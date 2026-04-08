@@ -1,0 +1,42 @@
+export default function TOS() {
+  return (
+    <main className="min-h-screen bg-white text-black px-6 py-10">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="text-3xl font-semibold mb-6">Terms of Service</h1>
+
+        <p className="mb-4">
+          BRANES provides access to a digital software service known as GEORGE.
+          By using this service, you agree to the terms outlined below.
+        </p>
+
+        <h2 className="mt-6 font-semibold">1. Service</h2>
+        <p className="mb-4">
+          GEORGE is a general-purpose system designed to assist with clarity,
+          decision-making, and structured thinking. It does not provide legal,
+          financial, or medical advice.
+        </p>
+
+        <h2 className="mt-6 font-semibold">2. Subscription</h2>
+        <p className="mb-4">
+          Access is provided via a recurring subscription. You may cancel at any time.
+        </p>
+
+        <h2 className="mt-6 font-semibold">3. Use</h2>
+        <p className="mb-4">
+          You agree to use the service responsibly and not for unlawful purposes.
+        </p>
+
+        <h2 className="mt-6 font-semibold">4. Liability</h2>
+        <p className="mb-4">
+          The service is provided “as is.” BRANES is not liable for decisions made
+          based on use of the system.
+        </p>
+
+        <h2 className="mt-6 font-semibold">5. Updates</h2>
+        <p>
+          These terms may be updated as the service evolves.
+        </p>
+      </div>
+    </main>
+  )
+}

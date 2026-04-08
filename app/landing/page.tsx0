@@ -1,0 +1,149 @@
+import Link from 'next/link'
+
+export default function LandingPage() {
+  const badges = [
+    'Clarity',
+    'Direction',
+    'Execution',
+    'Discipline',
+    'No Drift',
+    'Continuity',
+    'Memory',
+    'Preparedness',
+    'Resilience',
+    'Email Integration',
+    'Document Alignment',
+    'System Integration',
+    'And more...',
+  ]
+
+return (
+  <main className="min-h-screen bg-[#050505] text-neutral-100">
+
+    {/* TOP LEFT BRAND */}
+    <div className="fixed top-6 left-6 z-50 flex items-center gap-3">
+      <img
+        src="/logo2.png"
+        alt="BRANES"
+        className="h-10 w-10 rounded-full border border-amber-400/30"
+      />
+
+      <div className="flex flex-col leading-tight">
+        <span className="text-sm font-medium uppercase tracking-[0.28em] text-neutral-200">
+          BRANES
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.28em] text-neutral-500">
+          GEORGE
+        </span>
+      </div>
+    </div>
+
+    <div className="mx-auto max-w-5xl px-6 py-10 md:px-8 lg:px-10">
+      <header className="mb-12 border-b border-amber-400/20 pb-8 pt-16">
+        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+
+            {/* HERO */}
+           <div>   
+           <header className="mb-12 border-b border-amber-400/20 pb-8 pt-16">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-amber-300/80">
+                GEORGE
+              </p>
+
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
+                Clarity. Execution. Continuity.
+              </h1>
+
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-neutral-300">
+                GEORGE helps you take down obstacles and put wins on the board.
+              </p>
+
+              <p className="mt-3 max-w-3xl text-base leading-8 text-neutral-400">
+                The more you and GEORGE communicate, the more useful GEORGE becomes.
+              </p>
+
+              <p className="mt-4 text-sm text-neutral-500">
+                Principled. No drift. No noise. Just direction and execution.
+              </p>
+            </div>
+
+            {/* PRICING COLUMN */}
+            <div className="md:w-[280px]">
+              <p className="text-xs uppercase tracking-[0.28em] text-neutral-500 text-center">
+                STRUCTURED.
+              </p>
+              <p className="text-xs uppercase tracking-[0.28em] text-neutral-500 text-center">
+                CONTROLLED.
+              </p>
+              <p className="text-xs uppercase tracking-[0.28em] text-neutral-500 text-center">
+                LEGACY.
+              </p>
+
+              <div className="mt-4 rounded-2xl border border-amber-400/25 bg-[#0a0a0a] p-6 text-center">
+                <p className="text-sm text-neutral-400">
+                  $9.99 / month
+                </p>
+
+                <a
+                  href="https://buy.stripe.com/your-link-here"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-amber-400 px-5 py-3.5 text-sm font-semibold text-black transition hover:opacity-90"
+                >
+                  Start with GEORGE
+                </a>
+
+                <p className="mt-4 text-sm text-neutral-500">
+                  Cancel anytime
+                </p>
+              </div>   {/* pricing card */}
+            </div>     {/* right column */}
+          </div>       {/* flex row */}
+        </header>
+
+        {/* BADGES */}
+        <section className="mb-12">
+          <div className="flex flex-wrap gap-3">
+            {badges.map((badge) => (
+              <span
+                key={badge}
+                className="rounded-full border border-amber-400/25 bg-amber-400/5 px-4 py-2 text-sm text-amber-100/90"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="rounded-[2rem] border border-neutral-800 bg-[#080808] p-8">
+          <h2 className="text-3xl font-semibold tracking-tight">
+            Start with GEORGE.
+          </h2>
+          <p className="mt-4 text-neutral-400">
+            Stay clear. Move forward. Build without restarting.
+          </p>
+
+          <div className="mt-6 flex gap-4">
+            <a
+              href="https://buy.stripe.com/your-link-here"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-amber-400 px-6 py-3 text-sm font-medium text-black"
+            >
+              Continue
+            </a>
+
+            <Link
+              href="/"
+              className="rounded-full border border-neutral-700 px-6 py-3 text-sm text-neutral-200"
+            >
+              Back
+            </Link>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
