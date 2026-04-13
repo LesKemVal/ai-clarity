@@ -1,0 +1,63 @@
+$(cat ~/ai-clarity/app/api/chat/route.ts | sed '1,326p')
+
+    const latestUserMessage =
+      [...messages].reverse().find((m) => m.role === 'user')?.content.toLowerCase() || ''
+
+    const needsLegalDisclaimer =
+      /lawyer|legal|court|judge|appeal|lawsuit|sue|petition|hearing|case number|statute|contract|agreement|motion|complaint|affidavit|testimony|evidence/i.test(latestUserMessage)
+
+    const needsMedicalDisclaimer =
+      /doctor|medical|medicine|medication|diagnosis|diagnose|symptom|symptoms|treatment|pain|injury|illness|disease|hospital|prescription/i.test(latestUserMessage)
+
+    const needsFinancialDisclaimer =
+      /invest|investment|stock|stocks|crypto|bitcoin|portfolio|trade|trading|market|returns?|profit|financial advice|retirement|etf|mutual fund|asset allocation/i.test(latestUserMessage)
+
+    const isDegraded = messages.length > 10
+
+    const needsMemory =
+      /before|earlier|remember|last time|continue|pick up where we left off|as i said/i.test(latestUserMessage)
+
+    const needsDepth =
+      /plan|step by step|full plan|walk me through|break it down|roadmap|strategy|build this|launch/i.test(latestUserMessage)
+
+    let capacityNotice = ''
+
+    if (isDegraded && needsMemory) {
+      capacityNotice = "I don't have full context for this."
+    } else if (isDegraded && needsDepth) {
+      capacityNotice = 'I’ll help you get this done with the resources I have, but I will one hundred percent get you through this step by step post top up.'
+    }
+
+    if (capacityNotice && !reply.includes(capacityNotice)) {
+      reply = \`\${reply}\n\n\${capacityNotice}\`
+    }
+
+    let riskDisclaimer = ''
+
+    if (needsLegalDisclaimer || needsMedicalDisclaimer) {
+      riskDisclaimer = 'This isn’t a substitute for sound, competent legal or medical advice.'
+    } else if (needsFinancialDisclaimer) {
+      riskDisclaimer = 'This isn’t financial advice, and you should make decisions based on your own judgment and risk tolerance.'
+    }
+
+    if (riskDisclaimer && !reply.includes(riskDisclaimer)) {
+      reply = \`\${reply}\n\n\${riskDisclaimer}\`
+    }
+
+    return NextResponse.json({ message: reply })
+  } catch (err: unknown) {
+    console.error('Chat route error:', err)
+
+    const message =
+      err instanceof Error
+        ? err.message
+        : typeof err === 'object' && err !== null && 'message' in err
+          ? String((err as { message: unknown }).message)
+          : 'Unknown server error.'
+
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    )
+  }
+}

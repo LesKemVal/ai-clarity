@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#000000"/>
+
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7C8CFF" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#7C8CFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="earth" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C8CFF"/>
+      <stop offset="100%" stop-color="#4c5cff"/>
+    </linearGradient>
+
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <circle cx="575" cy="250" r="155" fill="url(#glow)"/>
+
+  <g transform="translate(575 250)">
+    <circle r="120" fill="url(#earth)" filter="url(#softGlow)"/>
+
+    <g opacity="0.22" stroke="#dfe4ff" stroke-width="2" fill="none">
+      <ellipse rx="120" ry="42"/>
+      <ellipse rx="120" ry="78"/>
+      <ellipse rx="120" ry="104"/>
+      <path d="M-120 0H120"/>
+      <path d="M0-120V120"/>
+      <path d="M-85-85C-30-20,-30,20,-85,85"/>
+      <path d="M85-85C30-20,30,20,85,85"/>
+    </g>
+
+    <g fill="#111827" opacity="0.28">
+      <path d="M-45,-35C-70,-25,-82,5,-68,28C-40,26,-24,15,-15,-5C-20,-22,-28,-30,-45,-35Z"/>
+      <path d="M20,-48C42,-42,58,-26,64,-8C48,6,28,10,10,0C2,-16,8,-34,20,-48Z"/>
+      <path d="M-8,28C14,24,30,34,36,52C18,66,-2,66,-24,58C-30,44,-22,32,-8,28Z"/>
+    </g>
+
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0"
+      to="360"
+      dur="24s"
+      repeatCount="indefinite"/>
+  </g>
+</svg>

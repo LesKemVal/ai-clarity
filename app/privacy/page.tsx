@@ -2,35 +2,35 @@
 
 import PageShell from '@/components/layout/PageShell'
 
-export default function TosPage() {
+export default function PrivacyPage() {
   return (
-    <PageShell eyebrow="Legal" title="Terms of Service" backToGeorge>
+    <PageShell eyebrow="Privacy" title="Privacy" backToGeorge>
       <div className="max-w-3xl space-y-6">
         <section className="rounded-3xl bg-neutral-950 p-6 md:p-8 text-sm leading-7 text-neutral-400">
           <p>
-            These terms govern your use of GEORGE and related pages in this app.
+            We respect your privacy. This page explains how information is handled when you use GEORGE.
           </p>
         </section>
 
         <section className="rounded-3xl bg-neutral-950 p-6 md:p-8 space-y-4 text-sm leading-7 text-neutral-400">
           <div>
-            <p className="font-medium text-white">Use</p>
+            <p className="font-medium text-white">Use of information</p>
             <p className="mt-1">
-              GEORGE is provided as a clarity, direction, and execution tool.
+              Information is used to provide and improve the GEORGE experience.
             </p>
           </div>
 
           <div>
-            <p className="font-medium text-white">Responsibility</p>
+            <p className="font-medium text-white">Sharing</p>
             <p className="mt-1">
-              You are responsible for the decisions you make and the actions you take.
+              We do not present your information as a public feed. Any sharing action is user-initiated.
             </p>
           </div>
 
           <div>
-            <p className="font-medium text-white">Availability</p>
+            <p className="font-medium text-white">Control</p>
             <p className="mt-1">
-              Features and responses may evolve as the system improves.
+              You decide how you use GEORGE and what you choose to submit.
             </p>
           </div>
         </section>
