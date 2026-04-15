@@ -11,7 +11,7 @@ export default function Brand({
 }: BrandProps) {
   return (
     <div className={`flex items-center ${compact ? 'gap-2.5' : 'gap-3.5'}`}>
-      <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF] text-[15px] font-black tracking-[-0.04em] text-black shadow-[0_0_24px_rgba(124,140,255,0.28)]">
+      <div className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[#7C8CFF] bg-black text-[15px] font-black tracking-[-0.04em] text-[#7C8CFF] shadow-[0_0_24px_rgba(124,140,255,0.28)]">
         <span className="relative top-[-0.5px]">B</span>
       </div>
 

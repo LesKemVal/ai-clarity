@@ -62,8 +62,6 @@ export default function TopUpPage() {
 
   return (
     <PageShell
-      title="Top-Up"
-      eyebrow="Continue"
       backToGeorge
       withSidebar={false}
     >

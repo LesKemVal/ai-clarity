@@ -1,0 +1,12 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+import MobileHeader from '@/components/MobileHeader'
+
+export default function MobileHeaderGate() {
+  const pathname = usePathname()
+
+  if (pathname.startsWith('/top-up') || pathname.startsWith('/george') || pathname.startsWith('/help') || pathname.startsWith('/landing') || pathname.startsWith('/legal/toa') || pathname.startsWith('/roadmap')) return null
+
+  return <MobileHeader showMenu={false} />
+}

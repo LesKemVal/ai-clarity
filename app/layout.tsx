@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import MobileHeader from '@/components/MobileHeader'
+import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -29,16 +29,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black text-neutral-100">
-        <MobileHeader />
+        <MobileHeaderGate />
         <div className="flex-1 pt-16 md:pt-0">
           {children}
         </div>

@@ -12,7 +12,7 @@ export default function RootPage() {
     if (active === 'true') {
       router.replace('/george')
     } else {
-      router.replace('/landing')
+      router.replace('/roadmap')
     }
   }, [router])
 

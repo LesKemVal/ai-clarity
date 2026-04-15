@@ -60,12 +60,18 @@ export default function PageShell({
               {backToGeorge && (
                 <button
                   type="button"
-                  onClick={() => (window.location.href = '/george')}
+                  onClick={() => {
+                    if (window.history.length > 1) {
+                      window.history.back()
+                    } else {
+                      window.location.href = '/george'
+                    }
+                  }}
                   className="group inline-flex items-center gap-2 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF] button-press"
                 >
                   <span className="text-lg leading-none transition duration-200 group-hover:-translate-x-0.5">←</span>
                   <span className="transition duration-200 group-hover:translate-x-0.5">
-                    Back to GEORGE
+                    Back
                   </span>
                 </button>
               )}
