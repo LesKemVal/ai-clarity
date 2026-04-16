@@ -32,17 +32,25 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const input = typeof body?.input === 'string' ? body.input.trim() : ''
+    const speed = typeof body?.speed === 'number' ? body.speed : 1
+    const tier = typeof body?.tier === 'string' ? body.tier : 'smart'
+    const voice = typeof body?.voice === 'string' ? body.voice : 'onyx'
 
     if (!input) {
       return NextResponse.json({ error: 'Missing input' }, { status: 400 })
     }
 
+    if (tier === 'smart') {
+      return NextResponse.json({ error: 'Voice not available in Smart mode' }, { status: 403 })
+    }
+
     const response = await openai.audio.speech.create({
       model: 'gpt-4o-mini-tts',
-      voice: 'onyx',
+      voice,
       input,
       instructions: getInstructions(),
       response_format: 'mp3',
+      speed,
     })
 
     const audioBuffer = Buffer.from(await response.arrayBuffer())

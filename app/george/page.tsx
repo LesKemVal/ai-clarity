@@ -63,7 +63,7 @@ export default function Page() {
   const router = useRouter()
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Most of what people want, I can handle right here. If what we’re building is real, we’ll carry it properly.\n\nWhat are we working on?' },
+    { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
   const [interimTranscript, setInterimTranscript] = useState('')
   const [voiceError, setVoiceError] = useState('')
@@ -82,6 +82,8 @@ export default function Page() {
   const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(true)
+  const [voiceSpeed, setVoiceSpeed] = useState(1.2)
+  const [voiceType, setVoiceType] = useState('onyx')
   const [isListening, setIsListening] = useState(false)
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -208,7 +210,7 @@ export default function Page() {
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const messagesRef = useRef<Message[]>([
-    { role: 'assistant', content: 'Most of what people want, I can handle right here. If what we’re building is real, we’ll carry it properly.\n\nWhat are we working on?' },
+    { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -449,6 +451,10 @@ export default function Page() {
     const storedBirthdayMD = window.localStorage.getItem('george_birthday_md') || ''
 
     const storedVoice = window.localStorage.getItem('george_voice') || 'off'
+    const storedVoiceSpeed = Number(window.localStorage.getItem('george_voice_speed') || '1.2')
+    const storedVoiceType = window.localStorage.getItem('george_voice_type') || 'onyx'
+    const nameLocked = window.localStorage.getItem('george_name_locked') === 'true'
+    const voiceLocked = window.localStorage.getItem('george_voice_locked') === 'true'
 
     
 
@@ -466,14 +472,32 @@ export default function Page() {
 
 
     setProfileName(storedName)
+
+    if (storedName && !nameLocked) {
+      window.localStorage.setItem('george_name_locked', 'true')
+    }
+
+    if (['onyx','shimmer'].includes(storedVoiceType)) {
+      setVoiceType(storedVoiceType)
+    }
     setBirthdayMD(storedBirthdayMD)
 
-    if (storedVoice === 'on') {
-      setInteractionMode('speech')
-      setVoiceOn(true)
-    } else {
+    if ([0.8, 1, 1.2, 1.4].includes(storedVoiceSpeed)) {
+      setVoiceSpeed(storedVoiceSpeed)
+    }
+
+    if (currentTier === 'smart') {
       setInteractionMode('text')
       setVoiceOn(false)
+    } else {
+      setInteractionMode('speech')
+      setVoiceOn(true)
+      window.localStorage.setItem('george_voice', 'on')
+
+    if (!voiceLocked) {
+      window.localStorage.setItem('george_voice_type', voiceType)
+      window.localStorage.setItem('george_voice_locked', 'true')
+    }
     }
 
     const params = new URLSearchParams(window.location.search)
@@ -507,6 +531,39 @@ export default function Page() {
       setActivePromptLabel(label)
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    if (currentTier === 'smart') {
+      setVoiceOn(false)
+      if (interactionMode === 'speech') {
+        setInteractionMode('text')
+      }
+      window.localStorage.setItem('george_voice', 'off')
+      return
+    }
+
+    if (!voiceOn) {
+      setVoiceOn(true)
+    }
+
+    if (interactionMode !== 'speech') {
+      setInteractionMode('speech')
+    }
+
+    window.localStorage.setItem('george_voice', 'on')
+
+    if (!voiceLocked) {
+      window.localStorage.setItem('george_voice_type', voiceType)
+      window.localStorage.setItem('george_voice_locked', 'true')
+    }
+  }, [currentTier, interactionMode, voiceOn])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('george_voice_speed', String(voiceSpeed))
+  }, [voiceSpeed])
 
 
   const tagline = `I will not contradict the Holy Bible (KJV).`
@@ -711,7 +768,7 @@ export default function Page() {
     const res = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: text }),
+      body: JSON.stringify({ input: text, speed: voiceSpeed, tier: currentTier, voice: voiceType }),
     })
 
     if (!res.ok) {
@@ -877,7 +934,7 @@ export default function Page() {
         setVoiceError('Voice reply failed.')
       }
     },
-    [interactionMode, isIOS, voiceOn]
+    [interactionMode, isIOS, voiceOn, voiceSpeed, currentTier]
   )
 
   const generateReroutePrompt = (input: string, response: string, messages: any[]) => {
@@ -1160,8 +1217,17 @@ const handleSend = useCallback(
   }
 
   useEffect(() => {
-    setVoiceSupported(Boolean(SpeechRecognitionCtor) && !isIOS)
-    if (!SpeechRecognitionCtor || isIOS) return
+    const supported = Boolean(SpeechRecognitionCtor) && !isIOS
+    setVoiceSupported(supported)
+
+    if (!supported) {
+      setVoiceError(
+        isIOS
+          ? 'Voice input is disabled on iPhone/iPad in this build.'
+          : 'Voice input is not available in this browser session.'
+      )
+      return
+    }
 
     const recognition = new SpeechRecognitionCtor()
     recognition.lang = 'en-US'
@@ -1170,11 +1236,13 @@ const handleSend = useCallback(
     recognition.maxAlternatives = 1
 
     recognition.onstart = () => {
+      console.log('speech recognition started')
       setVoiceError('')
       setIsListening(true)
     }
 
     recognition.onresult = (event: SpeechRecognitionEventLike) => {
+      console.log('speech recognition result', event)
       let finalTranscript = ''
       let liveTranscript = ''
 
@@ -1268,8 +1336,8 @@ const handleSend = useCallback(
           suggestedSignal={suggestedSignal}
           activePromptLabel={activePromptLabel}
           onNewSession={() => {
-            setMessages([{ role: 'assistant', content: 'Most of what people want, I can handle right here. If what we’re building is real, we’ll carry it properly.\n\nWhat are we working on?' }])
-            messagesRef.current = [{ role: 'assistant', content: 'Most of what people want, I can handle right here. If what we’re building is real, we’ll carry it properly.\n\nWhat are we working on?' }]
+            setMessages([{ role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' }])
+            messagesRef.current = [{ role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' }]
             setInput('')
             setInterimTranscript('')
             setVoiceError('')
@@ -1731,33 +1799,45 @@ const handleSend = useCallback(
                       />
 
                       <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (interactionMode === 'speech') {
-                              setInteractionMode('text')
-                              stopListening()
-                              setInterimTranscript('')
-                              return
-                            }
-                            if (!voiceSupported || isThinking) return
-                            if (isListening) {
-                              stopListening()
-                            } else {
-                              startListening()
-                            }
-                          }}
-                          disabled={!voiceSupported || isThinking}
-                          className="flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                          aria-label="Use speech"
-                        >
-                          <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/>
-                            <path d="M19 10a7 7 0 0 1-14 0"/>
-                            <path d="M12 17v4"/>
-                            <path d="M8 21h8"/>
-                          </svg>
-                        </button>
+                        {currentTier !== 'smart' && (
+                          <>
+                            <select
+                              value={voiceSpeed}
+                              onChange={(e) => setVoiceSpeed(Number(e.target.value))}
+                              className="h-9 rounded-full border border-white/10 bg-black/40 px-2 text-xs text-white outline-none"
+                              aria-label="Voice speed"
+                            >
+                              <option value={0.8}>0.8x</option>
+                              <option value={1}>1.0x</option>
+                              <option value={1.2}>1.2x</option>
+                              <option value={1.4}>1.4x</option>
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!voiceSupported || isThinking) return
+                                setInteractionMode('speech')
+                                if (isListening) {
+                                  stopListening()
+                                  setInterimTranscript('')
+                                } else {
+                                  startListening()
+                                }
+                              }}
+                              disabled={!voiceSupported || isThinking}
+                              className="flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label="Use speech"
+                            >
+                              <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/>
+                                <path d="M19 10a7 7 0 0 1-14 0"/>
+                                <path d="M12 17v4"/>
+                                <path d="M8 21h8"/>
+                              </svg>
+                            </button>
+                          </>
+                        )}
 
                         <button
                           type="button"
@@ -1779,6 +1859,8 @@ const handleSend = useCallback(
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
                     <span className="text-red-400">{voiceError}</span>
+                  ) : currentTier === 'smart' ? (
+                    <span className="text-neutral-600">Voice unlocks above Smart.</span>
                   ) : (
                     <span className={isListening ? 'text-[#7C8CFF]' : ''}>
                       {isListening ? 'Voice is listening…' : ''}
