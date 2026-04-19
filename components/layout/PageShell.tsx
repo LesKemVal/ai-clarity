@@ -40,10 +40,29 @@ export default function PageShell({
     window.location.href = '/george'
   }
 
-  const handleShareGeorge = () => {
+  const handleInstallGeorge = () => {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+    const isiPhone = /iPhone|iPad|iPod/i.test(ua)
     const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
+
+    if (isiPhone) {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).catch(() => {})
+      }
+      return
+    }
+
+    if (typeof window !== 'undefined' && (window as any).__branesInstallPrompt) {
+      const promptEvent = (window as any).__branesInstallPrompt
+      promptEvent.prompt()
+      promptEvent.userChoice.finally(() => {
+        ;(window as any).__branesInstallPrompt = null
+      })
+      return
+    }
+
     if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE', text: 'GEORGE', url }).catch(() => {})
+      navigator.share({ title: 'GEORGE', text: 'Install GEORGE', url }).catch(() => {})
       return
     }
 
@@ -125,10 +144,10 @@ export default function PageShell({
 
                     <button
                       type="button"
-                      onClick={handleShareGeorge}
+                      onClick={handleInstallGeorge}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
-                      aria-label="Share GEORGE"
-                      title="Share GEORGE"
+                      aria-label="Install GEORGE"
+                      title="Install GEORGE"
                     >
                       <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 16V4" />
@@ -161,10 +180,10 @@ export default function PageShell({
 
                     <button
                       type="button"
-                      onClick={handleShareGeorge}
+                      onClick={handleInstallGeorge}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
-                      aria-label="Share GEORGE"
-                      title="Share GEORGE"
+                      aria-label="Install GEORGE"
+                      title="Install GEORGE"
                     >
                       <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 16V4" />
