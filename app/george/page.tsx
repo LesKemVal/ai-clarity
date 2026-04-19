@@ -498,8 +498,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [memoryVersion, setMemoryVersion] = useState(0)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
-  const [showMakeGeorgeYoursModal, setShowMakeGeorgeYoursModal] = useState(false)
-  const [isGeorgeYours, setIsGeorgeYours] = useState(false)
   const [isSharingGeorgeLink, setIsSharingGeorgeLink] = useState(false)
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(null)
   const [typedMessageContent, setTypedMessageContent] = useState('')
@@ -1686,14 +1684,6 @@ function detectDomain(text: string) {
 
   return null
 }
-
-  function handleMakeGeorgeYours() {
-    if (isGeorgeYours) {
-      router.push('/welcome')
-      return
-    }
-    setShowMakeGeorgeYoursModal(true)
-  }
 
 const handleSend = useCallback(
     async (overrideText?: string) => {
@@ -3025,7 +3015,7 @@ return (
 
 </div>
 
-              <div className="relative z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+              <div className="sticky bottom-0 z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                 <div className="hidden">
                   <div className="flex items-center gap-1">
                         <button
@@ -3342,34 +3332,6 @@ return (
                     </div>
                   </div>
 
-                <div className="mt-3 px-2">
-                  {isGeorgeYours ? (
-                    <button
-                      type="button"
-                      onClick={() => router.push('/welcome')}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-white transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/16"
-                      aria-label="GEORGE is yours"
-                      title="GEORGE is yours"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9.5 8.5a2.5 2.5 0 1 1 5 0c0 1.2-.6 1.9-1.4 2.5-.7.5-1.1 1-1.1 1.8" />
-                        <path d="M12 17h.01" />
-                        <path d="M8.2 4.6A7.5 7.5 0 0 0 5 10.7c0 1.8.6 3.4 1.7 4.8" />
-                        <path d="M15.8 4.6a7.5 7.5 0 0 1 3.2 6.1c0 1.8-.6 3.4-1.7 4.8" />
-                        <path d="M6.9 18.1A8.7 8.7 0 0 0 12 19.8c1.9 0 3.7-.6 5.1-1.7" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleMakeGeorgeYours}
-                      className="w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-2.5 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/16"
-                    >
-                      Make GEORGE Yours
-                    </button>
-                  )}
-                </div>
-
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
                     <span className="text-neutral-400">{voiceError}</span>
@@ -3494,65 +3456,6 @@ return (
                 className="text-xs text-[#7C8CFF] transition hover:opacity-80"
               >
                 See full options
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showMakeGeorgeYoursModal && (
-        <div
-          className="fixed inset-0 z-[95] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
-          onClick={() => setShowMakeGeorgeYoursModal(false)}
-        >
-          <div
-            className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 text-center">
-              <p className="text-sm font-medium text-white">Make GEORGE yours</p>
-              <p className="mt-1 text-xs leading-6 text-neutral-400">
-                Personalization starts at Intelligent. Once GEORGE is yours, he remembers who he is working for.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowMakeGeorgeYoursModal(false)
-                  router.push('/roadmap')
-                }}
-                className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
-              >
-                <div className="text-sm font-medium text-white">See why it matters</div>
-                <div className="mt-1 text-xs leading-6 text-neutral-400">
-                  Learn what changes when GEORGE becomes personal.
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowMakeGeorgeYoursModal(false)
-                  router.push('/welcome')
-                }}
-                className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18 shadow-[0_0_20px_rgba(124,140,255,0.10)]"
-              >
-                <div className="text-sm font-medium text-white">Continue</div>
-                <div className="mt-1 text-xs leading-6 text-neutral-300">
-                  Smart upgrades first. Intelligent and Brilliant go straight into onboarding.
-                </div>
-              </button>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-              <button
-                type="button"
-                onClick={() => setShowMakeGeorgeYoursModal(false)}
-                className="text-xs text-neutral-500 transition hover:text-white"
-              >
-                Close
               </button>
             </div>
           </div>
