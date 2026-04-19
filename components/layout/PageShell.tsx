@@ -37,11 +37,7 @@ export default function PageShell({
   }
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      window.history.back()
-    } else {
-      window.location.href = '/george'
-    }
+    window.location.href = '/george'
   }
 
   return (

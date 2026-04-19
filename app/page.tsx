@@ -7,13 +7,7 @@ export default function RootPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const active = localStorage.getItem('george_active')
-
-    if (active === 'true') {
-      router.replace('/george')
-    } else {
-      router.replace('/roadmap')
-    }
+    router.replace('/george')
   }, [router])
 
   return null
