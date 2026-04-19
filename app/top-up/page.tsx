@@ -1,45 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
 
 const plans = [
   {
     key: 'smart',
+    featured: false,
     title: 'Smart GEORGE',
     price: 'Free',
     label: 'Start here',
-    text: 'Useful now. Clear next moves, steady help, and immediate usefulness without friction.',
+    text: 'Useful now. Clear next moves, grounded help, and immediate usefulness without drag.',
     bullets: [
-      'Ask GEORGE anything',
+      'Ask GEORGE what matters',
       'Clear next moves',
-      'Useful daily support',
+      'Useful day-to-day support',
+      'Fast entry into the product',
     ],
     cta: 'Included',
     disabled: true,
   },
   {
     key: 'intelligent',
+    disabled: false,
     title: 'Intelligent GEORGE',
     price: '$9.99',
-    label: 'Most people should start here',
-    text: 'Sharper daily advantage. Better framing, stronger continuity, and faster progress when things matter.',
+    label: 'Best practical upgrade',
+    text: 'This is where GEORGE gets more personal, more consistent, and more useful over time.',
     bullets: [
+      'Everything in Smart',
       'Stronger continuity',
-      'Smarter framing and signals',
-      'Better carry between sessions',
-      'More useful day to day',
+      'Better framing under pressure',
+      'Sharper day-to-day usefulness',
+      'Light voice interaction',
+      'Make GEORGE yours',
     ],
     cta: 'Upgrade to Intelligent',
     featured: true,
   },
   {
     key: 'brilliant',
+    featured: false,
+    disabled: false,
     title: 'Brilliant GEORGE',
     price: '$25',
-    label: 'Real-room advantage',
-    text: 'Bring GEORGE into pressure moments. Walk in prepared. Stay sharp in the room. Keep leverage.',
+    label: 'Pressure-room advantage',
+    text: 'Bring GEORGE into harder moments. Walk in prepared. Stay sharp in the room. Keep leverage.',
     bullets: [
+      'Everything in Intelligent',
       'Guided Conversation Engine',
       'Doctor visit mode',
       'Dealership mode',
@@ -49,11 +57,32 @@ const plans = [
     ],
     cta: 'Become Brilliant',
   },
-]
+] as const
 
 export default function TopUpPage() {
+  const [intent, setIntent] = useState<string | null>(null)
   const [loading, setLoading] = useState<string | null>(null)
   const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    setIntent(params.get('intent'))
+  }, [])
+
+  const headline = useMemo(() => {
+    if (intent === 'make-george-yours') {
+      return 'Make GEORGE yours.'
+    }
+    return 'Choose the level that matches the weight of the moment.'
+  }, [intent])
+
+  const subcopy = useMemo(() => {
+    if (intent === 'make-george-yours') {
+      return 'You can use GEORGE right now. But if you want GEORGE to learn your priorities, your friction, and how you work, that starts at Intelligent.'
+    }
+    return 'GEORGE is not here for entertainment. GEORGE helps you think clearly, move faster, and stay composed when decisions matter.'
+  }, [intent])
 
   async function subscribe(tier: 'intelligent' | 'brilliant') {
     try {
@@ -68,7 +97,9 @@ export default function TopUpPage() {
 
       const data = await res.json()
 
-      if (!res.ok || !data?.url) throw new Error(data?.error || 'Unable to continue.')
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || 'Unable to continue.')
+      }
 
       window.location.href = data.url
     } catch (e: any) {
@@ -87,12 +118,11 @@ export default function TopUpPage() {
             </p>
 
             <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
-              Choose the level that matches the weight of the moment.
+              {headline}
             </h1>
 
             <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
-              GEORGE is not here for entertainment. GEORGE helps you think clearly, move faster,
-              and stay composed when decisions matter. Pick the tier that fits how you use him.
+              {subcopy}
             </p>
 
             <div className="grid gap-3 pt-2 md:grid-cols-3">
@@ -173,20 +203,19 @@ export default function TopUpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="max-w-4xl space-y-4">
             <h2 className="text-2xl font-semibold text-white">
-              Why people upgrade
+              What changes when you upgrade
             </h2>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              People lose time, money, leverage, and confidence every day because they walk into
-              important moments unprepared. GEORGE helps reduce that.
+              Smart gets you in. Intelligent makes GEORGE more personal. Brilliant is for users who want stronger support in real conversations and higher-pressure moments.
             </p>
 
             <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                Intelligent is for people who use GEORGE often and want a stronger daily edge.
+                Intelligent is where continuity starts compounding.
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                Brilliant is for people who want GEORGE with them in live rooms where mistakes get expensive.
+                Brilliant is where GEORGE becomes more dangerous in rooms where mistakes get expensive.
               </div>
             </div>
 
