@@ -370,6 +370,20 @@ export default function Page() {
   return `${timeGreeting} What do you want to do?`
 }
 
+  function handleShareGeorge() {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({ title: 'GEORGE', text: 'GEORGE', url }).catch(() => {})
+      return
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setToastMessage('GEORGE link copied')
+        setShowToast(true)
+      }).catch(() => {})
+    }
+  }
+
 const [messages, setMessages] = useState<Message[]>([])
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
@@ -2411,6 +2425,7 @@ return (
                 return
               }
 
+              setShowSidebar(false)
               setInput(prompt.text)
             }}
         />
@@ -2418,7 +2433,7 @@ return (
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-hidden">
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-6 md:pb-0 md:pt-[92px]">
             <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
-              <div className="relative flex w-full max-w-5xl items-center justify-start">
+              <div className="relative flex w-full max-w-5xl items-center justify-between">
                 <div className="flex items-center gap-2.5 md:hidden">
                   <button
                     type="button"
@@ -2443,6 +2458,20 @@ return (
                     GEORGE
                   </span>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleShareGeorge}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                  aria-label="Share GEORGE"
+                  title="Share GEORGE"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 16V4" />
+                    <path d="m7 9 5-5 5 5" />
+                    <path d="M5 20h14" />
+                  </svg>
+                </button>
               </div>
             </header>
 

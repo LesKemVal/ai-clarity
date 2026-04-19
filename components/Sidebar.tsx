@@ -227,12 +227,18 @@ export default function Sidebar({
     [suggestedSignal]
   )
 
+  const handlePromptTap = (prompt: PromptItem) => {
+    setShowSidebar?.(false)
+    onPromptSelect(prompt)
+  }
+
+
   return (
     <aside
       className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'} xl:static xl:z-auto xl:flex xl:flex-col xl:translate-x-0 xl:pointer-events-auto`}
     >
       <div className="border-b border-white/5 px-5 pb-6 pt-7">
-        <div className="relative flex flex-col items-center justify-center">
+        <div className="relative flex items-center justify-center">
           <button
             type="button"
             onClick={() => setShowSidebar?.(false)}
@@ -242,12 +248,14 @@ export default function Sidebar({
             ×
           </button>
 
-          <div className="text-4xl font-semibold tracking-tight text-[#7C8CFF]">
-            B
-          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-4xl font-semibold tracking-tight text-[#7C8CFF]">
+              B
+            </div>
 
-          <div className="mt-2 text-[11px] uppercase tracking-[0.28em] text-neutral-400">
-            BRANES
+            <div className="text-[11px] uppercase tracking-[0.28em] text-neutral-400">
+              BRANES
+            </div>
           </div>
         </div>
       </div>
@@ -294,7 +302,7 @@ export default function Sidebar({
             <button
               type="button"
               onClick={() =>
-                onPromptSelect({
+                handlePromptTap({
                   label: 'Guide w/ Scripture (KJV)',
                   text: 'Guide w/ Scripture (KJV)',
                   context: 'bible_decision_lens',
@@ -328,7 +336,7 @@ export default function Sidebar({
                     <button
                       key={prompt.label}
                       type="button"
-                      onClick={() => onPromptSelect(prompt)}
+                      onClick={() => handlePromptTap(prompt)}
                       className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
                     >
                       {prompt.label}
@@ -385,7 +393,7 @@ export default function Sidebar({
                     <button
                       key={prompt.label}
                       type="button"
-                      onClick={() => onPromptSelect(prompt)}
+                      onClick={() => handlePromptTap(prompt)}
                       className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
                     >
                       {prompt.label}
@@ -445,7 +453,7 @@ export default function Sidebar({
                 <div>
                   <button
                     type="button"
-                    onClick={() => onPromptSelect(reroutePrompt)}
+                    onClick={() => reroutePrompt && handlePromptTap(reroutePrompt)}
                     className={`block w-full py-1 text-left text-sm text-[#7C8CFF] transition hover:text-white ${rerouteAnimationClass}`}
                   >
                     {reroutePrompt.label}
@@ -464,7 +472,7 @@ export default function Sidebar({
                       <button
                         key={`${prompt.context}:${prompt.label}`}
                         type="button"
-                        onClick={() => onPromptSelect(prompt)}
+                        onClick={() => handlePromptTap(prompt)}
                         className={`block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF] ${suggestedAnimationClass} ${
                           suggestedSignal > 0 ? 'shadow-[0_0_12px_rgba(124,140,255,0.18)]' : ''
                         }`}
@@ -498,7 +506,7 @@ export default function Sidebar({
                           <button
                             key={prompt.label}
                             type="button"
-                            onClick={() => onPromptSelect(prompt)}
+                            onClick={() => handlePromptTap(prompt)}
                             className="block w-full py-1 text-left text-sm text-neutral-400 transition hover:text-[#7C8CFF]"
                           >
                             {prompt.label}

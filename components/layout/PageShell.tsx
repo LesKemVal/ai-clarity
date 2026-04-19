@@ -40,6 +40,18 @@ export default function PageShell({
     window.location.href = '/george'
   }
 
+  const handleShareGeorge = () => {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({ title: 'GEORGE', text: 'GEORGE', url }).catch(() => {})
+      return
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).catch(() => {})
+    }
+  }
+
   return (
     <main className="min-h-[100dvh] w-full overflow-x-hidden bg-gradient-to-b from-black via-neutral-950 to-black text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
@@ -91,10 +103,11 @@ export default function PageShell({
 
                 <div className="min-w-0 flex-1">
                   {/* MOBILE */}
-                  <div className="flex items-center gap-2 md:hidden">
-                    <Brand compact subtitle={eyebrow || 'GEORGE'} />
+                  <div className="flex items-center justify-between gap-2 md:hidden">
+                    <div className="flex items-center gap-2">
+                      <Brand compact subtitle={eyebrow || 'GEORGE'} />
 
-                    {backToGeorge && (
+                      {backToGeorge && (
                       <button
                         type="button"
                         onClick={handleBack}
@@ -108,13 +121,29 @@ export default function PageShell({
                         </span>
                       </button>
                     )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleShareGeorge}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                      aria-label="Share GEORGE"
+                      title="Share GEORGE"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 16V4" />
+                        <path d="m7 9 5-5 5 5" />
+                        <path d="M5 20h14" />
+                      </svg>
+                    </button>
                   </div>
 
                   {/* DESKTOP */}
-                  <div className="hidden items-center gap-2 md:flex">
-                    <Brand subtitle={eyebrow || 'GEORGE'} showCore={false} />
+                  <div className="hidden items-center justify-between gap-2 md:flex">
+                    <div className="flex items-center gap-2">
+                      <Brand subtitle={eyebrow || 'GEORGE'} showCore={false} />
 
-                    {backToGeorge && (
+                      {backToGeorge && (
                       <button
                         type="button"
                         onClick={handleBack}
@@ -128,6 +157,21 @@ export default function PageShell({
                         </span>
                       </button>
                     )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleShareGeorge}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                      aria-label="Share GEORGE"
+                      title="Share GEORGE"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 16V4" />
+                        <path d="m7 9 5-5 5 5" />
+                        <path d="M5 20h14" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
