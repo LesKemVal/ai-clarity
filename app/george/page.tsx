@@ -1,12 +1,14 @@
 'use client'
 
+
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 
 type Message = {
-  role: 'assistant' | 'user'
+  role: 'assistant' | 'user' | 'system'
   content: string
+  constrained?: boolean
 }
 
 type PromptSelection = {
@@ -59,12 +61,375 @@ declare global {
   }
 }
 
+
+function detectTrainingTrack(raw: string) {
+  const value = raw.toLowerCase()
+  if (/driver'?s license|drivers license|driver'?s test|driving test|permit|road test|dmv/.test(value)) return 'drivers'
+  if (/cdl/.test(value)) return 'cdl'
+  if (/ged/.test(value)) return 'ged'
+  if (/cna/.test(value)) return 'cna'
+  return null
+}
+
+function trainingNeedsJurisdiction(raw: string) {
+  return /driver|cdl|cna/.test(raw.toLowerCase())
+}
+
+
+
+function extractAnswers(raw: string) {
+  const matches = raw.match(/[A-Da-d]/g)
+  if (!matches) return []
+  return matches.map(m => m.toUpperCase())
+}
+
+function evaluateDrivers(answers: string[]) {
+  const correct = ['C', 'B', 'C', 'B']
+  return scoreAnswers(answers, correct, 'drivers')
+}
+
+function evaluateCDL(answers: string[]) {
+  const correct = ['B', 'B', 'B', null]
+  return scoreAnswers(answers, correct, 'cdl')
+}
+
+function evaluateGED(answers: string[]) {
+  const correct = ['B', 'B', 'B', null]
+  return scoreAnswers(answers, correct, 'ged')
+}
+
+function evaluateCNA(answers: string[]) {
+  const correct = ['B', 'C', null, null]
+  return scoreAnswers(answers, correct, 'cna')
+}
+
+function scoreAnswers(answers: string[], correct: (string | null)[], track: string) {
+  let score = 0
+  let feedback = []
+
+  for (let i = 0; i < correct.length; i++) {
+    if (!correct[i]) continue
+    if (answers[i] === correct[i]) {
+      score++
+    } else {
+      feedback.push(`Question ${i + 1} is incorrect.`)
+    }
+  }
+
+  const total = correct.filter(Boolean).length
+
+  return {
+    score,
+    total,
+    feedback,
+    track
+  }
+}
+
+
+
+
+
+
+
+
+
+function buildFollowUpQuestions(track: string, result: any) {
+  const { score, total, feedback } = result
+  let questions: string[] = []
+
+  if (track === 'drivers') {
+    if (feedback.some((f: string) => f.includes("1"))) {
+      questions.push("Who yields at a 4-way stop when two cars arrive at the same time?")
+    }
+    if (feedback.some((f: string) => f.includes("2"))) {
+      questions.push("What is the difference between a flashing red and flashing yellow light?")
+    }
+    if (feedback.some((f: string) => f.includes("3"))) {
+      questions.push("Can you cross a solid yellow line to pass under any condition?")
+    }
+  }
+
+  if (track === 'ged' && score === total) {
+    questions = [
+      "Solve: 2x + 3 = 11",
+      "What is the main idea of a paragraph?"
+    ]
+  }
+
+  return questions.slice(0, 3)
+}
+
+function appendFollowUp(response: string, track: string, result: any) {
+  const followUps = buildFollowUpQuestions(track, result)
+  if (!followUps.length) return response
+
+  let block = "\n\nNext — answer these:\n"
+  followUps.forEach((q, i) => {
+    block += `${i + 1}. ${q}\n`
+  })
+
+  return response + block
+}
+
+function buildEvaluationResponse(result: any) {
+  const { score, total, feedback, track } = result
+
+  let response = `Score: ${score}/${total}\n\n`
+
+  if (score === total) {
+    response += "Good. You are closer than you think. We push speed and consistency now.\n\n"
+  } else if (score >= total / 2) {
+    response += "You are partially there. Weak areas need tightening.\n\n"
+  } else {
+    response += "You are not ready yet. We build from the ground up.\n\n"
+  }
+
+  if (feedback.length) {
+    response += "Fix these:\n" + feedback.join("\n") + "\n\n"
+  }
+
+  response += "Next step coming."
+
+  return response
+}
+
+
+
+function buildTrainingFollowThrough(raw: string, promptContext: string | null) {
+  const text = raw.trim()
+  if (!text || text.length < 12) return null
+
+  let track: string | null = null
+
+  if (promptContext === 'training_drivers_license') track = 'drivers'
+  if (promptContext === 'training_cdl') track = 'cdl'
+  if (promptContext === 'training_ged') track = 'ged'
+  if (promptContext === 'training_cna') track = 'cna'
+  if (!track) return null
+
+  // let scoring logic handle quiz-style answers first
+  if (/[Aa]\.|[Bb]\.|[Cc]\.|[Dd]\.|^[A-D](\s|,|$)/m.test(text)) return null
+
+  const hasNumbers = /\d/.test(text)
+  const mentionsTime =
+    /minute|minutes|hour|hours|day|days|week|weeks|month|months|daily|night|tonight|tomorrow/i.test(text)
+  const mentionsWeakness =
+    /weak|hard|struggle|avoid|math|reading|writing|science|signs|rules|recall|pre-trip|skills|road|confidence|anxiety/i.test(text)
+
+  if (!hasNumbers && !mentionsTime && !mentionsWeakness) return null
+
+  if (track === 'ged') {
+    return "Good. That is enough to begin. We start with consistency, not perfection. Keep the standard real and sustainable. Tonight, give me 25 focused minutes on the weakest subject instead of trying to fix everything at once. Be honest with yourself about why you're doing this, but you do not need to explain every private reason to me. Come back tomorrow and we’ll tighten the weakest area without dragging this out."
+  }
+
+  if (track === 'cdl') {
+    return "Good. That is enough to work with. We build one weak point at a time and keep your effort steady. Start with 20 focused minutes on the weakest area tonight—pre-trip, permit knowledge, skills, or road judgment. Do not scatter your effort. Come back tomorrow and we’ll tighten the next weak point."
+  }
+
+  if (track === 'drivers') {
+    return "Good. You are closer than it feels. We keep this simple and consistent. Start with 20 focused minutes on signs, rules, or right-of-way—whichever is weakest. Do not try to cover the whole manual in one sitting. Come back tomorrow and we’ll sharpen the next piece."
+  }
+
+  if (track === 'cna') {
+    return "Good. That is enough to begin properly. We go one weak point at a time and keep your confidence tied to repetition, not pressure. Start with 20 focused minutes on your weakest area tonight—knowledge, procedure flow, or confidence under testing. Come back tomorrow and we’ll tighten the next step."
+  }
+
+  return null
+}
+
+function buildTrainingIntakeOverride(raw: string) {
+  const track = detectTrainingTrack(raw)
+  if (!track) return null
+
+  const jurisdiction = trainingNeedsJurisdiction(raw)
+    ? "First: what state or testing jurisdiction is this for? Requirements change depending on where you are.\n\n"
+    : ""
+
+  const base =
+    "Good. You are making a real move, and I respect that. We do this seriously and efficiently.\n\n" +
+    jurisdiction +
+    "I’ll help you build a path you can actually stay with. We are not here to waste motion.\n\n" +
+    "I will help track:\n" +
+    "- timeline\n" +
+    "- available study time\n" +
+    "- weakest area\n" +
+    "- readiness level\n" +
+    "- consistency\n\n"
+
+  if (track === 'drivers') {
+    return base +
+      "Answer these now:\n" +
+      "1. How many days exactly?\n" +
+      "2. Minutes per day realistically?\n" +
+      "3. Written test, driving, or both?\n" +
+      "4. Weakest area—rules, signs, or recall?\n\n" +
+      "Quick test — answer these too:\n" +
+      "A. At a 4-way stop, who has the right of way?\n" +
+      "B. What does a flashing red light require you to do?\n" +
+      "C. What does a solid yellow line on your side mean?\n" +
+      "D. When should you signal before turning?"
+  }
+
+  if (track === 'cdl') {
+    return base +
+      "Answer these now:\n" +
+      "1. Days left?\n" +
+      "2. Permit, pre-trip, skills, or road?\n" +
+      "3. Minutes per day?\n" +
+      "4. Weakest area?\n\n" +
+      "Quick test — answer these too:\n" +
+      "A. What is the purpose of a pre-trip inspection?\n" +
+      "B. What should you check before moving a commercial vehicle?\n" +
+      "C. What does GVWR refer to?\n" +
+      "D. Which is weaker for you right now: knowledge, inspection, backing, or road judgment?"
+  }
+
+  if (track === 'ged') {
+    return "Good. Choosing the GED matters, and I respect the decision to come back and finish it. I’m with you, but I’m not throwing you into a test yet. First I need your starting point.\n\n" +
+      "Answer these now:\n" +
+      "1. How long have you been out of school?\n" +
+      "2. Which subject feels strongest right now?\n" +
+      "3. Which subject feels weakest or easiest to avoid?\n" +
+      "4. Realistically, how many minutes or hours can you give this each week?\n" +
+      "5. Have you taken a GED practice test yet?\n" +
+      "6. Are you more worried about knowledge gaps, test anxiety, or consistency?\n\n" +
+      "Be honest with yourself about why you're doing this. Once I see your starting point, I’ll help you build a path you can actually stay with."
+  }
+
+  if (track === 'cna') {
+    return base +
+      "Answer these now:\n" +
+      "1. Days left?\n" +
+      "2. Minutes per day?\n" +
+      "3. Knowledge, skills, or both?\n" +
+      "4. Any prior attempts?\n\n" +
+      "Quick test — answer these too:\n" +
+      "A. What is the first step before assisting a patient?\n" +
+      "B. When should hands be washed in patient care?\n" +
+      "C. What is weaker for you right now: recall, procedure flow, or confidence under testing?\n" +
+      "D. Have you practiced skills under time pressure yet?"
+  }
+
+  return base
+}
+
+
+function TypewriterText({
+  text,
+  speed = 14,
+}: {
+  text: string
+  speed?: number
+}) {
+  const [display, setDisplay] = useState('')
+
+  useEffect(() => {
+    let i = 0
+    setDisplay('')
+
+    const interval = setInterval(() => {
+      i += 1
+      setDisplay(text.slice(0, i))
+      if (i >= text.length) {
+        clearInterval(interval)
+      }
+    }, speed)
+
+    return () => clearInterval(interval)
+  }, [text, speed])
+
+  return <>{display}</>
+}
+
 export default function Page() {
   const router = useRouter()
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
-  ])
+  const [lastGuidedLine, setLastGuidedLine] = useState('')
+  const [liveMode, setLiveMode] = useState(false)
+  function getInitialGreeting(name = '', tier = 'smart') {
+  const hour = new Date().getHours()
+
+  const timeGreeting =
+    hour < 12 ? "Good morning."
+    : hour < 18 ? "Good afternoon."
+    : "Good evening."
+
+  if (tier === 'smart') {
+    return `${timeGreeting} I’m ready. What are we working on?`
+  }
+
+  if (tier === 'intelligent') {
+    return `${timeGreeting} I’m thinking with you now. What are we working on?`
+  }
+
+  if (tier === 'brilliant') {
+    return `${timeGreeting} Thanks to you, I am Brilliant. What can we do together?`
+  }
+
+  return `${timeGreeting} What do you want to do?`
+}
+
+const [messages, setMessages] = useState<Message[]>([])
+const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
+const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
+const [conversationMode, setConversationMode] = useState<string | null>(null)
+
+  useEffect(() => {
+    const greeting = getInitialGreeting()
+    setMessages((prev) => {
+      if (
+        prev.length === 1 &&
+        prev[0]?.role === 'assistant' &&
+        prev[0]?.content.includes("Tell me what matters today?")
+      ) {
+        return [{ role: 'assistant', content: greeting }]
+      }
+      return prev
+    })
+
+    if (
+      messagesRef.current.length === 1 &&
+      messagesRef.current[0]?.role === 'assistant' &&
+      messagesRef.current[0]?.content.includes("Tell me what matters today?")
+    ) {
+      messagesRef.current = [{ role: 'assistant', content: greeting }]
+    }
+  }, [])
+
+  function handleFeedback(index: number, type: 'up' | 'down') {
+    setFeedback((prev) => ({
+      ...prev,
+      [index]: type,
+    }))
+
+    const pulseKey = `${index}-${type}`
+    setFeedbackPulse((prev) => ({
+      ...prev,
+      [pulseKey]: true,
+    }))
+
+    window.setTimeout(() => {
+      setFeedbackPulse((prev) => ({
+        ...prev,
+        [pulseKey]: false,
+      }))
+    }, 260)
+
+    const msg = messagesRef.current[index]
+    if (!msg || msg.role !== 'assistant') return
+
+    const key = type === 'up' ? 'GEORGE_POSITIVE' : 'GEORGE_NEGATIVE'
+    const existing = JSON.parse(localStorage.getItem(key) || "[]")
+
+    existing.push({
+      content: msg.content,
+      timestamp: Date.now()
+    })
+
+    localStorage.setItem(key, JSON.stringify(existing))
+  }
+
   const [interimTranscript, setInterimTranscript] = useState('')
   const [voiceError, setVoiceError] = useState('')
   const [interactionMode, setInteractionMode] = useState<'text' | 'speech'>('text')
@@ -84,10 +449,42 @@ export default function Page() {
   const [voiceOn, setVoiceOn] = useState(true)
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
   const [voiceType, setVoiceType] = useState('onyx')
-  const [isListening, setIsListening] = useState(false)
+  
+
+const [otherSpeaking, setOtherSpeaking] = useState(false)
+const [lastTranscriptTime, setLastTranscriptTime] = useState(0)
+
+function detectLiveInterruption(interim: string) {
+  const now = Date.now()
+
+  if (interim && interim.trim().length > 0) {
+    setOtherSpeaking(true)
+    setLastTranscriptTime(now)
+  }
+
+  // if silence for 1.2s → other person stopped
+  if (now - lastTranscriptTime > 1200) {
+    setOtherSpeaking(false)
+  }
+
+  // if both talking → interruption
+  if (isListening && otherSpeaking) {
+    return true
+  }
+
+  return false
+}
+
+const [isListening, setIsListening] = useState(false)
+  const [smartMicUses, setSmartMicUses] = useState(0)
+  const SMART_MIC_LIMIT = 3
+  const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [thinkingDots, setThinkingDots] = useState(1)
+  const [bridgeThinking, setBridgeThinking] = useState(false)
+  const [conversationSignal, setConversationSignal] = useState<string | null>(null)
+  const [signalTimestamp, setSignalTimestamp] = useState(0)
   const [isIOS, setIsIOS] = useState(false)
   const [profileName, setProfileName] = useState('')
   const [birthdayMD, setBirthdayMD] = useState('')
@@ -97,11 +494,166 @@ export default function Page() {
   const [newFolderName, setNewFolderName] = useState('')
   const [showRecentFolders, setShowRecentFolders] = useState(false)
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(null)
+const [lastDomain, setLastDomain] = useState<string | null>(null)
+  const [memoryVersion, setMemoryVersion] = useState(0)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
+  const [isSharingGeorgeLink, setIsSharingGeorgeLink] = useState(false)
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(null)
   const [typedMessageContent, setTypedMessageContent] = useState('')
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
+
+  useEffect(() => {
+    if (messagesRef.current.length > 0) return
+
+    const greeting = getInitialGreeting(profileName, currentTier)
+    const timer = window.setTimeout(() => {
+      const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
+      setMessages(firstMessage)
+      messagesRef.current = firstMessage
+    }, 1000)
+
+    return () => window.clearTimeout(timer)
+  }, [profileName, currentTier])
+
+  const profileSource = `${input} ${interimTranscript}`.toLowerCase()
+
+  const georgeProfile =
+    /drivers? license|permit|road test|ged|cna|exam|test|quiz|study|certification|license prep/.test(profileSource)
+      ? 'study'
+      : /speech|lecture|presentation|audience|stage|podium|talk/.test(profileSource)
+        ? 'speech'
+        : /price|cost|deal|offer|terms|contract|negotiat|counter|close|buyer|seller/.test(profileSource)
+          ? 'negotiation'
+          : 'everyday'
+
+  const liveGuidance =
+    !liveMode || currentTier !== 'brilliant'
+      ? null
+      : georgeProfile === 'study'
+        ? isListening
+          ? {
+              signal: 'LISTEN FOR THE GAP',
+              say: 'Say: “Break that down one step at a time.”',
+            }
+          : interimTranscript.trim()
+            ? {
+                signal: 'TEACH TO CLARITY',
+                say: 'Say: “Let’s slow that down and make it plain.”',
+              }
+            : input.trim()
+              ? {
+                  signal: 'CHECK UNDERSTANDING',
+                  say: 'Say: “Here’s what I think it means.”',
+                }
+              : {
+                  signal: 'HOLD THE LESSON',
+                  say: 'Say: “Give me a second to think it through.”',
+                }
+        : georgeProfile === 'speech'
+          ? isListening
+            ? {
+                signal: 'COMMAND THE ROOM',
+                say: 'Say: “Let me make this plain.”',
+              }
+            : interimTranscript.trim()
+              ? {
+                  signal: 'LAND THE POINT',
+                  say: 'Say: “Here’s the point that matters.”',
+                }
+              : input.trim()
+                ? {
+                    signal: 'SPEAK CLEANLY',
+                    say: 'Say: “Let me say this directly.”',
+                  }
+                : {
+                    signal: 'HOLD THE FLOOR',
+                    say: 'Say: “Give me a second.”',
+                  }
+          : georgeProfile === 'negotiation'
+            ? isListening
+              ? {
+                  signal: 'READ THE ROOM',
+                  say: 'Say: “Hold on—walk me through that.”',
+                }
+              : interimTranscript.toLowerCase().includes('price') || interimTranscript.toLowerCase().includes('cost')
+                ? {
+                    signal: 'FOCUS ON TERMS',
+                    say: 'Say: “What exactly are you offering?”',
+                  }
+                : interimTranscript.toLowerCase().includes('now') || interimTranscript.toLowerCase().includes('today')
+                  ? {
+                      signal: 'PRESSURE DETECTED',
+                      say: 'Say: “I’m not rushing this.”',
+                    }
+                  : interimTranscript.trim()
+                    ? {
+                        signal: 'CLARITY GAP',
+                        say: 'Say: “Be more specific.”',
+                      }
+                    : input.trim()
+                      ? {
+                          signal: 'STATE YOUR POSITION',
+                          say: 'Say: “Here’s what I need.”',
+                        }
+                      : {
+                          signal: 'HOLD POSITION',
+                          say: 'Say: “Give me a second.”',
+                        }
+            : isListening
+              ? {
+                  signal: 'STAY PRESENT',
+                  say: 'Say: “Hold on—say that again.”',
+                }
+              : interimTranscript.trim()
+                ? {
+                    signal: 'GET CLEAR',
+                    say: 'Say: “Tell me exactly what you mean.”',
+                  }
+                : input.trim()
+                  ? {
+                      signal: 'SAY IT CLEAN',
+                      say: 'Say: “Here’s what I mean.”',
+                    }
+                  : {
+                      signal: 'HOLD POSITION',
+                      say: 'Say: “Give me a second.”',
+                    }
+
+  useEffect(() => {
+    if (!liveMode || currentTier !== 'brilliant' || !liveGuidance) {
+      setStableLiveGuidance(null)
+      return
+    }
+
+    const adaptiveDelay =
+      liveGuidance.signal === 'PRESSURE DETECTED'
+        ? 250
+        : liveGuidance.signal === 'FOCUS ON TERMS'
+          ? 350
+          : liveGuidance.signal === 'STATE YOUR POSITION'
+            ? 500
+            : liveGuidance.signal === 'CLARITY GAP'
+              ? 650
+              : liveGuidance.signal === 'READ THE ROOM'
+                ? 800
+                : 700
+
+    const timer = window.setTimeout(() => {
+      setStableLiveGuidance((prev) => {
+        if (
+          prev &&
+          prev.signal === liveGuidance.signal &&
+          prev.say === liveGuidance.say
+        ) {
+          return prev
+        }
+        return liveGuidance
+      })
+    }, adaptiveDelay)
+
+    return () => window.clearTimeout(timer)
+  }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
 
@@ -118,18 +670,27 @@ export default function Page() {
 
   useEffect(() => {
   if (typeof window === 'undefined') return
+  const params = new URLSearchParams(window.location.search)
+  const tierParam = params.get('tier')
+  const subStatus = params.get('subscription')
+
+  if (subStatus === 'success' && (tierParam === 'intelligent' || tierParam === 'brilliant')) {
+    setCurrentTier(tierParam)
+  }
+
 
   void fetch('/api/subscription-state')
     .then((res) => res.json())
     .then((data) => {
       const serverTier = data?.currentTier
 
-      if (serverTier === 'intelligent' || serverTier === 'brilliant') {
         setCurrentTier(serverTier)
-      } else {
-        setCurrentTier('smart')
-      }
 
+if (serverTier === 'intelligent' || serverTier === 'brilliant') {
+  setCurrentTier(serverTier)
+} else {
+  setCurrentTier('smart')
+}
       const cleanUrl = window.location.pathname
       window.history.replaceState({}, '', cleanUrl)
     })
@@ -189,7 +750,7 @@ export default function Page() {
     const interval = setInterval(() => {
       i++
 
-      setTypedMessageContent(fullText.slice(0, i))
+      setTypedMessageContent((prev) => fullText.slice(0, i))
 
       if (i >= fullText.length) {
         clearInterval(interval)
@@ -207,6 +768,7 @@ export default function Page() {
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
   const savePickerRef = useRef<HTMLDivElement | null>(null)
+  const folderBrowserRef = useRef<HTMLDivElement | null>(null)
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const messagesRef = useRef<Message[]>([
@@ -317,6 +879,7 @@ export default function Page() {
 
     window.localStorage.setItem('GEORGE_MEMORY', JSON.stringify(existing))
     window.localStorage.setItem('GEORGE_LAST_FOLDER', chosenFolder)
+    setMemoryVersion((prev) => prev + 1)
     setToastMessage(`Saved to ${chosenFolder}`)
     setShowToast(true)
     setActiveSaveIndex(null)
@@ -337,35 +900,6 @@ export default function Page() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, isThinking])
-
-  useEffect(() => {
-    const lastIndex = messages.length - 1
-    const lastMessage = messages[lastIndex]
-
-    if (!lastMessage || lastMessage.role !== 'assistant') {
-      setTypedMessageIndex(null)
-      setTypedMessageContent('')
-      return
-    }
-
-    if (isThinking) return
-
-    setTypedMessageIndex(lastIndex)
-    setTypedMessageContent('')
-
-    let i = 0
-    const full = lastMessage.content
-    const timer = window.setInterval(() => {
-      i += 3
-      const next = full.slice(0, i)
-      setTypedMessageContent(next)
-      if (i >= full.length) {
-        window.clearInterval(timer)
-      }
-    }, 12)
-
-    return () => window.clearInterval(timer)
   }, [messages, isThinking])
 
 
@@ -394,8 +928,8 @@ export default function Page() {
 
 
 
-  const availableFolders = useMemo(() => getExistingFolders(), [messages, activeSaveIndex])
-  const recentFolders = useMemo(() => availableFolders.slice(0, 5), [availableFolders])
+  const availableFolders = useMemo(() => getExistingFolders(), [messages, activeSaveIndex, memoryVersion])
+  const recentFolders = useMemo(() => availableFolders, [availableFolders])
 
   const SpeechRecognitionCtor = useMemo(() => {
     if (typeof window === 'undefined') return null
@@ -409,19 +943,18 @@ export default function Page() {
       const target = event.target as Node | null
       if (!target) return
 
-      const insidePromptMenu = promptMenuRef.current?.contains(target) ?? false
       const insideSavePicker = savePickerRef.current?.contains(target) ?? false
+      const insideFolderBrowser = folderBrowserRef.current?.contains(target) ?? false
+      const insidePromptMenu = promptMenuRef.current?.contains(target) ?? false
 
-      if (!insidePromptMenu) {
+      if (!insideSavePicker && !insideFolderBrowser && !insidePromptMenu) {
         // delay close so click on trigger doesn't instantly cancel
         setTimeout(() => {
           setShowPromptMenu(false)
           setShowRecentFolders(false)
           setActiveMemoryFolder(null)
         }, 120)
-      }
 
-      if (!insidePromptMenu && !insideSavePicker) {
         setActiveSaveIndex(null)
       }
     }
@@ -445,20 +978,45 @@ export default function Page() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    const handleOpenMemoryFolder = (event: Event) => {
+      const folder = (event as CustomEvent<string>).detail
+      if (!folder) return
+
+      const prompt =
+        folder === 'Credit'
+          ? "Let’s get clear on your credit."
+          : `Let's discuss ${String(folder).toLowerCase()}.`
+
+      setInput(prompt)
+
+      setTimeout(() => {
+        void handleSend(prompt)
+      }, 0)
+
+      setShowRecentFolders(false)
+      setActiveMemoryFolder(folder)
+      setShowSidebar(false)
+    }
+
+    window.addEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
+
+    return () => {
+      window.removeEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
     setIsIOS(/iPhone|iPad|iPod/i.test(window.navigator.userAgent))
 
     const storedName = window.localStorage.getItem('george_name') || ''
     const storedBirthdayMD = window.localStorage.getItem('george_birthday_md') || ''
-
-    const storedVoice = window.localStorage.getItem('george_voice') || 'off'
-    const storedVoiceSpeed = Number(window.localStorage.getItem('george_voice_speed') || '1.2')
-    const storedVoiceType = window.localStorage.getItem('george_voice_type') || 'onyx'
+    const storedVoiceSpeed = Number(window.localStorage.getItem('george_voice_speed') || '1.4')
+    const storedVoiceType = window.localStorage.getItem('george_voice_type') || 'nova'
     const nameLocked = window.localStorage.getItem('george_name_locked') === 'true'
     const voiceLocked = window.localStorage.getItem('george_voice_locked') === 'true'
 
-    
-
-    // LOAD FULL MODE STATE
     const storedWindowEnd = window.localStorage.getItem('george_full_until')
     if (storedWindowEnd) {
       const end = Number(storedWindowEnd)
@@ -470,16 +1028,16 @@ export default function Page() {
       }
     }
 
-
     setProfileName(storedName)
 
     if (storedName && !nameLocked) {
       window.localStorage.setItem('george_name_locked', 'true')
     }
 
-    if (['onyx','shimmer'].includes(storedVoiceType)) {
+    if (['onyx', 'shimmer'].includes(storedVoiceType)) {
       setVoiceType(storedVoiceType)
     }
+
     setBirthdayMD(storedBirthdayMD)
 
     if ([0.8, 1, 1.2, 1.4].includes(storedVoiceSpeed)) {
@@ -489,15 +1047,16 @@ export default function Page() {
     if (currentTier === 'smart') {
       setInteractionMode('text')
       setVoiceOn(false)
+      window.localStorage.setItem('george_voice', 'off')
     } else {
       setInteractionMode('speech')
       setVoiceOn(true)
       window.localStorage.setItem('george_voice', 'on')
 
-    if (!voiceLocked) {
-      window.localStorage.setItem('george_voice_type', voiceType)
-      window.localStorage.setItem('george_voice_locked', 'true')
-    }
+      if (!voiceLocked) {
+        window.localStorage.setItem('george_voice_type', storedVoiceType)
+        window.localStorage.setItem('george_voice_locked', 'true')
+      }
     }
 
     const params = new URLSearchParams(window.location.search)
@@ -510,7 +1069,6 @@ export default function Page() {
       setInput(shared)
       if (textareaRef.current) {
         textareaRef.current.value = shared
-        // removed auto-focus to prevent mobile jump
       }
     }
 
@@ -518,7 +1076,6 @@ export default function Page() {
       setInput(prompt)
       if (textareaRef.current) {
         textareaRef.current.value = prompt
-        // removed auto-focus to prevent mobile jump
       }
     }
 
@@ -553,11 +1110,6 @@ export default function Page() {
     }
 
     window.localStorage.setItem('george_voice', 'on')
-
-    if (!voiceLocked) {
-      window.localStorage.setItem('george_voice_type', voiceType)
-      window.localStorage.setItem('george_voice_locked', 'true')
-    }
   }, [currentTier, interactionMode, voiceOn])
 
   useEffect(() => {
@@ -588,16 +1140,8 @@ export default function Page() {
       return 'Merry Christmas.'
     }
 
-    if (hour < 12) {
-      return `Good morning${nameSuffix}. What can I do for you today?`
-    }
-
-    if (hour < 18) {
-      return `Hi${nameSuffix}, what can I do for you right now?`
-    }
-
-    return `Good evening${nameSuffix}. I'm here with you.`
-  }, [birthdayMD, profileName])
+    return getInitialGreeting(profileName, currentTier)
+  }, [birthdayMD, profileName, currentTier])
 
 
   function getSuggestedPromptsFromMessage(input: string): PromptSelection[] {
@@ -704,7 +1248,7 @@ export default function Page() {
 
     return cleaned
       .split(/(?<=[.!?])\s+/)
-      .map((s) => s.trim())
+      .map((s: string) => s.trim())
       .filter(Boolean)
       .flatMap((sentence) => {
         if (sentence.length <= 420) return [sentence]
@@ -765,6 +1309,11 @@ export default function Page() {
   }
 
   async function fetchSpeech(text: string) {
+    // block TTS for Smart tier
+    if (currentTier === 'smart') {
+      return null
+    }
+
     const res = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -778,8 +1327,6 @@ export default function Page() {
     }
 
     const buffer = await res.arrayBuffer()
-    console.log('TTS buffer bytes:', buffer.byteLength)
-
     if (!buffer.byteLength) {
       throw new Error('TTS returned empty audio')
     }
@@ -795,8 +1342,6 @@ export default function Page() {
 
     const base64 = btoa(binary)
     const dataUrl = `data:audio/mpeg;base64,${base64}`
-    console.log('TTS data URL generated')
-
     return dataUrl
   }
 
@@ -813,6 +1358,14 @@ export default function Page() {
     })
 
     setPendingAssistantMessage(null)
+
+// CLEAR ACTIVE PROMPT AFTER USE
+if (activePromptContext || activePromptLabel) {
+  setActivePromptContext(null)
+  setActivePromptLabel(null)
+  setContextTurnCount(0)
+}
+
   }
 
   async function playQueue() {
@@ -829,6 +1382,7 @@ export default function Page() {
         if (!chunk) continue
 
         const url = await fetchSpeech(chunk)
+        if (!url) continue
 
         await new Promise<void>((resolve, reject) => {
           const audio = new Audio()
@@ -896,12 +1450,8 @@ export default function Page() {
   }
 
   const speakText = useCallback(
-    async (text: string) => {
-      console.log('speakText called', { text, isIOS, voiceOn })
-      if (typeof window === 'undefined') return
-      if (isIOS || !voiceOn || !hasUserInteractedRef.current) {
-        console.log('speakText aborted', { isIOS, voiceOn })
-        return
+    async (text: string) => {      if (typeof window === 'undefined') return
+      if (isIOS || !voiceOn || !hasUserInteractedRef.current) {        return
       }
 
       try {
@@ -917,11 +1467,7 @@ export default function Page() {
           .trim()
 
         const chunks = splitForSpeech(cleaned)
-        console.log('speech chunks', chunks)
-
-        if (!chunks.length) {
-          console.log('No speech chunks generated')
-          return
+        if (!chunks.length) {          return
         }
 
         speechQueueRef.current = chunks
@@ -968,7 +1514,7 @@ export default function Page() {
   }
 
   const generatePrompts = (input: string, response: string, messages: any[]) => {
-    const prompts = []
+    const prompts: PromptSelection[] = []
 
     const recent = messages.slice(-4).map(m => m.content).join(' ').toLowerCase()
     const constrainedResponse =
@@ -995,18 +1541,18 @@ export default function Page() {
       })
 
       prompts.push({
-        label: 'Make G. smarter',
-        text: 'Take me to the level that lets you carry this properly.',
+        label: 'Make G. Intelligent',
+        text: 'Take me to Intelligent level support.',
         context: 'upgrade_intelligent',
       })
 
       prompts.push({
-        label: 'Top up',
+        label: 'See full options',
         text: 'Show me the upgrade path for deeper support.',
         context: 'upgrade_topup',
       })
 
-      return prompts.slice(0, 5)
+      return prompts
     }
 
     if (/build|app|product|platform/i.test(input) || /build|app|product/.test(recent)) {
@@ -1070,7 +1616,7 @@ export default function Page() {
       })
     }
 
-    return prompts.slice(0, 5)
+    return prompts
   }
 
   
@@ -1086,14 +1632,272 @@ export default function Page() {
   }
 
 
+
+
+
+function buildBrilliantLiveTriggerResponse(
+  raw: string,
+  currentTier: 'smart' | 'intelligent' | 'brilliant',
+  activePromptContext: string | null,
+  conversationMode: string | null
+) {
+  if (currentTier !== 'brilliant') return null
+
+  const brilliantContextActive =
+    (activePromptContext && activePromptContext.startsWith('brilliant_')) ||
+    (conversationMode && conversationMode.startsWith('brilliant_'))
+
+  if (!brilliantContextActive) return null
+
+  const text = raw.trim().toLowerCase()
+  if (!text) return null
+
+  const triggerMap: Record<string, string> = {
+    'hmm': "Let me think about that for a second.",
+    'i see': "I hear you. Keep going.",
+    'next': "Here’s the next clean line: let’s slow this down and separate the numbers.",
+    'reset': "Let’s reset for a second. I want to make sure we’re being precise.",
+    'pressure': "They’re trying to speed the decision up. Slow the room down and get clarity first.",
+  }
+
+  return triggerMap[text] ?? null
+}
+
+function detectDomain(text: string) {
+  const t = text.toLowerCase()
+
+  if (t.includes('credit') || t.includes('tradeline') || t.includes('score')) {
+    return 'credit'
+  }
+
+  if (t.includes('cdl') || t.includes('truck') || t.includes('trucking')) {
+    return 'cdl'
+  }
+
+  if (t.includes('ged') || t.includes('high school equivalency')) {
+    return 'ged'
+  }
+
+  if (t.includes('cna') || t.includes('nursing assistant')) {
+    return 'cna'
+  }
+
+  return null
+}
+
 const handleSend = useCallback(
     async (overrideText?: string) => {
-      const liveValue = textareaRef.current?.value ?? input
-      const text = (overrideText ?? liveValue).trim()
+      const text = (overrideText ?? input).trim()
+      console.log('[GEORGE handleSend]', {
+        overrideText,
+        input,
+        text,
+        isThinking,
+        activePromptContext,
+        activePromptLabel,
+      })
 
-      if (!text || isThinking) {
-        setVoiceError(text ? '' : 'Type a message first.')
+      const domain = detectDomain(text)
+      let activeDomain = domain || activeMemoryFolder || lastDomain
+
+      // persist domain once detected
+      if (domain) {
+        setLastDomain(domain)
+      }
+
+      let domainPrefix = ""
+      let creditIntent = ""
+      let lastCreditIntent = messagesRef.current
+        .slice()
+        .reverse()
+        .find(m =>
+          m.role === 'user' &&
+          /tradeline|authorized user/i.test(m.content || '')
+        ) ? "tradelines" : ""
+      let creditType = ""
+      let firstResponseOverride = null
+
+      const brilliantLiveTrigger = buildBrilliantLiveTriggerResponse(
+        text,
+        currentTier,
+        activePromptContext,
+        conversationMode
+      )
+      if (brilliantLiveTrigger) {
+        setConversationSignal('LIVE cue')
+        setLastGuidedLine('Brilliant live cue used.')
+        setInput('')
+        setInterimTranscript('')
+        if (textareaRef.current) {
+          textareaRef.current.value = ''
+        }
+
+        const userMessage: Message = {
+          role: 'user',
+          content: text,
+        }
+
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: brilliantLiveTrigger,
+        }
+
+        const nextMessages: Message[] = [...messagesRef.current, userMessage, assistantMessage]
+        setMessages(nextMessages)
+        messagesRef.current = nextMessages
         return
+      }
+
+      
+
+      const answers = extractAnswers(text)
+      if (answers.length >= 3) {
+        const track = detectTrainingTrack(text)
+
+        if (track === 'drivers') {
+          const result = evaluateDrivers(answers)
+          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
+          return buildEvaluationResponse(result)
+        }
+
+        if (track === 'cdl') {
+          const result = evaluateCDL(answers)
+          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
+          return buildEvaluationResponse(result)
+        }
+
+        if (track === 'ged') {
+          const result = evaluateGED(answers)
+          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
+          return buildEvaluationResponse(result)
+        }
+
+        if (track === 'cna') {
+          const result = evaluateCNA(answers)
+          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
+          return buildEvaluationResponse(result)
+        }
+      }
+
+
+const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptContext)
+      if (trainingFollowThrough) {
+        firstResponseOverride = trainingFollowThrough
+      }
+
+      const trainingOverride = buildTrainingIntakeOverride(text)
+      if (!firstResponseOverride && trainingOverride) {
+        firstResponseOverride = trainingOverride
+      }
+
+      if (!firstResponseOverride && activeDomain === 'credit') {
+        const t = text.toLowerCase()
+
+        let tradelineAdvice = ""
+
+        if (
+          t.includes('maxed') ||
+          t.includes('maxed out') ||
+          t.includes('cards are maxed') ||
+          t.includes('credit cards are maxed') ||
+          t.includes('utilization') ||
+          t.includes('balance') ||
+          t.includes('balances')
+        ) {
+          creditType = "utilization"
+        } else if (t.includes('collection') || t.includes('charge off') || t.includes('late')) {
+          creditType = "derogatory"
+        } else if (t.includes('no credit') || t.includes('no history') || t.includes('thin file')) {
+          creditType = "thin"
+        } else if (t.includes('tradeline') || t.includes('authorized user')) {
+          creditType = "tradelines"
+        }
+
+        if (creditType === "thin") {
+          tradelineAdvice = "Tradelines may help if your file is thin, but they need to be clean, aged, and low utilization to matter."
+        } else if (creditType === "utilization") {
+          tradelineAdvice = "Tradelines won’t fix high utilization. Lowering your balances will have a much stronger impact."
+        } else if (creditType === "derogatory") {
+          tradelineAdvice = "Tradelines won’t remove negative marks. You need to focus on resolving or removing derogatory items first."
+        } else if (creditType === "tradelines") {
+          tradelineAdvice = "Tradelines can help in specific situations, but they are often overrated and misused."
+        }
+
+        if (
+          t.includes('raise score') ||
+          t.includes('increase score') ||
+          t.includes('improve score') ||
+          t.includes('boost score') ||
+          t.includes('improve my score') ||
+          t.includes('raise my score') ||
+          t.includes('build my credit') ||
+          t.includes('improve my credit')
+        ) {
+          creditIntent = "score"
+        } else if (
+          t.includes('approval') ||
+          t.includes('approved') ||
+          t.includes('loan') ||
+          t.includes('car') ||
+          t.includes('mortgage') ||
+          t.includes('apartment')
+        ) {
+          creditIntent = "approval"
+        } else if (
+          t.includes('fix credit') ||
+          t.includes('repair credit') ||
+          t.includes('clean up credit')
+        ) {
+          creditIntent = "repair"
+        } else if (
+          t.includes('tradeline') ||
+          t.includes('authorized user')
+        ) {
+          creditIntent = "tradelines"
+        }
+
+        if (!creditIntent && lastCreditIntent) {
+          creditIntent = lastCreditIntent
+        }
+
+        domainPrefix = `You are helping with credit.
+
+First, identify the user's real goal (raise score, get approved, fix profile).
+
+Then:
+- If utilization is the issue → focus on paydown timing and balance strategy
+- If derogatories → focus on removal, not score tricks
+- If thin file → tradelines may be relevant
+- If tradelines mentioned → evaluate if they actually help or are a distraction
+
+Do NOT assume tradelines are the answer.
+
+Ask one sharp question that reveals what is actually holding them back.
+
+Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent || "unknown"}\nTradeline guidance: ${tradelineAdvice || "evaluate case by case"}`
+      }
+
+      if (domain === 'cdl') {
+        domainPrefix = "You are helping with CDL path. Focus on permit, training, test, endorsements, and job placement. Give the fastest credible path to income."
+      }
+
+      if (domain === 'ged') {
+        domainPrefix = "You are helping with GED. Focus on passing strategy, weakest subject, scheduling, and speed to completion."
+      }
+
+      if (domain === 'cna') {
+        domainPrefix = "You are helping with CNA. Focus on certification steps, exam, skills check, and fastest path to employment."
+      }
+
+      if (!text) {
+        setVoiceError('Type a message first.')
+        return
+      }
+
+      // allow override while thinking
+      if (isThinking) {
+        await stopSpeech()
+        setIsThinking(false)
       }
 
       hasUserInteractedRef.current = true
@@ -1106,21 +1910,85 @@ const handleSend = useCallback(
         content: text,
       }
 
-      const updatedMessages = [...messagesRef.current, userMessage]
-      const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text).slice(0, 5)
+
+      if (!firstResponseOverride && activeDomain === 'credit') {
+        const short = text.length < 40
+
+        // HARD OVERRIDE: utilization always wins if detected in text
+        if (/maxed|balance|utilization/i.test(text)) {
+          creditType = 'utilization'
+        }
+
+        if (creditType === 'utilization') {
+          firstResponseOverride = "Your cards being maxed out is the issue. Tradelines will not fix that. Bring each card under 30%—under 10% if possible. Paydown or balance shifting is the move. I can help you build a paydown plan, or I can show you the fastest way to lower utilization without adding new debt."
+        } else if (short && creditType === 'derogatory') {
+            firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
+          } else if (creditType === 'thin') {
+            firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
+          } else if (creditIntent === 'score') {
+            firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
+          } else if (creditIntent === 'approval') {
+            firstResponseOverride = "What are you trying to get approved for, and when?"
+          } else if (creditIntent === 'tradelines') {
+            firstResponseOverride = "Tradelines only help in specific cases. If your utilization or negatives are off, they won’t move the needle. What’s actually on your report right now?"
+          } else if (creditIntent === 'repair') {
+            firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
+          } else {
+            firstResponseOverride = "What are you trying to fix—your score, approvals, or your overall credit profile?"
+          }
+      }
+
+      const updatedMessages = [
+        ...messagesRef.current,
+        ...(domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
+        userMessage
+      ]
+      const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text)
 
       setSuggestedPrompts((prev) => {
-        if (!samePromptSet(prev, nextSuggestedPrompts)) {
-          setSuggestedSignal(Date.now())
-        setRerouteSignal(Date.now())
-          return nextSuggestedPrompts
-        }
-        return prev
-      })
+  const incoming = nextSuggestedPrompts || []
+
+  // MERGE EXISTING + NEW
+  let merged = [...prev, ...incoming]
+
+  // REMOVE DUPLICATES (by label)
+  const seen = new Set()
+  merged = merged.filter(p => {
+    if (seen.has(p.label)) return false
+    seen.add(p.label)
+    return true
+  })
+
+  // SIMPLE RELEVANCE SORT (newer first)
+  merged = merged.reverse()
+
+  // LIMIT TO 10
+  const curated = merged.slice(0, 10)
+
+  setSuggestedSignal(Date.now())
+  setRerouteSignal(Date.now())
+
+  return curated
+})
 
       
 
+      console.log('[GEORGE setMessages user]', {
+        updatedMessagesLength: updatedMessages.length,
+        lastUserMessage: updatedMessages[updatedMessages.length - 1]?.content,
+      })
       setMessages(updatedMessages)
+
+      // Brilliant conversation rhythm signal
+      if (currentTier === 'brilliant') {
+        const shortInput = text.length < 40
+        const rapidTurn = Date.now() - signalTimestamp < 4000
+
+        if (shortInput || rapidTurn) {
+          setConversationSignal('Stay in rhythm — increase GEORGE’s speed')
+          setSignalTimestamp(Date.now())
+        }
+      }
       messagesRef.current = updatedMessages
       setInput('')
       setInterimTranscript('')
@@ -1128,21 +1996,65 @@ const handleSend = useCallback(
       setIsThinking(true)
       startBridgeSpeech()
 
-      if (textareaRef.current) {
-        textareaRef.current.value = ''
-      }
+
 
       try {
+        if (firstResponseOverride) {
+          console.log('[GEORGE firstResponseOverride hit]', {
+            firstResponseOverride,
+            activePromptContext,
+            activePromptLabel,
+          })
+          stopBridgeSpeech()
+        const assistantMessage: Message = {
+            role: 'assistant',
+            content: firstResponseOverride,
+            constrained: false,
+          }
+
+          assistantRevealedRef.current = false
+
+          setMessages((prev) => {
+            const next = [...prev, assistantMessage]
+            console.log('[GEORGE setMessages assistant override]', {
+              prevLength: prev.length,
+              nextLength: next.length,
+              assistantPreview: assistantMessage.content.slice(0, 80),
+            })
+            messagesRef.current = next
+            return next
+          })
+
+          setPendingAssistantMessage(null)
+
+          if (activePromptContext) {
+            setContextTurnCount((prev) => prev + 1)
+          }
+
+          stopBridgeSpeech()
+          speakText(assistantMessage.content)
+          return
+        }
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: updatedMessages,
+            messages: firstResponseOverride
+            ? [
+                ...updatedMessages,
+                {
+                  role: 'system',
+                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + firstResponseOverride
+                }
+              ]
+            : updatedMessages,
             voiceMode: false,
             isFirstSession: updatedMessages.length <= 2,
             promptContext: activePromptContext,
             promptLabel: activePromptLabel,
             contextTurnCount,
+            tier: currentTier,
           }),
         })
 
@@ -1161,26 +2073,85 @@ const handleSend = useCallback(
 
         const constrained = isSmart && isHeavy
 
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: constrained
-            ? `I’ll give you the lay of the land—but I won’t carry the full build or project.\n\n${data.message}\n\nThat takes more support than this level unlocks.`
-            : data.message,
-          constrained,
+        let finalContent = firstResponseOverride ?? (constrained
+          ? `We can go further here.
+
+This takes more time and step-by-step work than this tier allows. Top up to continue.`
+          : data.message)
+
+        if (!constrained && typeof finalContent === 'string') {
+          if (conversationMode === 'brilliant_negotiation') {
+            finalContent = finalContent
+              .split('. ')
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+              .map((s) => (s.length > 120 ? s.slice(0, 120).trim() : s))
+              .join('. ')
+          }
+
+          if (conversationMode === 'brilliant_lecture') {
+            finalContent = `Let’s break this down step by step.
+
+${finalContent}`
+          }
+
+          if (conversationMode === 'brilliant_speech') {
+            finalContent = finalContent
+              .split('. ')
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+              .join('.\n')
+          }
+
+          if (conversationMode === 'brilliant_everyday') {
+            finalContent = finalContent
+          }
+
+          if (conversationMode === 'brilliant_tutor') {
+            finalContent = `Explain this to someone else as you go:
+
+${finalContent}`
+          }
         }
 
-        console.log('assistant reply received', assistantMessage.content)
-
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: finalContent,
+          constrained,
+        }
         assistantRevealedRef.current = false
 
+        // IMMEDIATE RENDER FIX
         setMessages((prev) => {
           const next = [...prev, assistantMessage]
           messagesRef.current = next
           return next
         })
 
-        const newPrompts = generatePrompts(input, assistantMessage.content, messagesRef.current)
-        setSuggestedPrompts(newPrompts)
+        const rawPrompts = generatePrompts(input, assistantMessage.content, messagesRef.current)
+
+// FILTER LOW-SIGNAL / GENERIC PROMPTS
+const newPrompts = rawPrompts.filter(p => {
+  const label = p.label.toLowerCase()
+
+if (label.includes('next step') && rawPrompts.length > 3) return false
+if (label.includes('clarify goal') && rawPrompts.length > 4) return false
+
+return true
+})
+        setSuggestedPrompts((prev) => {
+          let merged = [...prev, ...newPrompts]
+
+          const seen = new Set<string>()
+          merged = merged.filter((p) => {
+            if (seen.has(p.label)) return false
+            seen.add(p.label)
+            return true
+          })
+
+          const curated = merged.reverse().slice(0, 10)
+          return curated
+        })
         setSuggestedSignal(Date.now())
         setRerouteSignal(Date.now())
 
@@ -1205,9 +2176,9 @@ const handleSend = useCallback(
       } finally {
         setIsThinking(false)
       }
-    },
-    [input, isThinking, speakText, stopListening]
-  )
+  },
+  [input, isThinking, speakText, stopListening]
+)
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -1229,21 +2200,17 @@ const handleSend = useCallback(
       return
     }
 
-    const recognition = new SpeechRecognitionCtor()
+    const recognition = new (SpeechRecognitionCtor as NonNullable<typeof SpeechRecognitionCtor>)()
     recognition.lang = 'en-US'
     recognition.continuous = false
     recognition.interimResults = true
     recognition.maxAlternatives = 1
 
-    recognition.onstart = () => {
-      console.log('speech recognition started')
-      setVoiceError('')
+    recognition.onstart = () => {      setVoiceError('')
       setIsListening(true)
     }
 
-    recognition.onresult = (event: SpeechRecognitionEventLike) => {
-      console.log('speech recognition result', event)
-      let finalTranscript = ''
+    recognition.onresult = (event: SpeechRecognitionEventLike) => {      let finalTranscript = ''
       let liveTranscript = ''
 
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
@@ -1310,23 +2277,46 @@ const handleSend = useCallback(
 
   const showConversation = messages.length > 1 || isThinking
   const showMobileHero = !showConversation
+
+{showMobileHero && (
+  <div className="flex flex-col items-center justify-center text-center pt-28 pb-10">
+
+    <div className="text-[32px] font-semibold tracking-[0.25em] text-white">
+      GEORGE
+    </div>
+
+    <div className="mt-2 text-[12px] tracking-[0.18em] text-neutral-400">
+      Smart. Intelligent. Brilliant.
+    </div>
+
+    <div className="mt-4 flex items-center gap-2">
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-1" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-2" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-3" />
+    </div>
+
+  </div>
+)}
+
   useEffect(() => {
     if (showConversation) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [showConversation])
 
-  return (
+
+return (
     <main className="app-shell min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-30 bg-black/50 xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/50 backdrop-blur-sm xl:hidden"
           />
         )}
 
         <Sidebar
+          currentTier={currentTier}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
           voiceActive={voiceOn}
@@ -1336,8 +2326,11 @@ const handleSend = useCallback(
           suggestedSignal={suggestedSignal}
           activePromptLabel={activePromptLabel}
           onNewSession={() => {
-            setMessages([{ role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' }])
-            messagesRef.current = [{ role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' }]
+            const greeting = getInitialGreeting(profileName, currentTier)
+            setTimeout(() => {
+              setMessages([{ role: 'assistant', content: greeting }])
+              messagesRef.current = [{ role: 'assistant', content: greeting }]
+            }, 1000)
             setInput('')
             setInterimTranscript('')
             setVoiceError('')
@@ -1348,72 +2341,155 @@ const handleSend = useCallback(
             setRerouteSignal(0)
             setSuggestedPrompts([])
             setSuggestedSignal(0)
-            if (textareaRef.current) {
-              textareaRef.current.value = ''
-            }
           }}
           onPromptSelect={(prompt: PromptSelection) => {
-            if (prompt.context === 'upgrade_intelligent' || prompt.context === 'upgrade_topup') {
-              router.push('/top-up')
-              return
-            }
+              if (prompt.context === 'upgrade_intelligent' || prompt.context === 'upgrade_topup') {
+                router.push('/top-up')
+                return
+              }
 
-            setInput(prompt.text)
-            setActivePromptLabel(prompt.label)
-            setActivePromptContext(prompt.context)
-            setContextTurnCount(0)
-            setVoiceError('')
+              setActivePromptLabel(prompt.label)
+              setActivePromptContext(prompt.context)
+              setContextTurnCount(0)
+              setVoiceError('')
 
-            if (prompt.context === 'strategy_recalculation') {
-              setRerouteSignal(0)
-            }
+              if (prompt.context === 'strategy_recalculation') {
+                setRerouteSignal(0)
+              }
 
-            if (textareaRef.current) {
-              textareaRef.current.value = prompt.text
-              // removed auto-focus to prevent mobile jump
-            }
-          }}
+              const isPreTrainingCourse =
+                prompt.context === 'training_drivers_license' ||
+                prompt.context === 'training_cdl' ||
+                prompt.context === 'training_ged' ||
+                prompt.context === 'training_cna' ||
+                prompt.context === 'training_interview'
+
+              if (isPreTrainingCourse) {
+                const coursePrompt = prompt.text
+                const assistantText = buildTrainingIntakeOverride(coursePrompt)
+
+                setShowSidebar(false)
+                setInput('')
+                setVoiceError('')
+
+                const nextMessages: Message[] = [
+                  ...messagesRef.current,
+                  { role: 'user', content: coursePrompt },
+                  {
+                    role: 'assistant',
+                    content: assistantText || "Good. We are building a passing path.",
+                    constrained: false,
+                  },
+                ]
+
+                setMessages(nextMessages)
+                messagesRef.current = nextMessages
+                setActivePromptLabel(prompt.label)
+                setActivePromptContext(prompt.context)
+                setContextTurnCount(1)
+                return
+              }
+
+              if (prompt.context === 'courses_expand') {
+                setShowSidebar(false)
+                setInput('')
+                setVoiceError('')
+
+                const nextMessages: Message[] = [
+                  ...messagesRef.current,
+                  { role: 'user', content: prompt.text },
+                  {
+                    role: 'assistant',
+                    content: "There are other courses not shown here. Some could help you now. Some may mean nothing right now. Some may even be boring to you. Tell me what you want to earn, fix, avoid, build, understand, or become—and I’ll point to what matters.",
+                    constrained: false,
+                  },
+                ]
+
+                setMessages(nextMessages)
+                messagesRef.current = nextMessages
+                setContextTurnCount(1)
+                return
+              }
+
+              setInput(prompt.text)
+            }}
         />
 
-        <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
-          <div className="flex h-[calc(100dvh-4rem)] w-full flex-col overflow-hidden px-4 pb-4 pt-5 md:h-screen md:px-6 md:pb-4 md:pt-16">
-            <header className="hidden flex-none border-b border-neutral-800 pb-4 md:block">
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-                  GEORGE
-                </h1>
+        <div className="flex min-w-0 w-full flex-1 flex-col overflow-hidden">
+          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-6 md:pb-0 md:pt-[92px]">
+            <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+              <div className="relative flex w-full max-w-5xl items-center justify-start">
+                <div className="flex items-center gap-2.5 md:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowSidebar(true)}
+                    onTouchStart={() => setShowSidebar(true)}
+                    onPointerDown={() => setShowSidebar(true)}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
+                    aria-label="Open menu"
+                  >
+                    <span className="flex flex-col items-center justify-center gap-[3px]">
+                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+                    </span>
+                  </button>
 
-                <div className="flex items-center gap-1.5 rounded-full border border-[#7C8CFF]/20 bg-black/70 px-2.5 py-1 backdrop-blur">
-                  <span className={`h-2 w-2 rounded-full ${isFullMode ? "bg-[#7C8CFF]" : "bg-[#ff1a1a]"} branes-pulse-1`} />
-                  <span className={`h-2 w-2 rounded-full ${isFullMode ? "bg-[#7C8CFF]" : "bg-[#ff1a1a]"} branes-pulse-2`} />
-                  <span className={`h-2 w-2 rounded-full ${isFullMode ? "bg-[#7C8CFF]" : "bg-[#ff1a1a]"} branes-pulse-3`} />
+                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28">
+                    GEORGE
+                  </span>
                 </div>
               </div>
-
-              <p className="mt-1.5 text-neutral-400">{tagline}</p>
-
-              </header>
-
-            <div className="mt-5 hidden text-sm text-neutral-400 md:block">We can move step by step, or build something more strategic. Either way, we’ll get you there.</div>
+            </header>
 
             
-<div className="flex-1 w-full overflow-y-auto px-2 pt-4 space-y-5">
-  {messages.map((m, i) => (
+{conversationSignal && (
+  <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-[#0B0F1A]/90 px-4 py-2 text-xs text-[#7C8CFF] shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl animate-pulse">
+    {conversationSignal}
+  </div>
+)}
+<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-2 pt-5 pb-[300px] md:pb-[320px] space-y-5 md:pt-8 ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
+  {showMobileHero && (
+    <div className="flex min-h-[calc(100dvh-500px)] flex-col items-center justify-center px-4 md:hidden">
+      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-2xl md:text-3xl font-semibold tracking-tight text-transparent">
+        GEORGE
+      </div>
+
+      <div className="mt-2 text-center text-[12px] tracking-[0.22em] text-neutral-400">
+        Smart. Intelligent. Brilliant.
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 px-3 py-2">
+        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-1`} />
+        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-2`} />
+        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-3`} />
+      </div>
+    </div>
+  )}
+
+  {bridgeThinking && (
+    <div className="text-sm leading-7 text-white/70">
+      Thinking...
+    </div>
+  )}
+  {messages
+  .filter((m) => m.role !== 'system')
+  .map((m, i) => (
     <div key={i} className="space-y-2">
-      <div className="text-sm leading-7 text-white/90">
-        {typedMessageIndex === i ? typedMessageContent : m.content}
+      <div className="whitespace-pre-wrap text-sm leading-7 text-white/90">
+        {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
       </div>
 
       {m.role === 'assistant' && (
-        <div className="space-y-2">
+        <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <span className="h-1.5 w-6 rounded-full bg-red-500 animate-pulse" />
-                <span className="h-1.5 w-6 rounded-full bg-red-500 animate-pulse" />
-                <span className="h-1.5 w-6 rounded-full bg-red-500 animate-pulse" />
+              <div className="flex items-center gap-2 pl-1">
+                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
               </div>
-              <span className="text-xs text-red-400">
+              <span className="text-xs text-[#7C8CFF]">
                 This requires deeper support.
               </span>
             </div>
@@ -1425,7 +2501,7 @@ const handleSend = useCallback(
               onClick={() => {
                 setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setShowRecentFolders(true)
-                setActiveMemoryFolder(getDefaultFolder())
+                setActiveMemoryFolder(null)
               }}
               className="inline-flex items-center gap-2 transition hover:text-white"
             >
@@ -1451,23 +2527,115 @@ const handleSend = useCallback(
             >
               Share
             </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const prompt = "Show me related memory for this."
+                setInput(prompt)
+                if (textareaRef.current) {
+                  textareaRef.current.value = prompt
+                }
+              }}
+              className="transition hover:text-[#7C8CFF]"
+            >
+              Related
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleFeedback(i, 'up')
+                setToastMessage('Noted')
+                setShowToast(true)
+              }}
+              className={`relative flex items-center justify-center transition duration-150 ${
+                feedback[i] === 'up'
+                  ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
+                  : 'text-white/85 hover:text-white'
+              } ${
+                feedbackPulse[`${i}-up`]
+                  ? 'scale-125 drop-shadow-[0_0_12px_rgba(124,140,255,0.55)]'
+                  : 'scale-100'
+              }`}
+              aria-label="Thumbs up"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-[18px] w-[18px]"
+                fill={feedback[i] === 'up' ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 10V5.8c0-1 .3-2 .9-2.8L16 1.5l2 1.9c.7.7 1 1.6 1 2.6v3h1.5c1.1 0 1.9 1 1.7 2.1l-1.1 6.4A2 2 0 0 1 19.1 19H8a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h6Z" />
+                <path d="M6 10H3v9h3" />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleFeedback(i, 'down')
+                setToastMessage('Got it')
+                setShowToast(true)
+              }}
+              className={`relative flex items-center justify-center transition duration-150 ${
+                feedback[i] === 'down'
+                  ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
+                  : 'text-white/85 hover:text-white'
+              } ${
+                feedbackPulse[`${i}-down`]
+                  ? 'scale-125 drop-shadow-[0_0_12px_rgba(124,140,255,0.55)]'
+                  : 'scale-100'
+              }`}
+              aria-label="Thumbs down"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-[18px] w-[18px]"
+                fill={feedback[i] === 'down' ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 14v4.2c0 1-.3 2-.9 2.8L12 22.5l-2-1.9c-.7-.7-1-1.6-1-2.6v-3H7.5c-1.1 0-1.9-1-1.7-2.1l1.1-6.4A2 2 0 0 1 8.9 5H20a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6Z" />
+                <path d="M6 14H3V5h3" />
+              </svg>
+            </button>
           </div>
 
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className="max-w-[360px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+              className="absolute left-0 bottom-full z-30 mb-2 w-[170px] max-w-[52vw] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
             >
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
                   Save memory
                 </div>
 
-                {showRecentFolders && recentFolders.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const folder = getDefaultFolder()
+                    setActiveMemoryFolder(folder)
+                    saveMemory(m, i, folder)
+                  }}
+                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+                >
+                  Save to {getDefaultFolder()}
+                </button>
+
+                {getExistingFolders().length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs text-neutral-500">Recent folders</div>
+                    <div className="text-[14px] text-neutral-500">Recent folders</div>
                     <div className="flex flex-wrap gap-2">
-                      {recentFolders.map((folder) => (
+                      {getExistingFolders().map((folder) => (
                         <button
                           key={folder}
                           type="button"
@@ -1475,7 +2643,7 @@ const handleSend = useCallback(
                             setActiveMemoryFolder(folder)
                             saveMemory(m, i, folder)
                           }}
-                          className={`rounded-full border px-3 py-1 text-xs transition ${
+                          className={`rounded-full border px-2 py-1 text-[14px] leading-4 transition ${
                             activeMemoryFolder === folder
                               ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
                               : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
@@ -1489,19 +2657,19 @@ const handleSend = useCallback(
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs leading-5 text-neutral-400">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-[14px] leading-4 text-neutral-400">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <div className="text-xs text-neutral-500">Create folder</div>
+                  <div className="text-[14px] text-neutral-500">Create folder</div>
                   <div className="flex items-center gap-2">
                     <input
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="New folder"
-                      className="w-full rounded-xl border border-white/10 bg-transparent px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500"
+                      className="w-full rounded-xl border border-white/10 bg-transparent px-2.5 py-1.5 text-[11px] leading-4 text-white outline-none placeholder:text-neutral-500"
                     />
                     <button
                       type="button"
@@ -1510,7 +2678,7 @@ const handleSend = useCallback(
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white transition hover:border-white/20"
+                      className="rounded-xl border border-white/10 px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-white/20"
                     >
                       Save
                     </button>
@@ -1527,66 +2695,337 @@ const handleSend = useCallback(
 </div>
 
 
-            <div className="sticky bottom-0 z-40 w-full flex flex-col gap-2 px-2 pt-2 pb-2 bg-black/80 backdrop-blur-xl">
-              <div className="grid grid-cols-4 gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActivePromptLabel('Focus')
-                    setActivePromptContext('focus_mode')
-                    void handleSend('Help me focus on the main objective.')
-                  }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[10px] font-medium tracking-[0.1em] text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8"
-                >
-                  FOCUS
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => router.push('/help')}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[10px] font-medium tracking-[0.1em] text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8"
-                >
-                  HELP
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowUpgradeModal(true)}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[10px] font-medium tracking-[0.1em] text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8"
-                >
-                  {currentTier === 'smart' ? 'MAKE G. SMARTER' : currentTier === 'intelligent' ? 'INTELLIGENT' : 'BRILLIANT'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const shareText = 'Talk to George — clarity, direction, execution.'
-                    try {
-                      if (navigator.share) {
-                        await navigator.share({ text: shareText, url: window.location.origin + '/george' })
-                      } else if (navigator.clipboard?.writeText) {
-                        await navigator.clipboard.writeText(window.location.origin + '/george')
-                        setToastMessage('GEORGE link copied')
-                        setShowToast(true)
-                      }
-                    } catch {}
-                  }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[10px] font-medium tracking-[0.1em] text-white/85 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8"
-                >
-                  SHARE G.
-                </button>
+            {liveMode && currentTier === 'brilliant' && stableLiveGuidance && (
+              <div className="fixed bottom-[88px] left-0 right-0 z-50 flex justify-center px-2">
+                <div className="w-full max-w-md rounded-[1.2rem] border border-[#7C8CFF]/30 bg-black/80 px-4 py-3 text-center shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl">
+                  <div className="text-[14px] font-semibold tracking-[0.12em] text-[#7C8CFF]">
+                    {stableLiveGuidance.signal}
+                  </div>
+                  <div className="mt-1 text-[13px] leading-5 text-white/92">
+                    {stableLiveGuidance.say}
+                  </div>
+                </div>
               </div>
+            )}
 
-              <div className="flex items-center gap-2 w-full">
-                <div ref={promptMenuRef} className="relative">
+            <div className={`fixed bottom-0 left-0 right-0 w-full flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+              
+
+              <div className="relative z-[60] mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2">
+
+  <div className="flex items-center gap-4 text-white/80 text-[13px]">
+    <button
+      type="button"
+      onClick={() => {
+        setActivePromptLabel('Focus')
+        setActivePromptContext('focus_mode')
+        setConversationSignal('FOCUS patched in')
+        setMessages((prev) => {
+          const next: Message[] = [
+            ...prev,
+            {
+              role: 'assistant',
+              content: 'FOCUS patched in. I’m sharper now. Continue.',
+            },
+          ]
+          messagesRef.current = next
+          return next
+        })
+      }}
+      className="transition hover:text-white"
+      aria-label="Focus"
+    >
+      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+        <circle cx="12" cy="12" r="7" />
+        <circle cx="12" cy="12" r="2.5" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => router.push('/help')}
+      className="transition hover:text-white"
+    >
+      Help
+    </button>
+
+    <button
+      type="button"
+      onClick={async () => {
+        if (isSharingGeorgeLink) return
+
+        const url = window.location.origin + '/george'
+
+        try {
+          setIsSharingGeorgeLink(true)
+
+          if (navigator.share) {
+            await navigator.share({ url })
+          } else if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(url)
+            setToastMessage('GEORGE link copied')
+            setShowToast(true)
+          }
+        } catch (error: any) {
+          if (error?.name !== 'AbortError' && error?.name !== 'InvalidStateError') {
+            setToastMessage('Unable to share right now')
+            setShowToast(true)
+          }
+        } finally {
+          setIsSharingGeorgeLink(false)
+        }
+      }}
+      className="transition hover:text-white"
+    >
+      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
+        <circle cx="18" cy="5" r="2"/>
+        <circle cx="6" cy="12" r="2"/>
+        <circle cx="18" cy="19" r="2"/>
+        <path d="M8 12l8-6M8 12l8 6"/>
+      </svg>
+    </button>
+
+    <div ref={promptMenuRef} className="relative flex items-center gap-3">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          setShowRecentFolders((prev) => !prev)
+          setActiveMemoryFolder(null)
+        }}
+        className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
+        aria-label="Open memory folders"
+      >
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>
+        </svg>
+      </button>
+
+      {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
+        <button
+          type="button"
+          onClick={() => setLiveMode((prev) => !prev)}
+          className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
+            liveMode
+              ? 'border border-[#7C8CFF]/40 bg-[#7C8CFF]/20 text-[#7C8CFF]'
+              : 'text-white/80 hover:text-white'
+          }`}
+        >
+          LIVE
+        </button>
+      )}
+
+      {showRecentFolders && (
+        <div
+          ref={folderBrowserRef}
+          className="absolute bottom-[52px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+        >
+          <div className="space-y-3.5">
+            <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
+              Save memory
+            </div>
+
+            {getExistingFolders().length > 0 ? (
+              <div className="space-y-2">
+                {getExistingFolders().map((folder) => (
+                  <button
+                    key={folder}
+                    type="button"
+                    onClick={() => {
+                      setActiveMemoryFolder(folder)
+                    }}
+                    className={`block w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
+                      activeMemoryFolder === folder
+                        ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
+                        : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
+                    }`}
+                  >
+                    {folder}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-neutral-500">
+                No saved folders yet
+              </div>
+            )}
+
+            {activeMemoryFolder && (
+              <div className="mt-3 border-t border-white/10 pt-3">
+                <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-neutral-500">
+                  <span>{activeMemoryFolder}</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMemoryFolder(null)}
+                    className="text-neutral-400 hover:text-white transition"
+                  >
+                    Back
+                  </button>
+                </div>
+
+                <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
+                  {getMemoriesByFolder(activeMemoryFolder).map((item, idx) => {
+                    const textBlock =
+                      item.savedPair && item.userPromptContent
+                        ? `User: ${item.userPromptContent}\nGEORGE: ${item.content}`
+                        : item.content
+
+                    const isLatest = idx === 0
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setInput(textBlock)
+                          if (textareaRef.current) {
+                            textareaRef.current.value = textBlock
+                          }
+                          setShowRecentFolders(false)
+                          setActiveMemoryFolder(null)
+                        }}
+                        className={`block w-full rounded-xl border px-3 py-2 text-left text-xs transition ${
+                          isLatest
+                            ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
+                            : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
+                        }`}
+                      >
+                        <div className="mb-1 flex items-center justify-between gap-2">
+                          <span className="truncate">
+                            {item.preview || (item.content || '').slice(0, 80)}
+                          </span>
+                          {isLatest && (
+                            <span className="text-[14px] uppercase tracking-[0.14em] text-[#7C8CFF]">
+                              Latest
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          setShowPromptMenu((prev) => !prev)
+        }}
+        className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
+        aria-label="Make a better move"
+      >
+        <span className="text-[34px] leading-none">+</span>
+        <span
+          className={`absolute right-2 top-1 h-1.5 w-1.5 rounded-full ${
+            reroutePrompt || suggestedPrompts.length > 0
+              ? 'bg-[#7C8CFF]'
+              : 'bg-white/85'
+          } ${
+            suggestedSignal || rerouteSignal
+              ? 'ring-2 ring-[#7C8CFF]/60 shadow-[0_0_10px_#7C8CFF,0_0_20px_#7C8CFF] animate-pulse'
+              : ''
+          }`}
+        />
+      </button>
+
+      {showPromptMenu && (
+        <div className="absolute bottom-[52px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => {
+                const scriptureText = 'Guide by scripture'
+                setActivePromptLabel('Guide by scripture')
+                setActivePromptContext('bible_decision_lens')
+                setShowPromptMenu(false)
+                void handleSend(scriptureText)
+              }}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
+            >
+              Guide by scripture
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                fileInputRef.current?.click()
+                setShowPromptMenu(false)
+              }}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
+            >
+              Upload file or image
+            </button>
+
+            {reroutePrompt && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActivePromptLabel(reroutePrompt.label)
+                  setActivePromptContext(reroutePrompt.context)
+                  setShowPromptMenu(false)
+                  setRerouteSignal(0)
+                  void handleSend(reroutePrompt.text)
+                }}
+                className={`block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-200 ${rerouteSignal ? 'alert-dot-twice' : ''}`}
+              >
+                {reroutePrompt.label}
+              </button>
+            )}
+
+            {suggestedPrompts.map((prompt) => (
+              <button
+                key={prompt.label}
+                type="button"
+                onClick={() => {
+                  setActivePromptLabel(prompt.label)
+                  setActivePromptContext(prompt.context)
+                  if (prompt.context?.startsWith('brilliant_')) {
+                    setConversationMode(prompt.context)
+                  }
+                  setShowPromptMenu(false)
+                  void handleSend(prompt.text)
+                }}
+                className={`block w-full py-1 text-left text-sm transition ${activePromptLabel === prompt.label ? 'text-white' : 'text-neutral-300 hover:text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'} ${suggestedSignal ? 'glow-twice' : ''}`}
+              >
+                {prompt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => setShowUpgradeModal(true)}
+    className="rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/15 px-3 py-1.5 text-[12px] tracking-[0.12em]"
+  >
+    {currentTier === 'smart'
+      ? 'GO INTELLIGENT'
+      : currentTier === 'intelligent'
+      ? 'GO BRILLIANT'
+      : 'BRILLIANT'}
+  </button>
+
+</div>
+
+              <div className="relative z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                <div className="hidden">
                   <div className="flex items-center gap-1">
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setShowRecentFolders((prev) => !prev)
-                            setActiveMemoryFolder(getDefaultFolder())
+                            setActiveMemoryFolder(null)
                           }}
-                          className="relative flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10"
+                          className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
                           aria-label="Open memory folders"
                         >
                           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1594,19 +3033,33 @@ const handleSend = useCallback(
                           </svg>
                         </button>
 
+                        {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
+                          <button
+                            type="button"
+                            onClick={() => setLiveMode((prev) => !prev)}
+                            className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
+                              liveMode
+                                ? 'border border-[#7C8CFF]/40 bg-[#7C8CFF]/20 text-[#7C8CFF]'
+                                : 'text-white/80 hover:text-white'
+                            }`}
+                          >
+                            LIVE
+                          </button>
+                        )}
+
                         {showRecentFolders && (
                           <div
-                            ref={savePickerRef}
-                            className="absolute bottom-[52px] left-0 z-50 w-[260px] rounded-xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+                            ref={folderBrowserRef}
+                            className="absolute bottom-[52px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
                           >
-                            <div className="space-y-3">
+                            <div className="space-y-3.5">
                               <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
-                                Memory folders
+                                Save memory
                               </div>
 
-                              {recentFolders.length > 0 ? (
+                              {getExistingFolders().length > 0 ? (
                                 <div className="space-y-2">
-                                  {recentFolders.map((folder) => (
+                                  {getExistingFolders().map((folder) => (
                                     <button
                                       key={folder}
                                       type="button"
@@ -1674,7 +3127,7 @@ const handleSend = useCallback(
                                               {item.preview || (item.content || '').slice(0, 80)}
                                             </span>
                                             {isLatest && (
-                                              <span className="text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
+                                              <span className="text-[14px] uppercase tracking-[0.14em] text-[#7C8CFF]">
                                                 Latest
                                               </span>
                                             )}
@@ -1691,13 +3144,16 @@ const handleSend = useCallback(
 
                         <button
                           type="button"
-                          onClick={() => setShowPromptMenu((prev) => !prev)}
-                          className="relative flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10"
+                          onClick={(e) => {
+                          e.stopPropagation()
+                          setShowPromptMenu((prev) => !prev)
+                        }}
+                          className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
                           aria-label="Make a better move"
                         >
                           <span className="text-[34px] leading-none">+</span>
                           <span
-                            className={`absolute right-1 top-1 h-2.5 w-2.5 rounded-full ${
+                            className={`absolute right-2 top-1 h-1.5 w-1.5 rounded-full ${
                               reroutePrompt || suggestedPrompts.length > 0
                                 ? 'bg-[#7C8CFF]'
                                 : 'bg-white/85'
@@ -1710,7 +3166,7 @@ const handleSend = useCallback(
                         </button>
 
                         {showPromptMenu && (
-                          <div className="absolute bottom-[52px] left-0 z-50 w-max max-w-[220px] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                          <div className="absolute bottom-[52px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                             <div className="space-y-1">
                               <button
                                 type="button"
@@ -1753,17 +3209,20 @@ const handleSend = useCallback(
                                 </button>
                               )}
 
-                              {suggestedPrompts.slice(0, 5).map((prompt) => (
+                              {suggestedPrompts.map((prompt) => (
                                 <button
                                   key={prompt.label}
                                   type="button"
                                   onClick={() => {
                                     setActivePromptLabel(prompt.label)
                                     setActivePromptContext(prompt.context)
+                                    if (prompt.context?.startsWith('brilliant_')) {
+                                      setConversationMode(prompt.context)
+                                    }
                                     setShowPromptMenu(false)
                                     void handleSend(prompt.text)
                                   }}
-                                  className={`block w-full py-1 text-left text-sm transition ${activePromptLabel === prompt.label ? 'text-white' : 'text-neutral-300 hover:text-[#7C8CFF]'} ${suggestedSignal ? 'glow-twice' : ''}`}
+                                  className={`block w-full py-1 text-left text-sm transition ${activePromptLabel === prompt.label ? 'text-white' : 'text-neutral-300 hover:text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'} ${suggestedSignal ? 'glow-twice' : ''}`}
                                 >
                                   {prompt.label}
                                 </button>
@@ -1773,7 +3232,7 @@ const handleSend = useCallback(
                         )}
                       </div>
                     </div>
-                    <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-white/[0.04] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                    <div className="relative flex-1 rounded-[1.8rem] border border-white/15 bg-white/[0.05] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
 
                       <input
                         ref={fileInputRef}
@@ -1782,24 +3241,21 @@ const handleSend = useCallback(
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0]
-                          if (!file) return
-                          console.log('File selected:', file)
-                        }}
+                          if (!file) return                        }}
                       />
                       <textarea
                         ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder=""
+                        placeholder="What are we working on?"
                         rows={1}
                         style={{ WebkitUserSelect: 'text' }}
-                        className="min-h-[48px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent px-2 py-2.5 pr-24 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
+                        className="min-h-[44px] w-full flex-1 resize-none bg-transparent rounded-[1.6rem] border-0 bg-transparent px-2 py-2.5 pr-20 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
                       />
 
-                      <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
-                        {currentTier !== 'smart' && (
+                      <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                        {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
                           <>
                             <select
                               value={voiceSpeed}
@@ -1817,16 +3273,35 @@ const handleSend = useCallback(
                               type="button"
                               onClick={() => {
                                 if (!voiceSupported || isThinking) return
+
+                                if (currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT) {
+                                  setMessages((prev) => [
+                                    ...prev,
+                                    {
+                                      role: 'assistant',
+                                      content: 'Upgrade to continue — and support BRANES where GEORGE is needed most'
+                                    }
+                                  ])
+                                  return
+                                }
+
                                 setInteractionMode('speech')
                                 if (isListening) {
                                   stopListening()
                                   setInterimTranscript('')
                                 } else {
+                                  if (currentTier === 'smart') {
+                                    setSmartMicUses((prev) => prev + 1)
+                                  }
                                   startListening()
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className="flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                              className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
+                                  currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT
+                                    ? 'text-amber-300'
+                                    : 'text-white/90 hover:text-white'
+                                } disabled:cursor-not-allowed disabled:opacity-40`}
                               aria-label="Use speech"
                             >
                               <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1842,10 +3317,11 @@ const handleSend = useCallback(
                         <button
                           type="button"
                           onClick={() => {
+                            console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition hover:opacity-90 glow-soft glow-focus glow-press"
-                          aria-label="Move"
+                          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-black transition hover:opacity-90 glow-soft glow-focus glow-press"
+                          aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 19V5"/>
@@ -1858,24 +3334,30 @@ const handleSend = useCallback(
 
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
-                    <span className="text-red-400">{voiceError}</span>
+                    <span className="text-neutral-400">{voiceError}</span>
                   ) : currentTier === 'smart' ? (
                     <span className="text-neutral-600">Voice unlocks above Smart.</span>
                   ) : (
-                    <span className={isListening ? 'text-[#7C8CFF]' : ''}>
+                    <span className={isListening ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]' : ''}>
                       {isListening ? 'Voice is listening…' : ''}
                     </span>
                   )}
+                </div>
               </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
       {showUpgradeModal && (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.45)]">
-            <div className="mb-4">
+        <div
+          className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
+          onClick={() => setShowUpgradeModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 text-center">
               <p className="text-sm font-medium text-white">Take GEORGE further</p>
               <p className="mt-1 text-xs leading-6 text-neutral-400">
                 Choose the level of support you want, or see full options.
@@ -1883,6 +3365,13 @@ const handleSend = useCallback(
             </div>
 
             <div className="space-y-3">
+              <div className="w-full rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3.5 text-left">
+                <div className="text-sm font-medium text-white">Smart GEORGE — Free</div>
+                <div className="mt-1 text-xs leading-6 text-neutral-500">
+                  Keep it simple. Focus, direction, and forward movement.
+                </div>
+              </div>
+
               <button
                 type="button"
                 onClick={async () => {
@@ -1909,7 +3398,7 @@ const handleSend = useCallback(
                     setShowToast(true)
                   }
                 }}
-                className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8"
+                className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
               >
                 <div className="text-sm font-medium text-white">Intelligent GEORGE — $9.99</div>
                 <div className="mt-1 text-xs leading-6 text-neutral-400">
@@ -1943,16 +3432,16 @@ const handleSend = useCallback(
                     setShowToast(true)
                   }
                 }}
-                className="block w-full rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-left transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/14"
+                className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18 shadow-[0_0_20px_rgba(124,140,255,0.10)]"
               >
                 <div className="text-sm font-medium text-white">Brilliant GEORGE — $25</div>
                 <div className="mt-1 text-xs leading-6 text-neutral-300">
-                  Absorb complexity, refine judgment, and execute with precision under pressure.
+                  Guided Conversation Engine. Walk in prepared. Stay sharp in the room. Bring GEORGE with you.
                 </div>
               </button>
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
+            <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
               <button
                 type="button"
                 onClick={() => setShowUpgradeModal(false)}

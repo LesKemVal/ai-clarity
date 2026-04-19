@@ -5,10 +5,9 @@ import PageShell from '@/components/layout/PageShell'
 export default function HelpPage() {
   return (
     <PageShell
-      title="How to use GEORGE"
+      title="Ways to use GEORGE"
       eyebrow="Help"
       backToGeorge
-      withSidebar={false}
     >
       <div className="space-y-10">
 
@@ -16,21 +15,21 @@ export default function HelpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="max-w-3xl space-y-4">
             <p className="text-lg text-white">
-              GEORGE helps you think clearly, move with direction, and finish what you start.
+              GEORGE is about action. It helps you think better, move faster, and follow through.
             </p>
             <p className="text-sm text-neutral-400 md:text-base">
-              You don’t need perfect input. Start where you are—GEORGE will help shape the direction.
+              You do not need perfect input. Start where you are. GEORGE will help sharpen what matters next.
             </p>
           </div>
         </section>
 
         {/* FULL CAPACITY */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">What happens with full capacity?</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">What is GEORGE?</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              Full capacity changes what GEORGE can carry for you and how far he can take the work.
+              GEORGE is built for people who want clarity that actually helps.
             </p>
 
             <ul className="space-y-2 list-disc pl-5 text-neutral-400">
@@ -41,43 +40,43 @@ export default function HelpPage() {
             </ul>
 
             <p className="text-white">
-              This means you can actually finish what you start.
+              GEORGE is not here to decorate your screen. GEORGE is here to help you get something real done.
             </p>
           </div>
         </section>
 
         {/* PROMPTS */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Prompts</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Who is it for?</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              Prompts are suggested next moves—not commands.
+              People under pressure. Builders. Students. Entrepreneurs. Anyone who needs clarity before the moment gets expensive.
             </p>
 
             <p>
-              After you send a message, GEORGE may surface 2–3 prompts in the sidebar based on your direction.
+              GEORGE works best when something matters and you do not want to keep drifting.
             </p>
 
             <ul className="space-y-2 list-disc pl-5 text-neutral-400">
               <li>They appear when a stronger path is available</li>
-              <li>They help reduce hesitation and sharpen direction</li>
+              <li>They help reduce hesitation and sharpen decisions</li>
               <li>They adapt as the conversation evolves</li>
             </ul>
 
             <p>
-              Prompts are there to help you move—not to replace your thinking.
+              Results improve when clarity improves.
             </p>
           </div>
         </section>
 
         {/* MEMORY */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Memory (Folders)</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">How to use GEORGE</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              Memory allows you to save moments that are worth returning to—and continue from them later.
+              Start simple. Tell GEORGE what you are trying to do, where you are stuck, or what decision you need to make.
             </p>
 
             <ul className="space-y-2 list-disc pl-5 text-neutral-400">
@@ -88,11 +87,11 @@ export default function HelpPage() {
             </ul>
 
             <p className="text-white">
-              Memory is intentional. You decide what is worth keeping.
+              Best prompts:
             </p>
 
             <div className="pt-2 space-y-2">
-              <p className="text-white font-medium">Saving to folders</p>
+              <p className="text-white font-medium">Help me get unstuck.</p>
               <ul className="space-y-2 list-disc pl-5 text-neutral-400">
                 <li>Use <span className="text-white">Keep this</span> under a message</li>
                 <li>The save box opens above the message so you can still see what you’re saving</li>
@@ -102,11 +101,11 @@ export default function HelpPage() {
             </div>
 
             <div className="pt-2 space-y-2">
-              <p className="text-white font-medium">Best use</p>
+              <p className="text-white font-medium">Build me a path to ______.</p>
               <ul className="space-y-2 list-disc pl-5 text-neutral-400">
                 <li>Keep turning points, not everything</li>
                 <li>Organize by goal or active thread</li>
-                <li>Use saved points to restart direction quickly</li>
+                <li>Use saved points to restart momentum quickly</li>
               </ul>
             </div>
           </div>
@@ -114,30 +113,30 @@ export default function HelpPage() {
 
         {/* WHY PROMPTS */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Why prompts exist</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">What am I missing here?</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              Without prompts, GEORGE has to lead harder. Responses become longer and direction can feel forced.
+              Help me focus.
             </p>
 
             <p>
-              With prompts, you stay in control. Direction improves naturally.
+              Give me 3 realistic options.
             </p>
 
             <p className="text-white">
-              You choose the direction—GEORGE supports it.
+              Train me for ______.
             </p>
           </div>
         </section>
 
         {/* REROUTE */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">New strategy</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Help me think clearly.</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              If a path is weak or unclear, GEORGE may show:
+              What tier should I use?
             </p>
 
             <p className="text-white font-medium">
@@ -145,49 +144,49 @@ export default function HelpPage() {
             </p>
 
             <p>
-              This means there may be a better direction or something important is being missed.
+              SMART: Try it now.
             </p>
 
             <p>
-              It’s not a correction. It’s another move.
+              INTELLIGENT: If you use GEORGE often.
             </p>
           </div>
         </section>
 
         {/* CORE */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">GEORGE Core</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">BRILLIANT: If results matter.</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              GEORGE can support multiple goals and parallel direction.
+              Practical note
             </p>
 
             <p>
-              This is part of GEORGE Core.
+              GEORGE helps with judgment and execution.
             </p>
 
             <p>
-              If you attempt to move across multiple paths, you may be prompted to upgrade.
+              GEORGE is not a lawyer, doctor, therapist, or broker.
             </p>
           </div>
         </section>
 
         {/* SCRIPTURE */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Scripture-based guidance</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Start now</h2>
 
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              GEORGE may use scripture where it strengthens clarity and direction.
+              Enter GEORGE
             </p>
 
             <p>
-              This is applied naturally—not forced.
+              Upgrade to Intelligent
             </p>
 
             <p className="text-white">
-              Wisdom: Proverbs 4:7
+              Bring GEORGE with you
             </p>
           </div>
         </section>
@@ -196,49 +195,17 @@ export default function HelpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="space-y-4 text-neutral-300 text-sm md:text-base">
             <p>
-              GEORGE is not here to just answer questions.
+              GEORGE is not here just to answer questions.
             </p>
 
             <p className="text-white">
-              It is here to guide decisions, support execution, and help you finish what matters.
+              GEORGE is here to guide decisions, support execution, and help you finish what matters.
             </p>
           </div>
         </section>
 
 
-        {/* EXAMPLE */}
-        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Example</h2>
-
-          <div className="space-y-4 text-sm md:text-base">
-            <p className="text-neutral-300">
-              You:
-            </p>
-            <p className="text-white">
-              I want to build an app
-            </p>
-
-            <p className="text-neutral-300">
-              GEORGE:
-            </p>
-            <p className="text-white">
-              Start with a revenue-backed MVP. Pick a reachable user, solve one painful problem, and pre-sell before building.
-            </p>
-
-            <div className="mt-4 space-y-2">
-              <p className="text-neutral-300">Prompts:</p>
-
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-full border border-neutral-700 px-3 py-1 text-xs text-neutral-200">
-                  Define user
-                </span>
-                <span className="rounded-full border border-neutral-700 px-3 py-1 text-xs text-neutral-200">
-                  Core problem
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+        
 
       </div>
     </PageShell>
