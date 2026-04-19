@@ -178,6 +178,13 @@ export default function Sidebar({
   activePromptLabel = null,
   currentTier = 'smart',
 }: SidebarProps) {
+  const [isGeorgeYours, setIsGeorgeYours] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setIsGeorgeYours(window.localStorage.getItem('george_onboarded') === 'true')
+  }, [])
+
   const [conversationsOpen, setConversationsOpen] = useState(true)
   const [isSubscribed, setIsSubscribed] = useState(false)
 
@@ -520,7 +527,22 @@ export default function Sidebar({
 
             <div className="space-y-4">
               <a href="/" className={linkClass('/')}>GEORGE</a>
-              <a href="/welcome" className={linkClass('/welcome')}>Make GEORGE Yours</a>
+              {isGeorgeYours ? (
+                <a href="/welcome" className={linkClass('/welcome')} aria-label="GEORGE is yours" title="GEORGE is yours">
+                  <span className="inline-flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9.5 8.5a2.5 2.5 0 1 1 5 0c0 1.2-.6 1.9-1.4 2.5-.7.5-1.1 1-1.1 1.8" />
+                      <path d="M12 17h.01" />
+                      <path d="M8.2 4.6A7.5 7.5 0 0 0 5 10.7c0 1.8.6 3.4 1.7 4.8" />
+                      <path d="M15.8 4.6a7.5 7.5 0 0 1 3.2 6.1c0 1.8-.6 3.4-1.7 4.8" />
+                      <path d="M6.9 18.1A8.7 8.7 0 0 0 12 19.8c1.9 0 3.7-.6 5.1-1.7" />
+                    </svg>
+                    <span>Yours</span>
+                  </span>
+                </a>
+              ) : (
+                <a href="/welcome" className={linkClass('/welcome')}>Make GEORGE Yours</a>
+              )}
               <a href="/top-up" className={linkClass('/top-up')}>Top-Up</a>
               <a href="/roadmap" className={linkClass('/roadmap')}>Roadmap</a>
               <a href="/help" className={linkClass('/help')}>Help</a>
