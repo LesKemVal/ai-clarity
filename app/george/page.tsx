@@ -370,18 +370,39 @@ export default function Page() {
   return `${timeGreeting} What do you want to do?`
 }
 
-  function handleShareGeorge() {
+  function handleInstallGeorge() {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+    const isiPhone = /iPhone|iPad|iPod/i.test(ua)
     const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE', text: 'GEORGE', url }).catch(() => {})
+
+    if (isiPhone) {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).catch(() => {})
+      }
+      setToastMessage('On iPhone: Share → Add to Home Screen')
+      setShowToast(true)
       return
     }
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).then(() => {
-        setToastMessage('GEORGE link copied')
-        setShowToast(true)
-      }).catch(() => {})
+
+    if (typeof window !== 'undefined' && (window as any).__branesInstallPrompt) {
+      const promptEvent = (window as any).__branesInstallPrompt
+      promptEvent.prompt()
+      promptEvent.userChoice.finally(() => {
+        ;(window as any).__branesInstallPrompt = null
+      })
+      return
     }
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({ title: 'GEORGE', text: 'Install GEORGE', url }).catch(() => {})
+      return
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).catch(() => {})
+    }
+    setToastMessage('GEORGE link copied')
+    setShowToast(true)
   }
 
 const [messages, setMessages] = useState<Message[]>([])
@@ -2461,10 +2482,10 @@ return (
 
                 <button
                   type="button"
-                  onClick={handleShareGeorge}
+                  onClick={handleInstallGeorge}
                   className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
-                  aria-label="Share GEORGE"
-                  title="Share GEORGE"
+                  aria-label="Install GEORGE"
+                  title="Install GEORGE"
                 >
                   <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 16V4" />
