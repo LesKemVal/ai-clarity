@@ -105,9 +105,17 @@ export default function RoadmapPage() {
                   type="button"
                   onClick={startIntelligentTrial}
                   disabled={startingTrial}
-                  className="inline-flex items-center justify-center rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {startingTrial ? 'Starting trial...' : 'Upgrade to Intelligent'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => router.push('/welcome')}
+                  className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+                >
+                  Make GEORGE Yours
                 </button>
 
                 <a
