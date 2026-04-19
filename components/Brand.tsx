@@ -12,7 +12,7 @@ export default function Brand({
   showCore = true,
 }: BrandProps) {
   return (
-    <div className={`flex items-center ${compact ? 'gap-3' : 'gap-4.5'}`}>
+    <div className={`flex items-center ${compact ? 'gap-3' : 'gap-3'}`}>
       <div
         className={`relative flex items-center justify-center rounded-full border border-[#7C8CFF] bg-black text-[#7C8CFF] shadow-[0_0_28px_rgba(124,140,255,0.24)] ${
           compact ? 'h-10 w-10 text-[18px]' : 'h-14 w-14 text-[28px]'
@@ -33,14 +33,7 @@ export default function Brand({
             BRANES
           </span>
 
-          {!compact && showCore && (
-            <div className="flex items-center gap-2 rounded-full border border-[#7C8CFF]/30 bg-[#0B1020] px-3 py-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#7C8CFF] branes-pulse-1" />
-              <span className="text-[11px] uppercase tracking-[0.22em] text-neutral-400">
-                Core
-              </span>
-            </div>
-          )}
+
         </div>
 
         <div className={`${compact ? 'mt-1' : 'mt-2'} flex items-center gap-2.5`}>

@@ -356,15 +356,15 @@ export default function Page() {
     : "Good evening."
 
   if (tier === 'smart') {
-    return `${timeGreeting} I’m ready. What are we working on?`
+    return `${timeGreeting} I’m all about you today. What’s first?`
   }
 
   if (tier === 'intelligent') {
-    return `${timeGreeting} I’m thinking with you now. What are we working on?`
+    return `${timeGreeting} I’m all about you today. What’s first?`
   }
 
   if (tier === 'brilliant') {
-    return `${timeGreeting} Thanks to you, I am Brilliant. What can we do together?`
+    return `${timeGreeting} I’m all about you today. What’s first?`
   }
 
   return `${timeGreeting} What do you want to do?`
@@ -2435,7 +2435,11 @@ return (
                     </span>
                   </button>
 
-                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28">
+                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28 md:hidden">
+                    GEORGE
+                  </span>
+
+                  <span className="hidden md:block text-[13px] font-medium uppercase tracking-[0.34em] text-white/18 ml-2">
                     GEORGE
                   </span>
                 </div>
@@ -2448,7 +2452,7 @@ return (
     {conversationSignal}
   </div>
 )}
-<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-2 pt-5 pb-[300px] md:pb-[320px] space-y-5 md:pt-8 ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
+<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-2 pt-5 pb-[300px] md:pb-[320px] space-y-5 md:pt-12 ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-500px)] flex-col items-center justify-center px-4 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-2xl md:text-3xl font-semibold tracking-tight text-transparent">
