@@ -28,16 +28,37 @@ type SidebarProps = {
   suggestedPrompts?: PromptItem[]
   suggestedSignal?: number
   activePromptLabel?: string | null
+  currentTier?: 'smart' | 'intelligent' | 'brilliant'
 }
 
 const promptGroups: PromptGroup[] = [
   {
-    title: 'Bible',
+    title: 'Pre-training Courses',
     prompts: [
       {
-        label: 'Guide with scripture',
-        text: 'Guide with scripture',
-        context: 'bible_decision_lens',
+        label: "Driver's License",
+        text: "I need to pass my driver's license test",
+        context: 'training_drivers_license',
+      },
+      {
+        label: "CDL",
+        text: "I need to pass my CDL test",
+        context: 'training_cdl',
+      },
+      {
+        label: "GED",
+        text: "I need to complete my GED",
+        context: 'training_ged',
+      },
+      {
+        label: "CNA",
+        text: "I need to pass my CNA exam",
+        context: 'training_cna',
+      },
+      {
+        label: "Interview Prep",
+        text: "I need to prepare for a job interview",
+        context: 'training_interview',
       },
     ],
   },
@@ -155,6 +176,7 @@ export default function Sidebar({
   suggestedPrompts = [],
   suggestedSignal = 0,
   activePromptLabel = null,
+  currentTier = 'smart',
 }: SidebarProps) {
   const [conversationsOpen, setConversationsOpen] = useState(true)
   const [isSubscribed, setIsSubscribed] = useState(false)
@@ -170,6 +192,8 @@ export default function Sidebar({
     Build: false,
     Writing: false,
     Problems: false,
+    'Pre-training Courses': true,
+    'Conversation Modes': false,
     Resources: false,
   })
 
@@ -205,19 +229,26 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${showSidebar ? 'translate-x-0' : '-translate-x-full'} xl:static xl:flex xl:flex-col xl:translate-x-0`}
+      className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'} xl:static xl:z-auto xl:flex xl:flex-col xl:translate-x-0 xl:pointer-events-auto`}
     >
-      <div className="border-b border-neutral-800 px-5 pb-5 pt-8">
-        <div className="flex items-start justify-between gap-3">
-          <Brand subtitle={isSubscribed ? 'GEORGE Core active' : 'Standard access'} />
+      <div className="border-b border-white/5 px-5 pb-6 pt-7">
+        <div className="relative flex flex-col items-center justify-center">
           <button
             type="button"
             onClick={() => setShowSidebar?.(false)}
-            className="text-white/40 transition hover:text-white xl:hidden"
+            className="absolute right-0 top-0 text-white/40 transition hover:text-white xl:hidden"
             aria-label="Close sidebar"
           >
             ×
           </button>
+
+          <div className="text-4xl font-semibold tracking-tight text-[#7C8CFF]">
+            B
+          </div>
+
+          <div className="mt-2 text-[11px] uppercase tracking-[0.28em] text-neutral-400">
+            BRANES
+          </div>
         </div>
       </div>
 
@@ -254,13 +285,143 @@ export default function Sidebar({
           </div>
 
 
+
+          <div>
+            <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+              Framing
+            </p>
+
+            <button
+              type="button"
+              onClick={() =>
+                onPromptSelect({
+                  label: 'Guide w/ Scripture (KJV)',
+                  text: 'Guide w/ Scripture (KJV)',
+                  context: 'bible_decision_lens',
+                })
+              }
+              className="block w-full rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-[#7C8CFF] transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/12 hover:text-white"
+            >
+              Guide w/ Scripture (KJV)
+            </button>
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => toggleGroup('Pre-training Courses')}
+              className="flex w-full items-center justify-between text-left"
+            >
+              <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+                Pre-training Courses
+              </span>
+              <span className="text-xs text-neutral-500">
+                {openGroups['Pre-training Courses'] ? '▾' : '▸'}
+              </span>
+            </button>
+
+            {openGroups['Pre-training Courses'] && (
+              <div className="mt-4 space-y-2 pl-0">
+                {promptGroups
+                  .find((group) => group.title === 'Pre-training Courses')
+                  ?.prompts.map((prompt) => (
+                    <button
+                      key={prompt.label}
+                      type="button"
+                      onClick={() => onPromptSelect(prompt)}
+                      className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
+                    >
+                      {prompt.label}
+                    </button>
+                  ))}
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    onPromptSelect({
+                      label: 'Ask GEORGE',
+                      text: 'Show me other courses not listed here. Tell me plainly what they are, who they help, what they could mean for me, and if some may not matter to me.',
+                      context: 'courses_expand',
+                    })
+                  }
+                  className="mt-3 block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-400 transition hover:border-[#7C8CFF]/35 hover:text-[#7C8CFF]"
+                >
+                  Ask GEORGE
+                </button>
+
+              </div>
+            )}
+          </div>
+
+          {currentTier === 'brilliant' && (
+            <div>
+              <button
+                type="button"
+                onClick={() => toggleGroup('Conversation Modes')}
+                className="flex w-full items-center justify-between text-left"
+              >
+                <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+                  Guided Conversation Engine
+                </span>
+                <span className="text-xs text-neutral-500">
+                  {openGroups['Conversation Modes'] ? '▾' : '▸'}
+                </span>
+              </button>
+
+              {openGroups['Conversation Modes'] && (
+                <div className="mt-4 space-y-2 pl-0">
+                  {[
+                    { label: 'Doctor Visit', text: 'Set GEORGE to doctor visit mode and help me understand, respond, and stay on objective in real time.', context: 'brilliant_doctor' },
+                    { label: 'Dealership', text: 'Set GEORGE to dealership mode and help me slow pace, spot pressure, and negotiate clearly.', context: 'brilliant_dealership' },
+                    { label: 'Job Interview', text: 'Set GEORGE to interview mode and help me answer strongly and stay composed.', context: 'brilliant_interview' },
+                    { label: 'Boss / Workplace', text: 'Set GEORGE to workplace mode and help me navigate this professionally.', context: 'brilliant_workplace' },
+                    { label: 'Relationship Talk', text: 'Set GEORGE to relationship mode and help me communicate cleanly.', context: 'brilliant_relationship' },
+                    { label: 'Negotiation', text: 'Set GEORGE to negotiation mode and guide me through this in real time.', context: 'brilliant_negotiation' },
+                    { label: 'Public Speaking', text: 'Set GEORGE to speech mode and help me deliver this with control and cadence.', context: 'brilliant_speech' },
+                    { label: 'Everyday Conversation', text: 'Set GEORGE to everyday conversation mode and guide me through this naturally.', context: 'brilliant_everyday' },
+                    { label: 'Tutor Someone Else', text: 'Set GEORGE to tutor mode and guide me while I train someone else.', context: 'brilliant_tutor' },
+                    { label: 'Custom Situation', text: 'Help me prepare for a custom real-world conversation and guide me live.', context: 'brilliant_custom' },
+                  ].map((prompt) => (
+                    <button
+                      key={prompt.label}
+                      type="button"
+                      onClick={() => onPromptSelect(prompt)}
+                      className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
+                    >
+                      {prompt.label}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onPromptSelect({
+                        label: 'Ask GEORGE',
+                        text: 'Help me prepare for another real-world situation not listed here. Tell me what matters, what to watch for, and how to move well in the room.',
+                        context: 'brilliant_everyday',
+                      })
+                    }
+                    className="mt-3 block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-400 transition hover:border-[#7C8CFF]/35 hover:text-[#7C8CFF]"
+                  >
+                    Ask GEORGE about another situation
+                  </button>
+
+                
+                  <p className="mt-3 px-1 text-[11px] leading-5 text-neutral-500">
+                    Walk in prepared. Stay sharp in the room. Bring GEORGE with you.
+                  </p>
+</div>
+              )}
+            </div>
+          )}
+
           <div>
             <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
               Memory
             </p>
 
             <div className="space-y-2 text-sm">
-              {['General','Goals','Business','Personal','Health','Writing','Legal'].map((folder) => (
+              {['General','Goals','Business','Personal','Health','Writing','Legal','Credit'].map((folder) => (
                 <button
                   key={folder}
                   onClick={() => {
@@ -280,7 +441,7 @@ export default function Sidebar({
             </p>
 
             <div className="space-y-4">
-              {reroutePrompt && (
+{reroutePrompt && (
                 <div>
                   <button
                     type="button"
@@ -315,7 +476,9 @@ export default function Sidebar({
                 </div>
               )}
 
-              {promptGroups.map((group) => {
+              {promptGroups
+                .filter((group) => group.title !== 'Pre-training Courses')
+                .map((group) => {
                 const isOpen = openGroups[group.title]
 
                 return (
@@ -349,26 +512,6 @@ export default function Sidebar({
             </div>
           </div>
 
-          <div>
-            <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-              System
-            </p>
-
-            <div className="space-y-4">
-              <span className="block text-sm text-neutral-400">Sessions</span>
-
-              <div className="text-sm">
-                <span className="text-neutral-400">Voice</span>{' '}
-                <span className={voiceActive ? 'text-[#7C8CFF]' : 'text-neutral-500'}>
-                  {voiceActive ? 'On' : 'Off'}
-                </span>
-              </div>
-
-              <span className="block text-sm text-neutral-400">
-                Subscription: {isSubscribed ? 'Active' : 'Inactive'}
-              </span>
-            </div>
-          </div>
 
           <div>
             <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
@@ -382,30 +525,6 @@ export default function Sidebar({
               <a href="/help" className={linkClass('/help')}>Help</a>
             </div>
           </div>
-
-          <div>
-            <button
-              type="button"
-              onClick={() => toggleGroup('Resources')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-                Resources
-              </span>
-              <span className="text-xs text-neutral-500">
-                {openGroups['Resources'] ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {openGroups['Resources'] && (
-              <div className="mt-4 space-y-2 text-sm">
-                <a href="/help" className="block text-neutral-400 hover:text-[#7C8CFF]">Help</a>
-                <a href="/legal/toa" className="block text-neutral-400 hover:text-[#7C8CFF]">Terms</a>
-                <a href="/roadmap" className="block text-neutral-400 hover:text-[#7C8CFF]">Roadmap</a>
-              </div>
-            )}
-          </div>
-
 
           <div>
             <button

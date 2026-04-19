@@ -96,30 +96,21 @@ canvas {
 }
 
 @keyframes branesPulse {
-  0%, 100% {
-    opacity: 0.35;
-    transform: translateY(0) scale(0.92);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-1px) scale(1);
-  }
-  60% {
-    opacity: 0.6;
-    transform: translateY(0) scale(0.96);
-  }
+  0% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.3; transform: scale(0.9); }
 }
 
 .branes-pulse-1 {
-  animation: branesPulse 1.4s ease-in-out infinite;
+  animation: branesPulse 1.2s ease-in-out infinite;
 }
 
 .branes-pulse-2 {
-  animation: branesPulse 1.4s ease-in-out 0.18s infinite;
+  animation: branesPulse 1.2s ease-in-out 0.25s infinite;
 }
 
 .branes-pulse-3 {
-  animation: branesPulse 1.4s ease-in-out 0.36s infinite;
+  animation: branesPulse 1.2s ease-in-out 0.5s infinite;
 }
 
 textarea {

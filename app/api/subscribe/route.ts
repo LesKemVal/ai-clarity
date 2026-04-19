@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
       },
       success_url: `${appUrl}/george?subscription=success&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/roadmap?subscription=cancelled&tier=${tier}`,
+      cancel_url: `${appUrl}/george?subscription=cancelled&tier=${tier}`,
     })
 
     return NextResponse.json({ url: session.url })

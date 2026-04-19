@@ -89,7 +89,7 @@ export default function RoadmapPage() {
               </h1>
 
               <p className="max-w-2xl text-base leading-8 text-neutral-300 md:text-lg">
-                Be clear. Decide faster. Execute.
+                GEORGE is about action.
               </p>
 
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -123,7 +123,7 @@ export default function RoadmapPage() {
         <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 md:p-8">
           <div className="max-w-3xl space-y-5">
             <h2 className="text-2xl font-semibold text-white">
-              What GEORGE actually does
+              GEORGE works where life actually happens
             </h2>
 
             <p className="text-neutral-200 text-sm md:text-base leading-7">
@@ -151,7 +151,7 @@ export default function RoadmapPage() {
             </p>
 
             <p className="text-neutral-400 text-sm md:text-base leading-7">
-              There are more paths, opportunities, and outcomes available than can be listed here. GEORGE is built to help you find them, understand them, and move through them.
+              More is possible than most people realize. GEORGE helps you see it and move.
             </p>
           </div>
         </section>
@@ -165,10 +165,10 @@ export default function RoadmapPage() {
                 Start here
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-white">
-                Choose how you want to enter GEORGE.
+                Choose your level.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Smart is available free, forever. Intelligent begins with a 30-day free trial and requires a card up front. Brilliant is for heavier demands, deeper work, and stronger support under pressure.
+                Smart is available free, forever. Intelligent begins with a 30-day free trial and requires a card up front. Brilliant is for real conversations, sharper execution, and people who expect results.
               </p>
 
               <p className="text-base font-medium text-white md:text-lg">
@@ -177,26 +177,60 @@ export default function RoadmapPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5">
-                <p className="text-sm font-medium text-white">Smart</p>
-                <p className="mt-3 text-sm leading-7 text-neutral-400">
-                  Free forever. A minimal GEORGE—available at all times for clear direction and useful movement.
+
+              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5 space-y-3">
+                <p className="text-sm font-medium text-white">Smart — Free</p>
+
+                <ul className="text-sm leading-6 text-neutral-400 space-y-1">
+                  <li>• Clarify what you’re actually trying to do</li>
+                  <li>• Turn ideas into direction</li>
+                  <li>• Get immediate next steps</li>
+                  <li>• Work through everyday decisions</li>
+                  <li>• Stay moving instead of stalling</li>
+                  <li>• Build consistency in how you think</li>
+                </ul>
+
+                <p className="text-xs text-neutral-500 pt-2">
+                  This is where motion begins.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5">
-                <p className="text-sm font-medium text-white">Intelligent</p>
-                <p className="mt-3 text-sm leading-7 text-neutral-200">
-                  30 days free with card required. Stronger continuity, better structure, and more carrying power from the start.
+              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-3">
+                <p className="text-sm font-medium text-white">Intelligent — $9.99</p>
+
+                <ul className="text-sm leading-6 text-neutral-200 space-y-1">
+                  <li>• Everything in Smart</li>
+                  <li>• Deeper breakdowns of your situation</li>
+                  <li>• Stronger execution paths</li>
+                  <li>• Better decision framing under pressure</li>
+                  <li>• Cleaner thinking when things get unclear</li>
+                  <li>• Light voice interaction</li>
+                  <li>• Faster recovery when you lose direction</li>
+                </ul>
+
+                <p className="text-xs text-neutral-400 pt-2">
+                  This is where momentum returns.
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5">
-                <p className="text-sm font-medium text-white">Brilliant</p>
-                <p className="mt-3 text-sm leading-7 text-neutral-400">
-                  Premium GEORGE for heavier goals, deeper work, sharper thinking, and more moving parts at once.
+              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5 space-y-3">
+                <p className="text-sm font-medium text-white">Brilliant — $25</p>
+
+                <ul className="text-sm leading-6 text-neutral-400 space-y-1">
+                  <li>• Everything in Intelligent</li>
+                  <li>• Real-time conversation support</li>
+                  <li>• Navigate live conversations</li>
+                  <li>• Refine wording, tone, and delivery</li>
+                  <li>• Sharpen communication in high-stakes moments</li>
+                  <li>• Faster clarity → direction → control</li>
+                  <li>• Stronger presence when it matters</li>
+                </ul>
+
+                <p className="text-xs text-neutral-500 pt-2">
+                  Walk in prepared. Stay sharp in the room. Bring GEORGE with you.
                 </p>
               </div>
+
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">

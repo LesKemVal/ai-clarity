@@ -1,8 +1,6 @@
 node_modules
 .next
-.vercel
-.env.local
-.env
 backups
-*.bak-*
+*.tar.gz
+.git
 .DS_Store

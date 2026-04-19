@@ -20,11 +20,7 @@ export const metadata: Metadata = {
   },
   description: 'Clarity. Execution. Continuity.',
   applicationName: 'BRANES',
-  icons: {
-    icon: '/icon.svg',
-    apple: '/apple-icon.svg',
-    shortcut: '/icon.svg',
-  },
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 }
 
 export default function RootLayout({
@@ -37,7 +33,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black text-neutral-100">
+      <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation">
         <MobileHeaderGate />
         <div className="flex-1 pt-16 md:pt-0">
           {children}

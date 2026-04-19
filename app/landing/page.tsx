@@ -14,11 +14,15 @@ export default function LandingPage() {
           </p>
 
           <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">
-            Wherever you want to go, be, or do — take GEORGE with you.
+            GEORGE is about action.
           </h1>
 
           <p className="max-w-2xl text-base leading-8 text-neutral-300 md:text-lg">
             Be clear. Decide faster. Execute.
+          </p>
+
+          <p className="max-w-2xl text-sm leading-7 text-neutral-400">
+            Walk in prepared. Stay sharp in the room. Understand what they mean. Respond with confidence. Bring GEORGE with you.
           </p>
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -27,7 +31,7 @@ export default function LandingPage() {
               onClick={() => router.push('/george')}
               className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
             >
-              Try GEORGE
+              Start with GEORGE
             </button>
 
             <button

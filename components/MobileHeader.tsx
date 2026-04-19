@@ -18,22 +18,24 @@ export default function MobileHeader({
   return (
     <div className="sticky top-0 z-40 border-b border-neutral-800 bg-black/90 backdrop-blur xl:hidden">
       <div className="flex items-center justify-between px-4 py-3">
-        <div className="min-w-0">
-          <Brand compact subtitle={title || 'GEORGE'} />
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="flex h-9 w-9 items-center justify-center text-[#7C8CFF]"
+          aria-label="Open menu"
+        >
+          <span className="flex flex-col gap-[3px]">
+            <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+            <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+            <span className="block h-[1.5px] w-4 rounded-full bg-current" />
+          </span>
+        </button>
+
+        <div className="text-sm tracking-[0.24em] text-white">
+          BRANES
         </div>
 
-        {showMenu && (
-          <button
-            type="button"
-            onClick={onMenuClick}
-            className="relative rounded-full border border-neutral-700 px-4 py-2 text-sm text-neutral-200 transition hover:border-[#7C8CFF] hover:text-[#7C8CFF] button-press"
-          >
-            Menu
-            {alertDot && (
-              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-red-500 alert-dot-twice" />
-            )}
-          </button>
-        )}
+        <div className="w-9" />
       </div>
     </div>
   )

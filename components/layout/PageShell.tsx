@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
 import Brand from '@/components/Brand'
 
@@ -19,6 +19,8 @@ export default function PageShell({
   backToGeorge = false,
   withSidebar = true,
 }: PageShellProps) {
+  const [showSidebar, setShowSidebar] = useState(false)
+
   const goToGeorge = (prompt?: PromptItem) => {
     if (!prompt) {
       window.location.href = '/george'
@@ -34,11 +36,28 @@ export default function PageShell({
     window.location.href = `/george?${params.toString()}`
   }
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.location.href = '/george'
+    }
+  }
+
   return (
     <main className="min-h-[100dvh] w-full overflow-x-hidden bg-gradient-to-b from-black via-neutral-950 to-black text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
+        {withSidebar && showSidebar && (
+          <div
+            onClick={() => setShowSidebar(false)}
+            className="fixed inset-0 z-30 bg-black/50 xl:hidden"
+          />
+        )}
+
         {withSidebar && (
           <Sidebar
+            showSidebar={showSidebar}
+            setShowSidebar={setShowSidebar}
             voiceActive={false}
             onNewSession={() => {
               window.location.href = '/george'
@@ -54,27 +73,68 @@ export default function PageShell({
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
           <div className="mx-auto w-full max-w-5xl px-4 pb-12 pt-8 md:px-6 md:pt-12 xl:px-10">
-            <div className="mb-10 flex items-start justify-between gap-4">
-              <Brand subtitle={eyebrow || 'GEORGE'} />
+            <div className="mb-8 md:mb-10">
+              <div className="flex items-start gap-2 md:gap-3">
+                {withSidebar && (
+                  <button
+                    type="button"
+                    onClick={() => setShowSidebar(true)}
+                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/85 transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8 xl:hidden"
+                    aria-label="Open menu"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-5 w-5 fill-none stroke-current"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    >
+                      <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                  </button>
+                )}
 
-              {backToGeorge && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.history.length > 1) {
-                      window.history.back()
-                    } else {
-                      window.location.href = '/george'
-                    }
-                  }}
-                  className="group inline-flex items-center gap-2 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF] button-press"
-                >
-                  <span className="text-lg leading-none transition duration-200 group-hover:-translate-x-0.5">←</span>
-                  <span className="transition duration-200 group-hover:translate-x-0.5">
-                    Back
-                  </span>
-                </button>
-              )}
+                <div className="min-w-0 flex-1">
+                  {/* MOBILE */}
+                  <div className="flex items-center gap-2 md:hidden">
+                    <Brand compact subtitle={eyebrow || 'GEORGE'} />
+
+                    {backToGeorge && (
+                      <button
+                        type="button"
+                        onClick={handleBack}
+                        className="ml-1 group inline-flex items-center gap-1 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF]"
+                      >
+                        <span className="text-base leading-none group-hover:-translate-x-0.5 transition">
+                          ←
+                        </span>
+                        <span className="group-hover:translate-x-0.5 transition">
+                          Back
+                        </span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* DESKTOP */}
+                  <div className="hidden items-center gap-2 md:flex">
+                    <Brand subtitle={eyebrow || 'GEORGE'} showCore={false} />
+
+                    {backToGeorge && (
+                      <button
+                        type="button"
+                        onClick={handleBack}
+                        className="ml-1 group inline-flex items-center gap-1.5 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF]"
+                      >
+                        <span className="text-lg leading-none group-hover:-translate-x-0.5 transition">
+                          ←
+                        </span>
+                        <span className="group-hover:translate-x-0.5 transition">
+                          Back
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {(eyebrow || title) && (
@@ -92,9 +152,7 @@ export default function PageShell({
               </div>
             )}
 
-            <div className="space-y-6">
-              {children}
-            </div>
+            <div className="space-y-6">{children}</div>
           </div>
         </div>
       </div>

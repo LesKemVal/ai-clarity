@@ -321,8 +321,15 @@ export async function POST(req: Request) {
 
     const recentMessages = messages.slice(-10)
 
+    const model =
+      tier === 'brilliant'
+        ? (process.env.OPENAI_MODEL_BRILLIANT || 'gpt-5')
+        : tier === 'intelligent'
+        ? (process.env.OPENAI_MODEL_INTELLIGENT || 'gpt-4o')
+        : (process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini')
+
     const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      model,
       messages: [
         {
           role: 'system',
