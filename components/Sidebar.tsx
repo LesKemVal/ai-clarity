@@ -520,6 +520,7 @@ export default function Sidebar({
 
             <div className="space-y-4">
               <a href="/" className={linkClass('/')}>GEORGE</a>
+              <a href="/welcome" className={linkClass('/welcome')}>Make GEORGE Yours</a>
               <a href="/top-up" className={linkClass('/top-up')}>Top-Up</a>
               <a href="/roadmap" className={linkClass('/roadmap')}>Roadmap</a>
               <a href="/help" className={linkClass('/help')}>Help</a>

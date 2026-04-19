@@ -3332,6 +3332,16 @@ return (
                     </div>
                   </div>
 
+                <div className="mt-3 px-2">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/welcome')}
+                    className="w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-2.5 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/16"
+                  >
+                    Make GEORGE Yours
+                  </button>
+                </div>
+
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
                     <span className="text-neutral-400">{voiceError}</span>
