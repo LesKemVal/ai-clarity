@@ -81,15 +81,15 @@ export default function RoadmapPage() {
           <div className="mx-auto flex w-full max-w-5xl flex-col justify-center px-6 py-16 md:py-20">
             <div className="max-w-3xl space-y-6">
               <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
-                Free tier available
+                Use GEORGE now. Personalize later.
               </p>
 
               <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">
-                Whatever you want to do, be, or go — GEORGE is your ride.
+                Use GEORGE immediately. Make GEORGE yours when you're ready.
               </h1>
 
               <p className="max-w-2xl text-base leading-8 text-neutral-300 md:text-lg">
-                GEORGE is about action.
+                GEORGE becomes more valuable when he knows your goals, friction, and priorities.
               </p>
 
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -98,7 +98,7 @@ export default function RoadmapPage() {
                   onClick={enterSmartGeorge}
                   className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
                 >
-                  Enter Smart GEORGE
+                  Use GEORGE now
                 </button>
 
                 <button
@@ -107,7 +107,7 @@ export default function RoadmapPage() {
                   disabled={startingTrial}
                   className="inline-flex items-center justify-center rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {startingTrial ? 'Starting trial...' : 'Start 30-day Intelligent trial'}
+                  {startingTrial ? 'Starting trial...' : 'Upgrade to Intelligent'}
                 </button>
 
                 <a
@@ -165,10 +165,10 @@ export default function RoadmapPage() {
                 Start here
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-white">
-                Choose your level.
+                Choose your level. Personalization starts at Intelligent.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Smart is available free, forever. Intelligent begins with a 30-day free trial and requires a card up front. Brilliant is for real conversations, sharper execution, and people who expect results.
+                Smart lets you use GEORGE now. Intelligent lets you make GEORGE yours. Brilliant adds premium pressure-room advantages.
               </p>
 
               <p className="text-base font-medium text-white md:text-lg">
@@ -209,7 +209,7 @@ export default function RoadmapPage() {
                 </ul>
 
                 <p className="text-xs text-neutral-400 pt-2">
-                  This is where momentum returns.
+                  This is where GEORGE becomes personal.
                 </p>
               </div>
 
@@ -239,7 +239,7 @@ export default function RoadmapPage() {
                 onClick={enterSmartGeorge}
                 className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
               >
-                Enter Smart GEORGE
+                Use GEORGE now
               </button>
 
               <button
@@ -248,7 +248,7 @@ export default function RoadmapPage() {
                 disabled={startingTrial}
                 className="inline-flex items-center justify-center rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {startingTrial ? 'Starting trial...' : 'Start 30-day Intelligent trial'}
+                {startingTrial ? 'Starting trial...' : 'Upgrade to Intelligent'}
               </button>
 
               <a
