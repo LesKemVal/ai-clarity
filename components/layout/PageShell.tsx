@@ -99,7 +99,7 @@ export default function PageShell({
         )}
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
-          <div className="mx-auto w-full max-w-5xl px-4 pb-12 pt-8 md:px-6 md:pt-12 xl:px-10">
+          <div className="mx-auto w-full max-w-6xl px-4 pb-12 pt-8 md:px-6 md:pt-12 xl:px-10">
             <div className="mb-8 md:mb-10">
               <div className="flex items-start gap-2 md:gap-3">
                 {withSidebar && (
@@ -123,7 +123,7 @@ export default function PageShell({
                 <div className="min-w-0 flex-1">
                   {/* MOBILE */}
                   <div className="flex items-center justify-between gap-2 md:hidden">
-                    <div className="flex items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
                       <Brand compact subtitle={eyebrow || 'GEORGE'} />
 
                       {backToGeorge && (
@@ -145,20 +145,16 @@ export default function PageShell({
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
                       aria-label="Install GEORGE"
                       title="Install GEORGE"
                     >
-                      <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 16V4" />
-                        <path d="m7 9 5-5 5 5" />
-                        <path d="M5 20h14" />
-                      </svg>
+                      Install
                     </button>
                   </div>
 
                   {/* DESKTOP */}
-                  <div className="hidden items-center justify-between gap-2 md:flex">
+                  <div className="hidden items-center justify-between gap-4 md:flex">
                     <div className="flex items-center gap-2">
                       <Brand subtitle={eyebrow || 'GEORGE'} showCore={false} />
 
@@ -181,15 +177,11 @@ export default function PageShell({
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/70 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
                       aria-label="Install GEORGE"
                       title="Install GEORGE"
                     >
-                      <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 16V4" />
-                        <path d="m7 9 5-5 5 5" />
-                        <path d="M5 20h14" />
-                      </svg>
+                      Install
                     </button>
                   </div>
                 </div>

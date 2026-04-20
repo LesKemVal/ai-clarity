@@ -242,78 +242,15 @@ function buildTrainingIntakeOverride(raw: string) {
   const track = detectTrainingTrack(raw)
   if (!track) return null
 
-  const jurisdiction = trainingNeedsJurisdiction(raw)
-    ? "First: what state or testing jurisdiction is this for? Requirements change depending on where you are.\n\n"
-    : ""
-
-  const base =
-    "Good. You are making a real move, and I respect that. We do this seriously and efficiently.\n\n" +
-    jurisdiction +
-    "I’ll help you build a path you can actually stay with. We are not here to waste motion.\n\n" +
-    "I will help track:\n" +
-    "- timeline\n" +
-    "- available study time\n" +
-    "- weakest area\n" +
-    "- readiness level\n" +
-    "- consistency\n\n"
-
-  if (track === 'drivers') {
-    return base +
-      "Answer these now:\n" +
-      "1. How many days exactly?\n" +
-      "2. Minutes per day realistically?\n" +
-      "3. Written test, driving, or both?\n" +
-      "4. Weakest area—rules, signs, or recall?\n\n" +
-      "Quick test — answer these too:\n" +
-      "A. At a 4-way stop, who has the right of way?\n" +
-      "B. What does a flashing red light require you to do?\n" +
-      "C. What does a solid yellow line on your side mean?\n" +
-      "D. When should you signal before turning?"
+  const map: Record<string,string> = {
+    drivers: "Good. Driving tests usually break into written, driving skill, or nerves. Which part is actually in front of you right now?",
+    cdl: "Good. CDL issues usually come down to permit, pre-trip, backing, or road. Which part are we dealing with right now?",
+    ged: "Good. GED pressure usually comes from math, reading, writing, science, or delay. Which part is the real problem right now?",
+    cna: "Good. CNA exams usually break into knowledge, skills, timing, or confidence. Which part is actually blocking you right now?"
   }
 
-  if (track === 'cdl') {
-    return base +
-      "Answer these now:\n" +
-      "1. Days left?\n" +
-      "2. Permit, pre-trip, skills, or road?\n" +
-      "3. Minutes per day?\n" +
-      "4. Weakest area?\n\n" +
-      "Quick test — answer these too:\n" +
-      "A. What is the purpose of a pre-trip inspection?\n" +
-      "B. What should you check before moving a commercial vehicle?\n" +
-      "C. What does GVWR refer to?\n" +
-      "D. Which is weaker for you right now: knowledge, inspection, backing, or road judgment?"
-  }
-
-  if (track === 'ged') {
-    return "Good. Choosing the GED matters, and I respect the decision to come back and finish it. I’m with you, but I’m not throwing you into a test yet. First I need your starting point.\n\n" +
-      "Answer these now:\n" +
-      "1. How long have you been out of school?\n" +
-      "2. Which subject feels strongest right now?\n" +
-      "3. Which subject feels weakest or easiest to avoid?\n" +
-      "4. Realistically, how many minutes or hours can you give this each week?\n" +
-      "5. Have you taken a GED practice test yet?\n" +
-      "6. Are you more worried about knowledge gaps, test anxiety, or consistency?\n\n" +
-      "Be honest with yourself about why you're doing this. Once I see your starting point, I’ll help you build a path you can actually stay with."
-  }
-
-  if (track === 'cna') {
-    return base +
-      "Answer these now:\n" +
-      "1. Days left?\n" +
-      "2. Minutes per day?\n" +
-      "3. Knowledge, skills, or both?\n" +
-      "4. Any prior attempts?\n\n" +
-      "Quick test — answer these too:\n" +
-      "A. What is the first step before assisting a patient?\n" +
-      "B. When should hands be washed in patient care?\n" +
-      "C. What is weaker for you right now: recall, procedure flow, or confidence under testing?\n" +
-      "D. Have you practiced skills under time pressure yet?"
-  }
-
-  return base
+  return map[track] || null
 }
-
 
 function TypewriterText({
   text,
@@ -393,8 +330,18 @@ export default function Page() {
       return
     }
 
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE', text: 'Install GEORGE', url }).catch(() => {})
+    const isMac = /Macintosh|Mac OS X/i.test(ua)
+    const isWindows = /Windows/i.test(ua)
+
+    if (isMac) {
+      setToastMessage('Mac: Browser menu → Install App or Add to Dock')
+      setShowToast(true)
+      return
+    }
+
+    if (isWindows) {
+      setToastMessage('Desktop: Browser menu → Install App')
+      setShowToast(true)
       return
     }
 
@@ -409,6 +356,9 @@ const [messages, setMessages] = useState<Message[]>([])
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
 const [conversationMode, setConversationMode] = useState<string | null>(null)
+const [showWalkthrough, setShowWalkthrough] = useState(false)
+const [walkthroughStep, setWalkthroughStep] = useState(1)
+
 
   useEffect(() => {
     const greeting = getInitialGreeting()
@@ -2452,10 +2402,10 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-hidden">
-          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-6 md:pb-0 md:pt-[92px]">
+          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[320px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
-              <div className="relative flex w-full max-w-5xl items-center justify-between">
-                <div className="flex items-center gap-2.5 md:hidden">
+              <div className="relative flex w-full max-w-6xl items-center justify-between">
+                <div className="flex items-center gap-2.5 xl:hidden">
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
@@ -2471,19 +2421,48 @@ return (
                     </span>
                   </button>
 
-                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28 md:hidden">
+                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28">
                     GEORGE
                   </span>
+                </div>
 
-                  <span className="hidden md:block text-[13px] font-medium uppercase tracking-[0.34em] text-white/18 ml-2">
-                    GEORGE
-                  </span>
+                <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-6">
+
+                  <div />
+
+                  <div className="flex justify-center">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-white/18">
+                        GEORGE
+                      </span>
+                      {!showMobileHero && (
+                        <div className="hidden xl:flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-1" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-2" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-3" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-4" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleInstallGeorge}
+                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                      aria-label="Install GEORGE"
+                      title="Install GEORGE"
+                    >
+                      Install
+                    </button>
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                  className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white xl:hidden"
                   aria-label="Install GEORGE"
                   title="Install GEORGE"
                 >
@@ -2498,10 +2477,18 @@ return (
     {conversationSignal}
   </div>
 )}
-<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-2 pt-5 pb-[300px] md:pb-[320px] space-y-5 md:pt-12 ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
+
+{!showMobileHero && (
+  <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-1" />
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-2" />
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-3" />
+  </div>
+)}
+<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-500px)] flex-col items-center justify-center px-4 md:hidden">
-      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-2xl md:text-3xl font-semibold tracking-tight text-transparent">
+      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
         GEORGE
       </div>
 
@@ -2509,10 +2496,12 @@ return (
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-3 flex items-center gap-2 px-3 py-2">
-        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-1`} />
-        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-2`} />
-        <span className={`h-1 w-1 rounded-full bg-[#7C8CFF] branes-pulse-fast-3`} />
+      <div className="mt-3 flex items-end justify-center gap-1.5 px-3 py-2">
+        <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-smile-1" />
+        <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-2" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#7C8CFF] pulse-smile-3" />
+        <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-4" />
+        <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-smile-5" />
       </div>
     </div>
   )}
@@ -2526,7 +2515,7 @@ return (
   .filter((m) => m.role !== 'system')
   .map((m, i) => (
     <div key={i} className="space-y-2">
-      <div className="whitespace-pre-wrap text-sm leading-7 text-white/90">
+      <div className="whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92">
         {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
       </div>
 
@@ -2545,7 +2534,7 @@ return (
             </div>
           )}
 
-          <div className="flex items-center gap-4 text-xs text-neutral-500">
+          <div className="flex items-center gap-3 text-[11px] text-neutral-500">
             <button
               type="button"
               onClick={() => {
@@ -2758,7 +2747,7 @@ return (
               </div>
             )}
 
-            <div className={`fixed bottom-0 left-0 right-0 w-full flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[320px] flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
               <div className="relative z-[60] mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2">
@@ -3268,6 +3257,10 @@ return (
                                     setActivePromptContext(prompt.context)
                                     if (prompt.context?.startsWith('brilliant_')) {
                                       setConversationMode(prompt.context)
+                                      if (!window.localStorage.getItem("george_walkthrough_seen")) {
+                                        setShowWalkthrough(true)
+                                        setWalkthroughStep(1)
+                                      }
                                     }
                                     setShowPromptMenu(false)
                                     void handleSend(prompt.text)
@@ -3329,7 +3322,7 @@ return (
                                     ...prev,
                                     {
                                       role: 'assistant',
-                                      content: 'Upgrade to continue — and support BRANES where GEORGE is needed most'
+                                      content: 'Upgrade to continue — and support BRANESx where GEORGE is needed most'
                                     }
                                   ])
                                   return
@@ -3398,7 +3391,44 @@ return (
           </div>
         </div>
 
-      {showUpgradeModal && (
+      
+      {showWalkthrough && (
+        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+            <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-3">Conversation Engine</p>
+
+            {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
+            {walkthroughStep === 2 && <p className="text-white text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
+            {walkthroughStep === 3 && <p className="text-white text-sm leading-7">Mic button lets GEORGE listen while you stay in motion.</p>}
+            {walkthroughStep === 4 && <p className="text-white text-sm leading-7">LIVE cues give fast lines, warnings, and framing in real time.</p>}
+
+            <div className="mt-5">
+              {walkthroughStep < 4 ? (
+                <button
+                  type="button"
+                  onClick={() => setWalkthroughStep((s) => s + 1)}
+                  className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black"
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.localStorage.setItem("george_walkthrough_seen","1")
+                    setShowWalkthrough(false)
+                  }}
+                  className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black"
+                >
+                  End
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+{showUpgradeModal && (
         <div
           className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
           onClick={() => setShowUpgradeModal(false)}

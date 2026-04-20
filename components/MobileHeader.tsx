@@ -32,7 +32,7 @@ export default function MobileHeader({
         </button>
 
         <div className="text-sm tracking-[0.24em] text-white">
-          BRANES
+          BRANESx
         </div>
 
         <div className="w-9" />

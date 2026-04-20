@@ -5,7 +5,7 @@ import PageShell from '@/components/layout/PageShell'
 const sections = [
   {
     title: 'Acceptance',
-    body: 'By accessing BRANES / GEORGE, you agree to these Terms of Access.',
+    body: 'By accessing BRANESx / GEORGE, you agree to these Terms of Access.',
   },
   {
     title: 'No guaranteed outcomes',
@@ -40,7 +40,7 @@ const sections = [
   },
   {
     title: 'Limitation of liability',
-    body: 'Use GEORGE at your own discretion. To the maximum extent allowed by law, BRANES is not liable for indirect or consequential losses.',
+    body: 'Use GEORGE at your own discretion. To the maximum extent allowed by law, BRANESx is not liable for indirect or consequential losses.',
   },
   {
     title: 'Termination',
@@ -67,7 +67,7 @@ export default function TOAPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              These terms explain the boundaries of access and your responsibility while using BRANES / GEORGE.
+              These terms explain the boundaries of access and your responsibility while using BRANESx / GEORGE.
             </p>
           </div>
         </section>

@@ -5,207 +5,143 @@ import PageShell from '@/components/layout/PageShell'
 export default function HelpPage() {
   return (
     <PageShell
-      title="Ways to use GEORGE"
+      title="How to get what you want from GEORGE"
       eyebrow="Help"
       backToGeorge
     >
-      <div className="space-y-10">
+      <div className="space-y-8">
 
-        {/* INTRO */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <div className="max-w-3xl space-y-4">
-            <p className="text-lg text-white">
-              GEORGE is about action. It helps you think better, move faster, and follow through.
+          <div className="space-y-4">
+            <p className="text-xl font-semibold text-white">
+              GEORGE helps you think clearly, move correctly, and stay in motion.
             </p>
-            <p className="text-sm text-neutral-400 md:text-base">
-              You do not need perfect input. Start where you are. GEORGE will help sharpen what matters next.
+            <p className="text-neutral-400 leading-7">
+              You do not need perfect prompts. Bring the real situation. GEORGE helps narrow the problem, find leverage, and guide the next move.
             </p>
           </div>
         </section>
 
-        {/* FULL CAPACITY */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">What is GEORGE?</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Smart GEORGE — Free</h2>
 
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              GEORGE is built for people who want clarity that actually helps.
-            </p>
+          <div className="space-y-3 text-neutral-300">
+            <p>Best for quick clarity and daily momentum.</p>
 
-            <ul className="space-y-2 list-disc pl-5 text-neutral-400">
-              <li><span className="text-white">Full continuity:</span> You don’t repeat yourself. GEORGE remembers what you’re building and carries it forward.</li>
-              <li><span className="text-white">Step-by-step execution:</span> You get clear next moves, one at a time, until it’s done.</li>
-              <li><span className="text-white">Voice + uploads:</span> You can speak naturally or drop in files and images so GEORGE can work directly from what you give him.</li>
-              <li><span className="text-white">Stronger follow-through:</span> You keep moving from idea to result without losing momentum.</li>
+            <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+              <li>What should I do first?</li>
+              <li>Give me 3 realistic options.</li>
+              <li>Help me stop drifting.</li>
+              <li>What am I missing?</li>
             </ul>
 
             <p className="text-white">
-              GEORGE is not here to decorate your screen. GEORGE is here to help you get something real done.
+              Use Smart when you need direction now.
             </p>
           </div>
         </section>
 
-        {/* PROMPTS */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Who is it for?</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Intelligent GEORGE</h2>
 
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              People under pressure. Builders. Students. Entrepreneurs. Anyone who needs clarity before the moment gets expensive.
-            </p>
+          <div className="space-y-3 text-neutral-300">
+            <p>Best for recurring pressure, plans, decisions, and personal advancement.</p>
 
-            <p>
-              GEORGE works best when something matters and you do not want to keep drifting.
-            </p>
-
-            <ul className="space-y-2 list-disc pl-5 text-neutral-400">
-              <li>They appear when a stronger path is available</li>
-              <li>They help reduce hesitation and sharpen decisions</li>
-              <li>They adapt as the conversation evolves</li>
-            </ul>
-
-            <p>
-              Results improve when clarity improves.
-            </p>
-          </div>
-        </section>
-
-        {/* MEMORY */}
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">How to use GEORGE</h2>
-
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              Start simple. Tell GEORGE what you are trying to do, where you are stuck, or what decision you need to make.
-            </p>
-
-            <ul className="space-y-2 list-disc pl-5 text-neutral-400">
-              <li><span className="text-white">What gets saved:</span> A GEORGE response paired with the user message immediately before it</li>
-              <li><span className="text-white">How it appears:</span> A shortened GEORGE preview, still tied to your original question</li>
-              <li><span className="text-white">Where it lives:</span> Stored locally in your browser</li>
-              <li><span className="text-white">How it’s organized:</span> By folders you choose or create</li>
+            <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+              <li>Build me a path to CDL / CNA / GED / income.</li>
+              <li>Help me structure this business move.</li>
+              <li>Train me over the next 30 days.</li>
+              <li>Remember where we left off.</li>
             </ul>
 
             <p className="text-white">
-              Best prompts:
-            </p>
-
-            <div className="pt-2 space-y-2">
-              <p className="text-white font-medium">Help me get unstuck.</p>
-              <ul className="space-y-2 list-disc pl-5 text-neutral-400">
-                <li>Use <span className="text-white">Keep this</span> under a message</li>
-                <li>The save box opens above the message so you can still see what you’re saving</li>
-                <li>Choose a folder or create a new one</li>
-                <li>The last folder you used becomes the default next time</li>
-              </ul>
-            </div>
-
-            <div className="pt-2 space-y-2">
-              <p className="text-white font-medium">Build me a path to ______.</p>
-              <ul className="space-y-2 list-disc pl-5 text-neutral-400">
-                <li>Keep turning points, not everything</li>
-                <li>Organize by goal or active thread</li>
-                <li>Use saved points to restart momentum quickly</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* WHY PROMPTS */}
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">What am I missing here?</h2>
-
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              Help me focus.
-            </p>
-
-            <p>
-              Give me 3 realistic options.
-            </p>
-
-            <p className="text-white">
-              Train me for ______.
+              Use Intelligent when consistency matters.
             </p>
           </div>
         </section>
 
-        {/* REROUTE */}
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Help me think clearly.</h2>
+        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-6 md:p-8">
+          <h2 className="mb-4 text-xl font-semibold text-white">Brilliant GEORGE</h2>
 
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
+          <div className="space-y-3 text-neutral-200">
             <p>
-              What tier should I use?
+              Best for real rooms, live moments, negotiations, interviews, speeches, difficult conversations, pressure, and performance.
             </p>
 
             <p className="text-white font-medium">
-              New strategy
+              Includes Conversation Engine.
             </p>
 
-            <p>
-              SMART: Try it now.
-            </p>
-
-            <p>
-              INTELLIGENT: If you use GEORGE often.
-            </p>
+            <ul className="list-disc space-y-2 pl-5 text-neutral-300">
+              <li>Walk into meetings prepared.</li>
+              <li>Stay sharp while others talk.</li>
+              <li>Get live framing and cues.</li>
+              <li>Handle pressure without losing ground.</li>
+            </ul>
           </div>
         </section>
 
-        {/* CORE */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">BRILLIANT: If results matter.</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">How to Use Conversation Engine</h2>
 
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              Practical note
-            </p>
+          <div className="space-y-4 text-neutral-300">
+            <div>
+              <p className="font-medium text-white">Focus</p>
+              <p className="text-neutral-400">Choose negotiation, speech, interview, study, or everyday pressure.</p>
+            </div>
 
-            <p>
-              GEORGE helps with judgment and execution.
-            </p>
+            <div>
+              <p className="font-medium text-white">Voice Speed</p>
+              <p className="text-neutral-400">Control how fast GEORGE responds in live situations.</p>
+            </div>
 
-            <p>
-              GEORGE is not a lawyer, doctor, therapist, or broker.
-            </p>
-          </div>
-        </section>
+            <div>
+              <p className="font-medium text-white">Mic</p>
+              <p className="text-neutral-400">Use when moving, driving, walking, or in the room.</p>
+            </div>
 
-        {/* SCRIPTURE */}
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">Start now</h2>
-
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              Enter GEORGE
-            </p>
-
-            <p>
-              Upgrade to Intelligent
-            </p>
+            <div>
+              <p className="font-medium text-white">LIVE Cues</p>
+              <p className="text-neutral-400">Fast phrases, warnings, timing, leverage, and clarity.</p>
+            </div>
 
             <p className="text-white">
-              Bring GEORGE with you
+              Use Brilliant when the moment matters.
             </p>
           </div>
         </section>
 
-        {/* FINAL */}
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <div className="space-y-4 text-neutral-300 text-sm md:text-base">
-            <p>
-              GEORGE is not here just to answer questions.
-            </p>
+          <h2 className="mb-4 text-xl font-semibold text-white">Message Controls</h2>
 
-            <p className="text-white">
-              GEORGE is here to guide decisions, support execution, and help you finish what matters.
-            </p>
-          </div>
+          <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+            <li><span className="text-white">Keep this</span> saves useful turns.</li>
+            <li><span className="text-white">Share</span> sends useful responses.</li>
+            <li><span className="text-white">Related</span> pulls connected memory.</li>
+          </ul>
         </section>
 
+        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+          <h2 className="mb-4 text-xl font-semibold text-white">How to Get Better Results</h2>
 
-        
+          <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+            <li>Bring the real situation, not a perfect prompt.</li>
+            <li>Say what pressure exists.</li>
+            <li>Say what outcome you want.</li>
+            <li>Tell GEORGE what is blocking movement.</li>
+            <li>Return often so continuity compounds.</li>
+          </ul>
+        </section>
+
+        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+          <p className="text-white text-lg font-medium">
+            GEORGE is not here to decorate your screen.
+          </p>
+
+          <p className="mt-3 text-neutral-400 leading-7">
+            GEORGE is here to help you finish what matters.
+          </p>
+        </section>
 
       </div>
     </PageShell>

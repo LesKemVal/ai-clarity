@@ -95,23 +95,7 @@ canvas {
   transform-origin: center;
 }
 
-@keyframes branesPulse {
-  0% { opacity: 0.3; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0.3; transform: scale(0.9); }
-}
 
-.branes-pulse-1 {
-  animation: branesPulse 1.2s ease-in-out infinite;
-}
-
-.branes-pulse-2 {
-  animation: branesPulse 1.2s ease-in-out 0.25s infinite;
-}
-
-.branes-pulse-3 {
-  animation: branesPulse 1.2s ease-in-out 0.5s infinite;
-}
 
 textarea {
   font-size: 16px;
@@ -185,4 +169,32 @@ textarea {
 .button-row-selected {
   color: #7C8CFF;
 }
+
+@keyframes branesPulseFlow {
+  0% { opacity: .16; transform: translateX(10px) scale(.84); }
+  35% { opacity: 1; transform: translateX(0) scale(1.08); }
+  100% { opacity: .16; transform: translateX(-10px) scale(.84); }
+}
+
+@keyframes pulseSmileArc {
+  0% { opacity: .18; transform: translateY(2px) scale(.84); }
+  35% { opacity: 1; transform: translateY(0) scale(1.08); }
+  100% { opacity: .18; transform: translateY(2px) scale(.84); }
+}
+
+.branes-pulse-1 { animation: branesPulseFlow .85s ease-in-out 0s infinite; }
+.branes-pulse-2 { animation: branesPulseFlow .85s ease-in-out .12s infinite; }
+.branes-pulse-3 { animation: branesPulseFlow .85s ease-in-out .24s infinite; }
+
+.pulse-dot-1 { animation: branesPulseFlow .72s ease-in-out 0s infinite; }
+.pulse-dot-2 { animation: branesPulseFlow .72s ease-in-out .10s infinite; }
+.pulse-dot-3 { animation: branesPulseFlow .72s ease-in-out .20s infinite; }
+.pulse-dot-4 { animation: branesPulseFlow .72s ease-in-out .30s infinite; }
+
+.pulse-smile-1 { animation: pulseSmileArc .95s ease-in-out 0s infinite; }
+.pulse-smile-2 { animation: pulseSmileArc .95s ease-in-out .08s infinite; }
+.pulse-smile-3 { animation: pulseSmileArc .95s ease-in-out .16s infinite; }
+.pulse-smile-4 { animation: pulseSmileArc .95s ease-in-out .24s infinite; }
+.pulse-smile-5 { animation: pulseSmileArc .95s ease-in-out .32s infinite; }
+
 

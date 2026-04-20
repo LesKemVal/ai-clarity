@@ -5,35 +5,69 @@ import PageShell from '@/components/layout/PageShell'
 export default function PrivacyPage() {
   return (
     <PageShell eyebrow="Privacy" title="Privacy" backToGeorge>
-      <div className="max-w-3xl space-y-6">
-        <section className="rounded-3xl bg-neutral-950 p-6 md:p-8 text-sm leading-7 text-neutral-400">
-          <p>
-            We respect your privacy. This page explains how information is handled when you use GEORGE.
+      <div className="max-w-4xl space-y-8">
+
+        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+          <div className="space-y-4 max-w-3xl">
+            <h1 className="text-3xl md:text-4xl font-semibold text-white">
+              Privacy
+            </h1>
+
+            <p className="text-neutral-300 leading-7">
+              We take privacy seriously. This page explains how information is handled when you use GEORGE.
+            </p>
+          </div>
+        </section>
+
+        <section className="grid gap-4">
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <h2 className="text-white text-xl font-semibold">Your Inputs</h2>
+            <p className="mt-3 text-neutral-400 leading-7">
+              Information you submit may be processed to generate responses, improve functionality, and maintain the service.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <h2 className="text-white text-xl font-semibold">Saved Items</h2>
+            <p className="mt-3 text-neutral-400 leading-7">
+              Features such as saved responses, folders, and recent items may store data locally in your browser or device environment.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <h2 className="text-white text-xl font-semibold">Sharing</h2>
+            <p className="mt-3 text-neutral-400 leading-7">
+              GEORGE does not create a public feed of your conversations. Sharing actions are initiated by you.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <h2 className="text-white text-xl font-semibold">Security</h2>
+            <p className="mt-3 text-neutral-400 leading-7">
+              Reasonable efforts may be used to protect systems and data, but no system can guarantee absolute security.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <h2 className="text-white text-xl font-semibold">Your Choice</h2>
+            <p className="mt-3 text-neutral-400 leading-7">
+              You control what you submit, what you save, what you share, and whether you continue using the service.
+            </p>
+          </div>
+
+        </section>
+
+        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 md:p-8">
+          <p className="text-white font-medium">
+            Final position
+          </p>
+
+          <p className="mt-3 text-neutral-200 leading-7">
+            Privacy matters because trust matters.
           </p>
         </section>
 
-        <section className="rounded-3xl bg-neutral-950 p-6 md:p-8 space-y-4 text-sm leading-7 text-neutral-400">
-          <div>
-            <p className="font-medium text-white">Use of information</p>
-            <p className="mt-1">
-              Information is used to provide and improve the GEORGE experience.
-            </p>
-          </div>
-
-          <div>
-            <p className="font-medium text-white">Sharing</p>
-            <p className="mt-1">
-              We do not present your information as a public feed. Any sharing action is user-initiated.
-            </p>
-          </div>
-
-          <div>
-            <p className="font-medium text-white">Control</p>
-            <p className="mt-1">
-              You decide how you use GEORGE and what you choose to submit.
-            </p>
-          </div>
-        </section>
       </div>
     </PageShell>
   )

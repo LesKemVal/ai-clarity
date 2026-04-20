@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'BRANES',
-    short_name: 'BRANES',
+    name: 'BRANESx',
+    short_name: 'BRANESx',
     description: 'Clarity. Execution. Continuity.',
     start_url: '/george',
     display: 'standalone',
