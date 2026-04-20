@@ -3322,7 +3322,7 @@ return (
                                     ...prev,
                                     {
                                       role: 'assistant',
-                                      content: 'Upgrade to continue — and support BRANESx where GEORGE is needed most'
+                                      content: 'Upgrade to continue — your upgrade helps put GEORGE into the hands of people who need this companion most.'
                                     }
                                   ])
                                   return
