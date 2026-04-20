@@ -3486,37 +3486,17 @@ return (
                 </div>
               </button>
 
-              <button
+                            <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/subscribe', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({ tier: 'brilliant' }),
-                    })
-
-                    const data = await response.json()
-
-                    if (data?.url) {
-                      window.location.href = data.url
-                      return
-                    }
-
-                    setToastMessage(data?.error || 'Unable to open checkout.')
-                    setShowToast(true)
-                  } catch {
-                    setToastMessage('Unable to open checkout.')
-                    setShowToast(true)
-                  }
+                onClick={() => {
+                  setShowUpgradeModal(false)
+                  window.location.href = '/top-up?intent=brilliant-beta'
                 }}
-                className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18 shadow-[0_0_20px_rgba(124,140,255,0.10)]"
+                className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
               >
-                <div className="text-sm font-medium text-white">Brilliant GEORGE — $25</div>
+                <div className="text-sm font-medium text-white">Brilliant GEORGE — Beta Waitlist</div>
                 <div className="mt-1 text-xs leading-6 text-neutral-300">
-                  Guided Conversation Engine. Walk in prepared. Stay sharp in the room. Bring GEORGE with you.
+                  Conversation Engine, LIVE cues, room-awareness, and deeper support. Join the waitlist while Brilliant is in beta.
                 </div>
               </button>
             </div>
