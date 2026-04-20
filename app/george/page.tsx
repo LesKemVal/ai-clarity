@@ -2431,7 +2431,7 @@ return (
                   <div />
 
                   <div className="flex justify-center">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-white/18">
                         GEORGE
                       </span>
@@ -2514,7 +2514,7 @@ return (
   {messages
   .filter((m) => m.role !== 'system')
   .map((m, i) => (
-    <div key={i} className="space-y-2">
+    <div key={i} className="space-y-1.5">
       <div className="whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92">
         {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
       </div>
@@ -2651,10 +2651,10 @@ return (
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className="absolute left-0 bottom-full z-30 mb-2 w-[170px] max-w-[52vw] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+              className="absolute left-0 bottom-full z-30 mb-2 w-[150px] max-w-[42vw] rounded-2xl border border-white/10 bg-neutral-950/95 p-1.5 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
             >
-              <div className="space-y-2">
-                <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
+              <div className="space-y-1.5">
+                <div className="text-[10px] uppercase tracking-[0.14em] text-neutral-500">
                   Save memory
                 </div>
 
@@ -2665,15 +2665,15 @@ return (
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2 py-1.5 text-[10px] leading-4 text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
                 >
                   Save to {getDefaultFolder()}
                 </button>
 
                 {getExistingFolders().length > 0 && (
-                  <div className="space-y-2">
-                    <div className="text-[14px] text-neutral-500">Recent folders</div>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="space-y-1.5">
+                    <div className="text-[11px] text-neutral-500">Recent folders</div>
+                    <div className="flex flex-wrap gap-1.5">
                       {getExistingFolders().map((folder) => (
                         <button
                           key={folder}
@@ -2682,7 +2682,7 @@ return (
                             setActiveMemoryFolder(folder)
                             saveMemory(m, i, folder)
                           }}
-                          className={`rounded-full border px-2 py-1 text-[14px] leading-4 transition ${
+                          className={`rounded-full border px-1.5 py-1 text-[11px] leading-4 transition ${
                             activeMemoryFolder === folder
                               ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
                               : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
@@ -2696,13 +2696,13 @@ return (
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-[14px] leading-4 text-neutral-400">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-1.5 text-[11px] leading-4 text-neutral-400">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <div className="text-[14px] text-neutral-500">Create folder</div>
+                <div className="space-y-1.5">
+                  <div className="text-[11px] text-neutral-500">Create folder</div>
                   <div className="flex items-center gap-2">
                     <input
                       value={newFolderName}
@@ -3445,10 +3445,12 @@ return (
             </div>
 
             <div className="space-y-3">
-              <div className="w-full rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3.5 text-left">
-                <div className="text-sm font-medium text-white">Smart GEORGE — Free</div>
-                <div className="mt-1 text-xs leading-6 text-neutral-500">
-                  Keep it simple. Focus, direction, and forward movement.
+              <div className="w-full rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 text-left">
+                <div className="text-sm font-medium text-white">Beta checkout instructions</div>
+                <div className="mt-2 text-xs leading-6 text-neutral-300">
+                  Intelligent currently uses Stripe test mode.<br />
+                  Card: 4242 4242 4242 4242<br />
+                  Use any future date, any 3-digit CVC, and any name or email you want.
                 </div>
               </div>
 
@@ -3480,13 +3482,13 @@ return (
                 }}
                 className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
               >
-                <div className="text-sm font-medium text-white">Intelligent GEORGE — $9.99</div>
+                <div className="text-sm font-medium text-white">Explore Intelligent — Beta Test Checkout</div>
                 <div className="mt-1 text-xs leading-6 text-neutral-400">
                   Structure your thinking, make faster decisions, and execute with clarity.
                 </div>
               </button>
 
-                            <button
+              <button
                 type="button"
                 onClick={() => {
                   setShowUpgradeModal(false)

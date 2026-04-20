@@ -235,9 +235,9 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'} xl:fixed xl:top-[56px] xl:h-[calc(100vh-56px)] xl:z-[95] xl:flex xl:flex-col xl:translate-x-0 xl:pointer-events-auto`}
+      className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'} xl:fixed xl:top-0 xl:h-screen xl:z-[95] xl:flex xl:flex-col xl:translate-x-0 xl:pointer-events-auto`}
     >
-      <div className="relative z-[130] border-b border-white/5 px-4 pb-4 pt-5">
+      <div className="relative z-[130] border-b border-white/5 px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
         <div className="relative flex items-center justify-start">
           <button
             type="button"
