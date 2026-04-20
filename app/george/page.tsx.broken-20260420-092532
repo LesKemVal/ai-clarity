@@ -198,7 +198,7 @@ function buildEvaluationResponse(result: any) {
 
 function buildTrainingFollowThrough(raw: string, promptContext: string | null) {
   const text = raw.trim()
-  if (!text || text.length < 12) return null
+  if (!text || text.length < 6) return null
 
   let track: string | null = null
 
@@ -246,7 +246,7 @@ function buildTrainingIntakeOverride(raw: string) {
     drivers: "Good. Driving tests usually break into written, driving skill, or nerves. Which part is actually in front of you right now?",
     cdl: "Good. CDL issues usually come down to permit, pre-trip, backing, or road. Which part are we dealing with right now?",
     ged: "Good. GED pressure usually comes from math, reading, writing, science, or delay. Which part is the real problem right now?",
-    cna: "Good. CNA exams usually break into knowledge, skills, timing, or confidence. Which part is actually blocking you right now?"
+    cna: "Good. To get you certified fast, I need two things first: what state are you in, and when are you trying to test?"
   }
 
   return map[track] || null
@@ -1651,7 +1651,20 @@ function buildBrilliantLiveTriggerResponse(
 function detectDomain(text: string) {
   const t = text.toLowerCase()
 
-  if (t.includes('credit') || t.includes('tradeline') || t.includes('score')) {
+  if (
+    t.includes('credit') ||
+    t.includes('tradeline') ||
+    t.includes('score') ||
+    t.includes('loan') ||
+    t.includes('financing') ||
+    t.includes('finance') ||
+    t.includes('approved') ||
+    t.includes('approval') ||
+    t.includes('mortgage') ||
+    t.includes('apartment') ||
+    t.includes('renting') ||
+    t.includes('car')
+  ) {
     return 'credit'
   }
 
@@ -1683,7 +1696,9 @@ const handleSend = useCallback(
       })
 
       const domain = detectDomain(text)
+      console.log('[GEORGE step 1]', { domain, activeMemoryFolder, lastDomain })
       let activeDomain = domain || activeMemoryFolder || lastDomain
+      console.log('[GEORGE step 2]', { activeDomain })
 
       // persist domain once detected
       if (domain) {
@@ -1701,6 +1716,7 @@ const handleSend = useCallback(
         ) ? "tradelines" : ""
       let creditType = ""
       let firstResponseOverride = null
+      console.log('[GEORGE step 3]', { creditIntent, creditType, firstResponseOverride })
 
       const brilliantLiveTrigger = buildBrilliantLiveTriggerResponse(
         text,
@@ -1735,7 +1751,9 @@ const handleSend = useCallback(
 
       
 
+      console.log('[GEORGE step 4]', { brilliantLiveTrigger })
       const answers = extractAnswers(text)
+      console.log('[GEORGE step 5]', { answersLength: answers.length, answers })
       if (answers.length >= 3) {
         const track = detectTrainingTrack(text)
 
@@ -1766,13 +1784,22 @@ const handleSend = useCallback(
 
 
 const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptContext)
+      console.log('[GEORGE step 6]', { trainingFollowThrough, activePromptContext })
       if (trainingFollowThrough) {
         firstResponseOverride = trainingFollowThrough
       }
 
       const trainingOverride = buildTrainingIntakeOverride(text)
+      console.log('[GEORGE training override check]', {
+        text,
+        trainingOverride,
+        activeDomain,
+      })
       if (!firstResponseOverride && trainingOverride) {
         firstResponseOverride = trainingOverride
+        console.log('[GEORGE training override applied]', {
+          firstResponseOverride,
+        })
       }
 
       if (!firstResponseOverride && activeDomain === 'credit') {
@@ -1847,17 +1874,27 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
 
         domainPrefix = `You are helping with credit.
 
-First, identify the user's real goal (raise score, get approved, fix profile).
+Stay with the live thread.
+Use the latest user answer as the anchor.
+Do not assume the hidden problem too early.
 
-Then:
-- If utilization is the issue → focus on paydown timing and balance strategy
-- If derogatories → focus on removal, not score tricks
-- If thin file → tradelines may be relevant
-- If tradelines mentioned → evaluate if they actually help or are a distraction
+Narrow before you conclude.
+If multiple viable paths exist, reduce to the strongest 2.
+If the user has already chosen a path, stop broad framing and move tactically.
 
-Do NOT assume tradelines are the answer.
+In credit, first determine what is actually governing the outcome:
+- utilization
+- derogatory marks
+- thin history
+- approval timing
+- urgency versus better terms
 
-Ask one sharp question that reveals what is actually holding them back.
+Do not default to educating about tactics.
+Evaluate whether a tactic is strong, weak, premature, or irrelevant before discussing it.
+Tradelines are not the presumed solution.
+
+Protect momentum.
+Prefer the next useful question or next useful move.
 
 Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent || "unknown"}\nTradeline guidance: ${tradelineAdvice || "evaluate case by case"}`
       }
@@ -1898,29 +1935,34 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       if (!firstResponseOverride && activeDomain === 'credit') {
         const short = text.length < 40
+        const conversationTurns = messagesRef.current.filter(
+          (m) => m.role === 'user' || m.role === 'assistant'
+        ).length
+        const hasActiveThread = conversationTurns >= 2
+        const allowCreditOverride = !hasActiveThread
 
         // HARD OVERRIDE: utilization always wins if detected in text
-        if (/maxed|balance|utilization/i.test(text)) {
+        if (/maxed|maxed out|balance|balances|utilization/i.test(text)) {
           creditType = 'utilization'
         }
 
         if (creditType === 'utilization') {
           firstResponseOverride = "Your cards being maxed out is the issue. Tradelines will not fix that. Bring each card under 30%—under 10% if possible. Paydown or balance shifting is the move. I can help you build a paydown plan, or I can show you the fastest way to lower utilization without adding new debt."
-        } else if (short && creditType === 'derogatory') {
-            firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
-          } else if (creditType === 'thin') {
-            firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
-          } else if (creditIntent === 'score') {
-            firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
-          } else if (creditIntent === 'approval') {
-            firstResponseOverride = "What are you trying to get approved for, and when?"
-          } else if (creditIntent === 'tradelines') {
-            firstResponseOverride = "Tradelines only help in specific cases. If your utilization or negatives are off, they won’t move the needle. What’s actually on your report right now?"
-          } else if (creditIntent === 'repair') {
-            firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
-          } else {
-            firstResponseOverride = "Good. There are two strong paths: get the car fast, or improve your position first if that gives you better terms. Which matters more right now—speed or leverage?"
-          }
+        } else if (allowCreditOverride && short && creditType === 'derogatory') {
+          firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
+        } else if (allowCreditOverride && creditType === 'thin') {
+          firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
+        } else if (allowCreditOverride && creditIntent === 'score') {
+          firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
+        } else if (allowCreditOverride && creditIntent === 'approval') {
+          firstResponseOverride = "Good. There are two strong paths: get the car fast, or improve your position first if that gives you better terms. Which matters more right now—speed or leverage?"
+        } else if (allowCreditOverride && creditIntent === 'tradelines') {
+          firstResponseOverride = "Maybe—but only if the real blocker is thin history. If balances are high or negatives are dragging you down, tradelines are the weaker move. What’s hurting you most right now: maxed cards, negative marks, or thin history?"
+        } else if (allowCreditOverride && creditIntent === 'repair') {
+          firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
+        } else if (allowCreditOverride) {
+          firstResponseOverride = "What are you trying to fix—your score, approvals, or your overall credit profile?"
+        }
       }
 
       const updatedMessages = [
@@ -2018,6 +2060,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
           stopBridgeSpeech()
           speakText(assistantMessage.content)
+          setIsThinking(false)
           return
         }
 
@@ -2514,15 +2557,8 @@ return (
   {messages
   .filter((m) => m.role !== 'system')
   .map((m, i) => (
-    <div
-      key={i}
-      className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
-    >
-      <div
-        className={`whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right' : 'max-w-full text-left'
-        }`}
-      >
+    <div key={i} className="space-y-1.5">
+      <div className="whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92">
         {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
       </div>
 
