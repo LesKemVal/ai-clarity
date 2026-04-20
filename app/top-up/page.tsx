@@ -3,65 +3,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
 
-const plans = [
-  {
-    key: 'smart',
-    featured: false,
-    title: 'Smart GEORGE',
-    price: 'Free',
-    label: 'Start here',
-    text: 'Useful now. Clear next moves, grounded help, and immediate usefulness without drag.',
-    bullets: [
-      'Ask GEORGE what matters',
-      'Clear next moves',
-      'Useful day-to-day support',
-      'Fast entry into the product',
-    ],
-    cta: 'Included',
-    disabled: true,
-  },
-  {
-    key: 'intelligent',
-    disabled: false,
-    title: 'Intelligent GEORGE',
-    price: '$9.99',
-    label: 'Best practical upgrade',
-    text: 'This is where GEORGE gets more personal, more consistent, and more useful over time.',
-    bullets: [
-      'Everything in Smart',
-      'Stronger continuity',
-      'Better framing under pressure',
-      'Sharper day-to-day usefulness',
-      'Light voice interaction',
-      'Make GEORGE yours',
-    ],
-    cta: 'Upgrade to Intelligent',
-    featured: true,
-  },
-  {
-    key: 'brilliant',
-    featured: false,
-    disabled: false,
-    title: 'Brilliant GEORGE',
-    price: '$25',
-    label: 'Pressure-room advantage',
-    text: 'Bring GEORGE into harder moments. Walk in prepared. Stay sharp in the room. Keep leverage.',
-    bullets: [
-      'Everything in Intelligent',
-      'Guided Conversation Engine',
-      'Doctor visit mode',
-      'Dealership mode',
-      'Job interview mode',
-      'Boss / workplace mode',
-      'Relationship talk mode',
-    ],
-    cta: 'Become Brilliant',
-  },
-] as const
-
 export default function TopUpPage() {
   const [intent, setIntent] = useState<string | null>(null)
-  const [loading, setLoading] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [note, setNote] = useState('')
+  const [feedbackType, setFeedbackType] = useState('suggestion')
+  const [feedback, setFeedback] = useState('')
   const [message, setMessage] = useState('')
 
   useEffect(() => {
@@ -72,40 +20,60 @@ export default function TopUpPage() {
 
   const headline = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'Make GEORGE yours.'
+      return 'Join the beta waitlist.'
     }
-    return 'Choose the level that matches the weight of the moment.'
+    return 'BRANESx is in beta.'
   }, [intent])
 
   const subcopy = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'You can use GEORGE right now. But if you want GEORGE to learn your priorities, your friction, and how you work, that starts at Intelligent.'
+      return 'GEORGE is already useful. Waitlist access helps us notify you when paid tiers and deeper rollout are ready.'
     }
-    return 'GEORGE is not here for entertainment. GEORGE helps you think clearly, move faster, and stay composed when decisions matter.'
+    return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help shape what gets better before broader launch.'
   }, [intent])
 
-  async function subscribe(tier: 'intelligent' | 'brilliant') {
-    try {
-      setLoading(tier)
-      setMessage('')
-
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok || !data?.url) {
-        throw new Error(data?.error || 'Unable to continue.')
-      }
-
-      window.location.href = data.url
-    } catch (e: any) {
-      setMessage(e?.message || 'Unable to continue.')
-      setLoading(null)
+  function joinWaitlist() {
+    if (!email.trim()) {
+      setMessage('Enter an email first.')
+      return
     }
+
+    const payload = {
+      email: email.trim(),
+      name: name.trim(),
+      note: note.trim(),
+      source: 'waitlist',
+      timestamp: Date.now(),
+    }
+
+    const existing = JSON.parse(localStorage.getItem('GEORGE_WAITLIST') || '[]')
+    existing.push(payload)
+    localStorage.setItem('GEORGE_WAITLIST', JSON.stringify(existing))
+    setMessage('You are on the waitlist.')
+    setEmail('')
+    setName('')
+    setNote('')
+  }
+
+  function submitFeedback() {
+    if (!feedback.trim()) {
+      setMessage('Add feedback first.')
+      return
+    }
+
+    const payload = {
+      type: feedbackType,
+      feedback: feedback.trim(),
+      email: email.trim(),
+      source: 'beta-feedback',
+      timestamp: Date.now(),
+    }
+
+    const existing = JSON.parse(localStorage.getItem('GEORGE_FEEDBACK') || '[]')
+    existing.push(payload)
+    localStorage.setItem('GEORGE_FEEDBACK', JSON.stringify(existing))
+    setMessage('Feedback saved. Thank you.')
+    setFeedback('')
   }
 
   return (
@@ -114,7 +82,7 @@ export default function TopUpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="max-w-4xl space-y-4">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
-              Bring GEORGE with you
+              BRANESx Beta
             </p>
 
             <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
@@ -127,13 +95,13 @@ export default function TopUpPage() {
 
             <div className="grid gap-3 pt-2 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
-                Clearer decisions
+                Use GEORGE now
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
-                Stronger continuity
+                Join the waitlist
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
-                Better real-world execution
+                Send feedback
               </div>
             </div>
 
@@ -145,83 +113,103 @@ export default function TopUpPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-3">
-          {plans.map((plan) => (
-            <div
-              key={plan.key}
-              className={`rounded-3xl border p-6 ${
-                plan.featured
-                  ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 shadow-[0_0_30px_rgba(124,140,255,0.12)]'
-                  : 'border-neutral-800 bg-neutral-950/60'
-              }`}
-            >
-              <div className="space-y-3">
-                <p className="text-[11px] uppercase tracking-[0.22em] text-neutral-400">
-                  {plan.label}
-                </p>
+        <section className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6">
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-white">Waitlist</p>
+              <p className="text-sm leading-7 text-neutral-300">
+                Leave your email so we can notify you when paid access, deeper rollout, and launch access are ready.
+              </p>
 
-                <p className="text-lg font-medium text-white">{plan.title}</p>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
 
-                <p className="text-3xl font-semibold text-white">{plan.price}</p>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name (optional)"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
 
-                <p className="text-sm leading-7 text-neutral-300">
-                  {plan.text}
-                </p>
-
-                <ul className="space-y-2 pt-2 text-sm text-neutral-400">
-                  {plan.bullets.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={4}
+                placeholder="What do you want most from GEORGE? (optional)"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
 
               <button
                 type="button"
-                disabled={plan.disabled || loading !== null}
-                onClick={() =>
-                  plan.key === 'intelligent'
-                    ? subscribe('intelligent')
-                    : plan.key === 'brilliant'
-                    ? subscribe('brilliant')
-                    : null
-                }
-                className={`mt-6 w-full rounded-full px-5 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                  plan.featured
-                    ? 'border border-[#7C8CFF]/50 bg-[#7C8CFF] text-black hover:opacity-90'
-                    : 'border border-white/10 text-white hover:border-[#7C8CFF]'
-                }`}
+                onClick={joinWaitlist}
+                className="w-full rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
               >
-                {loading === plan.key ? 'Opening...' : plan.cta}
+                Join the waitlist
               </button>
             </div>
-          ))}
+          </div>
+
+          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-white">Comments and suggestions</p>
+              <p className="text-sm leading-7 text-neutral-300">
+                Tell us what feels confusing, useful, missing, or worth improving.
+              </p>
+
+              <select
+                value={feedbackType}
+                onChange={(e) => setFeedbackType(e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+              >
+                <option value="suggestion">Suggestion</option>
+                <option value="bug">Bug</option>
+                <option value="feature">Feature request</option>
+                <option value="confusion">Something felt confusing</option>
+              </select>
+
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                rows={6}
+                placeholder="What should change?"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              />
+
+              <button
+                type="button"
+                onClick={submitFeedback}
+                className="w-full rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+              >
+                Save feedback
+              </button>
+            </div>
+          </div>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="max-w-4xl space-y-4">
             <h2 className="text-2xl font-semibold text-white">
-              What changes when you upgrade
+              What we are testing right now
             </h2>
-
-            <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              Smart gets you in. Intelligent makes GEORGE more personal. Brilliant is for users who want stronger support in real conversations and higher-pressure moments.
-            </p>
 
             <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                Intelligent is where continuity starts compounding.
+                How people actually use GEORGE across Smart, Intelligent, and Brilliant.
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                Brilliant is where GEORGE becomes more dangerous in rooms where mistakes get expensive.
+                How clearly users understand Conversation Engine, voice controls, and LIVE cues.
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
+                How to help people find courses, tools, and credible resources through GEORGE.
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
+                What should be strengthened before broad launch.
               </div>
             </div>
-
-            <p className="text-sm leading-7 text-white md:text-base">
-              One better decision can pay for this many times over.
-            </p>
           </div>
         </section>
       </div>
