@@ -4,6 +4,7 @@
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { getSteering } from '@/lib/george/steering'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -640,6 +641,12 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [steeringHint, setSteeringHint] = useState<null | {
+    signal: string | null
+    label: string
+    reason: string
+    pulse: boolean
+  }>(null)
 
 
   // FULL GEORGE WINDOW SYSTEM
@@ -760,6 +767,8 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
     { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const scrollHostRef = useRef<HTMLDivElement | null>(null)
+  const userPinnedBottomRef = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const promptMenuRef = useRef<HTMLDivElement | null>(null)
@@ -884,8 +893,9 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
   }, [showToast])
 
   useEffect(() => {
+    if (!userPinnedBottomRef.current) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, isThinking])
+  }, [messages, isThinking, typedMessageContent])
 
 
   useEffect(() => {
@@ -1964,6 +1974,13 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       })
       setMessages(updatedMessages)
 
+      const steer = getSteering({
+        userText: text,
+        tier: currentTier,
+        conversationMode,
+      })
+      setSteeringHint(steer)
+
       // Brilliant conversation rhythm signal
       if (currentTier === 'brilliant') {
         const shortInput = text.length < 40
@@ -2478,6 +2495,12 @@ return (
   </div>
 )}
 
+{steeringHint?.signal && (
+  <div className={`fixed bottom-[132px] left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-black/88 px-4 py-2 text-[11px] tracking-[0.12em] text-white shadow-[0_0_20px_rgba(124,140,255,0.18)] backdrop-blur-xl ${steeringHint.pulse ? 'animate-pulse' : ''}`}>
+    GEORGE suggests: {steeringHint.label}
+  </div>
+)}
+
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
     <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-1" />
@@ -2485,7 +2508,14 @@ return (
     <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-3" />
   </div>
 )}
-<div className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
+<div
+  ref={scrollHostRef}
+  onScroll={(e) => {
+    const el = e.currentTarget
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
+    userPinnedBottomRef.current = nearBottom
+  }}
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-500px)] flex-col items-center justify-center px-4 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">

@@ -32,27 +32,39 @@ export default function TopUpPage() {
     return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help shape what gets better before broader launch.'
   }, [intent])
 
-  function joinWaitlist() {
+  async function joinWaitlist() {
     if (!email.trim()) {
       setMessage('Enter an email first.')
       return
     }
 
-    const payload = {
-      email: email.trim(),
-      name: name.trim(),
-      note: note.trim(),
-      source: 'waitlist',
-      timestamp: Date.now(),
-    }
+    setMessage('')
 
-    const existing = JSON.parse(localStorage.getItem('GEORGE_WAITLIST') || '[]')
-    existing.push(payload)
-    localStorage.setItem('GEORGE_WAITLIST', JSON.stringify(existing))
-    setMessage('You are on the waitlist.')
-    setEmail('')
-    setName('')
-    setNote('')
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: name.trim(),
+          note: note.trim(),
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setMessage(data?.error || 'Something went wrong.')
+        return
+      }
+
+      setMessage('You are on the waitlist. Check your email for confirmation.')
+      setEmail('')
+      setName('')
+      setNote('')
+    } catch {
+      setMessage('Unable to submit right now.')
+    }
   }
 
   function submitFeedback() {
@@ -201,7 +213,7 @@ export default function TopUpPage() {
                 How people actually use GEORGE across Smart, Intelligent, and Brilliant.
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                How clearly users understand Conversation Engine, voice controls, and LIVE cues.
+                How clearly users understand that Conversation Engine, voice controls, and LIVE cues are Brilliant beta features being refined before wider release.
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
                 How to help people find courses, tools, and credible resources through GEORGE.
