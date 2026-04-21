@@ -521,10 +521,6 @@ export async function POST(req: Request) {
       /doctor|medical|medicine|medication|diagnosis|diagnose|symptom|symptoms|treatment|pain|injury|illness|disease|hospital|prescription/i.test(latestUserMessage)
     ) {
       riskDisclaimer = 'This isn’t a substitute for sound, competent legal or medical advice.'
-    } else if (
-      /invest|investment|stock|stocks|crypto|bitcoin|portfolio|trade|trading|market|returns?|retirement|etf|mutual fund|asset allocation|securities?/i.test(latestUserMessage)
-    ) {
-      riskDisclaimer = 'This isn’t financial advice, and you should make decisions based on your own judgment and risk tolerance.'
     }
 
     if (riskDisclaimer && !reply.includes(riskDisclaimer)) {

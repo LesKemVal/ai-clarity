@@ -5,6 +5,7 @@ import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
+import { getGoalState } from '@/lib/george/goal-engine'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -489,6 +490,13 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [typedMessageContent, setTypedMessageContent] = useState('')
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 
+  const tierSuggestedLimit =
+    currentTier === 'brilliant'
+      ? 5
+      : currentTier === 'intelligent'
+        ? 3
+        : 2
+
   useEffect(() => {
     if (messagesRef.current.length > 0) return
 
@@ -646,6 +654,17 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     label: string
     reason: string
     pulse: boolean
+  }>(null)
+  const [goalState, setGoalState] = useState<null | {
+    statedObjective: string | null
+    likelyTrueObjective: string | null
+    chosenPath: string | null
+    bottleneck: string | null
+    urgency: 'low' | 'medium' | 'high'
+    resistance: 'low' | 'medium' | 'high'
+    todayMove: string | null
+    futureRisk: string | null
+    upgradeRelevance: 'none' | 'intelligent' | 'brilliant'
   }>(null)
 
 
@@ -895,7 +914,7 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
   useEffect(() => {
     if (!userPinnedBottomRef.current) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, isThinking, typedMessageContent])
+  }, [messages, isThinking])
 
 
   useEffect(() => {
@@ -1693,11 +1712,25 @@ const handleSend = useCallback(
       })
 
       const domain = detectDomain(text)
-      let activeDomain = domain || activeMemoryFolder || lastDomain
 
-      // persist domain once detected
+      const memoryDomain =
+        activeMemoryFolder === 'Credit' ? 'credit' :
+        activeMemoryFolder === 'Legal' ? null :
+        activeMemoryFolder === 'Health' ? null :
+        activeMemoryFolder === 'Business' ? null :
+        activeMemoryFolder === 'Goals' ? null :
+        activeMemoryFolder === 'Writing' ? null :
+        activeMemoryFolder === 'Personal' ? null :
+        activeMemoryFolder === 'General' ? null :
+        null
+
+      let activeDomain = domain || memoryDomain || null
+
+      // persist domain only when explicitly detected from current text
       if (domain) {
         setLastDomain(domain)
+      } else if (lastDomain && activeDomain === null) {
+        setLastDomain(null)
       }
 
       let domainPrefix = ""
@@ -1908,6 +1941,19 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       if (!firstResponseOverride && activeDomain === 'credit') {
         const short = text.length < 40
+        const singleWordAsk = text.trim().split(/\s+/).length === 1
+        const tradelineInfoAsk =
+          (text.toLowerCase().includes('tradeline') || text.toLowerCase().includes('tradelines') || text.toLowerCase().includes('authorized user')) &&
+          (
+            singleWordAsk ||
+            text.toLowerCase().includes('tell me about') ||
+            text.toLowerCase().includes('what is') ||
+            text.toLowerCase().includes("what's") ||
+            text.toLowerCase().includes('explain') ||
+            text.toLowerCase().includes('more about') ||
+            text.toLowerCase().includes('how do tradelines work') ||
+            text.toLowerCase().includes('how tradelines work')
+          )
 
         // HARD OVERRIDE: utilization always wins if detected in text
         if (/maxed|balance|utilization/i.test(text)) {
@@ -1917,20 +1963,20 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         if (creditType === 'utilization') {
           firstResponseOverride = "Your cards being maxed out is the issue. Tradelines will not fix that. Bring each card under 30%—under 10% if possible. Paydown or balance shifting is the move. I can help you build a paydown plan, or I can show you the fastest way to lower utilization without adding new debt."
         } else if (short && creditType === 'derogatory') {
-            firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
-          } else if (creditType === 'thin') {
-            firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
-          } else if (creditIntent === 'score') {
-            firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
-          } else if (creditIntent === 'approval') {
-            firstResponseOverride = "What are you trying to get approved for, and when?"
-          } else if (creditIntent === 'tradelines') {
-            firstResponseOverride = "Tradelines only help in specific cases. If your utilization or negatives are off, they won’t move the needle. What’s actually on your report right now?"
-          } else if (creditIntent === 'repair') {
-            firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
-          } else {
-            firstResponseOverride = "Good. There are two strong paths: get the car fast, or improve your position first if that gives you better terms. Which matters more right now—speed or leverage?"
-          }
+          firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
+        } else if (creditType === 'thin' && !tradelineInfoAsk) {
+          firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
+        } else if (creditIntent === 'score' && !tradelineInfoAsk) {
+          firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
+        } else if (creditIntent === 'approval' && !tradelineInfoAsk) {
+          firstResponseOverride = "What are you trying to get approved for, and when?"
+        } else if (creditIntent === 'tradelines' && !tradelineInfoAsk) {
+          firstResponseOverride = "Understood. I do not think tradelines are usually the strongest move unless your file is thin and otherwise clean. If you still want to pursue them, I’ll help you do it intelligently. First tell me what’s actually on your report: high utilization, negatives, or thin history?"
+        } else if (creditIntent === 'repair' && !tradelineInfoAsk) {
+          firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
+        } else if (!tradelineInfoAsk) {
+          firstResponseOverride = "What are you actually trying to improve—your score, your approvals, or the overall strength of your credit profile?"
+        }
       }
 
       const updatedMessages = [
@@ -1958,7 +2004,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
   merged = merged.reverse()
 
   // LIMIT TO 10
-  const curated = merged.slice(0, 10)
+  const curated = merged.slice(0, tierSuggestedLimit)
 
   setSuggestedSignal(Date.now())
   setRerouteSignal(Date.now())
@@ -1980,6 +2026,12 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         conversationMode,
       })
       setSteeringHint(steer)
+
+      const goal = getGoalState({
+        userText: text,
+        tier: currentTier,
+      })
+      setGoalState(goal)
 
       // Brilliant conversation rhythm signal
       if (currentTier === 'brilliant') {
@@ -2151,7 +2203,7 @@ return true
             return true
           })
 
-          const curated = merged.reverse().slice(0, 10)
+          const curated = merged.reverse().slice(0, tierSuggestedLimit)
           return curated
         })
         setSuggestedSignal(Date.now())
@@ -2496,9 +2548,44 @@ return (
 )}
 
 {steeringHint?.signal && (
-  <div className={`fixed bottom-[132px] left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-black/88 px-4 py-2 text-[11px] tracking-[0.12em] text-white shadow-[0_0_20px_rgba(124,140,255,0.18)] backdrop-blur-xl ${steeringHint.pulse ? 'animate-pulse' : ''}`}>
+  <button
+    type="button"
+    onClick={() => {
+      const steerPrompt =
+        steeringHint.signal === 'conversation_engine'
+          ? 'Use Conversation Engine and help me handle this in real time.'
+          : steeringHint.signal === 'compare'
+            ? 'Compare the strongest paths and tell me which is better.'
+            : steeringHint.signal === 'build_plan'
+              ? 'Build the strongest path and keep me moving logically.'
+              : steeringHint.signal === 'blind_spots'
+                ? 'Find the real bottleneck and keep me from missing it.'
+                : steeringHint.signal === 'scripture'
+                  ? 'Guide this by scripture and keep the decision logical.'
+                  : 'Show me the better next move and keep me on the strongest path.'
+
+      setActivePromptLabel(steeringHint.label)
+      setInput('')
+      void handleSend(steerPrompt)
+    }}
+    className={`fixed bottom-[132px] left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-black/88 px-4 py-2 text-[11px] tracking-[0.12em] text-white shadow-[0_0_20px_rgba(124,140,255,0.18)] backdrop-blur-xl transition hover:border-[#7C8CFF]/60 hover:bg-[#0B0F1A]/92 ${steeringHint.pulse ? 'animate-pulse' : ''}`}
+  >
     GEORGE suggests: {steeringHint.label}
-  </div>
+  </button>
+)}
+
+{goalState?.likelyTrueObjective && (
+  <button
+    type="button"
+    onClick={() => {
+      const targetPrompt = `Lock to this target and carry me toward it: ${goalState.likelyTrueObjective}. Keep me logical and tell me when I drift.`
+      setInput('')
+      void handleSend(targetPrompt)
+    }}
+    className="fixed bottom-[176px] left-1/2 z-50 max-w-[80vw] -translate-x-1/2 rounded-full border border-white/10 bg-neutral-950/92 px-4 py-2 text-[10px] tracking-[0.10em] text-white/85 shadow-[0_0_16px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:border-[#7C8CFF]/35 hover:text-white"
+  >
+    TARGET: {goalState.likelyTrueObjective}
+  </button>
 )}
 
 {!showMobileHero && (
@@ -3285,7 +3372,7 @@ return (
                                 </button>
                               )}
 
-                              {suggestedPrompts.map((prompt) => (
+                              {suggestedPrompts.slice(0, tierSuggestedLimit).map((prompt) => (
                                 <button
                                   key={prompt.label}
                                   type="button"
@@ -3321,7 +3408,11 @@ return (
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0]
-                          if (!file) return                        }}
+                          if (!file) return
+                          setToastMessage(`Selected ${file.name}. File analysis is not wired yet.`)
+                          setShowToast(true)
+                          e.currentTarget.value = ''
+                        }}
                       />
                       <textarea
                         ref={textareaRef}
