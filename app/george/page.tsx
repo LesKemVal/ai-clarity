@@ -1940,42 +1940,16 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
 
       if (!firstResponseOverride && activeDomain === 'credit') {
-        const short = text.length < 40
-        const singleWordAsk = text.trim().split(/\s+/).length === 1
-        const tradelineInfoAsk =
-          (text.toLowerCase().includes('tradeline') || text.toLowerCase().includes('tradelines') || text.toLowerCase().includes('authorized user')) &&
-          (
-            singleWordAsk ||
-            text.toLowerCase().includes('tell me about') ||
-            text.toLowerCase().includes('what is') ||
-            text.toLowerCase().includes("what's") ||
-            text.toLowerCase().includes('explain') ||
-            text.toLowerCase().includes('more about') ||
-            text.toLowerCase().includes('how do tradelines work') ||
-            text.toLowerCase().includes('how tradelines work')
-          )
+        // KEEP ONLY THE STRONGEST LOCAL INTERRUPT:
+        // if utilization is explicitly present, we can answer fast.
+        const multiProblem =
+          /interview|job|boss|meeting|business|income|car|transportation|relationship|court|doctor/i.test(text)
 
-        // HARD OVERRIDE: utilization always wins if detected in text
-        if (/maxed|balance|utilization/i.test(text)) {
-          creditType = 'utilization'
-        }
-
-        if (creditType === 'utilization') {
+        if (
+          /maxed|maxed|balance|balances|utilization/i.test(text) &&
+          !multiProblem
+        ) {
           firstResponseOverride = "Your cards being maxed out is the issue. Tradelines will not fix that. Bring each card under 30%—under 10% if possible. Paydown or balance shifting is the move. I can help you build a paydown plan, or I can show you the fastest way to lower utilization without adding new debt."
-        } else if (short && creditType === 'derogatory') {
-          firstResponseOverride = "If negative marks are the issue, tradelines will not fix the core problem. What is on your report right now—collections, charge-offs, or late payments?"
-        } else if (creditType === 'thin' && !tradelineInfoAsk) {
-          firstResponseOverride = "If your file is thin, tradelines may help—but only if the rest of the profile is clean. Do you currently have any open revolving accounts of your own?"
-        } else if (creditIntent === 'score' && !tradelineInfoAsk) {
-          firstResponseOverride = "What’s holding your score back right now—high balances, missed payments, or not enough history?"
-        } else if (creditIntent === 'approval' && !tradelineInfoAsk) {
-          firstResponseOverride = "What are you trying to get approved for, and when?"
-        } else if (creditIntent === 'tradelines' && !tradelineInfoAsk) {
-          firstResponseOverride = "Understood. I do not think tradelines are usually the strongest move unless your file is thin and otherwise clean. If you still want to pursue them, I’ll help you do it intelligently. First tell me what’s actually on your report: high utilization, negatives, or thin history?"
-        } else if (creditIntent === 'repair' && !tradelineInfoAsk) {
-          firstResponseOverride = "What is doing the most damage right now—collections, late payments, charge-offs, or something else?"
-        } else if (!tradelineInfoAsk) {
-          firstResponseOverride = "What are you actually trying to improve—your score, your approvals, or the overall strength of your credit profile?"
         }
       }
 
