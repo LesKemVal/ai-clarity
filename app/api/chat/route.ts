@@ -646,6 +646,28 @@ function detectCadenceAvoidance(messages: CleanMessage[]) {
   return avoid.slice(0, 3)
 }
 
+function detectLiveScenario(input: string) {
+  const t = input.toLowerCase().trim()
+
+  if (/interview|hiring manager|recruiter/.test(t)) {
+    return { active: true, type: 'interview' }
+  }
+  if (/boss|manager|coworker|hr|meeting/.test(t)) {
+    return { active: true, type: 'workplace' }
+  }
+  if (/deal|price|seller|dealer|negotiat/.test(t)) {
+    return { active: true, type: 'negotiation' }
+  }
+  if (/girlfriend|boyfriend|wife|husband|dating|text her|text him|relationship/.test(t)) {
+    return { active: true, type: 'relationship' }
+  }
+  if (/call in 5|about to call|right now talking|live conversation|on the phone/.test(t)) {
+    return { active: true, type: 'immediate-live' }
+  }
+
+  return { active: false, type: 'none' }
+}
+
 
 
 export async function POST(req: Request) {
@@ -699,6 +721,7 @@ export async function POST(req: Request) {
     const scores = scoreRuntimeSignals(latestUserRaw)
     const bottleneck = detectLikelyBottleneck(latestUserRaw)
     const cadenceAvoid = detectCadenceAvoidance(messages)
+    const liveScenario = detectLiveScenario(latestUserRaw)
 
     const model =
       tier === 'brilliant'
@@ -759,7 +782,25 @@ BOTTLENECK SIGNAL
 CADENCE CONTROL
 - Avoid repeating these recent patterns: ${cadenceAvoid.join(', ') || 'none'}
 - Use fresh openings, varied sentence rhythm, and alternate structures.
-- Do not sound templated across turns.`,
+- Do not sound templated across turns.
+
+BRILLIANT LIVE ENGINE
+- Tier check: ${tier}
+- Live scenario active: ${liveScenario.active}
+- Scenario type: ${liveScenario.type}
+- If tier is brilliant and live scenario is active:
+  - prioritize exact next words, framing, timing, and leverage
+  - give concise lines the user can actually say
+  - identify power dynamics quickly
+  - protect dignity and objective
+  - avoid essays
+  - prefer 1 strong move over many ideas
+- If immediate-live:
+  - respond as if the moment is happening now
+  - compress sharply
+  - give fast usable language first
+- If not brilliant tier:
+  - you may still help, but reserve strongest live precision for Brilliant.`,
 
         },
         ...recentMessages,
