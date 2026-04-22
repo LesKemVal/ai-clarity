@@ -600,6 +600,28 @@ function scoreRuntimeSignals(input: string) {
   return { seriousnessScore, opportunityScore, confusionScore, urgencyScore }
 }
 
+function detectLikelyBottleneck(input: string) {
+  const t = input.toLowerCase().trim()
+
+  if (/credit|maxed|maxed out|score|approval|loan|mortgage/.test(t)) {
+    return { label: 'profile strength', confidence: 'high' }
+  }
+  if (/job|interview|hired|resume/.test(t)) {
+    return { label: 'conversion bottleneck', confidence: 'high' }
+  }
+  if (/money|bills|rent|broke|cash/.test(t)) {
+    return { label: 'cashflow pressure', confidence: 'high' }
+  }
+  if (/confused|lost|not sure|which one|what should i do/.test(t)) {
+    return { label: 'decision fog', confidence: 'high' }
+  }
+  if (/build|launch|business|project|app/.test(t)) {
+    return { label: 'execution clarity', confidence: 'medium' }
+  }
+
+  return { label: 'unknown', confidence: 'low' }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -649,6 +671,7 @@ export async function POST(req: Request) {
 
     const control = classifyControlState(latestUserRaw)
     const scores = scoreRuntimeSignals(latestUserRaw)
+    const bottleneck = detectLikelyBottleneck(latestUserRaw)
 
     const model =
       tier === 'brilliant'
@@ -697,7 +720,14 @@ SCORE-AWARE STEERING
 - If opportunity score is 4 or 5 and urgency score is low: allow a stronger strategic recommendation instead of only near-term triage.
 - If all scores are low: stay light, direct, and useful without overbuilding the answer.
 - Do not mention scores directly to the user.
-- Use scores as steering pressure, not as a substitute for judgment.`,
+- Use scores as steering pressure, not as a substitute for judgment.
+
+BOTTLENECK SIGNAL
+- Likely bottleneck: ${bottleneck.label}
+- Confidence: ${bottleneck.confidence}
+- If confidence is high, often lead with the bottleneck early.
+- If confidence is medium, test it lightly.
+- If confidence is low, do not force diagnosis.`,
 
         },
         ...recentMessages,
