@@ -294,16 +294,25 @@ export default function Page() {
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
+  const greetingPool = [
+    `${timeGreeting} I am in Beta, so cut me just a little slack. What's on our agenda today?`,
+    `${timeGreeting} Did you know the Earth spins at roughly 1,000 mph at the equator? What do you want to do today?`,
+    `${timeGreeting} Did you know Earth is traveling around the sun at about 67,000 mph? What's the move today?`,
+    `${timeGreeting} Did you know we are standing on a moving planet right now? What matters most today?`,
+    `${timeGreeting} Did you know sunlight reaching you left the sun about 8 minutes ago? What do you want to build today?`,
+    `${timeGreeting} Hi, I am in BETA but full throttle.. What do you want to do?`
+  ]
+
   if (tier === 'smart') {
-    return `${timeGreeting} I’m all about you today. What’s first?`
+    return greetingPool[Math.floor(Date.now() / 60000) % greetingPool.length]
   }
 
   if (tier === 'intelligent') {
-    return `${timeGreeting} I’m all about you today. What’s first?`
+    return greetingPool[Math.floor(Date.now() / 60000) % greetingPool.length]
   }
 
   if (tier === 'brilliant') {
-    return `${timeGreeting} I’m all about you today. What’s first?`
+    return greetingPool[Math.floor(Date.now() / 60000) % greetingPool.length]
   }
 
   return `${timeGreeting} What do you want to do?`
@@ -1082,14 +1091,12 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
     if (shared) {
       setInput(shared)
       if (textareaRef.current) {
-        textareaRef.current.value = shared
       }
     }
 
     if (prompt) {
       setInput(prompt)
       if (textareaRef.current) {
-        textareaRef.current.value = prompt
       }
     }
 
@@ -1757,7 +1764,6 @@ const handleSend = useCallback(
         setInput('')
         setInterimTranscript('')
         if (textareaRef.current) {
-          textareaRef.current.value = ''
         }
 
         const userMessage: Message = {
@@ -2671,8 +2677,7 @@ return (
                 const prompt = "Show me related memory for this."
                 setInput(prompt)
                 if (textareaRef.current) {
-                  textareaRef.current.value = prompt
-                }
+                          }
               }}
               className="transition hover:text-[#7C8CFF]"
             >
@@ -3016,7 +3021,6 @@ return (
                         onClick={() => {
                           setInput(textBlock)
                           if (textareaRef.current) {
-                            textareaRef.current.value = textBlock
                           }
                           setShowRecentFolders(false)
                           setActiveMemoryFolder(null)
@@ -3153,226 +3157,6 @@ return (
 </div>
 
               <div className="sticky bottom-0 z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-                <div className="hidden">
-                  <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setShowRecentFolders((prev) => !prev)
-                            setActiveMemoryFolder(null)
-                          }}
-                          className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
-                          aria-label="Open memory folders"
-                        >
-                          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>
-                          </svg>
-                        </button>
-
-                        {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
-                          <button
-                            type="button"
-                            onClick={() => setLiveMode((prev) => !prev)}
-                            className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
-                              liveMode
-                                ? 'border border-[#7C8CFF]/40 bg-[#7C8CFF]/20 text-[#7C8CFF]'
-                                : 'text-white/80 hover:text-white'
-                            }`}
-                          >
-                            LIVE
-                          </button>
-                        )}
-
-                        {showRecentFolders && (
-                          <div
-                            ref={folderBrowserRef}
-                            className="absolute bottom-[52px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
-                          >
-                            <div className="space-y-3.5">
-                              <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
-                                Save memory
-                              </div>
-
-                              {getExistingFolders().length > 0 ? (
-                                <div className="space-y-2">
-                                  {getExistingFolders().map((folder) => (
-                                    <button
-                                      key={folder}
-                                      type="button"
-                                      onClick={() => {
-                                        setActiveMemoryFolder(folder)
-                                      }}
-                                      className={`block w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
-                                        activeMemoryFolder === folder
-                                          ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
-                                          : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
-                                      }`}
-                                    >
-                                      {folder}
-                                    </button>
-                                  ))}
-                                </div>
-                              ) : (
-                                <div className="text-sm text-neutral-500">
-                                  No saved folders yet
-                                </div>
-                              )}
-
-                              {activeMemoryFolder && (
-                                <div className="mt-3 border-t border-white/10 pt-3">
-                                  <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-neutral-500">
-                                    <span>{activeMemoryFolder}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => setActiveMemoryFolder(null)}
-                                      className="text-neutral-400 hover:text-white transition"
-                                    >
-                                      Back
-                                    </button>
-                                  </div>
-
-                                  <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
-                                    {getMemoriesByFolder(activeMemoryFolder).map((item, idx) => {
-                                      const textBlock =
-                                        item.savedPair && item.userPromptContent
-                                          ? `User: ${item.userPromptContent}\nGEORGE: ${item.content}`
-                                          : item.content
-
-                                      const isLatest = idx === 0
-
-                                      return (
-                                        <button
-                                          key={idx}
-                                          type="button"
-                                          onClick={() => {
-                                            setInput(textBlock)
-                                            if (textareaRef.current) {
-                                              textareaRef.current.value = textBlock
-                                            }
-                                            setShowRecentFolders(false)
-                                            setActiveMemoryFolder(null)
-                                          }}
-                                          className={`block w-full rounded-xl border px-3 py-2 text-left text-xs transition ${
-                                            isLatest
-                                              ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
-                                              : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
-                                          }`}
-                                        >
-                                          <div className="mb-1 flex items-center justify-between gap-2">
-                                            <span className="truncate">
-                                              {item.preview || (item.content || '').slice(0, 80)}
-                                            </span>
-                                            {isLatest && (
-                                              <span className="text-[14px] uppercase tracking-[0.14em] text-[#7C8CFF]">
-                                                Latest
-                                              </span>
-                                            )}
-                                          </div>
-                                        </button>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                          e.stopPropagation()
-                          setShowPromptMenu((prev) => !prev)
-                        }}
-                          className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
-                          aria-label="Make a better move"
-                        >
-                          <span className="text-[34px] leading-none">+</span>
-                          <span
-                            className={`absolute right-2 top-1 h-1.5 w-1.5 rounded-full ${
-                              reroutePrompt || suggestedPrompts.length > 0
-                                ? 'bg-[#7C8CFF]'
-                                : 'bg-white/85'
-                            } ${
-                              suggestedSignal || rerouteSignal
-                                ? 'ring-2 ring-[#7C8CFF]/60 shadow-[0_0_10px_#7C8CFF,0_0_20px_#7C8CFF] animate-pulse'
-                                : ''
-                            }`}
-                          />
-                        </button>
-
-                        {showPromptMenu && (
-                          <div className="absolute bottom-[52px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-                            <div className="space-y-1">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const scriptureText = 'Guide by scripture'
-                                  setActivePromptLabel('Guide by scripture')
-                                  setActivePromptContext('bible_decision_lens')
-                                  setShowPromptMenu(false)
-                                  void handleSend(scriptureText)
-                                }}
-                                className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
-                              >
-                                Guide by scripture
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  fileInputRef.current?.click()
-                                  setShowPromptMenu(false)
-                                }}
-                                className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
-                              >
-                                Upload file or image
-                              </button>
-
-                              {reroutePrompt && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActivePromptLabel(reroutePrompt.label)
-                                    setActivePromptContext(reroutePrompt.context)
-                                    setShowPromptMenu(false)
-                                    setRerouteSignal(0)
-                                    void handleSend(reroutePrompt.text)
-                                  }}
-                                  className={`block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-200 ${rerouteSignal ? 'alert-dot-twice' : ''}`}
-                                >
-                                  {reroutePrompt.label}
-                                </button>
-                              )}
-
-                              {suggestedPrompts.slice(0, tierSuggestedLimit).map((prompt) => (
-                                <button
-                                  key={prompt.label}
-                                  type="button"
-                                  onClick={() => {
-                                    setActivePromptLabel(prompt.label)
-                                    setActivePromptContext(prompt.context)
-                                    if (prompt.context?.startsWith('brilliant_')) {
-                                      setConversationMode(prompt.context)
-                                      if (!window.localStorage.getItem("george_walkthrough_seen")) {
-                                        setShowWalkthrough(true)
-                                        setWalkthroughStep(1)
-                                      }
-                                    }
-                                    setShowPromptMenu(false)
-                                    void handleSend(prompt.text)
-                                  }}
-                                  className={`block w-full py-1 text-left text-sm transition ${activePromptLabel === prompt.label ? 'text-white' : 'text-neutral-300 hover:text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'} ${suggestedSignal ? 'glow-twice' : ''}`}
-                                >
-                                  {prompt.label}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/15 bg-white/[0.05] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
 
                       <input
@@ -3396,23 +3180,12 @@ return (
                         placeholder="What are we working on?"
                         rows={1}
                         style={{ WebkitUserSelect: 'text' }}
-                        className="min-h-[44px] w-full flex-1 resize-none bg-transparent rounded-[1.6rem] border-0 bg-transparent px-2 py-2.5 pr-20 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-2.5 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
                         {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
                           <>
-                            <select
-                              value={voiceSpeed}
-                              onChange={(e) => setVoiceSpeed(Number(e.target.value))}
-                              className="h-9 rounded-full border border-white/10 bg-black/40 px-2 text-xs text-white outline-none"
-                              aria-label="Voice speed"
-                            >
-                              <option value={0.8}>0.8x</option>
-                              <option value={1}>1.0x</option>
-                              <option value={1.2}>1.2x</option>
-                              <option value={1.4}>1.4x</option>
-                            </select>
 
                             <button
                               type="button"
