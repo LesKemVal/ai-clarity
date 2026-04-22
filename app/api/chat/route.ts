@@ -511,12 +511,93 @@ ${tier === 'brilliant' ? `
 - Support real-time conversations, pressure situations, and nuanced wording with strong continuity.
 ` : ''}
 
+PREMIUM RESPONSE ENGINE
+- First sentence should create value quickly.
+- Prefer naming the real issue, hidden pressure, or strongest lever early.
+- Do not open weakly or generically.
+- Do not merely answer; move the user closer to outcome.
+- If the user is overwhelmed: shorten, stabilize, prioritize.
+- If urgent: become decisive and sequence moves.
+- If vague: narrow intelligently with minimal questions.
+- If ambitious: think strategically and surface leverage.
+- If emotional: be useful, steady, and clean.
+- Vary cadence, openings, and rhythm naturally.
+- Avoid repeating the same response formula every turn.
+- Once the goal is clear, bias toward completion over discussion.
+
 FINAL RULE
 GEORGE maintains direction without forcing it.
 `.trim()
 
 function isValidIncomingMessage(m: IncomingMessage): m is FilteredIncomingMessage {
   return !!m && m.role !== 'system' && typeof m.content === 'string'
+}
+
+function classifyControlState(input: string) {
+  const t = input.toLowerCase().trim()
+
+  const urgent = /now|asap|today|immediately|urgent|fast|quick|deadline/.test(t)
+  const emotional = /hurt|angry|sad|depressed|anxious|stress|stressed|upset/.test(t)
+  const builder = /build|launch|start|create|business|company|app|project/.test(t)
+  const writing = /rewrite|write|text message|email|caption|bio|resume/.test(t)
+  const live = /interview|date|meeting|call|conversation|talk to|negotiat/.test(t)
+  const vague = t.split(/\s+/).length <= 3
+  const overwhelmed = /overwhelmed|too much|confused|lost|behind/.test(t)
+
+  const userState =
+    overwhelmed ? 'overwhelmed' :
+    urgent ? 'urgent' :
+    emotional ? 'emotional' :
+    builder ? 'builder' :
+    vague ? 'vague' :
+    'focused'
+
+  const objectiveMode =
+    writing ? 'writing' :
+    live ? 'live-pressure' :
+    builder ? 'planning' :
+    vague ? 'clarification' :
+    'execution'
+
+  const pressureLevel =
+    urgent ? 'high' :
+    emotional || overwhelmed ? 'medium' :
+    'low'
+
+  return { userState, objectiveMode, pressureLevel }
+}
+
+function scoreRuntimeSignals(input: string) {
+  const t = input.toLowerCase().trim()
+
+  let seriousnessScore = 1
+  let opportunityScore = 1
+  let confusionScore = 1
+  let urgencyScore = 1
+
+  if (/need|must|can't|cannot|stuck|problem|issue|behind|risk|pressure|serious/.test(t)) {
+    seriousnessScore += 2
+  }
+  if (/business|build|launch|grow|income|opportunity|client|customers|market|invest/.test(t)) {
+    opportunityScore += 2
+  }
+  if (/confused|lost|not sure|don't know|dont know|overwhelmed|too much|which one|what should i do/.test(t)) {
+    confusionScore += 2
+  }
+  if (/now|today|asap|urgent|immediately|fast|quick|deadline|tonight/.test(t)) {
+    urgencyScore += 2
+  }
+
+  if (t.split(/\s+/).length <= 3) {
+    confusionScore += 1
+  }
+
+  seriousnessScore = Math.min(5, seriousnessScore)
+  opportunityScore = Math.min(5, opportunityScore)
+  confusionScore = Math.min(5, confusionScore)
+  urgencyScore = Math.min(5, urgencyScore)
+
+  return { seriousnessScore, opportunityScore, confusionScore, urgencyScore }
 }
 
 export async function POST(req: Request) {
@@ -563,6 +644,12 @@ export async function POST(req: Request) {
 
     const recentMessages = messages.slice(-10)
 
+    const latestUserRaw =
+      [...messages].reverse().find((m) => m.role === 'user')?.content || ''
+
+    const control = classifyControlState(latestUserRaw)
+    const scores = scoreRuntimeSignals(latestUserRaw)
+
     const model =
       tier === 'brilliant'
         ? (process.env.OPENAI_MODEL_BRILLIANT || 'gpt-5')
@@ -582,7 +669,36 @@ export async function POST(req: Request) {
             promptLabel,
             contextTurnCount,
             tier
-          ),
+          ) + `
+
+CONTROL STATE
+- User state: ${control.userState}
+- Objective mode: ${control.objectiveMode}
+- Pressure level: ${control.pressureLevel}
+- Adapt behavior accordingly.
+
+RUNTIME SCORES
+- Seriousness score: ${scores.seriousnessScore}/5
+- Opportunity score: ${scores.opportunityScore}/5
+- Confusion score: ${scores.confusionScore}/5
+- Urgency score: ${scores.urgencyScore}/5
+- Higher confusion = narrow faster.
+- Higher urgency = compress and decide faster.
+- Higher opportunity = think in leverage, upside, and path quality.
+- Higher seriousness = reduce fluff and protect outcome.
+
+SCORE-AWARE STEERING
+- If confusion score is 4 or 5: reduce explanation, narrow hard, and ask at most one clarifying question.
+- If confusion score is 4 or 5: prefer orientation, sorting, or sequencing over depth.
+- If urgency score is 4 or 5: recommend faster, compress harder, and avoid slow exploratory framing.
+- If urgency score is 4 or 5 and seriousness score is 4 or 5: lead with the strongest move first.
+- If seriousness score is 4 or 5: reduce warmth, reduce filler, and protect outcome over comfort.
+- If opportunity score is 4 or 5 and confusion score is 1 or 2: think more strategically and widen one level upward to leverage, upside, or positioning.
+- If opportunity score is 4 or 5 and urgency score is low: allow a stronger strategic recommendation instead of only near-term triage.
+- If all scores are low: stay light, direct, and useful without overbuilding the answer.
+- Do not mention scores directly to the user.
+- Use scores as steering pressure, not as a substitute for judgment.`,
+
         },
         ...recentMessages,
       ],

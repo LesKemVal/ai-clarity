@@ -300,7 +300,11 @@ export default function Page() {
     `${timeGreeting} Did you know Earth is traveling around the sun at about 67,000 mph? What's the move today?`,
     `${timeGreeting} Did you know we are standing on a moving planet right now? What matters most today?`,
     `${timeGreeting} Did you know sunlight reaching you left the sun about 8 minutes ago? What do you want to build today?`,
-    `${timeGreeting} Hi, I am in BETA but full throttle.. What do you want to do?`
+    `${timeGreeting} I am in BETA mode - cut me no slack. What are we doing right now?`,
+    `${timeGreeting} We can waste time or move forward. Choose.`,
+    `${timeGreeting} Talk plain. I’ll do the same.`,
+    `${timeGreeting} What are we solving tonight?`,
+    `${timeGreeting} What matters most right now?`
   ]
 
   if (tier === 'smart') {
@@ -2451,8 +2455,8 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-hidden">
-          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[320px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-2.5 xl:hidden">
                   <button
@@ -2850,7 +2854,7 @@ return (
               </div>
             )}
 
-            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[320px] flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
               <div className="relative z-[60] mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2">
