@@ -38,7 +38,7 @@ export default function SuccessPage() {
 
           <button
             type="button"
-            onClick={() => (window.location.href = '/top-up')}
+            onClick={() => (window.open('/top-up','_blank','noopener,noreferrer'))}
             className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
           >
             Return to beta access

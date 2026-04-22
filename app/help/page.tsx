@@ -139,7 +139,7 @@ export default function HelpPage() {
           </p>
 
           <p className="mt-3 text-neutral-400 leading-7">
-            GEORGE is here to help you finish what matters.
+            GEORGE is this generation’s cheat code.
           </p>
         </section>
 
