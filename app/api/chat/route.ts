@@ -622,6 +622,32 @@ function detectLikelyBottleneck(input: string) {
   return { label: 'unknown', confidence: 'low' }
 }
 
+function detectCadenceAvoidance(messages: CleanMessage[]) {
+  const recentAssistant = messages
+    .filter((m) => m.role === 'assistant')
+    .slice(-4)
+    .map((m) => m.content.toLowerCase())
+
+  const avoid: string[] = []
+
+  if (recentAssistant.some((t) => t.startsWith('good.') || t.startsWith('good '))) {
+    avoid.push('opening with Good')
+  }
+  if (recentAssistant.some((t) => t.includes('two paths'))) {
+    avoid.push('phrase two paths')
+  }
+  if (recentAssistant.some((t) => t.includes('real issue is'))) {
+    avoid.push('phrase real issue is')
+  }
+  if (recentAssistant.some((t) => t.includes('bottleneck'))) {
+    avoid.push('leading with bottleneck wording')
+  }
+
+  return avoid.slice(0, 3)
+}
+
+
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -672,6 +698,7 @@ export async function POST(req: Request) {
     const control = classifyControlState(latestUserRaw)
     const scores = scoreRuntimeSignals(latestUserRaw)
     const bottleneck = detectLikelyBottleneck(latestUserRaw)
+    const cadenceAvoid = detectCadenceAvoidance(messages)
 
     const model =
       tier === 'brilliant'
@@ -727,7 +754,12 @@ BOTTLENECK SIGNAL
 - Confidence: ${bottleneck.confidence}
 - If confidence is high, often lead with the bottleneck early.
 - If confidence is medium, test it lightly.
-- If confidence is low, do not force diagnosis.`,
+- If confidence is low, do not force diagnosis.
+
+CADENCE CONTROL
+- Avoid repeating these recent patterns: ${cadenceAvoid.join(', ') || 'none'}
+- Use fresh openings, varied sentence rhythm, and alternate structures.
+- Do not sound templated across turns.`,
 
         },
         ...recentMessages,
