@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import PageShell from '@/components/layout/PageShell'
 
 export default function TopUpPage() {
+  const router = useRouter()
   const [intent, setIntent] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -88,22 +90,16 @@ export default function TopUpPage() {
     setFeedback('')
   }
 
+  function jumpTo(id: string) {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <PageShell backToGeorge withSidebar={false}>
       <div className="space-y-8">
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="max-w-5xl space-y-6">
-            <div className="flex justify-center md:justify-end">
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] px-5 py-3 shadow-[0_0_40px_rgba(255,255,255,0.06)]">
-                <svg viewBox="0 0 180 72" className="h-14 w-auto text-white" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M42 8c10 3 18 14 18 28v8c0 7-4 13-10 16l-8 4V38h-7V18l7-10Z"/>
-                  <path d="M138 8c-10 3-18 14-18 28v8c0 7 4 13 10 16l8 4V38h7V18l-7-10Z"/>
-                  <circle cx="42" cy="10" r="2" fill="currentColor"/>
-                  <circle cx="138" cy="10" r="2" fill="currentColor"/>
-                </svg>
-              </div>
-            </div>
-
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
               BRANESx Beta
             </p>
@@ -171,15 +167,27 @@ export default function TopUpPage() {
             </div>
 
             <div className="grid gap-3 pt-1 md:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
+              <button
+                type="button"
+                onClick={() => router.push('/george')}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-white/20 hover:text-white"
+              >
                 Use GEORGE now
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
+              </button>
+              <button
+                type="button"
+                onClick={() => jumpTo('waitlist')}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF] hover:text-white"
+              >
                 Join the waitlist
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
+              </button>
+              <button
+                type="button"
+                onClick={() => jumpTo('feedback')}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF] hover:text-white"
+              >
                 Send feedback
-              </div>
+              </button>
             </div>
 
             {message ? (
@@ -191,7 +199,7 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6">
+          <div id="waitlist" className="rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6 scroll-mt-24">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Waitlist</p>
               <p className="text-sm leading-7 text-neutral-300">
@@ -230,7 +238,7 @@ export default function TopUpPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div id="feedback" className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 scroll-mt-24">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Comments and suggestions</p>
               <p className="text-sm leading-7 text-neutral-300">
@@ -263,29 +271,6 @@ export default function TopUpPage() {
               >
                 Save feedback
               </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <div className="max-w-4xl space-y-4">
-            <h2 className="text-2xl font-semibold text-white">
-              What we are testing right now
-            </h2>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                How people actually use GEORGE across Smart, Intelligent, and Brilliant.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                How clearly users understand that Conversation Engine, voice controls, and LIVE cues are Brilliant beta features being refined before wider release.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                How to help people find courses, tools, and credible resources through GEORGE.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-neutral-300">
-                What should be strengthened before broad launch.
-              </div>
             </div>
           </div>
         </section>

@@ -3171,8 +3171,20 @@ return (
                         onChange={(e) => {
                           const file = e.target.files?.[0]
                           if (!file) return
-                          setToastMessage(`Selected ${file.name}. File analysis is not wired yet.`)
+
+                          const isImage = file.type.startsWith('image/')
+                          const starter = isImage
+                            ? `I uploaded image: ${file.name}. Analyze this image and help me.`
+                            : `I uploaded file: ${file.name}. Help me understand and use this file.`
+
+                          setInput(starter)
+                          setToastMessage(`${file.name} attached to composer.`)
                           setShowToast(true)
+
+                          if (textareaRef.current) {
+                            textareaRef.current.focus()
+                          }
+
                           e.currentTarget.value = ''
                         }}
                       />

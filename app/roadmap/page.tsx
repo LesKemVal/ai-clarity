@@ -11,8 +11,8 @@ export default function RoadmapPage() {
     router.push('/george')
   }
 
-  function goWaitlist() {
-    router.push('/top-up')
+  function goBrilliant() {
+    router.push('/top-up#waitlist')
   }
 
   function goHelp() {
@@ -21,23 +21,44 @@ export default function RoadmapPage() {
 
   return (
     <PageShell title="Roadmap" eyebrow="Beta" backToGeorge withSidebar={false}>
-      <div className="max-w-5xl space-y-8">
-        <section className="rounded-[2rem] border border-neutral-800 bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
-          <div className="mx-auto flex w-full max-w-5xl flex-col justify-center px-6 py-16 md:py-20">
-            <div className="max-w-3xl space-y-6">
-              <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
-                BRANESx Beta
-              </p>
+      <div className="max-w-6xl space-y-8">
+        <section className="overflow-hidden rounded-[2rem] border border-neutral-800 bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
+          <div className="lg:hidden">
+            <div className="relative">
+              <img
+                src="/roadmap/earbuds-hero.png"
+                alt="Multiple earbuds supported by Brilliant Conversation Engine"
+                className="block h-[52vh] min-h-[360px] w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/15 to-black/90" />
+              <div className="absolute inset-x-0 bottom-0 px-6 pb-7">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
+                  BRANESx Beta
+                </p>
+                <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-white">
+                  Earbuds unlock best with Brilliant.
+                </h1>
+                <p className="mt-4 max-w-2xl text-base leading-8 text-neutral-200">
+                  Conversation Engine is built for real moments. Interviews. Negotiations. Workplace pressure. Relationship talks. Fast-moving situations where timing, tone, and wording matter.
+                </p>
+              </div>
+            </div>
 
-              <h1 className="text-4xl font-semibold tracking-tight text-white md:text-6xl">
-                GEORGE is in beta, but the direction is already real.
-              </h1>
+            <div className="space-y-5 px-6 py-6">
+              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
+                Use earbuds to keep GEORGE close while you stay in the conversation. Brilliant is where live cues, room-awareness, and pressure support start to matter.
+              </div>
 
-              <p className="max-w-2xl text-base leading-8 text-neutral-300 md:text-lg">
-                Use GEORGE now. Join the waitlist while paid access is still in beta. Help shape what becomes stronger, sharper, and more useful over time.
-              </p>
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">
+                  Powered by Conversation Engine
+                </p>
+                <p className="mt-3 text-sm leading-7 text-neutral-200">
+                  Real-time guidance in your ear. Context-aware. Private. Always with you.
+                </p>
+              </div>
 
-              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+              <div className="flex flex-col gap-3">
                 <button
                   type="button"
                   onClick={enterGeorge}
@@ -48,10 +69,10 @@ export default function RoadmapPage() {
 
                 <button
                   type="button"
-                  onClick={goWaitlist}
+                  onClick={goBrilliant}
                   className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
-                  Join the waitlist
+                  See Brilliant
                 </button>
 
                 <button
@@ -64,25 +85,68 @@ export default function RoadmapPage() {
               </div>
             </div>
           </div>
-        </section>
 
-        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 md:p-8">
-          <div className="max-w-3xl space-y-5">
-            <h2 className="text-2xl font-semibold text-white">
-              What beta means right now
-            </h2>
+          <div className="hidden lg:grid lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+            <div className="space-y-6 px-8 py-10 lg:flex lg:flex-col lg:justify-center">
+              <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
+                BRANESx Beta
+              </p>
 
-            <p className="text-sm leading-7 text-neutral-200 md:text-base">
-              GEORGE is live for testing and real use, but paid access, launch messaging, and broader rollout are still being shaped.
-            </p>
+              <h1 className="max-w-3xl text-6xl font-semibold tracking-tight text-white">
+                Earbuds unlock best with Brilliant.
+              </h1>
 
-            <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              During beta, the right move is to gather signal, improve the product, tighten the experience, and make sure people understand how to use GEORGE well before broader release.
-            </p>
+              <p className="max-w-2xl text-lg leading-8 text-neutral-300">
+                Conversation Engine is built for real moments. Interviews. Negotiations. Workplace pressure. Relationship talks. Fast-moving situations where timing, tone, and wording matter.
+              </p>
 
-            <p className="text-sm leading-7 text-white md:text-base">
-              This is where feedback matters.
-            </p>
+              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
+                Use earbuds to keep GEORGE close while you stay in the conversation. Brilliant is where live cues, room-awareness, and pressure support start to matter.
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">
+                  Powered by Conversation Engine
+                </p>
+                <p className="mt-3 text-base leading-7 text-neutral-200">
+                  Real-time guidance in your ear. Context-aware. Private. Always with you.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={enterGeorge}
+                  className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
+                >
+                  Use GEORGE now
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goBrilliant}
+                  className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                >
+                  See Brilliant
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goHelp}
+                  className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+                >
+                  Learn how to use it
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <img
+                src="/roadmap/earbuds-hero.png"
+                alt="Multiple earbuds supported by Brilliant Conversation Engine"
+                className="block h-full min-h-[640px] w-full object-cover object-center"
+              />
+            </div>
           </div>
         </section>
 
@@ -90,74 +154,59 @@ export default function RoadmapPage() {
           <div className="space-y-6">
             <div className="max-w-3xl space-y-3">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">
-                Current product path
+                Conversation Engine modes
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-white">
-                GEORGE gets more useful as the weight of the moment increases.
+                Choose the kind of help the moment actually needs.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Smart is for clarity and movement. Intelligent is for continuity and better judgment over time. Brilliant is where Conversation Engine, live cues, and room-awareness start to matter.
+                Brilliant is not just stronger chat. It is mode-based live support built for different kinds of human pressure.
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5 space-y-3">
-                <p className="text-sm font-medium text-white">Smart</p>
-                <ul className="space-y-1 text-sm leading-6 text-neutral-400">
-                  <li>• Quick clarity</li>
-                  <li>• Immediate next moves</li>
-                  <li>• Useful without setup</li>
-                  <li>• Start using GEORGE now</li>
-                </ul>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Interview mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you answer clearly, stay composed, and recover fast under pressure.
+                </p>
               </div>
 
-              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-3">
-                <p className="text-sm font-medium text-white">Intelligent</p>
-                <ul className="space-y-1 text-sm leading-6 text-neutral-200">
-                  <li>• Stronger continuity</li>
-                  <li>• Better framing</li>
-                  <li>• More useful over time</li>
-                  <li>• Better for active goals</li>
-                </ul>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Negotiation mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you protect leverage, control phrasing, and avoid weak concessions.
+                </p>
               </div>
 
-              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5 space-y-3">
-                <p className="text-sm font-medium text-white">Brilliant</p>
-                <ul className="space-y-1 text-sm leading-6 text-neutral-400">
-                  <li>• Conversation Engine</li>
-                  <li>• Live cues</li>
-                  <li>• Better room handling</li>
-                  <li>• Sharper pressure support</li>
-                </ul>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Workplace mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you respond cleanly when blame, tension, or power dynamics show up.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Relationship mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you say what matters without rambling, chasing, or sounding weak.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Defensive mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you protect dignity, slow escalation, and avoid saying the wrong thing under fire.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-sm font-medium text-white">Everyday live mode</p>
+                <p className="mt-1 text-sm leading-6 text-neutral-300">
+                  Helps you think and respond in real time when the moment is moving fast.
+                </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
-          <div className="max-w-4xl space-y-4">
-            <h2 className="text-2xl font-semibold text-white">
-              What is coming
-            </h2>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-neutral-300">
-                Better onboarding so new users immediately understand what GEORGE is for and how to get more from it.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-neutral-300">
-                Stronger Conversation Engine support so people know how to use Focus, voice speed, mic, and LIVE cues in real moments.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-neutral-300">
-                Better course and resource discovery so GEORGE can help users find credible learning paths and structure progress around them.
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-neutral-300">
-                Waitlist, feedback, and beta learning loops that help shape launch in a more grounded way.
-              </div>
-            </div>
-
-            <p className="text-sm leading-7 text-white md:text-base">
-              GEORGE is not just for answers. GEORGE is being built to help people move.
-            </p>
           </div>
         </section>
       </div>
