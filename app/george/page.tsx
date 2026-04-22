@@ -286,17 +286,63 @@ export default function Page() {
   const [input, setInput] = useState('')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
+  function getVisitCount() {
+    if (typeof window === 'undefined') return 0
+    const raw = window.localStorage.getItem('george_visit_count')
+    const count = Number(raw || '0')
+    return Number.isFinite(count) ? count : 0
+  }
+
+  function bumpVisitCount() {
+    if (typeof window === 'undefined') return
+    const next = getVisitCount() + 1
+    window.localStorage.setItem('george_visit_count', String(next))
+  }
+
   function getInitialGreeting(name = '', tier = 'smart') {
   const hour = new Date().getHours()
+  const visitCount = getVisitCount()
 
   const timeGreeting =
     hour < 12 ? "Good morning."
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
+  const firstTimeGreeting = `${timeGreeting}
+Here are a few things you should know about me.
+
+I exist to help make sure your goals get met.
+
+You are using Intelligent free for 30 days.
+
+Get familiar with these controls:
+
+🎯 Focus
+🎤 Voice
+📌 Keep This
+📤 Share
+📂 Folders
+⬆️ Upgrade
+
+What do you want to accomplish first?`
+
+  const earlyUserGreeting = `${timeGreeting}
+
+I exist to help make sure your goals get met.
+
+Use me well:
+
+🎯 Focus
+🎤 Voice
+📌 Keep This
+📤 Share
+📂 Folders
+⬆️ Upgrade
+
+What do you want to accomplish first?`
+
   const greetingPool = [
-    `${timeGreeting} I am in Beta, so cut me just a little slack. What's on our agenda today?`,
-    `${timeGreeting} Did you know the Earth spins at roughly 1,000 mph at the equator? What do you want to do today?`,
+       `${timeGreeting} Did you know the Earth spins at roughly 1,000 mph at the equator? What do you want to do today?`,
     `${timeGreeting} Did you know Earth is traveling around the sun at about 67,000 mph? What's the move today?`,
     `${timeGreeting} Did you know we are standing on a moving planet right now? What matters most today?`,
     `${timeGreeting} Did you know sunlight reaching you left the sun about 8 minutes ago? What do you want to build today?`,
@@ -306,6 +352,14 @@ export default function Page() {
     `${timeGreeting} What are we solving tonight?`,
     `${timeGreeting} What matters most right now?`
   ]
+
+  if (visitCount === 0) {
+    return firstTimeGreeting
+  }
+
+  if (visitCount > 0 && visitCount < 5) {
+    return earlyUserGreeting
+  }
 
   if (tier === 'smart') {
     return greetingPool[Math.floor(Date.now() / 60000) % greetingPool.length]
@@ -514,6 +568,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     if (messagesRef.current.length > 0) return
 
     const greeting = getInitialGreeting(profileName, currentTier)
+    bumpVisitCount()
     const timer = window.setTimeout(() => {
       const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
       setMessages(firstMessage)
@@ -2382,7 +2437,7 @@ return (
           }}
           onPromptSelect={(prompt: PromptSelection) => {
               if (prompt.context === 'upgrade_intelligent' || prompt.context === 'upgrade_topup') {
-                router.push('/top-up')
+                window.open('/top-up','_blank')
                 return
               }
 
@@ -2889,7 +2944,7 @@ return (
 
     <button
       type="button"
-      onClick={() => router.push('/help')}
+      onClick={() => window.open('/help','_blank')}
       className="transition hover:text-white"
     >
       Help
@@ -3405,7 +3460,7 @@ return (
 
               <button
                 type="button"
-                onClick={() => router.push('/top-up')}
+                onClick={() => window.open('/top-up','_blank')}
                 className="text-xs text-[#7C8CFF] transition hover:opacity-80"
               >
                 See full options

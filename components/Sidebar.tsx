@@ -528,9 +528,9 @@ export default function Sidebar({
 
             <div className="space-y-4">
               <a href="/" className={linkClass('/')}>GEORGE</a>
-              <a href="/top-up" className={linkClass('/top-up')}>Top-Up</a>
-              <a href="/roadmap" className={linkClass('/roadmap')}>Roadmap</a>
-              <a href="/help" className={linkClass('/help')}>Help</a>
+              <a target="_blank" rel="noopener noreferrer" href="/top-up" className={linkClass('/top-up')}>Top-Up</a>
+              <a target="_blank" rel="noopener noreferrer" href="/roadmap" className={linkClass('/roadmap')}>Roadmap</a>
+              <a target="_blank" rel="noopener noreferrer" href="/help" className={linkClass('/help')}>Help</a>
             </div>
           </div>
 
@@ -550,9 +550,9 @@ export default function Sidebar({
 
             {openGroups['Resources'] && (
               <div className="mt-4 space-y-2 text-sm">
-                <a href="/help" className="block text-neutral-400 hover:text-[#7C8CFF]">Help</a>
+                <a target="_blank" rel="noopener noreferrer" href="/help" className="block text-neutral-400 hover:text-[#7C8CFF]">Help</a>
                 <a href="/legal/toa" className="block text-neutral-400 hover:text-[#7C8CFF]">Terms</a>
-                <a href="/roadmap" className="block text-neutral-400 hover:text-[#7C8CFF]">Roadmap</a>
+                <a target="_blank" rel="noopener noreferrer" href="/roadmap" className="block text-neutral-400 hover:text-[#7C8CFF]">Roadmap</a>
               </div>
             )}
           </div>

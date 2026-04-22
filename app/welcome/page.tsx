@@ -34,9 +34,9 @@ export default function WelcomePage() {
   useEffect(() => {
     if (!ready) return
     if (tier === 'smart') {
-      router.replace('/top-up?intent=make-george-yours')
+      window.location.replace('/top-up?intent=make-george-yours')
     }
-  }, [ready, tier, router])
+  }, [ready, tier])
 
   const valid = useMemo(() => {
     return !!(name && mission && priority && weeklyTime && learningStyle && tone && friction)
@@ -55,7 +55,7 @@ export default function WelcomePage() {
     localStorage.setItem('george_user_tone', tone)
     localStorage.setItem('george_user_friction', friction)
 
-    router.push('/george')
+    window.location.href = '/george'
   }
 
   if (!ready) return null
@@ -65,7 +65,7 @@ export default function WelcomePage() {
     <main className="min-h-screen bg-black px-6 py-10 text-white">
       <div className="mx-auto max-w-4xl space-y-6">
         <button
-          onClick={() => router.push('/george')}
+          onClick={() => (window.location.href = '/george')}
           className="text-sm text-white/70 transition hover:text-white"
         >
           ← Back to GEORGE
@@ -141,7 +141,7 @@ export default function WelcomePage() {
             </button>
 
             <button
-              onClick={() => router.push('/roadmap')}
+              onClick={() => window.open('/roadmap','_blank','noopener,noreferrer')}
               className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
             >
               Review the value first

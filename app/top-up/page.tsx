@@ -1,11 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import PageShell from '@/components/layout/PageShell'
 
 export default function TopUpPage() {
-  const router = useRouter()
   const [intent, setIntent] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -18,6 +16,11 @@ export default function TopUpPage() {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
+    if (window.location.hash === '#waitlist') {
+      setTimeout(() => {
+        document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
   }, [])
 
   const headline = useMemo(() => {
@@ -91,8 +94,7 @@ export default function TopUpPage() {
   }
 
   function jumpTo(id: string) {
-    const el = document.getElementById(id)
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
@@ -169,7 +171,7 @@ export default function TopUpPage() {
             <div className="grid gap-3 pt-1 md:grid-cols-3">
               <button
                 type="button"
-                onClick={() => router.push('/george')}
+                onClick={() => (window.location.href = '/george')}
                 className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-white/20 hover:text-white"
               >
                 Use GEORGE now
@@ -199,7 +201,7 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="waitlist" className="rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6 scroll-mt-24">
+          <div id="waitlist" className="scroll-mt-24 rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Waitlist</p>
               <p className="text-sm leading-7 text-neutral-300">
@@ -207,24 +209,67 @@ export default function TopUpPage() {
               </p>
 
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="First name"
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
               />
 
               <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Name (optional)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Best email"
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
               />
+
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <p className="mb-3 text-sm font-medium text-white">
+                  What do you want from GEORGE?
+                </p>
+                <p className="mb-4 text-xs text-neutral-400">
+                  Select all that apply
+                </p>
+
+                <div className="grid gap-3 text-sm text-neutral-200 md:grid-cols-2">
+                  {[
+                    'Better decision making',
+                    'Motivation / discipline',
+                    'Business growth help',
+                    'More money / income ideas',
+                    'Career direction',
+                    'Confidence in conversations',
+                    'Relationship guidance',
+                    'Credit / financial improvement',
+                    'Daily structure / planning',
+                    'Biblical wisdom guidance',
+                    'Reduce confusion / clarity',
+                    'Other'
+                  ].map((item) => (
+                    <label key={item} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        value={item}
+                        onChange={(e) => {
+                          const v = e.target.value
+                          const arr = note ? note.split(' | ') : []
+                          if (e.target.checked) {
+                            if (!arr.includes(v)) setNote([...arr, v].join(' | '))
+                          } else {
+                            setNote(arr.filter(x => x !== v).join(' | '))
+                          }
+                        }}
+                      />
+                      <span>{item}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={4}
-                placeholder="What do you want most from GEORGE? (optional)"
+                placeholder="Optional: add details or type your own answer"
                 className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
               />
 
@@ -233,12 +278,12 @@ export default function TopUpPage() {
                 onClick={joinWaitlist}
                 className="w-full rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
               >
-                Join the waitlist
+                Get Early Access
               </button>
             </div>
           </div>
 
-          <div id="feedback" className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 scroll-mt-24">
+          <div id="feedback" className="scroll-mt-24 rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Comments and suggestions</p>
               <p className="text-sm leading-7 text-neutral-300">
