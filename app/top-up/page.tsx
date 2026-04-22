@@ -92,7 +92,18 @@ export default function TopUpPage() {
     <PageShell backToGeorge withSidebar={false}>
       <div className="space-y-8">
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
-          <div className="max-w-4xl space-y-4">
+          <div className="max-w-5xl space-y-6">
+            <div className="flex justify-center md:justify-end">
+              <div className="rounded-[2rem] border border-white/10 bg-white/[0.02] px-5 py-3 shadow-[0_0_40px_rgba(255,255,255,0.06)]">
+                <svg viewBox="0 0 180 72" className="h-14 w-auto text-white" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M42 8c10 3 18 14 18 28v8c0 7-4 13-10 16l-8 4V38h-7V18l7-10Z"/>
+                  <path d="M138 8c-10 3-18 14-18 28v8c0 7 4 13 10 16l8 4V38h7V18l-7-10Z"/>
+                  <circle cx="42" cy="10" r="2" fill="currentColor"/>
+                  <circle cx="138" cy="10" r="2" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
               BRANESx Beta
             </p>
@@ -105,7 +116,61 @@ export default function TopUpPage() {
               {subcopy}
             </p>
 
-            <div className="grid gap-3 pt-2 md:grid-cols-3">
+            <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
+              Brilliant unlocks Conversation Engine, live cues, and premium earbud guidance.
+            </div>
+
+            <div className="grid gap-4 pt-2 lg:grid-cols-3">
+              <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-base font-semibold text-white">Brilliant</p>
+                  <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
+                    Full engine
+                  </span>
+                </div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
+                  <li>• Conversation Engine</li>
+                  <li>• Earbud live guidance</li>
+                  <li>• Live cues and room awareness</li>
+                  <li>• Strongest pressure support</li>
+                </ul>
+              </div>
+
+              <div className="rounded-[1.8rem] border border-white/15 bg-white/[0.04] p-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-base font-semibold text-white">Intelligent</p>
+                  <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
+                    Best value
+                  </span>
+                </div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-300">
+                  <li>• Stronger continuity</li>
+                  <li>• Sharper reasoning</li>
+                  <li>• Better planning and framing</li>
+                  <li>• Better for active goals</li>
+                </ul>
+              </div>
+
+              <div className="rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-base font-semibold text-white">Smart</p>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
+                    Free
+                  </span>
+                </div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-400">
+                  <li>• Quick clarity</li>
+                  <li>• Immediate next moves</li>
+                  <li>• Useful without setup</li>
+                  <li>• Start using GEORGE now</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="grid gap-3 pt-1 md:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-neutral-300">
                 Use GEORGE now
               </div>
