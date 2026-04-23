@@ -204,6 +204,22 @@ export default function PageShell({
             )}
 
             <div className="space-y-6">{children}</div>
+
+            <footer className="mt-14 border-t border-white/8 pt-6">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <p className="text-xs leading-6 text-neutral-500">
+                  BRANESx / GEORGE is operated by R. Block Share Holdings, LLC.
+                </p>
+
+                <div className="flex flex-wrap gap-4 text-xs text-neutral-500">
+                  <a href="/privacy" className="transition hover:text-white">Privacy</a>
+                  <a href="/legal/toa" className="transition hover:text-white">Access</a>
+                  <a href="/legal/tos" className="transition hover:text-white">Terms</a>
+                  <a href="/contact" className="transition hover:text-white">Contact</a>
+                </div>
+              </div>
+            </footer>
+
           </div>
         </div>
       </div>
