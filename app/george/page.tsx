@@ -3337,7 +3337,7 @@ return (
             <div className="mb-5 text-center">
               <p className="text-sm font-medium text-white">Make GEORGE yours</p>
               <p className="mt-1 text-xs leading-6 text-neutral-400">
-                Optional. The mind stays GEORGE. You choose how GEORGE speaks and what name you use.
+                Optional. Same mind. Same standards. Choose GEORGE or GEORGette, then keep the name or make it yours.
               </p>
             </div>
 
@@ -3346,8 +3346,8 @@ return (
                 <p className="mb-2 text-xs uppercase tracking-[0.18em] text-neutral-500">Voice</p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: 'George', value: 'onyx' },
-                    { label: 'Claire', value: 'shimmer' },
+                    { label: 'GEORGE', value: 'onyx' },
+                    { label: 'GEORGette', value: 'shimmer' },
                   ].map((voice) => (
                     <button
                       key={voice.value}
