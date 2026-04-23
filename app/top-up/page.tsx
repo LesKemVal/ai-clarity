@@ -34,7 +34,7 @@ export default function TopUpPage() {
     if (intent === 'make-george-yours') {
       return 'GEORGE is already useful. Waitlist access helps us notify you when paid tiers and deeper rollout are ready.'
     }
-    return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help shape what gets better before broader launch.'
+    return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help make GEORGE better before launch.'
   }, [intent])
 
   async function joinWaitlist() {

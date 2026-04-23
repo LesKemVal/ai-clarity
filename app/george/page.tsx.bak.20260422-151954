@@ -11,7 +11,6 @@ type Message = {
   role: 'assistant' | 'user' | 'system'
   content: string
   constrained?: boolean
-  imageDataUrl?: string | null
 }
 
 type PromptSelection = {
@@ -310,26 +309,48 @@ export default function Page() {
     : "Good evening."
 
   const firstTimeGreeting = `${timeGreeting}
-I’m GEORGE. Built to help you succeed. Bring me something real.
+Here are a few things you should know about me.
 
-Build, repair, decide, grow, recover, prepare—start anywhere.`
+I exist to help make sure your goals get met.
+
+You are using Intelligent free for 30 days.
+
+Get familiar with these controls:
+
+🎯 Focus
+🎤 Voice
+📌 Keep This
+📤 Share
+📂 Folders
+⬆️ Upgrade
+
+What do you want to accomplish first?`
 
   const earlyUserGreeting = `${timeGreeting}
-I’m GEORGE. Built to help you succeed. Bring me something real.
 
-Build, repair, decide, grow, recover, prepare—start anywhere.`
+I exist to help make sure your goals get met.
+
+Use me well:
+
+🎯 Focus
+🎤 Voice
+📌 Keep This
+📤 Share
+📂 Folders
+⬆️ Upgrade
+
+What do you want to accomplish first?`
 
   const greetingPool = [
-    `${timeGreeting} Most distractions are noise. What matters today?`,
-    `${timeGreeting} We can drift, or we can execute. Which is it?`,
-    `${timeGreeting} Bring me something real.`,
-    `${timeGreeting} Comfort costs. What is the bottleneck?`,
-    `${timeGreeting} Protect momentum. What’s the next decisive step?`,
-    `${timeGreeting} Focus on what lasts. What durable problem are we solving?`,
-    `${timeGreeting} Pressure reveals weak systems. What needs fixing?`,
-    `${timeGreeting} Time is moving either way. What move are we making?`,
-    `${timeGreeting} What are we building that actually matters?`,
-    `${timeGreeting} The strongest next move is usually smaller than you think. What is it?`,
+       `${timeGreeting} Did you know the Earth spins at roughly 1,000 mph at the equator? What do you want to do today?`,
+    `${timeGreeting} Did you know Earth is traveling around the sun at about 67,000 mph? What's the move today?`,
+    `${timeGreeting} Did you know we are standing on a moving planet right now? What matters most today?`,
+    `${timeGreeting} Did you know sunlight reaching you left the sun about 8 minutes ago? What do you want to build today?`,
+    `${timeGreeting} I am in BETA mode - cut me no slack. What are we doing right now?`,
+    `${timeGreeting} We can waste time or move forward. Choose.`,
+    `${timeGreeting} Talk plain. I’ll do the same.`,
+    `${timeGreeting} What are we solving tonight?`,
+    `${timeGreeting} What matters most right now?`
   ]
 
   if (visitCount === 0) {
@@ -401,7 +422,6 @@ Build, repair, decide, grow, recover, prepare—start anywhere.`
   }
 
 const [messages, setMessages] = useState<Message[]>([])
-const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string } | null>(null)
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
 const [conversationMode, setConversationMode] = useState<string | null>(null)
@@ -525,7 +545,6 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
-const [savePopupUpward, setSavePopupUpward] = useState(true)
   const [newFolderName, setNewFolderName] = useState('')
   const [showRecentFolders, setShowRecentFolders] = useState(false)
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(null)
@@ -698,7 +717,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-
   const [steeringHint, setSteeringHint] = useState<null | {
     signal: string | null
     label: string
@@ -840,20 +858,6 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
   const userPinnedBottomRef = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-  const autoResizeTextarea = useCallback(() => {
-    const el = textareaRef.current
-    if (!el) return
-    el.style.height = '0px'
-    const maxHeight = 180
-    const next = Math.min(el.scrollHeight, maxHeight)
-    el.style.height = `${next}px`
-    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden'
-  }, [])
-
-  useEffect(() => {
-    autoResizeTextarea()
-  }, [input, interimTranscript, autoResizeTextarea])
   const promptMenuRef = useRef<HTMLDivElement | null>(null)
   const hasUserInteractedRef = useRef(false)
 
@@ -1819,7 +1823,6 @@ const handleSend = useCallback(
         setInput('')
         setInterimTranscript('')
         if (textareaRef.current) {
-          textareaRef.current.focus()
         }
 
         const userMessage: Message = {
@@ -1997,8 +2000,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       const userMessage: Message = {
         role: 'user',
-        content: text.trim(),
-        imageDataUrl: pendingImage?.dataUrl || null,
+        content: text,
       }
 
 
@@ -2082,7 +2084,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       }
       messagesRef.current = updatedMessages
       setInput('')
-      setPendingImage(null)
       setInterimTranscript('')
       setVoiceError('')
       setIsThinking(true)
@@ -2275,8 +2276,6 @@ return true
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      if (isThinking) return
-      if (!input.trim()) return
       handleSend()
     }
   }
@@ -2419,28 +2418,7 @@ return (
           suggestedPrompts={suggestedPrompts}
           suggestedSignal={suggestedSignal}
           activePromptLabel={activePromptLabel}
-          activePromptContext={activePromptContext}
-          onToggleScripture={() => {
-            const turningOn = activePromptContext !== 'bible_decision_lens'
-            setActivePromptLabel(turningOn ? 'Guide by Scripture' : null)
-            setActivePromptContext(turningOn ? 'bible_decision_lens' : null)
-            setContextTurnCount(0)
-            setToastMessage(turningOn ? 'Scripture guide on' : 'Scripture guide off')
-            setShowToast(true)
-          }}
           onNewSession={() => {
-            try {
-              const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
-              if (messagesRef.current.length > 1) {
-                existing.unshift({
-                  id: Date.now(),
-                  createdAt: new Date().toISOString(),
-                  messages: messagesRef.current
-                })
-                window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(existing.slice(0, 25)))
-              }
-            } catch {}
-
             const greeting = getInitialGreeting(profileName, currentTier)
             setTimeout(() => {
               setMessages([{ role: 'assistant', content: greeting }])
@@ -2467,14 +2445,6 @@ return (
               setActivePromptContext(prompt.context)
               setContextTurnCount(0)
               setVoiceError('')
-
-              if (prompt.context === 'bible_decision_lens') {
-                setShowSidebar(false)
-                setToastMessage('Scripture guide on')
-                setShowToast(true)
-                textareaRef.current?.focus()
-                return
-              }
 
               if (prompt.context === 'strategy_recalculation') {
                 setRerouteSignal(0)
@@ -2673,7 +2643,7 @@ return (
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
   {showMobileHero && (
-    <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-6 md:hidden">
+    <div className="flex min-h-[calc(100dvh-500px)] flex-col items-center justify-center px-4 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
         GEORGE
       </div>
@@ -2727,19 +2697,15 @@ return (
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+          <div className="flex items-center gap-3 text-[11px] text-neutral-500">
             <button
               type="button"
-              onClick={(event) => {
-                const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-                const roomAbove = rect.top
-                const roomBelow = window.innerHeight - rect.bottom
-                setSavePopupUpward(roomAbove > 260 || roomAbove > roomBelow)
+              onClick={() => {
                 setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setShowRecentFolders(true)
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              className="inline-flex items-center gap-2 transition hover:text-white"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
               <span>Keep this</span>
@@ -2759,7 +2725,7 @@ return (
                   }
                 } catch {}
               }}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              className="transition hover:text-white"
             >
               Share
             </button>
@@ -2769,9 +2735,10 @@ return (
               onClick={() => {
                 const prompt = "Show me related memory for this."
                 setInput(prompt)
-                void handleSend(prompt)
+                if (textareaRef.current) {
+                          }
               }}
-              className="rounded-full border border-[#7C8CFF]/20 bg-[#7C8CFF]/10 px-3 py-1.5 transition hover:border-[#7C8CFF]/40 hover:text-[#7C8CFF]"
+              className="transition hover:text-[#7C8CFF]"
             >
               Related
             </button>
@@ -2846,7 +2813,7 @@ return (
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute left-0 z-30 w-[220px] max-w-[72vw] rounded-[20px] border border-white/10 bg-black/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl ${savePopupUpward ? 'bottom-full mb-2' : 'top-full mt-2'}` }
+              className="absolute left-0 bottom-full z-30 mb-2 w-[220px] max-w-[72vw] rounded-[20px] border border-white/10 bg-black/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl"
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
@@ -3172,29 +3139,15 @@ return (
             <button
               type="button"
               onClick={() => {
-                const turningOn = activePromptContext !== 'bible_decision_lens'
-                setActivePromptLabel(turningOn ? 'Guide by Scripture' : null)
-                setActivePromptContext(turningOn ? 'bible_decision_lens' : null)
-                setContextTurnCount(0)
+                const scriptureText = 'Guide by scripture'
+                setActivePromptLabel('Guide by scripture')
+                setActivePromptContext('bible_decision_lens')
                 setShowPromptMenu(false)
-                setToastMessage(turningOn ? 'Scripture guide on' : 'Scripture guide off')
-                setShowToast(true)
-                textareaRef.current?.focus()
+                void handleSend(scriptureText)
               }}
-              className={`block w-full py-1 text-left text-sm transition ${
-                activePromptContext === 'bible_decision_lens'
-                  ? 'text-red-300 hover:text-red-200'
-                  : 'text-neutral-300 hover:text-white'
-              }`}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              <span className="inline-flex items-center gap-2">
-                {activePromptContext === 'bible_decision_lens' ? (
-                  <span className="text-red-400">🔥</span>
-                ) : (
-                  <span className="text-[#7C8CFF]">✦</span>
-                )}
-                <span>{activePromptContext === 'bible_decision_lens' ? 'Guide by Scripture is on' : 'Guide by Scripture'}</span>
-              </span>
+              Guide by scripture
             </button>
 
             <button
@@ -3275,28 +3228,18 @@ return (
                           if (!file) return
 
                           const isImage = file.type.startsWith('image/')
+                          const starter = isImage
+                            ? `I uploaded image: ${file.name}. Analyze this image and help me.`
+                            : `I uploaded file: ${file.name}. Help me understand and use this file.`
 
-                          if (isImage) {
-                            const reader = new FileReader()
-                            reader.onload = () => {
-                              const dataUrl = String(reader.result || '')
-                              if (!dataUrl) return
-                              setPendingImage({ dataUrl, name: file.name })
-                              setToastMessage(`${file.name} ready to send.`)
-                              setShowToast(true)
-                              textareaRef.current?.focus()
-                            }
-                            reader.readAsDataURL(file)
-                            e.currentTarget.value = ''
-                            return
-                          }
-
-                          const starter = `I uploaded file: ${file.name}. Help me understand and use this file.`
-                          setPendingImage(null)
                           setInput(starter)
                           setToastMessage(`${file.name} attached to composer.`)
                           setShowToast(true)
-                          textareaRef.current?.focus()
+
+                          if (textareaRef.current) {
+                            textareaRef.current.focus()
+                          }
+
                           e.currentTarget.value = ''
                         }}
                       />
@@ -3307,8 +3250,7 @@ return (
                         onKeyDown={handleComposerKeyDown}
                         placeholder="What are we working on?"
                         rows={1}
-                        onInput={autoResizeTextarea}
-                        style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
+                        style={{ WebkitUserSelect: 'text' }}
                         className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-2.5 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
                       />
 
