@@ -602,6 +602,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
+  const [draftProfileName, setDraftProfileName] = useState('')
 
   const [steeringHint, setSteeringHint] = useState<null | {
     signal: string | null
@@ -1016,13 +1018,20 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
       }
     }
 
-    setProfileName(storedName)
+    const personalized = window.localStorage.getItem('george_personalized') === 'true'
 
-    if (storedName && !nameLocked) {
+    if (currentTier === 'smart') {
+      setProfileName('')
       window.localStorage.setItem('george_name_locked', 'true')
+      window.localStorage.setItem('george_voice_locked', 'true')
+    } else {
+      setProfileName(personalized ? storedName : '')
+      setDraftProfileName(personalized ? storedName : '')
+      window.localStorage.setItem('george_name_locked', personalized ? 'false' : 'true')
+      window.localStorage.setItem('george_voice_locked', personalized ? 'false' : 'true')
     }
 
-    if (['onyx', 'shimmer'].includes(storedVoiceType)) {
+    if (personalized && ['onyx', 'shimmer'].includes(storedVoiceType)) {
       setVoiceType(storedVoiceType)
     }
 
@@ -1041,10 +1050,6 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
       setVoiceOn(true)
       window.localStorage.setItem('george_voice', 'on')
 
-      if (!voiceLocked) {
-        window.localStorage.setItem('george_voice_type', storedVoiceType)
-        window.localStorage.setItem('george_voice_locked', 'true')
-      }
     }
 
     const params = new URLSearchParams(window.location.search)
@@ -1100,8 +1105,9 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    if (currentTier === 'smart') return
     window.localStorage.setItem('george_voice_speed', String(voiceSpeed))
-  }, [voiceSpeed])
+  }, [voiceSpeed, currentTier])
 
 
   const tagline = `I will not contradict the Holy Bible (KJV).`
@@ -3130,7 +3136,14 @@ return (
 
   <button
     type="button"
-    onClick={() => setShowUpgradeModal(true)}
+    onClick={() => {
+      if (currentTier === 'smart') {
+        setShowUpgradeModal(true)
+        return
+      }
+      setDraftProfileName(profileName)
+      setShowPersonalizeModal(true)
+    }}
     className="rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/15 px-3 py-1.5 text-[12px] tracking-[0.12em]"
   >
     {currentTier === 'smart'
@@ -3307,6 +3320,102 @@ return (
                   End
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+{showPersonalizeModal && (
+        <div
+          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
+          onClick={() => setShowPersonalizeModal(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-5 text-center">
+              <p className="text-sm font-medium text-white">Make GEORGE yours</p>
+              <p className="mt-1 text-xs leading-6 text-neutral-400">
+                Optional. The mind stays GEORGE. You choose how GEORGE speaks and what name you use.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-neutral-500">Voice</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'George', value: 'onyx' },
+                    { label: 'Claire', value: 'shimmer' },
+                  ].map((voice) => (
+                    <button
+                      key={voice.value}
+                      type="button"
+                      onClick={() => setVoiceType(voice.value)}
+                      className={`rounded-2xl border px-4 py-3 text-sm transition ${
+                        voiceType === voice.value
+                          ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
+                          : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      {voice.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs uppercase tracking-[0.18em] text-neutral-500">
+                  Name
+                </label>
+                <input
+                  value={draftProfileName}
+                  onChange={(e) => setDraftProfileName(e.target.value)}
+                  placeholder="GEORGE"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentTier === 'smart') return
+
+                  const cleanName = draftProfileName.trim().slice(0, 32)
+                  setProfileName(cleanName)
+                  window.localStorage.setItem('george_name', cleanName)
+                  window.localStorage.setItem('george_voice_type', voiceType)
+                  window.localStorage.setItem('george_personalized', 'true')
+                  window.localStorage.setItem('george_name_locked', 'false')
+                  window.localStorage.setItem('george_voice_locked', 'false')
+                  window.localStorage.setItem('george_walkthrough_seen', '1')
+                  setShowPersonalizeModal(false)
+                  setToastMessage('GEORGE is yours now.')
+                  setShowToast(true)
+                }}
+                className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black transition hover:opacity-90"
+              >
+                Save
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentTier === 'smart') return
+
+                  window.localStorage.setItem('george_personalized', 'true')
+                  window.localStorage.setItem('george_name_locked', 'false')
+                  window.localStorage.setItem('george_voice_locked', 'false')
+                  window.localStorage.setItem('george_walkthrough_seen', '1')
+                  setShowPersonalizeModal(false)
+                  setToastMessage('Defaults kept. You can personalize later.')
+                  setShowToast(true)
+                }}
+                className="w-full text-xs text-neutral-500 transition hover:text-white"
+              >
+                Skip for now
+              </button>
             </div>
           </div>
         </div>
