@@ -369,19 +369,19 @@ export default function Sidebar({
 
           <div>
             <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-              Memory
+              Suggested Directions
             </p>
 
             <div className="space-y-2 text-sm">
-              {['Business','Legal','Funding','Credit'].map((folder) => (
+              {['Business','Legal','Funding','Credit'].map((topic) => (
                 <button
-                  key={folder}
+                  key={topic}
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('open-memory-folder', { detail: folder }))
+                    window.dispatchEvent(new CustomEvent('open-memory-folder', { detail: topic }))
                   }}
                   className="block text-left text-neutral-400 transition hover:text-[#7C8CFF]"
                 >
-                  {folder}
+                  {topic}
                 </button>
               ))}
             </div>

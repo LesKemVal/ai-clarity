@@ -18,7 +18,7 @@ export default function TosPage() {
             </p>
 
             <p className="text-neutral-400 leading-7">
-              By using the service, you agree to use it responsibly and within the boundaries below.
+              By using the service, you agree to operate within the boundaries below and accept responsibility for your use of the platform.
             </p>
           </div>
         </section>
@@ -28,7 +28,7 @@ export default function TosPage() {
           <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
             <h2 className="text-white text-xl font-semibold">Use of Service</h2>
             <p className="mt-3 text-neutral-400 leading-7">
-              GEORGE is designed for clarity, direction, planning, communication support, and execution assistance.
+              GEORGE is designed for clarity, direction, planning, communication support, and execution assistance. It is a software system, not a substitute for legal, medical, tax, investment, or emergency judgment.
             </p>
           </div>
 
@@ -56,14 +56,14 @@ export default function TosPage() {
           <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
             <h2 className="text-white text-xl font-semibold">Billing</h2>
             <p className="mt-3 text-neutral-400 leading-7">
-              Paid subscriptions may renew automatically until canceled under the billing terms presented at checkout.
+              Paid subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan details, renewal terms, and cancellation timing.
             </p>
           </div>
 
           <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
             <h2 className="text-white text-xl font-semibold">Availability</h2>
             <p className="mt-3 text-neutral-400 leading-7">
-              Features, pricing, models, responses, and availability may change or improve over time.
+              Features, pricing, models, responses, and availability may change, improve, or be withdrawn over time. Continued use of the service means you accept those changes.
             </p>
           </div>
 
@@ -75,11 +75,11 @@ export default function TosPage() {
           </p>
 
           <p className="mt-3 text-neutral-200 leading-7">
-            GEORGE can support your thinking and execution.
+            GEORGE can support thinking, structure, and execution.
           </p>
 
           <p className="mt-2 text-neutral-300 leading-7">
-            You remain the decision-maker.
+            But the user remains the decision-maker and bears responsibility for action, timing, conduct, and outcome.
           </p>
         </section>
 

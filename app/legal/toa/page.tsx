@@ -5,7 +5,7 @@ import PageShell from '@/components/layout/PageShell'
 const sections = [
   {
     title: 'Acceptance',
-    body: 'By accessing BRANESx / GEORGE, you agree to these Terms of Access.',
+    body: 'By accessing BRANESx / GEORGE, you agree to these Terms of Access and to the operating boundaries of the service.',
   },
   {
     title: 'No guaranteed outcomes',
@@ -21,7 +21,7 @@ const sections = [
   },
   {
     title: 'Payments',
-    body: 'Subscriptions may renew automatically unless canceled according to billing terms.',
+    body: 'Subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan terms before purchase.',
   },
   {
     title: 'Acceptable use',
@@ -36,7 +36,7 @@ const sections = [
   },
   {
     title: 'Service changes',
-    body: 'Features, pricing, and availability may change.',
+    body: 'Features, pricing, models, and availability may change at any time. Continued use of the service means you accept those changes.',
   },
   {
     title: 'Limitation of liability',
@@ -44,7 +44,7 @@ const sections = [
   },
   {
     title: 'Termination',
-    body: 'Access may be suspended or terminated for abuse, misuse, or violations of these terms.',
+    body: 'Access may be suspended, limited, or terminated for abuse, misuse, policy violations, payment issues, or conduct that creates risk to the platform or other users.',
   },
   {
     title: 'Contact',
@@ -67,7 +67,7 @@ export default function TOAPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              These terms explain the boundaries of access and your responsibility while using BRANESx / GEORGE.
+              These terms define the boundaries of access, the limits of the service, and your responsibility while using BRANESx / GEORGE.
             </p>
           </div>
         </section>
@@ -111,11 +111,11 @@ export default function TOAPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-200 md:text-base">
-              GEORGE can support your thinking and execution.
+              GEORGE may assist with clarity, planning, and execution support.
             </p>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              But you are the one acting, choosing, and remaining responsible for outcomes.
+              But authority remains with the user. You are responsible for your choices, your conduct, your filings, your purchases, and the consequences that follow.
             </p>
           </div>
         </section>
