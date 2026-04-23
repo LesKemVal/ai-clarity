@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
+import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile } from '@/lib/george/conversation-engine'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -555,109 +556,16 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [profileName, currentTier])
 
-  const profileSource = `${input} ${interimTranscript}`.toLowerCase()
+  const georgeProfile = detectConversationProfile(input, interimTranscript)
 
-  const georgeProfile =
-    /drivers? license|permit|road test|ged|cna|exam|test|quiz|study|certification|license prep/.test(profileSource)
-      ? 'study'
-      : /speech|lecture|presentation|audience|stage|podium|talk/.test(profileSource)
-        ? 'speech'
-        : /price|cost|deal|offer|terms|contract|negotiat|counter|close|buyer|seller/.test(profileSource)
-          ? 'negotiation'
-          : 'everyday'
-
-  const liveGuidance =
-    !liveMode || currentTier !== 'brilliant'
-      ? null
-      : georgeProfile === 'study'
-        ? isListening
-          ? {
-              signal: 'LISTEN FOR THE GAP',
-              say: 'Say: “Break that down one step at a time.”',
-            }
-          : interimTranscript.trim()
-            ? {
-                signal: 'TEACH TO CLARITY',
-                say: 'Say: “Let’s slow that down and make it plain.”',
-              }
-            : input.trim()
-              ? {
-                  signal: 'CHECK UNDERSTANDING',
-                  say: 'Say: “Here’s what I think it means.”',
-                }
-              : {
-                  signal: 'HOLD THE LESSON',
-                  say: 'Say: “Give me a second to think it through.”',
-                }
-        : georgeProfile === 'speech'
-          ? isListening
-            ? {
-                signal: 'COMMAND THE ROOM',
-                say: 'Say: “Let me make this plain.”',
-              }
-            : interimTranscript.trim()
-              ? {
-                  signal: 'LAND THE POINT',
-                  say: 'Say: “Here’s the point that matters.”',
-                }
-              : input.trim()
-                ? {
-                    signal: 'SPEAK CLEANLY',
-                    say: 'Say: “Let me say this directly.”',
-                  }
-                : {
-                    signal: 'HOLD THE FLOOR',
-                    say: 'Say: “Give me a second.”',
-                  }
-          : georgeProfile === 'negotiation'
-            ? isListening
-              ? {
-                  signal: 'READ THE ROOM',
-                  say: 'Say: “Hold on—walk me through that.”',
-                }
-              : interimTranscript.toLowerCase().includes('price') || interimTranscript.toLowerCase().includes('cost')
-                ? {
-                    signal: 'FOCUS ON TERMS',
-                    say: 'Say: “What exactly are you offering?”',
-                  }
-                : interimTranscript.toLowerCase().includes('now') || interimTranscript.toLowerCase().includes('today')
-                  ? {
-                      signal: 'PRESSURE DETECTED',
-                      say: 'Say: “I’m not rushing this.”',
-                    }
-                  : interimTranscript.trim()
-                    ? {
-                        signal: 'CLARITY GAP',
-                        say: 'Say: “Be more specific.”',
-                      }
-                    : input.trim()
-                      ? {
-                          signal: 'STATE YOUR POSITION',
-                          say: 'Say: “Here’s what I need.”',
-                        }
-                      : {
-                          signal: 'HOLD POSITION',
-                          say: 'Say: “Give me a second.”',
-                        }
-            : isListening
-              ? {
-                  signal: 'STAY PRESENT',
-                  say: 'Say: “Hold on—say that again.”',
-                }
-              : interimTranscript.trim()
-                ? {
-                    signal: 'GET CLEAR',
-                    say: 'Say: “Tell me exactly what you mean.”',
-                  }
-                : input.trim()
-                  ? {
-                      signal: 'SAY IT CLEAN',
-                      say: 'Say: “Here’s what I mean.”',
-                    }
-                  : {
-                      signal: 'HOLD POSITION',
-                      say: 'Say: “Give me a second.”',
-                    }
+  const liveGuidance = buildLiveGuidance({
+    liveMode,
+    currentTier,
+    isListening,
+    interimTranscript,
+    input,
+    profile: georgeProfile,
+  })
 
   useEffect(() => {
     if (!liveMode || currentTier !== 'brilliant' || !liveGuidance) {
@@ -1713,33 +1621,6 @@ if (activePromptContext || activePromptLabel) {
 
 
 
-function buildBrilliantLiveTriggerResponse(
-  raw: string,
-  currentTier: 'smart' | 'intelligent' | 'brilliant',
-  activePromptContext: string | null,
-  conversationMode: string | null
-) {
-  if (currentTier !== 'brilliant') return null
-
-  const brilliantContextActive =
-    (activePromptContext && activePromptContext.startsWith('brilliant_')) ||
-    (conversationMode && conversationMode.startsWith('brilliant_'))
-
-  if (!brilliantContextActive) return null
-
-  const text = raw.trim().toLowerCase()
-  if (!text) return null
-
-  const triggerMap: Record<string, string> = {
-    'hmm': "Let me think about that for a second.",
-    'i see': "I hear you. Keep going.",
-    'next': "Here’s the next clean line: let’s slow this down and separate the numbers.",
-    'reset': "Let’s reset for a second. I want to make sure we’re being precise.",
-    'pressure': "They’re trying to speed the decision up. Slow the room down and get clarity first.",
-  }
-
-  return triggerMap[text] ?? null
-}
 
 function detectDomain(text: string) {
   const t = text.toLowerCase()
