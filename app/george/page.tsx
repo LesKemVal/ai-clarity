@@ -310,14 +310,10 @@ export default function Page() {
     : "Good evening."
 
   const firstTimeGreeting = `${timeGreeting}
-I’m GEORGE. Built to help you succeed. Bring me something real.
-
-Build, repair, decide, grow, recover, prepare—start anywhere.`
+Set a goal—any goal. Then follow me.`
 
   const earlyUserGreeting = `${timeGreeting}
-I’m GEORGE. Built to help you succeed. Bring me something real.
-
-Build, repair, decide, grow, recover, prepare—start anywhere.`
+Set a goal—any goal. Then follow me.`
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
@@ -1063,8 +1059,14 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
 
       const prompt =
         folder === 'Credit'
-          ? "Let’s get clear on your credit."
-          : `Let's discuss ${String(folder).toLowerCase()}.`
+          ? "Help me tighten my credit situation and show me the strongest path."
+          : folder === 'Business'
+          ? "Help me improve the business path in front of me."
+          : folder === 'Legal'
+          ? "Help me understand the legal issue clearly and cautiously."
+          : folder === 'Funding'
+          ? "Help me think clearly about funding and show me the strongest path."
+          : "Help me find the strongest next move." 
 
       setInput(prompt)
 
@@ -1783,7 +1785,6 @@ const handleSend = useCallback(
         activeMemoryFolder === 'Goals' ? null :
         activeMemoryFolder === 'Writing' ? null :
         activeMemoryFolder === 'Personal' ? null :
-        activeMemoryFolder === 'General' ? null :
         null
 
       let activeDomain = domain || memoryDomain || null
@@ -2383,7 +2384,7 @@ return true
       Smart. Intelligent. Brilliant.
     </div>
 
-    <div className="mt-4 flex items-center gap-2">
+    <div className="mt-4 flex items-center gap-1.5">
       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-1" />
       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-2" />
       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-3" />
@@ -2535,7 +2536,7 @@ return (
               }
 
               setShowSidebar(false)
-              setInput(prompt.text)
+              void handleSend(prompt.text)
             }}
         />
 
@@ -2543,7 +2544,7 @@ return (
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <div className="flex items-center gap-2.5 xl:hidden">
+                <div className="flex items-center gap-1.5.5 xl:hidden">
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
@@ -2671,7 +2672,7 @@ return (
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
     userPinnedBottomRef.current = nearBottom
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} ${showSidebar ? "pointer-events-none md:pointer-events-auto" : ""}`}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[220px] md:px-6 md:pb-[240px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-6 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
@@ -2715,8 +2716,8 @@ return (
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
           {m.constrained && (
-            <div className="mt-2 flex items-center gap-2">
-              <div className="flex items-center gap-2 pl-1">
+            <div className="mt-2 flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 pl-1">
                 <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
                 <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
                 <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
@@ -2727,7 +2728,7 @@ return (
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400">
             <button
               type="button"
               onClick={(event) => {
@@ -2739,7 +2740,7 @@ return (
                 setShowRecentFolders(true)
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
               <span>Keep this</span>
@@ -2846,7 +2847,7 @@ return (
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute left-0 z-30 w-[220px] max-w-[72vw] rounded-[20px] border border-white/10 bg-black/95 p-2 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl ${savePopupUpward ? 'bottom-full mb-2' : 'top-full mt-2'}` }
+              className={`absolute left-0 z-30 w-[184px] max-w-[62vw] rounded-[16px] border border-white/10 bg-black/95 p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl ${savePopupUpward ? 'bottom-full mb-2' : 'top-full mt-2'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
@@ -2891,7 +2892,7 @@ return (
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-[10px] leading-4 text-neutral-400 break-words">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-1.5 text-[10px] leading-4 text-neutral-400 break-words">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
@@ -3097,7 +3098,7 @@ return (
                   </button>
                 </div>
 
-                <div className="max-h-[220px] space-y-2 overflow-y-auto pr-1">
+                <div className="max-h-[168px] space-y-2 overflow-y-auto pr-1">
                   {getMemoriesByFolder(activeMemoryFolder).map((item, idx) => {
                     const textBlock =
                       item.savedPair && item.userPromptContent
@@ -3123,7 +3124,7 @@ return (
                             : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
                         }`}
                       >
-                        <div className="mb-1 flex items-center justify-between gap-2">
+                        <div className="mb-1 flex items-center justify-between gap-1.5">
                           <span className="truncate">
                             {item.preview || (item.content || '').slice(0, 80)}
                           </span>
@@ -3183,17 +3184,15 @@ return (
               }}
               className={`block w-full py-1 text-left text-sm transition ${
                 activePromptContext === 'bible_decision_lens'
-                  ? 'text-red-300 hover:text-red-200'
+                  ? 'text-white'
                   : 'text-neutral-300 hover:text-white'
               }`}
             >
-              <span className="inline-flex items-center gap-2">
-                {activePromptContext === 'bible_decision_lens' ? (
-                  <span className="text-red-400">🔥</span>
-                ) : (
-                  <span className="text-[#7C8CFF]">✦</span>
-                )}
-                <span>{activePromptContext === 'bible_decision_lens' ? 'Guide by Scripture is on' : 'Guide by Scripture'}</span>
+              <span className="inline-flex w-full items-center justify-between gap-1.5">
+                <span>Guide by Scripture</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
+                  {activePromptContext === 'bible_decision_lens' ? 'ON' : 'OFF'}
+                </span>
               </span>
             </button>
 

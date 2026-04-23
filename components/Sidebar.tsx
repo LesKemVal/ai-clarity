@@ -77,21 +77,9 @@ const promptGroups: PromptGroup[] = [
         text: "I need to prepare for a job interview.",
         context: 'training_interview',
       },
-      {
-        label: "Speak Better",
-        text: "Help me speak more clearly, confidently, and effectively.",
-        context: 'brilliant_speech',
-      },
-      {
-        label: "Discipline Reset",
-        text: "Help me reset my discipline and get moving again.",
-        context: 'build_week_plan',
-      },
-      {
-        label: "Learn Faster",
-        text: "Help me learn this faster and retain it better.",
-        context: 'problem_step_by_step',
-      },
+
+
+
     ],
   },
 ]
@@ -210,11 +198,28 @@ export default function Sidebar({
           <div>
             <button
               type="button"
+              onClick={onToggleScripture}
+              className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition ${
+                activePromptContext === 'bible_decision_lens'
+                  ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
+                  : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#7C8CFF]/30 hover:text-white'
+              }`}
+            >
+              <span>Guide by Scripture</span>
+              <span className="text-[11px] uppercase tracking-[0.14em] text-neutral-400">
+                {activePromptContext === 'bible_decision_lens' ? 'ON' : 'OFF'}
+              </span>
+            </button>
+          </div>
+
+          <div>
+            <button
+              type="button"
               onClick={() => toggleGroup('POWER')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-                Power
+                Modes
               </span>
               <span className="text-xs text-neutral-500">
                 {openGroups['POWER'] ? '▾' : '▸'}
@@ -235,20 +240,6 @@ export default function Sidebar({
                   className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
                 >
                   Focus
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    onPromptSelect({
-                      label: 'Guide w/ Scripture (KJV)',
-                      text: 'Guide w/ Scripture (KJV)',
-                      context: 'bible_decision_lens',
-                    })
-                  }
-                  className="block w-full rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-[#7C8CFF] transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/12 hover:text-white"
-                >
-                  Scripture Lens
                 </button>
 
                 {currentTier === 'brilliant' && (
@@ -382,7 +373,7 @@ export default function Sidebar({
             </p>
 
             <div className="space-y-2 text-sm">
-              {['General','Goals','Business','Personal','Health','Writing','Legal','Credit'].map((folder) => (
+              {['Business','Legal','Funding','Credit'].map((folder) => (
                 <button
                   key={folder}
                   onClick={() => {
@@ -438,7 +429,7 @@ export default function Sidebar({
               )}
 
               {promptGroups
-                .filter((group) => group.title !== 'Pre-training Courses')
+                .filter((group) => !['Build', 'Training Lab'].includes(group.title))
                 .map((group) => {
                 const isOpen = openGroups[group.title]
 
