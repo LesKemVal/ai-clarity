@@ -11,7 +11,38 @@ export type LiveGuidance = {
   say: string
 }
 
+export type ConversationTriggerCode = {
+  phrase: string
+  profile: ConversationProfile
+  signal?: string
+}
+
+const DEFAULT_TRIGGER_CODES: ConversationTriggerCode[] = [
+  { phrase: 'maybe i’ll ask', profile: 'negotiation', signal: 'NEGOTIATION CODE' },
+  { phrase: 'maybe ill ask', profile: 'negotiation', signal: 'NEGOTIATION CODE' },
+  { phrase: 'let me think on that', profile: 'negotiation', signal: 'HOLD POSITION CODE' },
+  { phrase: 'say that one more time', profile: 'everyday', signal: 'CLARITY CODE' },
+]
+
+export function detectConversationTriggerCode(
+  input: string,
+  interimTranscript: string,
+  codes: ConversationTriggerCode[] = DEFAULT_TRIGGER_CODES
+): ConversationProfile | null {
+  const text = `${input} ${interimTranscript}`.toLowerCase().replace(/[’]/g, "'")
+
+  const match = codes.find((code) => {
+    const phrase = code.phrase.toLowerCase().replace(/[’]/g, "'")
+    return phrase.length > 0 && text.includes(phrase)
+  })
+
+  return match?.profile ?? null
+}
+
 export function detectConversationProfile(input: string, interimTranscript: string): ConversationProfile {
+  const triggerProfile = detectConversationTriggerCode(input, interimTranscript)
+  if (triggerProfile) return triggerProfile
+
   const profileSource = `${input} ${interimTranscript}`.toLowerCase()
 
   if (/drivers? license|permit|road test|ged|cna|exam|test|quiz|study|certification|license prep/.test(profileSource)) {
