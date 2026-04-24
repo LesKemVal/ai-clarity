@@ -3137,20 +3137,15 @@ return (
   <button
     type="button"
     onClick={() => {
-      if (currentTier === 'smart') {
-        setShowUpgradeModal(true)
-        return
-      }
-      setDraftProfileName(profileName)
-      setShowPersonalizeModal(true)
+      setShowUpgradeModal(true)
     }}
     className="rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/15 px-3 py-1.5 text-[12px] tracking-[0.12em]"
   >
     {currentTier === 'smart'
-      ? 'GO INTELLIGENT'
+      ? 'UPGRADE'
       : currentTier === 'intelligent'
-      ? 'GO BRILLIANT'
-      : 'BRILLIANT'}
+      ? 'UPGRADE'
+      : 'MAKE GEORGE YOURS'}
   </button>
 
 </div>
