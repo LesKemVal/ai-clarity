@@ -1539,7 +1539,7 @@ if (activePromptContext || activePromptLabel) {
       })
 
       prompts.push({
-        label: 'See full options',
+        label: 'Pricing',
         text: 'Show me the upgrade path for deeper support.',
         context: 'upgrade_topup',
       })
@@ -3428,7 +3428,7 @@ return (
             <div className="mb-5 text-center">
               <p className="text-sm font-medium text-white">Take GEORGE further</p>
               <p className="mt-1 text-xs leading-6 text-neutral-400">
-                Choose the level of support you want, or see full options.
+                Choose the level of support you want.
               </p>
             </div>
 
@@ -3478,15 +3478,35 @@ return (
 
               <button
                 type="button"
-                onClick={() => {
-                  setShowUpgradeModal(false)
-                  window.location.href = '/top-up?intent=brilliant-beta'
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/subscribe', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ tier: 'brilliant' }),
+                    })
+
+                    const data = await response.json()
+
+                    if (data?.url) {
+                      window.location.href = data.url
+                      return
+                    }
+
+                    setToastMessage(data?.error || 'Unable to open checkout.')
+                    setShowToast(true)
+                  } catch {
+                    setToastMessage('Unable to open checkout.')
+                    setShowToast(true)
+                  }
                 }}
                 className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
               >
-                <div className="text-sm font-medium text-white">Brilliant GEORGE — Beta Waitlist</div>
+                <div className="text-sm font-medium text-white">Go Brilliant</div>
                 <div className="mt-1 text-xs leading-6 text-neutral-300">
-                  Conversation Engine, LIVE cues, room-awareness, and deeper support. Join the waitlist while Brilliant is in beta.
+                  Conversation Engine, LIVE cues, room-awareness, premium execution support.
                 </div>
               </button>
             </div>
