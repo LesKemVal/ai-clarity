@@ -40,11 +40,11 @@ export default function RoadmapPage() {
                   </h1>
 
                   <p className="max-w-xl text-sm leading-7 text-neutral-200 md:text-base">
-                    Conversation Engine is built for real moments. Interviews. Negotiations. Workplace pressure. Relationship talks. Fast-moving situations where timing, tone, and wording matter.
+                    Start free. Upgrade when you want deeper continuity, stronger guidance, and live advantage in real time.
                   </p>
 
                   <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
-                    Real-time guidance in your ear. Context-aware. Private. Always with you.
+                    Early users get first access to future features, smarter guidance, and premium upgrades as GEORGE continues to mature.
                   </div>
                 </div>
               </div>
