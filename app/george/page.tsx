@@ -311,10 +311,18 @@ export default function Page() {
     : "Good evening."
 
   const firstTimeGreeting = `${timeGreeting}
-Set a goal—any goal. Then follow me.`
+If you want to build something, fund something, solve something, or change something—just say it.
+
+We can start from wherever you are: logistically, financially, or emotionally.
+
+And we can start now.`
 
   const earlyUserGreeting = `${timeGreeting}
-Set a goal—any goal. Then follow me.`
+If you want to build something, fund something, solve something, or change something—just say it.
+
+We can start from wherever you are: logistically, financially, or emotionally.
+
+And we can start now.`
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
