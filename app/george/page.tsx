@@ -2489,8 +2489,8 @@ return (
                       type="button"
                       onClick={handleInstallGeorge}
                       className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
-                      aria-label="Install GEORGE"
-                      title="Install GEORGE"
+                      aria-label="Share G."
+                      title="Share G."
                     >
                       Install
                     </button>
@@ -2501,8 +2501,8 @@ return (
                   type="button"
                   onClick={handleInstallGeorge}
                   className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white xl:hidden"
-                  aria-label="Install GEORGE"
-                  title="Install GEORGE"
+                  aria-label="Share G."
+                  title="Share G."
                 >
                   Install
                 </button>
