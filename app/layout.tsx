@@ -20,6 +20,24 @@ export const metadata: Metadata = {
   },
   description: 'Want to get something done? GEORGE is your guide.',
   applicationName: 'GEORGE',
+  themeColor: '#7C8CFF',
+  appleWebApp: {
+    title: 'GEORGE',
+    capable: true,
+    statusBarStyle: 'black-translucent',
+  },
+  openGraph: {
+    title: 'GEORGE by BRANESx',
+    description: 'Want to get something done? GEORGE is your guide.',
+    siteName: 'BRANESx',
+    url: 'https://www.branesx.com/george',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'GEORGE by BRANESx',
+    description: 'Want to get something done? GEORGE is your guide.',
+  },
 }
 
 export const viewport: Viewport = {
