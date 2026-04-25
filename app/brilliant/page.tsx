@@ -90,9 +90,19 @@ export default function BrilliantPage() {
                 BRANESx Brilliant
               </p>
 
-              <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
-                You choose when GEORGE wakes, how GEORGE thinks, and when GEORGE speaks.
-              </h1>
+              <div className="space-y-3">
+                <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+                  Keep control of your own conversation.
+                </h1>
+
+                <p className="text-xl font-medium tracking-tight text-[#d7dcff] md:text-2xl">
+                  Command the room when it matters.
+                </p>
+              </div>
+
+              <p className="max-w-2xl text-sm leading-7 text-neutral-300 md:text-base">
+                You decide when GEORGE wakes—and when GEORGE speaks.
+              </p>
 
               <p className="max-w-2xl text-sm leading-7 text-neutral-300 md:text-base">
                 Conversation Engine is for real moments. Interviews. Negotiations. Workplace pressure.
