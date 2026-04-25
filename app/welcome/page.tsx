@@ -75,10 +75,10 @@ export default function WelcomePage() {
               Make GEORGE yours
             </p>
             <h1 className="text-4xl font-semibold tracking-tight">
-              Let GEORGE learn who he&apos;s working for.
+              Build a GEORGE that understands your motion.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
-              Keep it honest. Keep it simple. This is not about building a profile. This is about giving GEORGE enough signal to be more useful over time.
+              Give GEORGE real signal now, so guidance becomes sharper, faster, and more useful over time.
             </p>
           </div>
 
@@ -92,7 +92,7 @@ export default function WelcomePage() {
             <input
               value={mission}
               onChange={(e) => setMission(e.target.value)}
-              placeholder="What are you trying to build, fix, or become?"
+              placeholder="What are you trying to build, fix, fund, or change?"
               className="rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
@@ -135,14 +135,14 @@ export default function WelcomePage() {
               disabled={!valid}
               className="rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-40"
             >
-              Activate my GEORGE
+              Make GEORGE Mine
             </button>
 
             <button
               onClick={() => window.open('/roadmap','_blank','noopener,noreferrer')}
               className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
             >
-              Review the value first
+              Why Users Upgrade
             </button>
           </div>
         </div>
