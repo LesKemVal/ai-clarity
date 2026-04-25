@@ -3289,7 +3289,7 @@ return (
 
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
-                    <span className="text-neutral-400">{voiceError}</span>
+                    <span className="block w-full text-center text-neutral-400">{voiceError}</span>
                   ) : currentTier === 'smart' ? (
                     <span className="text-neutral-600">Voice unlocks above Smart.</span>
                   ) : (
