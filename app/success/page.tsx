@@ -5,7 +5,7 @@ import PageShell from '@/components/layout/PageShell'
 export default function SuccessPage() {
   return (
     <PageShell
-      title="You’re on the waitlist"
+      title="You’re in."
       eyebrow="Beta"
       backToGeorge
       withSidebar={false}
@@ -14,15 +14,15 @@ export default function SuccessPage() {
         <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
-              You’re on the waitlist.
+              You’re in.
             </p>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              Thanks for your interest in GEORGE during beta.
+              Your access is active. GEORGE is in beta, and early users get early access as the system improves.
             </p>
 
             <p className="text-sm text-white">
-              Keep using GEORGE. Keep sending signal. We’ll notify users as launch gets closer.
+              Continue now, or make GEORGE yours when you are ready.
             </p>
           </div>
         </section>
@@ -38,10 +38,10 @@ export default function SuccessPage() {
 
           <button
             type="button"
-            onClick={() => (window.open('/top-up','_blank','noopener,noreferrer'))}
+            onClick={() => (window.location.href = '/george?intent=make-george-yours')}
             className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
           >
-            Return to beta access
+            Make GEORGE Yours
           </button>
         </section>
       </div>
