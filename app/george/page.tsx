@@ -2492,7 +2492,7 @@ return (
                       aria-label="Share G."
                       title="Share G."
                     >
-                      Install
+                      Share G.
                     </button>
                   </div>
                 </div>
@@ -2504,8 +2504,8 @@ return (
                   aria-label="Share G."
                   title="Share G."
                 >
-                  Install
-                </button>
+                      Share G.
+                    </button>
               </div>
             </header>
 

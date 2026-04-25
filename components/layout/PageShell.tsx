@@ -158,7 +158,7 @@ export default function PageShell({
                       aria-label="Share G."
                       title="Share G."
                     >
-                      Install
+                      Share G.
                     </button>
                   </div>
 
@@ -190,7 +190,7 @@ export default function PageShell({
                       aria-label="Share G."
                       title="Share G."
                     >
-                      Install
+                      Share G.
                     </button>
                   </div>
                 </div>
