@@ -14,10 +14,10 @@ export default function HelpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <div className="space-y-4">
             <p className="text-xl font-semibold text-white">
-              GEORGE helps you think clearly, move correctly, and stay in motion.
+              GEORGE makes sure your every move is a premium one.
             </p>
             <p className="text-neutral-400 leading-7">
-              You do not need perfect prompts. Bring the real situation. GEORGE helps narrow the problem, find leverage, and guide the next move.
+              You do not need perfect words. Bring the real situation. GEORGE helps narrow the problem, find leverage, and guide the next move.
             </p>
           </div>
         </section>
@@ -106,7 +106,7 @@ export default function HelpPage() {
             </div>
 
             <p className="text-white">
-              Use Brilliant when the moment matters.
+              Use Brilliant when the moment is live.
             </p>
           </div>
         </section>
