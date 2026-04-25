@@ -46,6 +46,15 @@ export default function PageShell({
     const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
 
     if (isiPhone) {
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        navigator.share({
+          title: 'GEORGE by BRANESx',
+          text: 'Add GEORGE to your Home Screen.',
+          url,
+        }).catch(() => {})
+        return
+      }
+
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(url).catch(() => {})
       }
