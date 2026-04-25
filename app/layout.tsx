@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'BRANESx',
-    template: '%s | BRANESx',
+    default: 'GEORGE by BRANESx',
+    template: '%s | GEORGE',
   },
-  description: 'Clarity. Execution. Continuity.',
-  applicationName: 'BRANESx',
+  description: 'Want to get something done? GEORGE is your guide.',
+  applicationName: 'GEORGE',
 }
 
 export const viewport: Viewport = {

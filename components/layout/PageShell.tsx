@@ -49,7 +49,7 @@ export default function PageShell({
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Add GEORGE to your Home Screen.',
+          text: 'Want to get something done? GEORGE is your guide.',
           url,
         }).catch(() => {})
         return
@@ -71,7 +71,7 @@ export default function PageShell({
     }
 
     if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE', text: 'Share G.', url }).catch(() => {})
+      navigator.share({ title: 'GEORGE by BRANESx', text: 'Want to get something done? GEORGE is your guide.', url }).catch(() => {})
       return
     }
 

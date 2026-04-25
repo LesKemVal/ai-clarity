@@ -361,7 +361,7 @@ Set a goal—any goal. Then follow me.`
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Add GEORGE to your Home Screen.',
+          text: 'Want to get something done? GEORGE is your guide.',
           url,
         }).catch(() => {
           setToastMessage('iPhone: Share → Edit Actions → Add to Home Screen')
@@ -2651,7 +2651,7 @@ return (
                 const shareText = m.content
                 try {
                   if (navigator.share) {
-                    await navigator.share({ text: shareText })
+                    await navigator.share({ title: 'GEORGE by BRANESx', text: `Want to get something done? GEORGE is your guide.\n\n${shareText}`, url: window.location.origin + '/george' })
                   } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(shareText)
                     setToastMessage('Copied to clipboard')
@@ -2894,7 +2894,7 @@ return (
           setIsSharingGeorgeLink(true)
 
           if (navigator.share) {
-            await navigator.share({ url })
+            await navigator.share({ title: 'GEORGE by BRANESx', text: 'Want to get something done? GEORGE is your guide.', url })
           } else if (navigator.clipboard?.writeText) {
             await navigator.clipboard.writeText(url)
             setToastMessage('GEORGE link copied')
