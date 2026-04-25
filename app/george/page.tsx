@@ -2196,7 +2196,7 @@ return true
     if (!supported) {
       setVoiceError(
         isIOS
-          ? 'Voice input is disabled on iPhone/iPad in this build.'
+          ? 'Enhanced voice support is rolling out during beta.'
           : 'Voice input is not available in this browser session.'
       )
       return
