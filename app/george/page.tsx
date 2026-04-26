@@ -494,11 +494,72 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
-  const [suggestedPrompts, setSuggestedPrompts] = useState<PromptSelection[]>([
-  { label: 'Make money', text: 'I need to make money', context: 'money_start' },
-  { label: 'Build something', text: 'I want to build something', context: 'build_start' },
-  { label: 'Get unstuck', text: 'I am stuck and need the next move', context: 'unstuck_start' },
-])
+  const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
+  const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
+    if (currentTier === 'brilliant') {
+      return [
+        {
+          label: 'Fastest revenue',
+          text: 'I need to make money as fast as legally and safely possible, and I want GEORGE to find the fastest path based on my real constraints.',
+          context: 'money_fast_safe',
+        },
+        {
+          label: 'Build with leverage',
+          text: 'I want to build something with real leverage, and I want GEORGE to ask what matters first before choosing the strongest path.',
+          context: 'build_start',
+        },
+        {
+          label: 'Break the bottleneck',
+          text: 'I am stuck, and I want GEORGE to identify the bottleneck, remove noise, and tell me the next decisive move.',
+          context: 'unstuck_start',
+        },
+      ]
+    }
+
+    if (currentTier === 'intelligent') {
+      return [
+        {
+          label: 'Faster revenue',
+          text: 'I need to make money faster, and I want GEORGE to ask the right question first, then build a practical execution plan.',
+          context: 'money_skill_to_income',
+        },
+        {
+          label: 'Build correctly',
+          text: 'I want to build something, and I want GEORGE to help me define the target, sequence the work, and avoid wasted steps.',
+          context: 'build_start',
+        },
+        {
+          label: 'Get moving',
+          text: 'I am stuck, and I want GEORGE to clarify what is blocking me and turn this into an executable next step.',
+          context: 'unstuck_start',
+        },
+      ]
+    }
+
+    return [
+      {
+        label: 'Fast revenue',
+        text: 'I need to make money, and I want the clearest realistic path before I choose a direction.',
+        context: 'money_this_week',
+      },
+      {
+        label: 'Build something',
+        text: 'I want to build something, and I need GEORGE to help me see the strongest starting point.',
+        context: 'build_start',
+      },
+      {
+        label: 'Get unstuck',
+        text: 'I am stuck, and I need GEORGE to show me what matters most and what to do first.',
+        context: 'unstuck_start',
+      },
+    ]
+  }, [currentTier])
+
+  const [suggestedPrompts, setSuggestedPrompts] = useState<PromptSelection[]>(tieredStarterPrompts)
+
+  useEffect(() => {
+    setSuggestedPrompts(tieredStarterPrompts)
+  }, [tieredStarterPrompts])
   const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
@@ -558,7 +619,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [isSharingGeorgeLink, setIsSharingGeorgeLink] = useState(false)
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(null)
   const [typedMessageContent, setTypedMessageContent] = useState('')
-  const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 
   const tierSuggestedLimit =
     currentTier === 'brilliant'
@@ -661,61 +721,35 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   }, [])
 
   useEffect(() => {
-  if (typeof window === 'undefined') return
-  const params = new URLSearchParams(window.location.search)
-  const tierParam = params.get('tier')
-  const subStatus = params.get('subscription')
-
-  if (subStatus === 'success' && (tierParam === 'intelligent' || tierParam === 'brilliant')) {
-    setCurrentTier(tierParam)
-  }
-
-
-  void fetch('/api/subscription-state')
-    .then((res) => res.json())
-    .then((data) => {
-      const serverTier = data?.currentTier
-
-        setCurrentTier(serverTier)
-
-if (serverTier === 'intelligent' || serverTier === 'brilliant') {
-  setCurrentTier(serverTier)
-} else {
-  setCurrentTier('smart')
-}
-      const cleanUrl = window.location.pathname
-      window.history.replaceState({}, '', cleanUrl)
-    })
-    .catch(() => {
-      setCurrentTier('smart')
-
-      const cleanUrl = window.location.pathname
-      window.history.replaceState({}, '', cleanUrl)
-    })
-}, [])
-
-  useEffect(() => {
     if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams(window.location.search)
+    const tierParam = params.get('tier')
+    const subStatus = params.get('subscription')
+    const validTier = tierParam === 'smart' || tierParam === 'intelligent' || tierParam === 'brilliant'
+
+    if (validTier) {
+      setCurrentTier(tierParam)
+      return
+    }
 
     void fetch('/api/subscription-state')
       .then((res) => res.json())
       .then((data) => {
         const serverTier = data?.currentTier
-
         if (serverTier === 'intelligent' || serverTier === 'brilliant') {
           setCurrentTier(serverTier)
         } else {
           setCurrentTier('smart')
         }
 
-        const cleanUrl = window.location.pathname
-        window.history.replaceState({}, '', cleanUrl)
+        if (subStatus === 'success') {
+          const cleanUrl = window.location.pathname
+          window.history.replaceState({}, '', cleanUrl)
+        }
       })
       .catch(() => {
         setCurrentTier('smart')
-
-        const cleanUrl = window.location.pathname
-        window.history.replaceState({}, '', cleanUrl)
       })
   }, [])
 
@@ -3251,10 +3285,10 @@ return (
     className="rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/15 px-3 py-1.5 text-[12px] tracking-[0.12em]"
   >
     {currentTier === 'smart'
-      ? 'UPGRADE'
+      ? 'GO INTELLIGENT'
       : currentTier === 'intelligent'
-      ? 'UPGRADE'
-      : 'MAKE GEORGE YOURS'}
+      ? 'GO BRILLIANT'
+      : 'STAY BRILLIANT'}
   </button>
 
 </div>
