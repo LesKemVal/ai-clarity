@@ -2632,7 +2632,68 @@ return (
         )}
       </div>
 
-      {m.role === 'assistant' && (
+      {m.role === 'assistant' && m.content.includes('How should GEORGE assist?') && (
+        <div className="flex flex-wrap gap-2">
+          {[
+            ['Text Assist', 'Use Text Assist. Give me short onscreen guidance for this conversation.'],
+            ['Audio Assist', 'Use Audio Assist. Give me spoken help for earbud use, only when it is useful.'],
+            ['Full Sentence', 'Use Full Sentence Assist. Give me exact lines I can say in this conversation.'],
+            ['Silent Insight', 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.'],
+          ].map(([label, prompt]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => {
+                const isAudioAssist = label === 'Audio Assist'
+                const isTextAssist = label === 'Text Assist'
+                const isFullSentence = label === 'Full Sentence'
+                const isSilentInsight = label === 'Silent Insight'
+
+                if (isAudioAssist) {
+                  setVoiceOn(true)
+                  setInteractionMode('speech')
+                  window.localStorage.setItem('george_voice', 'on')
+                  setTimeout(() => startListening(), 120)
+                }
+
+                if (isTextAssist || isFullSentence || isSilentInsight) {
+                  setVoiceOn(false)
+                  setInteractionMode('speech')
+                  window.localStorage.setItem('george_voice', 'off')
+                  setTimeout(() => startListening(), 120)
+                }
+
+                setActivePromptLabel(label)
+                setActivePromptContext(`conversation_assist_${label.toLowerCase().replace(/ /g, '_')}`)
+
+                const assistantMessage: Message = {
+                  role: 'assistant',
+                  content: `${label} active.
+
+I am listening now. Speak naturally. I will respond ${
+                    isAudioAssist
+                      ? 'through audio when help is useful.'
+                      : isFullSentence
+                      ? 'with exact lines you can say.'
+                      : isSilentInsight
+                      ? 'only when leverage, tone, or risk shifts.'
+                      : 'with short onscreen guidance.'
+                  }`,
+                }
+
+                const nextMessages = [...messagesRef.current, assistantMessage]
+                setMessages(nextMessages)
+                messagesRef.current = nextMessages
+              }}
+              className="rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-xs text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {m.role === 'assistant' && !m.content.includes('How should GEORGE assist?') && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -3114,18 +3175,9 @@ return (
                 setShowToast(true)
                 textareaRef.current?.focus()
               }}
-              className={`block w-full py-1 text-left text-sm transition ${
-                activePromptContext === 'bible_decision_lens'
-                  ? 'text-white'
-                  : 'text-neutral-300 hover:text-white'
-              }`}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              <span className="inline-flex w-full items-center justify-between gap-1.5">
-                <span>Be as Christ</span>
-                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
-                  {activePromptContext === 'bible_decision_lens' ? 'ON' : 'OFF'}
-                </span>
-              </span>
+              Be as Christ
             </button>
 
             <button
@@ -3136,7 +3188,6 @@ return (
                   setShowToast(true)
                   return
                 }
-
                 const nextVoice = !voiceOn
                 setVoiceOn(nextVoice)
                 setInteractionMode(nextVoice ? 'speech' : 'text')
@@ -3146,12 +3197,7 @@ return (
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              <span className="inline-flex w-full items-center justify-between gap-1.5">
-                <span>Voice replies</span>
-                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
-                  {voiceOn ? 'ON' : 'OFF'}
-                </span>
-              </span>
+              Voice replies {voiceOn ? 'ON' : 'OFF'}
             </button>
 
             <button
@@ -3162,69 +3208,13 @@ return (
                   setShowToast(true)
                   return
                 }
-                setShowConversationMenu((prev) => !prev)
+                setShowPromptMenu(false)
+                setShowConversationMenu(true)
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              <span className="inline-flex w-full items-center justify-between gap-1.5">
-                <span>Conversation Mode</span>
-                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
-                  {showConversationMenu ? 'OPEN' : '›'}
-                </span>
-              </span>
+              Conversation Mode ›
             </button>
-
-            {showConversationMenu && (
-              <div className="mt-1 rounded-xl border border-white/10 bg-black/70 p-1.5">
-                {[
-                  {
-                    label: 'Negotiation',
-                    context: 'brilliant_negotiation',
-                    text: 'Set GEORGE to Conversation Mode for negotiation. Help me keep leverage, slow pressure, and say the right thing next.',
-                  },
-                  {
-                    label: 'Dealership',
-                    context: 'brilliant_dealership',
-                    text: 'Set GEORGE to Conversation Mode for a dealership. Help me avoid pressure, expose weak terms, and protect my money.',
-                  },
-                  {
-                    label: 'Interview',
-                    context: 'brilliant_interview',
-                    text: 'Set GEORGE to Conversation Mode for an interview. Help me answer clearly, protect my value, and move toward the offer.',
-                  },
-                  {
-                    label: 'Workplace',
-                    context: 'brilliant_workplace',
-                    text: 'Set GEORGE to Conversation Mode for work. Help me stay composed, protect my position, and say this professionally.',
-                  },
-                  {
-                    label: 'Custom',
-                    context: 'brilliant_custom',
-                    text: 'Set GEORGE to Conversation Mode. I will describe the room, the pressure, and what I need to accomplish.',
-                  },
-                ].map((mode) => (
-                  <button
-                    key={mode.context}
-                    type="button"
-                    onClick={() => {
-                      setConversationMode(mode.context)
-                      setActivePromptContext(mode.context)
-                      setActivePromptLabel(mode.label)
-                      setShowConversationMenu(false)
-                      setShowPromptMenu(false)
-                      void handleSend(mode.text)
-                    }}
-                    className={`block w-full rounded-lg px-2 py-1.5 text-left text-xs transition ${
-                      conversationMode === mode.context
-                        ? 'bg-[#7C8CFF]/15 text-white'
-                        : 'text-neutral-300 hover:bg-white/[0.04] hover:text-white'
-                    }`}
-                  >
-                    {mode.label}
-                  </button>
-                ))}
-              </div>
-            )}
 
             <button
               type="button"
@@ -3247,7 +3237,7 @@ return (
                   setRerouteSignal(0)
                   void handleSend(reroutePrompt.text)
                 }}
-                className={`block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-200 ${rerouteSignal ? 'alert-dot-twice' : ''}`}
+                className="block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-200"
               >
                 {reroutePrompt.label}
               </button>
@@ -3260,13 +3250,11 @@ return (
                 onClick={() => {
                   setActivePromptLabel(prompt.label)
                   setActivePromptContext(prompt.context)
-                  if (prompt.context?.startsWith('brilliant_')) {
-                    setConversationMode(prompt.context)
-                  }
+                  if (prompt.context?.startsWith('brilliant_')) setConversationMode(prompt.context)
                   setShowPromptMenu(false)
                   void handleSend(prompt.text)
                 }}
-                className={`block w-full py-1 text-left text-sm transition ${activePromptLabel === prompt.label ? 'text-white' : 'text-neutral-300 hover:text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'} ${suggestedSignal ? 'glow-twice' : ''}`}
+                className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
               >
                 {prompt.label}
               </button>
@@ -3274,6 +3262,105 @@ return (
           </div>
         </div>
       )}
+
+      {showConversationMenu && (
+        <>
+          <button
+            type="button"
+            aria-label="Close conversation modes"
+            onClick={() => setShowConversationMenu(false)}
+            className="fixed inset-0 z-[70] bg-black/35 backdrop-blur-[2px]"
+          />
+          <div className="absolute bottom-[52px] left-0 z-[80] w-[270px] rounded-2xl border border-[#7C8CFF]/30 bg-[radial-gradient(circle_at_top_left,rgba(124,140,255,0.16),transparent_38%),linear-gradient(180deg,rgba(18,18,22,0.97),rgba(6,6,9,0.99))] p-3 shadow-[0_24px_70px_rgba(0,0,0,0.62),0_0_28px_rgba(124,140,255,0.14)] backdrop-blur-xl">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">Conversation Assistance</span>
+            <button type="button" onClick={() => setShowConversationMenu(false)} className="text-white/45 transition hover:text-white">×</button>
+          </div>
+          <div className="space-y-2">
+            {[
+              {
+                label: 'Everyday Conversation',
+                context: 'brilliant_everyday',
+                text: 'Set GEORGE to Conversation Assistance for everyday conversation. Help me understand where the conversation is going, simplify what matters, notice what I may be missing, and help me improve without overreacting.',
+              },
+              {
+                label: 'Negotiation / Deal',
+                context: 'brilliant_negotiation',
+                text: 'Set GEORGE to Conversation Assistance for negotiation or a deal. Help me simplify the conversation, protect leverage, notice advantages gained or lost, and tell me what to say or ask next.',
+              },
+              {
+                label: 'Job Interview',
+                context: 'brilliant_interview',
+                text: 'Set GEORGE to Conversation Assistance for a job interview. Help me simplify the topic, understand where the interviewer is heading, protect my value, and improve my answers as we go.',
+              },
+              {
+                label: 'Sales / Customer',
+                context: 'brilliant_sales',
+                text: 'Set GEORGE to Conversation Assistance for sales or a customer conversation. Help me clarify the customer need, simplify objections, see where trust is gained or lost, and guide me toward the next strong question.',
+              },
+              {
+                label: 'Custom Setup',
+                context: 'brilliant_custom',
+                text: 'Set GEORGE to Conversation Assistance with a custom setup. First ask me who I am speaking with, what I want, what pressure exists, what outcome matters most, and what I cannot afford to lose. Then help me perform better in the conversation.',
+              },
+            ].map((mode) => (
+              <button
+                key={mode.context}
+                type="button"
+                onClick={() => {
+                  setConversationMode(mode.context)
+                  setActivePromptContext(mode.context)
+                  setActivePromptLabel(mode.label)
+                  setShowConversationMenu(false)
+
+                  const setupMessage = `${mode.label} mode is active.
+
+How should GEORGE assist?
+
+Choose below, then tell me who you are speaking with and what outcome matters most.`
+
+                  const assistantMessage: Message = {
+                    role: 'assistant',
+                    content: setupMessage,
+                  }
+
+                  setSuggestedPrompts([
+                    {
+                      label: 'Text Assist',
+                      text: 'Use Text Assist. Give me short onscreen guidance for this conversation.',
+                      context: `${mode.context}_text`,
+                    },
+                    {
+                      label: 'Audio Assist',
+                      text: 'Use Audio Assist. Give me spoken help for earbud use, only when it is useful.',
+                      context: `${mode.context}_audio`,
+                    },
+                    {
+                      label: 'Full Sentence',
+                      text: 'Use Full Sentence Assist. Give me exact lines I can say in this conversation.',
+                      context: `${mode.context}_sentences`,
+                    },
+                    {
+                      label: 'Silent Insight',
+                      text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
+                      context: `${mode.context}_silent`,
+                    },
+                  ])
+
+                  const nextMessages = [...messagesRef.current, assistantMessage]
+                  setMessages(nextMessages)
+                  messagesRef.current = nextMessages
+                }}
+                className="group block w-full rounded-xl border border-white/8 bg-white/[0.025] px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white hover:shadow-[0_0_18px_rgba(124,140,255,0.10)]"
+              >
+                <span className="block">{mode.label}</span>
+              </button>
+            ))}
+          </div>
+          </div>
+        </>
+      )}
+
     </div>
   </div>
 
@@ -3388,6 +3475,63 @@ return (
                           e.currentTarget.value = ''
                         }}
                       />
+                      {activePromptContext?.startsWith('conversation_assist_') && (
+                        <div className="mb-2 rounded-2xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/10 p-2">
+                          <div className="mb-1.5 flex items-center justify-between gap-2">
+                            <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">
+                              {activePromptLabel || 'Conversation Assist'} Active
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                stopListening()
+                                setVoiceOn(false)
+                                setInteractionMode('text')
+                                setActivePromptContext(null)
+                                setActivePromptLabel(null)
+                                window.localStorage.setItem('george_voice', 'off')
+                              }}
+                              className="text-[10px] uppercase tracking-[0.14em] text-white/45 transition hover:text-white"
+                            >
+                              Exit
+                            </button>
+                          </div>
+
+                          <div className="flex gap-1.5 overflow-x-auto">
+                            {[
+                              ['Text Assist', false],
+                              ['Audio Assist', true],
+                              ['Full Sentence', false],
+                              ['Silent Insight', false],
+                            ].map(([label, audio]) => (
+                              <button
+                                key={String(label)}
+                                type="button"
+                                onClick={() => {
+                                  const labelText = String(label)
+                                  const wantsAudio = Boolean(audio)
+                                  setActivePromptLabel(labelText)
+                                  setActivePromptContext(`conversation_assist_${labelText.toLowerCase().replace(/ /g, '_')}`)
+                                  setVoiceOn(wantsAudio)
+                                  setInteractionMode('speech')
+                                  window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
+                                  setTimeout(() => startListening(), 120)
+                                  setToastMessage(`${labelText} active`)
+                                  setShowToast(true)
+                                }}
+                                className={`shrink-0 rounded-full border px-2.5 py-1.5 text-[11px] transition ${
+                                  activePromptLabel === label
+                                    ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/20 text-white'
+                                    : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:text-white'
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {pendingImage && (
                         <div className="mb-1.5 flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-white/8 bg-white/[0.03] px-2 py-1.5">
                           <div className="relative h-10 w-10 shrink-0">
