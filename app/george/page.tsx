@@ -2655,6 +2655,18 @@ return (
             <button
               type="button"
               onClick={() => {
+                const prompt = "Simplify your last response into plain language with only what matters most."
+                setInput(prompt)
+                void handleSend(prompt)
+              }}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:text-white"
+            >
+              Simplify
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
                 handleFeedback(i, 'up')
                 setToastMessage('Noted')
                 setShowToast(true)
@@ -3176,6 +3188,19 @@ return (
                           e.currentTarget.value = ''
                         }}
                       />
+                      {pendingImage && (
+                        <div className="mb-2 flex items-center gap-2 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-1 text-xs text-white">
+                          <span className="truncate max-w-[180px]">{pendingImage.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => setPendingImage(null)}
+                            className="text-white/70 hover:text-white"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+
                       <textarea
                         ref={textareaRef}
                         value={input}

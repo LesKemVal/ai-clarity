@@ -128,7 +128,7 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Blueprint-level clarity</li>
+                  <li>• Clear macro direction</li>
                   <li>• What matters most</li>
                   <li>• Main steps in order</li>
                   <li>• Strongest first move</li>
@@ -144,8 +144,8 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Stronger continuity</li>
-                  <li>• Sharper reasoning</li>
+                  <li>• Tracks progress across time</li>
+                  <li>• Better decisions under pressure</li>
                   <li>• Better planning and framing</li>
                   <li>• Better for active goals</li>
                 </ul>
@@ -160,10 +160,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Conversation Engine</li>
+                  <li>• Live Conversation Engine</li>
                   <li>• Earbud live guidance</li>
                   <li>• Live cues and room awareness</li>
-                  <li>• Strongest pressure support</li>
+                  <li>• Real-time pressure support</li>
                 </ul>
               </div>
             </div>
