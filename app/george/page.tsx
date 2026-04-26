@@ -3288,117 +3288,55 @@ I am listening now. Speak naturally. I will respond ${
           </div>
 
           <div className="space-y-2">
-            {[
-              {
-                label: 'Everyday Conversation',
-                context: 'brilliant_everyday',
-                text: 'Set GEORGE to Conversation Assistance for everyday conversation. Help me understand where the conversation is going, simplify what matters, notice what I may be missing, and help me improve without overreacting.',
-              },
-              {
-                label: 'Negotiation / Deal',
-                context: 'brilliant_negotiation',
-                text: 'Set GEORGE to Conversation Assistance for negotiation or a deal. Help me simplify the conversation, protect leverage, notice advantages gained or lost, and tell me what to say or ask next.',
-              },
-              {
-                label: 'Job Interview',
-                context: 'brilliant_interview',
-                text: 'Set GEORGE to Conversation Assistance for a job interview. Help me simplify the topic, understand where the interviewer is heading, protect my value, and improve my answers as we go.',
-              },
-              {
-                label: 'Sales / Customer',
-                context: 'brilliant_sales',
-                text: 'Set GEORGE to Conversation Assistance for sales or a customer conversation. Help me clarify the customer need, simplify objections, see where trust is gained or lost, and guide me toward the next strong question.',
-              },
-              {
-                label: 'Appointment Setting',
-                context: 'professional_appointment_setting',
-                text: 'Set GEORGE to Professional Mode for appointment setting. First learn my market, offer, target outcome, common objections, and what counts as a successful booked appointment. Then help me in real time call by call.',
-              },
-              {
-                label: 'Fundraising / Donations',
-                context: 'professional_fundraising',
-                text: 'Set GEORGE to Professional Mode for fundraising or donation calls. First learn the cause, market, ask amount, donor type, objections, and desired commitment. Then help me build trust and move toward the ask.',
-              },
-              {
-                label: 'Consulting Outreach',
-                context: 'professional_consulting',
-                text: 'Set GEORGE to Professional Mode for consulting outreach. First learn my market, offer, business pain, decision maker, desired appointment, and common objections. Then help me guide the conversation toward a booked call.',
-              },
-              {
-                label: 'Performance Threshold',
-                context: 'professional_threshold',
-                text: 'Set GEORGE to Professional Threshold Mode. Learn my success metric, minimum acceptable threshold, team size, and current results. Then identify who needs support, likely causes, and create user-specific scripts or coaching to raise performance.',
-              },
-              {
-                label: 'Custom Setup',
-                context: 'brilliant_custom',
-                text: 'Set GEORGE to Conversation Assistance with a custom setup. First ask me who I am speaking with, what I want, what pressure exists, what outcome matters most, and what I cannot afford to lose. Then help me perform better in the conversation.',
-              },
-            ].map((mode) => (
-              <button
-                key={mode.context}
-                type="button"
-                onClick={() => {
-                  setConversationMode(mode.context)
-                  setActivePromptContext(mode.context)
-                  setActivePromptLabel(mode.label)
-                  setShowConversationMenu(false)
+            {conversationMenuLane === 'selector' && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setConversationMenuLane('personal')}
+                  className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-white/[0.025] px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-white">Personal</span>
+                    <span className="flex items-center gap-1">
+                      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#7C8CFF]/70 animate-pulse"></span>
+                    </span>
+                  </div>
+                  <span className="mt-1 block text-[11px] text-white/55">
+                    Everyday pressure, interviews, deals, and personal conversations.
+                  </span>
+                </button>
 
-                  const setupMessage = `${mode.label} mode is active.
+                <button
+                  type="button"
+                  onClick={() => setConversationMenuLane('professional')}
+                  className="block w-full rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/15 hover:text-white"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-white">Professional</span>
+                    <span className="flex items-center gap-1">
+                      <span className="h-1 w-1 rounded-full bg-[#22c55e] animate-pulse"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#22c55e]/70 animate-pulse"></span>
+                    </span>
+                  </div>
+                  <span className="mt-1 block text-[11px] text-white/55">
+                    Calls, appointments, donations, scripts, and firm outcomes.
+                  </span>
+                </button>
+              </>
+            )}
 
-How should GEORGE assist?
+            {conversationMenuLane === 'personal' && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.025] px-3 py-3 text-xs leading-5 text-white/70">
+                Personal conversation styles will open here next.
+              </div>
+            )}
 
-Choose below, then tell me who you are speaking with and what outcome matters most.
-
-Professional users can also ask:
-• Find reps below threshold
-• Explain why performance is low
-• Build scripts for weaker performers
-• Compare improvement over time
-
-Professional users can also ask:
-• Find reps below threshold
-• Explain why performance is low
-• Build scripts for weaker performers
-• Compare improvement over time`
-
-                  const assistantMessage: Message = {
-                    role: 'assistant',
-                    content: setupMessage,
-                  }
-
-                  setSuggestedPrompts([
-                    {
-                      label: 'Text Assist',
-                      text: 'Use Text Assist. Give me short onscreen guidance for this conversation.',
-                      context: `${mode.context}_text`,
-                    },
-                    {
-                      label: 'Audio Assist',
-                      text: 'Use Audio Assist. Give me spoken help for earbud use, only when it is useful.',
-                      context: `${mode.context}_audio`,
-                    },
-                    {
-                      label: 'Full Sentence',
-                      text: 'Use Full Sentence Assist. Give me exact lines I can say in this conversation.',
-                      context: `${mode.context}_sentences`,
-                    },
-                    {
-                      label: 'Silent Insight',
-                      text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
-                      context: `${mode.context}_silent`,
-                    },
-                  ])
-
-                  const nextMessages = [...messagesRef.current, assistantMessage]
-                  setMessages(nextMessages)
-                  messagesRef.current = nextMessages
-                }}
-                className="group block w-full rounded-xl border border-white/8 bg-white/[0.025] px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white hover:shadow-[0_0_18px_rgba(124,140,255,0.10)]"
-              >
-                <span className="block">{mode.label}</span>
-              </button>
-            ))}
+            {conversationMenuLane === 'professional' && (
+              <div className="rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-3 py-3 text-xs leading-5 text-white/70">
+                Professional setup and firm conversation styles will open here next.
+              </div>
+            )}
           </div>
           </div>
         </>
