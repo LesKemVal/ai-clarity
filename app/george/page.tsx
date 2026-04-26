@@ -2582,7 +2582,7 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-[#7C8CFF]/18 bg-[#0B0F1A] px-4 py-3 shadow-[0_0_14px_rgba(124,140,255,0.08)]' : 'max-w-full text-left'
+          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
