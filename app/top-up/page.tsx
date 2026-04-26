@@ -32,7 +32,7 @@ export default function TopUpPage() {
 
   const subcopy = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'Choose GEORGE or GEORGette, personalize voice, and access future continuity features during beta and beyond. Early users get early access as the system improves for you—and for people who need GEORGE most.'
+      return 'Choose GEORGE / GEORGette, personalize voice, and access future continuity features during beta as well as production. Early users get early access as the system improves for you—and for others who may need GEORGE most.'
     }
     return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help make GEORGE better before launch.'
   }, [intent])
