@@ -3115,7 +3115,7 @@ return (
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              Upload file or image
+              Upload image
             </button>
 
             {reroutePrompt && (
@@ -3180,7 +3180,7 @@ return (
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/*,.pdf,.doc,.docx,.txt"
+                        accept="image/*"
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0]
