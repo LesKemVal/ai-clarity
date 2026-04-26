@@ -3676,7 +3676,7 @@ I am listening now. Speak naturally. I will respond ${
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 text-center">
@@ -3773,7 +3773,7 @@ I am listening now. Speak naturally. I will respond ${
 
 {showUpgradeModal && (
         <div
-          className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-4 backdrop-blur-sm overflow-y-auto"
           onClick={() => setShowUpgradeModal(false)}
         >
           <div
