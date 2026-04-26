@@ -2334,10 +2334,10 @@ return (
           activePromptContext={activePromptContext}
           onToggleScripture={() => {
             const turningOn = activePromptContext !== 'bible_decision_lens'
-            setActivePromptLabel(turningOn ? 'Guide by Scripture' : null)
+            setActivePromptLabel(turningOn ? 'Be as Christ' : null)
             setActivePromptContext(turningOn ? 'bible_decision_lens' : null)
             setContextTurnCount(0)
-            setToastMessage(turningOn ? 'Scripture guide on' : 'Scripture guide off')
+            setToastMessage(turningOn ? 'Be as Christ on' : 'Be as Christ off')
             setShowToast(true)
           }}
           onNewSession={() => {
@@ -2382,7 +2382,7 @@ return (
 
               if (prompt.context === 'bible_decision_lens') {
                 setShowSidebar(false)
-                setToastMessage('Scripture guide on')
+                setToastMessage('Be as Christ on')
                 setShowToast(true)
                 textareaRef.current?.focus()
                 return
@@ -3085,11 +3085,11 @@ return (
               type="button"
               onClick={() => {
                 const turningOn = activePromptContext !== 'bible_decision_lens'
-                setActivePromptLabel(turningOn ? 'Guide by Scripture' : null)
+                setActivePromptLabel(turningOn ? 'Be as Christ' : null)
                 setActivePromptContext(turningOn ? 'bible_decision_lens' : null)
                 setContextTurnCount(0)
                 setShowPromptMenu(false)
-                setToastMessage(turningOn ? 'Scripture guide on' : 'Scripture guide off')
+                setToastMessage(turningOn ? 'Be as Christ on' : 'Be as Christ off')
                 setShowToast(true)
                 textareaRef.current?.focus()
               }}
@@ -3100,7 +3100,7 @@ return (
               }`}
             >
               <span className="inline-flex w-full items-center justify-between gap-1.5">
-                <span>Guide by Scripture</span>
+                <span>Be as Christ</span>
                 <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
                   {activePromptContext === 'bible_decision_lens' ? 'ON' : 'OFF'}
                 </span>

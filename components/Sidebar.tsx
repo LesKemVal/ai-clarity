@@ -107,7 +107,7 @@ export default function Sidebar({
     if (active === 'true') setIsSubscribed(true)
   }, [])
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    POWER: false,
+    GUIDANCE: false,
     Build: false,
     'Training Lab': false,
     ACCOUNT: false,
@@ -189,6 +189,17 @@ export default function Sidebar({
 
             <button
               type="button"
+              onClick={() => {
+                setShowSidebar?.(false)
+                window.location.href = '/welcome'
+              }}
+              className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
+            >
+              Make GEORGE Yours
+            </button>
+
+            <button
+              type="button"
               className="block w-full text-left text-sm text-neutral-400 transition hover:text-[#7C8CFF]"
             >
               Sessions
@@ -205,7 +216,7 @@ export default function Sidebar({
                   : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#7C8CFF]/30 hover:text-white'
               }`}
             >
-              <span>Guide by Scripture</span>
+              <span>Be as Christ</span>
               <span className="text-[11px] uppercase tracking-[0.14em] text-neutral-400">
                 {activePromptContext === 'bible_decision_lens' ? 'ON' : 'OFF'}
               </span>
@@ -215,18 +226,18 @@ export default function Sidebar({
           <div>
             <button
               type="button"
-              onClick={() => toggleGroup('POWER')}
+              onClick={() => toggleGroup('GUIDANCE')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
                 Modes
               </span>
               <span className="text-xs text-neutral-500">
-                {openGroups['POWER'] ? '▾' : '▸'}
+                {openGroups['GUIDANCE'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups['POWER'] && (
+            {openGroups['GUIDANCE'] && (
               <div className="mt-4 space-y-3">
                 <button
                   type="button"
@@ -389,7 +400,7 @@ export default function Sidebar({
 
           <div>
             <p className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-              Prompts
+              Live Suggestions
             </p>
 
             <div className="space-y-4">
