@@ -34,7 +34,8 @@ export async function POST(req: Request) {
     const input = typeof body?.input === 'string' ? body.input.trim() : ''
     const speed = typeof body?.speed === 'number' ? body.speed : 1
     const tier = typeof body?.tier === 'string' ? body.tier : 'smart'
-    const voice = typeof body?.voice === 'string' ? body.voice : 'onyx'
+    const requestedVoice = typeof body?.voice === 'string' ? body.voice : 'ash'
+    const voice = ['ash', 'coral'].includes(requestedVoice) ? requestedVoice : 'ash'
 
     if (!input) {
       return NextResponse.json({ error: 'Missing input' }, { status: 400 })

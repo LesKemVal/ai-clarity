@@ -503,7 +503,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(true)
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
-  const [voiceType, setVoiceType] = useState('onyx')
+  const [voiceType, setVoiceType] = useState('ash')
   
 
 const [otherSpeaking, setOtherSpeaking] = useState(false)
@@ -1030,7 +1030,7 @@ requestAnimationFrame(() => {
     const storedName = window.localStorage.getItem('george_name') || ''
     const storedBirthdayMD = window.localStorage.getItem('george_birthday_md') || ''
     const storedVoiceSpeed = Number(window.localStorage.getItem('george_voice_speed') || '1.4')
-    const storedVoiceType = window.localStorage.getItem('george_voice_type') || 'nova'
+    const storedVoiceType = window.localStorage.getItem('george_voice_type') || 'ash'
     const nameLocked = window.localStorage.getItem('george_name_locked') === 'true'
     const voiceLocked = window.localStorage.getItem('george_voice_locked') === 'true'
 
@@ -1058,7 +1058,7 @@ requestAnimationFrame(() => {
       window.localStorage.setItem('george_voice_locked', personalized ? 'false' : 'true')
     }
 
-    if (personalized && ['onyx', 'shimmer'].includes(storedVoiceType)) {
+    if (personalized && ['ash', 'coral'].includes(storedVoiceType)) {
       setVoiceType(storedVoiceType)
     }
 
@@ -3354,8 +3354,13 @@ return (
                 <p className="mb-2 text-xs uppercase tracking-[0.18em] text-neutral-500">Voice</p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: 'GEORGE', value: 'onyx' },
-                    { label: 'GEORGette', value: 'shimmer' },
+                    { label: 'Ash', value: 'ash' },
+                    { label: 'Onyx', value: 'onyx' },
+                    { label: 'Sage', value: 'sage' },
+                    { label: 'Alloy', value: 'alloy' },
+                    { label: 'Nova', value: 'nova' },
+                    { label: 'Shimmer', value: 'shimmer' },
+                    { label: 'Coral', value: 'coral' },
                   ].map((voice) => (
                     <button
                       key={voice.value}

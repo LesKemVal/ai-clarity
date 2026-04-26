@@ -11,6 +11,7 @@ export default function TopUpPage() {
   const [feedbackType, setFeedbackType] = useState('suggestion')
   const [feedback, setFeedback] = useState('')
   const [message, setMessage] = useState('')
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -29,6 +30,45 @@ export default function TopUpPage() {
     }
     return 'BRANESx is in beta.'
   }, [intent])
+
+  async function playVoiceSample(voice: string, label: string) {
+    try {
+      setPlayingVoice(voice)
+      setMessage(`Playing ${label} sample...`)
+
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: 'This is GEORGE. Clear direction, real momentum, and the next best move.',
+          speed: 1.15,
+          tier: 'intelligent',
+          voice,
+        }),
+      })
+
+      if (!res.ok) {
+        setMessage(`${label} is not available yet.`)
+        return
+      }
+
+      const buffer = await res.arrayBuffer()
+      const blob = new Blob([buffer], { type: 'audio/mpeg' })
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+
+      audio.onended = () => {
+        URL.revokeObjectURL(url)
+        setPlayingVoice(null)
+        setMessage('')
+      }
+
+      await audio.play()
+    } catch {
+      setMessage('Unable to play voice sample right now.')
+      setPlayingVoice(null)
+    }
+  }
 
   const subcopy = useMemo(() => {
     if (intent === 'make-george-yours') {
@@ -117,6 +157,40 @@ export default function TopUpPage() {
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
               Brilliant unlocks Conversation Engine, live cues, and premium earbud guidance.
             </div>
+
+            {intent === 'make-george-yours' && (
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 space-y-3">
+                <p className="text-sm font-medium text-white">Beta Voice Identity</p>
+                <p className="text-xs leading-6 text-neutral-400">
+                  We are narrowing GEORGE and GEORGette to two premium voices. Current finalists:
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2 text-sm">
+                  {[
+                    { label: 'Ash', value: 'ash', group: 'GEORGE' },
+                    { label: 'Onyx', value: 'onyx', group: 'GEORGE' },
+                    { label: 'Sage', value: 'sage', group: 'GEORGE' },
+                    { label: 'Nova', value: 'nova', group: 'GEORGette' },
+                    { label: 'Shimmer', value: 'shimmer', group: 'GEORGette' },
+                    { label: 'Coral', value: 'coral', group: 'GEORGette' },
+                  ].map((voice) => (
+                    <button
+                      key={voice.value}
+                      type="button"
+                      onClick={() => playVoiceSample(voice.value, voice.label)}
+                      className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-white transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10"
+                    >
+                      <span className="block text-[10px] uppercase tracking-[0.16em] text-neutral-500">
+                        {voice.group}
+                      </span>
+                      <span>{playingVoice === voice.value ? 'Playing...' : `Play ${voice.label}`}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Final voices will be chosen for natural tone, trust, and daily usability.
+                </p>
+              </div>
+            )}
 
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
               <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
