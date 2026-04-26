@@ -155,7 +155,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant unlocks Conversation Engine, live cues, and premium earbud guidance.
+              Brilliant gives you live advantage: Conversation Engine, pressure guidance, room cues, and premium earbud support.
             </div>
 
             {intent === 'make-george-yours' && (
@@ -203,8 +203,8 @@ export default function TopUpPage() {
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
                   <li>• Clear macro direction</li>
-                  <li>• What matters most</li>
-                  <li>• Main steps in order</li>
+                  <li>• What matters now</li>
+                  <li>• Best path in order</li>
                   <li>• Strongest first move</li>
                 </ul>
               </div>
@@ -220,8 +220,8 @@ export default function TopUpPage() {
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
                   <li>• Tracks progress across time</li>
                   <li>• Better decisions under pressure</li>
-                  <li>• Better planning and framing</li>
-                  <li>• Better for active goals</li>
+                  <li>• Cleaner plans and sharper framing</li>
+                  <li>• Built for active goals</li>
                 </ul>
               </div>
 
@@ -235,8 +235,8 @@ export default function TopUpPage() {
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
                   <li>• Live Conversation Engine</li>
-                  <li>• Earbud live guidance</li>
-                  <li>• Live cues and room awareness</li>
+                  <li>• Earbud live support</li>
+                  <li>• Live cues and room reading</li>
                   <li>• Real-time pressure support</li>
                 </ul>
               </div>
@@ -251,7 +251,7 @@ export default function TopUpPage() {
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Waitlist</p>
               <p className="text-sm leading-7 text-neutral-300">
-                Leave your email so we can notify you when paid access, deeper rollout, and launch access are ready.
+                Leave your email for launch access, paid tier rollout, and early upgrades before the public release.
               </p>
 
               <input
@@ -324,7 +324,7 @@ export default function TopUpPage() {
                 onClick={joinWaitlist}
                 className="w-full rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
               >
-                Get Early Access
+                Reserve Early Access
               </button>
             </div>
           </div>
