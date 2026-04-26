@@ -908,6 +908,9 @@ if (serverTier === 'intelligent' || serverTier === 'brilliant') {
   useEffect(() => {
     if (!userPinnedBottomRef.current) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+requestAnimationFrame(() => {
+  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+})
   }, [messages, isThinking])
 
 
@@ -2528,46 +2531,7 @@ return (
   </div>
 )}
 
-{steeringHint?.signal && (
-  <button
-    type="button"
-    onClick={() => {
-      const steerPrompt =
-        steeringHint.signal === 'conversation_engine'
-          ? 'Use Conversation Engine and help me handle this in real time.'
-          : steeringHint.signal === 'compare'
-            ? 'Compare the strongest paths and tell me which is better.'
-            : steeringHint.signal === 'build_plan'
-              ? 'Build the strongest path and keep me moving logically.'
-              : steeringHint.signal === 'blind_spots'
-                ? 'Find the real bottleneck and keep me from missing it.'
-                : steeringHint.signal === 'scripture'
-                  ? 'Guide this by scripture and keep the decision logical.'
-                  : 'Show me the better next move and keep me on the strongest path.'
 
-      setActivePromptLabel(steeringHint.label)
-      setInput('')
-      void handleSend(steerPrompt)
-    }}
-    className={`fixed bottom-[132px] left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-black/88 px-4 py-2 text-[11px] tracking-[0.12em] text-white shadow-[0_0_20px_rgba(124,140,255,0.18)] backdrop-blur-xl transition hover:border-[#7C8CFF]/60 hover:bg-[#0B0F1A]/92 ${steeringHint.pulse ? 'animate-pulse' : ''}`}
-  >
-    GEORGE suggests: {steeringHint.label}
-  </button>
-)}
-
-{goalState?.likelyTrueObjective && (
-  <button
-    type="button"
-    onClick={() => {
-      const targetPrompt = `Lock to this target and carry me toward it: ${goalState.likelyTrueObjective}. Keep me logical and tell me when I drift.`
-      setInput('')
-      void handleSend(targetPrompt)
-    }}
-    className="fixed bottom-[176px] left-1/2 z-50 max-w-[80vw] -translate-x-1/2 rounded-full border border-white/10 bg-neutral-950/92 px-4 py-2 text-[10px] tracking-[0.10em] text-white/85 shadow-[0_0_16px_rgba(0,0,0,0.35)] backdrop-blur-xl transition hover:border-[#7C8CFF]/35 hover:text-white"
-  >
-    TARGET: {goalState.likelyTrueObjective}
-  </button>
-)}
 
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
@@ -2618,7 +2582,7 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right' : 'max-w-full text-left'
+          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-[#7C8CFF]/18 bg-[#0B0F1A] px-4 py-3 shadow-[0_0_14px_rgba(124,140,255,0.08)]' : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
