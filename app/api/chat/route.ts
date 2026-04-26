@@ -9,18 +9,21 @@ type IncomingMessage = {
   role?: string
   content?: string
   imageDataUrl?: string | null
+  imageDataUrls?: string[] | null
 } | null
 
 type FilteredIncomingMessage = {
   role?: string
   content: string
   imageDataUrl?: string | null
+  imageDataUrls?: string[] | null
 }
 
 type CleanMessage = {
   role: 'user' | 'assistant'
   content: string
   imageDataUrl?: string | null
+  imageDataUrls?: string[] | null
 }
 
 function getPromptContextBlock(
@@ -874,8 +877,9 @@ export async function POST(req: Request) {
         role: m.role as 'user' | 'assistant',
         content: m.content.trim(),
         imageDataUrl: typeof m.imageDataUrl === 'string' ? m.imageDataUrl : null,
+        imageDataUrls: Array.isArray(m.imageDataUrls) ? m.imageDataUrls.filter((src) => typeof src === 'string').slice(0, 10) : null,
       }))
-      .filter((m: CleanMessage) => m.content.length > 0 || Boolean(m.imageDataUrl))
+      .filter((m: CleanMessage) => m.content.length > 0 || Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
 
     if (!messages.length) {
       return NextResponse.json(
@@ -897,7 +901,7 @@ export async function POST(req: Request) {
     const liveScenario = detectLiveScenario(latestUserRaw)
 
     const hasImageInput = recentMessages.some(
-      (m) => m.role === 'user' && Boolean(m.imageDataUrl)
+      (m) => m.role === 'user' && (Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
     )
 
     const model = hasImageInput
@@ -997,20 +1001,23 @@ BRILLIANT LIVE ENGINE
         input: [
           {
             role: 'system',
-            content: [{ type: 'input_text', text: systemContent }],
+            content: systemContent,
           },
           ...recentMessages.map((m) =>
-            m.role === 'user' && m.imageDataUrl
+            m.role === 'user' && (m.imageDataUrl || m.imageDataUrls?.length)
               ? ({
                   role: 'user',
                   content: [
                     { type: 'input_text', text: m.content || 'Analyze this image and help me.' },
-                    { type: 'input_image', image_url: m.imageDataUrl },
+                    ...((m.imageDataUrls?.length ? m.imageDataUrls : m.imageDataUrl ? [m.imageDataUrl] : []).slice(0, 10).map((src) => ({
+                      type: 'input_image',
+                      image_url: src,
+                    }))),
                   ],
                 } as any)
               : ({
                   role: m.role,
-                  content: [{ type: 'input_text', text: m.content }],
+                  content: m.content,
                 } as any)
           ),
         ],

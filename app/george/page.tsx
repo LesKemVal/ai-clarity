@@ -501,7 +501,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 ])
   const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
-  const [voiceOn, setVoiceOn] = useState(true)
+  const [voiceOn, setVoiceOn] = useState(false)
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
   const [voiceType, setVoiceType] = useState('ash')
   
@@ -544,6 +544,7 @@ const [isListening, setIsListening] = useState(false)
   const [profileName, setProfileName] = useState('')
   const [birthdayMD, setBirthdayMD] = useState('')
   const [showPromptMenu, setShowPromptMenu] = useState(false)
+  const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
 const [savePopupUpward, setSavePopupUpward] = useState(true)
@@ -1073,9 +1074,9 @@ requestAnimationFrame(() => {
       setVoiceOn(false)
       window.localStorage.setItem('george_voice', 'off')
     } else {
-      setInteractionMode('speech')
-      setVoiceOn(true)
-      window.localStorage.setItem('george_voice', 'on')
+      setInteractionMode('text')
+      setVoiceOn(false)
+      window.localStorage.setItem('george_voice', 'off')
 
     }
 
@@ -1119,15 +1120,7 @@ requestAnimationFrame(() => {
       return
     }
 
-    if (!voiceOn) {
-      setVoiceOn(true)
-    }
-
-    if (interactionMode !== 'speech') {
-      setInteractionMode('speech')
-    }
-
-    window.localStorage.setItem('george_voice', 'on')
+    window.localStorage.setItem('george_voice', voiceOn ? 'on' : 'off')
   }, [currentTier, interactionMode, voiceOn])
 
   useEffect(() => {
@@ -1679,7 +1672,7 @@ function detectDomain(text: string) {
 
 const handleSend = useCallback(
     async (overrideText?: string) => {
-      const text = (overrideText ?? input).trim()
+      let text = (overrideText ?? input).trim()
       console.log('[GEORGE handleSend]', {
         overrideText,
         input,
@@ -1894,9 +1887,13 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         domainPrefix = "You are helping with CNA. Focus on certification steps, exam, skills check, and fastest path to employment."
       }
 
-      if (!text) {
+      if (!text && !pendingImage) {
         setVoiceError('Type a message first.')
         return
+      }
+
+      if (!text && pendingImage) {
+        text = `I uploaded image: ${pendingImage.name}. Describe the visible image briefly and help me use it. If a person appears, describe visible features only. Do not identify the person. Keep it concise.`
       }
 
       // allow override while thinking
@@ -2184,7 +2181,7 @@ return true
         setIsThinking(false)
       }
   },
-  [input, isThinking, speakText, stopListening]
+  [input, isThinking, speakText, stopListening, pendingImage]
 )
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -2585,7 +2582,20 @@ return (
           m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >
-        {m.role === 'assistant' ? <TypewriterText text={m.content} /> : m.content}
+        {m.role === 'assistant' ? (
+          <TypewriterText text={m.content} />
+        ) : (
+          <>
+            {m.imageDataUrl && (
+              <img
+                src={m.imageDataUrl}
+                alt="Uploaded image"
+                className="mb-3 max-h-40 w-full rounded-2xl border border-white/10 object-cover"
+              />
+            )}
+
+          </>
+        )}
       </div>
 
       {m.role === 'assistant' && (
@@ -3036,6 +3046,7 @@ return (
         onClick={(e) => {
           e.stopPropagation()
           setShowPromptMenu((prev) => !prev)
+          setShowConversationMenu(false)
         }}
         className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
         aria-label="Make a better move"
@@ -3086,12 +3097,110 @@ return (
             <button
               type="button"
               onClick={() => {
+                if (currentTier === 'smart') {
+                  setToastMessage('Voice replies unlock above Smart.')
+                  setShowToast(true)
+                  return
+                }
+
+                const nextVoice = !voiceOn
+                setVoiceOn(nextVoice)
+                setInteractionMode(nextVoice ? 'speech' : 'text')
+                window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+                setToastMessage(nextVoice ? 'Voice replies on' : 'Voice replies off')
+                setShowToast(true)
+              }}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
+            >
+              <span className="inline-flex w-full items-center justify-between gap-1.5">
+                <span>Voice replies</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
+                  {voiceOn ? 'ON' : 'OFF'}
+                </span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (currentTier !== 'brilliant') {
+                  setToastMessage('Conversation Mode belongs to Brilliant.')
+                  setShowToast(true)
+                  return
+                }
+                setShowConversationMenu((prev) => !prev)
+              }}
+              className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
+            >
+              <span className="inline-flex w-full items-center justify-between gap-1.5">
+                <span>Conversation Mode</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">
+                  {showConversationMenu ? 'OPEN' : '›'}
+                </span>
+              </span>
+            </button>
+
+            {showConversationMenu && (
+              <div className="mt-1 rounded-xl border border-white/10 bg-black/70 p-1.5">
+                {[
+                  {
+                    label: 'Negotiation',
+                    context: 'brilliant_negotiation',
+                    text: 'Set GEORGE to Conversation Mode for negotiation. Help me keep leverage, slow pressure, and say the right thing next.',
+                  },
+                  {
+                    label: 'Dealership',
+                    context: 'brilliant_dealership',
+                    text: 'Set GEORGE to Conversation Mode for a dealership. Help me avoid pressure, expose weak terms, and protect my money.',
+                  },
+                  {
+                    label: 'Interview',
+                    context: 'brilliant_interview',
+                    text: 'Set GEORGE to Conversation Mode for an interview. Help me answer clearly, protect my value, and move toward the offer.',
+                  },
+                  {
+                    label: 'Workplace',
+                    context: 'brilliant_workplace',
+                    text: 'Set GEORGE to Conversation Mode for work. Help me stay composed, protect my position, and say this professionally.',
+                  },
+                  {
+                    label: 'Custom',
+                    context: 'brilliant_custom',
+                    text: 'Set GEORGE to Conversation Mode. I will describe the room, the pressure, and what I need to accomplish.',
+                  },
+                ].map((mode) => (
+                  <button
+                    key={mode.context}
+                    type="button"
+                    onClick={() => {
+                      setConversationMode(mode.context)
+                      setActivePromptContext(mode.context)
+                      setActivePromptLabel(mode.label)
+                      setShowConversationMenu(false)
+                      setShowPromptMenu(false)
+                      void handleSend(mode.text)
+                    }}
+                    className={`block w-full rounded-lg px-2 py-1.5 text-left text-xs transition ${
+                      conversationMode === mode.context
+                        ? 'bg-[#7C8CFF]/15 text-white'
+                        : 'text-neutral-300 hover:bg-white/[0.04] hover:text-white'
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
                 fileInputRef.current?.click()
                 setShowPromptMenu(false)
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              Upload image
+              Upload image / file
             </button>
 
             {reroutePrompt && (
@@ -3163,6 +3272,63 @@ return (
                           if (!file) return
 
                           const isImage = file.type.startsWith('image/')
+                          const isText = file.type === 'text/plain' || file.name.toLowerCase().endsWith('.txt')
+                          const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+                          const isDocx = file.type.includes('officedocument.wordprocessingml.document') || file.name.toLowerCase().endsWith('.docx')
+
+                          if (isPdf || isDocx) {
+                            const formData = new FormData()
+                            formData.append('file', file)
+
+                            setToastMessage(`Reading ${file.name}...`)
+                            setShowToast(true)
+
+                            fetch('/api/extract-file', {
+                              method: 'POST',
+                              body: formData,
+                            })
+                              .then(async (res) => {
+                                const data = await res.json().catch(() => ({}))
+                                if (!res.ok) {
+                                  throw new Error(data?.error || 'Unable to read this PDF.')
+                                }
+
+                                setPendingImage(null)
+                                setInput(`I uploaded file: ${data.name || file.name}. Help me understand and use it.\\n\\n${data.text}`)
+                                setToastMessage(`${data.name || file.name} loaded into GEORGE.`)
+                                setShowToast(true)
+                                textareaRef.current?.focus()
+                              })
+                              .catch((err) => {
+                                setToastMessage(err?.message || 'Unable to read this PDF.')
+                                setShowToast(true)
+                              })
+
+                            e.currentTarget.value = ''
+                            return
+                          }
+
+                          if (isText) {
+                            const reader = new FileReader()
+                            reader.onload = () => {
+                              const fileText = String(reader.result || '').trim()
+                              if (!fileText) {
+                                setToastMessage('That text file appears empty.')
+                                setShowToast(true)
+                                return
+                              }
+
+                              const clipped = fileText.length > 12000 ? fileText.slice(0, 12000) + '\n\n[Text clipped for length.]' : fileText
+                              setPendingImage(null)
+                              setInput(`I uploaded text file: ${file.name}. Help me understand and use it.\n\n${clipped}`)
+                              setToastMessage(`${file.name} loaded into GEORGE.`)
+                              setShowToast(true)
+                              textareaRef.current?.focus()
+                            }
+                            reader.readAsText(file)
+                            e.currentTarget.value = ''
+                            return
+                          }
 
                           if (isImage) {
                             const reader = new FileReader()
@@ -3189,15 +3355,22 @@ return (
                         }}
                       />
                       {pendingImage && (
-                        <div className="mb-2 flex items-center gap-2 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-1 text-xs text-white">
-                          <span className="truncate max-w-[180px]">{pendingImage.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => setPendingImage(null)}
-                            className="text-white/70 hover:text-white"
-                          >
-                            ×
-                          </button>
+                        <div className="mb-1.5 flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-white/8 bg-white/[0.03] px-2 py-1.5">
+                          <div className="relative h-10 w-10 shrink-0">
+                            <img
+                              src={pendingImage.dataUrl}
+                              alt="Image preview"
+                              className="h-10 w-10 rounded-lg object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setPendingImage(null)}
+                              className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/80 text-[10px] text-white/70 transition hover:text-white"
+                              aria-label="Remove image"
+                            >
+                              ×
+                            </button>
+                          </div>
                         </div>
                       )}
 
