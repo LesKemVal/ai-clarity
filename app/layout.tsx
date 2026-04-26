@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: 'GEORGE by BRANESx',
     template: '%s | GEORGE',
   },
-  description: 'Want to get something done? GEORGE is your guide.',
+  description: 'Build it. Change it. Tear it down responsibly. Get all the way there with GEORGE.',
   applicationName: 'GEORGE',
   themeColor: '#7C8CFF',
   appleWebApp: {

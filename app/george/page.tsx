@@ -311,18 +311,22 @@ export default function Page() {
     : "Good evening."
 
   const firstTimeGreeting = `${timeGreeting}
-If you want to build something, fund something, solve something, or change something—just say it.
+Whatever it is you want to do, just say so—right now.
 
-We can start from wherever you are: logistically, financially, or emotionally.
+I’ll map a step-by-step path for you from A to Z.
 
-And we can start now.`
+I’ll do most of the heavy lifting once you set the direction.
+
+Ready?`
 
   const earlyUserGreeting = `${timeGreeting}
-If you want to build something, fund something, solve something, or change something—just say it.
+Whatever it is you want to do, just say so—right now.
 
-We can start from wherever you are: logistically, financially, or emotionally.
+I’ll map a step-by-step path for you from A to Z.
 
-And we can start now.`
+I’ll do most of the heavy lifting once you set the direction.
+
+Ready?`
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
