@@ -3287,9 +3287,6 @@ I am listening now. Speak naturally. I will respond ${
           </div>
 
           <div className="space-y-2">
-            <div className="px-1 pt-1 text-[10px] uppercase tracking-[0.16em] text-white/40">
-              Personal
-            </div>
             {[
               {
                 label: 'Everyday Conversation',
@@ -3310,11 +3307,6 @@ I am listening now. Speak naturally. I will respond ${
                 label: 'Sales / Customer',
                 context: 'brilliant_sales',
                 text: 'Set GEORGE to Conversation Assistance for sales or a customer conversation. Help me clarify the customer need, simplify objections, see where trust is gained or lost, and guide me toward the next strong question.',
-              },
-              {
-                label: '────────',
-                context: 'divider_professional',
-                text: '',
               },
               {
                 label: 'Appointment Setting',
@@ -3361,6 +3353,12 @@ Professional users can also ask:
 • Find reps below threshold
 • Explain why performance is low
 • Build scripts for weaker performers
+• Compare improvement over time
+
+Professional users can also ask:
+• Find reps below threshold
+• Explain why performance is low
+• Build scripts for weaker performers
 • Compare improvement over time`
 
                   const assistantMessage: Message = {
@@ -3397,9 +3395,7 @@ Professional users can also ask:
                 }}
                 className="group block w-full rounded-xl border border-white/8 bg-white/[0.025] px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white hover:shadow-[0_0_18px_rgba(124,140,255,0.10)]"
               >
-                <span className="block">
-                  {mode.context === 'divider_professional' ? 'Professional ●●' : mode.label}
-                </span>
+                <span className="block">{mode.label}</span>
               </button>
             ))}
           </div>
