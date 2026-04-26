@@ -123,10 +123,10 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    Full engine
+                    Free
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
                   <li>• Blueprint-level clarity</li>
                   <li>• What matters most</li>
@@ -155,10 +155,10 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
-                    Free
+                    Full engine
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
                   <li>• Conversation Engine</li>
                   <li>• Earbud live guidance</li>
