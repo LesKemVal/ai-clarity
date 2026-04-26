@@ -83,14 +83,14 @@ export default function RoadmapPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-6">
             <div className="max-w-3xl space-y-3">              <h2 className="text-2xl font-semibold tracking-tight text-white">
-                Smart, Intelligent, Brilliant.
+                Smart, Intelligent, Brilliant, Professional.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Smart gets you moving. Intelligent sharpens continuity. Brilliant is where earbuds, Conversation Engine, and live support become worth paying for.
+                Smart gets you moving. Intelligent sharpens continuity. Brilliant unlocks live advantage. Professional is for people whose conversations create revenue, appointments, donations, influence, or measurable outcomes.
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="rounded-2xl border border-neutral-800 bg-black/25 p-5 space-y-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Smart</p>
@@ -127,6 +127,19 @@ export default function RoadmapPage() {
                   <li>• Better room handling</li>
                   <li>• Sharper pressure support</li>
                 </ul>              </div>
+              <div className="rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 space-y-4 shadow-[0_0_30px_rgba(34,197,94,0.07)]">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-white">Professional</p>
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/65">Performance tier</p>
+                </div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
+                  <li>• Revenue-generating live tools</li>
+                  <li>• Sales and appointment assist</li>
+                  <li>• Campaign memory</li>
+                  <li>• ROI-focused outcomes</li>
+                </ul>
+              </div>
+
             </div>
           </div>
         </section>

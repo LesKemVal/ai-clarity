@@ -158,7 +158,7 @@ export default function TopUpPage() {
               Brilliant gives you live advantage: Conversation Engine, pressure guidance, room cues, and premium earbud support.
             </div>
 
-            <div className="grid gap-4 pt-2 lg:grid-cols-3">
+            <div className="grid gap-4 pt-2 lg:grid-cols-4">
               <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
@@ -188,6 +188,22 @@ export default function TopUpPage() {
                   <li>• Better decisions under pressure</li>
                   <li>• Cleaner plans and sharper framing</li>
                   <li>• Built for active goals</li>
+                </ul>
+              </div>
+
+              <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-base font-semibold text-white">Professional</p>
+                  <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
+                    ROI
+                  </span>
+                </div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
+                  <li>• Live outbound conversation engine</li>
+                  <li>• Sales / appointment / donation modes</li>
+                  <li>• Campaign memory + caller reset</li>
+                  <li>• Built for measurable outcomes</li>
                 </ul>
               </div>
 
