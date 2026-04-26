@@ -20,7 +20,6 @@ export const metadata: Metadata = {
   },
   description: 'Build it. Change it. Tear it down responsibly. Get all the way there with GEORGE.',
   applicationName: 'GEORGE',
-  themeColor: '#7C8CFF',
   appleWebApp: {
     title: 'GEORGE',
     capable: true,
@@ -46,6 +45,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
+  themeColor: '#7C8CFF',
 }
 
 export default function RootLayout({
