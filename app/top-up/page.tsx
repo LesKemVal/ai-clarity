@@ -128,10 +128,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Conversation Engine</li>
-                  <li>• Earbud live guidance</li>
-                  <li>• Live cues and room awareness</li>
-                  <li>• Strongest pressure support</li>
+                  <li>• Blueprint-level clarity</li>
+                  <li>• What matters most</li>
+                  <li>• Main steps in order</li>
+                  <li>• Strongest first move</li>
                 </ul>
               </div>
 
@@ -160,10 +160,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Quick clarity</li>
-                  <li>• Immediate next moves</li>
-                  <li>• Useful without setup</li>
-                  <li>• Start using GEORGE now</li>
+                  <li>• Conversation Engine</li>
+                  <li>• Earbud live guidance</li>
+                  <li>• Live cues and room awareness</li>
+                  <li>• Strongest pressure support</li>
                 </ul>
               </div>
             </div>
