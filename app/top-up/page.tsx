@@ -121,7 +121,7 @@ export default function TopUpPage() {
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
               <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Brilliant</p>
+                  <p className="text-base font-semibold text-white">Smart</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
                     Full engine
                   </span>
@@ -153,7 +153,7 @@ export default function TopUpPage() {
 
               <div className="rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Smart</p>
+                  <p className="text-base font-semibold text-white">Brilliant</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
                     Free
                   </span>
@@ -168,35 +168,7 @@ export default function TopUpPage() {
               </div>
             </div>
 
-            <div className="grid gap-3 pt-1 md:grid-cols-3">
-              <button
-                type="button"
-                onClick={() => (window.location.href = '/george')}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-white/20 hover:text-white"
-              >
-                Use GEORGE now
-              </button>
-              <button
-                type="button"
-                onClick={() => jumpTo('waitlist')}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF] hover:text-white"
-              >
-                Join the waitlist
-              </button>
-              <button
-                type="button"
-                onClick={() => jumpTo('feedback')}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF] hover:text-white"
-              >
-                Send feedback
-              </button>
-            </div>
-
-            {message ? (
-              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white">
-                {message}
-              </div>
-            ) : null}
+            
           </div>
         </section>
 

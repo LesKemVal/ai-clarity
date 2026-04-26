@@ -82,11 +82,7 @@ export default function RoadmapPage() {
 
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-6">
-            <div className="max-w-3xl space-y-3">
-              <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">
-                Current product path
-              </p>
-              <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <div className="max-w-3xl space-y-3">              <h2 className="text-2xl font-semibold tracking-tight text-white">
                 Smart, Intelligent, Brilliant.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
@@ -105,11 +101,7 @@ export default function RoadmapPage() {
                   <li>• Immediate next moves</li>
                   <li>• Useful without setup</li>
                   <li>• Fast help when you need direction</li>
-                </ul>
-                <p className="text-sm leading-6 text-neutral-400">
-                  Best for users who want real help right away without needing to configure anything first.
-                </p>
-              </div>
+                </ul>              </div>
 
               <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-4">
                 <div className="space-y-1">
@@ -121,11 +113,7 @@ export default function RoadmapPage() {
                   <li>• Better framing</li>
                   <li>• More useful over time</li>
                   <li>• Better for active goals and ongoing progress</li>
-                </ul>
-                <p className="text-sm leading-6 text-neutral-200">
-                  Best for users building momentum who want GEORGE to stay sharper, more aware, and more useful across sessions.
-                </p>
-              </div>
+                </ul>              </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.07)]">
                 <div className="space-y-1">
@@ -138,11 +126,7 @@ export default function RoadmapPage() {
                   <li>• Live cues</li>
                   <li>• Better room handling</li>
                   <li>• Sharper pressure support</li>
-                </ul>
-                <p className="text-sm leading-6 text-neutral-300">
-                  Best for users who need real-time support while the moment is actually happening.
-                </p>
-              </div>
+                </ul>              </div>
             </div>
           </div>
         </section>

@@ -60,7 +60,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation">
         <MobileHeaderGate />
-        <div className="flex-1 pt-16 md:pt-0">
+        <div className="flex-1 pt-12 md:pt-0">
           {children}
         </div>
       </body>
