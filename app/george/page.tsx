@@ -3476,7 +3476,7 @@ I am listening now. Speak naturally. I will respond ${
             onClick={() => setShowConversationMenu(false)}
             className="fixed inset-0 z-[70] bg-black/35 backdrop-blur-[2px]"
           />
-          <div className="absolute bottom-[58px] left-0 z-[80] w-[340px] max-w-[92vw] rounded-[1.7rem] border border-[#7C8CFF]/32 bg-[radial-gradient(circle_at_top_left,rgba(124,140,255,0.18),transparent_40%),linear-gradient(180deg,rgba(18,18,24,0.985),rgba(6,6,10,0.995))] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.70),0_0_34px_rgba(124,140,255,0.16)] backdrop-blur-2xl">
+          <div className="fixed bottom-[118px] left-1/2 z-[80] w-[min(340px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.7rem] border border-[#7C8CFF]/32 bg-[radial-gradient(circle_at_top_left,rgba(124,140,255,0.18),transparent_40%),linear-gradient(180deg,rgba(18,18,24,0.985),rgba(6,6,10,0.995))] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.70),0_0_34px_rgba(124,140,255,0.16)] backdrop-blur-2xl">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">Conversation Assistance</span>
             <button type="button" onClick={() => setShowConversationMenu(false)} className="text-white/45 transition hover:text-white">×</button>
