@@ -19,6 +19,25 @@ export default function ConversationPage() {
             <p className="leading-7 text-neutral-200">
               GEORGE helps you think, respond, hold leverage, and move outcomes in real time.
             </p>
+
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a
+                href="/george"
+                className="rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+              >
+                Use GEORGE Defaults
+              </a>
+              <a
+                href="/george"
+                className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/45"
+              >
+                Build Custom Setup
+              </a>
+            </div>
+
+            <p className="text-sm leading-6 text-neutral-400">
+              If you are not ready to answer every setup question, GEORGE will use best-practice defaults and help you refine as you go.
+            </p>
           </div>
         </section>
 
