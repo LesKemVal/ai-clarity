@@ -2847,8 +2847,8 @@ I am listening now. Speak naturally. I will respond ${
 
                   {conversationSetupPopup?.output === output && (
                     <div
-                      className={`absolute left-0 z-[90] w-56 rounded-[1.35rem] border border-[#7C8CFF]/30 bg-[#070A12]/96 p-2.5 shadow-[0_24px_80px_rgba(0,0,0,0.68),0_0_34px_rgba(124,140,255,0.16)] backdrop-blur-2xl animate-[conversationPopup_160ms_ease-out] ${
-                        conversationSetupPopup.direction === 'up' ? 'bottom-full mb-3 origin-bottom-left' : 'top-full mt-3 origin-top-left'
+                      className={`absolute z-[90] w-[min(260px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/35 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_38px_rgba(124,140,255,0.18)] backdrop-blur-2xl animate-[conversationPopup_160ms_ease-out] ${
+                        conversationSetupPopup.direction === 'up' ? 'bottom-full left-0 mb-3 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'
                       }`}
                     >
                       {[
@@ -2869,10 +2869,10 @@ I am listening now. Speak naturally. I will respond ${
                             setConversationSetupPopup(null)
                             setTimeout(() => startListening(), 120)
                           }}
-                          className={`block w-full rounded-xl border px-3 py-2 text-left text-[11px] font-medium transition ${
+                          className={`block min-h-[46px] w-full rounded-[1rem] border px-3.5 py-3 text-left text-[12px] font-semibold tracking-[0.01em] transition ${
                             activePromptLabel === `${label}: ${styleLabel}`
-                              ? 'border-[#7C8CFF]/70 bg-[#7C8CFF]/20 text-white shadow-[0_0_18px_rgba(124,140,255,0.18)]'
-                              : 'border-transparent text-white/68 hover:border-[#7C8CFF]/25 hover:bg-[#7C8CFF]/10 hover:text-white'
+                              ? 'border-[#7C8CFF]/75 bg-[#7C8CFF]/22 text-white shadow-[0_0_20px_rgba(124,140,255,0.20)]'
+                              : 'border-transparent text-white/70 hover:border-[#7C8CFF]/28 hover:bg-[#7C8CFF]/11 hover:text-white'
                           }`}
                         >
                           <span className="flex items-center justify-between gap-3">
