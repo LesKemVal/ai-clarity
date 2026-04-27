@@ -3290,10 +3290,6 @@ I am listening now. Speak naturally. I will respond ${
             <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">Conversation Assistance</span>
             <button type="button" onClick={() => setShowConversationMenu(false)} className="text-white/45 transition hover:text-white">×</button>
           </div>
-          <div className="mb-2 rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-3 py-2 text-xs leading-5 text-neutral-200">
-            <span className="font-medium text-white">Professional Mode:</span> for calls and conversations that create revenue, appointments, donations, influence, or measurable outcomes.
-          </div>
-
           <div className="space-y-2">
             {conversationMenuLane === 'selector' && (
               <>
