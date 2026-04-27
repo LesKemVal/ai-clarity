@@ -3332,15 +3332,60 @@ I am listening now. Speak naturally. I will respond ${
             {conversationMenuLane === 'personal' && (
               <div className="space-y-2">
                 {[
-                  'Everyday Conversation Assistant',
-                  'Negotiation Assistant',
-                  'Job Interview Assistant',
-                  'Sales / Customer Service Assistant',
-                  'Custom Setup',
-                ].map((label) => (
+                  ['Everyday Conversation Assistant', 'brilliant_everyday'],
+                  ['Negotiation Assistant', 'brilliant_negotiation'],
+                  ['Job Interview Assistant', 'brilliant_interview'],
+                  ['Sales / Customer Service Assistant', 'brilliant_sales'],
+                  ['Custom Setup', 'brilliant_custom'],
+                ].map(([label, context]) => (
                   <button
-                    key={label}
+                    key={context}
                     type="button"
+                    onClick={() => {
+                      setConversationMode(context)
+                      setActivePromptContext(context)
+                      setActivePromptLabel(label)
+                      setShowConversationMenu(false)
+                      setConversationMenuLane('selector')
+
+                      const setupMessage = `${label} is active.
+
+How should GEORGE assist?
+
+Choose below, then tell me who you are speaking with and what outcome matters most.`
+
+                      const assistantMessage: Message = {
+                        role: 'assistant',
+                        content: setupMessage,
+                      }
+
+                      setSuggestedPrompts([
+                        {
+                          label: 'Text Assist',
+                          text: 'Use Text Assist. Give me short onscreen guidance for this conversation.',
+                          context: `${context}_text`,
+                        },
+                        {
+                          label: 'Audio Assist',
+                          text: 'Use Audio Assist. Give me spoken help for earbud use when useful.',
+                          context: `${context}_audio`,
+                        },
+                        {
+                          label: 'Full Sentence',
+                          text: 'Use Full Sentence Assist. Give me exact lines I can say.',
+                          context: `${context}_sentences`,
+                        },
+                        {
+                          label: 'Silent Insight',
+                          text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
+                          context: `${context}_silent`,
+                        },
+                      ])
+
+                      const nextMessages = [...messagesRef.current, assistantMessage]
+                      setMessages(nextMessages)
+                      messagesRef.current = nextMessages
+                    }}
                     className="block w-full rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
                   >
                     {label}
@@ -3352,15 +3397,60 @@ I am listening now. Speak naturally. I will respond ${
             {conversationMenuLane === 'professional' && (
               <div className="space-y-2">
                 {[
-                  'Appointment Setting Partner',
-                  'Telemarketing Partner',
-                  'Fundraising / Donations Partner',
-                  'Script Building Partner',
-                  'Custom Setup',
-                ].map((label) => (
+                  ['Appointment Setting Partner', 'professional_appointment_setting'],
+                  ['Telemarketing Partner', 'professional_telemarketing'],
+                  ['Fundraising / Donations Partner', 'professional_fundraising'],
+                  ['Script Building Partner', 'professional_script_building'],
+                  ['Custom Setup', 'professional_custom'],
+                ].map(([label, context]) => (
                   <button
-                    key={label}
+                    key={context}
                     type="button"
+                    onClick={() => {
+                      setConversationMode(context)
+                      setActivePromptContext(context)
+                      setActivePromptLabel(label)
+                      setShowConversationMenu(false)
+                      setConversationMenuLane('selector')
+
+                      const setupMessage = `${label} is active.
+
+GEORGE will help with live responses, scripts, objections, and outcome-focused conversation support.
+
+Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE must respect.`
+
+                      const assistantMessage: Message = {
+                        role: 'assistant',
+                        content: setupMessage,
+                      }
+
+                      setSuggestedPrompts([
+                        {
+                          label: 'Text Assist',
+                          text: 'Use Text Assist. Give me short onscreen guidance for this professional conversation.',
+                          context: `${context}_text`,
+                        },
+                        {
+                          label: 'Audio Assist',
+                          text: 'Use Audio Assist. Give me spoken help for earbud use when useful.',
+                          context: `${context}_audio`,
+                        },
+                        {
+                          label: 'Full Sentence',
+                          text: 'Use Full Sentence Assist. Give me exact lines I can say.',
+                          context: `${context}_sentences`,
+                        },
+                        {
+                          label: 'Silent Insight',
+                          text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
+                          context: `${context}_silent`,
+                        },
+                      ])
+
+                      const nextMessages = [...messagesRef.current, assistantMessage]
+                      setMessages(nextMessages)
+                      messagesRef.current = nextMessages
+                    }}
                     className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
                   >
                     {label}
