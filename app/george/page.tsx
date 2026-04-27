@@ -3347,7 +3347,7 @@ setShowRecentFolders(false)
         <div className="absolute bottom-[52px] left-0 z-50 w-[min(340px,calc(100vw-28px))] rounded-[1.6rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">Active Campaign</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">Campaign / Script</div>
               <button type="button" onClick={() => setShowCampaignMenu(false)} className="text-white/45 transition hover:text-white">×</button>
             </div>
 
@@ -3369,7 +3369,14 @@ setShowRecentFolders(false)
                         : 'border-white/10 bg-white/[0.025] text-white/75 hover:border-[#7C8CFF]/35 hover:text-white'
                     }`}
                   >
-                    {campaign.name}
+                    <span className="flex items-center justify-between gap-3">
+                      <span>{campaign.name}</span>
+                      {activeCampaignId === campaign.id && (
+                        <span className="rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/15 px-2 py-0.5 text-[9px] uppercase tracking-[0.12em] text-[#D7DDFF]">
+                          Active
+                        </span>
+                      )}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -3379,27 +3386,51 @@ setShowRecentFolders(false)
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => {
-                const id = `campaign_${Date.now()}`
-                const campaign: GeorgeCampaign = {
-                  id,
-                  name: 'Starter Campaign',
-                  mode: 'solo',
-                  dataToPreserve: ['Scripts', 'Cues', 'Objections', 'Compliance', 'Guardrails', 'Follow-ups'],
-                  defaultAnswersEnabled: true,
-                }
-                setCampaigns((prev) => [campaign, ...prev])
-                setActiveCampaignId(id)
-                setShowCampaignMenu(false)
-                setToastMessage('Starter Campaign active')
-                setShowToast(true)
-              }}
-              className="min-h-[46px] w-full rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-3 py-2 text-[12px] font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18"
-            >
-              Create Starter Campaign
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const id = `campaign_${Date.now()}`
+                  const campaign: GeorgeCampaign = {
+                    id,
+                    name: 'Solo Starter',
+                    mode: 'solo',
+                    dataToPreserve: ['Scripts', 'Cues', 'Objections', 'Compliance', 'Guardrails', 'Follow-ups'],
+                    defaultAnswersEnabled: true,
+                  }
+                  setCampaigns((prev) => [campaign, ...prev])
+                  setActiveCampaignId(id)
+                  setShowCampaignMenu(false)
+                  setToastMessage('Solo Starter active')
+                  setShowToast(true)
+                }}
+                className="min-h-[46px] rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-3 py-2 text-[12px] font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18"
+              >
+                Solo Starter
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const id = `campaign_${Date.now()}`
+                  const campaign: GeorgeCampaign = {
+                    id,
+                    name: 'Team/Firm Starter',
+                    mode: 'firm',
+                    dataToPreserve: ['Scripts', 'Cues', 'Objections', 'Compliance', 'Guardrails', 'Follow-ups', 'Rep Usage', 'Outcomes'],
+                    defaultAnswersEnabled: true,
+                  }
+                  setCampaigns((prev) => [campaign, ...prev])
+                  setActiveCampaignId(id)
+                  setShowCampaignMenu(false)
+                  setToastMessage('Team/Firm Starter active')
+                  setShowToast(true)
+                }}
+                className="min-h-[46px] rounded-xl border border-[#22c55e]/35 bg-[#22c55e]/12 px-3 py-2 text-[12px] font-semibold text-white transition hover:border-[#22c55e]/60 hover:bg-[#22c55e]/18"
+              >
+                Team/Firm
+              </button>
+            </div>
           </div>
         </div>
       )}
