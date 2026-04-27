@@ -3611,7 +3611,9 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
                           e.currentTarget.value = ''
                         }}
                       />
-                      {activePromptContext?.startsWith('conversation_assist_') && (
+                      {(activePromptContext?.startsWith('conversation_assist_') ||
+                        activePromptContext?.startsWith('brilliant_') ||
+                        activePromptContext?.startsWith('professional_')) && (
                         <div className="mb-2 rounded-2xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/10 p-2">
                           <div className="mb-1.5 flex items-center justify-between gap-2">
                             <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">
@@ -3635,10 +3637,12 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
 
                           <div className="flex gap-1.5 overflow-x-auto">
                             {[
-                              ['Text Assist', false, 'Onscreen guidance'],
-                              ['Audio Assist', true, 'Earbud / spoken help'],
-                              ['Full Sentence', false, 'Exact words to say'],
-                              ['Silent Insight', false, 'Later critique / key alerts only'],
+                              ['Text Output', false, 'Show guidance on screen'],
+                              ['Audio Output', true, 'Speak guidance through earbuds'],
+                              ['Short', false, 'Brief in-the-moment help'],
+                              ['Full', false, 'Exact full sentence to say'],
+                              ['Questions', false, 'Probing questions to ask'],
+                              ['Silent', false, 'Only key alerts / later critique'],
                             ].map(([label, audio, hint]) => (
                               <button
                                 key={String(label)}
@@ -3649,7 +3653,11 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
                                   const labelText = String(label)
                                   const wantsAudio = Boolean(audio)
                                   setActivePromptLabel(labelText)
-                                  setActivePromptContext(`conversation_assist_${labelText.toLowerCase().replace(/ /g, '_')}`)
+                                  setActivePromptContext(
+                                    activePromptContext?.startsWith('professional_') || activePromptContext?.startsWith('brilliant_')
+                                      ? `${activePromptContext}_${labelText.toLowerCase().replace(/ /g, '_')}`
+                                      : `conversation_assist_${labelText.toLowerCase().replace(/ /g, '_')}`
+                                  )
                                   setVoiceOn(wantsAudio)
                                   setInteractionMode('speech')
                                   window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
