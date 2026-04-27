@@ -3680,7 +3680,11 @@ setShowRecentFolders(false)
               <>
                 <button
                   type="button"
-                  onClick={() => setConversationMenuLane('personal')}
+                  onClick={() => {
+                      setConversationMenuLane('personal')
+                      setToastMessage('Welcome to Conversation Assistance.')
+                      setShowToast(true)
+                    }}
                   className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-white/[0.025] px-4 py-4 text-left text-[15px] text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
                 >
                   <div className="flex items-center justify-between">
@@ -3698,7 +3702,11 @@ setShowRecentFolders(false)
 
                 <button
                   type="button"
-                  onClick={() => setConversationMenuLane('professional')}
+                  onClick={() => {
+                      setConversationMenuLane('professional')
+                      setToastMessage('Professional mode. Outcomes matter.')
+                      setShowToast(true)
+                    }}
                   className="block w-full rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-4 py-4 text-left text-[15px] text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/15 hover:text-white"
                 >
                   <div className="flex items-center justify-between">
@@ -3736,6 +3744,10 @@ setShowRecentFolders(false)
                       window.localStorage.setItem('george_active_label', label)
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
+                      setToastMessage(`${label} ready.`)
+                      setShowToast(true)
+                      setToastMessage(`${label} ready.`)
+                      setShowToast(true)
 
                       const setupMessage = `${label} is active.
 
