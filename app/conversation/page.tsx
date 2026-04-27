@@ -95,6 +95,20 @@ export default function ConversationPage() {
 
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">
+            Change GEORGE Mid-Conversation
+          </h2>
+
+          <div className="space-y-2 text-neutral-300">
+            <p>Start with repeatable lines.</p>
+            <p>Switch to short cues.</p>
+            <p>Move into negotiation mode.</p>
+            <p>Turn audio on or off.</p>
+            <p>GEORGE keeps your campaign, script, and guardrails active while changing how it helps.</p>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+          <h2 className="mb-4 text-xl font-semibold text-white">
             Return Fast
           </h2>
 
