@@ -2798,42 +2798,92 @@ I am listening now. Speak naturally. I will respond ${
           )}
 
           {activePromptContext && (
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              {['Text','Audio','Short','Full','Questions','Silent','Exit'].map((label) => (
+            <div className="relative flex flex-wrap items-center gap-1.5 text-[11px]">
+              {conversationSetupPopup && (
                 <button
-                  key={label}
                   type="button"
-                  onClick={() => {
-                    if (label === 'Exit') {
-                      stopListening()
-                      setVoiceOn(false)
-                      setInteractionMode('text')
-                      setActivePromptContext(null)
-                      setActivePromptLabel(null)
-                      window.localStorage.removeItem('george_active_context')
-                      window.localStorage.removeItem('george_active_label')
-                      window.localStorage.setItem('george_voice','off')
-                      return
-                    }
+                  aria-label="Close conversation setup"
+                  onClick={() => setConversationSetupPopup(null)}
+                  className="fixed inset-0 z-[80] bg-black/45 backdrop-blur-[2px]"
+                />
+              )}
 
-                    const wantsAudio = label === 'Audio'
-                    setVoiceOn(wantsAudio)
-                    setInteractionMode('speech')
-                    setActivePromptLabel(label)
-                    window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
-                    setTimeout(() => startListening(), 120)
-                  }}
-                  className={`rounded-full border px-3 py-1.5 transition ${
-                    label === 'Exit'
-                      ? 'border-red-400/25 bg-red-500/10 text-red-200'
-                      : activePromptLabel === label
-                      ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/20 text-white'
-                      : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/10 text-white/80'
-                  }`}
-                >
-                  {label}
-                </button>
+              {[
+                ['Text Response', 'text'],
+                ['Audio Response', 'audio'],
+              ].map(([label, output]) => (
+                <div key={label} className="relative">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      const rect = event.currentTarget.getBoundingClientRect()
+                      const roomAbove = rect.top
+                      const roomBelow = window.innerHeight - rect.bottom
+                      setConversationSetupPopup({
+                        output: output as 'text' | 'audio',
+                        direction: roomAbove > 180 || roomAbove > roomBelow ? 'up' : 'down',
+                      })
+                    }}
+                    className={`rounded-full border px-3 py-1.5 transition ${
+                      (output === 'audio' && voiceOn) || (output === 'text' && !voiceOn)
+                        ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/20 text-white'
+                        : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/10 text-white/80'
+                    }`}
+                  >
+                    {label}
+                  </button>
+
+                  {conversationSetupPopup?.output === output && (
+                    <div
+                      className={`absolute left-0 z-[90] w-48 rounded-2xl border border-[#7C8CFF]/25 bg-neutral-950/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_24px_rgba(124,140,255,0.14)] backdrop-blur-xl ${
+                        conversationSetupPopup.direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+                      }`}
+                    >
+                      {[
+                        ['Short cues', 'short'],
+                        ['Repeatable sentence', 'full'],
+                        ['Question to ask', 'questions'],
+                        ['Silent insight', 'silent'],
+                      ].map(([styleLabel, style]) => (
+                        <button
+                          key={style}
+                          type="button"
+                          onClick={() => {
+                            const wantsAudio = output === 'audio'
+                            setVoiceOn(wantsAudio)
+                            setInteractionMode('speech')
+                            setActivePromptLabel(`${label}: ${styleLabel}`)
+                            window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
+                            setConversationSetupPopup(null)
+                            setTimeout(() => startListening(), 120)
+                          }}
+                          className="block w-full rounded-xl px-3 py-2 text-left text-[11px] text-white/80 transition hover:bg-[#7C8CFF]/12 hover:text-white"
+                        >
+                          {styleLabel}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
+
+              <button
+                type="button"
+                onClick={() => {
+                  stopListening()
+                  setVoiceOn(false)
+                  setInteractionMode('text')
+                  setActivePromptContext(null)
+                  setActivePromptLabel(null)
+                  setConversationSetupPopup(null)
+                  window.localStorage.removeItem('george_active_context')
+                  window.localStorage.removeItem('george_active_label')
+                  window.localStorage.setItem('george_voice','off')
+                }}
+                className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition"
+              >
+                Exit
+              </button>
             </div>
           )}
 
