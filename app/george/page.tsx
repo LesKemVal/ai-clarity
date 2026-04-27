@@ -2840,7 +2840,13 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {isLatestAssistant && !m.content.includes('What do you want to accomplish today?') && (
+      {isLatestAssistant &&
+        !m.content.includes('What do you want to accomplish today?') &&
+        (
+          activePromptContext?.startsWith('conversation_assist_') ||
+          activePromptContext?.startsWith('professional_') ||
+          activePromptContext?.startsWith('brilliant_')
+        ) && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
