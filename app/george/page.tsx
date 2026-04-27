@@ -3258,7 +3258,7 @@ I am listening now. Speak naturally. I will respond ${
             </div>
 
             {getExistingFolders().length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {getExistingFolders().map((folder) => (
                   <button
                     key={folder}
@@ -3476,8 +3476,8 @@ I am listening now. Speak naturally. I will respond ${
             onClick={() => setShowConversationMenu(false)}
             className="fixed inset-0 z-[70] bg-black/35 backdrop-blur-[2px]"
           />
-          <div className="absolute bottom-[52px] left-0 z-[80] w-[270px] rounded-2xl border border-[#7C8CFF]/30 bg-[radial-gradient(circle_at_top_left,rgba(124,140,255,0.16),transparent_38%),linear-gradient(180deg,rgba(18,18,22,0.97),rgba(6,6,9,0.99))] p-3 shadow-[0_24px_70px_rgba(0,0,0,0.62),0_0_28px_rgba(124,140,255,0.14)] backdrop-blur-xl">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="absolute bottom-[58px] left-0 z-[80] w-[340px] max-w-[92vw] rounded-[1.7rem] border border-[#7C8CFF]/32 bg-[radial-gradient(circle_at_top_left,rgba(124,140,255,0.18),transparent_40%),linear-gradient(180deg,rgba(18,18,24,0.985),rgba(6,6,10,0.995))] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.70),0_0_34px_rgba(124,140,255,0.16)] backdrop-blur-2xl">
+          <div className="mb-4 flex items-center justify-between">
             <span className="text-[10px] uppercase tracking-[0.16em] text-[#D7DDFF]">Conversation Assistance</span>
             <button type="button" onClick={() => setShowConversationMenu(false)} className="text-white/45 transition hover:text-white">×</button>
           </div>
@@ -3487,7 +3487,7 @@ I am listening now. Speak naturally. I will respond ${
                 <button
                   type="button"
                   onClick={() => setConversationMenuLane('personal')}
-                  className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-white/[0.025] px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
+                  className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-white/[0.025] px-4 py-4 text-left text-[15px] text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-white">Personal</span>
@@ -3504,7 +3504,7 @@ I am listening now. Speak naturally. I will respond ${
                 <button
                   type="button"
                   onClick={() => setConversationMenuLane('professional')}
-                  className="block w-full rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-3 py-3 text-left text-sm text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/15 hover:text-white"
+                  className="block w-full rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-4 py-4 text-left text-[15px] text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/15 hover:text-white"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-white">Professional</span>
@@ -3594,7 +3594,7 @@ Choose below, then tell me who you are speaking with and what outcome matters mo
                       setMessages(nextMessages)
                       messagesRef.current = nextMessages
                     }}
-                    className="block w-full rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
+                    className="block w-full rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3.5 text-left text-[15px] text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
                   >
                     {label}
                   </button>
@@ -3676,7 +3676,7 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
                       setMessages(nextMessages)
                       messagesRef.current = nextMessages
                     }}
-                    className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
+                    className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-4 py-3.5 text-left text-[15px] text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
                   >
                     {label}
                   </button>
