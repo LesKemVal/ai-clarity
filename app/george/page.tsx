@@ -2828,10 +2828,10 @@ I am listening now. Speak naturally. I will respond ${
                         direction: roomAbove > 180 || roomAbove > roomBelow ? 'up' : 'down',
                       })
                     }}
-                    className={`rounded-full border px-3 py-1.5 transition ${
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] transition ${
                       (output === 'audio' && voiceOn) || (output === 'text' && !voiceOn)
-                        ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/20 text-white'
-                        : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/10 text-white/80'
+                        ? 'border-[#7C8CFF]/85 bg-[#7C8CFF]/25 text-white shadow-[0_0_18px_rgba(124,140,255,0.22)]'
+                        : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/8 text-white/65 hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white'
                     }`}
                   >
                     {label}
@@ -2861,9 +2861,18 @@ I am listening now. Speak naturally. I will respond ${
                             setConversationSetupPopup(null)
                             setTimeout(() => startListening(), 120)
                           }}
-                          className="block w-full rounded-xl px-3 py-2 text-left text-[11px] text-white/80 transition hover:bg-[#7C8CFF]/12 hover:text-white"
+                          className={`block w-full rounded-xl border px-3 py-2 text-left text-[11px] font-medium transition ${
+                            activePromptLabel === `${label}: ${styleLabel}`
+                              ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/18 text-white shadow-[0_0_16px_rgba(124,140,255,0.16)]'
+                              : 'border-transparent text-white/72 hover:border-[#7C8CFF]/20 hover:bg-[#7C8CFF]/12 hover:text-white'
+                          }`}
                         >
-                          {styleLabel}
+                          <span className="flex items-center justify-between gap-3">
+                            <span>{styleLabel}</span>
+                            {activePromptLabel === `${label}: ${styleLabel}` && (
+                              <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
+                            )}
+                          </span>
                         </button>
                       ))}
                     </div>
