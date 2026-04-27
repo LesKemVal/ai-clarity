@@ -228,32 +228,48 @@ export default function Sidebar({
                   </span>
                 </button>
 
-                {currentTier === 'brilliant' ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handlePromptTap({
-                        label: 'Live Conversation',
-                        text: 'Set GEORGE for live conversation support. Help me think, respond, and hold leverage in real time.',
-                        context: 'brilliant_live_conversation',
-                      })
-                    }
-                    className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition hover:border-[#7C8CFF]/45"
-                  >
-                    Live Conversation
-                  </button>
-                ) : (
+                <div className="space-y-2">
+                  {currentTier === 'brilliant' ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handlePromptTap({
+                          label: 'Personal Conversation Assistance',
+                          text: 'Set GEORGE for personal live conversation support. Help me think, respond, and hold leverage in real time.',
+                          context: 'brilliant_live_conversation',
+                        })
+                      }
+                      title="Live personal guidance, cues, timing, and exact lines."
+                      className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition hover:border-[#7C8CFF]/45"
+                    >
+                      Personal Conversation Assistance
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => window.open('/top-up', '_blank')}
+                      title="Buy Conversation Engine and unlock Brilliant automatically."
+                      className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                    >
+                      Personal Conversation Assistance
+                      <span className="ml-2 text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
+                        Upgrade
+                      </span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => window.open('/top-up', '_blank')}
-                    className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-400 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                    title="For sales reps, firms, callers, campaigns, live scripts, analytics, and team use. Purchase auto-upgrades access."
+                    className="block w-full rounded-xl border border-[#7C8CFF]/18 bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-white/88 transition hover:border-[#7C8CFF]/40 hover:text-white"
                   >
-                    Live Conversation
+                    Pro Conversation Partner
                     <span className="ml-2 text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
-                      Brilliant
+                      Any Tier
                     </span>
                   </button>
-                )}
+                </div>
               </div>
             )}
           </section>
