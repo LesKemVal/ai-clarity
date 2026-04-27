@@ -3330,14 +3330,42 @@ I am listening now. Speak naturally. I will respond ${
             )}
 
             {conversationMenuLane === 'personal' && (
-              <div className="rounded-xl border border-white/10 bg-white/[0.025] px-3 py-3 text-xs leading-5 text-white/70">
-                Personal conversation styles will open here next.
+              <div className="space-y-2">
+                {[
+                  'Everyday Conversation Assistant',
+                  'Negotiation Assistant',
+                  'Job Interview Assistant',
+                  'Sales / Customer Service Assistant',
+                  'Custom Setup',
+                ].map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className="block w-full rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             )}
 
             {conversationMenuLane === 'professional' && (
-              <div className="rounded-xl border border-[#22c55e]/25 bg-[#22c55e]/10 px-3 py-3 text-xs leading-5 text-white/70">
-                Professional setup and firm conversation styles will open here next.
+              <div className="space-y-2">
+                {[
+                  'Appointment Setting Partner',
+                  'Telemarketing Partner',
+                  'Fundraising / Donations Partner',
+                  'Script Building Partner',
+                  'Custom Setup',
+                ].map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-3 py-2.5 text-left text-sm text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             )}
           </div>
