@@ -2779,7 +2779,7 @@ return (
         )}
       </div>
 
-      {m.role === 'assistant' && m.content.includes('How should GEORGE assist?') && (
+      {false && m.role === 'assistant' && m.content.includes('How should GEORGE assist?') && (
         <div className="flex flex-wrap gap-2">
           {[
             ['Text Assist', 'Use Text Assist. Give me short onscreen guidance for this conversation.'],
@@ -2840,7 +2840,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {isLatestAssistant && !m.content.includes('What do you want to accomplish today?') && !m.content.includes('How should GEORGE assist?') && (
+      {isLatestAssistant && !m.content.includes('What do you want to accomplish today?') && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -2867,8 +2867,8 @@ I am listening now. Speak naturally. I will respond ${
               )}
 
               {[
-                ['Text Response', 'text'],
-                ['Audio Response', 'audio'],
+                ['Text Assist', 'text'],
+                ['Audio Assist', 'audio'],
               ].map(([label, output]) => (
                 <div key={label} className="relative">
                   <button
@@ -3642,6 +3642,7 @@ I am listening now. Speak naturally. I will respond ${
                     <span className="flex items-center gap-1">
                       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse"></span>
                       <span className="h-1 w-1 rounded-full bg-[#7C8CFF]/70 animate-pulse"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#7C8CFF]/45 animate-pulse"></span>
                     </span>
                   </div>
                   <span className="mt-1 block text-[11px] text-white/55">
@@ -3659,6 +3660,7 @@ I am listening now. Speak naturally. I will respond ${
                     <span className="flex items-center gap-1">
                       <span className="h-1 w-1 rounded-full bg-[#22c55e] animate-pulse"></span>
                       <span className="h-1 w-1 rounded-full bg-[#22c55e]/70 animate-pulse"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#22c55e]/45 animate-pulse"></span>
                     </span>
                   </div>
                   <span className="mt-1 block text-[11px] text-white/55">
