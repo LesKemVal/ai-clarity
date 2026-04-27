@@ -21,6 +21,20 @@ type PromptSelection = {
   context: string
 }
 
+type GeorgeCampaign = {
+  id: string
+  name: string
+  mode: 'solo' | 'firm'
+  productOrService?: string
+  targetMarket?: string
+  callingFromRegion?: string
+  callingToRegion?: string
+  desiredOutcome?: string
+  complianceBoundaries?: string
+  dataToPreserve?: string[]
+  defaultAnswersEnabled: boolean
+}
+
 const REROUTE_PROMPT: PromptSelection = {
   label: 'New strategy',
   text: 'Give me a new strategy from where I am now.',
@@ -491,6 +505,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
   const [activePromptLabel, setActivePromptLabel] = useState<string | null>(null)
   const [activePromptContext, setActivePromptContext] = useState<string | null>(null)
+  const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
+  const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
+  const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const [conversationSetupPopup, setConversationSetupPopup] = useState<null | {
     output: 'text' | 'audio'
     direction: 'up' | 'down'
@@ -2170,6 +2187,8 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
             isFirstSession: updatedMessages.length <= 2,
             promptContext: activePromptContext,
             promptLabel: activePromptLabel,
+            activeCampaign,
+            campaignDefaultsEnabled: activeCampaign?.defaultAnswersEnabled ?? true,
             contextTurnCount,
             tier: currentTier,
           }),
