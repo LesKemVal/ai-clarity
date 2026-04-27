@@ -511,6 +511,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [activePromptContext, setActivePromptContext] = useState<string | null>(null)
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
+  const [showCampaignMenu, setShowCampaignMenu] = useState(false)
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const [conversationSetupPopup, setConversationSetupPopup] = useState<null | {
     output: 'text' | 'audio'
@@ -585,6 +586,36 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   useEffect(() => {
     setSuggestedPrompts(tieredStarterPrompts)
   }, [tieredStarterPrompts])
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const savedCampaigns = JSON.parse(window.localStorage.getItem('GEORGE_CAMPAIGNS') || '[]')
+      const savedActiveCampaignId = window.localStorage.getItem('GEORGE_ACTIVE_CAMPAIGN_ID')
+
+      if (Array.isArray(savedCampaigns)) {
+        setCampaigns(savedCampaigns)
+      }
+
+      if (savedActiveCampaignId) {
+        setActiveCampaignId(savedActiveCampaignId)
+      }
+    } catch {
+      setCampaigns([])
+      setActiveCampaignId(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('GEORGE_CAMPAIGNS', JSON.stringify(campaigns))
+
+    if (activeCampaignId) {
+      window.localStorage.setItem('GEORGE_ACTIVE_CAMPAIGN_ID', activeCampaignId)
+    } else {
+      window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_ID')
+    }
+  }, [campaigns, activeCampaignId])
   const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
@@ -3261,6 +3292,23 @@ I am listening now. Speak naturally. I will respond ${
         type="button"
         onClick={(e) => {
           e.stopPropagation()
+          setShowCampaignMenu((prev) => !prev)
+          setShowRecentFolders(false)
+        }}
+        className={`relative flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold tracking-[0.08em] transition ${
+          activeCampaign
+            ? 'border-[#7C8CFF]/45 bg-[#7C8CFF]/16 text-white shadow-[0_0_18px_rgba(124,140,255,0.14)]'
+            : 'border-white/10 bg-white/[0.03] text-white/75 hover:border-[#7C8CFF]/35 hover:text-white'
+        }`}
+        aria-label="Open campaign selector"
+      >
+        {activeCampaign ? activeCampaign.name : 'Campaign'}
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
           setShowRecentFolders((prev) => !prev)
           setActiveMemoryFolder(null)
         }}
@@ -3284,6 +3332,67 @@ I am listening now. Speak naturally. I will respond ${
         >
           LIVE
         </button>
+      )}
+
+      {showCampaignMenu && (
+        <div className="absolute bottom-[52px] left-0 z-50 w-[min(340px,calc(100vw-28px))] rounded-[1.6rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">Active Campaign</div>
+              <button type="button" onClick={() => setShowCampaignMenu(false)} className="text-white/45 transition hover:text-white">×</button>
+            </div>
+
+            {campaigns.length > 0 ? (
+              <div className="space-y-1.5">
+                {campaigns.map((campaign) => (
+                  <button
+                    key={campaign.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveCampaignId(campaign.id)
+                      setShowCampaignMenu(false)
+                      setToastMessage(`${campaign.name} active`)
+                      setShowToast(true)
+                    }}
+                    className={`min-h-[44px] w-full rounded-xl border px-3 py-2 text-left text-[12px] font-semibold transition ${
+                      activeCampaignId === campaign.id
+                        ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/18 text-white'
+                        : 'border-white/10 bg-white/[0.025] text-white/75 hover:border-[#7C8CFF]/35 hover:text-white'
+                    }`}
+                  >
+                    {campaign.name}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-[12px] leading-5 text-white/65">
+                No campaign yet. Create a starter campaign and GEORGE will use defaults until you refine it.
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                const id = `campaign_${Date.now()}`
+                const campaign: GeorgeCampaign = {
+                  id,
+                  name: 'Starter Campaign',
+                  mode: 'solo',
+                  dataToPreserve: ['Scripts', 'Cues', 'Objections', 'Compliance', 'Guardrails', 'Follow-ups'],
+                  defaultAnswersEnabled: true,
+                }
+                setCampaigns((prev) => [campaign, ...prev])
+                setActiveCampaignId(id)
+                setShowCampaignMenu(false)
+                setToastMessage('Starter Campaign active')
+                setShowToast(true)
+              }}
+              className="min-h-[46px] w-full rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/12 px-3 py-2 text-[12px] font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/18"
+            >
+              Create Starter Campaign
+            </button>
+          </div>
+        </div>
       )}
 
       {showRecentFolders && (
