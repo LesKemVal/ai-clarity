@@ -2222,7 +2222,11 @@ return true
       } finally {
         setIsThinking(false)
 
-        if (activePromptContext?.startsWith('conversation_assist_')) {
+        if (
+          activePromptContext?.startsWith('conversation_assist_') ||
+          activePromptContext?.startsWith('professional_') ||
+          activePromptContext?.startsWith('brilliant_')
+        ) {
           setTimeout(() => {
             startListening()
           }, 700)
