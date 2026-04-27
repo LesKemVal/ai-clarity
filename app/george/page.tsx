@@ -491,6 +491,10 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
   const [activePromptLabel, setActivePromptLabel] = useState<string | null>(null)
   const [activePromptContext, setActivePromptContext] = useState<string | null>(null)
+  const [conversationSetupPopup, setConversationSetupPopup] = useState<null | {
+    output: 'text' | 'audio'
+    direction: 'up' | 'down'
+  }>(null)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
