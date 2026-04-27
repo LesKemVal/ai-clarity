@@ -731,6 +731,13 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     if (validTier) {
       setCurrentTier(tierParam)
+
+      if (subStatus === 'success') {
+        setToastMessage(`${tierParam.charAt(0).toUpperCase() + tierParam.slice(1)} is active.`)
+        setShowToast(true)
+        window.history.replaceState({}, '', window.location.pathname)
+      }
+
       return
     }
 
