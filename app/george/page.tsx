@@ -768,6 +768,66 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       })
   }, [])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const savedContext = window.localStorage.getItem('george_active_context')
+    const savedLabel = window.localStorage.getItem('george_active_label')
+    const savedVoice = window.localStorage.getItem('george_voice')
+
+    if (
+      savedContext &&
+      (
+        savedContext.startsWith('conversation_assist_') ||
+        savedContext.startsWith('brilliant_') ||
+        savedContext.startsWith('professional_')
+      )
+    ) {
+      setActivePromptContext(savedContext)
+      setConversationMode(savedContext)
+    }
+
+    if (savedLabel) {
+      setActivePromptLabel(savedLabel)
+    }
+
+    if (savedVoice === 'on') {
+      setVoiceOn(true)
+      setInteractionMode('speech')
+      setTimeout(() => startListening(), 900)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const savedContext = window.localStorage.getItem('george_active_context')
+    const savedLabel = window.localStorage.getItem('george_active_label')
+    const savedVoice = window.localStorage.getItem('george_voice')
+
+    if (
+      savedContext &&
+      (
+        savedContext.startsWith('conversation_assist_') ||
+        savedContext.startsWith('brilliant_') ||
+        savedContext.startsWith('professional_')
+      )
+    ) {
+      setActivePromptContext(savedContext)
+      setConversationMode(savedContext)
+    }
+
+    if (savedLabel) {
+      setActivePromptLabel(savedLabel)
+    }
+
+    if (savedVoice === 'on') {
+      setVoiceOn(true)
+      setInteractionMode('speech')
+      setTimeout(() => startListening(), 900)
+    }
+  }, [])
+
 
 
 
@@ -3356,6 +3416,8 @@ I am listening now. Speak naturally. I will respond ${
                       setConversationMode(context)
                       setActivePromptContext(context)
                       setActivePromptLabel(label)
+                      window.localStorage.setItem('george_active_context', context)
+                      window.localStorage.setItem('george_active_label', label)
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
 
@@ -3436,6 +3498,8 @@ Choose below, then tell me who you are speaking with and what outcome matters mo
                       setConversationMode(context)
                       setActivePromptContext(context)
                       setActivePromptLabel(label)
+                      window.localStorage.setItem('george_active_context', context)
+                      window.localStorage.setItem('george_active_label', label)
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
 
@@ -3634,6 +3698,10 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
                                 setInteractionMode('text')
                                 setActivePromptContext(null)
                                 setActivePromptLabel(null)
+                                window.localStorage.removeItem('george_active_context')
+                                window.localStorage.removeItem('george_active_label')
+                                window.localStorage.removeItem('george_active_context')
+                                window.localStorage.removeItem('george_active_label')
                                 window.localStorage.setItem('george_voice', 'off')
                               }}
                               className="text-[10px] uppercase tracking-[0.14em] text-white/45 transition hover:text-white"
