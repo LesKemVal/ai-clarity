@@ -28,6 +28,12 @@ export default function TopUpPage() {
     if (intent === 'make-george-yours') {
       return 'Make GEORGE yours.'
     }
+    if (intent === 'conversation') {
+      return 'Activate Conversation Engine.'
+    }
+    if (intent === 'pro') {
+      return 'Activate Pro Conversation Partner.'
+    }
     return 'BRANESx is in beta.'
   }, [intent])
 
@@ -74,7 +80,13 @@ export default function TopUpPage() {
     if (intent === 'make-george-yours') {
       return 'Choose GEORGE / GEORGette, personalize voice, and access future continuity features during beta as well as production. Early users get early access as the system improves for you—and for others who may need GEORGE most.'
     }
-    return 'Paid access is not live yet. Use GEORGE now, join the waitlist, and help make GEORGE better before launch.'
+    if (intent === 'conversation') {
+      return 'Conversation Engine unlocks Brilliant-level live assistance: cues, exact lines, timing, and pressure support when words matter.'
+    }
+    if (intent === 'pro') {
+      return 'Pro Conversation Partner is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
+    }
+    return 'Paid access is opening through Stripe checkout. Use GEORGE now, upgrade when ready, and help make GEORGE better before launch.'
   }, [intent])
 
   async function joinWaitlist() {
@@ -133,6 +145,29 @@ export default function TopUpPage() {
     setFeedback('')
   }
 
+  async function startCheckout(tier: 'intelligent' | 'brilliant') {
+    try {
+      setMessage('Opening secure checkout...')
+
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data?.url) {
+        setMessage(data?.error || 'Unable to start checkout right now.')
+        return
+      }
+
+      window.location.href = data.url
+    } catch {
+      setMessage('Unable to start checkout right now.')
+    }
+  }
+
   function jumpTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -189,6 +224,13 @@ export default function TopUpPage() {
                   <li>• Cleaner plans and sharper framing</li>
                   <li>• Built for active goals</li>
                 </ul>
+                <button
+                  type="button"
+                  onClick={() => startCheckout('intelligent')}
+                  className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
+                >
+                  Start Intelligent
+                </button>
               </div>
 
               <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
@@ -205,6 +247,13 @@ export default function TopUpPage() {
                   <li>• Campaign memory + caller reset</li>
                   <li>• Built for measurable outcomes</li>
                 </ul>
+                <button
+                  type="button"
+                  onClick={() => startCheckout('brilliant')}
+                  className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
+                >
+                  Activate Pro
+                </button>
               </div>
 
               <div className="rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
@@ -221,6 +270,13 @@ export default function TopUpPage() {
                   <li>• Live cues and room reading</li>
                   <li>• Real-time pressure support</li>
                 </ul>
+                <button
+                  type="button"
+                  onClick={() => startCheckout('brilliant')}
+                  className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                >
+                  Start Brilliant
+                </button>
               </div>
             </div>
 
