@@ -2786,7 +2786,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {isLatestAssistant && !m.content.includes('How should GEORGE assist?') && (
+      {isLatestAssistant && !m.content.includes('What do you want to accomplish today?') && !m.content.includes('How should GEORGE assist?') && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
