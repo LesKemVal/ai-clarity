@@ -727,10 +727,12 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     const params = new URLSearchParams(window.location.search)
     const tierParam = params.get('tier')
     const subStatus = params.get('subscription')
+    const savedTier = window.localStorage.getItem('george_tier')
     const validTier = tierParam === 'smart' || tierParam === 'intelligent' || tierParam === 'brilliant'
 
     if (validTier) {
       setCurrentTier(tierParam)
+      window.localStorage.setItem('george_tier', tierParam)
 
       if (subStatus === 'success') {
         setToastMessage(`${tierParam.charAt(0).toUpperCase() + tierParam.slice(1)} is active.`)
@@ -738,6 +740,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         window.history.replaceState({}, '', window.location.pathname)
       }
 
+      return
+    }
+
+    if (savedTier === 'intelligent' || savedTier === 'brilliant') {
+      setCurrentTier(savedTier)
       return
     }
 
