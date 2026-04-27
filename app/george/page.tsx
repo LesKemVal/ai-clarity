@@ -3312,7 +3312,11 @@ I am listening now. Speak naturally. I will respond ${
           setShowRecentFolders((prev) => !prev)
           setActiveMemoryFolder(null)
         }}
-        className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
+        className={`relative flex h-9 w-9 items-center justify-center transition ${
+(activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live'))
+? 'text-[#7C8CFF] drop-shadow-[0_0_8px_rgba(124,140,255,0.55)]'
+: 'text-white/85 hover:text-white'
+}` }
         aria-label="Open memory folders"
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3323,7 +3327,12 @@ I am listening now. Speak naturally. I will respond ${
       {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
         <button
           type="button"
-          onClick={() => setLiveMode((prev) => !prev)}
+          onClick={() => {
+setLiveMode(true)
+setShowConversationMenu(true)
+setShowCampaignMenu(false)
+setShowRecentFolders(false)
+}}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
               ? 'border border-[#7C8CFF]/40 bg-[#7C8CFF]/20 text-[#7C8CFF]'
