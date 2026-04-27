@@ -2793,6 +2793,46 @@ I am listening now. Speak naturally. I will respond ${
             </div>
           )}
 
+          {activePromptContext && (
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+              {['Text','Audio','Short','Full','Questions','Silent','Exit'].map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    if (label === 'Exit') {
+                      stopListening()
+                      setVoiceOn(false)
+                      setInteractionMode('text')
+                      setActivePromptContext(null)
+                      setActivePromptLabel(null)
+                      window.localStorage.removeItem('george_active_context')
+                      window.localStorage.removeItem('george_active_label')
+                      window.localStorage.setItem('george_voice','off')
+                      return
+                    }
+
+                    const wantsAudio = label === 'Audio'
+                    setVoiceOn(wantsAudio)
+                    setInteractionMode('speech')
+                    setActivePromptLabel(label)
+                    window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
+                    setTimeout(() => startListening(), 120)
+                  }}
+                  className={`rounded-full border px-3 py-1.5 transition ${
+                    label === 'Exit'
+                      ? 'border-red-400/25 bg-red-500/10 text-red-200'
+                      : activePromptLabel === label
+                      ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/20 text-white'
+                      : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/10 text-white/80'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className={`flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400 ${
             activePromptContext
               ? 'hidden'
