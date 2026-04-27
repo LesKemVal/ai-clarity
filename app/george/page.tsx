@@ -3545,7 +3545,7 @@ I am listening now. Speak naturally. I will respond ${
 
 How should GEORGE assist?
 
-Choose below, then tell me who you are speaking with and what outcome matters most.`
+Choose below, then tell me who is your target market, where are they, and what outcome matters most.`
 
                       const assistantMessage: Message = {
                         role: 'assistant',
@@ -3627,7 +3627,7 @@ Choose below, then tell me who you are speaking with and what outcome matters mo
 
 GEORGE will help with live responses, scripts, objections, and outcome-focused conversation support.
 
-Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE must respect.`
+Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE and user must respect.`
 
                       const assistantMessage: Message = {
                         role: 'assistant',
