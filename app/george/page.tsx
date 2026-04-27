@@ -2695,7 +2695,11 @@ return (
   )}
   {messages
   .filter((m) => m.role !== 'system')
-  .map((m, i) => (
+  .map((m, i, visibleMessages) => {
+    const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
+    const isLatestAssistant = m.role === 'assistant' && i === latestAssistantIndex
+
+    return (
     <div
       key={i}
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -2782,7 +2786,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {m.role === 'assistant' && !m.content.includes('How should GEORGE assist?') && (
+      {isLatestAssistant && !m.content.includes('How should GEORGE assist?') && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -3100,7 +3104,8 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
     </div>
-  ))}
+    )
+  })}
   <div ref={messagesEndRef} />
 </div>
 
