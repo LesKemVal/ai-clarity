@@ -2793,7 +2793,11 @@ I am listening now. Speak naturally. I will respond ${
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400">
+          <div className={`flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400 ${
+            activePromptContext
+              ? 'hidden'
+              : ''
+          }`}>
             <button
               type="button"
               onClick={(event) => {
