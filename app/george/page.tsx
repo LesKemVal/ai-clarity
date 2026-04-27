@@ -3062,11 +3062,27 @@ I am listening now. Speak naturally. I will respond ${
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute left-0 z-30 w-[184px] max-w-[62vw] rounded-[16px] border border-white/10 bg-black/95 p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl ${savePopupUpward ? 'bottom-full mb-2' : 'top-full mt-2'}` }
+              className={`absolute z-30 w-[min(300px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-0 mb-3 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'}` }
             >
               <div className="space-y-1.5">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-                  Save memory
+                <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
+                  Save for repetition
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5">
+                  {['Scripts', 'Cues', 'Objections', 'Compliance', 'Do Not Claim', 'Follow-ups'].map((folder) => (
+                    <button
+                      key={folder}
+                      type="button"
+                      onClick={() => {
+                        setActiveMemoryFolder(folder)
+                        saveMemory(m, i, folder)
+                      }}
+                      className="min-h-[42px] rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/8 px-2 py-2 text-[11px] font-semibold text-white/82 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white"
+                    >
+                      {folder}
+                    </button>
+                  ))}
                 </div>
 
                 <button
@@ -3076,7 +3092,7 @@ I am listening now. Speak naturally. I will respond ${
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-2 text-[11px] leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
+                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
                 >
                   Save to {getDefaultFolder()}
                 </button>
