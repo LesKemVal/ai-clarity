@@ -3361,19 +3361,34 @@ Choose below, then tell me who you are speaking with and what outcome matters mo
 
                       setSuggestedPrompts([
                         {
-                          label: 'Text Assist',
-                          text: 'Use Text Assist. Give me short onscreen guidance for this conversation.',
+                          label: 'Text Help',
+                          text: 'Use Text Help. Give me short onscreen guidance for this conversation.',
                           context: `${context}_text`,
                         },
                         {
-                          label: 'Audio Assist',
-                          text: 'Use Audio Assist. Give me spoken help for earbud use when useful.',
+                          label: 'Audio Help',
+                          text: 'Use Audio Help. Speak useful guidance when I need it.',
                           context: `${context}_audio`,
                         },
                         {
-                          label: 'Full Sentence',
-                          text: 'Use Full Sentence Assist. Give me exact lines I can say.',
+                          label: 'Stay Listening',
+                          text: 'Stay Listening. Keep listening until I exit this conversation mode.',
+                          context: `${context}_listening`,
+                        },
+                        {
+                          label: 'Short Answers',
+                          text: 'Use Short Answers. Keep guidance brief and usable in the moment.',
+                          context: `${context}_short`,
+                        },
+                        {
+                          label: 'Full Sentences',
+                          text: 'Use Full Sentences. Give me exact lines I can say.',
                           context: `${context}_sentences`,
+                        },
+                        {
+                          label: 'Probing Questions',
+                          text: 'Use Probing Questions. Give me sharp questions that move the conversation forward.',
+                          context: `${context}_questions`,
                         },
                         {
                           label: 'Silent Insight',
@@ -3426,19 +3441,34 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
 
                       setSuggestedPrompts([
                         {
-                          label: 'Text Assist',
-                          text: 'Use Text Assist. Give me short onscreen guidance for this professional conversation.',
+                          label: 'Text Help',
+                          text: 'Use Text Help. Give me short onscreen guidance for this professional conversation.',
                           context: `${context}_text`,
                         },
                         {
-                          label: 'Audio Assist',
-                          text: 'Use Audio Assist. Give me spoken help for earbud use when useful.',
+                          label: 'Audio Help',
+                          text: 'Use Audio Help. Speak useful guidance when I need it.',
                           context: `${context}_audio`,
                         },
                         {
-                          label: 'Full Sentence',
-                          text: 'Use Full Sentence Assist. Give me exact lines I can say.',
+                          label: 'Stay Listening',
+                          text: 'Stay Listening. Keep listening until I exit this conversation mode.',
+                          context: `${context}_listening`,
+                        },
+                        {
+                          label: 'Short Answers',
+                          text: 'Use Short Answers. Keep guidance brief and usable in the moment.',
+                          context: `${context}_short`,
+                        },
+                        {
+                          label: 'Full Sentences',
+                          text: 'Use Full Sentences. Give me exact lines I can say.',
                           context: `${context}_sentences`,
+                        },
+                        {
+                          label: 'Probing Questions',
+                          text: 'Use Probing Questions. Give me sharp questions that move the conversation forward.',
+                          context: `${context}_questions`,
                         },
                         {
                           label: 'Silent Insight',
