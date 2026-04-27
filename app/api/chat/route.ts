@@ -26,6 +26,58 @@ type CleanMessage = {
   imageDataUrls?: string[] | null
 }
 
+type ActiveCampaign = {
+  id?: string
+  name?: string
+  mode?: 'solo' | 'firm'
+  productOrService?: string
+  targetMarket?: string
+  callingFromRegion?: string
+  callingToRegion?: string
+  desiredOutcome?: string
+  complianceBoundaries?: string
+  dataToPreserve?: string[]
+  defaultAnswersEnabled?: boolean
+} | null
+
+function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefaultsEnabled: boolean) {
+  if (!activeCampaign) {
+    return campaignDefaultsEnabled
+      ? `CAMPAIGN DEFAULTS
+- No active campaign is selected.
+- If the user is in a professional, sales, calling, fundraising, appointment-setting, or live conversation context, use best-practice defaults.
+- Keep words and cues in the user's mouth.
+- Do not wait for a perfect setup before helping.
+- Ask only the next highest-leverage question when details are missing.`
+      : ''
+  }
+
+  const dataToPreserve = Array.isArray(activeCampaign.dataToPreserve) && activeCampaign.dataToPreserve.length
+    ? activeCampaign.dataToPreserve.join(', ')
+    : 'objections, callbacks, hot leads, winning lines, personal notes, best call times, compliance boundaries, and outcomes'
+
+  return `ACTIVE CAMPAIGN
+- Campaign name: ${activeCampaign.name || 'Unnamed campaign'}
+- Mode: ${activeCampaign.mode || 'solo'}
+- Product/service: ${activeCampaign.productOrService || 'not provided'}
+- Target market: ${activeCampaign.targetMarket || 'not provided'}
+- Calling from region: ${activeCampaign.callingFromRegion || 'not provided'}
+- Calling to region: ${activeCampaign.callingToRegion || 'not provided'}
+- Desired outcome: ${activeCampaign.desiredOutcome || 'not provided'}
+- Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
+- Data to preserve: ${dataToPreserve}
+- Campaign defaults enabled: ${campaignDefaultsEnabled ? 'yes' : 'no'}
+
+CAMPAIGN OPERATING RULES
+- Treat this active campaign as governing context until the user switches campaigns.
+- If fields are missing and defaults are enabled, fill gaps with strong best-practice defaults.
+- Keep practical words, cues, questions, and lines in the user's mouth.
+- Adapt scripts and cues to product, audience, region, desired outcome, and compliance boundaries.
+- Do not drift into generic advice when campaign context exists.
+- For sales/calling contexts, prioritize openers, screeners/gatekeepers, objection counters, close timing, callbacks, and follow-up lines.
+- Encourage disciplined call volume without becoming reckless or ignoring compliance.`
+}
+
 function getPromptContextBlock(
   promptContext: string | null,
   promptLabel: string | null,
@@ -866,6 +918,16 @@ export async function POST(req: Request) {
         ? body.contextTurnCount
         : 0
 
+    const activeCampaign =
+      body?.activeCampaign && typeof body.activeCampaign === 'object'
+        ? body.activeCampaign as ActiveCampaign
+        : null
+
+    const campaignDefaultsEnabled =
+      typeof body?.campaignDefaultsEnabled === 'boolean'
+        ? body.campaignDefaultsEnabled
+        : true
+
     const tier =
       body?.tier === 'intelligent' || body?.tier === 'brilliant'
         ? body.tier
@@ -921,6 +983,8 @@ export async function POST(req: Request) {
         contextTurnCount,
         tier
       ) + `
+
+${getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled)}
 
 CONTROL STATE
 - User state: ${control.userState}
