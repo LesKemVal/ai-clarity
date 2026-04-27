@@ -2834,7 +2834,15 @@ I am listening now. Speak naturally. I will respond ${
                         : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/8 text-white/65 hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white'
                     }`}
                   >
-                    {label}
+                    <span className="inline-flex items-center gap-2">
+                      {output === 'audio' && voiceOn && (
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C8CFF] opacity-55" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7C8CFF]" />
+                        </span>
+                      )}
+                      <span>{label}</span>
+                    </span>
                   </button>
 
                   {conversationSetupPopup?.output === output && (
