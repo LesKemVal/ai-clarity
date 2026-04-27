@@ -31,6 +31,10 @@ type GeorgeCampaign = {
   callingToRegion?: string
   desiredOutcome?: string
   complianceBoundaries?: string
+  requiredLanguage?: string[]
+  forbiddenClaims?: string[]
+  timingRules?: string[]
+  qualificationRules?: string[]
   dataToPreserve?: string[]
   defaultAnswersEnabled: boolean
 }

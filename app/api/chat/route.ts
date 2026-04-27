@@ -36,6 +36,10 @@ type ActiveCampaign = {
   callingToRegion?: string
   desiredOutcome?: string
   complianceBoundaries?: string
+  requiredLanguage?: string[]
+  forbiddenClaims?: string[]
+  timingRules?: string[]
+  qualificationRules?: string[]
   dataToPreserve?: string[]
   defaultAnswersEnabled?: boolean
 } | null
@@ -56,6 +60,22 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
     ? activeCampaign.dataToPreserve.join(', ')
     : 'objections, callbacks, hot leads, winning lines, personal notes, best call times, compliance boundaries, and outcomes'
 
+  const requiredLanguage = Array.isArray(activeCampaign.requiredLanguage) && activeCampaign.requiredLanguage.length
+    ? activeCampaign.requiredLanguage.join(', ')
+    : 'none provided'
+
+  const forbiddenClaims = Array.isArray(activeCampaign.forbiddenClaims) && activeCampaign.forbiddenClaims.length
+    ? activeCampaign.forbiddenClaims.join(', ')
+    : 'guaranteed returns, unverified approvals, price before qualification, cancellation promises unless true, and claims outside verified campaign rules'
+
+  const timingRules = Array.isArray(activeCampaign.timingRules) && activeCampaign.timingRules.length
+    ? activeCampaign.timingRules.join(', ')
+    : 'qualify before pricing, confirm need before closing, preserve callback commitments'
+
+  const qualificationRules = Array.isArray(activeCampaign.qualificationRules) && activeCampaign.qualificationRules.length
+    ? activeCampaign.qualificationRules.join(', ')
+    : 'ask enough qualifying questions before making strong claims or moving to close'
+
   return `ACTIVE CAMPAIGN
 - Campaign name: ${activeCampaign.name || 'Unnamed campaign'}
 - Mode: ${activeCampaign.mode || 'solo'}
@@ -65,6 +85,10 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Calling to region: ${activeCampaign.callingToRegion || 'not provided'}
 - Desired outcome: ${activeCampaign.desiredOutcome || 'not provided'}
 - Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
+- Required language: ${requiredLanguage}
+- Forbidden claims: ${forbiddenClaims}
+- Timing rules: ${timingRules}
+- Qualification rules: ${qualificationRules}
 - Data to preserve: ${dataToPreserve}
 - Campaign defaults enabled: ${campaignDefaultsEnabled ? 'yes' : 'no'}
 
@@ -73,6 +97,8 @@ CAMPAIGN OPERATING RULES
 - If fields are missing and defaults are enabled, fill gaps with strong best-practice defaults.
 - Keep practical words, cues, questions, and lines in the user's mouth.
 - Adapt scripts and cues to product, audience, region, desired outcome, and compliance boundaries.
+- Never generate lines that violate forbidden claims, timing rules, qualification rules, or required language.
+- If the user asks for a line that would violate campaign guardrails, rewrite it into a compliant usable line.
 - Do not drift into generic advice when campaign context exists.
 - For sales/calling contexts, prioritize openers, screeners/gatekeepers, objection counters, close timing, callbacks, and follow-up lines.
 - Encourage disciplined call volume without becoming reckless or ignoring compliance.`
