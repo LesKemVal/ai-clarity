@@ -3324,7 +3324,7 @@ I am listening now. Speak naturally. I will respond ${
         }}
         className={`relative flex h-9 w-9 items-center justify-center transition ${
 (activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live'))
-? 'text-[#7C8CFF] drop-shadow-[0_0_8px_rgba(124,140,255,0.55)]'
+? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.9)] shadow-[0_0_18px_rgba(124,140,255,0.45)]'
 : 'text-white/85 hover:text-white'
 }` }
         aria-label="Open memory folders"
@@ -3825,7 +3825,7 @@ I will guide you in real time. Start speaking.`
                     onClick={() => {
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
-                      setShowProSetup(true)
+                      
                       setToastMessage(`${label} ready.`)
                       setShowToast(true)
 
@@ -3872,7 +3872,11 @@ Choose below, then tell me who is your target market, where are they, and what o
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
 
-                      // Professional flow intercepted — onboarding will handle session start
+                      setShowConversationMenu(false)
+                      setConversationMenuLane('selector')
+                      setShowProSetup(true)
+                      setToastMessage('Professional setup ready.')
+                      setShowToast(true)
                     }}
                     className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-4 py-3.5 text-left text-[15px] text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
                   >
@@ -3904,6 +3908,98 @@ Choose below, then tell me who is your target market, where are they, and what o
   </button>
 
 </div>
+
+              {liveMode && (
+                <div className="sticky bottom-[72px] z-[59] mx-2 mb-2 rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/90 px-3 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                  <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-semibold tracking-[0.08em] text-white/70">
+                    <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVoiceOn(false)
+                        setInteractionMode('text')
+                        window.localStorage.setItem('george_voice', 'off')
+                        setToastMessage('Text guidance active.')
+                        setShowToast(true)
+                      }}
+                      className={`shrink-0 rounded-full border px-3 py-1.5 transition ${
+                        !voiceOn
+                          ? 'border-[#7C8CFF]/70 bg-[#7C8CFF]/20 text-white'
+                          : 'border-white/10 bg-white/[0.03] text-white/60'
+                      }`}
+                    >
+                      Text
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVoiceOn(true)
+                        setInteractionMode('speech')
+                        window.localStorage.setItem('george_voice', 'on')
+                        setTimeout(() => startListening(), 120)
+                        setToastMessage('Audio guidance active.')
+                        setShowToast(true)
+                      }}
+                      className={`shrink-0 rounded-full border px-3 py-1.5 transition ${
+                        voiceOn
+                          ? 'border-[#7C8CFF]/70 bg-[#7C8CFF]/20 text-white'
+                          : 'border-white/10 bg-white/[0.03] text-white/60'
+                      }`}
+                    >
+                      Audio
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActivePromptContext('professional_negotiation')
+                        setConversationMode('professional_negotiation')
+                        setToastMessage('Negotiation mode active.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 transition hover:border-[#7C8CFF]/40 hover:text-white"
+                    >
+                      Negotiate
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActivePromptContext('professional_objection_handling')
+                        setConversationMode('professional_objection_handling')
+                        setToastMessage('Objection handling active.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 transition hover:border-[#7C8CFF]/40 hover:text-white"
+                    >
+                      Objections
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        stopListening()
+                        setLiveMode(false)
+                        setVoiceOn(false)
+                        setInteractionMode('text')
+                        setActivePromptContext(null)
+                        setActivePromptLabel(null)
+                        setConversationMode(null)
+                        window.localStorage.removeItem('george_active_context')
+                        window.localStorage.removeItem('george_active_label')
+                        window.localStorage.setItem('george_voice', 'off')
+                        setToastMessage('Returned to normal GEORGE.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition hover:border-red-300/45 hover:bg-red-500/15"
+                    >
+                      Exit
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="sticky bottom-0 z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/15 bg-white/[0.05] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
