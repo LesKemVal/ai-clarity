@@ -3710,8 +3710,6 @@ if (liveMode) {
                       setConversationMenuLane('selector')
                       setToastMessage(`${label} ready.`)
                       setShowToast(true)
-                      setToastMessage(`${label} ready.`)
-                      setShowToast(true)
 
                       const setupMessage = `${label} is active.
 
@@ -3723,45 +3721,6 @@ Choose below, then tell me who is your target market, where are they, and what o
                         role: 'assistant',
                         content: setupMessage,
                       }
-
-                      setSuggestedPrompts([
-                        {
-                          label: 'Text Help',
-                          text: 'Use Text Help. Give me short onscreen guidance for this conversation.',
-                          context: `${context}_text`,
-                        },
-                        {
-                          label: 'Audio Help',
-                          text: 'Use Audio Help. Speak useful guidance when I need it.',
-                          context: `${context}_audio`,
-                        },
-                        {
-                          label: 'Stay Listening',
-                          text: 'Stay Listening. Keep listening until I exit this conversation mode.',
-                          context: `${context}_listening`,
-                        },
-                        {
-                          label: 'Short Answers',
-                          text: 'Use Short Answers. Keep guidance brief and usable in the moment.',
-                          context: `${context}_short`,
-                        },
-                        {
-                          label: 'Full Sentences',
-                          text: 'Use Full Sentences. Give me exact lines I can say.',
-                          context: `${context}_sentences`,
-                        },
-                        {
-                          label: 'Probing Questions',
-                          text: 'Use Probing Questions. Give me sharp questions that move the conversation forward.',
-                          context: `${context}_questions`,
-                        },
-                        {
-                          label: 'Silent Insight',
-                          text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
-                          context: `${context}_silent`,
-                        },
-                      ])
-
                       const nextMessages = [...messagesRef.current, assistantMessage]
                       setMessages(nextMessages)
                       messagesRef.current = nextMessages
@@ -3805,45 +3764,6 @@ Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE
                         role: 'assistant',
                         content: setupMessage,
                       }
-
-                      setSuggestedPrompts([
-                        {
-                          label: 'Text Help',
-                          text: 'Use Text Help. Give me short onscreen guidance for this professional conversation.',
-                          context: `${context}_text`,
-                        },
-                        {
-                          label: 'Audio Help',
-                          text: 'Use Audio Help. Speak useful guidance when I need it.',
-                          context: `${context}_audio`,
-                        },
-                        {
-                          label: 'Stay Listening',
-                          text: 'Stay Listening. Keep listening until I exit this conversation mode.',
-                          context: `${context}_listening`,
-                        },
-                        {
-                          label: 'Short Answers',
-                          text: 'Use Short Answers. Keep guidance brief and usable in the moment.',
-                          context: `${context}_short`,
-                        },
-                        {
-                          label: 'Full Sentences',
-                          text: 'Use Full Sentences. Give me exact lines I can say.',
-                          context: `${context}_sentences`,
-                        },
-                        {
-                          label: 'Probing Questions',
-                          text: 'Use Probing Questions. Give me sharp questions that move the conversation forward.',
-                          context: `${context}_questions`,
-                        },
-                        {
-                          label: 'Silent Insight',
-                          text: 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.',
-                          context: `${context}_silent`,
-                        },
-                      ])
-
                       const nextMessages = [...messagesRef.current, assistantMessage]
                       setMessages(nextMessages)
                       messagesRef.current = nextMessages
