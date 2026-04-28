@@ -2837,7 +2837,6 @@ I am listening now. Speak naturally. I will respond ${
       )}
 
       {isLatestAssistant &&
-        !m.content.includes('What do you want to accomplish today?') &&
         (
           activePromptContext?.startsWith('conversation_assist_') ||
           activePromptContext?.startsWith('professional_') ||
@@ -2918,7 +2917,7 @@ I am listening now. Speak naturally. I will respond ${
           )}
 
           <div className={`flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400 ${
-            activePromptContext
+            activePromptContext || m.content.includes('What do you want to accomplish today?')
               ? 'hidden'
               : ''
           }`}>
@@ -3532,7 +3531,7 @@ if (liveMode) {
         <span className="text-[34px] leading-none">+</span>
         <span
           className={`absolute right-2 top-1 h-1.5 w-1.5 rounded-full ${
-            reroutePrompt || suggestedPrompts.length > 0
+            reroutePrompt || suggestedPrompts !== tieredStarterPrompts && suggestedPrompts.length > 0
               ? 'bg-[#7C8CFF]'
               : 'bg-white/85'
           } ${
