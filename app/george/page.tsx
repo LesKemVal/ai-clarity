@@ -850,39 +850,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     }
   }, [])
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const savedContext = window.localStorage.getItem('george_active_context')
-    const savedLabel = window.localStorage.getItem('george_active_label')
-    const savedVoice = window.localStorage.getItem('george_voice')
-
-    if (
-      savedContext &&
-      (
-        savedContext.startsWith('conversation_assist_') ||
-        savedContext.startsWith('brilliant_') ||
-        savedContext.startsWith('professional_')
-      )
-    ) {
-      setActivePromptContext(savedContext)
-      setConversationMode(savedContext)
-    }
-
-    if (savedLabel) {
-      setActivePromptLabel(savedLabel)
-    }
-
-    if (savedVoice === 'on') {
-      setVoiceOn(true)
-      setInteractionMode('speech')
-      setTimeout(() => startListening(), 900)
-    }
-  }, [])
-
-
-
-
   const assistantRevealedRef = useRef(false)
 
   // CHATGPT-STYLE TYPING ENGINE
@@ -2747,7 +2714,9 @@ return (
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
+    const firstAssistantIndex = visibleMessages.findIndex((msg) => msg.role === 'assistant')
     const isLatestAssistant = m.role === 'assistant' && i === latestAssistantIndex
+    const isWelcomeAssistant = m.role === 'assistant' && i === firstAssistantIndex
 
     return (
     <div
@@ -2770,7 +2739,7 @@ return (
                 className="mb-3 max-h-40 w-full rounded-2xl border border-white/10 object-cover"
               />
             )}
-
+            <span>{m.content}</span>
           </>
         )}
       </div>
@@ -2836,12 +2805,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {isLatestAssistant &&
-        (
-          activePromptContext?.startsWith('conversation_assist_') ||
-          activePromptContext?.startsWith('professional_') ||
-          activePromptContext?.startsWith('brilliant_')
-        ) && (
+      {m.role === 'assistant' && (
         <div className="relative space-y-2">
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -2856,7 +2820,12 @@ I am listening now. Speak naturally. I will respond ${
             </div>
           )}
 
-          {activePromptContext && (
+          {activePromptContext &&
+            (
+              activePromptContext.startsWith('conversation_assist_') ||
+              activePromptContext.startsWith('professional_') ||
+              activePromptContext.startsWith('brilliant_')
+            ) && (
             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
               <button
                 type="button"
@@ -2899,10 +2868,15 @@ I am listening now. Speak naturally. I will respond ${
                 type="button"
                 onClick={() => {
                   stopListening()
+                  setLiveMode(false)
                   setVoiceOn(false)
                   setInteractionMode('text')
+                  setConversationMode(null)
+                  setShowConversationMenu(false)
+                  setConversationMenuLane('selector')
                   setActivePromptContext(null)
                   setActivePromptLabel(null)
+                  setStableLiveGuidance(null)
                   window.localStorage.removeItem('george_active_context')
                   window.localStorage.removeItem('george_active_label')
                   window.localStorage.setItem('george_voice', 'off')
@@ -2916,11 +2890,16 @@ I am listening now. Speak naturally. I will respond ${
             </div>
           )}
 
-          <div className={`flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400 ${
-            activePromptContext || m.content.includes('What do you want to accomplish today?')
-              ? 'hidden'
-              : ''
-          }`}>
+          {!isWelcomeAssistant &&
+            (!activePromptContext ||
+              !(
+                activePromptContext.startsWith('conversation_assist_') ||
+                activePromptContext.startsWith('professional_') ||
+                activePromptContext.startsWith('brilliant_')
+              )) && (
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400">
+            {!isWelcomeAssistant && (
+              <>
             <button
               type="button"
               onClick={(event) => {
@@ -2980,6 +2959,9 @@ I am listening now. Speak naturally. I will respond ${
             >
               Simplify
             </button>
+
+              </>
+            )}
 
             <button
               type="button"
@@ -3047,6 +3029,7 @@ I am listening now. Speak naturally. I will respond ${
               </svg>
             </button>
           </div>
+          )}
 
           {activeSaveIndex === i && (
             <div
