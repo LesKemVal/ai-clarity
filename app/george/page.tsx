@@ -2805,6 +2805,68 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
+      {(m.role === 'user' || isWelcomeAssistant) && (
+        <div className="flex items-center gap-2 text-white/85">
+          <button
+            type="button"
+            onClick={() => {
+              handleFeedback(i, 'up')
+              setToastMessage('Noted')
+              setShowToast(true)
+            }}
+            className={`relative flex items-center justify-center transition duration-150 ${
+              feedback[i] === 'up'
+                ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
+                : 'text-white/85 hover:text-white'
+            }`}
+            aria-label="Thumbs up"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-[18px] w-[18px]"
+              fill={feedback[i] === 'up' ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M14 10V5.8c0-1 .3-2 .9-2.8L16 1.5l2 1.9c.7.7 1 1.6 1 2.6v3h1.5c1.1 0 1.9 1 1.7 2.1l-1.1 6.4A2 2 0 0 1 19.1 19H8a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h6Z" />
+              <path d="M6 10H3v9h3" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              handleFeedback(i, 'down')
+              setToastMessage('Noted')
+              setShowToast(true)
+            }}
+            className={`relative flex items-center justify-center transition duration-150 ${
+              feedback[i] === 'down'
+                ? 'text-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]'
+                : 'text-white/85 hover:text-white'
+            }`}
+            aria-label="Thumbs down"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-[18px] w-[18px]"
+              fill={feedback[i] === 'down' ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M10 14v4.2c0 1-.3 2-.9 2.8L8 22.5l-2-1.9c-.7-.7-1-1.6-1-2.6v-3H3.5c-1.1 0-1.9-1-1.7-2.1l1.1-6.4A2 2 0 0 1 4.9 5H16a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6Z" />
+              <path d="M18 14h3V5h-3" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
           {m.constrained && (
