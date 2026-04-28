@@ -3803,19 +3803,7 @@ Choose below, then tell me who is your target market, where are they, and what o
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
 
-                      const setupMessage = `${label} is active.
-
-GEORGE will help with live responses, scripts, objections, and outcome-focused conversation support.
-
-Tell me the firm, campaign, audience, desired outcome, and any boundaries GEORGE and user must respect.`
-
-                      const assistantMessage: Message = {
-                        role: 'assistant',
-                        content: setupMessage,
-                      }
-                      const nextMessages = [...messagesRef.current, assistantMessage]
-                      setMessages(nextMessages)
-                      messagesRef.current = nextMessages
+                      // Professional flow intercepted — onboarding will handle session start
                     }}
                     className="block w-full rounded-xl border border-[#22c55e]/20 bg-white/[0.025] px-4 py-3.5 text-left text-[15px] text-neutral-200 transition hover:border-[#22c55e]/45 hover:bg-[#22c55e]/10 hover:text-white"
                   >
