@@ -885,6 +885,31 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const messagesRef = useRef<Message[]>([
     { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
+  const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
+    if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
+      try {
+        const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+        existing.unshift({
+          id: `session_${Date.now()}`,
+          label: sessionLabel,
+          createdAt: Date.now(),
+          messages: messagesRef.current,
+        })
+        window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(existing.slice(0, 25)))
+      } catch {}
+    }
+
+    setMessages([openingMessage])
+    messagesRef.current = [openingMessage]
+    setInput('')
+    setInterimTranscript('')
+    setVoiceError('')
+    setSuggestedPrompts([])
+    setSuggestedSignal(0)
+    setReroutePrompt(null)
+    setRerouteSignal(0)
+    setContextTurnCount(0)
+  }
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const scrollHostRef = useRef<HTMLDivElement | null>(null)
   const userPinnedBottomRef = useRef(true)
