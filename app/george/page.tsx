@@ -827,17 +827,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     const savedLabel = window.localStorage.getItem('george_active_label')
     const savedVoice = window.localStorage.getItem('george_voice')
 
-    if (
-      savedContext &&
-      (
-        savedContext.startsWith('conversation_assist_') ||
-        savedContext.startsWith('brilliant_') ||
-        savedContext.startsWith('professional_')
-      )
-    ) {
-      setActivePromptContext(savedContext)
-      setConversationMode(savedContext)
-    }
+    // Disabled auto LIVE restore — GEORGE must start in normal mode
+
 
     if (savedLabel) {
       setActivePromptLabel(savedLabel)
