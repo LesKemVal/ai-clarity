@@ -513,10 +513,6 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
   const [showCampaignMenu, setShowCampaignMenu] = useState(false)
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
-  const [conversationSetupPopup, setConversationSetupPopup] = useState<null | {
-    output: 'text' | 'audio'
-    direction: 'up' | 'down'
-  }>(null)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
@@ -2862,91 +2858,43 @@ I am listening now. Speak naturally. I will respond ${
           )}
 
           {activePromptContext && (
-            <div className="relative flex flex-wrap items-center gap-1.5 text-[11px]">
-              {conversationSetupPopup && (
-                <button
-                  type="button"
-                  aria-label="Close conversation setup"
-                  onClick={() => setConversationSetupPopup(null)}
-                  className="fixed inset-0 z-[80] bg-black/45 backdrop-blur-[2px]"
-                />
-              )}
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+              <button
+                type="button"
+                onClick={() => {
+                  setVoiceOn(false)
+                  setInteractionMode('text')
+                  window.localStorage.setItem('george_voice', 'off')
+                  setToastMessage('Text Assist active.')
+                  setShowToast(true)
+                }}
+                className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
+                  !voiceOn
+                    ? 'border-[#7C8CFF]/85 bg-[#7C8CFF]/25 text-white shadow-[0_0_18px_rgba(124,140,255,0.22)]'
+                    : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/8 text-white/65 hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white'
+                }`}
+              >
+                Text Assist
+              </button>
 
-              {[
-                ['Text Assist', 'text'],
-                ['Audio Assist', 'audio'],
-              ].map(([label, output]) => (
-                <div key={label} className="relative">
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      const rect = event.currentTarget.getBoundingClientRect()
-                      const roomAbove = rect.top
-                      const roomBelow = window.innerHeight - rect.bottom
-                      setConversationSetupPopup({
-                        output: output as 'text' | 'audio',
-                        direction: roomAbove > 180 || roomAbove > roomBelow ? 'up' : 'down',
-                      })
-                    }}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold tracking-[0.08em] transition ${
-                      (output === 'audio' && voiceOn) || (output === 'text' && !voiceOn)
-                        ? 'border-[#7C8CFF]/85 bg-[#7C8CFF]/25 text-white shadow-[0_0_18px_rgba(124,140,255,0.22)]'
-                        : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/8 text-white/65 hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white'
-                    }`}
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      {output === 'audio' && voiceOn && (
-                        <span className="relative flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C8CFF] opacity-55" />
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7C8CFF]" />
-                        </span>
-                      )}
-                      <span>{label}</span>
-                    </span>
-                  </button>
-
-                  {conversationSetupPopup?.output === output && (
-                    <div
-                      className={`absolute z-[90] w-[min(260px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/35 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_38px_rgba(124,140,255,0.18)] backdrop-blur-2xl animate-[conversationPopup_160ms_ease-out] ${
-                        conversationSetupPopup.direction === 'up' ? 'bottom-full left-0 mb-3 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'
-                      }`}
-                    >
-                      {[
-                        ['Short cues', 'short'],
-                        ['Repeatable sentence', 'full'],
-                        ['Question to ask', 'questions'],
-                        ['Silent insight', 'silent'],
-                      ].map(([styleLabel, style]) => (
-                        <button
-                          key={style}
-                          type="button"
-                          onClick={() => {
-                            const wantsAudio = output === 'audio'
-                            setVoiceOn(wantsAudio)
-                            setInteractionMode('speech')
-                            setActivePromptLabel(`${label}: ${styleLabel}`)
-                            window.localStorage.setItem('george_voice', wantsAudio ? 'on' : 'off')
-                            setConversationSetupPopup(null)
-                            setTimeout(() => startListening(), 120)
-                          }}
-                          className={`block min-h-[46px] w-full rounded-[1rem] border px-3.5 py-3 text-left text-[12px] font-semibold tracking-[0.01em] transition ${
-                            activePromptLabel === `${label}: ${styleLabel}`
-                              ? 'border-[#7C8CFF]/75 bg-[#7C8CFF]/22 text-white shadow-[0_0_20px_rgba(124,140,255,0.20)]'
-                              : 'border-transparent text-white/70 hover:border-[#7C8CFF]/28 hover:bg-[#7C8CFF]/11 hover:text-white'
-                          }`}
-                        >
-                          <span className="flex items-center justify-between gap-3">
-                            <span>{styleLabel}</span>
-                            {activePromptLabel === `${label}: ${styleLabel}` && (
-                              <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
-                            )}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setVoiceOn(true)
+                  setInteractionMode('speech')
+                  window.localStorage.setItem('george_voice', 'on')
+                  setTimeout(() => startListening(), 120)
+                  setToastMessage('Audio Assist active.')
+                  setShowToast(true)
+                }}
+                className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
+                  voiceOn
+                    ? 'border-[#7C8CFF]/85 bg-[#7C8CFF]/25 text-white shadow-[0_0_18px_rgba(124,140,255,0.22)]'
+                    : 'border-[#7C8CFF]/20 bg-[#7C8CFF]/8 text-white/65 hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white'
+                }`}
+              >
+                Audio Assist
+              </button>
 
               <button
                 type="button"
@@ -2956,12 +2904,13 @@ I am listening now. Speak naturally. I will respond ${
                   setInteractionMode('text')
                   setActivePromptContext(null)
                   setActivePromptLabel(null)
-                  setConversationSetupPopup(null)
                   window.localStorage.removeItem('george_active_context')
                   window.localStorage.removeItem('george_active_label')
-                  window.localStorage.setItem('george_voice','off')
+                  window.localStorage.setItem('george_voice', 'off')
+                  setToastMessage('Returned to normal GEORGE.')
+                  setShowToast(true)
                 }}
-                className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition"
+                className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition hover:border-red-300/45 hover:bg-red-500/15"
               >
                 Exit
               </button>
@@ -3339,7 +3288,6 @@ if (liveMode) {
   setLiveMode(false)
   setShowConversationMenu(false)
   setConversationMenuLane('selector')
-  setConversationSetupPopup(null)
   setActivePromptContext(null)
   setActivePromptLabel(null)
   setToastMessage('Returned to normal GEORGE.')
