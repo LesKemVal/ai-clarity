@@ -306,6 +306,12 @@ export default function Page() {
   const [input, setInput] = useState('')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
+  const [showProSetup, setShowProSetup] = useState(false)
+  const [proGoal, setProGoal] = useState('')
+  const [proAudience, setProAudience] = useState('')
+  const [proOutcome, setProOutcome] = useState('')
+  const [proConstraints, setProConstraints] = useState('')
+
   function getVisitCount() {
     if (typeof window === 'undefined') return 0
     const raw = window.localStorage.getItem('george_visit_count')
@@ -3675,7 +3681,74 @@ if (liveMode) {
         </div>
       )}
 
-      {showConversationMenu && (
+      
+      {showProSetup && (
+        <>
+          <button
+            type="button"
+            onClick={() => setShowProSetup(false)}
+            className="fixed inset-0 z-[90] bg-black/40"
+          />
+
+          <div className="fixed bottom-[118px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
+
+            <div className="text-white text-sm">Professional Setup</div>
+
+            <textarea
+              placeholder="What are you doing?"
+              value={proGoal}
+              onChange={(e)=>setProGoal(e.target.value)}
+              className="w-full p-2 bg-black border border-white/10 rounded text-white"
+            />
+
+            <textarea
+              placeholder="Who are you speaking to?"
+              value={proAudience}
+              onChange={(e)=>setProAudience(e.target.value)}
+              className="w-full p-2 bg-black border border-white/10 rounded text-white"
+            />
+
+            <textarea
+              placeholder="What outcome matters most?"
+              value={proOutcome}
+              onChange={(e)=>setProOutcome(e.target.value)}
+              className="w-full p-2 bg-black border border-white/10 rounded text-white"
+            />
+
+            <textarea
+              placeholder="Constraints (optional)"
+              value={proConstraints}
+              onChange={(e)=>setProConstraints(e.target.value)}
+              className="w-full p-2 bg-black border border-white/10 rounded text-white"
+            />
+
+            <button
+              onClick={() => {
+                const msg: Message = {
+                  role: 'assistant',
+                  content: `We are now in a live professional scenario.
+
+Goal: ${proGoal || 'General'}
+Audience: ${proAudience || 'Unknown'}
+Outcome: ${proOutcome || 'Best outcome'}
+Constraints: ${proConstraints || 'None'}
+
+I will guide you in real time. Start speaking.`
+                }
+
+                startNewGeorgeSession(msg, 'Professional Session')
+                setShowProSetup(false)
+              }}
+              className="w-full bg-[#22c55e]/30 border border-[#22c55e]/50 py-3 rounded text-white"
+            >
+              Start Session
+            </button>
+
+          </div>
+        </>
+      )}
+
+{showConversationMenu && (
         <>
           <button
             type="button"
@@ -3750,13 +3823,9 @@ if (liveMode) {
                     key={context}
                     type="button"
                     onClick={() => {
-                      setConversationMode(context)
-                      setActivePromptContext(context)
-                      setActivePromptLabel(label)
-                      window.localStorage.setItem('george_active_context', context)
-                      window.localStorage.setItem('george_active_label', label)
                       setShowConversationMenu(false)
                       setConversationMenuLane('selector')
+                      setShowProSetup(true)
                       setToastMessage(`${label} ready.`)
                       setShowToast(true)
 
