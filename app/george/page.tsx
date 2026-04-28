@@ -3151,38 +3151,7 @@ I am listening now. Speak naturally. I will respond ${
 </div>
 
 
-            {liveMode && (
-              <div className="fixed bottom-[148px] left-0 right-0 z-50 flex justify-center px-2">
-                <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-full border border-[#7C8CFF]/25 bg-black/82 px-4 py-2 text-[11px] shadow-[0_0_22px_rgba(124,140,255,0.18)] backdrop-blur-xl">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C8CFF] opacity-60" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7C8CFF]" />
-                    </span>
-                    <span className="shrink-0 font-semibold tracking-[0.14em] text-[#D7DDFF]">LIVE ACTIVE</span>
-                    <span className="truncate text-white/55">
-                      {activePromptLabel || conversationMode || 'Conversation Assistance'}
-                    </span>
-                  </div>
-                  <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-white/70">
-                    {voiceOn ? 'AUDIO' : 'TEXT'}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {liveMode && currentTier === 'brilliant' && stableLiveGuidance && (
-              <div className="fixed bottom-[88px] left-0 right-0 z-50 flex justify-center px-2">
-                <div className="w-full max-w-md rounded-[1.2rem] border border-[#7C8CFF]/30 bg-black/80 px-4 py-3 text-center shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl">
-                  <div className="text-[14px] font-semibold tracking-[0.12em] text-[#7C8CFF]">
-                    {stableLiveGuidance.signal}
-                  </div>
-                  <div className="mt-1 text-[13px] leading-5 text-white/92">
-                    {stableLiveGuidance.say}
-                  </div>
-                </div>
-              </div>
-            )}
+            
 
             <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
