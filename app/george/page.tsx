@@ -3334,10 +3334,26 @@ I am listening now. Speak naturally. I will respond ${
         <button
           type="button"
           onClick={() => {
-setLiveMode(true)
-setShowConversationMenu(true)
-setShowCampaignMenu(false)
-setShowRecentFolders(false)
+if (liveMode) {
+  stopListening()
+  setLiveMode(false)
+  setShowConversationMenu(false)
+  setConversationMenuLane('selector')
+  setConversationSetupPopup(null)
+  setActivePromptContext(null)
+  setActivePromptLabel(null)
+  setToastMessage('Returned to normal GEORGE.')
+  setShowToast(true)
+  window.localStorage.removeItem('george_active_context')
+  window.localStorage.removeItem('george_active_label')
+} else {
+  setLiveMode(true)
+  setShowConversationMenu(true)
+  setShowCampaignMenu(false)
+  setShowRecentFolders(false)
+  setToastMessage('Conversation Assistance ready.')
+  setShowToast(true)
+}
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
