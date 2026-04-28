@@ -29,10 +29,10 @@ export default function TopUpPage() {
       return 'Make GEORGE yours.'
     }
     if (intent === 'conversation') {
-      return 'Activate Conversation Engine.'
+      return 'Activate Conversation Assistance.'
     }
     if (intent === 'pro') {
-      return 'Activate Pro Conversation Partner.'
+      return 'Start Pro + Brilliant Conversation Partner.'
     }
     return 'BRANESx is in beta.'
   }, [intent])
@@ -81,10 +81,10 @@ export default function TopUpPage() {
       return 'Choose GEORGE / GEORGette, personalize voice, and access future continuity features during beta as well as production. Early users get early access as the system improves for you—and for others who may need GEORGE most.'
     }
     if (intent === 'conversation') {
-      return 'Conversation Engine unlocks Brilliant-level live assistance: cues, exact lines, timing, and pressure support when words matter.'
+      return 'Conversation Assistance includes Brilliant access with live guidance, cues, exact lines, timing help, and pressure support when words matter.'
     }
     if (intent === 'pro') {
-      return 'Pro Conversation Partner is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
+      return 'Pro Conversation Partner includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
     }
     return 'Paid access is opening through Stripe checkout. Use GEORGE now, upgrade when ready, and help make GEORGE better before launch.'
   }, [intent])
@@ -190,7 +190,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant gives you live advantage: Conversation Engine, pressure guidance, room cues, and premium earbud support.
+              Brilliant powers live advantage: conversation support, pressure guidance, room cues, and premium earbud support.
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-4">
@@ -235,7 +235,7 @@ export default function TopUpPage() {
 
               <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Professional</p>
+                  <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
                     ROI
                   </span>
@@ -252,7 +252,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
                 >
-                  Activate Pro
+                  Start Pro + Brilliant
                 </button>
               </div>
 
@@ -275,7 +275,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
-                  Start Brilliant
+                  Start Brilliant Core
                 </button>
               </div>
             </div>
