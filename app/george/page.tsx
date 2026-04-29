@@ -3784,6 +3784,61 @@ I will guide you in real time. Start speaking.`
         </>
       )}
 
+
+{showProLiveGate && (
+  <>
+    <button
+      type="button"
+      onClick={() => setShowProLiveGate(false)}
+      className="fixed inset-0 z-[120] bg-black/50"
+    />
+
+    <div className="fixed inset-0 z-[130] flex items-center justify-center">
+      <div className="w-[92%] max-w-sm rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+
+        <div className="text-white text-sm tracking-[0.12em]">
+          PRO LIVE
+        </div>
+
+        <button
+          onClick={() => {
+            setShowProLiveGate(false)
+            setShowCampaignMenu(true)
+          }}
+          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+        >
+          Resume Previous Campaign
+        </button>
+
+        <button
+          onClick={() => {
+            localStorage.setItem('george_intake_pending', 'pro')
+            window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+            setShowProLiveGate(false)
+          }}
+          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+        >
+          Start New Campaign
+        </button>
+
+        <button
+          onClick={() => {
+            setShowProLiveGate(false)
+            setLiveMode(true)
+            setConversationMode('manual_live')
+            setActivePromptContext('manual_live')
+            setActivePromptLabel('Manual Live')
+          }}
+          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+        >
+          Manual Mode
+        </button>
+
+      </div>
+    </div>
+  </>
+)}
+
 {showConversationMenu && (
         <>
           <button
