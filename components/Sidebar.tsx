@@ -175,7 +175,7 @@ export default function Sidebar({
               type="button"
               onClick={() => {
                 setShowSidebar?.(false)
-                window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                window.location.href = '/welcome'
               }}
               className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
             >
@@ -260,7 +260,10 @@ export default function Sidebar({
 
                   <button
                     type="button"
-                    onClick={() => window.open('/top-up', '_blank')}
+                    onClick={() => {
+                      localStorage.setItem('george_intake_pending', 'pro')
+                      window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                    }}
                     title="For sales reps, firms, callers, campaigns, live scripts, analytics, and team use. Purchase auto-upgrades access."
                     className="block w-full rounded-xl border border-[#7C8CFF]/18 bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-white/88 transition hover:border-[#7C8CFF]/40 hover:text-white"
                   >
