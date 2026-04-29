@@ -919,9 +919,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const pending = window.localStorage.getItem('george_intake_pending')
+    const activatePendingIntake = () => {
+      const pending = window.localStorage.getItem('george_intake_pending')
 
-    if (pending === 'pro') {
+      if (pending !== 'pro') return
+
       window.localStorage.removeItem('george_intake_pending')
 
       setLiveMode(true)
@@ -934,10 +936,20 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         {
           role: 'assistant',
           content:
-            "Your professional setup is ready.\n\nTell me what you entered, or paste your campaign details here. I’ll turn it into live guidance."
+            "Your professional setup is ready.\n\nI don’t have your Typeform answers connected yet, so paste the campaign details here and I’ll turn them into live guidance."
         },
         'Professional Intake'
       )
+    }
+
+    activatePendingIntake()
+
+    window.addEventListener('focus', activatePendingIntake)
+    document.addEventListener('visibilitychange', activatePendingIntake)
+
+    return () => {
+      window.removeEventListener('focus', activatePendingIntake)
+      document.removeEventListener('visibilitychange', activatePendingIntake)
     }
   }, [])
 
