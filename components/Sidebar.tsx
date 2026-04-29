@@ -175,7 +175,7 @@ export default function Sidebar({
               type="button"
               onClick={() => {
                 setShowSidebar?.(false)
-                window.location.href = '/welcome'
+                window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
               }}
               className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
             >
