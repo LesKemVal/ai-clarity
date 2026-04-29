@@ -664,6 +664,8 @@ const [isListening, setIsListening] = useState(false)
   const [birthdayMD, setBirthdayMD] = useState('')
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
+  const [showProLiveGate, setShowProLiveGate] = useState(false)
+
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
@@ -3387,12 +3389,9 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setLiveMode(true)
-  setShowConversationMenu(true)
+  setShowProLiveGate(true)
   setShowCampaignMenu(false)
   setShowRecentFolders(false)
-  setToastMessage('Conversation Assistance ready.')
-  setShowToast(true)
 }
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
