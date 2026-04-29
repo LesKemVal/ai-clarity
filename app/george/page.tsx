@@ -916,6 +916,31 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     setRerouteSignal(0)
     setContextTurnCount(0)
   }
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const pending = window.localStorage.getItem('george_intake_pending')
+
+    if (pending === 'pro') {
+      window.localStorage.removeItem('george_intake_pending')
+
+      setLiveMode(true)
+      setConversationMode('professional_intake')
+      setActivePromptContext('professional_intake')
+      setActivePromptLabel('Pro Conversation Partner')
+      setShowConversationMenu(false)
+
+      startNewGeorgeSession(
+        {
+          role: 'assistant',
+          content:
+            "Your professional setup is ready.\n\nTell me what you entered, or paste your campaign details here. I’ll turn it into live guidance."
+        },
+        'Professional Intake'
+      )
+    }
+  }, [])
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const scrollHostRef = useRef<HTMLDivElement | null>(null)
   const userPinnedBottomRef = useRef(true)
