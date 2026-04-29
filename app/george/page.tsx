@@ -2930,6 +2930,61 @@ I am listening now. Speak naturally. I will respond ${
 
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
+
+          {(activePromptContext?.includes('conversation') ||
+            activePromptContext?.includes('professional') ||
+            activePromptContext?.includes('brilliant')) && (
+            <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
+
+              <button
+                onClick={() => {
+                  saveMemory(m, i)
+                  setToastMessage('Saved to campaign')
+                  setShowToast(true)
+                }}
+              >
+                Keep this
+              </button>
+
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ text: m.content })
+                  } else {
+                    navigator.clipboard.writeText(m.content || '')
+                    setToastMessage('Copied for sharing')
+                    setShowToast(true)
+                  }
+                }}
+              >
+                Share
+              </button>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(m.content || '')
+                  setToastMessage('Copied')
+                  setShowToast(true)
+                }}
+              >
+                Copy
+              </button>
+
+              <button
+                onClick={() => {
+                  setInput(`Rewrite this for a live conversation:\n\n${m.content}`)
+                  textareaRef.current?.focus()
+                }}
+              >
+                Reword
+              </button>
+
+              <button onClick={() => handleFeedback(i, 'up')}>👍</button>
+              <button onClick={() => handleFeedback(i, 'down')}>👎</button>
+
+            </div>
+          )}
+
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
               <div className="flex items-center gap-1.5 pl-1">
