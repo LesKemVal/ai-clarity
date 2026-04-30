@@ -2850,7 +2850,7 @@ return (
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
     userPinnedBottomRef.current = nearBottom
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[220px] md:px-6 md:pb-[240px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-6 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
@@ -4231,7 +4231,7 @@ Backup:
               )}
 
               {showScrollHint && (
-                <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
+                <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-28 bg-gradient-to-t from-black via-black/90 to-transparent" />
               )}
 
               <div className="sticky bottom-[16px] z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
@@ -4358,7 +4358,7 @@ Backup:
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-2.5 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
