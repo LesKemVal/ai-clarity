@@ -4112,8 +4112,8 @@ Backup:
 
 </div>
 
-              {liveMode && (
-                <div className="sticky bottom-[72px] z-[59] mx-3 mb-3 rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
+              {(
+                <div className="fixed bottom-[96px] left-0 right-0 z-[70] mx-auto w-[calc(100%-24px)] max-w-[900px] rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
                   <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
                     <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
 
