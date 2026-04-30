@@ -751,6 +751,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
   const [draftProfileName, setDraftProfileName] = useState('')
 
@@ -3637,8 +3638,7 @@ if (liveMode) {
                         type="button"
                         onClick={() => {
                           if (isCampaign) {
-                            setToastMessage('This is a Pro campaign. Pro Mode lets you resume structured conversations, use scripts and guided flow, and continue where you left off. Upgrade to continue this campaign.')
-                            setShowToast(true)
+                            setShowCampaignUpgradeGate(true)
                             return
                           }
 
@@ -4636,6 +4636,46 @@ Backup:
                 See full options
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showCampaignUpgradeGate && (
+        <div className="fixed inset-x-0 bottom-[92px] z-[95] flex justify-center px-4">
+          <div className="w-full max-w-md rounded-3xl border border-[#7C8CFF]/25 bg-neutral-950/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.62)] backdrop-blur-xl">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7C8CFF]">Pro Campaign</p>
+                <p className="mt-1 text-sm font-medium text-white">This is a Pro campaign.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCampaignUpgradeGate(false)}
+                className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-neutral-400 transition hover:border-white/20 hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs leading-6 text-neutral-300">
+              <div>Pro Mode lets you:</div>
+              <div className="mt-1 space-y-1">
+                <div>• resume structured conversations</div>
+                <div>• use scripts and guided flow</div>
+                <div>• continue where you left off</div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowCampaignUpgradeGate(false)
+                setShowUpgradeModal(true)
+              }}
+              className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
+            >
+              Upgrade to continue this campaign
+            </button>
           </div>
         </div>
       )}
