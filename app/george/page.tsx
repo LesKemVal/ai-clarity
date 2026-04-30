@@ -2942,7 +2942,8 @@ I am listening now. Speak naturally. I will respond ${
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
 
-          {(activePromptContext?.includes('conversation') ||
+          {(liveMode ||
+            activePromptContext?.includes('conversation') ||
             activePromptContext?.includes('professional') ||
             activePromptContext?.includes('brilliant')) && (
   <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
