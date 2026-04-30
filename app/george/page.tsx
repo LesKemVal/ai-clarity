@@ -3752,6 +3752,13 @@ if (liveMode) {
       </button>
 
       {showPromptMenu && (
+        <div
+          onClick={() => setShowPromptMenu(false)}
+          className="fixed inset-0 z-[49] bg-black/70 backdrop-blur-sm"
+        />
+      )}
+
+      {showPromptMenu && (
         <div className="absolute bottom-[152px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
