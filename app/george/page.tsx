@@ -3850,13 +3850,13 @@ I will guide you in real time. Start speaking.`
 
                   const resumeMessage = {
                     role: 'assistant',
-                    content: `Campaign restored: ${session.label || 'Saved Campaign'}.
+                    content: `Campaign ready: ${session.label || 'Saved Campaign'}.
 
 Say:
-“Let’s lock the next step.”
+“Let’s open strong and move toward the next step.”
 
 Backup:
-“What would make this a yes today?”`
+“What would make this worth your time today?”`
                   } as Message
 
                   const nextMessages = [resumeMessage]
