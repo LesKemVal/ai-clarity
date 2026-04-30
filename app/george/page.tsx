@@ -613,7 +613,10 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
       window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_ID')
     }
   }, [campaigns, activeCampaignId])
-  const [suggestedSignal, setSuggestedSignal] = useState(0)
+  const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null)
+const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
+
+const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
@@ -2987,6 +2990,29 @@ Cue:`
       void handleSend(prompt)
     }}>
       G?
+    </button>
+
+    {tonePopupIndex === i && (
+      <div className="absolute bottom-8 left-0 z-[80] w-40 rounded-xl border border-[#7C8CFF]/30 bg-black p-2 shadow-[0_0_20px_rgba(124,140,255,0.25)]">
+        {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
+          <button
+            key={tone}
+            onClick={() => {
+              setAssistTone(tone)
+              setTonePopupIndex(null)
+              setToastMessage(`Tone: ${tone}`)
+              setShowToast(true)
+            }}
+            className="block w-full text-left text-xs px-2 py-1.5 text-white/80 hover:bg-[#7C8CFF]/20 rounded"
+          >
+            {tone}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <button onClick={() => setTonePopupIndex(i)}>
+      TP
     </button>
 
     <button onClick={() => handleFeedback(i, 'up')}>👍</button>
