@@ -3474,10 +3474,10 @@ Cue:`
 
             
 
-            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black ${showSidebar ? "hidden md:flex" : "flex"} ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`${liveMode ? "hidden" : "relative z-[60] mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2"}`}>
+              <div className={`${liveMode ? "hidden" : "fixed bottom-[96px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
   <div className="flex items-center gap-4 text-white/80 text-[13px]">
     <button
