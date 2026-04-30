@@ -129,7 +129,19 @@ export default function Sidebar({
     [suggestedSignal]
   )
 
-  return (
+  
+      {/* Collapsed Rail (desktop only) */}
+      {!showSidebar && (
+        <div className="hidden xl:flex fixed left-0 top-0 z-[110] h-screen w-[72px] flex-col items-center gap-6 border-r border-white/10 bg-black/90 pt-4">
+          <img src="/branding/logo.png" className="h-10 w-10 rounded-full" />
+
+          <button className="text-white/60 hover:text-white">✎</button>
+          <button className="text-white/60 hover:text-white">🔍</button>
+          <button className="text-white/60 hover:text-white">💬</button>
+        </div>
+      )}
+
+return (
     <aside
       className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
@@ -138,12 +150,11 @@ export default function Sidebar({
       <div className="border-b border-white/5 px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="text-4xl font-semibold tracking-tight text-[#7C8CFF]">
-              B
-            </div>
-            <div className="text-[11px] uppercase tracking-[0.20em] text-neutral-400">
-              BRANESx
-            </div>
+            <img
+              src="/branding/logo.png"
+              alt="BRANESx"
+              className="h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
+            />
           </div>
 
           <button
@@ -299,10 +310,10 @@ export default function Sidebar({
                       key={prompt.label}
                       type="button"
                       onClick={() => handlePromptTap(prompt)}
-                      className={`block w-full rounded-xl px-2 py-1 text-left text-sm transition ${
+                      className={`block w-full rounded-xl px-3 py-2 text-left text-sm transition-all duration-200 ease-out ${
                         activePromptLabel === prompt.label
-                          ? 'text-[#7C8CFF]'
-                          : 'text-neutral-300 hover:text-[#7C8CFF]'
+                          ? 'bg-[#7C8CFF]/10 text-white shadow-[0_0_14px_rgba(124,140,255,0.18)]'
+                          : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.35)]'
                       }`}
                     >
                       {prompt.label}
