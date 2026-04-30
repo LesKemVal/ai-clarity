@@ -38,6 +38,7 @@ type ActiveCampaign = {
   assistMode?: 'manual' | 'negotiation' | 'objection_handling' | 'discovery' | 'closing' | 'compliance'
   deliveryMode?: 'text' | 'audio' | 'both'
   outputStyle?: 'say_ask_boundary_close' | 'short_cues' | 'repeatable_lines'
+  assistTone?: 'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'
   successSignal?: string
   currentGoal?: string
   complianceBoundaries?: string
@@ -93,6 +94,7 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Assist mode: ${activeCampaign.assistMode || 'manual'}
 - Delivery mode: ${activeCampaign.deliveryMode || 'text'}
 - Output style: ${activeCampaign.outputStyle || 'short_cues'}
+- Assist tone: ${activeCampaign.assistTone || 'direct'}
 - Success signal: ${activeCampaign.successSignal || 'not provided'}
 - Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
 - Required language: ${requiredLanguage}
