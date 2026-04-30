@@ -2617,7 +2617,7 @@ return true
 
 
 return (
-    <main className="app-shell pb-[84px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
+    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
@@ -4234,7 +4234,7 @@ Backup:
                 <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
               )}
 
-              <div className="sticky bottom-[8px] z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+              <div className="sticky bottom-[16px] z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/15 bg-white/[0.05] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
 
                       <input
