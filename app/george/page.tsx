@@ -3910,7 +3910,7 @@ Backup:
 “What would make this a yes today?”`
                   } as Message
 
-                  const nextMessages = [...restoredMessages, resumeMessage]
+                  const nextMessages = [resumeMessage]
 
                   setMessages(nextMessages)
                   messagesRef.current = nextMessages
