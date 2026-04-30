@@ -4023,9 +4023,24 @@ I will guide you in real time. Start speaking.`
                         },
                       ]
 
+                  const resumeHelpKey = `george_resume_help_count_${session.id || session.label || 'campaign'}`
+                  const resumeHelpCount = Number(window.localStorage.getItem(resumeHelpKey) || '0')
+                  window.localStorage.setItem(resumeHelpKey, String(resumeHelpCount + 1))
+
                   const resumeMessage = {
                     role: 'assistant',
-                    content: `Need a quick 10-second setup on product and controls, or should I start the call?`
+                    content: resumeHelpCount < 3
+                      ? `Need a quick 10-second setup on product and controls, or should I start the call?`
+                      : `Welcome back. Your ${session.label || 'Saved Campaign'} campaign is ready.
+
+Say:
+“Hi, it’s Lester for John. Is he available?”
+
+Backup:
+“I’m on a tight window — should I catch him now or later?”
+
+Cue:
+Start at screener. No pitch.`
                   } as Message
 
                   const nextMessages = [resumeMessage]
