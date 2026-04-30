@@ -664,6 +664,7 @@ const [isListening, setIsListening] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showProLiveGate, setShowProLiveGate] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
+  const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
 
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
@@ -904,6 +905,24 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const messagesRef = useRef<Message[]>([
     { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
+
+  const enterLiveMode = () => {
+    setPreLiveMessages((prev) => prev ?? messagesRef.current)
+    setLiveMode(true)
+  }
+
+  const exitLiveMode = () => {
+    setLiveMode(false)
+
+    setPreLiveMessages((prev) => {
+      if (prev && prev.length > 0) {
+        setMessages(prev)
+        messagesRef.current = prev
+      }
+
+      return null
+    })
+  }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
       try {
@@ -939,7 +958,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       window.localStorage.removeItem('george_intake_pending')
 
-      setLiveMode(true)
+      enterLiveMode()
       setConversationMode('professional_intake')
       setActivePromptContext('professional_intake')
       setActivePromptLabel('Pro Conversation Partner')
@@ -3100,7 +3119,7 @@ Cue:`
                 type="button"
                 onClick={() => {
                   stopListening()
-                  setLiveMode(false)
+                  exitLiveMode()
                   setVoiceOn(false)
                   setInteractionMode('text')
                   setConversationMode(null)
@@ -3484,7 +3503,7 @@ Cue:`
           onClick={() => {
 if (liveMode) {
   stopListening()
-  setLiveMode(false)
+  exitLiveMode()
   setShowConversationMenu(false)
   setConversationMenuLane('selector')
   setActivePromptContext(null)
@@ -3874,7 +3893,7 @@ Backup:
                   setMessages(nextMessages)
                   messagesRef.current = nextMessages
                   setShowSessionPicker(false)
-                  setLiveMode(true)
+                  enterLiveMode()
                   setConversationMode('resumed_campaign')
                   setActivePromptContext('resumed_campaign')
                   setActivePromptLabel(session.label || 'Resumed Campaign')
@@ -3937,7 +3956,7 @@ Backup:
         <button
           onClick={() => {
             setShowProLiveGate(false)
-            setLiveMode(true)
+            enterLiveMode()
             setConversationMode('manual_live')
             setActivePromptContext('manual_live')
             setActivePromptLabel('Manual Live')
@@ -4070,7 +4089,7 @@ Backup:
                       type="button"
                       onClick={() => {
                         stopListening()
-                        setLiveMode(false)
+                        exitLiveMode()
                         setVoiceOn(false)
                         setInteractionMode('text')
                         setActivePromptContext(null)
