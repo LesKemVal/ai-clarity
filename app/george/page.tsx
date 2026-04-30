@@ -3890,10 +3890,11 @@ Backup:
                   setInput('')
                   setInterimTranscript('')
                   setVoiceError('')
+                  enterLiveMode()
+
                   setMessages(nextMessages)
                   messagesRef.current = nextMessages
                   setShowSessionPicker(false)
-                  enterLiveMode()
                   setConversationMode('resumed_campaign')
                   setActivePromptContext('resumed_campaign')
                   setActivePromptLabel(session.label || 'Resumed Campaign')
