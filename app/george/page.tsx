@@ -4180,6 +4180,13 @@ Backup:
                       onClick={() => {
                         setVoiceOn(false)
                         setInteractionMode('text')
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? { ...c, deliveryMode: 'text' }
+                              : c
+                          )
+                        )
                         window.localStorage.setItem('george_voice', 'off')
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
@@ -4198,6 +4205,13 @@ Backup:
                       onClick={() => {
                         setVoiceOn(true)
                         setInteractionMode('speech')
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? { ...c, deliveryMode: 'audio' }
+                              : c
+                          )
+                        )
                         window.localStorage.setItem('george_voice', 'on')
                         setTimeout(() => startListening(), 120)
                         setToastMessage('Audio guidance active.')
