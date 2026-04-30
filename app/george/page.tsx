@@ -526,21 +526,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
     if (currentTier === 'brilliant') {
       return [
-        {
-          label: 'Fastest revenue',
-          text: 'I need to make money as fast as legally and safely possible, and I want GEORGE to find the fastest path based on my real constraints.',
-          context: 'money_fast_safe',
-        },
-        {
-          label: 'Build with leverage',
-          text: 'I want to build something with real leverage, and I want GEORGE to ask what matters first before choosing the strongest path.',
-          context: 'build_start',
-        },
-        {
-          label: 'Break the bottleneck',
-          text: 'I am stuck, and I want GEORGE to identify the bottleneck, remove noise, and tell me the next decisive move.',
-          context: 'unstuck_start',
-        },
+        
+        
+        
       ]
     }
 
@@ -890,6 +878,18 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const folderBrowserRef = useRef<HTMLDivElement | null>(null)
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const interruptAndListen = () => {
+    try {
+      stopSpeechRef.current = true
+      window.speechSynthesis.cancel()
+    } catch {}
+
+    setVoiceOn(true)
+    setInteractionMode('speech')
+    setTimeout(() => startListening(), 80)
+  }
+
   const messagesRef = useRef<Message[]>([
     { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
   ])
@@ -2934,56 +2934,46 @@ I am listening now. Speak naturally. I will respond ${
           {(activePromptContext?.includes('conversation') ||
             activePromptContext?.includes('professional') ||
             activePromptContext?.includes('brilliant')) && (
-            <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
+  <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
 
-              <button
-                onClick={() => {
-                  saveMemory(m, i)
-                  setToastMessage('Saved to campaign')
-                  setShowToast(true)
-                }}
-              >
-                Keep this
-              </button>
+    <button onClick={() => saveMemory(m, i)}>
+      Keep this
+    </button>
 
-              <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({ text: m.content })
-                  } else {
-                    navigator.clipboard.writeText(m.content || '')
-                    setToastMessage('Copied for sharing')
-                    setShowToast(true)
-                  }
-                }}
-              >
-                Share
-              </button>
+    <button onClick={() => {
+      setActiveSaveIndex((prev) => (prev === i ? null : i))
+      setShowRecentFolders(true)
+    }}>
+      Save
+    </button>
 
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(m.content || '')
-                  setToastMessage('Copied')
-                  setShowToast(true)
-                }}
-              >
-                Copy
-              </button>
+    <button onClick={() => {
+      setInput(`Rewrite this for a live conversation:
 
-              <button
-                onClick={() => {
-                  setInput(`Rewrite this for a live conversation:\n\n${m.content}`)
-                  textareaRef.current?.focus()
-                }}
-              >
-                Reword
-              </button>
+${m.content}`)
+      textareaRef.current?.focus()
+    }}>
+      Reword
+    </button>
 
-              <button onClick={() => handleFeedback(i, 'up')}>👍</button>
-              <button onClick={() => handleFeedback(i, 'down')}>👎</button>
+    <button onClick={interruptAndListen}>
+      Stop
+    </button>
 
-            </div>
-          )}
+    <button onClick={() => {
+      setInput(`Give me a sharper angle on this:
+
+${m.content}`)
+      textareaRef.current?.focus()
+    }}>
+      G?
+    </button>
+
+    <button onClick={() => handleFeedback(i, 'up')}>👍</button>
+    <button onClick={() => handleFeedback(i, 'down')}>👎</button>
+
+  </div>
+)}
 
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -3069,12 +3059,7 @@ I am listening now. Speak naturally. I will respond ${
           )}
 
           {!isWelcomeAssistant &&
-            (!activePromptContext ||
-              !(
-                activePromptContext.startsWith('conversation_assist_') ||
-                activePromptContext.startsWith('professional_') ||
-                activePromptContext.startsWith('brilliant_')
-              )) && (
+            !liveMode && (
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-neutral-400">
             {!isWelcomeAssistant && (
               <>
@@ -3713,7 +3698,7 @@ if (liveMode) {
               type="button"
               onClick={() => {
                 if (currentTier !== 'brilliant') {
-                  setToastMessage('Conversation Mode belongs to Brilliant.')
+                  
                   setShowToast(true)
                   return
                 }
@@ -3722,7 +3707,7 @@ if (liveMode) {
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
             >
-              Conversation Mode ›
+              
             </button>
 
             <button
