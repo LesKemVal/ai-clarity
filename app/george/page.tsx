@@ -3912,6 +3912,10 @@ Backup:
 
                   const nextMessages = [resumeMessage]
 
+                  setPendingImage(null)
+                  setInput('')
+                  setInterimTranscript('')
+                  setVoiceError('')
                   setMessages(nextMessages)
                   messagesRef.current = nextMessages
                   setShowSessionPicker(false)
