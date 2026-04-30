@@ -50,6 +50,41 @@ type ActiveCampaign = {
   defaultAnswersEnabled?: boolean
 } | null
 
+function getOutputStyleRules(activeCampaign: ActiveCampaign) {
+  const outputStyle = activeCampaign?.outputStyle || 'short_cues'
+
+  if (outputStyle === 'repeatable_lines') {
+    return `OUTPUT STYLE ENFORCEMENT
+- Output style: repeatable_lines
+- Give exact full sentences the user can say out loud.
+- Keep lines natural, clean, and usable immediately.
+- Do not explain unless the user asks why.
+- Prefer:
+Say:
+Backup:
+Cue:`
+  }
+
+  if (outputStyle === 'say_ask_boundary_close') {
+    return `OUTPUT STYLE ENFORCEMENT
+- Output style: say_ask_boundary_close
+- Structure the response exactly as:
+Say:
+Ask:
+Boundary:
+Close:
+- Keep each line short and usable.
+- Do not add extra sections.`
+  }
+
+  return `OUTPUT STYLE ENFORCEMENT
+- Output style: short_cues
+- Give short live cues, not paragraphs.
+- Prefer fragments, timing signals, and next-move guidance.
+- Use [PAUSE] or [LISTEN] when silence is strongest.
+- Do not explain unless the user asks.`
+}
+
 function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefaultsEnabled: boolean) {
   if (!activeCampaign) {
     return campaignDefaultsEnabled
@@ -1038,6 +1073,8 @@ export async function POST(req: Request) {
       ) + `
 
 ${getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled)}
+
+${getOutputStyleRules(activeCampaign)}
 
 CONTROL STATE
 - User state: ${control.userState}
