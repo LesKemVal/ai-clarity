@@ -4651,25 +4651,26 @@ Backup:
       )}
 
       {showCampaignUpgradeGate && (
-        <div className="fixed inset-x-0 bottom-[92px] z-[95] flex justify-center px-4">
-          <div className="w-full max-w-md rounded-3xl border border-[#7C8CFF]/25 bg-neutral-950/95 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.62)] backdrop-blur-xl">
-            <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
+          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+            <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7C8CFF]">Pro Campaign</p>
-                <p className="mt-1 text-sm font-medium text-white">This is a Pro campaign.</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">Pro Campaign</p>
+                <p className="mt-1 text-[15px] font-semibold text-white">This is a Pro campaign.</p>
+                <p className="mt-1 text-xs leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-neutral-400 transition hover:border-white/20 hover:text-white"
+                className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-neutral-400 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white"
               >
                 Close
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs leading-6 text-neutral-300">
-              <div>Pro Mode lets you:</div>
-              <div className="mt-1 space-y-1">
+            <div className="rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
+              <div className="font-medium text-white/80">Pro Mode lets you:</div>
+              <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
                 <div>• use scripts and guided flow</div>
                 <div>• continue where you left off</div>
@@ -4682,7 +4683,7 @@ Backup:
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
+              className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
