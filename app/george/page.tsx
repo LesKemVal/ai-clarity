@@ -2757,8 +2757,8 @@ return (
             }}
         />
 
-        <div className="flex min-w-0 w-full flex-1 flex-col overflow-hidden">
-          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+        <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
+          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-visible px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-1.5.5 xl:hidden">
@@ -3477,7 +3477,7 @@ Cue:`
             <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`${liveMode ? "hidden" : "fixed bottom-[96px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
+              <div className={`${liveMode ? "hidden" : "fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
   <div className="flex items-center gap-4 text-white/80 text-[13px]">
     <button
@@ -3624,7 +3624,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="absolute bottom-[52px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="absolute bottom-[152px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
@@ -3752,7 +3752,7 @@ if (liveMode) {
       </button>
 
       {showPromptMenu && (
-        <div className="absolute bottom-[52px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="absolute bottom-[152px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
               type="button"
@@ -3863,7 +3863,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[118px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
+          <div className="fixed bottom-[220px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -3930,8 +3930,8 @@ I will guide you in real time. Start speaking.`
       className="fixed inset-0 z-[120] bg-black/50"
     />
 
-    <div className="fixed inset-0 z-[130] flex items-center justify-center">
-      <div className="w-[92%] max-w-sm rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+    <div className="fixed inset-x-0 bottom-[164px] z-[180] flex justify-center px-4">
+      <div className="w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
             RESUME CAMPAIGN
