@@ -3543,8 +3543,8 @@ Cue:`
         }}
         className={`relative flex h-9 w-9 items-center justify-center transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'text-[#7C8CFF] animate-pulse drop-shadow-[0_0_12px_rgba(124,140,255,0.85)]'
-            : 'text-white/85 hover:text-white'
+            ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)]'
+            : 'text-white/85 hover:text-white hover:scale-[1.05]'
         }`}
         aria-label="Open memory folders"
       >
