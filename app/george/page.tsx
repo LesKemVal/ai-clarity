@@ -3882,8 +3882,21 @@ I will guide you in real time. Start speaking.`
                         },
                       ]
 
-                  setMessages(restoredMessages)
-                  messagesRef.current = restoredMessages
+                  const resumeMessage = {
+                    role: 'assistant',
+                    content: `Campaign restored: ${session.label || 'Saved Campaign'}.
+
+Say:
+“Let’s lock the next step.”
+
+Backup:
+“What would make this a yes today?”`
+                  } as Message
+
+                  const nextMessages = [...restoredMessages, resumeMessage]
+
+                  setMessages(nextMessages)
+                  messagesRef.current = nextMessages
                   setShowSessionPicker(false)
                   setLiveMode(true)
                   setConversationMode('resumed_campaign')
