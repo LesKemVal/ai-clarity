@@ -2821,7 +2821,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[15px] md:text-[15.5px] leading-8 tracking-[0.01em] text-white/92 ${
+        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >

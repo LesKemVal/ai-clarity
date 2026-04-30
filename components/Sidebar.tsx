@@ -166,7 +166,7 @@ export default function Sidebar({
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+              className="block w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition-all duration-200 ease-out hover:border-white/20 hover:bg-white/[0.06] hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
             >
               New Session
             </button>
@@ -177,7 +177,7 @@ export default function Sidebar({
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
+              className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:border-white/20 hover:bg-white/[0.06] hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
             >
               Make GEORGE Yours
             </button>
@@ -208,7 +208,7 @@ export default function Sidebar({
                       context: 'decision_next_move',
                     })
                   }
-                  className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
+                  className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
                 >
                   Focus
                 </button>
@@ -249,7 +249,7 @@ export default function Sidebar({
                       type="button"
                       onClick={() => window.open('/top-up', '_blank')}
                       title="Buy Conversation Engine and unlock Brilliant automatically."
-                      className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition hover:border-[#7C8CFF]/30 hover:text-white"
+                      className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:border-white/20 hover:bg-white/[0.06] hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
                     >
                       Conversation Assistance
                       <span className="ml-2 text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
@@ -335,7 +335,7 @@ export default function Sidebar({
                     key={`${prompt.context}:${prompt.label}`}
                     type="button"
                     onClick={() => handlePromptTap(prompt)}
-                    className={`block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF] ${suggestedAnimationClass}`}
+                    className={`block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)] ${suggestedAnimationClass}`}
                   >
                     {prompt.label}
                   </button>
@@ -374,7 +374,7 @@ export default function Sidebar({
           </section>
 
           <section className="border-t border-neutral-800 pt-4">
-            <a href="/legal/toa" className="block text-sm text-neutral-500 transition hover:text-[#7C8CFF]">
+            <a href="/legal/toa" className="block text-sm text-neutral-500 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]">
               Terms
             </a>
           </section>
