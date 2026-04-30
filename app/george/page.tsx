@@ -1002,6 +1002,29 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   }, [])
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
+  const [showScrollHint, setShowScrollHint] = useState(false)
+
+  useEffect(() => {
+    const checkScroll = () => {
+      const el = messagesEndRef.current
+      if (!el) return
+
+      const rect = el.getBoundingClientRect()
+      const inView = rect.top < window.innerHeight
+
+      setShowScrollHint(!inView && (isThinking || bridgeThinking))
+    }
+
+    window.addEventListener('scroll', checkScroll)
+    window.addEventListener('resize', checkScroll)
+
+    return () => {
+      window.removeEventListener('scroll', checkScroll)
+      window.removeEventListener('resize', checkScroll)
+    }
+  }, [isThinking, bridgeThinking])
+
   const scrollHostRef = useRef<HTMLDivElement | null>(null)
   const userPinnedBottomRef = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -3432,7 +3455,20 @@ Cue:`
     </div>
     )
   })}
-  <div ref={messagesEndRef} />
+  
+{showScrollHint && (
+  <div className="pointer-events-none fixed bottom-[110px] left-1/2 z-[70] -translate-x-1/2 flex flex-col items-center gap-1">
+    <div className="flex gap-1">
+      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse" />
+      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
+    </div>
+    <span className="text-[10px] text-white/40">more below</span>
+  </div>
+)}
+
+<div ref={messagesEndRef} />
+
 </div>
 
 
@@ -4192,6 +4228,10 @@ Backup:
                     </button>
                   </div>
                 </div>
+              )}
+
+              {showScrollHint && (
+                <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-16 bg-gradient-to-t from-black via-black/70 to-transparent" />
               )}
 
               <div className="sticky bottom-[8px] z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
