@@ -614,6 +614,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     }
   }, [campaigns, activeCampaignId])
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null)
+  const [tonePopupUpward, setTonePopupUpward] = useState(true)
 const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
 
 const [suggestedSignal, setSuggestedSignal] = useState(0)
@@ -3131,11 +3132,15 @@ Cue:`
 
       void handleSend(prompt)
     }}>
-      CUE
+      Cue
     </button>
 
     {tonePopupIndex === i && (
-      <div className="absolute bottom-8 left-0 z-[80] w-40 rounded-xl border border-[#7C8CFF]/30 bg-black p-2 shadow-[0_0_20px_rgba(124,140,255,0.25)]">
+      <div
+        className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+          tonePopupUpward ? 'bottom-8' : 'top-8'
+        }`}
+      >
         {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
           <button
             key={tone}
@@ -3145,7 +3150,7 @@ Cue:`
               setToastMessage(`Tone: ${tone}`)
               setShowToast(true)
             }}
-            className="block w-full text-left text-xs px-2 py-1.5 text-white/80 hover:bg-[#7C8CFF]/20 rounded"
+            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
           >
             {tone}
           </button>
@@ -3153,8 +3158,16 @@ Cue:`
       </div>
     )}
 
-    <button onClick={() => setTonePopupIndex(i)}>
-      TP
+    <button
+      onClick={(event) => {
+        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+        const roomAbove = rect.top
+        const roomBelow = window.innerHeight - rect.bottom
+        setTonePopupUpward(roomAbove > 180 || roomAbove > roomBelow)
+        setTonePopupIndex((prev) => (prev === i ? null : i))
+      }}
+    >
+      Tone
     </button>
 
     <button onClick={() => handleFeedback(i, 'up')}>👍</button>
