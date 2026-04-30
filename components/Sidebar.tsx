@@ -149,11 +149,11 @@ return (
     >
       <div className="border-b border-white/5 px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
         <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
               src="/branding/logo.png"
               alt="BRANESx"
-              className="mt-[3px] h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
+              className="h-9 w-9  rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
             />
           </div>
 
