@@ -615,6 +615,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   }, [campaigns, activeCampaignId])
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null)
   const [tonePopupUpward, setTonePopupUpward] = useState(true)
+  const [rewordPopupIndex, setRewordPopupIndex] = useState<number | null>(null)
+  const [rewordPopupUpward, setRewordPopupUpward] = useState(true)
 const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
 
 const [suggestedSignal, setSuggestedSignal] = useState(0)
@@ -3084,10 +3086,20 @@ I am listening now. Speak naturally. I will respond ${
       Save
     </button>
 
-    <button onClick={() => {
-      const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-      const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
-      const prompt = `GEORGE, reword this for the current live conversation.
+    <div className="relative">
+      {rewordPopupIndex === i && (
+        <div
+          className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+            rewordPopupUpward ? 'bottom-8' : 'top-8'
+          }`}
+        >
+          {(['Reword','Rescript','Shorter','Stronger'] as const).map((action) => (
+            <button
+              key={action}
+              onClick={() => {
+                const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
+                const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+                const prompt = `GEORGE, ${action.toLowerCase()} this for the current live conversation.
 
 Goal: ${goal}
 Mode: ${mode}
@@ -3099,10 +3111,29 @@ Say:
 Backup:
 Cue:`
 
-      void handleSend(prompt)
-    }}>
-      Reword
-    </button>
+                setRewordPopupIndex(null)
+                void handleSend(prompt)
+              }}
+              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+            >
+              {action}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <button
+        onClick={(event) => {
+          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+          const roomAbove = rect.top
+          const roomBelow = window.innerHeight - rect.bottom
+          setRewordPopupUpward(roomAbove > 180 || roomAbove > roomBelow)
+          setRewordPopupIndex((prev) => (prev === i ? null : i))
+        }}
+      >
+        Reword
+      </button>
+    </div>
 
     <button onClick={() => {
       const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
