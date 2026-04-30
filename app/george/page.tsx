@@ -2225,11 +2225,13 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       await stopSpeech()
       stopListening()
 
-      const userMessage: Message = {
-        role: 'user',
-        content: text.trim(),
-        imageDataUrl: pendingImage?.dataUrl || null,
-      }
+      const userMessage: Message | null = options?.hidden
+        ? null
+        : {
+            role: 'user',
+            content: text.trim(),
+            imageDataUrl: pendingImage?.dataUrl || null,
+          }
 
 
       if (!firstResponseOverride && activeDomain === 'credit') {
@@ -2249,7 +2251,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       const updatedMessages = [
         ...messagesRef.current,
         ...(domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
-        userMessage
+        ...(userMessage ? [userMessage] : [])
       ]
       const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text)
 
