@@ -2960,10 +2960,21 @@ I am listening now. Speak naturally. I will respond ${
     </button>
 
     <button onClick={() => {
-      setInput(`Rewrite this for a live conversation:
+      const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
+      const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+      const prompt = `GEORGE, reword this for the current live conversation.
 
-${m.content}`)
-      textareaRef.current?.focus()
+Goal: ${goal}
+Mode: ${mode}
+Original line:
+${m.content}
+
+Return only:
+Say:
+Backup:
+Cue:`
+
+      void handleSend(prompt)
     }}>
       Reword
     </button>
