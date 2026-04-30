@@ -752,6 +752,17 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   }, [liveMode, currentTier, liveGuidance])
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
+  const [upgradeCtaWord, setUpgradeCtaWord] = useState<'Intelligent' | 'Brilliant'>('Intelligent')
+
+  useEffect(() => {
+    if (currentTier === 'brilliant') return
+
+    const timer = window.setInterval(() => {
+      setUpgradeCtaWord((word) => (word === 'Intelligent' ? 'Brilliant' : 'Intelligent'))
+    }, 2600)
+
+    return () => window.clearInterval(timer)
+  }, [currentTier])
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
   const [draftProfileName, setDraftProfileName] = useState('')
 
@@ -4047,13 +4058,12 @@ Backup:
     onClick={() => {
       setShowUpgradeModal(true)
     }}
-    className="rounded-full border border-[#7C8CFF]/40 bg-[#7C8CFF]/15 px-3 py-1.5 text-[12px] tracking-[0.12em]"
+    className="px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
   >
-    {currentTier === 'smart'
-      ? 'GO INTELLIGENT'
-      : currentTier === 'intelligent'
-      ? 'GO BRILLIANT'
-      : 'STAY BRILLIANT'}
+    <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>{' '}
+    <span className="inline-block min-w-[74px] text-[#7C8CFF] transition">
+      {currentTier === 'brilliant' ? 'Brilliant' : upgradeCtaWord}
+    </span>
   </button>
 
 </div>
