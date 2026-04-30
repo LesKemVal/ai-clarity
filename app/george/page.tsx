@@ -30,6 +30,11 @@ type GeorgeCampaign = {
   callingFromRegion?: string
   callingToRegion?: string
   desiredOutcome?: string
+  assistMode?: 'manual' | 'negotiation' | 'objection_handling' | 'discovery' | 'closing' | 'compliance'
+  deliveryMode?: 'text' | 'audio' | 'both'
+  outputStyle?: 'say_ask_boundary_close' | 'short_cues' | 'repeatable_lines'
+  successSignal?: string
+  currentGoal?: string
   complianceBoundaries?: string
   requiredLanguage?: string[]
   forbiddenClaims?: string[]
