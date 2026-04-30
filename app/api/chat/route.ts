@@ -103,6 +103,21 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Campaign defaults enabled: ${campaignDefaultsEnabled ? 'yes' : 'no'}
 
 CAMPAIGN OPERATING RULES
+
+SCRIPT CONSISTENCY RULE
+- If the user asks to reword, rescript, or improve a line:
+  - Check if any of the following changed:
+    - campaign goal
+    - assist mode
+    - constraints
+    - objection type
+    - outcome signal
+  - If nothing meaningful changed:
+    - Return the SAME or nearly identical winning line.
+    - Do NOT fabricate improvement.
+  - If improvement is possible:
+    - Provide a better version and explain briefly why it improves conversion.
+
 - Treat this active campaign as governing context until the user switches campaigns.
 - If fields are missing and defaults are enabled, fill gaps with strong best-practice defaults.
 - Keep practical words, cues, questions, and lines in the user's mouth.
