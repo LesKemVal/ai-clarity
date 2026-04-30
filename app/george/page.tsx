@@ -2806,11 +2806,11 @@ return (
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white"
+                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white"
                       aria-label="Share George"
                       title="Share George"
                     >
-                      <span className="font-medium tracking-[0.02em] italic">Share <span className="font-black not-italic">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
                   </div>
                 </div>
@@ -2818,11 +2818,11 @@ return (
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white xl:hidden"
+                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white xl:hidden"
                   aria-label="Share George"
                   title="Share George"
                 >
-                      <span className="font-medium tracking-[0.02em] italic">Share <span className="font-black not-italic">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
               </div>
             </header>
