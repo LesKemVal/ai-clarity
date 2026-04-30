@@ -3467,7 +3467,7 @@ Cue:`
   </div>
 )}
 
-<div ref={messagesEndRef} />
+<div ref={messagesEndRef} className="h-[170px] md:h-[190px]" />
 
 </div>
 
@@ -3927,10 +3927,10 @@ I will guide you in real time. Start speaking.`
     <button
       type="button"
       onClick={() => setShowSessionPicker(false)}
-      className="fixed inset-0 z-[120] bg-black/50"
+      className="fixed inset-0 z-[170] bg-black/50"
     />
 
-    <div className="fixed inset-x-0 bottom-[164px] z-[180] flex justify-center px-4">
+    <div className="fixed inset-x-0 bottom-[164px] z-[190] flex justify-center px-4">
       <div className="w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
@@ -3939,7 +3939,7 @@ I will guide you in real time. Start speaking.`
           <button
             type="button"
             onClick={() => setShowSessionPicker(false)}
-            className="text-white/45 transition hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-lg leading-none text-white/70 transition hover:border-white/25 hover:text-white"
           >
             ×
           </button>
