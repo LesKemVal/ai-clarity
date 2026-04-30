@@ -460,6 +460,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
 
   useEffect(() => {
+    if (liveMode || activePromptContext) return
+
     const greeting = getInitialGreeting()
     setMessages((prev) => {
       if (
