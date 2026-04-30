@@ -2594,7 +2594,7 @@ return true
 
 
 return (
-    <main className="app-shell min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
+    <main className="app-shell pb-[84px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
@@ -3524,10 +3524,10 @@ Cue:`
           setShowCampaignMenu(false)
           setShowRecentFolders(false)
         }}
-        className={`relative flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold tracking-[0.08em] transition ${
+        className={`relative flex items-center gap-1 border-b px-1 py-1 text-[11px] font-medium tracking-[0.12em] transition ${
           activeCampaign
-            ? 'border-[#7C8CFF]/45 bg-[#7C8CFF]/16 text-white shadow-[0_0_18px_rgba(124,140,255,0.14)]'
-            : 'border-white/10 bg-white/[0.03] text-white/75 hover:border-[#7C8CFF]/35 hover:text-white'
+            ? 'border-[#7C8CFF] text-white'
+            : 'border-transparent text-white/55 hover:border-[#7C8CFF]/50 hover:text-white'
         }`}
         aria-label="Open campaign selector"
       >
@@ -4194,7 +4194,7 @@ Backup:
                 </div>
               )}
 
-              <div className="sticky bottom-0 z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+              <div className="sticky bottom-[8px] z-[60] flex items-center w-full border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/15 bg-white/[0.05] shadow-[0_18px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl">
 
                       <input
