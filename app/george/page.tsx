@@ -4077,8 +4077,8 @@ Backup:
 </div>
 
               {liveMode && (
-                <div className="sticky bottom-[72px] z-[59] mx-2 mb-3 rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/90 px-3 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-                  <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-semibold tracking-[0.08em] text-white/70">
+                <div className="sticky bottom-[72px] z-[59] mx-3 mb-3 rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
+                  <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
                     <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
 
                     <button
@@ -4090,10 +4090,10 @@ Backup:
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full border px-3 py-1.5 transition ${
+                      className={`shrink-0 border-b px-0.5 py-1 transition ${
                         !voiceOn
-                          ? 'border-[#7C8CFF]/70 bg-[#7C8CFF]/20 text-white'
-                          : 'border-white/10 bg-white/[0.03] text-white/60'
+                          ? 'border-[#7C8CFF] text-white'
+                          : 'border-transparent text-white/45 hover:text-white/75'
                       }`}
                     >
                       Text
@@ -4109,10 +4109,10 @@ Backup:
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full border px-3 py-1.5 transition ${
+                      className={`shrink-0 border-b px-0.5 py-1 transition ${
                         voiceOn
-                          ? 'border-[#7C8CFF]/70 bg-[#7C8CFF]/20 text-white'
-                          : 'border-white/10 bg-white/[0.03] text-white/60'
+                          ? 'border-[#7C8CFF] text-white'
+                          : 'border-transparent text-white/45 hover:text-white/75'
                       }`}
                     >
                       Audio
@@ -4139,7 +4139,7 @@ Backup:
                         setToastMessage('Negotiation mode active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 transition hover:border-[#7C8CFF]/40 hover:text-white"
+                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-white/45 transition hover:border-[#7C8CFF]/60 hover:text-white/80"
                     >
                       Negotiate
                     </button>
@@ -4165,7 +4165,7 @@ Backup:
                         setToastMessage('Objection handling active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-white/70 transition hover:border-[#7C8CFF]/40 hover:text-white"
+                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-white/45 transition hover:border-[#7C8CFF]/60 hover:text-white/80"
                     >
                       Objections
                     </button>
@@ -4186,7 +4186,7 @@ Backup:
                         setToastMessage('Returned to normal GEORGE.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition hover:border-red-300/45 hover:bg-red-500/15"
+                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-red-300/70 transition hover:border-red-300/50 hover:text-red-200"
                     >
                       Exit
                     </button>
