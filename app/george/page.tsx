@@ -3073,7 +3073,7 @@ I am listening now. Speak naturally. I will respond ${
   <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
 
     <button onClick={() => saveMemory(m, i)}>
-      Keep this
+      Save
     </button>
 
     <button onClick={() => {
@@ -3101,10 +3101,6 @@ Cue:`
       void handleSend(prompt)
     }}>
       Reword
-    </button>
-
-    <button onClick={interruptAndListen}>
-      Stop
     </button>
 
     <button onClick={() => {
@@ -3289,18 +3285,6 @@ Cue:`
               className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
             >
               Share
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                const prompt = "Show me related memory for this."
-                setInput(prompt)
-                void handleSend(prompt)
-              }}
-              className="rounded-full border border-[#7C8CFF]/20 bg-[#7C8CFF]/10 px-3 py-1.5 transition hover:border-[#7C8CFF]/40 hover:text-[#7C8CFF]"
-            >
-              Related
             </button>
 
             <button
