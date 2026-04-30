@@ -2257,7 +2257,13 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
             isFirstSession: updatedMessages.length <= 2,
             promptContext: activePromptContext,
             promptLabel: activePromptLabel,
-            activeCampaign,
+            activeCampaign: activeCampaign
+              ? {
+                  ...activeCampaign,
+                  assistTone,
+                  deliveryMode: activeCampaign.deliveryMode || 'text',
+                }
+              : null,
             campaignDefaultsEnabled: activeCampaign?.defaultAnswersEnabled ?? true,
             contextTurnCount,
             tier: currentTier,
