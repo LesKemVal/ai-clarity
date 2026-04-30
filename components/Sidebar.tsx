@@ -27,6 +27,7 @@ type SidebarProps = {
   activePromptLabel?: string | null
   activePromptContext?: string | null
   onToggleScripture?: () => void
+  onOpenLiveGate?: () => void
   currentTier?: 'smart' | 'intelligent' | 'brilliant'
 }
 
@@ -91,6 +92,7 @@ export default function Sidebar({
   activePromptLabel = null,
   activePromptContext = null,
   onToggleScripture = () => {},
+  onOpenLiveGate = () => {},
   currentTier = 'smart',
 }: SidebarProps) {
   const pathname = usePathname()
@@ -243,13 +245,10 @@ return (
                   {currentTier === 'brilliant' ? (
                     <button
                       type="button"
-                      onClick={() =>
-                        handlePromptTap({
-                          label: 'Conversation Assistance',
-                          text: 'Set GEORGE for personal live conversation support. Help me think, respond, and hold leverage in real time.',
-                          context: 'brilliant_live_conversation',
-                        })
-                      }
+                      onClick={() => {
+                        setShowSidebar?.(false)
+                        onOpenLiveGate()
+                      }}
                       title="Live personal guidance, cues, timing, and exact lines."
                       className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition hover:border-[#7C8CFF]/45"
                     >
@@ -272,8 +271,8 @@ return (
                   <button
                     type="button"
                     onClick={() => {
-                      localStorage.setItem('george_intake_pending', 'pro')
-                      window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                      setShowSidebar?.(false)
+                      onOpenLiveGate()
                     }}
                     title="For sales reps, firms, callers, campaigns, live scripts, analytics, and team use. Purchase auto-upgrades access."
                     className="block w-full rounded-xl border border-[#7C8CFF]/18 bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-white/88 transition hover:border-[#7C8CFF]/40 hover:text-white"

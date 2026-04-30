@@ -757,6 +757,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   useEffect(() => {
     if (currentTier === 'brilliant') return
 
+    setUpgradeCtaWord(currentTier === 'smart' ? 'Intelligent' : 'Brilliant')
+
     const timer = window.setInterval(() => {
       setUpgradeCtaWord((word) => (word === 'Intelligent' ? 'Brilliant' : 'Intelligent'))
     }, 2600)
@@ -927,7 +929,33 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   }
 
   const exitLiveMode = () => {
+    try {
+      stopListening()
+      window.speechSynthesis.cancel()
+    } catch {}
+
     setLiveMode(false)
+    setVoiceOn(false)
+    setInteractionMode('text')
+    setConversationMode(null)
+    setShowConversationMenu(false)
+    setConversationMenuLane('selector')
+    setShowProLiveGate(false)
+    setShowSessionPicker(false)
+    setShowProSetup(false)
+    setShowCampaignMenu(false)
+    setShowRecentFolders(false)
+    setActivePromptContext(null)
+    setActivePromptLabel(null)
+    setStableLiveGuidance(null)
+    setInterimTranscript('')
+    setVoiceError('')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('george_active_context')
+      window.localStorage.removeItem('george_active_label')
+      window.localStorage.setItem('george_voice', 'off')
+    }
 
     setPreLiveMessages((prev) => {
       if (prev && prev.length > 0) {
@@ -2628,6 +2656,11 @@ return (
 
         <Sidebar
           currentTier={currentTier}
+            onOpenLiveGate={() => {
+              setShowProLiveGate(true)
+              setShowCampaignMenu(false)
+              setShowRecentFolders(false)
+            }}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
           voiceActive={voiceOn}
@@ -3036,10 +3069,7 @@ I am listening now. Speak naturally. I will respond ${
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
 
-          {(liveMode ||
-            activePromptContext?.includes('conversation') ||
-            activePromptContext?.includes('professional') ||
-            activePromptContext?.includes('brilliant')) && (
+          {(isLatestAssistant && liveMode) && (
   <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
 
     <button onClick={() => saveMemory(m, i)}>
@@ -3150,11 +3180,11 @@ Cue:`
             </div>
           )}
 
-          {activePromptContext &&
+          {false && activePromptContext &&
             (
-              activePromptContext.startsWith('conversation_assist_') ||
-              activePromptContext.startsWith('professional_') ||
-              activePromptContext.startsWith('brilliant_')
+              activePromptContext?.startsWith('conversation_assist_') ||
+              activePromptContext?.startsWith('professional_') ||
+              activePromptContext?.startsWith('brilliant_')
             ) && (
             <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
               <button
@@ -4133,7 +4163,7 @@ Backup:
     className="inline-flex items-center gap-1 whitespace-nowrap px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
   >
     <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>
-    <span className="inline-block text-[#7C8CFF] transition-all duration-300 ease-out">
+    <span className={`inline-block text-[#7C8CFF] transition-all duration-300 ease-out ${currentTier === 'brilliant' ? '' : 'animate-pulse'}`}>
       {currentTier === 'brilliant' ? 'Brilliant' : upgradeCtaWord}
     </span>
   </button>
