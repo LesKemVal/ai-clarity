@@ -2967,10 +2967,22 @@ ${m.content}`)
     </button>
 
     <button onClick={() => {
-      setInput(`Give me a sharper angle on this:
+      const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
+      const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+      const style = activeCampaign?.outputStyle || 'short_cues'
+      const prompt = `GEORGE, give me the next move for this live conversation.
 
-${m.content}`)
-      textareaRef.current?.focus()
+Goal: ${goal}
+Mode: ${mode}
+Output style: ${style}
+Use the active campaign context, constraints, and what is happening now.
+
+Return only:
+Say:
+Backup:
+Cue:`
+
+      void handleSend(prompt)
     }}>
       G?
     </button>
@@ -4189,6 +4201,19 @@ Choose below, then tell me who is your target market, where are they, and what o
                       onClick={() => {
                         setActivePromptContext('professional_negotiation')
                         setConversationMode('professional_negotiation')
+
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? {
+                                  ...c,
+                                  assistMode: 'negotiation',
+                                  outputStyle: 'say_ask_boundary_close',
+                                }
+                              : c
+                          )
+                        )
+
                         setToastMessage('Negotiation mode active.')
                         setShowToast(true)
                       }}
@@ -4202,6 +4227,19 @@ Choose below, then tell me who is your target market, where are they, and what o
                       onClick={() => {
                         setActivePromptContext('professional_objection_handling')
                         setConversationMode('professional_objection_handling')
+
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? {
+                                  ...c,
+                                  assistMode: 'objection_handling',
+                                  outputStyle: 'repeatable_lines',
+                                }
+                              : c
+                          )
+                        )
+
                         setToastMessage('Objection handling active.')
                         setShowToast(true)
                       }}
