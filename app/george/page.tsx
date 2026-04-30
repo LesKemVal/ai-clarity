@@ -2806,11 +2806,11 @@ return (
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center px-2 text-[18px] font-black tracking-[-0.04em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)] transition hover:scale-[1.04] hover:text-white"
+                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white"
                       aria-label="Share George"
                       title="Share George"
                     >
-                      G<span className="ml-0.5 text-[12px] align-super text-[#7C8CFF]">↗</span>
+                      <span className="font-medium tracking-[0.02em] italic">Share <span className="font-black not-italic">G.</span></span>
                     </button>
                   </div>
                 </div>
@@ -2818,11 +2818,11 @@ return (
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[18px] font-black tracking-[-0.04em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)] transition hover:scale-[1.04] hover:text-white xl:hidden"
+                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-black uppercase tracking-[0.16em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white xl:hidden"
                   aria-label="Share George"
                   title="Share George"
                 >
-                      G<span className="ml-0.5 text-[12px] align-super text-[#7C8CFF]">↗</span>
+                      <span className="font-medium tracking-[0.02em] italic">Share <span className="font-black not-italic">G.</span></span>
                     </button>
               </div>
             </header>
