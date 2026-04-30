@@ -4416,7 +4416,7 @@ Backup:
                             console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF] text-black transition hover:opacity-90 glow-soft glow-focus glow-press"
+                          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF] text-black transition hover:opacity-90"
                           aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
