@@ -3827,6 +3827,88 @@ I will guide you in real time. Start speaking.`
       )}
 
 
+{showSessionPicker && (
+  <>
+    <button
+      type="button"
+      onClick={() => setShowSessionPicker(false)}
+      className="fixed inset-0 z-[120] bg-black/50"
+    />
+
+    <div className="fixed inset-0 z-[130] flex items-center justify-center">
+      <div className="w-[92%] max-w-sm rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+        <div className="flex items-center justify-between">
+          <div className="text-white text-sm tracking-[0.12em]">
+            RESUME CAMPAIGN
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowSessionPicker(false)}
+            className="text-white/45 transition hover:text-white"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="max-h-[300px] space-y-2 overflow-y-auto pr-1">
+          {(() => {
+            let sessions: any[] = []
+            try {
+              sessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+              if (!Array.isArray(sessions)) sessions = []
+            } catch {
+              sessions = []
+            }
+
+            if (!sessions.length) {
+              return (
+                <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-[12px] leading-5 text-white/65">
+                  No saved campaigns yet. Start a new campaign first.
+                </div>
+              )
+            }
+
+            return sessions.slice(0, 12).map((session) => (
+              <button
+                key={session.id}
+                type="button"
+                onClick={() => {
+                  const restoredMessages = Array.isArray(session.messages) && session.messages.length
+                    ? session.messages
+                    : [
+                        {
+                          role: 'assistant',
+                          content: 'Campaign restored.\n\nSay:\n“Let’s lock the next step.”\n\nBackup:\n“What would make this a yes today?”',
+                        },
+                      ]
+
+                  setMessages(restoredMessages)
+                  messagesRef.current = restoredMessages
+                  setShowSessionPicker(false)
+                  setLiveMode(true)
+                  setConversationMode('resumed_campaign')
+                  setActivePromptContext('resumed_campaign')
+                  setActivePromptLabel(session.label || 'Resumed Campaign')
+                  setToastMessage('Campaign restored')
+                  setShowToast(true)
+                }}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2 text-left transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10"
+              >
+                <div className="text-[12px] font-semibold text-white">
+                  {session.label || 'Saved Campaign'}
+                </div>
+                <div className="mt-1 text-[10px] text-white/45">
+                  {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved session'}
+                </div>
+              </button>
+            ))
+          })()}
+        </div>
+      </div>
+    </div>
+  </>
+)}
+
 {showProLiveGate && (
   <>
     <button
