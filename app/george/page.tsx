@@ -3381,7 +3381,8 @@ ${m.content}`)
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          setShowCampaignMenu((prev) => !prev)
+          setShowProLiveGate(true)
+          setShowCampaignMenu(false)
           setShowRecentFolders(false)
         }}
         className={`relative flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold tracking-[0.08em] transition ${
