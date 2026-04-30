@@ -907,7 +907,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   ])
 
   const enterLiveMode = () => {
-    setPreLiveMessages((prev) => prev ?? messagesRef.current)
+    setPreLiveMessages((prev) => prev ?? [...messagesRef.current])
     setLiveMode(true)
   }
 
