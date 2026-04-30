@@ -1989,7 +1989,7 @@ function detectDomain(text: string) {
 }
 
 const handleSend = useCallback(
-    async (overrideText?: string) => {
+    async (overrideText?: string, options?: { hidden?: boolean }) => {
       let text = (overrideText ?? input).trim()
       console.log('[GEORGE handleSend]', {
         overrideText,
@@ -3099,7 +3099,7 @@ I am listening now. Speak naturally. I will respond ${
               onClick={() => {
                 const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
                 const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
-                const prompt = `GEORGE, ${action.toLowerCase()} this for the current live conversation.
+                const prompt = `Rewrite the line below for a live call.
 
 Goal: ${goal}
 Mode: ${mode}
