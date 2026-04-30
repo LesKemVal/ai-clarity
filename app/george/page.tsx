@@ -3467,7 +3467,7 @@ Cue:`
   </div>
 )}
 
-<div ref={messagesEndRef} className="h-[170px] md:h-[190px]" />
+<div ref={messagesEndRef} className="h-[120px] md:h-[140px]" />
 
 </div>
 
@@ -4033,16 +4033,37 @@ Backup:
 
 {showProLiveGate && (
   <>
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Close PRO LIVE menu"
       onClick={() => setShowProLiveGate(false)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+          setShowProLiveGate(false)
+        }
+      }}
       className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-[2px]"
     />
 
-    <div className="fixed inset-x-0 bottom-[96px] z-[130] flex justify-center px-4">
-      <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+    <div
+      onClick={() => setShowProLiveGate(false)}
+      className="fixed inset-0 z-[130] flex items-end justify-center px-4 pb-[96px]"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+      >
+        <button
+          type="button"
+          aria-label="Close PRO LIVE menu"
+          onClick={() => setShowProLiveGate(false)}
+          className="absolute right-3 top-3 rounded-full px-2 py-1 text-xs text-white/55 transition hover:bg-white/10 hover:text-white"
+        >
+          ×
+        </button>
 
-        <div className="mb-3">
+        <div className="mb-3 pr-8">
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
             PRO LIVE
           </div>
@@ -4623,7 +4644,11 @@ Backup:
                     const data = await response.json()
 
                     if (data?.url) {
-                      window.location.href = data.url
+                      if (data.url && data.url.startsWith('http')) {
+  window.location.href = data.url
+} else {
+  router.replace(data.url)
+}
                       return
                     }
 
@@ -4657,7 +4682,11 @@ Backup:
                     const data = await response.json()
 
                     if (data?.url) {
-                      window.location.href = data.url
+                      if (data.url && data.url.startsWith('http')) {
+  window.location.href = data.url
+} else {
+  router.replace(data.url)
+}
                       return
                     }
 
