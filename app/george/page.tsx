@@ -667,7 +667,10 @@ const [isListening, setIsListening] = useState(false)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
 
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
-  const [showSidebar, setShowSidebar] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(() => {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth >= 1280
+})
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
 const [savePopupUpward, setSavePopupUpward] = useState(true)
   const [newFolderName, setNewFolderName] = useState('')
