@@ -4000,14 +4000,22 @@ Backup:
     <button
       type="button"
       onClick={() => setShowProLiveGate(false)}
-      className="fixed inset-0 z-[120] bg-black/50"
+      className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-[2px]"
     />
 
-    <div className="fixed inset-0 z-[130] flex items-center justify-center">
-      <div className="w-[92%] max-w-sm rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+    <div className="fixed inset-x-0 bottom-[96px] z-[130] flex justify-center px-4">
+      <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
 
-        <div className="text-white text-sm tracking-[0.12em]">
-          PRO LIVE
+        <div className="mb-3">
+          <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
+            PRO LIVE
+          </div>
+          <div className="mt-1 text-[15px] font-semibold text-white">
+            Choose how GEORGE enters the conversation.
+          </div>
+          <div className="mt-1 text-xs leading-5 text-neutral-400">
+            Resume a campaign, start a structured flow, or enter manual live support.
+          </div>
         </div>
 
         <button
@@ -4015,7 +4023,7 @@ Backup:
             setShowProLiveGate(false)
             setShowSessionPicker(true)
           }}
-          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+          className="w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
         >
           Resume Previous Campaign
         </button>
@@ -4026,7 +4034,7 @@ Backup:
             window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
             setShowProLiveGate(false)
           }}
-          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
           Start New Campaign
         </button>
@@ -4039,7 +4047,7 @@ Backup:
             setActivePromptContext('manual_live')
             setActivePromptLabel('Manual Live')
           }}
-          className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
         >
           Manual Mode
         </button>
@@ -4058,10 +4066,10 @@ Backup:
     onClick={() => {
       setShowUpgradeModal(true)
     }}
-    className="px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
+    className="inline-flex items-center gap-1 whitespace-nowrap px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
   >
-    <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>{' '}
-    <span className="inline-block min-w-[74px] text-[#7C8CFF] transition">
+    <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>
+    <span className="inline-block text-[#7C8CFF] transition-all duration-300 ease-out">
       {currentTier === 'brilliant' ? 'Brilliant' : upgradeCtaWord}
     </span>
   </button>
@@ -4069,7 +4077,7 @@ Backup:
 </div>
 
               {liveMode && (
-                <div className="sticky bottom-[72px] z-[59] mx-2 mb-2 rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/90 px-3 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                <div className="sticky bottom-[72px] z-[59] mx-2 mb-3 rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/90 px-3 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
                   <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-semibold tracking-[0.08em] text-white/70">
                     <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
 
