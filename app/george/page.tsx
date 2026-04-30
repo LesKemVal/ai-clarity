@@ -2806,11 +2806,11 @@ return (
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
-                      aria-label="Share G."
-                      title="Share G."
+                      className="inline-flex h-9 items-center justify-center px-2 text-[18px] font-black tracking-[-0.04em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)] transition hover:scale-[1.04] hover:text-white"
+                      aria-label="Share George"
+                      title="Share George"
                     >
-                      Share G.
+                      G<span className="ml-0.5 text-[12px] align-super text-[#7C8CFF]">↗</span>
                     </button>
                   </div>
                 </div>
@@ -2818,11 +2818,11 @@ return (
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white xl:hidden"
-                  aria-label="Share G."
-                  title="Share G."
+                  className="inline-flex h-9 items-center justify-center px-2 text-[18px] font-black tracking-[-0.04em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)] transition hover:scale-[1.04] hover:text-white xl:hidden"
+                  aria-label="Share George"
+                  title="Share George"
                 >
-                      Share G.
+                      G<span className="ml-0.5 text-[12px] align-super text-[#7C8CFF]">↗</span>
                     </button>
               </div>
             </header>
