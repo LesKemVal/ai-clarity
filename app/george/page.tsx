@@ -3622,19 +3622,26 @@ if (liveMode) {
                 </div>
 
                 <div className="max-h-[168px] space-y-2 overflow-y-auto pr-1">
-                  {getMemoriesByFolder(activeMemoryFolder).map((item, idx) => {
+                  {getFolderItems(activeMemoryFolder).map((item, idx) => {
                     const textBlock =
                       item.savedPair && item.userPromptContent
                         ? `User: ${item.userPromptContent}\nGEORGE: ${item.content}`
                         : item.content
 
                     const isLatest = idx === 0
+                    const isCampaign = (item.type || 'memory') === 'campaign'
 
                     return (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => {
+                          if (isCampaign) {
+                            setToastMessage('This is a Pro campaign. Pro Mode lets you resume structured conversations, use scripts and guided flow, and continue where you left off. Upgrade to continue this campaign.')
+                            setShowToast(true)
+                            return
+                          }
+
                           setInput(textBlock)
                           if (textareaRef.current) {
                           }
@@ -3642,16 +3649,22 @@ if (liveMode) {
                           setActiveMemoryFolder(null)
                         }}
                         className={`block w-full rounded-xl border px-3 py-2 text-left text-xs transition ${
-                          isLatest
-                            ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
-                            : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
+                          isCampaign
+                            ? 'border-[#7C8CFF]/30 bg-[#7C8CFF]/10 text-neutral-200 hover:border-[#7C8CFF]/50'
+                            : isLatest
+                              ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
+                              : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between gap-1.5">
                           <span className="truncate">
-                            {item.preview || (item.content || '').slice(0, 80)}
+                            {isCampaign ? (item.label || 'Campaign session') : item.preview || (item.content || '').slice(0, 80)}
                           </span>
-                          {isLatest && (
+                          {isCampaign ? (
+                            <span className="shrink-0 rounded-full border border-[#7C8CFF]/30 px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
+                              ⚡ Campaign
+                            </span>
+                          ) : isLatest && (
                             <span className="text-[14px] uppercase tracking-[0.14em] text-[#7C8CFF]">
                               Latest
                             </span>
