@@ -653,6 +653,7 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showProLiveGate, setShowProLiveGate] = useState(false)
+  const [showSessionPicker, setShowSessionPicker] = useState(false)
 
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
@@ -3844,7 +3845,7 @@ I will guide you in real time. Start speaking.`
         <button
           onClick={() => {
             setShowProLiveGate(false)
-            setShowCampaignMenu(true)
+            setShowSessionPicker(true)
           }}
           className="w-full rounded-xl border border-white/10 px-3 py-2 text-left text-sm text-white hover:border-[#7C8CFF]/40"
         >
