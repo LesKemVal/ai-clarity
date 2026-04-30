@@ -1044,7 +1044,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as any[]
 
     return existing
-      .filter((item) => (item.folder || '').trim() === folder.trim())
+      .filter((item) => (item.type || 'memory') === 'memory' && (item.folder || '').trim() === folder.trim())
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
   }
 
@@ -1052,6 +1052,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     if (typeof window === 'undefined') return null
 
     const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as Array<{
+      type?: 'memory' | 'campaign'
       content?: string
       role?: string
       folder?: string
@@ -1061,7 +1062,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     }>
 
     const matches = existing
-      .filter((item) => (item.folder || '').trim() === folder.trim())
+      .filter((item) => (item.type || 'memory') === 'memory' && (item.folder || '').trim() === folder.trim())
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
 
     if (!matches.length) return null
@@ -1098,6 +1099,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         : (message.content || '').slice(0, 120)
 
     existing.push({
+      type: 'memory',
       content: message.content,
       preview: abbreviated,
       role: message.role,
@@ -3498,11 +3500,11 @@ Cue:`
           setShowRecentFolders((prev) => !prev)
           setActiveMemoryFolder(null)
         }}
-        className={`relative flex h-9 w-9 items-center justify-center transition ${
-(activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live'))
-? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.9)] shadow-[0_0_18px_rgba(124,140,255,0.45)]'
-: 'text-white/85 hover:text-white'
-}` }
+        className={`relative flex h-9 w-9 items-center justify-center transition-all duration-300 ${
+          liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
+            ? 'text-[#7C8CFF] animate-pulse drop-shadow-[0_0_12px_rgba(124,140,255,0.85)]'
+            : 'text-white/85 hover:text-white'
+        }`}
         aria-label="Open memory folders"
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -3877,6 +3879,15 @@ I will guide you in real time. Start speaking.`
                 key={session.id}
                 type="button"
                 onClick={() => {
+                  const canLoadCampaign = currentTier === 'brilliant'
+
+                  if (!canLoadCampaign) {
+                    setToastMessage('Pro Mode required to resume campaign context.')
+                    setShowToast(true)
+                    setShowUpgradeModal(true)
+                    return
+                  }
+
                   const restoredMessages = Array.isArray(session.messages) && session.messages.length
                     ? session.messages
                     : [
