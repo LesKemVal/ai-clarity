@@ -3012,12 +3012,22 @@ Cue:`
       const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
       const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
       const style = activeCampaign?.outputStyle || 'short_cues'
-      const prompt = `GEORGE, give me the next move for this live conversation.
+      const delivery = activeCampaign?.deliveryMode || 'text'
+      const prompt = `GEORGE, give me the next live cue.
 
 Goal: ${goal}
 Mode: ${mode}
 Output style: ${style}
+Tone: ${assistTone}
+Delivery: ${delivery}
+
 Use the active campaign context, constraints, and what is happening now.
+
+Rules:
+- If delivery is text: return structured Say / Backup / Cue.
+- If delivery is audio: give a speakable line with a delivery instruction, not emotional performance.
+- If delivery is repeat: give one short repeatable line.
+- Do not explain.
 
 Return only:
 Say:
@@ -3026,7 +3036,7 @@ Cue:`
 
       void handleSend(prompt)
     }}>
-      G?
+      CUE
     </button>
 
     {tonePopupIndex === i && (
