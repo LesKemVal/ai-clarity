@@ -1049,6 +1049,33 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
   }
 
+  const getCampaigns = () => {
+    if (typeof window === 'undefined') return []
+
+    try {
+      return JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]') || []
+    } catch {
+      return []
+    }
+  }
+
+  const getFolderItems = (folder: string) => {
+    if (typeof window === 'undefined') return []
+
+    const memoryItems = getMemoriesByFolder(folder)
+
+    const campaigns = getCampaigns()
+
+    const campaignItems = campaigns.map((session: any) => ({
+      ...session,
+      type: "campaign",
+      folder: "campaigns",
+    }))
+
+    return [...memoryItems, ...campaignItems]
+  }
+
+
   const getLatestSavedMemoryByFolder = (folder: string) => {
     if (typeof window === 'undefined') return null
 
