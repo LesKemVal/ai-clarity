@@ -1074,7 +1074,7 @@ export async function POST(req: Request) {
 
 ${getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled)}
 
-${getOutputStyleRules(activeCampaign)}
+${activeCampaign ? getOutputStyleRules(activeCampaign) : ''}
 
 CONTROL STATE
 - User state: ${control.userState}
