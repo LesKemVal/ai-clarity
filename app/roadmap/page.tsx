@@ -6,7 +6,9 @@ export default function RoadmapPage() {
 
   function enterGeorge() {
     window.localStorage.setItem('george_active', 'true')
-    window.location.href = '/george'
+    if (typeof window !== 'undefined') {
+      window.history.back()
+    }
   }
 
   function goWaitlist() {

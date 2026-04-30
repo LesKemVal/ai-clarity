@@ -133,7 +133,7 @@ export default function Sidebar({
       {/* Collapsed Rail (desktop only) */}
       {!showSidebar && (
         <div className="hidden xl:flex fixed left-0 top-0 z-[110] h-screen w-[72px] flex-col items-center gap-6 border-r border-white/10 bg-black/90 pt-4">
-          <img src="/branding/logo.png" className="h-10 w-10 rounded-full" />
+          <img src="/branding/logo.png" className="h-10 w-10 rounded-full mt-[3px]" />
 
           <button className="text-white/60 hover:text-white">✎</button>
           <button className="text-white/60 hover:text-white">🔍</button>
@@ -153,14 +153,14 @@ return (
             <img
               src="/branding/logo.png"
               alt="BRANESx"
-              className="h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
+              className="mt-[3px] h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
             />
           </div>
 
           <button
             type="button"
             onClick={() => setShowSidebar?.(false)}
-            className="text-white/40 transition hover:text-white xl:hidden"
+            className="text-white/40 transition hover:text-white"
             aria-label="Close sidebar"
           >
             ×
