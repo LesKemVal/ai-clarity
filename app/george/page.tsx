@@ -932,6 +932,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
         existing.unshift({
           id: `session_${Date.now()}`,
+          type: "campaign",
           label: sessionLabel,
           createdAt: Date.now(),
           messages: messagesRef.current,
@@ -2588,6 +2589,7 @@ return (
               if (messagesRef.current.length > 1) {
                 existing.unshift({
                   id: Date.now(),
+                  type: "campaign",
                   createdAt: new Date().toISOString(),
                   messages: messagesRef.current
                 })
