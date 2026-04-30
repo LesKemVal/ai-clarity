@@ -4025,13 +4025,7 @@ I will guide you in real time. Start speaking.`
 
                   const resumeMessage = {
                     role: 'assistant',
-                    content: `Campaign ready: ${session.label || 'Saved Campaign'}.
-
-Say:
-“Let’s open strong and move toward the next step.”
-
-Backup:
-“What would make this worth your time today?”`
+                    content: `Need a quick 10-second setup on product and controls, or should I start the call?`
                   } as Message
 
                   const nextMessages = [resumeMessage]
