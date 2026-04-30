@@ -35,6 +35,11 @@ type ActiveCampaign = {
   callingFromRegion?: string
   callingToRegion?: string
   desiredOutcome?: string
+  assistMode?: 'manual' | 'negotiation' | 'objection_handling' | 'discovery' | 'closing' | 'compliance'
+  deliveryMode?: 'text' | 'audio' | 'both'
+  outputStyle?: 'say_ask_boundary_close' | 'short_cues' | 'repeatable_lines'
+  successSignal?: string
+  currentGoal?: string
   complianceBoundaries?: string
   requiredLanguage?: string[]
   forbiddenClaims?: string[]
@@ -84,6 +89,11 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Calling from region: ${activeCampaign.callingFromRegion || 'not provided'}
 - Calling to region: ${activeCampaign.callingToRegion || 'not provided'}
 - Desired outcome: ${activeCampaign.desiredOutcome || 'not provided'}
+- Current goal: ${activeCampaign.currentGoal || activeCampaign.desiredOutcome || 'not provided'}
+- Assist mode: ${activeCampaign.assistMode || 'manual'}
+- Delivery mode: ${activeCampaign.deliveryMode || 'text'}
+- Output style: ${activeCampaign.outputStyle || 'short_cues'}
+- Success signal: ${activeCampaign.successSignal || 'not provided'}
 - Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
 - Required language: ${requiredLanguage}
 - Forbidden claims: ${forbiddenClaims}
