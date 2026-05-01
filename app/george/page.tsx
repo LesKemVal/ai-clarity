@@ -4980,6 +4980,10 @@ Start at screener. No pitch.`
       )}
 
 {showUpgradeModal && (
+  <>
+    <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" />
+
+
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-4 backdrop-blur-sm overflow-y-auto"
           onClick={() => setShowUpgradeModal(false)}
@@ -4989,20 +4993,15 @@ Start at screener. No pitch.`
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 text-center">
-              <p className="text-sm font-medium text-white">Take GEORGE further</p>
-              <p className="mt-0.5 text-xs leading-6 text-neutral-400">
-                Choose the level of support you want.
+              <p className="text-sm font-medium text-white">Stay Brilliant.</p>
+              <p className="mt-1 text-xs leading-6 text-neutral-400">
+                You are already operating at a higher level.
+                Choose how much control and execution support you want.
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="w-full rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 text-left">
-                <div className="text-sm font-medium text-white">Beta checkout instructions</div>
-                <div className="mt-2 text-xs leading-6 text-neutral-300">
-                  Intelligent currently uses Stripe test mode.<br />
-                  Card: 4242 4242 4242 4242<br />
-                  Use any future date, any 3-digit CVC, and any name or email you want.
-                </div>
+              
               </div>
 
               <button
@@ -5100,7 +5099,7 @@ Start at screener. No pitch.`
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {showCampaignUpgradeGate && (

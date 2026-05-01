@@ -44,7 +44,7 @@ export default function RoadmapPage() {
                   </p>
 
                   <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
-                    Early users get first access to future features, smarter guidance, and premium upgrades as GEORGE continues to mature.
+                    GEORGE improves your performance in real time. Start free. Upgrade when you want stronger control, continuity, and live execution advantage.
                   </div>
                 </div>
               </div>
