@@ -164,6 +164,73 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
     return calls > 0 ? `${Math.round((losses / calls) * 100)}%` : 'not enough data'
   })()}
 
+- Weak spot diagnosis:
+  ${(() => {
+    const history = activeCampaign.performance?.history || []
+    const weakSpots = activeCampaign.performance?.weakSpots || []
+    const objections = activeCampaign.performance?.objections || 0
+    const callbacks = activeCampaign.performance?.callbacks || activeCampaign.performance?.followUps || 0
+    const closes = activeCampaign.performance?.closes || activeCampaign.performance?.wins || 0
+    const losses = activeCampaign.performance?.losses || 0
+
+    if (weakSpots.length) {
+      return `Known weak spots: ${weakSpots.slice(0, 5).join(', ')}. Compensate before the user reaches that point.`
+    }
+
+    if (callbacks > closes && callbacks >= losses) {
+      return "Likely weak spot: accepting delay too easily. Push for a decision or scheduled commitment before fallback."
+    }
+
+    if (objections > closes) {
+      return "Likely weak spot: objection control. Isolate the objection, reframe value, then reattempt the close."
+    }
+
+    if (losses > closes) {
+      return "Likely weak spot: weak opening or poor qualification. Tighten the opening, identify decision power faster, and avoid pitching before need is clear."
+    }
+
+    if (history.length < 3) {
+      return "Not enough weak-spot data yet. Watch for hesitation, objections, delays, and missed closing moments."
+    }
+
+    return "No dominant weak spot detected. Keep collecting outcomes and preserve what works."
+  })()}
+- Streak detection:
+  ${(() => {
+    const history = activeCampaign.performance?.history || []
+    if (history.length < 3) return "No streak detected."
+
+    const recent = history.slice(0, 5).map(h => h.signal)
+
+    let streakType = null
+    let streakCount = 1
+
+    for (let i = 1; i < recent.length; i++) {
+      if (recent[i] === recent[0]) {
+        streakCount++
+      } else {
+        break
+      }
+    }
+
+    if (streakCount >= 3) {
+      streakType = recent[0]
+    }
+
+    if (streakType === "LOSS") {
+      return "Loss streak detected. Change behavior immediately. Tighten control, reduce passive language, and push for decision earlier."
+    }
+
+    if (streakType === "FOLLOW_UP") {
+      return "Follow-up streak detected. Stop allowing delay. Push for commitment and reduce soft exits."
+    }
+
+    if (streakType === "WIN") {
+      return "Win streak detected. Reinforce current structure. Maintain pressure and consistency."
+    }
+
+    return "No strong streak. Continue normal adaptive behavior."
+  })()}
 - Pacing intelligence:
   ${(() => {
     const history = activeCampaign.performance?.history || []
