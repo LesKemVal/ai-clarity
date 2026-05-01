@@ -57,7 +57,7 @@ type ActiveCampaign = {
     callbacks?: number
     closes?: number
     weakSpots?: string[]
-    history?: Array<{ signal?: string; context?: string | null; ts?: number }>
+    history?: Array<{ signal?: string; context?: string | null; ts?: number; duration?: number | null }>
   }
 } | null
 
@@ -164,6 +164,18 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
     return calls > 0 ? `${Math.round((losses / calls) * 100)}%` : 'not enough data'
   })()}
 
+- Pacing intelligence:
+  ${(() => {
+    const history = activeCampaign.performance?.history || []
+    if (history.length < 3) return "Not enough pacing data yet."
+
+    const recent = history.slice(0, 5)
+    const avgDuration = recent.reduce((sum, h) => sum + (h.duration || 0), 0) / recent.length
+
+    if (avgDuration < 60000) return "Fast attempts detected. Maintain pressure but avoid rushing past key objections."
+    if (avgDuration > 180000) return "Slow pacing detected. Tighten conversations and push toward decisions sooner."
+    return "Balanced pacing. Maintain control and continue applying pressure intelligently."
+  })()}
 - Performance behavior directive:
   ${(() => {
     const calls = activeCampaign.performance?.calls || 0

@@ -756,7 +756,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
-  const [showOutcomeBar, setShowOutcomeBar] = useState(false)
+  const [attemptStartTime, setAttemptStartTime] = useState<number | null>(null)
+const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -1012,6 +1013,7 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
       window.localStorage.removeItem('george_intake_pending')
 
       enterLiveMode()
+setAttemptStartTime(Date.now())
       setConversationMode('professional_intake')
       setActivePromptContext('professional_intake')
       setActivePromptLabel('Pro Conversation Partner')
@@ -4454,7 +4456,12 @@ Start at screener. No pitch.`
                     closes: (perf.closes || 0) + (signal === 'WIN' ? 1 : 0),
                     callbacks: (perf.callbacks || 0) + (signal === 'FOLLOW_UP' ? 1 : 0),
                     history: [
-                      { signal, context: lastOutcomeContext, ts: Date.now() },
+                      {
+                        signal,
+                        context: lastOutcomeContext,
+                        ts: Date.now(),
+                        duration: attemptStartTime ? (Date.now() - attemptStartTime) : null
+                      },
                       ...((perf.history || []) as any[]),
                     ].slice(0, 50),
                   }
