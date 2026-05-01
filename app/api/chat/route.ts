@@ -48,6 +48,17 @@ type ActiveCampaign = {
   qualificationRules?: string[]
   dataToPreserve?: string[]
   defaultAnswersEnabled?: boolean
+  performance?: {
+    wins?: number
+    losses?: number
+    followUps?: number
+    calls?: number
+    objections?: number
+    callbacks?: number
+    closes?: number
+    weakSpots?: string[]
+    history?: Array<{ signal?: string; context?: string | null; ts?: number }>
+  }
 } | null
 
 function getOutputStyleRules(activeCampaign: ActiveCampaign) {
@@ -131,6 +142,19 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Output style: ${activeCampaign.outputStyle || 'short_cues'}
 - Assist tone: ${activeCampaign.assistTone || 'direct'}
 - Success signal: ${activeCampaign.successSignal || 'not provided'}
+- Performance:
+  Wins: ${activeCampaign.performance?.wins || 0}
+  Losses: ${activeCampaign.performance?.losses || 0}
+  Follow-ups: ${activeCampaign.performance?.followUps || 0}
+
+- Interpretation:
+  ${(
+    (activeCampaign.performance?.wins || 0) > (activeCampaign.performance?.losses || 0)
+      ? "You are performing well. Continue applying pressure and closing."
+      : (activeCampaign.performance?.losses || 0) > (activeCampaign.performance?.wins || 0)
+      ? "You are losing more than closing. Adjust earlier, tighten control, and reduce passive responses."
+      : "Performance is neutral. Push for clearer outcomes and stronger closes."
+  )}
 - Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
 - Required language: ${requiredLanguage}
 - Forbidden claims: ${forbiddenClaims}
