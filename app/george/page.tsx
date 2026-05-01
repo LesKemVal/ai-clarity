@@ -3699,7 +3699,9 @@ if (liveMode) {
                 </div>
 
                 <div className="max-h-[168px] space-y-2 overflow-y-auto pr-1">
-                  {getFolderItems(activeMemoryFolder).map((item, idx) => {
+                  {getFolderItems(activeMemoryFolder)
+  .filter(item => (item.type || 'memory') !== 'campaign')
+  .map((item, idx) => {
                     const textBlock =
                       item.savedPair && item.userPromptContent
                         ? `User: ${item.userPromptContent}\nGEORGE: ${item.content}`
