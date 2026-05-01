@@ -3098,17 +3098,28 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {rewordPopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
-            rewordPopupUpward ? 'bottom-[35px]' : 'top-[29px]'
+          className={`absolute left-0 z-[80] w-44 rounded-xl border border-white/10 bg-black/95 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+            rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
-          {(['Reword','Rescript','Shorter','Stronger'] as const).map((action) => (
+          <div className="flex items-center justify-between px-2 py-1 border-b border-white/10">
+            <span className="text-[10px] tracking-[0.12em] text-white/50">REWORD</span>
             <button
-              key={action}
-              onClick={() => {
-                const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-                const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
-                const prompt = `Rewrite the line below for a live call.
+              onClick={() => setRewordPopupIndex(null)}
+              className="text-white/40 hover:text-white transition text-[12px]"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="p-1.5">
+            {(['Reword','Rescript','Shorter','Stronger'] as const).map((action) => (
+              <button
+                key={action}
+                onClick={() => {
+                  const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
+                  const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+                  const prompt = `Rewrite the line below for a live call.
 
 Goal: ${goal}
 Mode: ${mode}
@@ -3120,14 +3131,15 @@ Say:
 Backup:
 Cue:`
 
-                setRewordPopupIndex(null)
-                void handleSend(prompt)
-              }}
-              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
-            >
-              {action}
-            </button>
-          ))}
+                  setRewordPopupIndex(null)
+                  void handleSend(prompt)
+                }}
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+              >
+                {action}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
