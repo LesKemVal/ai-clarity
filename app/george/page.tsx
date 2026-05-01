@@ -3688,7 +3688,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="absolute bottom-[155px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="absolute bottom-full mb-3 left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
@@ -3823,7 +3823,7 @@ if (liveMode) {
       )}
 
       {showPromptMenu && (
-        <div className="absolute bottom-[155px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="absolute bottom-full mb-3 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
               type="button"
@@ -3934,7 +3934,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[220px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
+          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -4001,7 +4001,7 @@ I will guide you in real time. Start speaking.`
       className="fixed inset-0 z-[170] bg-black/50"
     />
 
-    <div className="fixed inset-x-0 bottom-[188px] z-[190] flex justify-center px-4">
+    <div className="fixed inset-x-0 bottom-[120px] z-[190] flex justify-center px-4">
       <div className="w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
@@ -4123,16 +4123,16 @@ Start at screener. No pitch.`
           setShowProLiveGate(false)
         }
       }}
-      className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[140] bg-black/60 backdrop-blur-[2px]"
     />
 
     <div
       onClick={() => setShowProLiveGate(false)}
-      className="fixed inset-0 z-[130] flex items-end justify-center px-4 pb-[96px]"
+      className="pointer-events-none fixed inset-0 z-[150] flex items-end justify-center px-4 pb-[120px]"
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
