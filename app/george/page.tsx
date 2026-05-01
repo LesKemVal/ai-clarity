@@ -3627,7 +3627,7 @@ Cue:`
         }`}
         aria-label="Open campaign selector"
       >
-        {activeCampaign ? (activeCampaign.name === 'Starter Campaign' ? 'Campaign' : activeCampaign.name) : 'Campaign'}
+        {activeCampaign ? (activeCampaign.name === 'Starter Campaign' ? 'Active' : activeCampaign.name) : 'Campaign'}
       </button>
 
       <button
