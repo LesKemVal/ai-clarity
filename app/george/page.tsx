@@ -3714,7 +3714,13 @@ if (liveMode) {
                         type="button"
                         onClick={() => {
                           if (isCampaign) {
-                            setShowCampaignUpgradeGate(true)
+                            if (currentTier === 'brilliant') {
+                              setShowRecentFolders(false)
+                              setActiveMemoryFolder(null)
+                              setShowSessionPicker(true)
+                            } else {
+                              setShowCampaignUpgradeGate(true)
+                            }
                             return
                           }
 
