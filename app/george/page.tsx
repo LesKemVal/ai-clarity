@@ -4124,11 +4124,10 @@ Start at screener. No pitch.`
           setShowProLiveGate(false)
         }
       }}
-      className="fixed inset-0 z-[140] bg-black/60 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[140] bg-black/70 backdrop-blur-[2px]"
     />
 
     <div
-      onClick={() => setShowProLiveGate(false)}
       className="pointer-events-none fixed inset-0 z-[150] flex items-end justify-center px-4 pb-[120px]"
     >
       <div
