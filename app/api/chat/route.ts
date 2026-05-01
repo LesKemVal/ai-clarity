@@ -987,6 +987,7 @@ function detectLiveScenario(input: string) {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
+    const language = body?.language === 'ES' ? 'ES' : 'EN'
 
     const incomingMessages: IncomingMessage[] = Array.isArray(body?.messages)
       ? body.messages
@@ -1062,7 +1063,18 @@ export async function POST(req: Request) {
         ? (process.env.OPENAI_MODEL_INTELLIGENT || 'gpt-4o')
         : (process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini')
 
-    const systemContent =
+    
+    const languageRule =
+      language === 'ES'
+        ? `
+LANGUAGE MODE: SPANISH
+- Respond fully in Spanish.
+- Do not mix English unless explicitly requested.
+- Stay natural, direct, and clear in Spanish.
+`
+        : ''
+
+    const systemContent = languageRule +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
