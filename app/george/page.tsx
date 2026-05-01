@@ -2362,6 +2362,12 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           return
         }
 
+        const campaignContextActive =
+          liveMode ||
+          activePromptContext?.includes('conversation') ||
+          activePromptContext?.includes('professional') ||
+          activePromptContext?.includes('brilliant_live')
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2379,14 +2385,14 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
             isFirstSession: updatedMessages.length <= 2,
             promptContext: activePromptContext,
             promptLabel: activePromptLabel,
-            activeCampaign: activeCampaign
+            activeCampaign: activeCampaign && campaignContextActive
               ? {
                   ...activeCampaign,
                   assistTone,
                   deliveryMode: activeCampaign.deliveryMode || 'text',
                 }
               : null,
-            campaignDefaultsEnabled: activeCampaign?.defaultAnswersEnabled ?? true,
+            campaignDefaultsEnabled: campaignContextActive ? (activeCampaign?.defaultAnswersEnabled ?? true) : false,
             contextTurnCount,
             tier: currentTier,
             language,
@@ -3614,7 +3620,7 @@ Cue:`
       </svg>
     </button>
 
-    <div ref={promptMenuRef} className="relative flex items-center gap-3">
+    <div className="relative flex items-center gap-3">
       <button
         type="button"
         onClick={(e) => {
