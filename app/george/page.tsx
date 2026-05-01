@@ -2849,7 +2849,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-black/50 backdrop-blur-sm xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/75 backdrop-blur-md xl:hidden"
           />
         )}
 
@@ -3093,12 +3093,12 @@ return (
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-3 flex items-end justify-center gap-1.5 px-3 py-2">
-        <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-smile-1" />
-        <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-2" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#7C8CFF] pulse-smile-3" />
-        <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-4" />
-        <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-smile-5" />
+      <div className="mt-3 flex items-center justify-center gap-[3px] px-3 py-2">
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.6s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.8s]" />
       </div>
     </div>
   )}
