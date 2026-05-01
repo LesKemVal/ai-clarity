@@ -3305,7 +3305,12 @@ Cue:`
       const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
       const style = activeCampaign?.outputStyle || 'short_cues'
       const delivery = activeCampaign?.deliveryMode || 'text'
-      const prompt = `GEORGE, give me the next live cue.
+      const closingDirective = forceClose
+  ? "\n\n[DIRECTIVE: Stay in close. Continue pushing for a decision. Do not drift.]"
+  : ""
+
+const prompt = `GEORGE, give me the next live cue.${closingDirective}
+
 
 Goal: ${goal}
 Mode: ${mode}
