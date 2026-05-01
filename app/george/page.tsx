@@ -4002,7 +4002,7 @@ I will guide you in real time. Start speaking.`
       className="pointer-events-auto fixed inset-0 z-[200] bg-black/75 backdrop-blur-[3px]"
     />
 
-    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4">
+    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
       <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
@@ -4128,7 +4128,7 @@ Start at screener. No pitch.`
     />
 
     <div
-      className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4"
+      className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]"
     >
       <div
         onClick={(event) => event.stopPropagation()}
@@ -4561,7 +4561,7 @@ Start at screener. No pitch.`
 
       
       {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
           <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-3">Conversation Engine</p>
 
