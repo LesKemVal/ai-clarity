@@ -756,7 +756,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [showOutcomeBar, setShowOutcomeBar] = useState(false)
+const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
+
+const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
   const [upgradeCtaWord, setUpgradeCtaWord] = useState<'Intelligent' | 'Brilliant'>('Intelligent')
 
@@ -2155,6 +2158,12 @@ const handleSend = useCallback(
 
         const nextMessages: Message[] = [...messagesRef.current, userMessage, assistantMessage]
         setMessages(nextMessages)
+setTimeout(() => {
+  setShowOutcomeBar(true)
+  setLastOutcomeContext("post_call")
+}, 1200)
+
+
         messagesRef.current = nextMessages
         return
       }
@@ -4398,7 +4407,57 @@ Start at screener. No pitch.`
 
 </div>
 
-              {liveMode && (
+              
+{showOutcomeBar && (
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/10 bg-black/90 px-3 py-2 backdrop-blur-xl">
+
+    <div className="text-[11px] text-white/60 mb-2">
+      What happened here?
+    </div>
+
+    <div className="flex justify-between gap-2">
+
+      <button
+        onClick={() => {
+          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
+          history.unshift({ signal: "WIN", ts: Date.now() })
+          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
+          setShowOutcomeBar(false)
+        }}
+        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-green-400"
+      >
+        ✓ Won
+      </button>
+
+      <button
+        onClick={() => {
+          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
+          history.unshift({ signal: "LOSS", ts: Date.now() })
+          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
+          setShowOutcomeBar(false)
+        }}
+        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-red-400"
+      >
+        ✗ Lost
+      </button>
+
+      <button
+        onClick={() => {
+          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
+          history.unshift({ signal: "FOLLOW_UP", ts: Date.now() })
+          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
+          setShowOutcomeBar(false)
+        }}
+        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-yellow-400"
+      >
+        ↻ Follow-up
+      </button>
+
+    </div>
+  </div>
+)}
+
+{liveMode && (
                 <div className="fixed bottom-[96px] left-0 right-0 z-[70] mx-auto w-[calc(100%-24px)] max-w-[900px] rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
                   <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
                     <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
