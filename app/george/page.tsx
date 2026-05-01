@@ -5036,9 +5036,9 @@ Start at screener. No pitch.`
                 }}
                 className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
               >
-                <div className="text-sm font-medium text-white">Explore Intelligent — Beta Test Checkout</div>
+                <div className="text-sm font-medium text-white">Move with Intelligent</div>
                 <div className="mt-0.5 text-xs leading-6 text-neutral-400">
-                  Structure your thinking, make faster decisions, and execute with clarity.
+                  Structure your moves, remove hesitation, and make consistent progress.
                 </div>
               </button>
 
@@ -5074,9 +5074,9 @@ Start at screener. No pitch.`
                 }}
                 className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
               >
-                <div className="text-sm font-medium text-white">Go Brilliant</div>
+                <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
                 <div className="mt-0.5 text-xs leading-6 text-neutral-300">
-                  Conversation Engine, LIVE cues, room-awareness, premium execution support.
+                  Real-time execution when words, timing, and pressure matter.
                 </div>
               </button>
             </div>
