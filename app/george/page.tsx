@@ -1280,14 +1280,12 @@ requestAnimationFrame(() => {
       const insidePromptMenu = promptMenuRef.current?.contains(target) ?? false
 
       if (!insideSavePicker && !insideFolderBrowser && !insidePromptMenu) {
-        // delay close so click on trigger doesn't instantly cancel
-        setTimeout(() => {
-          setShowPromptMenu(false)
-          setShowRecentFolders(false)
-          setActiveMemoryFolder(null)
-        }, 120)
-
+        setShowPromptMenu(false)
+        setShowRecentFolders(false)
+        setActiveMemoryFolder(null)
         setActiveSaveIndex(null)
+        setRewordPopupIndex(null)
+        setTonePopupIndex(null)
       }
     }
 
@@ -3548,33 +3546,7 @@ Cue:`
 
               <div className={`${liveMode ? "hidden" : "fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
-  <div className="flex items-center gapx-4 py-3 text-white/80 text-[13px]">
-    <button
-      type="button"
-      onClick={() => {
-        setActivePromptLabel('Focus')
-        setActivePromptContext('focus_mode')
-        setConversationSignal('FOCUS patched in')
-        setMessages((prev) => {
-          const next: Message[] = [
-            ...prev,
-            {
-              role: 'assistant',
-              content: 'FOCUS patched in. I’m sharper now. Continue.',
-            },
-          ]
-          messagesRef.current = next
-          return next
-        })
-      }}
-      className="transition hover:text-white"
-      aria-label="Focus"
-    >
-      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
-        <circle cx="12" cy="12" r="7" />
-        <circle cx="12" cy="12" r="2.5" />
-      </svg>
-    </button>
+  <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
 
     <button
       type="button"
@@ -3582,42 +3554,6 @@ Cue:`
       className="transition hover:text-white"
     >
       Help
-    </button>
-
-    <button
-      type="button"
-      onClick={async () => {
-        if (isSharingGeorgeLink) return
-
-        const url = window.location.origin + '/george'
-
-        try {
-          setIsSharingGeorgeLink(true)
-
-          if (navigator.share) {
-            await navigator.share({ title: 'GEORGE by BRANESx', text: 'Want to get something done? GEORGE is your guide.', url })
-          } else if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(url)
-            setToastMessage('GEORGE link copied')
-            setShowToast(true)
-          }
-        } catch (error: any) {
-          if (error?.name !== 'AbortError' && error?.name !== 'InvalidStateError') {
-            setToastMessage('Unable to share right now')
-            setShowToast(true)
-          }
-        } finally {
-          setIsSharingGeorgeLink(false)
-        }
-      }}
-      className="transition hover:text-white"
-    >
-      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2">
-        <circle cx="18" cy="5" r="2"/>
-        <circle cx="6" cy="12" r="2"/>
-        <circle cx="18" cy="19" r="2"/>
-        <path d="M8 12l8-6M8 12l8 6"/>
-      </svg>
     </button>
 
     <div className="relative flex items-center gap-3">
@@ -3638,7 +3574,7 @@ Cue:`
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          setShowRecentFolders((prev) => !prev)
+          setShowRecentFolders(prev => !prev)
           setActiveMemoryFolder(null)
         }}
         className={`relative flex h-9 w-9 items-center justify-center transition-all duration-300 ${
@@ -3817,13 +3753,8 @@ if (liveMode) {
 
       {showPromptMenu && (
         <div
-          onClick={() => setShowPromptMenu(false)}
-          className="fixed inset-0 z-[49] bg-black/70 backdrop-blur-sm"
-        />
-      )}
-
-      {showPromptMenu && (
-        <div className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          ref={promptMenuRef}
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
               type="button"
