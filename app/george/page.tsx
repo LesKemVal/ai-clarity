@@ -3,6 +3,7 @@
 
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
@@ -2844,8 +2845,8 @@ Cue:`
 
 
 return (
-    <main className={`app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100 transition duration-200 ${showUpgradeModal ? "blur-[6px] brightness-[0.6]" : ""}`}>
-      <div id="george-app-content" className={`mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden transition duration-200 ${showUpgradeModal ? "blur-[6px] brightness-[0.6]" : ""}`}>
+    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
+      <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
@@ -2991,7 +2992,7 @@ return (
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-visible px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-2 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-1.5.5 xl:hidden">
                   <button
@@ -3061,7 +3062,7 @@ return (
 
             
 {conversationSignal && (
-  <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-[#0B0F1A]/90 px-4 py-2 text-xs text-[#7C8CFF] shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl animate-pulse">
+  <div className={`fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-[#0B0F1A]/90 px-4 py-2 text-xs text-[#7C8CFF] shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl animate-pulse transition duration-200`}>
     {conversationSignal}
   </div>
 )}
@@ -3775,7 +3776,7 @@ Cue:`)
   })}
   
 {showScrollHint && (
-  <div className="pointer-events-none fixed bottom-[110px] left-1/2 z-[70] -translate-x-1/2 flex flex-col items-center gap-1">
+  <div className={`pointer-events-none fixed bottom-[110px] left-1/2 z-[70] -translate-x-1/2 flex flex-col items-center gap-1 transition duration-200`}>
     <div className="flex gap-1">
       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse" />
       <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
@@ -3792,7 +3793,7 @@ Cue:`)
 
             
 
-            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
               <div className={`${liveMode ? "hidden" : "fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
@@ -4631,7 +4632,7 @@ Start at screener. No pitch.`
                 <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-28 bg-gradient-to-t from-black via-black/90 to-transparent" />
               )}
 
-              <div className="fixed bottom-[16px] left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+              <div className={`fixed bottom-[16px] left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-2 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition duration-200`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
@@ -4980,127 +4981,129 @@ Start at screener. No pitch.`
       )}
 
 
-      {showUpgradeModal && (
+      {showUpgradeModal && typeof document !== 'undefined' && createPortal(
   <>
-    
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Close upgrade menu"
+      onClick={() => setShowUpgradeModal(false)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+          setShowUpgradeModal(false)
+        }
+      }}
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/45 backdrop-blur-[6px]"
+    />
 
-        <div
-          className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-4 overflow-y-auto"
-          onClick={() => setShowUpgradeModal(false)}
-        >
-          <div
-            className="w-full max-w-md rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-5 text-center">
-              <p className="text-sm font-medium text-white">Stay Brilliant.</p>
-              <p className="mt-1 text-xs leading-6 text-neutral-400">
-                You are already operating at a higher level.
-                Choose how much control and execution support you want.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              
-              </div>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/subscribe', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({ tier: 'intelligent' }),
-                    })
-
-                    const data = await response.json()
-
-                    if (data?.url) {
-                      if (data.url && data.url.startsWith('http')) {
-  window.location.href = data.url
-} else {
-  router.replace(data.url)
-}
-                      return
-                    }
-
-                    setToastMessage(data?.error || 'Unable to open checkout.')
-                    setShowToast(true)
-                  } catch {
-                    setToastMessage('Unable to open checkout.')
-                    setShowToast(true)
-                  }
-                }}
-                className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
-              >
-                <div className="text-sm font-medium text-white">Move with Intelligent</div>
-                <div className="mt-0.5 text-xs leading-6 text-neutral-400">
-                  Structure your moves, remove hesitation, and make consistent progress.
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/subscribe', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({ tier: 'brilliant' }),
-                    })
-
-                    const data = await response.json()
-
-                    if (data?.url) {
-                      if (data.url && data.url.startsWith('http')) {
-  window.location.href = data.url
-} else {
-  router.replace(data.url)
-}
-                      return
-                    }
-
-                    setToastMessage(data?.error || 'Unable to open checkout.')
-                    setShowToast(true)
-                  } catch {
-                    setToastMessage('Unable to open checkout.')
-                    setShowToast(true)
-                  }
-                }}
-                className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
-              >
-                <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
-                <div className="mt-0.5 text-xs leading-6 text-neutral-300">
-                  Real-time execution when words, timing, and pressure matter.
-                </div>
-              </button>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-              <button
-                type="button"
-                onClick={() => setShowUpgradeModal(false)}
-                className="text-xs text-neutral-500 transition hover:text-white"
-              >
-                Close
-              </button>
-
-              <button
-                type="button"
-                onClick={() => window.open('/top-up','_blank')}
-                className="text-xs text-[#7C8CFF] transition hover:opacity-80"
-              >
-                See full options
-              </button>
-            </div>
+    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-4 overflow-y-auto">
+      <div
+        className="pointer-events-auto w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-5 text-center">
+          <p className="text-sm font-medium text-white">Stay Brilliant.</p>
+          <p className="mt-1 text-xs leading-6 text-neutral-400">
+            You are already operating at a higher level. Choose how much control and execution support you want.
+          </p>
         </div>
-        </>
-      )}
+
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/subscribe', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ tier: 'intelligent' }),
+                })
+
+                const data = await response.json()
+
+                if (data?.url) {
+                  if (data.url && data.url.startsWith('http')) {
+                    window.location.href = data.url
+                  } else {
+                    router.replace(data.url)
+                  }
+                  return
+                }
+
+                setToastMessage(data?.error || 'Unable to open checkout.')
+                setShowToast(true)
+              } catch {
+                setToastMessage('Unable to open checkout.')
+                setShowToast(true)
+              }
+            }}
+            className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+          >
+            <div className="text-sm font-medium text-white">Move with Intelligent</div>
+            <div className="mt-0.5 text-xs leading-6 text-neutral-400">
+              Structure your moves, remove hesitation, and make consistent progress.
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/subscribe', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ tier: 'brilliant' }),
+                })
+
+                const data = await response.json()
+
+                if (data?.url) {
+                  if (data.url && data.url.startsWith('http')) {
+                    window.location.href = data.url
+                  } else {
+                    router.replace(data.url)
+                  }
+                  return
+                }
+
+                setToastMessage(data?.error || 'Unable to open checkout.')
+                setShowToast(true)
+              } catch {
+                setToastMessage('Unable to open checkout.')
+                setShowToast(true)
+              }
+            }}
+            className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
+          >
+            <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
+            <div className="mt-0.5 text-xs leading-6 text-neutral-300">
+              Real-time execution when words, timing, and pressure matter.
+            </div>
+          </button>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
+          <button
+            type="button"
+            onClick={() => setShowUpgradeModal(false)}
+            className="text-xs text-neutral-500 transition hover:text-white"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.open('/top-up','_blank')}
+            className="text-xs text-[#7C8CFF] transition hover:opacity-80"
+          >
+            See full options
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
