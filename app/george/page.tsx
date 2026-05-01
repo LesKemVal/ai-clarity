@@ -1732,7 +1732,9 @@ requestAnimationFrame(() => {
     const res = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: text, speed: voiceSpeed, tier: currentTier, voice: voiceType }),
+      body: JSON.stringify({
+        forceClose,
+ input: text, speed: voiceSpeed, tier: currentTier, voice: voiceType }),
     })
 
     if (!res.ok) {
