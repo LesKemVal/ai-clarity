@@ -3999,10 +3999,10 @@ I will guide you in real time. Start speaking.`
       role="button"
       tabIndex={0}
       onClick={() => setShowSessionPicker(false)}
-      className="fixed inset-0 z-[140] bg-black/60 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[9998] bg-black/75 backdrop-blur-[3px]"
     />
 
-    <div className="pointer-events-none fixed inset-0 z-[150] flex items-end justify-center px-4 pb-[120px]">
+    <div className="pointer-events-none fixed inset-0 z-[9999] flex items-end justify-center px-4 pb-[160px]">
       <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
@@ -4124,11 +4124,11 @@ Start at screener. No pitch.`
           setShowProLiveGate(false)
         }
       }}
-      className="fixed inset-0 z-[140] bg-black/70 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[9998] bg-black/75 backdrop-blur-[3px]"
     />
 
     <div
-      className="pointer-events-none fixed inset-0 z-[150] flex items-end justify-center px-4 pb-[120px]"
+      className="pointer-events-none fixed inset-0 z-[9999] flex items-end justify-center px-4 pb-[160px]"
     >
       <div
         onClick={(event) => event.stopPropagation()}
