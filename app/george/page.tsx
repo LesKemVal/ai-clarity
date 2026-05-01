@@ -3236,9 +3236,6 @@ Cue:`
       </button>
     </div>
 
-    <button onClick={() => handleFeedback(i, 'up')}>👍</button>
-    <button onClick={() => handleFeedback(i, 'down')}>👎</button>
-
   </div>
 )}
 
