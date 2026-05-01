@@ -59,15 +59,14 @@ export default function RoadmapPage() {
                 className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
               >
                 Use GEORGE now
+              </button>
 
-<button
-  type="button"
-  onClick={() => window.location.href = '/george'}
-  className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
->
-  Enter GEORGE
-</button>
-
+              <button
+                type="button"
+                onClick={() => window.location.href = '/george'}
+                className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+              >
+                Enter GEORGE
               </button>
 
               
