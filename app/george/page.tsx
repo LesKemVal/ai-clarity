@@ -3094,7 +3094,7 @@ I am listening now. Speak naturally. I will respond ${
       {rewordPopupIndex === i && (
         <div
           className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
-            rewordPopupUpward ? 'bottom-8' : 'top-8'
+            rewordPopupUpward ? 'bottom-[35px]' : 'top-[29px]'
           }`}
         >
           {(['Reword','Rescript','Shorter','Stronger'] as const).map((action) => (
@@ -3173,7 +3173,7 @@ Cue:`
     {tonePopupIndex === i && (
       <div
         className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
-          tonePopupUpward ? 'bottom-8' : 'top-8'
+          tonePopupUpward ? 'bottom-[35px]' : 'top-[29px]'
         }`}
       >
         {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
@@ -3681,7 +3681,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="absolute bottom-[152px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="absolute bottom-[155px] left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
@@ -3816,7 +3816,7 @@ if (liveMode) {
       )}
 
       {showPromptMenu && (
-        <div className="absolute bottom-[152px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="absolute bottom-[155px] left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
               type="button"
