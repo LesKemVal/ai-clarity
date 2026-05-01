@@ -2703,6 +2703,27 @@ return true
 
       if (finalTranscript.trim()) {
         const clean = finalTranscript.trim()
+
+const outcomeSignal = (() => {
+  const text = clean.toLowerCase()
+
+  if (text.includes("closed") || text.includes("deal done")) return "WIN"
+  if (text.includes("call me") || text.includes("next week")) return "CALLBACK"
+  if (text.includes("not interested") || text.includes("no thanks")) return "LOSS"
+  if (text.includes("send") || text.includes("info")) return "STALL"
+
+  return null
+})()
+
+if (outcomeSignal) {
+  const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
+  history.unshift({
+    signal: outcomeSignal,
+    text: clean,
+    ts: Date.now()
+  })
+  window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0, 50)))
+}
         setInterimTranscript('')
 
         const livePrompt = liveMode
