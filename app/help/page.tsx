@@ -143,7 +143,26 @@ export default function HelpPage() {
           </p>
         </section>
 
-      </div>
+      
+<section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+  <h2 className="mb-4 text-xl font-semibold text-white">How GEORGE Improves You</h2>
+
+  <div className="space-y-3 text-neutral-300">
+    <p>Every attempt matters.</p>
+
+    <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+      <li>✓ Won — what worked</li>
+      <li>✗ Lost — what failed</li>
+      <li>↻ Follow-up — what continues</li>
+    </ul>
+
+    <p className="text-white">
+      GEORGE uses this to adjust your next move.
+    </p>
+  </div>
+</section>
+
+</div>
     </PageShell>
   )
 }
