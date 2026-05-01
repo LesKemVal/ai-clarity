@@ -2844,8 +2844,8 @@ Cue:`
 
 
 return (
-    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
+    <main className={`app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100 transition duration-200 ${showUpgradeModal ? "blur-[6px] brightness-[0.6]" : ""}`}>
+      <div id="george-app-content" className={`mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden transition duration-200 ${showUpgradeModal ? "blur-[6px] brightness-[0.6]" : ""}`}>
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
@@ -4979,9 +4979,10 @@ Start at screener. No pitch.`
         </div>
       )}
 
-{showUpgradeModal && (
+
+      {showUpgradeModal && (
   <>
-    <div className="fixed inset-0 z-[89] bg-black/80 backdrop-blur-md" />
+    
 
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-4 overflow-y-auto"
