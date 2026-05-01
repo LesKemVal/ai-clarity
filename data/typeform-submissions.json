@@ -1,0 +1,13 @@
+[
+  {
+    "id": "typeform_test_1",
+    "source": "typeform",
+    "receivedAt": "2026-05-01T00:00:00.000Z",
+    "mapped": {
+      "product_service": "Digital marketing services",
+      "target_audience": "small business owners",
+      "goal": "book appointments",
+      "constraints": "no aggressive language, must stay compliant"
+    }
+  }
+]

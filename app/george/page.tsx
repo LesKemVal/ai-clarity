@@ -1018,13 +1018,43 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
           const res = await fetch('/api/typeform')
           const data = await res.json()
 
-          // fallback if no data
-          const campaignContext = "We are now in a live professional scenario.\n\nUse structured communication, stay focused on outcome, and guide toward a clear next step."
+          const latestSubmission = Array.isArray(data?.submissions) ? data.submissions[0] : null
+          const mapped = latestSubmission?.mapped || {}
+
+          const productOrService = mapped.product_service || mapped.product_or_service || mapped.offer || 'the product or service'
+          const targetAudience = mapped.target_audience || mapped.audience || mapped.customer || 'the target audience'
+          const campaignGoal = mapped.goal || mapped.outcome || mapped.objective || 'move the conversation toward the next clear step'
+          const campaignConstraints = mapped.constraints || mapped.guardrails || mapped.notes || 'stay clear, respectful, and compliant'
+
+          const campaignLabel = `${campaignGoal} — ${productOrService}`.slice(0, 72)
+
+          const campaignContext = `Campaign loaded.
+
+Product / Service:
+${productOrService}
+
+Target Audience:
+${targetAudience}
+
+Goal:
+${campaignGoal}
+
+Constraints:
+${campaignConstraints}
+
+GEORGE should help with:
+- repeatable lines
+- live cues
+- objection handling
+- follow-up language
+- what to say and what not to say
+
+Start by giving the user one strong opening line, one backup line, and one cue.`
 
           const newCampaign = {
             id: `campaign_${Date.now()}`,
             type: 'campaign',
-            label: 'New Campaign',
+            label: campaignLabel,
             createdAt: Date.now(),
             messages: [
               {
