@@ -4181,8 +4181,7 @@ Start at screener. No pitch.`
                     <button
                       type="button"
                       onClick={() => {
-                        setShowRecentFolders(prev => !prev)
-                        setActiveMemoryFolder(null)
+                        setShowSessionPicker(true)
                       }}
                       className="shrink-0 flex items-center justify-center text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)] hover:text-white transition"
                       aria-label="Open memory folders"
