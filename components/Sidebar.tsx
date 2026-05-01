@@ -267,7 +267,7 @@ return (
                   >
                     Pro Conversation Partner
                     <span className="ml-2 text-[10px] uppercase tracking-[0.14em] text-[#7C8CFF]">
-                      Any Tier
+                      
                     </span>
                   </button>
                 </div>
