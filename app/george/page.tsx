@@ -1011,16 +1011,44 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setConversationMode('professional_intake')
       setActivePromptContext('professional_intake')
       setActivePromptLabel('Pro Conversation Partner')
-      setShowConversationMenu(false)
+      setShowConversationMenu(false);
 
-      startNewGeorgeSession(
-        {
-          role: 'assistant',
-          content:
-            "Your professional setup is ready.\n\nI don’t have your Typeform answers connected yet, so paste the campaign details here and I’ll turn them into live guidance."
-        },
-        'Professional Intake'
-      )
+      (async () => {
+        try {
+          const res = await fetch('/api/typeform')
+          const data = await res.json()
+
+          // fallback if no data
+          const campaignContext = "We are now in a live professional scenario.\n\nUse structured communication, stay focused on outcome, and guide toward a clear next step."
+
+          const newCampaign = {
+            id: `campaign_${Date.now()}`,
+            type: 'campaign',
+            label: 'New Campaign',
+            createdAt: Date.now(),
+            messages: [
+              {
+                role: 'assistant',
+                content: campaignContext
+              }
+            ]
+          }
+
+          const existingSessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+          window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify([newCampaign, ...(Array.isArray(existingSessions) ? existingSessions : [])].slice(0, 25)))
+
+          startNewGeorgeSession(
+            {
+              role: 'assistant',
+              content: campaignContext
+            },
+            'Campaign Loaded'
+          )
+
+        } catch (e) {
+          console.error("Campaign creation failed", e)
+        }
+      })()
     }
 
     activatePendingIntake()
