@@ -24,7 +24,7 @@ export default function TopUpPage() {
       return 'Activate Conversation Assistance.'
     }
     if (intent === 'pro') {
-      return 'Start Pro + Brilliant Conversation Partner.'
+      return 'Start Closing with Pro Conversation Partner.'
     }
     return 'Decide how far you want GEORGE to take you.'
   }, [intent])
@@ -146,7 +146,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant powers live advantage: conversation support, pressure guidance, room cues, and premium earbud support.
+              Brilliant gives you the edge when it matters — what to say, when to say it, and how to stay in control under pressure.
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-4">
@@ -185,7 +185,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('intelligent')}
                   className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
                 >
-                  Start Intelligent
+                  Move with Intelligent
                 </button>
               </div>
 
@@ -208,7 +208,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
                 >
-                  Start Pro + Brilliant
+                  Start Closing with Pro
                 </button>
               </div>
 
@@ -231,7 +231,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
-                  Start Brilliant Core
+                  Enter Brilliant Mode
                 </button>
               </div>
             </div>
