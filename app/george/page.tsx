@@ -4191,12 +4191,10 @@ Start at screener. No pitch.`
                       onClick={() => {
                         setShowSessionPicker(true)
                       }}
-                      className="shrink-0 flex items-center justify-center text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)] hover:text-white transition"
-                      aria-label="Open memory folders"
+                      className="shrink-0 border-b border-[#7C8CFF]/40 px-1 py-1 text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)] transition hover:border-[#7C8CFF] hover:text-white"
+                      aria-label="Open campaign picker"
                     >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>
-                      </svg>
+                      ⚡ Campaign
                     </button>
 
                     <button
