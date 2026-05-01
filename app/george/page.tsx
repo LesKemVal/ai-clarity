@@ -3187,40 +3187,54 @@ Cue:`
       Cue
     </button>
 
-    {tonePopupIndex === i && (
-      <div
-        className={`absolute left-0 z-[80] w-40 rounded-xl border border-white/10 bg-black/95 p-1.5 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
-          tonePopupUpward ? 'bottom-[35px]' : 'top-[29px]'
-        }`}
-      >
-        {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
-          <button
-            key={tone}
-            onClick={() => {
-              setAssistTone(tone)
-              setTonePopupIndex(null)
-              setToastMessage(`Tone: ${tone}`)
-              setShowToast(true)
-            }}
-            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
-          >
-            {tone}
-          </button>
-        ))}
-      </div>
-    )}
+    <div className="relative">
+      {tonePopupIndex === i && (
+        <div
+          className={`absolute left-0 z-[80] w-44 rounded-xl border border-white/10 bg-black/95 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+            tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
+          }`}
+        >
+          <div className="flex items-center justify-between px-2 py-1 border-b border-white/10">
+            <span className="text-[10px] tracking-[0.12em] text-white/50">TONE</span>
+            <button
+              onClick={() => setTonePopupIndex(null)}
+              className="text-white/40 hover:text-white transition text-[12px]"
+            >
+              ✕
+            </button>
+          </div>
 
-    <button
-      onClick={(event) => {
-        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-        const roomAbove = rect.top
-        const roomBelow = window.innerHeight - rect.bottom
-        setTonePopupUpward(roomAbove > 180 || roomAbove > roomBelow)
-        setTonePopupIndex((prev) => (prev === i ? null : i))
-      }}
-    >
-      Tone
-    </button>
+          <div className="p-1.5">
+            {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
+              <button
+                key={tone}
+                onClick={() => {
+                  setAssistTone(tone)
+                  setTonePopupIndex(null)
+                  setToastMessage(`Tone: ${tone}`)
+                  setShowToast(true)
+                }}
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+              >
+                {tone}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={(event) => {
+          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+          const roomAbove = rect.top
+          const roomBelow = window.innerHeight - rect.bottom
+          setTonePopupUpward(roomAbove > 180 || roomAbove > roomBelow)
+          setTonePopupIndex((prev) => (prev === i ? null : i))
+        }}
+      >
+        Tone
+      </button>
+    </div>
 
     <button onClick={() => handleFeedback(i, 'up')}>👍</button>
     <button onClick={() => handleFeedback(i, 'down')}>👎</button>
