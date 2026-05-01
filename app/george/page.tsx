@@ -1056,6 +1056,32 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
             type: 'campaign',
             label: campaignLabel,
             createdAt: Date.now(),
+
+            // 🔥 campaign intelligence layer
+            intelligence: {
+              productOrService,
+              targetAudience,
+              campaignGoal,
+              campaignConstraints,
+
+              // future Typeform expansion
+              dataToDetect: mapped.data_to_detect || [],
+              dataToSave: mapped.data_to_save || [],
+              deliveryTarget: mapped.delivery_target || 'user',
+              region: mapped.region || 'general',
+              userWeakness: mapped.user_weakness || 'unknown',
+              channel: mapped.channel || 'phone'
+            },
+
+            // 📊 performance tracking
+            performance: {
+              calls: 0,
+              objections: 0,
+              callbacks: 0,
+              closes: 0,
+              weakSpots: []
+            },
+
             messages: [
               {
                 role: 'assistant',
