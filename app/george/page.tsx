@@ -2840,10 +2840,10 @@ return (
                       </span>
                       {!showMobileHero && (
                         <div className="hidden xl:flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-1" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-2" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-3" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-dot-4" />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-1" />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-2" />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-3" />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-4" />
                         </div>
                       )}
                     </div>
@@ -2909,11 +2909,11 @@ return (
       </div>
 
       <div className="mt-3 flex items-end justify-center gap-1.5 px-3 py-2">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-smile-1" />
+        <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-smile-1" />
         <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-2" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#7C8CFF] pulse-smile-3" />
         <span className="h-2 w-2 rounded-full bg-[#7C8CFF] pulse-smile-4" />
-        <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] pulse-smile-5" />
+        <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-smile-5" />
       </div>
     </div>
   )}
@@ -2949,7 +2949,7 @@ return (
               <img
                 src={m.imageDataUrl}
                 alt="Uploaded image"
-                className="mb-3 max-h-40 w-full rounded-2xl border border-white/10 object-cover"
+                className="mb-2 max-h-40 w-full rounded-2xl border border-white/10 object-cover"
               />
             )}
             <span>{m.content}</span>
@@ -3221,9 +3221,9 @@ Cue:`
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
               <div className="flex items-center gap-1.5 pl-1">
-                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
-                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
-                <span className="h-1.5 w-6 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
               </div>
               <span className="text-xs text-[#7C8CFF]">
                 This requires deeper support.
@@ -3319,7 +3319,7 @@ Cue:`
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF]" />
+              <span className="h-1 w-1 rounded-full bg-[#7C8CFF]" />
               <span>Keep this</span>
             </button>
 
@@ -3428,7 +3428,7 @@ Cue:`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[min(300px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-0 mb-3 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'}` }
+              className={`absolute z-30 w-[min(300px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-0 mb-2 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -3528,9 +3528,9 @@ Cue:`
 {showScrollHint && (
   <div className="pointer-events-none fixed bottom-[110px] left-1/2 z-[70] -translate-x-1/2 flex flex-col items-center gap-1">
     <div className="flex gap-1">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse" />
-      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
-      <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
     </div>
     <span className="text-[10px] text-white/40">more below</span>
   </div>
@@ -3548,7 +3548,7 @@ Cue:`
 
               <div className={`${liveMode ? "hidden" : "fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
-  <div className="flex items-center gap-4 text-white/80 text-[13px]">
+  <div className="flex items-center gapx-4 py-3 text-white/80 text-[13px]">
     <button
       type="button"
       onClick={() => {
@@ -3688,7 +3688,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="absolute bottom-full mb-3 left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="absolute bottom-full mb-2 left-0 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
@@ -3803,13 +3803,13 @@ if (liveMode) {
       >
         <span className="text-[34px] leading-none">+</span>
         <span
-          className={`absolute right-2 top-1 h-1.5 w-1.5 rounded-full ${
+          className={`absolute right-2 top-1 h-1 w-1 rounded-full ${
             reroutePrompt || suggestedPrompts !== tieredStarterPrompts && suggestedPrompts.length > 0
               ? 'bg-[#7C8CFF]'
               : 'bg-white/85'
           } ${
             suggestedSignal || rerouteSignal
-              ? 'ring-2 ring-[#7C8CFF]/60 shadow-[0_0_10px_#7C8CFF,0_0_20px_#7C8CFF] animate-pulse'
+              ? 'ring-1 ring-[#7C8CFF]/45 shadow-[0_0_6px_#7C8CFF,0_0_12px_#7C8CFF] animate-pulse'
               : ''
           }`}
         />
@@ -3823,7 +3823,7 @@ if (liveMode) {
       )}
 
       {showPromptMenu && (
-        <div className="absolute bottom-full mb-3 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <div className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
           <div className="space-y-1">
             <button
               type="button"
@@ -3934,7 +3934,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black p-4 space-y-3">
+          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-4 py-3 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -3999,11 +3999,11 @@ I will guide you in real time. Start speaking.`
       role="button"
       tabIndex={0}
       onClick={() => setShowSessionPicker(false)}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/75 backdrop-blur-[3px]"
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/82 backdrop-blur-[4px]"
     />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
-      <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+      <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-3 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
             RESUME CAMPAIGN
@@ -4011,7 +4011,7 @@ I will guide you in real time. Start speaking.`
           <button
             type="button"
             onClick={() => setShowSessionPicker(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-lg leading-none text-white/70 transition hover:border-white/25 hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-lg leading-none text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
           >
             ×
           </button>
@@ -4124,7 +4124,7 @@ Start at screener. No pitch.`
           setShowProLiveGate(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/75 backdrop-blur-[3px]"
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/82 backdrop-blur-[4px]"
     />
 
     <div
@@ -4132,26 +4132,26 @@ Start at screener. No pitch.`
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
           aria-label="Close PRO LIVE menu"
           onClick={() => setShowProLiveGate(false)}
-          className="absolute right-3 top-3 rounded-full px-2 py-1 text-xs text-white/55 transition hover:bg-white/10 hover:text-white"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
         >
           ×
         </button>
 
-        <div className="mb-3 pr-8">
+        <div className="mb-2 pr-8">
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
             PRO LIVE
           </div>
-          <div className="mt-1 text-[15px] font-semibold text-white">
-            Choose how GEORGE enters the conversation.
+          <div className="mt-0.5 text-[15px] font-semibold text-white">
+            Do you want LIVE assistance to help...
           </div>
-          <div className="mt-1 text-xs leading-5 text-neutral-400">
-            Resume a campaign, start a structured flow, or enter manual live support.
+          <div className="mt-0.5 text-xs leading-5 text-neutral-400">
+            Close a deal, set appointments, run a structured campaign, or handle a real conversation like doctors, bills, SSI, or pressure situations.
           </div>
         </div>
 
@@ -4162,7 +4162,7 @@ Start at screener. No pitch.`
           }}
           className="w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
         >
-          Resume Previous Campaign
+          Resume Active Campaign
         </button>
 
         <button
@@ -4173,7 +4173,7 @@ Start at screener. No pitch.`
           }}
           className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
-          Start New Campaign
+          Start Sales / Appointment Flow
         </button>
 
         <button
@@ -4186,7 +4186,7 @@ Start at screener. No pitch.`
           }}
           className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
         >
-          Manual Mode
+          Live Help — Real Conversations
         </button>
 
       </div>
@@ -4563,7 +4563,7 @@ Start at screener. No pitch.`
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
           <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-3">Conversation Engine</p>
+            <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
             {walkthroughStep === 2 && <p className="text-white text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
@@ -4607,7 +4607,7 @@ Start at screener. No pitch.`
           >
             <div className="mb-5 text-center">
               <p className="text-sm font-medium text-white">Make GEORGE yours</p>
-              <p className="mt-1 text-xs leading-6 text-neutral-400">
+              <p className="mt-0.5 text-xs leading-6 text-neutral-400">
                 Optional. Same mind. Same standards. Choose GEORGE or GEORGette, then keep the name or make it yours.
               </p>
             </div>
@@ -4708,7 +4708,7 @@ Start at screener. No pitch.`
           >
             <div className="mb-5 text-center">
               <p className="text-sm font-medium text-white">Take GEORGE further</p>
-              <p className="mt-1 text-xs leading-6 text-neutral-400">
+              <p className="mt-0.5 text-xs leading-6 text-neutral-400">
                 Choose the level of support you want.
               </p>
             </div>
@@ -4756,7 +4756,7 @@ Start at screener. No pitch.`
                 className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
               >
                 <div className="text-sm font-medium text-white">Explore Intelligent — Beta Test Checkout</div>
-                <div className="mt-1 text-xs leading-6 text-neutral-400">
+                <div className="mt-0.5 text-xs leading-6 text-neutral-400">
                   Structure your thinking, make faster decisions, and execute with clarity.
                 </div>
               </button>
@@ -4794,7 +4794,7 @@ Start at screener. No pitch.`
                 className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
               >
                 <div className="text-sm font-medium text-white">Go Brilliant</div>
-                <div className="mt-1 text-xs leading-6 text-neutral-300">
+                <div className="mt-0.5 text-xs leading-6 text-neutral-300">
                   Conversation Engine, LIVE cues, room-awareness, premium execution support.
                 </div>
               </button>
@@ -4823,12 +4823,12 @@ Start at screener. No pitch.`
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
-          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
-            <div className="mb-3 flex items-start justify-between gap-3">
+          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+            <div className="mb-2 flex items-start justify-between gap-3">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">Pro Campaign</p>
-                <p className="mt-1 text-[15px] font-semibold text-white">This is a Pro campaign.</p>
-                <p className="mt-1 text-xs leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
+                <p className="mt-0.5 text-[15px] font-semibold text-white">This is a Pro campaign.</p>
+                <p className="mt-0.5 text-xs leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
               </div>
               <button
                 type="button"
