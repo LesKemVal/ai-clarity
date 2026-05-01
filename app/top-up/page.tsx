@@ -17,11 +17,6 @@ export default function TopUpPage() {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
-    if (window.location.hash === '#waitlist') {
-      setTimeout(() => {
-        document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
-    }
   }, [])
 
   const headline = useMemo(() => {
@@ -98,8 +93,7 @@ export default function TopUpPage() {
     const payload = {
       type: feedbackType,
       feedback: feedback.trim(),
-      email: email.trim(),
-      source: 'beta-feedback',
+      source: 'george-feedback',
       timestamp: Date.now(),
     }
 
