@@ -159,10 +159,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Clear macro direction</li>
-                  <li>• What matters now</li>
-                  <li>• Best path in order</li>
-                  <li>• Strongest first move</li>
+                  <li>• See what actually matters</li>
+                  <li>• Know what to focus on now</li>
+                  <li>• Move in the right order</li>
+                  <li>• Take the strongest first step</li>
                 </ul>
               </div>
 
@@ -175,10 +175,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Tracks progress across time</li>
-                  <li>• Better decisions under pressure</li>
-                  <li>• Cleaner plans and sharper framing</li>
-                  <li>• Built for active goals</li>
+                  <li>• Stay on track across time</li>
+                  <li>• Make better decisions under pressure</li>
+                  <li>• Think clearer and move faster</li>
+                  <li>• Turn plans into real progress</li>
                 </ul>
                 <button
                   type="button"
@@ -198,10 +198,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Live outbound conversation engine</li>
-                  <li>• Sales / appointment / donation modes</li>
-                  <li>• Campaign memory + caller reset</li>
-                  <li>• Built for measurable outcomes</li>
+                  <li>• Stay sharp on every call</li>
+                  <li>• Know what to say in real time</li>
+                  <li>• Recover fast and keep momentum</li>
+                  <li>• Improve results with every attempt</li>
                 </ul>
                 <button
                   type="button"
@@ -221,10 +221,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Live Conversation Engine</li>
-                  <li>• Earbud live support</li>
-                  <li>• Live cues and room reading</li>
-                  <li>• Real-time pressure support</li>
+                  <li>• Know what to say before you say it</li>
+                  <li>• Stay composed under pressure</li>
+                  <li>• Read the room and adjust instantly</li>
+                  <li>• Move forward without hesitation</li>
                 </ul>
                 <button
                   type="button"
