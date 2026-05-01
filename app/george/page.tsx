@@ -620,6 +620,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [rewordPopupIndex, setRewordPopupIndex] = useState<number | null>(null)
   const [rewordPopupUpward, setRewordPopupUpward] = useState(true)
 const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
+const [forceClose, setForceClose] = useState(false)
 
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
