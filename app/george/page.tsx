@@ -2659,10 +2659,70 @@ return true
 
       setInterimTranscript(liveTranscript)
 
+      // 🔥 live sales signal detection
+      if (liveMode && activeCampaignId && liveTranscript) {
+        const lower = liveTranscript.toLowerCase()
+
+        const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+
+        const updated = existing.map((c: any) => {
+          if (c.id !== activeCampaignId) return c
+
+          const perf = c.performance || {
+            calls: 0,
+            objections: 0,
+            callbacks: 0,
+            closes: 0,
+            weakSpots: []
+          }
+
+          // detect objection
+          if (/already|have someone|not interested|too expensive|no budget/.test(lower)) {
+            perf.objections += 1
+            perf.weakSpots.push('objection')
+          }
+
+          // detect delay / callback
+          if (/call me|later|next week|send me|follow up/.test(lower)) {
+            perf.callbacks += 1
+          }
+
+          // detect close intent
+          if (/yes|let's do it|i'm in|sounds good/.test(lower)) {
+            perf.closes += 1
+          }
+
+          return { ...c, performance: perf }
+        })
+
+        window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(updated))
+      }
+
       if (finalTranscript.trim()) {
         const clean = finalTranscript.trim()
         setInterimTranscript('')
-        void handleSend(clean)
+
+        const livePrompt = liveMode
+          ? `LIVE PROSPECT:
+${clean}
+
+You are GEORGE.
+This is what the prospect just said.
+
+Your job:
+1. Push for the close
+2. If blocked, reposition
+3. If still blocked, secure next step
+4. Always maintain control
+
+Return ONLY:
+
+Say:
+Backup:
+Cue:`
+          : clean
+
+        void handleSend(livePrompt)
       }
     }
 
