@@ -3331,6 +3331,33 @@ Cue:`
       Cue
     </button>
 
+    <button
+      type="button"
+      onClick={() => {
+        void handleSend(`SCREENER / GATEKEEPER.
+
+You are GEORGE.
+
+User is speaking to a gatekeeper or opening a call.
+
+Your job:
+- get past the screener
+- do NOT pitch
+- stay tight
+- move to decision maker
+
+Return ONLY:
+
+Say:
+Backup:
+Cue:`)
+      }}
+      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+      title="Screener"
+    >
+      🎯
+    </button>
+
     <div className="relative">
       {tonePopupIndex === i && (
         <div
@@ -4327,7 +4354,7 @@ Start at screener. No pitch.`
 
               {liveMode && (
                 <div className="fixed bottom-[96px] left-0 right-0 z-[70] mx-auto w-[calc(100%-24px)] max-w-[900px] rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
-                  <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
+                  <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
                     <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
 
                     <button
@@ -4335,7 +4362,7 @@ Start at screener. No pitch.`
                       onClick={() => {
                         setShowSessionPicker(true)
                       }}
-                      className="shrink-0 border-b border-[#7C8CFF]/40 px-1 py-1 text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)] transition hover:border-[#7C8CFF] hover:text-white"
+                      className="shrink-0 rounded-md border border-[#7C8CFF]/50 bg-[#7C8CFF]/10 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.35)] transition hover:bg-[#7C8CFF]/20 hover:text-white"
                       aria-label="Open campaign picker"
                     >
                       ⚡ Campaign
@@ -4357,7 +4384,7 @@ Start at screener. No pitch.`
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 border-b px-0.5 py-1 transition ${
+                      className={`shrink-0 text-[10px] px-1 py-1 opacity-60 hover:opacity-100 transition ${
                         !voiceOn
                           ? 'border-[#7C8CFF] text-white'
                           : 'border-transparent text-white/45 hover:text-white/75'
@@ -4383,7 +4410,7 @@ Start at screener. No pitch.`
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 border-b px-0.5 py-1 transition ${
+                      className={`shrink-0 text-[10px] px-1 py-1 opacity-60 hover:opacity-100 transition ${
                         voiceOn
                           ? 'border-[#7C8CFF] text-white'
                           : 'border-transparent text-white/45 hover:text-white/75'
@@ -4413,7 +4440,7 @@ Start at screener. No pitch.`
                         setToastMessage('Negotiation mode active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-white/45 transition hover:border-[#7C8CFF]/60 hover:text-white/80"
+                      className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
                     >
                       Negotiate
                     </button>
@@ -4439,7 +4466,7 @@ Start at screener. No pitch.`
                         setToastMessage('Objection handling active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-white/45 transition hover:border-[#7C8CFF]/60 hover:text-white/80"
+                      className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
                     >
                       Objections
                     </button>
