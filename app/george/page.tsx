@@ -2389,6 +2389,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
             campaignDefaultsEnabled: activeCampaign?.defaultAnswersEnabled ?? true,
             contextTurnCount,
             tier: currentTier,
+            language,
           }),
         })
 
