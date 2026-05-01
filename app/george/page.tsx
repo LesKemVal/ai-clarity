@@ -4417,41 +4417,61 @@ Start at screener. No pitch.`
 
     <div className="flex justify-between gap-2">
 
-      <button
-        onClick={() => {
-          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
-          history.unshift({ signal: "WIN", ts: Date.now() })
-          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
-          setShowOutcomeBar(false)
-        }}
-        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-green-400"
-      >
-        ✓ Won
-      </button>
+      {([
+        ['WIN', '✓ Won', 'text-green-400'],
+        ['LOSS', '✗ Lost', 'text-red-400'],
+        ['FOLLOW_UP', '↻ Follow-up', 'text-yellow-400'],
+      ] as const).map(([signal, label, colorClass]) => (
+        <button
+          key={signal}
+          onClick={() => {
+            const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
+            history.unshift({ signal, context: lastOutcomeContext, ts: Date.now() })
+            window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
 
-      <button
-        onClick={() => {
-          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
-          history.unshift({ signal: "LOSS", ts: Date.now() })
-          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
-          setShowOutcomeBar(false)
-        }}
-        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-red-400"
-      >
-        ✗ Lost
-      </button>
+            const sessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+            const updatedSessions = Array.isArray(sessions)
+              ? sessions.map((session: any) => {
+                  if (activeCampaignId && session.id !== activeCampaignId) return session
 
-      <button
-        onClick={() => {
-          const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
-          history.unshift({ signal: "FOLLOW_UP", ts: Date.now() })
-          window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
-          setShowOutcomeBar(false)
-        }}
-        className="flex-1 rounded-lg border border-white/10 py-1 text-[12px] text-yellow-400"
-      >
-        ↻ Follow-up
-      </button>
+                  const perf = session.performance || {
+                    calls: 0,
+                    objections: 0,
+                    callbacks: 0,
+                    closes: 0,
+                    weakSpots: [],
+                    wins: 0,
+                    losses: 0,
+                    followUps: 0,
+                    history: [],
+                  }
+
+                  const nextPerf = {
+                    ...perf,
+                    wins: (perf.wins || 0) + (signal === 'WIN' ? 1 : 0),
+                    losses: (perf.losses || 0) + (signal === 'LOSS' ? 1 : 0),
+                    followUps: (perf.followUps || 0) + (signal === 'FOLLOW_UP' ? 1 : 0),
+                    closes: (perf.closes || 0) + (signal === 'WIN' ? 1 : 0),
+                    callbacks: (perf.callbacks || 0) + (signal === 'FOLLOW_UP' ? 1 : 0),
+                    history: [
+                      { signal, context: lastOutcomeContext, ts: Date.now() },
+                      ...((perf.history || []) as any[]),
+                    ].slice(0, 50),
+                  }
+
+                  return { ...session, performance: nextPerf }
+                })
+              : []
+
+            window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(updatedSessions))
+            setShowOutcomeBar(false)
+            setLastOutcomeContext(null)
+          }}
+          className={`flex-1 rounded-lg border border-white/10 py-1 text-[12px] ${colorClass}`}
+        >
+          {label}
+        </button>
+      ))}
 
     </div>
   </div>
