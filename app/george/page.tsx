@@ -4199,7 +4199,7 @@ I will guide you in real time. Start speaking.`
     />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
-      <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-3 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+      <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/30 bg-black p-5 space-y-3 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
             RESUME CAMPAIGN
@@ -4844,7 +4844,7 @@ Start at screener. No pitch.`
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
-          <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
@@ -4884,7 +4884,7 @@ Start at screener. No pitch.`
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 text-center">
@@ -4911,7 +4911,7 @@ Start at screener. No pitch.`
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-2xl border px-4 py-3 text-sm transition ${
+                      className={`rounded-2xl border transition hover:scale-[1.01] px-4 py-3 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
                           : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
@@ -4981,15 +4981,14 @@ Start at screener. No pitch.`
 
 {showUpgradeModal && (
   <>
-    <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm" />
-
+    <div className="fixed inset-0 z-[89] bg-black/80 backdrop-blur-md" />
 
         <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-4 backdrop-blur-sm overflow-y-auto"
+          className="fixed inset-0 z-[90] flex items-center justify-center px-4 py-4 overflow-y-auto"
           onClick={() => setShowUpgradeModal(false)}
         >
           <div
-            className="w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-md rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 text-center">
@@ -5098,7 +5097,7 @@ Start at screener. No pitch.`
                 See full options
               </button>
             </div>
-          </div>
+        </div>
         </>
       )}
 
@@ -5135,7 +5134,7 @@ Start at screener. No pitch.`
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
