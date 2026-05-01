@@ -199,6 +199,44 @@ return (
             </button>
 
             {openGroups.Modes && (
+              <div className="mt-3 space-y-2">
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSidebar?.(false)
+
+                    if (currentTier !== 'brilliant') {
+                      onPromptSelect({
+                        label: 'Conversation Mode',
+                        text: `Conversation Mode is where GEORGE works with you in real time.
+
+Brilliant gives you live guidance.
+Pro turns GEORGE into a full execution system:
+- scripts
+- cues
+- objection handling
+- campaign memory
+- performance tracking
+
+Upgrade to continue.`,
+                        context: 'conversation_mode_info'
+                      })
+                      return
+                    }
+
+                    onOpenLiveGate?.()
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-neutral-300 transition hover:bg-white/[0.05] hover:text-white"
+                >
+                  <span className="text-[#7C8CFF]">⚡</span>
+                  <span>Conversation Assistant</span>
+                </button>
+
+              </div>
+            )}
+
+            {openGroups.Modes && (
               <div className="mt-4 space-y-3">
                 <button
                   type="button"
