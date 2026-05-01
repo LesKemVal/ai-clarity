@@ -3651,27 +3651,33 @@ if (liveMode) {
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
-              Save memory
+              Save / Resume
             </div>
 
-            {getExistingFolders().length > 0 ? (
+            {(['campaigns', ...getExistingFolders()]).length > 0 ? (
               <div className="space-y-3">
-                {getExistingFolders().map((folder) => (
-                  <button
-                    key={folder}
-                    type="button"
-                    onClick={() => {
-                      setActiveMemoryFolder(folder)
-                    }}
-                    className={`block w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
-                      activeMemoryFolder === folder
-                        ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
-                        : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
-                    }`}
-                  >
-                    {folder}
-                  </button>
-                ))}
+                {(['campaigns', ...getExistingFolders()]).map((folder) => {
+                  const isCampaignFolder = folder === 'campaigns'
+
+                  return (
+                    <button
+                      key={folder}
+                      type="button"
+                      onClick={() => {
+                        setActiveMemoryFolder(folder)
+                      }}
+                      className={`block w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
+                        activeMemoryFolder === folder
+                          ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
+                          : isCampaignFolder
+                            ? 'border-[#7C8CFF]/30 bg-[#7C8CFF]/10 text-[#C9CEFF] hover:border-[#7C8CFF]/50 hover:text-white'
+                            : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      {isCampaignFolder ? '⚡ Campaigns' : folder}
+                    </button>
+                  )
+                })}
               </div>
             ) : (
               <div className="text-sm text-neutral-500">
