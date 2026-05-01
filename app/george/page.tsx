@@ -3618,24 +3618,13 @@ Cue:`
         type="button"
         onClick={(e) => {
           e.stopPropagation()
-          setShowProLiveGate(true)
-          setShowCampaignMenu(false)
-          setShowRecentFolders(false)
+          setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
         }}
-        className={`relative flex items-center gap-1 border-b px-1 py-1 text-[11px] font-medium tracking-[0.12em] transition ${
-          activeCampaign
-            ? 'border-[#7C8CFF] text-white'
-            : 'border-transparent text-white/55 hover:border-[#7C8CFF]/50 hover:text-white'
-        }`}
-        aria-label="Open campaign selector"
+        className="relative flex items-center gap-1 border-b border-transparent px-1 py-1 text-[11px] font-medium tracking-[0.12em] text-white/65 transition hover:border-[#7C8CFF]/50 hover:text-white"
+        aria-label="Change language"
       >
-        <span
-          onClick={() => setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')}
-          className="flex items-center gap-1 cursor-pointer"
-        >
-          <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
-          <span>{language}</span>
-        </span>
+        <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
+        <span>{language}</span>
       </button>
 
       <button
