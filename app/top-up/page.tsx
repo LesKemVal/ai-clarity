@@ -26,7 +26,7 @@ export default function TopUpPage() {
     if (intent === 'pro') {
       return 'Start Pro + Brilliant Conversation Partner.'
     }
-    return 'Choose your level of control.'
+    return 'Decide how far you want GEORGE to take you.'
   }, [intent])
 
   async function playVoiceSample(voice: string, label: string) {
