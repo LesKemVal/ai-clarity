@@ -142,19 +142,43 @@ function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefault
 - Output style: ${activeCampaign.outputStyle || 'short_cues'}
 - Assist tone: ${activeCampaign.assistTone || 'direct'}
 - Success signal: ${activeCampaign.successSignal || 'not provided'}
-- Performance:
-  Wins: ${activeCampaign.performance?.wins || 0}
+- Performance math:
+  Calls/attempts: ${activeCampaign.performance?.calls || 0}
+  Wins/closes: ${activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0}
   Losses: ${activeCampaign.performance?.losses || 0}
-  Follow-ups: ${activeCampaign.performance?.followUps || 0}
+  Follow-ups/rain-checks: ${activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0}
+  Objections detected: ${activeCampaign.performance?.objections || 0}
+  Close rate: ${(() => {
+    const calls = activeCampaign.performance?.calls || 0
+    const wins = activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0
+    return calls > 0 ? `${Math.round((wins / calls) * 100)}%` : 'not enough data'
+  })()}
+  Follow-up rate: ${(() => {
+    const calls = activeCampaign.performance?.calls || 0
+    const followUps = activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0
+    return calls > 0 ? `${Math.round((followUps / calls) * 100)}%` : 'not enough data'
+  })()}
+  Loss rate: ${(() => {
+    const calls = activeCampaign.performance?.calls || 0
+    const losses = activeCampaign.performance?.losses || 0
+    return calls > 0 ? `${Math.round((losses / calls) * 100)}%` : 'not enough data'
+  })()}
 
-- Interpretation:
-  ${(
-    (activeCampaign.performance?.wins || 0) > (activeCampaign.performance?.losses || 0)
-      ? "You are performing well. Continue applying pressure and closing."
-      : (activeCampaign.performance?.losses || 0) > (activeCampaign.performance?.wins || 0)
-      ? "You are losing more than closing. Adjust earlier, tighten control, and reduce passive responses."
-      : "Performance is neutral. Push for clearer outcomes and stronger closes."
-  )}
+- Performance behavior directive:
+  ${(() => {
+    const calls = activeCampaign.performance?.calls || 0
+    const wins = activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0
+    const losses = activeCampaign.performance?.losses || 0
+    const followUps = activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0
+    const objections = activeCampaign.performance?.objections || 0
+
+    if (calls < 3) return "Not enough data yet. Use strong best-practice closing behavior, collect clean outcomes, and avoid pretending the pattern is proven."
+    if (wins >= losses && wins >= followUps) return "Winning pattern detected. Preserve the strongest structure, keep pressure intelligent, and do not over-change the script."
+    if (followUps > wins && followUps >= losses) return "Too many rain-checks/follow-ups. Tighten the close, ask for commitment sooner, and stop accepting passive delay too early."
+    if (losses > wins) return "Loss pattern detected. Change behavior earlier: clarify need, isolate objection, reframe value, and push for a decision before fallback."
+    if (objections >= calls) return "Objections are frequent. Prepare objection handling earlier and ask sharper qualifying questions before pitching."
+    return "Performance is mixed. Push for clearer outcomes, keep lines short, and force a measurable next step."
+  })()}
 - Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
 - Required language: ${requiredLanguage}
 - Forbidden claims: ${forbiddenClaims}
