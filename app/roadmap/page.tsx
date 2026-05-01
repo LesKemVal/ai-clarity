@@ -58,7 +58,7 @@ export default function RoadmapPage() {
                 onClick={enterGeorge}
                 className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
               >
-                Use GEORGE now
+                Start with GEORGE
               </button>
 
               <button
@@ -66,7 +66,7 @@ export default function RoadmapPage() {
                 onClick={() => window.location.href = '/george'}
                 className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
               >
-                Enter GEORGE
+                Enter GEORGE Mode
               </button>
 
               
@@ -76,7 +76,7 @@ export default function RoadmapPage() {
                 onClick={goHelp}
                 className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
               >
-                Learn how to use it
+                Learn how to win with GEORGE
               </button>
             </div>
           </div>
