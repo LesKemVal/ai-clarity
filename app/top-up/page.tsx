@@ -89,41 +89,6 @@ export default function TopUpPage() {
     return 'Paid access is opening through Stripe checkout. Use GEORGE now, upgrade when ready, and help make GEORGE better before launch.'
   }, [intent])
 
-  async function joinWaitlist() {
-    if (!email.trim()) {
-      setMessage('Enter an email first.')
-      return
-    }
-
-    setMessage('')
-
-    try {
-      const res = await fetch('/api/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim(),
-          name: name.trim(),
-          note: note.trim(),
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setMessage(data?.error || 'Something went wrong.')
-        return
-      }
-
-      setMessage('You are on the waitlist. Check your email for confirmation.')
-      setEmail('')
-      setName('')
-      setNote('')
-    } catch {
-      setMessage('Unable to submit right now.')
-    }
-  }
-
   function submitFeedback() {
     if (!feedback.trim()) {
       setMessage('Add feedback first.')
@@ -285,81 +250,6 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="waitlist" className="scroll-mt-24 rounded-3xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-6">
-            <div className="space-y-4">
-              <p className="text-sm font-medium text-white">Waitlist</p>
-              <p className="text-sm leading-7 text-neutral-300">
-                Leave your email for launch access, paid tier rollout, and early upgrades before the public release.
-              </p>
-
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="First name"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-              />
-
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Best email"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-              />
-
-              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                <p className="mb-2 text-sm font-medium text-white">
-                  What do you want GEORGE to help you do first?
-                </p>
-                <p className="mb-4 text-xs text-neutral-400">
-                  Choose the closest answer.
-                </p>
-
-                <div className="flex flex-wrap gap-2 text-sm">
-                  {[
-                    'Make better decisions',
-                    'Build a business',
-                    'Improve money',
-                    'Improve credit',
-                    'Prepare for hard conversations',
-                    'Get daily structure',
-                    'Stay on track',
-                    'Use biblical wisdom',
-                    'Other',
-                  ].map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setNote(item)}
-                      className={`rounded-full border px-3 py-2 text-left transition ${
-                        note === item
-                          ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
-                          : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={4}
-                placeholder="Optional: add details or type your own answer"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-              />
-
-              <button
-                type="button"
-                onClick={joinWaitlist}
-                className="w-full rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
-              >
-                Reserve Early Access
-              </button>
-            </div>
-          </div>
-
           <div id="feedback" className="scroll-mt-24 rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Comments and suggestions</p>
