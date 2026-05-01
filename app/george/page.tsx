@@ -3995,14 +3995,15 @@ I will guide you in real time. Start speaking.`
 
 {showSessionPicker && (
   <>
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => setShowSessionPicker(false)}
-      className="fixed inset-0 z-[170] bg-black/50"
+      className="fixed inset-0 z-[170] bg-black/60 backdrop-blur-[2px]"
     />
 
-    <div className="fixed inset-x-0 bottom-[120px] z-[190] flex justify-center px-4">
-      <div className="w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
+    <div className="pointer-events-none fixed inset-0 z-[180] flex items-end justify-center px-4 pb-[120px]">
+      <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border border-[#7C8CFF]/30 bg-black p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
             RESUME CAMPAIGN
