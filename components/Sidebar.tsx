@@ -99,9 +99,9 @@ export default function Sidebar({
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Modes: true,
-    Build: false,
-    'Training Lab': false,
-    Account: false,
+    Build: true,
+    'Training Lab': true,
+    Account: true,
   })
 
   const toggleGroup = (title: string) => {
@@ -130,18 +130,6 @@ export default function Sidebar({
     () => (suggestedSignal > 0 ? 'glow-twice' : ''),
     [suggestedSignal]
   )
-
-  
-      {/* Collapsed Rail (desktop only) */}
-      {!showSidebar && (
-        <div className="hidden xl:flex fixed left-0 top-0 z-[110] h-screen w-[72px] flex-col items-center gap-6 border-r border-white/10 bg-black/90 pt-4">
-          <img src="/branding/logo.png" className="h-10 w-10 rounded-full mt-[3px]" />
-
-          <button className="text-white/60 hover:text-white">✎</button>
-          <button className="text-white/60 hover:text-white">🔍</button>
-          <button className="text-white/60 hover:text-white">💬</button>
-        </div>
-      )}
 
 return (
     <aside
@@ -221,7 +209,7 @@ return (
                       context: 'decision_next_move',
                     })
                   }
-                  className="block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
+                  className="block w-full rounded-xl px-3 py-2 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:bg-white/[0.055] hover:text-white hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]"
                 >
                   Focus
                 </button>
@@ -229,10 +217,10 @@ return (
                 <button
                   type="button"
                   onClick={onToggleScripture}
-                  className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition ${
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm transition-all duration-200 ease-out ${
                     activePromptContext === 'bible_decision_lens'
-                      ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
-                      : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#7C8CFF]/30 hover:text-white'
+                      ? 'bg-[#7C8CFF]/10 text-white shadow-[0_8px_20px_rgba(124,140,255,0.10)]'
+                      : 'text-neutral-300 hover:bg-white/[0.055] hover:text-white hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]'
                   }`}
                 >
                   <span>Be as Christ</span>
@@ -250,7 +238,7 @@ return (
                         onOpenLiveGate()
                       }}
                       title="Live personal guidance, cues, timing, and exact lines."
-                      className="block w-full rounded-xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition hover:border-[#7C8CFF]/45"
+                      className="block w-full rounded-xl bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm text-white transition-all duration-200 ease-out hover:bg-[#7C8CFF]/15 hover:shadow-[0_8px_20px_rgba(124,140,255,0.14)]"
                     >
                       Conversation Assistance
                     </button>
@@ -312,7 +300,7 @@ return (
                       className={`block w-full rounded-xl px-3 py-2 text-left text-sm transition-all duration-200 ease-out ${
                         activePromptLabel === prompt.label
                           ? 'bg-[#7C8CFF]/10 text-white shadow-[0_0_14px_rgba(124,140,255,0.18)]'
-                          : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.35)]'
+                          : 'text-neutral-400 hover:bg-white/[0.055] hover:text-white hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]'
                       }`}
                     >
                       {prompt.label}
@@ -345,7 +333,7 @@ return (
                     key={`${prompt.context}:${prompt.label}`}
                     type="button"
                     onClick={() => handlePromptTap(prompt)}
-                    className={`block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)] ${suggestedAnimationClass}`}
+                    className={`block w-full rounded-xl px-2 py-1 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06]  hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)] ${suggestedAnimationClass}`}
                   >
                     {prompt.label}
                   </button>
@@ -384,7 +372,7 @@ return (
           </section>
 
           <section className="border-t border-neutral-800 pt-4">
-            <a href="/legal/toa" className="block text-sm text-neutral-500 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06] hover:px-3 hover:py-2 hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]">
+            <a href="/legal/toa" className="block text-sm text-neutral-500 transition-all duration-200 ease-out hover:rounded-xl hover:bg-white/[0.06]  hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]">
               Terms
             </a>
           </section>
