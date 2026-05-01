@@ -32,19 +32,19 @@ export default function RoadmapPage() {
               <div className="px-6 py-6 md:px-8">
                 <div className="max-w-2xl space-y-4">
                   <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
-                    BRANESx Beta
+                    BRANESx
                   </p>
 
                   <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl">
-                    Earbuds unlock best with Brilliant.
+                    GEORGE helps you perform when it matters.
                   </h1>
 
                   <p className="max-w-xl text-sm leading-7 text-neutral-200 md:text-base">
-                    Start free. Upgrade when you want deeper continuity, stronger guidance, and live advantage in real time.
+                    Start free. Upgrade when you want stronger control, sharper execution, and real-time advantage.
                   </p>
 
                   <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
-                    GEORGE improves your performance in real time. Start free. Upgrade when you want stronger control, continuity, and live execution advantage.
+                    GEORGE helps you think clearly, act decisively, and stay sharp when the pressure is real.
                   </div>
                 </div>
               </div>
@@ -99,10 +99,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/45">Start here</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Quick clarity</li>
-                  <li>• Immediate next moves</li>
-                  <li>• Useful without setup</li>
-                  <li>• Fast help when you need direction</li>
+                  <li>• See what matters instantly</li>
+                  <li>• Know your next move</li>
+                  <li>• Move without overthinking</li>
+                  <li>• Get unstuck fast</li>
                 </ul>              </div>
 
               <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-4">
@@ -111,10 +111,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-[#D7DDFF]">Best value</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Stronger continuity</li>
-                  <li>• Better framing</li>
-                  <li>• More useful over time</li>
-                  <li>• Better for active goals and ongoing progress</li>
+                  <li>• Stay on track over time</li>
+                  <li>• Think clearer and move faster</li>
+                  <li>• Improve decisions under pressure</li>
+                  <li>• Turn plans into real progress</li>
                 </ul>              </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.07)]">
@@ -123,11 +123,11 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/55">Flagship</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-200">
-                  <li>• Conversation Engine</li>
-                  <li>• Earbud live guidance</li>
-                  <li>• Live cues</li>
-                  <li>• Better room handling</li>
-                  <li>• Sharper pressure support</li>
+                  <li>• Know what to say before you say it</li>
+                  <li>• Stay composed under pressure</li>
+                  <li>• Adjust in real time</li>
+                  <li>• Handle conversations with control</li>
+                  <li>• Move forward without hesitation</li>
                 </ul>              </div>
               <div className="rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 space-y-4 shadow-[0_0_30px_rgba(34,197,94,0.07)]">
                 <div className="space-y-1">
@@ -135,10 +135,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/65">Performance tier</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Revenue-generating live tools</li>
-                  <li>• Sales and appointment assist</li>
-                  <li>• Campaign memory</li>
-                  <li>• ROI-focused outcomes</li>
+                  <li>• Stay sharp on every call</li>
+                  <li>• Know what to say in real time</li>
+                  <li>• Improve results with every attempt</li>
+                  <li>• Build repeatable performance</li>
                 </ul>
               </div>
 
