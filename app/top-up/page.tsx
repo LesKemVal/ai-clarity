@@ -5,9 +5,6 @@ import PageShell from '@/components/layout/PageShell'
 
 export default function TopUpPage() {
   const [intent, setIntent] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [note, setNote] = useState('')
   const [feedbackType, setFeedbackType] = useState('suggestion')
   const [feedback, setFeedback] = useState('')
   const [message, setMessage] = useState('')
@@ -29,7 +26,7 @@ export default function TopUpPage() {
     if (intent === 'pro') {
       return 'Start Pro + Brilliant Conversation Partner.'
     }
-    return 'BRANESx is in beta.'
+    return 'Choose your level of control.'
   }, [intent])
 
   async function playVoiceSample(voice: string, label: string) {
@@ -73,7 +70,7 @@ export default function TopUpPage() {
 
   const subcopy = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'Choose GEORGE / GEORGette, personalize voice, and access future continuity features during beta as well as production. Early users get early access as the system improves for you—and for others who may need GEORGE most.'
+      return 'Choose GEORGE / GEORGette, personalize voice, and shape how your assistant supports your direction, continuity, and execution.'
     }
     if (intent === 'conversation') {
       return 'Conversation Assistance includes Brilliant access with live guidance, cues, exact lines, timing help, and pressure support when words matter.'
@@ -81,7 +78,7 @@ export default function TopUpPage() {
     if (intent === 'pro') {
       return 'Pro Conversation Partner includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
     }
-    return 'Paid access is opening through Stripe checkout. Use GEORGE now, upgrade when ready, and help make GEORGE better before launch.'
+    return 'GEORGE is available now. Upgrade when you are ready for stronger continuity, sharper execution support, and more control over how GEORGE helps you move.'
   }, [intent])
 
   function submitFeedback() {
