@@ -525,6 +525,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
   const [showCampaignMenu, setShowCampaignMenu] = useState(false)
+  const [language, setLanguage] = useState<'EN' | 'ES'>('EN')
+
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
@@ -3627,7 +3629,13 @@ Cue:`
         }`}
         aria-label="Open campaign selector"
       >
-        {activeCampaign ? (activeCampaign.name === 'Starter Campaign' ? 'Active' : activeCampaign.name) : 'Campaign'}
+        <span
+          onClick={() => setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')}
+          className="flex items-center gap-1 cursor-pointer"
+        >
+          <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
+          <span>{language}</span>
+        </span>
       </button>
 
       <button
