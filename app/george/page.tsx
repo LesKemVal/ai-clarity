@@ -1043,12 +1043,20 @@ ${campaignGoal}
 Constraints:
 ${campaignConstraints}
 
-GEORGE should help with:
-- repeatable lines
-- live cues
-- objection handling
-- follow-up language
-- what to say and what not to say
+GEORGE will:
+- give you repeatable lines
+- guide you in real time
+- help you stay in control of the conversation
+
+If you're using this to close deals or set appointments:
+
+Pro:
+- remembers every interaction
+- tracks what works and what fails
+- improves your next attempt automatically
+- prepares your next conversation with advantage
+
+(30-day access requires a payment method)
 
 Start by giving the user one strong opening line, one backup line, and one cue.`
 
