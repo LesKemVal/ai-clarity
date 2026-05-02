@@ -2830,9 +2830,9 @@ Cue:`
     </div>
 
     <div className="mt-4 flex items-center gap-1.5">
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-1" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-2" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot pulse-dot-3" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite]" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite_0.2s]" />
+      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite_0.4s]" />
     </div>
 
   </div>
@@ -4604,7 +4604,7 @@ I will guide you in real time. Start speaking.`
 
               <div className={`
 
-fixed bottom-[16px] left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition duration-200`}>
+${showConversation ? 'fixed bottom-[19px]' : 'absolute top-1/2 -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition duration-200`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
