@@ -3882,11 +3882,11 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[300px] rounded-[1.4rem] border border-white/[0.07] bg-black/88 p-3 shadow-[0_16px_38px_rgba(0,0,0,0.32)] backdrop-blur-xl"
         >
-          <div className="space-y-3.5">
-            <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
-              Memory Folders
+          <div className="space-y-3">
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/35">
+              Recall
             </div>
 
             {getExistingFolders().length > 0 ? (
@@ -3899,10 +3899,10 @@ if (liveMode) {
                       onClick={() => {
                         setActiveMemoryFolder(folder)
                       }}
-                      className={`block w-full rounded-xl border px-4 py-1.5 text-left text-sm transition ${
+                      className={`block w-full rounded-xl px-3 py-1.5 text-left text-[13px] transition ${
                         activeMemoryFolder === folder
-                          ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
-                          : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
+                          ? 'bg-white/[0.08] text-white'
+                          : 'text-white/62 hover:bg-white/[0.04] hover:text-white'
                       }`}
                     >
                       {folder}
@@ -3911,19 +3911,19 @@ if (liveMode) {
                 })}
               </div>
             ) : (
-              <div className="text-sm text-neutral-500">
-                No saved folders yet
+              <div className="text-[13px] text-white/40">
+                No saved memories yet
               </div>
             )}
 
             {activeMemoryFolder && (
-              <div className="mt-3 border-t border-white/10 pt-3">
-                <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.16em] text-neutral-500">
+              <div className="mt-3 border-t border-white/[0.06] pt-3">
+                <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-white/35">
                   <span>{activeMemoryFolder}</span>
                   <button
                     type="button"
                     onClick={() => setActiveMemoryFolder(null)}
-                    className="text-neutral-400 hover:text-white transition"
+                    className="text-white/40 transition hover:text-white"
                   >
                     Back
                   </button>
