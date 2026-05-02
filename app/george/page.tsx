@@ -3885,8 +3885,8 @@ if (liveMode) {
           className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[300px] rounded-[1.4rem] border border-white/[0.07] bg-black/88 p-3 shadow-[0_16px_38px_rgba(0,0,0,0.32)] backdrop-blur-xl"
         >
           <div className="space-y-3">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-white/35">
-              Recall
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
+              saved memory
             </div>
 
             {getExistingFolders().length > 0 ? (
