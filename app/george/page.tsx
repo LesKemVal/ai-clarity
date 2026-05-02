@@ -4610,7 +4610,9 @@ I will guide you in real time. Start speaking.`
                 <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-28 bg-gradient-to-t from-black via-black/90 to-transparent" />
               )}
 
-              <div className={`fixed bottom-[16px] left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition duration-200`}>
+              <div className={`
+
+fixed bottom-[16px] left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition duration-200`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
