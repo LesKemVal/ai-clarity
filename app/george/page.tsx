@@ -3124,7 +3124,7 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
+          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-3 py-2 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? (
@@ -3270,7 +3270,7 @@ I am listening now. Speak naturally. I will respond ${
         <div className="relative space-y-2">
 
           {(isLatestAssistant && liveMode) && (
-  <div className="flex items-center gap-3 mt-2 text-[11px] text-white/70">
+  <div className="flex items-center gap-2 mt-2 text-[11px] text-white/70">
 
     <button onClick={() => saveMemory(m, i)}>
       Save
@@ -3570,7 +3570,7 @@ Cue:`)
               className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
             >
               <span className="h-1 w-1 rounded-full bg-[#7C8CFF]" />
-              <span>Keep this</span>
+              
             </button>
 
             <button
@@ -3678,7 +3678,7 @@ Cue:`)
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[min(300px,calc(100vw-32px))] rounded-[1.45rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-3 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-0 mb-2 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'}` }
+              className={`absolute z-30 w-[220px] rounded-[1.1rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-2 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-0 mb-2 origin-bottom-left' : 'top-full left-0 mt-3 origin-top-left'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -3808,7 +3808,7 @@ Cue:`)
       Help
     </button>
 
-    <div className="relative flex items-center gap-3">
+    <div className="relative flex items-center gap-2">
       <button
         type="button"
         onClick={(e) => {
@@ -3876,7 +3876,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+          className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[320px] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl"
         >
           <div className="space-y-3.5">
             <div className="text-xs uppercase tracking-[0.16em] text-neutral-500">
@@ -4131,7 +4131,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-4 py-3 space-y-3">
+          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-3 py-2 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -4199,7 +4199,7 @@ I will guide you in real time. Start speaking.`
       className="pointer-events-auto fixed inset-0 z-[200] bg-black/55 backdrop-blur-[10px]"
     />
 
-    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
+    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 ">
       <div className="pointer-events-auto w-full max-w-sm max-h-[calc(100dvh-220px)] overflow-y-auto rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/30 bg-black p-5 space-y-3 shadow-[0_0_30px_rgba(124,140,255,0.25)]">
         <div className="flex items-center justify-between">
           <div className="text-white text-sm tracking-[0.12em]">
@@ -4226,7 +4226,7 @@ I will guide you in real time. Start speaking.`
 
             if (!sessions.length) {
               return (
-                <div className="rounded-xl border border-white/10 bg-white/[0.025] p-3 text-[12px] leading-5 text-white/65">
+                <div className="rounded-xl border border-white/10 bg-white/[0.025] p-2 text-[12px] leading-5 text-white/65">
                   No saved campaigns yet. Start a new campaign first.
                 </div>
               )
@@ -4324,17 +4324,17 @@ Start at screener. No pitch.`
       className="pointer-events-auto fixed inset-0 z-[200] bg-black/55 backdrop-blur-[10px]"    />
 
     <div
-      className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]"
+      className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 "
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-[320px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
           aria-label="Close PRO LIVE menu"
           onClick={() => setShowProLiveGate(false)}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
+          className="absolute right-3 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
         >
           ×
         </button>
@@ -4343,11 +4343,11 @@ Start at screener. No pitch.`
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
             PRO LIVE
           </div>
-          <div className="mt-0.5 text-[15px] font-semibold text-white">
-            Do you want LIVE assistance to help...
+          <div className="mt-0.5 text-[14px] font-semibold text-white">
+            How would you like to use LIVE assistance?
           </div>
-          <div className="mt-0.5 text-xs leading-5 text-neutral-400">
-            Close a deal, set appointments, run a structured campaign, or handle a real conversation like doctors, bills, SSI, or pressure situations.
+          <div className="mt-0.5 text-[11px] leading-4 text-neutral-400">
+            Close a deal, set appointments, run a structured campaign, or handle real conversation with your doctor, bill collectors, or "wifey", or any other pressure situation, LIVE.
           </div>
         </div>
 
@@ -4356,7 +4356,7 @@ Start at screener. No pitch.`
             setShowProLiveGate(false)
             setShowSessionPicker(true)
           }}
-          className="w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
+          className="w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
         >
           Resume Active Campaign
         </button>
@@ -4367,7 +4367,7 @@ Start at screener. No pitch.`
             window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
             setShowProLiveGate(false)
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
           Start Sales / Appointment Flow
         </button>
@@ -4380,7 +4380,7 @@ Start at screener. No pitch.`
             setActivePromptContext('manual_live')
             setActivePromptLabel('Manual Live')
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-3 py-2 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
         >
           Live Help — Real Conversations
         </button>
@@ -4843,7 +4843,7 @@ Start at screener. No pitch.`
 
       
       {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
+        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
@@ -4857,7 +4857,7 @@ Start at screener. No pitch.`
                 <button
                   type="button"
                   onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black"
+                  className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black"
                 >
                   Next
                 </button>
@@ -4868,7 +4868,7 @@ Start at screener. No pitch.`
                     window.localStorage.setItem("george_walkthrough_seen","1")
                     setShowWalkthrough(false)
                   }}
-                  className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black"
+                  className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black"
                 >
                   End
                 </button>
@@ -4911,7 +4911,7 @@ Start at screener. No pitch.`
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-2xl border transition hover:scale-[1.01] px-4 py-3 text-sm transition ${
+                      className={`rounded-2xl border transition hover:scale-[1.01] px-3 py-2 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
                           : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
@@ -4931,7 +4931,7 @@ Start at screener. No pitch.`
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -4952,7 +4952,7 @@ Start at screener. No pitch.`
                   setToastMessage('GEORGE is yours now.')
                   setShowToast(true)
                 }}
-                className="w-full rounded-2xl bg-[#7C8CFF] px-4 py-3 text-sm font-medium text-black transition hover:opacity-90"
+                className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black transition hover:opacity-90"
               >
                 Save
               </button>
@@ -5035,7 +5035,7 @@ Start at screener. No pitch.`
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+            className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
             <div className="mt-0.5 text-xs leading-6 text-neutral-400">
@@ -5071,7 +5071,7 @@ Start at screener. No pitch.`
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
+            className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-3 py-2.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
           >
             <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
             <div className="mt-0.5 text-xs leading-6 text-neutral-300">
@@ -5105,12 +5105,12 @@ Start at screener. No pitch.`
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
-          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
-            <div className="mb-2 flex items-start justify-between gap-3">
+          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+            <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">Pro Campaign</p>
-                <p className="mt-0.5 text-[15px] font-semibold text-white">This is a Pro campaign.</p>
-                <p className="mt-0.5 text-xs leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
+                <p className="mt-0.5 text-[14px] font-semibold text-white">This is a Pro campaign.</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
               </div>
               <button
                 type="button"
@@ -5121,7 +5121,7 @@ Start at screener. No pitch.`
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
+            <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
               <div className="font-medium text-white/80">Pro Mode lets you:</div>
               <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
@@ -5136,7 +5136,7 @@ Start at screener. No pitch.`
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-3 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-3 py-2 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
