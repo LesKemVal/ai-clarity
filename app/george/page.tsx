@@ -3094,7 +3094,7 @@ return (
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-[3px] px-3 py-2">
+      <div className="mt-3 flex items-center justify-center gap-[3px] px-4 py-2.5">
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
@@ -3124,7 +3124,7 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-3 py-2 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
+          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-2.5 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? (
@@ -3135,7 +3135,7 @@ return (
               <img
                 src={m.imageDataUrl}
                 alt="Uploaded image"
-                className="mb-2 max-h-40 w-full rounded-2xl border border-white/10 object-cover"
+                className="mb-2 max-h-40 w-full rounded-2xl max-w-full border border-white/10 object-cover"
               />
             )}
             <span>{m.content}</span>
@@ -3196,7 +3196,7 @@ I am listening now. Speak naturally. I will respond ${
                 setMessages(nextMessages)
                 messagesRef.current = nextMessages
               }}
-              className="rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-3 py-2 text-xs text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+              className="rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-4 py-2.5 text-xs text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
             >
               {label}
             </button>
@@ -3895,7 +3895,7 @@ if (liveMode) {
                       onClick={() => {
                         setActiveMemoryFolder(folder)
                       }}
-                      className={`block w-full rounded-xl border px-3 py-2 text-left text-sm transition ${
+                      className={`block w-full rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                         activeMemoryFolder === folder
                           ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
                           : isCampaignFolder
@@ -3961,7 +3961,7 @@ if (liveMode) {
                           setShowRecentFolders(false)
                           setActiveMemoryFolder(null)
                         }}
-                        className={`block w-full rounded-xl border px-3 py-2 text-left text-xs transition ${
+                        className={`block w-full rounded-xl border px-4 py-2.5 text-left text-xs transition ${
                           isCampaign
                             ? 'border-[#7C8CFF]/30 bg-[#7C8CFF]/10 text-neutral-200 hover:border-[#7C8CFF]/50'
                             : isLatest
@@ -4131,7 +4131,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-3 py-2 space-y-3">
+          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-4 py-2.5 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -4292,7 +4292,7 @@ Start at screener. No pitch.`
                   setToastMessage('Campaign restored')
                   setShowToast(true)
                 }}
-                className="w-full rounded-xl border border-white/10 bg-white/[0.025] px-3 py-2 text-left transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.025] px-4 py-2.5 text-left transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10"
               >
                 <div className="text-[12px] font-semibold text-white">
                   {session.label || 'Saved Campaign'}
@@ -4314,7 +4314,7 @@ Start at screener. No pitch.`
    <div
       role="button"
       tabIndex={0}
-      aria-label="Close PRO LIVE menu"
+      aria-label="Close LIVE ASSISTANT menu"
       onClick={() => setShowProLiveGate(false)}
       onKeyDown={(event) => {
         if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
@@ -4328,11 +4328,11 @@ Start at screener. No pitch.`
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-[320px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-[340px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-2.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
-          aria-label="Close PRO LIVE menu"
+          aria-label="Close LIVE ASSISTANCE menu"
           onClick={() => setShowProLiveGate(false)}
           className="absolute right-3 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
         >
@@ -4340,14 +4340,14 @@ Start at screener. No pitch.`
         </button>
 
         <div className="mb-2 pr-8">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
-            PRO LIVE
+          <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">
+            LIVE ASSISTANCE
           </div>
-          <div className="mt-0.5 text-[14px] font-semibold text-white">
+          <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
             How would you like to use LIVE assistance?
           </div>
           <div className="mt-0.5 text-[11px] leading-4 text-neutral-400">
-            Close a deal, set appointments, run a structured campaign, or handle real conversation with your doctor, bill collectors, or "wifey", or any other pressure situation, LIVE.
+            Close a deal, set appointments, run a structured telephone or in-person sales campaign — or handle real life conversation with your doctor, bill collectors, or any other pressure situation, LIVE.
           </div>
         </div>
 
@@ -4356,7 +4356,7 @@ Start at screener. No pitch.`
             setShowProLiveGate(false)
             setShowSessionPicker(true)
           }}
-          className="w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-3 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
+          className="mt-4 w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-2.5 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
         >
           Resume Active Campaign
         </button>
@@ -4367,9 +4367,9 @@ Start at screener. No pitch.`
             window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
             setShowProLiveGate(false)
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-2.5 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
-          Start Sales / Appointment Flow
+          Build a New Campaign
         </button>
 
         <button
@@ -4380,9 +4380,9 @@ Start at screener. No pitch.`
             setActivePromptContext('manual_live')
             setActivePromptLabel('Manual Live')
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/25 px-3 py-2 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
+          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-black/25 px-4 py-2.5 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
         >
-          Live Help — Real Conversations
+          Everyday Conversation Assistance
         </button>
 
       </div>
@@ -4411,7 +4411,7 @@ Start at screener. No pitch.`
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/10 bg-black/90 px-3 py-2 backdrop-blur-xl">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/10 bg-black/90 px-4 py-2.5 backdrop-blur-xl">
 
     <div className="text-[11px] text-white/60 mb-2">
       What happened here?
@@ -4487,7 +4487,7 @@ Start at screener. No pitch.`
 {liveMode && (
                 <div className="fixed bottom-[96px] left-0 right-0 z-[70] mx-auto w-[calc(100%-24px)] max-w-[900px] rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
                   <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
-                    <span className="shrink-0 text-[#7C8CFF]">PRO LIVE</span>
+                    <span className="shrink-0 text-[#7C8CFF]">LIVE ASSISTANCE</span>
 
                     <button
                       type="button"
@@ -4857,7 +4857,7 @@ Start at screener. No pitch.`
                 <button
                   type="button"
                   onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black"
+                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-2.5 text-sm font-medium text-black"
                 >
                   Next
                 </button>
@@ -4868,7 +4868,7 @@ Start at screener. No pitch.`
                     window.localStorage.setItem("george_walkthrough_seen","1")
                     setShowWalkthrough(false)
                   }}
-                  className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black"
+                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-2.5 text-sm font-medium text-black"
                 >
                   End
                 </button>
@@ -4884,7 +4884,7 @@ Start at screener. No pitch.`
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[340px] max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 text-center">
@@ -4911,7 +4911,7 @@ Start at screener. No pitch.`
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-2xl border transition hover:scale-[1.01] px-3 py-2 text-sm transition ${
+                      className={`rounded-2xl border transition hover:scale-[1.01] px-4 py-2.5 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
                           : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
@@ -4931,7 +4931,7 @@ Start at screener. No pitch.`
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-2xl max-w-full border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -4952,7 +4952,7 @@ Start at screener. No pitch.`
                   setToastMessage('GEORGE is yours now.')
                   setShowToast(true)
                 }}
-                className="w-full rounded-2xl bg-[#7C8CFF] px-3 py-2 text-sm font-medium text-black transition hover:opacity-90"
+                className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-2.5 text-sm font-medium text-black transition hover:opacity-90"
               >
                 Save
               </button>
@@ -4996,7 +4996,7 @@ Start at screener. No pitch.`
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-4 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-md rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[340px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 text-center">
@@ -5035,7 +5035,7 @@ Start at screener. No pitch.`
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+            className="block w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-2.5.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
             <div className="mt-0.5 text-xs leading-6 text-neutral-400">
@@ -5071,7 +5071,7 @@ Start at screener. No pitch.`
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-3 py-2.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
+            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-2.5.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
           >
             <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
             <div className="mt-0.5 text-xs leading-6 text-neutral-300">
@@ -5105,11 +5105,11 @@ Start at screener. No pitch.`
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
-          <div className="w-full max-w-md rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-3 py-2 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+          <div className="w-full max-w-[340px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-2.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">Pro Campaign</p>
-                <p className="mt-0.5 text-[14px] font-semibold text-white">This is a Pro campaign.</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Pro Campaign</p>
+                <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a Pro campaign.</p>
                 <p className="mt-0.5 text-[11px] leading-4 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
               </div>
               <button
@@ -5121,7 +5121,7 @@ Start at screener. No pitch.`
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/35 px-3 py-2 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
+            <div className="rounded-2xl border border-white/10 bg-black/35 px-4 py-2.5 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
               <div className="font-medium text-white/80">Pro Mode lets you:</div>
               <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
@@ -5136,7 +5136,7 @@ Start at screener. No pitch.`
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-3 py-2 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-2xl max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
