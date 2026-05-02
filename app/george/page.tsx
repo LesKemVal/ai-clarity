@@ -1036,7 +1036,7 @@ setAttemptStartTime(Date.now())
 
           const campaignLabel = `${campaignGoal} — ${productOrService}`.slice(0, 72)
 
-          const campaignContext = `Campaign loaded.
+          const campaignContext = `
 
 Product / Service:
 ${productOrService}
@@ -1187,7 +1187,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
       new Set(
         existing
           .map((item: { folder?: string }) => (item.folder || '').trim())
-          .filter(Boolean)
+          .filter((folder: string) => folder && folder !== 'Scripts')
       )
     ) as string[]
 
