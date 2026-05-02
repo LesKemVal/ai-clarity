@@ -3832,16 +3832,19 @@ Cue:`)
           setShowRecentFolders(prev => !prev)
           setActiveMemoryFolder(null)
         }}
-        className={`relative flex h-9 w-9 items-center justify-center transition-all duration-300 ${
+        className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.45)]'
-            : 'text-white/85 hover:text-white hover:scale-[1.05]'
+            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF] shadow-[0_0_14px_rgba(124,140,255,0.28)]'
+            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
         }`}
         aria-label="Open memory folders"
+        title="Memory"
       >
-        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>
-        </svg>
+        <span className="relative flex h-4 w-4 items-center justify-center">
+          <span className="absolute top-[3px] h-[2px] w-3 rounded-full bg-current opacity-80 transition group-hover:w-3.5" />
+          <span className="absolute top-[7px] h-[2px] w-3.5 rounded-full bg-current opacity-95 transition group-hover:w-4" />
+          <span className="absolute top-[11px] h-[2px] w-2.5 rounded-full bg-current opacity-70 transition group-hover:w-3" />
+        </span>
       </button>
 
       {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
