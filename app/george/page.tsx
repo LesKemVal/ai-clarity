@@ -3962,8 +3962,8 @@ if (liveMode) {
                             {item.preview || (item.content || '').slice(0, 80)}
                           </span>
                           {isLatest && (
-                            <span className="text-[14px] uppercase tracking-[0.14em] text-[#7C8CFF]">
-                              Latest
+                            <span className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[9px] uppercase tracking-[0.16em] text-white/45">
+                              recent
                             </span>
                           )}
                         </div>
