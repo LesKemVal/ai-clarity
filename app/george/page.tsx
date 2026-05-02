@@ -3945,7 +3945,7 @@ if (liveMode) {
                         key={idx}
                         type="button"
                         onClick={() => {
-                          const memoryContext = `You saved this earlier:\n${textBlock}\n\nDo you want me to respond to it, critique it, or build on it?`
+                          const memoryContext = `You saved this earlier:\n${textBlock}\n\nDo you want me to respond, or leave it as-is?`
 
                           const nextMessages = [
                             ...messagesRef.current,
