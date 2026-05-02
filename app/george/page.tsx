@@ -4311,7 +4311,7 @@ I will guide you in real time. Start speaking.`
             How would you like to use LIVE assistance?
           </div>
           <div className="mt-0.5 text-[11px] leading-4 text-neutral-400">
-            Close a deal, set appointments, run a structured telephone or in-person sales campaign — or handle real life conversation with your doctor, bill collectors, or any other pressure situation, LIVE.
+            Use LIVE assistance for structured campaigns or real conversations. Choose a campaign for sales and outreach, or enter everyday conversation support for real-life situations.
           </div>
         </div>
 
@@ -4344,9 +4344,9 @@ I will guide you in real time. Start speaking.`
             setActivePromptContext('manual_live')
             setActivePromptLabel('Manual Live')
           }}
-          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-black/25 px-4 py-1.5.5 text-left text-sm font-medium text-neutral-200 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
+          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.04] px-4 py-1.5.5 text-left text-sm font-medium text-white/80 transition hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
         >
-          Everyday Conversation Assistance
+          Personal Conversation
         </button>
 
       </div>
