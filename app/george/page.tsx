@@ -4196,7 +4196,7 @@ I will guide you in real time. Start speaking.`
       role="button"
       tabIndex={0}
       onClick={() => setShowSessionPicker(false)}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/82 backdrop-blur-[4px]"
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/55 backdrop-blur-[10px]"
     />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]">
@@ -4309,9 +4309,9 @@ Start at screener. No pitch.`
   </>
 )}
 
-{showProLiveGate && (
+{showProLiveGate && typeof document !== 'undefined' && createPortal( 
   <>
-    <div
+   <div
       role="button"
       tabIndex={0}
       aria-label="Close PRO LIVE menu"
@@ -4321,8 +4321,7 @@ Start at screener. No pitch.`
           setShowProLiveGate(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/82 backdrop-blur-[4px]"
-    />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/55 backdrop-blur-[10px]"    />
 
     <div
       className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 -translate-y-[6vh] -translate-y-[6vh]"
@@ -4388,9 +4387,9 @@ Start at screener. No pitch.`
 
       </div>
     </div>
-  </>
+  </>,
+  document.body
 )}
-
 
     </div>
   </div>
@@ -4993,8 +4992,7 @@ Start at screener. No pitch.`
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/45 backdrop-blur-[6px]"
-    />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-red-500/50" />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-4 overflow-y-auto">
       <div
@@ -5002,7 +5000,7 @@ Start at screener. No pitch.`
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 text-center">
-          <p className="text-sm font-medium text-white">Stay Brilliant.</p>
+          <p className="text-sm font-medium text-red-400">RUNTIME TEST — Stay Brilliant.</p>
           <p className="mt-1 text-xs leading-6 text-neutral-400">
             You are already operating at a higher level. Choose how much control and execution support you want.
           </p>
