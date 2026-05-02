@@ -3945,9 +3945,16 @@ if (liveMode) {
                         key={idx}
                         type="button"
                         onClick={() => {
-                          setInput(textBlock)
-                          if (textareaRef.current) {
-                          }
+                          const memoryContext = `You saved this earlier:\n${textBlock}\n\nDo you want me to respond to it, critique it, or build on it?`
+
+                          const nextMessages = [
+                            ...messagesRef.current,
+                            { role: 'assistant' as const, content: memoryContext }
+                          ]
+
+                          setMessages(nextMessages)
+                          messagesRef.current = nextMessages
+
                           setShowRecentFolders(false)
                           setActiveMemoryFolder(null)
                         }}
