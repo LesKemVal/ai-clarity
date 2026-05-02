@@ -13,14 +13,14 @@ export default function Brand({
     <div className="flex items-center gap-2">
       <img
         src="/branding/logo.png"
-        alt="BRANESx"
+        alt="BRANES"
         className="h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
       />
       {!compact && (
         <div className="flex flex-col leading-tight">
           {showCore && (
             <span className="text-[11px] tracking-widest text-white/40">
-              BRANESx
+              BRANES
             </span>
           )}
           <span className="text-sm text-white/80">
