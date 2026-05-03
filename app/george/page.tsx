@@ -4604,7 +4604,7 @@ I will guide you in real time. Start speaking.`
 
               <div className={`
 
-${showConversation ? 'fixed bottom-[38px]' : 'fixed top-1/2 -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${showConversation ? 'fixed bottom-[38px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
