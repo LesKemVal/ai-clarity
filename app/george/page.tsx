@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
-import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile } from '@/lib/george/conversation-engine'
+import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
@@ -3049,6 +3049,23 @@ if (responseTimerRef.current) {
 
           const lineText = (() => {
             const lowerSignal = liveTranscript.toLowerCase()
+            const personProfile = detectConversationPersonProfile(input, liveTranscript)
+
+            if (personProfile.role === 'doctor') {
+              return 'Doctor — Say: “I’ll keep this clear. Here are the symptoms, when they started, and what worries me most.”'
+            }
+
+            if (personProfile.role === 'lawyer') {
+              return 'Lawyer — Say: “Explain that in plain language before I agree to anything.”'
+            }
+
+            if (personProfile.role === 'authority') {
+              return 'Authority — Say: “Help me understand the exact requirement and the next step.”'
+            }
+
+            if (personProfile.role === 'gatekeeper') {
+              return 'Gatekeeper — Say: “I only need 20 seconds to see if this belongs on their desk.”'
+            }
 
             if (/not interested|no thanks|don't need|dont need|not right now|already have|have someone/.test(lowerSignal)) {
               return 'Say: “I understand. Here’s the simple version — [pause] then you can decide.”'
