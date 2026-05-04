@@ -7,22 +7,6 @@ import { setActiveMode } from '@/lib/george/session/store'
 export default function GeorgeLivePage() {
   const router = useRouter()
   const [entering, setEntering] = useState(true)
-  const [showPrompt, setShowPrompt] = useState(false)
-  const [loading, setLoading] = useState(null)
-
-  async function startCheckout(tier) {
-    try {
-      setLoading(tier)
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
-      })
-      const data = await res.json()
-      if (data?.url) window.location.href = data.url
-    } catch {}
-    setLoading(null)
-  }
   const [showFullStrengthPrompt, setShowFullStrengthPrompt] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
 
@@ -53,7 +37,6 @@ export default function GeorgeLivePage() {
   useEffect(() => {
     setActiveMode('live')
     const t = setTimeout(() => setEntering(false), 550)
-    setTimeout(() => setShowPrompt(true), 1800)
     return () => clearTimeout(t)
   }, [])
 
@@ -174,7 +157,7 @@ export default function GeorgeLivePage() {
       )}
 
       {/* Transition Overlay */}
-      {showPrompt && (
+      {showFullStrengthPrompt && (
   <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
     <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6">
 
@@ -199,7 +182,7 @@ export default function GeorgeLivePage() {
         </button>
 
         <button
-          onClick={() => setShowPrompt(false)}
+          onClick={() => setShowFullStrengthPrompt(false)}
           className="w-full text-xs text-white/40"
         >
           Not now
