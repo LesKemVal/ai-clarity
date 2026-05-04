@@ -1079,7 +1079,11 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       window.localStorage.setItem('george_voice', 'off')
     }
 
-    setPreLiveMessages(null)
+    if (preLiveMessages) {
+  setMessages(preLiveMessages)
+  messagesRef.current = preLiveMessages
+}
+setPreLiveMessages(null)
   }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
@@ -1104,6 +1108,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
 
     if (conversationMode === 'manual_live') {
+  // hard override any existing messages
+  messagesRef.current = []
   const liveIntro: Message = {
     role: 'assistant',
     content: `I’m listening.
@@ -4019,7 +4025,7 @@ Cue:`)
 
             
 
-            <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
               <div className={`${liveMode ? "hidden" : "fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
@@ -4496,7 +4502,7 @@ If anything changed, tell me before you continue.`
                   {session.title || session.label || session.name || 'Conversation'}
                 </div>
                 <div className="mt-1 text-[11px] text-neutral-500">
-                  {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved campaign'}
+                  {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved conversation'}
                 </div>
               </button>
             ))
@@ -4546,14 +4552,37 @@ If anything changed, tell me before you continue.`
             How would you like to use LIVE assistance?
           </div>
           <div className="mt-0.5 text-[11px] leading-4 text-neutral-400">
-            Use LIVE assistance for structured campaigns or real conversations. Choose a campaign for sales and outreach, or enter everyday conversation support for real-life situations.
+            Use LIVE assistance for real conversations. You can speak naturally, and GEORGE will listen, learn the context, and help when needed.
           </div>
         </div>
 
         <button
           onClick={() => {
             setShowProLiveGate(false)
+
+            // Save normal GEORGE state BEFORE replacing messages with LIVE intro.
             enterLiveMode()
+
+            const liveIntro: Message = {
+              role: 'assistant',
+              content: `I’m listening.
+
+You don’t have to explain everything up front.
+As you speak, I’ll pick up the room.
+
+If you need help, say things like:
+“hold on…”
+“how do I say this?”
+“what’s the word I’m looking for?”
+“let me put that another way…”
+“help me here”
+
+I’ll stay with you.`
+            }
+
+            setMessages([liveIntro])
+            messagesRef.current = [liveIntro]
+
             setConversationMode('manual_live')
             setActivePromptContext('manual_live')
             setActivePromptLabel('Conversation')
@@ -4840,7 +4869,7 @@ If anything changed, tell me before you continue.`
 
               <div className={`
 
-${showConversation ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
@@ -5313,7 +5342,7 @@ ${showConversation ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'}
 )}
 
       {showCampaignUpgradeGate && (
-        <div className="fixed inset-x-0 bottom-[96px] z-[95] flex justify-center px-4">
+        <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
           <div className="w-full max-w-[340px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
