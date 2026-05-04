@@ -3114,10 +3114,14 @@ setPendingAssistantMessage({
             return
           }
           stopListening()
+
+          const personProfile = detectConversationPersonProfile(input, liveTranscript)
+          const profileLabel = `${personProfile.role} — ${personProfile.posture}`
+
           setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
-              ? lineText
+              ? profileLabel + "\n" + lineText
               : intent === "reword"
               ? "Try: “Let me put that another way…”"
               : intent === "cue"
