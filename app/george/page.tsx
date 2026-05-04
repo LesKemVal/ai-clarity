@@ -4687,18 +4687,27 @@ I will guide you in real time. Start speaking.`
                   setActivePromptContext('manual_live')
                   setActivePromptLabel(session.title || 'Conversation')
 
+                  const goal = session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'
+                  const state = session.lastKnownState || session.summary || 'Unknown'
+                  const restart = session.suggestedRestart || 'Continue from the strongest next move, or tell me what changed.'
+
                   const restartBrief: Message = {
                     role: 'assistant',
-                    content: `Conversation restored.
+                    content: `Smart Resume.
 
-Context: ${session.personOrRole || 'Unknown'} — ${session.setting || 'General'}
-Goal: ${session.userGoal || 'Not set'}
-Last known position: ${session.lastKnownState || 'Unknown'}
+Goal:
+${goal}
 
-Suggested restart:
-${session.suggestedRestart || 'Pick up naturally and clarify your intent.'}
+Last known state:
+${state}
 
-If anything changed, tell me before you continue.`
+Recommended next move:
+${restart}
+
+Choose one:
+1. Continue from here.
+2. Tell me what changed.
+3. Start fresh.`
                   }
 
                   const restored = Array.isArray(session.messages)
