@@ -7,6 +7,32 @@ import { setActiveMode } from '@/lib/george/session/store'
 export default function GeorgeLivePage() {
   const router = useRouter()
   const [entering, setEntering] = useState(true)
+  const [showFullStrengthPrompt, setShowFullStrengthPrompt] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setShowFullStrengthPrompt(true), 1800)
+    return () => window.clearTimeout(t)
+  }, [])
+
+  async function startCheckout(tier: 'brilliant_day' | 'brilliant') {
+    try {
+      setCheckoutLoading(tier)
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      })
+      const data = await res.json()
+      if (data?.url) {
+        window.location.href = data.url
+        return
+      }
+      setCheckoutLoading(null)
+    } catch {
+      setCheckoutLoading(null)
+    }
+  }
 
   useEffect(() => {
     setActiveMode('live')
@@ -91,6 +117,44 @@ export default function GeorgeLivePage() {
 
         </div>
       </div>
+
+      {showFullStrengthPrompt && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/72 px-5 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.85)]">
+            <p className="text-xl font-semibold leading-7 text-white">
+              Keep GEORGE at full strength:
+            </p>
+
+            <div className="mt-5 space-y-3">
+              <button
+                type="button"
+                onClick={() => startCheckout('brilliant_day')}
+                disabled={checkoutLoading !== null}
+                className="w-full rounded-xl bg-white px-4 py-3 text-sm font-medium text-black transition hover:bg-white/90 disabled:opacity-50"
+              >
+                {checkoutLoading === 'brilliant_day' ? 'Opening…' : 'Continue today — $3'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => startCheckout('brilliant')}
+                disabled={checkoutLoading !== null}
+                className="w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm font-medium text-white/85 transition hover:bg-white/[0.08] hover:text-white disabled:opacity-50"
+              >
+                {checkoutLoading === 'brilliant' ? 'Opening…' : 'Stay Brilliant — $25/month'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowFullStrengthPrompt(false)}
+                className="w-full rounded-xl px-4 py-2 text-xs text-white/40 transition hover:text-white/70"
+              >
+                Not now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Transition Overlay */}
       {entering && (
