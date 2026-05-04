@@ -3051,11 +3051,11 @@ if (responseTimerRef.current) {
             const lowerSignal = liveTranscript.toLowerCase()
 
             if (/not interested|no thanks|don't need|dont need|not right now|already have|have someone/.test(lowerSignal)) {
-              return 'Say: “I understand. Here’s the simple version — then you can decide.”'
+              return 'Say: “I understand. Here’s the simple version — [pause] then you can decide.”'
             }
 
             if (/too expensive|cost|price|budget|no budget|can't afford|cant afford/.test(lowerSignal)) {
-              return 'Say: “Fair. Let me show you why this makes sense before price becomes the issue.”'
+              return 'Say: “Fair. Let me show you why this makes sense — [pause] before price becomes the issue.”'
             }
 
             if (/send me|email me|call me later|next week|follow up/.test(lowerSignal)) {
