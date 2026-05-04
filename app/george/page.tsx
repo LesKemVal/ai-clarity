@@ -45,6 +45,23 @@ type GeorgeCampaign = {
   defaultAnswersEnabled: boolean
 }
 
+type GeorgeConversation = {
+  id: string
+  type: "conversation"
+  title?: string
+  createdAt: number
+  updatedAt: number
+  messages: Message[]
+
+  summary?: string
+  personOrRole?: string
+  setting?: string
+  userGoal?: string
+  lastKnownState?: string
+  suggestedRestart?: string
+}
+
+
 const REROUTE_PROMPT: PromptSelection = {
   label: 'New strategy',
   text: 'Give me a new strategy from where I am now.',
@@ -1067,7 +1084,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
       try {
-        const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+        const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
         existing.unshift({
           id: `session_${Date.now()}`,
           type: "session",
@@ -1215,7 +1232,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
             }
           }
 
-          const existingSessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+          const existingSessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
           window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify([newCampaign, ...(Array.isArray(existingSessions) ? existingSessions : [])].slice(0, 25)))
 
           startNewGeorgeSession(
@@ -1330,7 +1347,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (typeof window === 'undefined') return []
 
     try {
-      return JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]') || []
+      return JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]') || []
     } catch {
       return []
     }
@@ -2828,7 +2845,7 @@ setPendingAssistantMessage({
         }
         const lower = liveTranscript.toLowerCase()
 
-        const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+        const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
 
         const updated = existing.map((c: any) => {
           if (c.id !== activeCampaignId) return c
@@ -3070,7 +3087,7 @@ return (
           }}
           onNewSession={() => {
             try {
-              const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+              const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
               if (messagesRef.current.length > 1) {
                 existing.unshift({
                   id: Date.now(),
@@ -4369,7 +4386,7 @@ Constraints: ${proConstraints || 'None'}
 I will guide you in real time. Start speaking.`
                 }
 
-                startNewGeorgeSession(msg, 'Professional Session')
+                startNewGeorgeSession(msg, 'Conversation')
                 setShowProSetup(false)
               }}
               className="w-full bg-[#22c55e]/30 border border-[#22c55e]/50 py-3 rounded text-white"
@@ -4418,7 +4435,7 @@ I will guide you in real time. Start speaking.`
           {(() => {
             let sessions = []
             try {
-              sessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+              sessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
               if (!Array.isArray(sessions)) sessions = []
             } catch {
               sessions = []
@@ -4427,7 +4444,7 @@ I will guide you in real time. Start speaking.`
             if (!sessions.length) {
               return (
                 <div className="rounded-xl border border-white/10 bg-white/[0.025] p-2 text-[12px] text-white/65">
-                  No saved campaigns yet.
+                  No saved conversations yet.
                 </div>
               )
             }
@@ -4457,7 +4474,7 @@ I will guide you in real time. Start speaking.`
                 className="w-full text-left rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-[12px] text-white/80 hover:bg-white/5"
               >
                 <div className="font-semibold text-white">
-                  {session.title || session.label || session.name || 'Professional Session'}
+                  {session.title || session.label || session.name || 'Conversation'}
                 </div>
                 <div className="mt-1 text-[11px] text-neutral-500">
                   {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved campaign'}
@@ -4598,7 +4615,7 @@ I will guide you in real time. Start speaking.`
             history.unshift({ signal, context: lastOutcomeContext, ts: Date.now() })
             window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
 
-            const sessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
+            const sessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
             const updatedSessions = Array.isArray(sessions)
               ? sessions.map((session: any) => {
                   if (activeCampaignId && session.id !== activeCampaignId) return session
