@@ -465,7 +465,10 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     if (liveMode || activePromptContext) return
 
     const greeting = getInitialGreeting()
+
+
     setMessages((prev) => {
+
       if (
         prev.length === 1 &&
         prev[0]?.role === 'assistant' &&
@@ -593,8 +596,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     if (typeof window === 'undefined') return
 
     try {
-      const savedCampaigns = JSON.parse(window.localStorage.getItem('GEORGE_CAMPAIGNS') || '[]')
-      const savedActiveCampaignId = window.localStorage.getItem('GEORGE_ACTIVE_CAMPAIGN_ID')
+      const savedCampaigns = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+      const savedActiveCampaignId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
 
       if (Array.isArray(savedCampaigns)) {
         setCampaigns(savedCampaigns)
@@ -611,12 +614,12 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    window.localStorage.setItem('GEORGE_CAMPAIGNS', JSON.stringify(campaigns))
+    window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(campaigns))
 
     if (activeCampaignId) {
-      window.localStorage.setItem('GEORGE_ACTIVE_CAMPAIGN_ID', activeCampaignId)
+      window.localStorage.setItem('GEORGE_ACTIVE_CONVERSATION_ID', activeCampaignId)
     } else {
-      window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_ID')
+      window.localStorage.removeItem('GEORGE_ACTIVE_CONVERSATION_ID')
     }
   }, [campaigns, activeCampaignId])
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null)
@@ -1074,7 +1077,30 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       } catch {}
     }
 
-    setMessages([openingMessage])
+    if (conversationMode === 'manual_live') {
+  const liveIntro: Message = {
+    role: 'assistant',
+    content: `I’m listening.
+
+You don’t have to explain everything up front.
+As you speak, I’ll pick up the room.
+
+If you need help, just say things like:
+“hold on…”
+“how do I say this?”
+“what’s the word I’m looking for?”
+“let me put that another way…”
+“help me here”
+
+I’ll stay with you.`
+  }
+
+  setMessages([liveIntro])
+  messagesRef.current = [liveIntro]
+} else {
+  setMessages([openingMessage])
+  messagesRef.current = [openingMessage]
+}
     messagesRef.current = [openingMessage]
     setInput('')
     setInterimTranscript('')
@@ -2779,7 +2805,8 @@ if (responseTimerRef.current) {
             void handleSend("Focus. Control the next sentence.")
             return
           }
-          setPendingAssistantMessage({
+          stopListening()
+setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
               ? "Say: [keep it simple and direct]"
@@ -2871,21 +2898,22 @@ LATEST HEARD:
 ${clean}
 
 You are GEORGE in Conversation Mode.
-Respond only from what you actually heard or what the user has given you.
-If the user asks for words, give a usable line.
-If the user needs direction, give a short cue.
-If the context is still unclear, ask for one missing signal instead of guessing.
 
-Return short:
+Respond ONLY from what you actually heard.
+
+Keep responses:
+- short
+- usable out loud
+- natural
+
+Use:
+Word:
+Say:
 Cue:
-Line:
 Need:`
-            : `GEORGE does not have enough of the room yet.
+            : `I don’t have enough of the room yet.
 
-Tell the user briefly:
-"I need more of the room. Give me who you are speaking to, what this is about, or what outcome you want."
-
-Do not guess.`
+Tell me who you're speaking to, what this is about, or what outcome you want.`
           : clean
 
         
@@ -2912,7 +2940,9 @@ responseTimerRef.current = setTimeout(() => {
   if (!friction) return
   if (score < 3) return
 
-  void handleSend(livePrompt)
+  if (!isSpeaking) {
+    void handleSend(livePrompt)
+}
 }, 2600)
 
       }
@@ -2936,6 +2966,12 @@ responseTimerRef.current = setTimeout(() => {
     }
 
     recognition.onend = () => {
+      if (liveMode && voiceOn && !isThinking) {
+        setTimeout(() => {
+          startListening()
+        }, 250)
+      }
+
       setIsListening(false)
       setInterimTranscript('')
     }
@@ -4362,7 +4398,7 @@ I will guide you in real time. Start speaking.`
       >
         <div className="flex items-center justify-between mb-2">
           <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
-            RESUME CAMPAIGN
+            RESUME CONVERSATION
           </div>
           <button
             onClick={() => setShowSessionPicker(false)}
@@ -4622,7 +4658,7 @@ I will guide you in real time. Start speaking.`
                       className="shrink-0 rounded-md border border-[#7C8CFF]/50 bg-[#7C8CFF]/10 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.35)] transition hover:bg-[#7C8CFF]/20 hover:text-white"
                       aria-label="Open campaign picker"
                     >
-                      ⚡ Campaign
+                      Conversation
                     </button>
 
                     <button
