@@ -3055,7 +3055,11 @@ if (responseTimerRef.current) {
             }
 
             if (/too expensive|cost|price|budget|no budget|can't afford|cant afford/.test(lowerSignal)) {
-              return 'Say: “Fair. Let me show you why this makes sense — [pause] before price becomes the issue.”'
+              return [
+  'Say: “Fair. Let me show you why this makes sense — [pause] before price becomes the issue.”',
+  'Say: “I hear you — [pause] but let me show you where this actually pays off.”',
+  'Say: “Price matters — [pause] let me show you what this really does first.”'
+][Math.floor(Date.now() % 3)]
             }
 
             if (/send me|email me|call me later|next week|follow up/.test(lowerSignal)) {
