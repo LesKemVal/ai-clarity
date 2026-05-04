@@ -966,7 +966,41 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const savedContext = window.localStorage.getItem('george_active_context')
+    
+    // 🔥 RESTORE LAST ACTIVE CONVERSATION
+    try {
+      const savedId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
+      const all = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+
+      if (savedId && Array.isArray(all)) {
+        const found = all.find((c: any) => c.id === savedId)
+
+        if (found) {
+          const briefing: Message = {
+            role: 'assistant',
+            content: `Conversation found.
+
+Goal:
+${found.userGoal || 'Not set'}
+
+Status:
+${found.lastKnownState || 'Unknown'}
+
+Next:
+${found.suggestedRestart || 'Continue naturally.'}
+
+Say “continue” or use controls.
+You can also reload the full conversation.`
+          }
+
+          skipNextTypewriterRef.current = true
+          setMessages([briefing])
+          messagesRef.current = [briefing]
+        }
+      }
+    } catch {}
+
+const savedContext = window.localStorage.getItem('george_active_context')
     const savedLabel = window.localStorage.getItem('george_active_label')
     const savedVoice = window.localStorage.getItem('george_voice')
 
@@ -985,9 +1019,17 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   }, [])
 
   const assistantRevealedRef = useRef(false)
+const skipNextTypewriterRef = useRef(false)
 
   // CHATGPT-STYLE TYPING ENGINE
   useEffect(() => {
+    if (skipNextTypewriterRef.current) {
+      skipNextTypewriterRef.current = false
+      setTypedMessageIndex(null)
+      setTypedMessageContent('')
+      return
+    }
+
     if (!messages.length) return
 
     const lastIndex = messages.length - 1
@@ -1080,10 +1122,39 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
 
     if (preLiveMessages) {
+  skipNextTypewriterRef.current = true
   setMessages(preLiveMessages)
   messagesRef.current = preLiveMessages
   setTypedMessageIndex(null) // prevent re-type animation
+  setTypedMessageContent('')
 }
+// save LIVE conversation if meaningful
+if (messagesRef.current.length > 2) {
+  try {
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+
+    const newSession = {
+      id: `conversation_${Date.now()}`,
+      type: "conversation",
+      title: "Untitled Conversation",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      messages: messagesRef.current,
+      summary: "Conversation captured from LIVE mode.",
+      personOrRole: "Unknown",
+      setting: "Live interaction",
+      userGoal: "In progress",
+      lastKnownState: "User exited LIVE mode.",
+      suggestedRestart: "Resume by re-engaging naturally."
+    }
+
+    window.localStorage.setItem(
+      'GEORGE_CONVERSATIONS',
+      JSON.stringify([newSession, ...existing].slice(0, 25))
+    )
+  } catch {}
+}
+
 setPreLiveMessages(null)
   }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
@@ -1467,7 +1538,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   }, [showToast])
 
   useEffect(() => {
-    if (!userPinnedBottomRef.current) return
+    if (!userPinnedBottomRef.current && !liveMode) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
 requestAnimationFrame(() => {
   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -1931,6 +2002,17 @@ requestAnimationFrame(() => {
     setMessages((prev) => {
       const next = [...prev, pendingAssistantMessage]
       messagesRef.current = next
+
+      try {
+        const activeId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
+        if (activeId) {
+          const all = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+          const updated = all.map((c: any) =>
+            c.id === activeId ? { ...c, messages: next, updatedAt: Date.now() } : c
+          )
+          window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(updated))
+        }
+      } catch {}
       return next
     })
 
@@ -3343,7 +3425,11 @@ return (
         }`}
       >
         {m.role === 'assistant' ? (
-          <TypewriterText text={m.content} />
+          typedMessageIndex === i ? (
+            typedMessageContent || m.content
+          ) : (
+            m.content
+          )
         ) : (
           <>
             {m.imageDataUrl && (
