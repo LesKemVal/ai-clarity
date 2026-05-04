@@ -123,6 +123,8 @@ export default function Sidebar({
   const pathname = usePathname()
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
+  const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
+
 
   useEffect(() => {
     const loadNormalSessions = () => {
@@ -201,13 +203,7 @@ export default function Sidebar({
   }
 
   const openGoalCheck = (item: GoalCheckItem) => {
-    setActiveMode('normal')
-    setShowSidebar?.(false)
-    onPromptSelect({
-      label: item.title,
-      text: `Goal Check: ${item.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
-      context: 'goal_check_manual',
-    })
+    setActiveGoalCheck(item)
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
@@ -547,6 +543,74 @@ Upgrade to continue.`,
           </section>
         </div>
       </div>
-    </aside>
+    
+{activeGoalCheck && (
+  <div
+    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+    onClick={() => setActiveGoalCheck(null)}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
+    >
+      <div className="mb-4 text-lg text-white font-semibold">
+        {activeGoalCheck.title}
+      </div>
+
+      <div className="space-y-3">
+
+        <button
+          onClick={() => {
+            setActiveGoalCheck(null)
+            setShowSidebar?.(false)
+            onPromptSelect({
+              label: activeGoalCheck.title,
+              text: `Goal Check: ${activeGoalCheck.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
+              context: 'goal_check_manual',
+            })
+          }}
+          className="w-full rounded-xl bg-white text-black px-4 py-2 text-sm"
+        >
+          Review with GEORGE
+        </button>
+
+        <button
+          onClick={() => {
+            const next = window.prompt('Rename Goal Check', activeGoalCheck.title)
+            if (!next?.trim()) return
+
+            const updated = goalChecks.map((g) =>
+              g.id === activeGoalCheck.id
+                ? { ...g, title: next.trim(), updatedAt: Date.now() }
+                : g
+            )
+
+            setGoalChecks(updated)
+            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+            setActiveGoalCheck(null)
+          }}
+          className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
+        >
+          Rename
+        </button>
+
+        <button
+          onClick={() => {
+            const updated = goalChecks.filter((g) => g.id !== activeGoalCheck.id)
+            setGoalChecks(updated)
+            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+            setActiveGoalCheck(null)
+          }}
+          className="w-full rounded-xl border border-red-500/30 px-4 py-2 text-sm text-red-400"
+        >
+          Delete
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
+</aside>
   )
 }
