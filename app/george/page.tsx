@@ -4764,10 +4764,10 @@ If anything changed, tell me before you continue.`
             LIVE ASSISTANCE
           </div>
           <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
-            How would you like to use LIVE assistance?
+            Start LIVE assistance
           </div>
           <div className="mt-1 text-[11px] leading-5 text-neutral-400">
-            Use LIVE assistance for real conversations. You can speak naturally, and GEORGE will listen, learn the context, and help when needed.
+            Speak naturally. I’ll pick up context and guide you in real time.
           </div>
         </div>
 
@@ -4808,7 +4808,7 @@ setMessages([liveIntro])
             setInteractionMode('speech')
             setTimeout(() => startListening(), 120)
           }}
-          className="mt-4 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/[0.06]"
+          className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 shadow-[0_0_20px_rgba(124,140,255,0.25)] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/[0.06]"
         >
           Start
         </button>
@@ -4819,7 +4819,7 @@ setMessages([liveIntro])
             window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
             setShowProLiveGate(false)
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+          className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
           Setup
         </button>
@@ -4829,7 +4829,7 @@ setMessages([liveIntro])
             setShowProLiveGate(false)
             setShowSessionPicker(true)
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+          className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
           Sessions
         </button>
