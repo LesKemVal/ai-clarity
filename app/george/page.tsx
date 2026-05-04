@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile } from '@/lib/george/conversation-engine'
-import { createSession, getActiveSession, updateActiveSessionMessages } from '@/lib/george/session/store'
+import { createSession, getActiveSession, getActiveSessionId, setActiveSessionId, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -473,6 +473,8 @@ Ready?`
 const [messages, setMessages] = useState<Message[]>([])
 const normalSessionBootedRef = useRef(false)
 const normalSessionWriteReadyRef = useRef(false)
+const liveSessionWriteReadyRef = useRef(false)
+const preLiveSessionIdRef = useRef<string | null>(null)
 const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string } | null>(null)
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
@@ -734,6 +736,16 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     normalSessionBootedRef.current = true
 
     const activeSession = getActiveSession()
+
+    if (activeSession?.mode === 'live' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+      setLiveMode(true)
+      setConversationMode('manual_live')
+      setActivePromptContext('manual_live')
+      setMessages(activeSession.messages)
+      messagesRef.current = activeSession.messages
+      liveSessionWriteReadyRef.current = true
+      return
+    }
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
       setMessages(activeSession.messages)
@@ -1109,7 +1121,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   ])
 
   const enterLiveMode = () => {
-    setPreLiveMessages([...messagesRef.current])
+    preLiveSessionIdRef.current = getActiveSessionId()
+setPreLiveMessages([...messagesRef.current])
     setLiveMode(true)
   }
 
@@ -1144,6 +1157,12 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
     if (preLiveMessages) {
   skipNextTypewriterRef.current = true
+  if (preLiveSessionIdRef.current) {
+    setActiveSessionId(preLiveSessionIdRef.current)
+  }
+  setActiveMode('normal')
+  liveSessionWriteReadyRef.current = false
+  normalSessionWriteReadyRef.current = true
   setMessages(preLiveMessages)
   messagesRef.current = preLiveMessages
   setTypedMessageIndex(null) // prevent re-type animation
@@ -1220,10 +1239,14 @@ If you need help, just say things like:
 I’ll stay with you.`
   }
 
-  setMessages([liveIntro])
+  createSession('live', [liveIntro], 'LIVE Assistance')
+liveSessionWriteReadyRef.current = true
+setMessages([liveIntro])
   messagesRef.current = [liveIntro]
 } else {
-  setMessages([openingMessage])
+  createSession('live', [openingMessage], 'LIVE Assistance')
+liveSessionWriteReadyRef.current = true
+setMessages([openingMessage])
   messagesRef.current = [openingMessage]
 }
     setInput('')
@@ -1554,6 +1577,15 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (typeof window === 'undefined') return
     if (!normalSessionWriteReadyRef.current) return
     if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+    if (!messages.length) return
+
+    updateActiveSessionMessages(messages)
+  }, [messages, liveMode, conversationMode, activePromptContext])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!liveSessionWriteReadyRef.current) return
+    if (!liveMode && conversationMode !== 'manual_live' && activePromptContext !== 'manual_live') return
     if (!messages.length) return
 
     updateActiveSessionMessages(messages)
@@ -4697,7 +4729,9 @@ If you need help, say things like:
 I’ll stay with you.`
             }
 
-            setMessages([liveIntro])
+            createSession('live', [liveIntro], 'LIVE Assistance')
+liveSessionWriteReadyRef.current = true
+setMessages([liveIntro])
             messagesRef.current = [liveIntro]
 
             setConversationMode('manual_live')
