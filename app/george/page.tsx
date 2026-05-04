@@ -8,6 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile } from '@/lib/george/conversation-engine'
+import { createSession, getActiveSession, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -470,6 +471,8 @@ Ready?`
   }
 
 const [messages, setMessages] = useState<Message[]>([])
+const normalSessionBootedRef = useRef(false)
+const normalSessionWriteReadyRef = useRef(false)
 const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string } | null>(null)
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
@@ -724,17 +727,35 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         : 2
 
   useEffect(() => {
-    if (messagesRef.current.length > 0) return
+    if (typeof window === 'undefined') return
+    if (normalSessionBootedRef.current) return
+    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+
+    normalSessionBootedRef.current = true
+
+    const activeSession = getActiveSession()
+
+    if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+      setMessages(activeSession.messages)
+      messagesRef.current = activeSession.messages
+      normalSessionWriteReadyRef.current = true
+      return
+    }
 
     const greeting = getInitialGreeting(profileName, currentTier)
     bumpVisitCount()
-    const timer = window.setTimeout(() => {
-      const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
-      setMessages(firstMessage)
-      messagesRef.current = firstMessage
-    }, 1000)
 
-    return () => window.clearTimeout(timer)
+    const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
+    createSession('normal', firstMessage, 'GEORGE')
+    setMessages(firstMessage)
+    messagesRef.current = firstMessage
+    normalSessionWriteReadyRef.current = true
+  }, [profileName, currentTier, liveMode, conversationMode, activePromptContext])
+
+  useEffect(() => {
+    // Session bootstrap is now handled by the normal session store effect above.
+    // Keep this disabled so refresh does not overwrite restored conversations.
+    return
   }, [profileName, currentTier])
 
   
@@ -1528,6 +1549,15 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!normalSessionWriteReadyRef.current) return
+    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+    if (!messages.length) return
+
+    updateActiveSessionMessages(messages)
+  }, [messages, liveMode, conversationMode, activePromptContext])
 
   useEffect(() => {
     if (!showToast) return
