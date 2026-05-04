@@ -3180,6 +3180,16 @@ responseTimerRef.current = setTimeout(() => {
     lower.includes("maybe") ||
     lower.includes("what do you think")
 
+  if (liveMode && strongSignal) {
+    stopListening()
+    setPendingAssistantMessage({
+      role: 'assistant',
+      content: 'Say: “Let me make this simple…”'
+    })
+    setConversationSignal('LIVE strong signal')
+    return
+  }
+
   const text = liveTranscript || ""
   const friction = detectFriction(text)
   const score = scoreFriction(text)
