@@ -3050,11 +3050,11 @@ if (responseTimerRef.current) {
           const lineText = (() => {
             const lowerSignal = liveTranscript.toLowerCase()
 
-            if (/not interested|no thanks|don't need|dont need/.test(lowerSignal)) {
+            if (/not interested|no thanks|don't need|dont need|not right now|already have|have someone/.test(lowerSignal)) {
               return 'Say: “I understand. Here’s the simple version — then you can decide.”'
             }
 
-            if (/too expensive|cost|price|budget/.test(lowerSignal)) {
+            if (/too expensive|cost|price|budget|no budget|can't afford|cant afford/.test(lowerSignal)) {
               return 'Say: “Fair. Let me show you what this actually saves or solves.”'
             }
 
