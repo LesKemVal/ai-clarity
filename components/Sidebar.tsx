@@ -233,11 +233,11 @@ export default function Sidebar({
     let completionNote = targetTodo.completionNote || ''
 
     if (!targetTodo.done) {
-      const proof = window.prompt('What proves this is done?')
+      const proof = window.prompt('What changed?')
       const cleanProof = proof?.trim()
 
       if (!cleanProof || cleanProof.length < 4) {
-        window.alert('Do not cheat yourself. Add a real completion note before marking this done.')
+        window.alert('Do not cheat yourself. Describe what actually changed before marking this done.')
         return
       }
 
@@ -694,7 +694,7 @@ Upgrade to continue.`,
                   </span>
                   {todo.done && todo.completionNote && (
                     <span className="mt-1 block text-[11px] leading-4 text-white/35">
-                      Proof: {todo.completionNote}
+                      Completion: {todo.completionNote}
                     </span>
                   )}
                 </span>
@@ -736,7 +736,7 @@ Upgrade to continue.`,
             const todos = currentGoalCheck.todos || []
 const done = todos
   .filter(t => t.done)
-  .map(t => `${t.text}${t.completionNote ? ` — Proof: ${t.completionNote}` : ''}`)
+  .map(t => `${t.text}${t.completionNote ? ` — Completion: ${t.completionNote}` : ''}`)
 const open = todos.filter(t => !t.done).map(t => t.text)
 
 onPromptSelect({
