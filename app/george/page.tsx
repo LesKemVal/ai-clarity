@@ -3049,6 +3049,7 @@ if (responseTimerRef.current) {
 
           const lineText = (() => {
             const lowerSignal = liveTranscript.toLowerCase()
+
             const personProfile = detectConversationPersonProfile(input, liveTranscript)
 
             if (personProfile.role === 'doctor') {
