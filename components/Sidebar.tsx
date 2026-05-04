@@ -18,7 +18,7 @@ type PromptGroup = {
 type GoalCheckItem = {
   id: string
   title: string
-  todos: { id: string; text: string; done: boolean }[]
+  todos: { id: string; text: string; done: boolean; completionNote?: string }[]
   updatedAt: number
 }
 
@@ -227,12 +227,35 @@ export default function Sidebar({
   }
 
   const toggleTodo = (goal: GoalCheckItem, todoId: string) => {
+    const targetTodo = goal.todos.find((todo) => todo.id === todoId)
+    if (!targetTodo) return
+
+    let completionNote = targetTodo.completionNote || ''
+
+    if (!targetTodo.done) {
+      const proof = window.prompt('What proves this is done?')
+      const cleanProof = proof?.trim()
+
+      if (!cleanProof || cleanProof.length < 4) {
+        window.alert('Do not cheat yourself. Add a real completion note before marking this done.')
+        return
+      }
+
+      completionNote = cleanProof
+    }
+
     const updated = goalChecks.map((g) =>
       g.id === goal.id
         ? {
             ...g,
             todos: g.todos.map((t) =>
-              t.id === todoId ? { ...t, done: !t.done } : t
+              t.id === todoId
+                ? {
+                    ...t,
+                    done: !t.done,
+                    completionNote: !t.done ? completionNote : '',
+                  }
+                : t
             ),
             updatedAt: Date.now(),
           }
@@ -529,33 +552,6 @@ Upgrade to continue.`,
               </p>
 
               <div className="space-y-3">
-
-        <div className="max-h-48 overflow-y-auto space-y-2">
-          {(!(currentGoalCheck?.todos?.length)) ? (
-            <p className="text-xs text-white/40">No to-dos yet.</p>
-          ) : (
-            (currentGoalCheck?.todos || []).map((todo) => (
-              <button
-                key={todo.id}
-                onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
-                className="flex w-full items-center gap-2 text-left text-sm"
-              >
-                <span className={`w-4 h-4 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
-                <span className={todo.done ? 'line-through text-white/40' : 'text-white'}>
-                  {todo.text}
-                </span>
-              </button>
-            ))
-          )}
-        </div>
-
-        <button
-          onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
-        >
-          + Add To-Do
-        </button>
-
                 {reroutePrompt && (
                   <button
                     type="button"
@@ -630,14 +626,48 @@ Upgrade to continue.`,
         {currentGoalCheck.title}
       </div>
 
+      <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
+        {(!(currentGoalCheck?.todos?.length)) ? (
+          <p className="text-xs text-white/40">No to-dos yet.</p>
+        ) : (
+          (currentGoalCheck?.todos || []).map((todo) => (
+            <button
+              key={todo.id}
+              onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
+              className="flex w-full items-start gap-2 rounded-xl border border-white/8 bg-white/[0.025] px-3 py-2 text-left text-sm transition hover:bg-white/[0.055]"
+            >
+              <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
+              <span className="min-w-0">
+                <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
+                  {todo.text}
+                </span>
+                {todo.done && todo.completionNote && (
+                  <span className="mt-1 block text-[11px] leading-4 text-white/35">
+                    Proof: {todo.completionNote}
+                  </span>
+                )}
+              </span>
+            </button>
+          ))
+        )}
+      </div>
+
       <div className="space-y-3">
+        <button
+          onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
+          className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
+        >
+          + Add To-Do
+        </button>
 
         <button
           onClick={() => {
             setActiveGoalCheck(null)
             setShowSidebar?.(false)
             const todos = currentGoalCheck.todos || []
-const done = todos.filter(t => t.done).map(t => t.text)
+const done = todos
+  .filter(t => t.done)
+  .map(t => `${t.text}${t.completionNote ? ` — Proof: ${t.completionNote}` : ''}`)
 const open = todos.filter(t => !t.done).map(t => t.text)
 
 onPromptSelect({
@@ -651,6 +681,8 @@ ${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}
 
 Open:
 ${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}
+
+Rule: Do not let me cheat myself. If a completed item looks vague, weak, unproven, or contradicted by the open items, challenge it directly and tell me what would count as real completion.
 
 What is the strongest next move based on this?`,
   context: 'goal_check_structured',
