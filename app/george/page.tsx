@@ -3063,7 +3063,7 @@ if (responseTimerRef.current) {
             }
 
             if (/not sure|maybe|i guess|i don’t know|i dont know/.test(lowerSignal)) {
-              return 'Say: “That’s fair. Let’s make the decision clearer.”'
+              return 'Say: “Good. Let’s make the decision clear right now.”'
             }
 
             return 'Say: “Here’s the simple version — then you can decide.”'
