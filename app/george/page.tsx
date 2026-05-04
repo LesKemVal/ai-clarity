@@ -713,7 +713,31 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     return () => window.clearTimeout(timer)
   }, [profileName, currentTier])
 
-  const georgeProfile = detectConversationProfile(input, interimTranscript)
+  
+const detectTriggerIntent = (text: string) => {
+  const lower = text.toLowerCase()
+
+  if (lower.includes("what should i say") || lower.includes("how do i say")) {
+    return "line"
+  }
+
+  if (lower.includes("give me a second") || lower.includes("hold on")) {
+    return "cue"
+  }
+
+  if (lower.includes("help me here")) {
+    return "urgent"
+  }
+
+  if (lower.includes("stay with me") || lower.includes("just listen")) {
+    return "listen"
+  }
+
+  return null
+}
+
+
+const georgeProfile = detectConversationProfile(input, interimTranscript)
 
   const liveGuidance = buildLiveGuidance({
     liveMode,
@@ -2667,7 +2691,23 @@ return true
       setInterimTranscript(liveTranscript)
 
       // 🔥 live sales signal detection
-      if (liveMode && activeCampaignId && liveTranscript) {
+      if (liveMode && liveTranscript) {
+
+        const intent = detectTriggerIntent(liveTranscript)
+
+        if (intent === "listen") return
+
+        if (intent) {
+          setPendingAssistantMessage({
+            role: 'assistant',
+            content: intent === "line"
+              ? "Say: [response forming...]"
+              : intent === "cue"
+              ? "Stay calm. Slow it down."
+              : "Focus. Control the next sentence."
+          })
+          return
+        }
         const lower = liveTranscript.toLowerCase()
 
         const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
@@ -4311,35 +4351,39 @@ I will guide you in real time. Start speaking.`
         <button
           onClick={() => {
             setShowProLiveGate(false)
-            setShowSessionPicker(true)
-          }}
-          className="mt-4 w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-1.5.5 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/70 hover:bg-[#7C8CFF]/15"
-        >
-          Resume Active Campaign
-        </button>
-
-        <button
-          onClick={() => {
-            localStorage.setItem('george_intake_pending', 'pro')
-            window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
-            setShowProLiveGate(false)
-          }}
-          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-1.5.5 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
-        >
-          Build a New Campaign
-        </button>
-
-        <button
-          onClick={() => {
-            setShowProLiveGate(false)
             enterLiveMode()
             setConversationMode('manual_live')
             setActivePromptContext('manual_live')
-            setActivePromptLabel('Manual Live')
+            setActivePromptLabel('Conversation')
+
+            setVoiceOn(true)
+            setInteractionMode('speech')
+            setTimeout(() => startListening(), 120)
           }}
-          className="mt-2 w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.04] px-4 py-1.5.5 text-left text-sm font-medium text-white/80 transition hover:border-white/30 hover:bg-white/[0.06] hover:text-white"
+          className="mt-4 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/[0.06]"
         >
-          Personal Conversation
+          Start
+        </button>
+
+        <button
+          onClick={() => {
+            localStorage.setItem('george_intake_pending', 'conversation')
+            window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+            setShowProLiveGate(false)
+          }}
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+        >
+          Setup
+        </button>
+
+        <button
+          onClick={() => {
+            setShowProLiveGate(false)
+            setShowSessionPicker(true)
+          }}
+          className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
+        >
+          Sessions
         </button>
 
       </div>
