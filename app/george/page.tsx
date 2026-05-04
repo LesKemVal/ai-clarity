@@ -753,6 +753,17 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       // do not auto-restore LIVE session by default
       // user can resume later via sessions if needed
 
+      let existingLive = getActiveSessionForMode('live')
+
+if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
+        skipNextTypewriterRef.current = true
+        restoredMessagesSignatureRef.current = getMessagesSignature(existingLive.messages)
+        setMessages(existingLive.messages)
+        messagesRef.current = existingLive.messages
+        liveSessionWriteReadyRef.current = true
+        return
+      }
+
       const liveIntro: Message = {
         role: 'assistant',
         content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
