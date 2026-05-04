@@ -3059,18 +3059,23 @@ if (responseTimerRef.current) {
             const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
             if (personProfile.role === 'doctor') {
+              if (personProfile.posture === 'rushed') return 'Doctor — rushed\nSay: “I’ll be brief. Here are the symptoms, when they started, and what worries me most.”'
+              if (personProfile.posture === 'confused') return 'Doctor — confused\nSay: “Let me restate this clearly so I do not miss anything important.”'
               return 'Doctor — Say: “I’ll keep this clear. Here are the symptoms, when they started, and what worries me most.”'
             }
 
             if (personProfile.role === 'lawyer') {
+              if (personProfile.posture === 'pressuring') return 'Lawyer — pressuring\nSay: “I need that explained in plain language before I agree to anything.”'
               return 'Lawyer — Say: “Explain that in plain language before I agree to anything.”'
             }
 
             if (personProfile.role === 'authority') {
+              if (personProfile.posture === 'pressuring') return 'Authority — pressuring\nSay: “I understand. Tell me the exact requirement and the next step.”'
               return 'Authority — Say: “Help me understand the exact requirement and the next step.”'
             }
 
             if (personProfile.role === 'gatekeeper') {
+              if (personProfile.posture === 'rushed') return 'Gatekeeper — rushed\nSay: “I’ll be brief — I only need 20 seconds.”'
               return 'Gatekeeper — Say: “I only need 20 seconds to see if this belongs on their desk.”'
             }
 
