@@ -1160,9 +1160,17 @@ setPreLiveMessages([...messagesRef.current])
   if (preLiveSessionIdRef.current) {
     setActiveSessionId(preLiveSessionIdRef.current)
   }
+
+  // 🔒 FORCE NORMAL MODE + BREAK LIVE STATE
   setActiveMode('normal')
   liveSessionWriteReadyRef.current = false
   normalSessionWriteReadyRef.current = true
+
+  // 🔒 CLEAR ANY LIVE CONTEXT FLAGS
+  setLiveMode(false)
+  setConversationMode(null)
+  setActivePromptContext(null)
+
   setMessages(preLiveMessages)
   messagesRef.current = preLiveMessages
   setTypedMessageIndex(null) // prevent re-type animation
