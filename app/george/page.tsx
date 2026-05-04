@@ -559,6 +559,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
   const liveInterventionRef = useRef<number>(0)
+  const lastCueTsRef = useRef<number>(0)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
@@ -3059,6 +3060,13 @@ if (responseTimerRef.current) {
             : null
 
         if (proactiveCue) {
+          const now = Date.now()
+
+          // 5 second cooldown
+          if (now - lastCueTsRef.current < 5000) return
+
+          lastCueTsRef.current = now
+
           setPendingAssistantMessage({
             role: 'assistant',
             content: proactiveCue
