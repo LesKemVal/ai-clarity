@@ -3049,7 +3049,12 @@ if (responseTimerRef.current) {
 
           // urgency override (instant response)
           if (intent === "urgent") {
-            void handleSend("Focus. Control the next sentence.")
+            stopListening()
+            setPendingAssistantMessage({
+              role: 'assistant',
+              content: 'Pause. Control the next sentence.'
+            })
+            setConversationSignal('LIVE urgent')
             return
           }
           stopListening()
