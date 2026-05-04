@@ -3065,7 +3065,7 @@ setPendingAssistantMessage({
               : intent === "reword"
               ? "Try: “Let me put that another way…”"
               : intent === "cue"
-              ? "Cue: Slow it down. Control the next sentence."
+              ? "Cue: Slow down. Control the next sentence."
               : intent === "word"
               ? "Word: [clear single word]"
               : "Focus. Control the next sentence."
