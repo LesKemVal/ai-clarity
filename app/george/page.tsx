@@ -4938,6 +4938,10 @@ setMessages([liveIntro])
                   <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
                     <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">LIVE</span>
 
+<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+
+<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+
 <button
   type="button"
   onClick={() => {
