@@ -3055,7 +3055,7 @@ if (responseTimerRef.current) {
             }
 
             if (/too expensive|cost|price|budget|no budget|can't afford|cant afford/.test(lowerSignal)) {
-              return 'Say: “Fair. Let me show you what this actually saves or solves.”'
+              return 'Say: “Fair. Let me show you why this makes sense before price becomes the issue.”'
             }
 
             if (/send me|email me|call me later|next week|follow up/.test(lowerSignal)) {
