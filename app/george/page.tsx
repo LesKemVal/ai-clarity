@@ -750,14 +750,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       const activeLiveSession = getActiveSessionForMode('live')
 
-      if (activeLiveSession?.mode === 'live' && Array.isArray(activeLiveSession.messages) && activeLiveSession.messages.length > 0) {
-        skipNextTypewriterRef.current = true
-        restoredMessagesSignatureRef.current = getMessagesSignature(activeLiveSession.messages)
-        setMessages(activeLiveSession.messages)
-        messagesRef.current = activeLiveSession.messages
-        liveSessionWriteReadyRef.current = true
-        return
-      }
+      // do not auto-restore LIVE session by default
+      // user can resume later via sessions if needed
 
       const liveIntro: Message = {
         role: 'assistant',
@@ -4238,7 +4232,7 @@ router.push('/george')
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`${liveMode ? "hidden" : "fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
+              <div className={`${"fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
   <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
 
@@ -4302,8 +4296,7 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setActiveMode('live')
-  router.push('/george/live')
+  setShowProLiveGate(true)
   setShowCampaignMenu(false)
   setShowRecentFolders(false)
 }
@@ -5081,7 +5074,22 @@ router.push('/george')
               <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[210px] bg-black" />
               <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[110px] bg-gradient-to-t from-black to-transparent" />
 
-              <div className={`
+              
+{(isThinking || isSpeaking || bridgeThinking) && (
+  <div className="fixed bottom-[96px] left-0 right-0 z-[70] flex justify-center pointer-events-none">
+    <div className="text-[11px] text-white/40 tracking-[0.18em]">
+      {isThinking ? (
+        <>THINKING{'.'.repeat(thinkingDots)}</>
+      ) : isSpeaking ? (
+        <>SPEAKING…</>
+      ) : (
+        <>PROCESSING…</>
+      )}
+    </div>
+  </div>
+)}
+
+<div className={`
 
 ${(showConversation || liveMode) ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
