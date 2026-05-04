@@ -4938,6 +4938,25 @@ setMessages([liveIntro])
                   <div className="flex items-center gap-3 py-3 text-white/80 text-[13px]">
                     <span className="shrink-0 text-[#7C8CFF]">LIVE ASSISTANCE</span>
 
+<button
+  type="button"
+  onClick={() => {
+    const liveIntro: Message = {
+      role: 'assistant',
+      content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
+    }
+
+    createSession('live', [liveIntro], 'LIVE Assistance')
+    setMessages([liveIntro])
+    messagesRef.current = [liveIntro]
+    setToastMessage('New LIVE session started.')
+    setShowToast(true)
+  }}
+  className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
+>
+  New
+</button>
+
                     <button
                       type="button"
                       onClick={() => {
