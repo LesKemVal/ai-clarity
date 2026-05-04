@@ -326,7 +326,7 @@ function TypewriterText({
   return <>{display}</>
 }
 
-export default function Page() {
+export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
@@ -740,12 +740,42 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (normalSessionBootedRef.current) return
+
+    if (forceLive) {
+      normalSessionBootedRef.current = true
+      setActiveMode('live')
+      setLiveMode(true)
+      setConversationMode('manual_live')
+      setActivePromptContext('manual_live')
+
+      const activeLiveSession = getActiveSessionForMode('live')
+
+      if (activeLiveSession?.mode === 'live' && Array.isArray(activeLiveSession.messages) && activeLiveSession.messages.length > 0) {
+        skipNextTypewriterRef.current = true
+        restoredMessagesSignatureRef.current = getMessagesSignature(activeLiveSession.messages)
+        setMessages(activeLiveSession.messages)
+        messagesRef.current = activeLiveSession.messages
+        liveSessionWriteReadyRef.current = true
+        return
+      }
+
+      const liveIntro: Message = {
+        role: 'assistant',
+        content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
+      }
+
+      createSession('live', [liveIntro], 'LIVE Assistance')
+      setMessages([liveIntro])
+      messagesRef.current = [liveIntro]
+      liveSessionWriteReadyRef.current = true
+      return
+    }
+
     if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
 
     normalSessionBootedRef.current = true
 
     // /george always boots into normal GEORGE.
-    // LIVE restore should happen only through an intentional LIVE route/action.
     setActiveMode('normal')
     const activeSession = getActiveSessionForMode('normal')
 
@@ -767,7 +797,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     setMessages(firstMessage)
     messagesRef.current = firstMessage
     normalSessionWriteReadyRef.current = true
-  }, [profileName, currentTier, liveMode, conversationMode, activePromptContext])
+  }, [profileName, currentTier, liveMode, conversationMode, activePromptContext, forceLive])
 
   useEffect(() => {
     // Session bootstrap is now handled by the normal session store effect above.
@@ -1156,6 +1186,7 @@ setPreLiveMessages([...messagesRef.current])
     setVoiceOn(false)
     setInteractionMode('text')
     setConversationMode(null)
+router.push('/george')
     setShowConversationMenu(false)
     setConversationMenuLane('selector')
     setShowProLiveGate(false)
@@ -1189,6 +1220,7 @@ setPreLiveMessages([...messagesRef.current])
   // 🔒 CLEAR ANY LIVE CONTEXT FLAGS
   setLiveMode(false)
   setConversationMode(null)
+router.push('/george')
   setActivePromptContext(null)
 
   setMessages(preLiveMessages)
@@ -3925,6 +3957,7 @@ Cue:`)
                   setVoiceOn(false)
                   setInteractionMode('text')
                   setConversationMode(null)
+router.push('/george')
                   setShowConversationMenu(false)
                   setConversationMenuLane('selector')
                   setActivePromptContext(null)
@@ -5030,6 +5063,7 @@ setMessages([liveIntro])
                         setActivePromptContext(null)
                         setActivePromptLabel(null)
                         setConversationMode(null)
+router.push('/george')
                         window.localStorage.removeItem('george_active_context')
                         window.localStorage.removeItem('george_active_label')
                         window.localStorage.setItem('george_voice', 'off')
@@ -5169,7 +5203,9 @@ ${(showConversation || liveMode) ? 'fixed bottom-[48px]' : 'fixed top-[42%] -tra
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="What are we working on?"
+                        placeholder="
+
+What are we working on?"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
