@@ -114,6 +114,29 @@ export default function Sidebar({
     return () => window.removeEventListener('storage', loadNormalSessions)
   }, [])
 
+
+  const getSessionTitle = (session: GeorgeStoredSession) => {
+    const firstUserMessage = session.messages?.find((message) => message.role === 'user')?.content?.trim()
+    const firstAssistantMessage = session.messages?.find((message) => message.role === 'assistant')?.content?.trim()
+    const rawTitle = session.title?.trim()
+
+    const source =
+      rawTitle && rawTitle.toLowerCase() !== 'george' && rawTitle.toLowerCase() !== 'new session'
+        ? rawTitle
+        : firstUserMessage || firstAssistantMessage || 'Untitled session'
+
+    return source.replace(/\s+/g, ' ').slice(0, 42)
+  }
+
+  const getSessionPreview = (session: GeorgeStoredSession) => {
+    const preview =
+      session.messages?.find((message) => message.role === 'user')?.content?.trim() ||
+      session.messages?.find((message) => message.role === 'assistant')?.content?.trim() ||
+      'Saved normal session'
+
+    return preview.replace(/\s+/g, ' ').slice(0, 64)
+  }
+
   const openNormalSession = (session: GeorgeStoredSession) => {
     setActiveSessionIdForMode('normal', session.id)
     setActiveMode('normal')
@@ -238,10 +261,10 @@ return (
                       className="block w-full rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out hover:bg-white/[0.055] hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]"
                     >
                       <span className="block truncate text-sm text-neutral-300 hover:text-white">
-                        {session.title || 'GEORGE Session'}
+                        {getSessionTitle(session)}
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-neutral-600">
-                        {session.messages?.find((m) => m.role === 'user')?.content || session.messages?.[0]?.content || 'Saved normal session'}
+                        {getSessionPreview(session)}
                       </span>
                     </button>
                   ))

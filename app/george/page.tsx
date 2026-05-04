@@ -763,7 +763,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     bumpVisitCount()
 
     const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
-    createSession('normal', firstMessage, 'GEORGE')
+    createSession('normal', firstMessage, 'Untitled session')
     setMessages(firstMessage)
     messagesRef.current = firstMessage
     normalSessionWriteReadyRef.current = true
