@@ -4243,7 +4243,8 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setShowProLiveGate(true)
+  setActiveMode('live')
+  router.push('/george/live')
   setShowCampaignMenu(false)
   setShowRecentFolders(false)
 }
