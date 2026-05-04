@@ -137,7 +137,7 @@ export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mod
   const sessions = safeReadSessions()
   const updated = sessions.map((session) =>
     session.id === activeId
-      ? { ...session, messages, updatedAt: Date.now(), userGoal: userGoal || session.userGoal, lastKnownState: lastKnownState || session.lastKnownState }
+      ? { ...session, messages, updatedAt: Date.now(), userGoal: userGoal || session.userGoal, lastKnownState: lastKnownState || session.lastKnownState, title: generateSessionTitle(userGoal || session.userGoal, lastKnownState || session.lastKnownState) }
       : session
   )
 
@@ -177,4 +177,21 @@ export function createSession(mode: GeorgeSessionMode, messages: GeorgeStoredMes
   setActiveMode(mode)
 
   return session
+}
+
+
+function generateSessionTitle(goal?: string, state?: string) {
+  const g = (goal || '').toLowerCase()
+  const s = (state || '').toLowerCase()
+
+  if (g.includes('close') || g.includes('deal')) return 'Closing a deal'
+  if (g.includes('money') || g.includes('income')) return 'Making money'
+  if (g.includes('build')) return 'Building something'
+  if (g.includes('fix') || s.includes('error')) return 'Fixing an issue'
+  if (g.includes('client')) return 'Client conversation'
+  if (g.includes('plan')) return 'Planning next steps'
+
+  if (goal && goal.length > 10) return goal.slice(0, 40)
+
+  return 'Conversation'
 }
