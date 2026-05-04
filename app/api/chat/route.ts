@@ -1204,7 +1204,41 @@ LANGUAGE MODE: SPANISH
 `
         : ''
 
-    const systemContent = languageRule +
+    const modeBlock =
+  body?.mode === 'conversation'
+    ? `
+LIVE CONVERSATION MODE
+
+You are in a real conversation.
+
+Rules:
+- Do not analyze broadly
+- Do not explain strategy
+- Do not sound like an advisor
+- Only give short, usable language
+
+Prefer:
+Word:
+Say:
+Cue:
+Need:
+
+Stay in the room.
+`
+    : body?.mode === 'campaign'
+    ? `
+CAMPAIGN EXECUTION MODE
+
+You are executing a structured objective.
+
+- Use scripts
+- Handle objections
+- Move toward outcome
+- Stay disciplined
+`
+    : ''
+
+const systemContent = languageRule + modeBlock +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,

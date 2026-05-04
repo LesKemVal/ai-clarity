@@ -462,7 +462,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
 
   useEffect(() => {
-    if (liveMode || activePromptContext) return
+    // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
+    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
 
     const greeting = getInitialGreeting()
 
@@ -1856,6 +1857,11 @@ requestAnimationFrame(() => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+            mode: liveMode
+              ? 'conversation'
+              : activeCampaign
+              ? 'campaign'
+              : 'normal',
         forceClose,
  input: text, speed: voiceSpeed, tier: currentTier, voice: voiceType }),
     })
