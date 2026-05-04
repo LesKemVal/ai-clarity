@@ -4453,22 +4453,34 @@ I will guide you in real time. Start speaking.`
               <button
                 key={session.id}
                 onClick={() => {
-                  const canLoadCampaign = currentTier === 'brilliant'
-
-                  if (!canLoadCampaign) {
-                    setToastMessage('Pro Mode required to resume campaign context.')
-                    setShowToast(true)
-                    setShowUpgradeModal(true)
-                    return
-                  }
-
                   setShowSessionPicker(false)
                   enterLiveMode()
-                  setActiveCampaignId(session.id)
-                  setConversationMode(session.assistMode || session.savedEnvironment?.assistMode || 'professional_live')
-                  setActivePromptContext(session.assistMode || session.savedEnvironment?.assistMode || 'professional_live')
-                  setActivePromptLabel(session.label || session.title || session.name || 'Campaign')
-                  setToastMessage(`${session.label || session.title || session.name || 'Campaign'} loaded.`)
+                  setConversationMode('manual_live')
+                  setActivePromptContext('manual_live')
+                  setActivePromptLabel(session.title || 'Conversation')
+
+                  const restartBrief: Message = {
+                    role: 'assistant',
+                    content: `Conversation restored.
+
+Context: ${session.personOrRole || 'Unknown'} — ${session.setting || 'General'}
+Goal: ${session.userGoal || 'Not set'}
+Last known position: ${session.lastKnownState || 'Unknown'}
+
+Suggested restart:
+${session.suggestedRestart || 'Pick up naturally and clarify your intent.'}
+
+If anything changed, tell me before you continue.`
+                  }
+
+                  const restored = Array.isArray(session.messages)
+                    ? session.messages
+                    : []
+
+                  setMessages([...restored, restartBrief])
+                  messagesRef.current = [...restored, restartBrief]
+
+                  setToastMessage(`${session.title || 'Conversation'} restored.`)
                   setShowToast(true)
                 }}
                 className="w-full text-left rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-[12px] text-white/80 hover:bg-white/5"
