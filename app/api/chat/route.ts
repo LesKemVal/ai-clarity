@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { NextResponse } from 'next/server'
+import { getGeorgeModeBlock, type GeorgeMode } from '@/lib/george/behavior/mode'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1204,41 +1205,14 @@ LANGUAGE MODE: SPANISH
 `
         : ''
 
-    const modeBlock =
-  body?.mode === 'conversation'
-    ? `
-LIVE CONVERSATION MODE
+    const mode: GeorgeMode =
+      body?.mode === 'conversation' || body?.mode === 'campaign'
+        ? body.mode
+        : 'normal'
 
-You are in a real conversation.
+    const modeBlock = getGeorgeModeBlock(mode)
 
-Rules:
-- Do not analyze broadly
-- Do not explain strategy
-- Do not sound like an advisor
-- Only give short, usable language
-
-Prefer:
-Word:
-Say:
-Cue:
-Need:
-
-Stay in the room.
-`
-    : body?.mode === 'campaign'
-    ? `
-CAMPAIGN EXECUTION MODE
-
-You are executing a structured objective.
-
-- Use scripts
-- Handle objections
-- Move toward outcome
-- Stay disciplined
-`
-    : ''
-
-const systemContent = languageRule + modeBlock +
+    const systemContent = languageRule + modeBlock +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
