@@ -11,6 +11,40 @@ export type LiveGuidance = {
   say: string
 }
 
+export type UserDeliveryLevel = 'simple' | 'standard' | 'sharp'
+
+export function detectUserDeliveryLevel(input: string, interimTranscript: string): UserDeliveryLevel {
+  const text = `${input} ${interimTranscript}`.toLowerCase()
+
+  if (/simplify|simple|plain english|plain language|break it down|i don't understand|i dont understand|confused/.test(text)) {
+    return 'simple'
+  }
+
+  if (/be direct|be sharp|pressure|close|negotiate|objection|firm|boss|client/.test(text)) {
+    return 'sharp'
+  }
+
+  return 'standard'
+}
+
+export function adaptCueForUser(cue: string, level: UserDeliveryLevel): string {
+  if (level === 'simple') {
+    return cue
+      .replace("Cue: You’re conceding. Reset your position.", "Cue: You’re giving in. Start over.")
+      .replace("Cue: Stop explaining. Control the next sentence.", "Cue: Stop explaining. Say one clear thing.")
+      .replace("Cue: Pause. Ask a question.", "Cue: Pause. Ask one question.")
+  }
+
+  if (level === 'sharp') {
+    return cue
+      .replace("Cue: You’re conceding. Reset your position.", "Cue: You’re giving ground. Take control.")
+      .replace("Cue: Stop explaining. Control the next sentence.", "Cue: Stop explaining. Lead the next sentence.")
+      .replace("Cue: Pause. Ask a question.", "Cue: Pause. Make them answer.")
+  }
+
+  return cue
+}
+
 export type ConversationPersonProfile = {
   role: 'doctor' | 'lawyer' | 'authority' | 'gatekeeper' | 'buyer' | 'client' | 'family' | 'unknown'
   posture: 'helpful' | 'neutral' | 'resistant' | 'rushed' | 'confused' | 'pressuring'

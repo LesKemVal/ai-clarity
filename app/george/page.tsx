@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
-import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile } from '@/lib/george/conversation-engine'
+import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
