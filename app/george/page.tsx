@@ -3051,6 +3051,7 @@ if (responseTimerRef.current) {
             const lowerSignal = liveTranscript.toLowerCase()
 
             const personProfile = detectConversationPersonProfile(input, liveTranscript)
+            const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
             if (personProfile.role === 'doctor') {
               return 'Doctor — Say: “I’ll keep this clear. Here are the symptoms, when they started, and what worries me most.”'
@@ -3102,7 +3103,10 @@ if (responseTimerRef.current) {
           // urgency override (instant response)
           if (intent === "urgent") {
             stopListening()
-            setPendingAssistantMessage({
+            const personProfile = detectConversationPersonProfile(input, liveTranscript)
+          const profileLabel = `${personProfile.role} — ${personProfile.posture}`
+
+setPendingAssistantMessage({
               role: 'assistant',
               content: 'Pause. Control the next sentence.'
             })
