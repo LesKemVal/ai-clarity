@@ -558,6 +558,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
+  const liveInterventionRef = useRef<number>(0)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
@@ -3184,11 +3185,35 @@ responseTimerRef.current = setTimeout(() => {
   const score = scoreFriction(text)
 
   if (!friction) return
+
+  const interventionNow = Date.now()
+  const canIntervene = interventionNow - liveInterventionRef.current > 8000
+
+  if (liveMode && canIntervene && score >= 3) {
+    stopListening()
+
+    if (score >= 5) {
+      setPendingAssistantMessage({
+        role: 'assistant',
+        content: 'Pause. Take control of the next sentence.\nSay: “Let me clarify the main point.”'
+      })
+    } else {
+      setPendingAssistantMessage({
+        role: 'assistant',
+        content: 'Cue: Slow down. Ask one clean question.'
+      })
+    }
+
+    liveInterventionRef.current = interventionNow
+    setConversationSignal('LIVE intervention')
+    return
+  }
+
   if (score < 3) return
 
   if (!isSpeaking) {
     void handleSend(livePrompt)
-}
+  }
 }, 2600)
 
       }
