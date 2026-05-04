@@ -4714,8 +4714,14 @@ Choose one:
                     ? session.messages
                     : []
 
-                  setMessages([...restored, restartBrief])
-                  messagesRef.current = [...restored, restartBrief]
+                  // Smart Resume FIRST (promoted)
+                  const smartResumeEntry: Message = restartBrief
+
+                  // keep history behind it (hidden until user scrolls)
+                  const merged = [smartResumeEntry, ...restored]
+
+                  setMessages(merged)
+                  messagesRef.current = merged
 
                   setToastMessage(`${session.title || 'Conversation'} restored.`)
                   setShowToast(true)
