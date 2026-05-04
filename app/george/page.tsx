@@ -735,18 +735,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     normalSessionBootedRef.current = true
 
-    const activeMode = getActiveMode()
-    const activeSession = activeMode === 'live' ? getActiveSessionForMode('live') : getActiveSessionForMode('normal')
+    // /george always boots into normal GEORGE.
+    // LIVE restore should happen only through an intentional LIVE route/action.
+    setActiveMode('normal')
+    const activeSession = getActiveSessionForMode('normal')
 
-    if (activeSession?.mode === 'live' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
-      setLiveMode(true)
-      setConversationMode('manual_live')
-      setActivePromptContext('manual_live')
-      setMessages(activeSession.messages)
-      messagesRef.current = activeSession.messages
-      liveSessionWriteReadyRef.current = true
-      return
-    }
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
       setMessages(activeSession.messages)
