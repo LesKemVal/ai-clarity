@@ -3061,14 +3061,14 @@ if (responseTimerRef.current) {
 setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
-              ? "Say: [keep it simple and direct]"
+              ? "Say: “Let me make this simple…”"
               : intent === "reword"
               ? "Try: “Let me put that another way…”"
               : intent === "cue"
               ? "Cue: Slow it down. Control the next sentence."
               : intent === "word"
-              ? "Word: [clean single word]"
-              : "Focus."
+              ? "Word: [clear single word]"
+              : "Focus. Control the next sentence."
           })
           return
         }
