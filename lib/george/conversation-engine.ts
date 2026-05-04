@@ -75,11 +75,11 @@ export function detectConversationPersonProfile(input: string, interimTranscript
   if (/maybe|not sure|i guess/.test(text)) signals.push("hesitation")
   if (/call me|later|next week/.test(text)) signals.push("delay")
 
-  const confidence =
-    signals.length >= 3 ? 0.85 :
-    signals.length === 2 ? 0.7 :
-    signals.length === 1 ? 0.55 :
-    0.4
+  const roleBoost = role !== 'unknown' ? 0.15 : 0
+  const postureBoost = posture !== 'neutral' ? 0.15 : 0
+  const signalBoost = Math.min(signals.length * 0.15, 0.45)
+
+  const confidence = Math.min(0.95, 0.35 + roleBoost + postureBoost + signalBoost)
 
   return {
     role,
