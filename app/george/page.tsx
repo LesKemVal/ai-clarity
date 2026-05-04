@@ -4748,7 +4748,7 @@ If anything changed, tell me before you continue.`
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-[340px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-[420px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
@@ -5384,12 +5384,12 @@ What are we working on?"
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[340px] max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-5 text-center">
+            <div className="mb-6 text-center">
               <p className="text-sm font-medium text-white">Make GEORGE yours</p>
-              <p className="mt-0.5 text-xs leading-6 text-neutral-400">
+              <p className="mt-1 text-xs leading-5 text-neutral-400">
                 Optional. Same mind. Same standards. Choose GEORGE or GEORGette, then keep the name or make it yours.
               </p>
             </div>
@@ -5492,15 +5492,15 @@ What are we working on?"
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-red-500/50" />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/60 backdrop-blur-[16px]" />
 
-    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-4 overflow-y-auto">
+    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[340px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[420px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-5 text-center">
-          <p className="text-sm font-medium text-red-400">RUNTIME TEST — Stay Brilliant.</p>
+        <div className="mb-6 text-center">
+          <p className="text-sm font-medium text-red-400">Stay Brilliant.</p>
           <p className="mt-1 text-xs leading-6 text-neutral-400">
             You are already operating at a higher level. Choose how much control and execution support you want.
           </p>
@@ -5535,10 +5535,10 @@ What are we working on?"
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-1.5.5.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+            className="block w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
-            <div className="mt-0.5 text-xs leading-6 text-neutral-400">
+            <div className="mt-1 text-xs leading-5 text-neutral-400">
               Structure your moves, remove hesitation, and make consistent progress.
             </div>
           </button>
@@ -5571,10 +5571,10 @@ What are we working on?"
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-1.5.5.5 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
+            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
           >
             <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
-            <div className="mt-0.5 text-xs leading-6 text-neutral-300">
+            <div className="mt-1 text-xs leading-5 text-neutral-300">
               Real-time execution when words, timing, and pressure matter.
             </div>
           </button>
@@ -5605,7 +5605,7 @@ What are we working on?"
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[340px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Pro Campaign</p>
