@@ -2410,16 +2410,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       })
       setGoalState(goal)
 
-      // Brilliant conversation rhythm signal
-      if (currentTier === 'brilliant') {
-        const shortInput = text.length < 40
-        const rapidTurn = Date.now() - signalTimestamp < 4000
-
-        if (shortInput || rapidTurn) {
-          setConversationSignal('Stay in rhythm — increase GEORGE’s speed')
-          setSignalTimestamp(Date.now())
-        }
-      }
       messagesRef.current = updatedMessages
       setInput('')
       setPendingImage(null)
@@ -2851,7 +2841,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-black/75 backdrop-blur-md xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/18 backdrop-blur-[16px] backdrop-saturate-50 xl:hidden"
           />
         )}
 
@@ -3062,13 +3052,6 @@ return (
             </header>
 
             
-{conversationSignal && (
-  <div className={`fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full border border-[#7C8CFF]/30 bg-[#0B0F1A]/90 px-4 py-1.5 text-xs text-[#7C8CFF] shadow-[0_0_20px_rgba(124,140,255,0.25)] backdrop-blur-xl animate-pulse transition duration-200`}>
-    {conversationSignal}
-  </div>
-)}
-
-
 
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
@@ -3799,7 +3782,7 @@ Cue:`)
             <div className={`fixed bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`${liveMode ? "hidden" : "fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
+              <div className={`${liveMode ? "hidden" : "fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl"}`}>
 
   <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
 
@@ -4598,13 +4581,12 @@ I will guide you in real time. Start speaking.`
                 </div>
               )}
 
-              {showScrollHint && (
-                <div className="pointer-events-none fixed bottom-[90px] left-0 right-0 z-[65] h-28 bg-gradient-to-t from-black via-black/90 to-transparent" />
-              )}
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[210px] bg-black" />
+              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[110px] bg-gradient-to-t from-black to-transparent" />
 
               <div className={`
 
-${showConversation ? (liveMode ? 'fixed bottom-[110px]' : 'fixed bottom-[38px]') : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${showSidebar ? 'hidden' : showConversation ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 z-[60] flex items-center w-full max-w-[900px] mx-auto border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
