@@ -3518,7 +3518,7 @@ return (
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-[3px] px-4 py-1.5.5">
+      <div className="mt-3 flex items-center justify-center gap-[3px] px-5 py-4">
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
@@ -3548,7 +3548,7 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-4 py-1.5.5 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
+          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? (
@@ -3624,7 +3624,7 @@ I am listening now. Speak naturally. I will respond ${
                 setMessages(nextMessages)
                 messagesRef.current = nextMessages
               }}
-              className="rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-4 py-1.5.5 text-xs text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
+              className="rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-5 py-4 text-xs text-white transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/15"
             >
               {label}
             </button>
@@ -4568,7 +4568,7 @@ if (liveMode) {
             className="fixed inset-0 z-[90] bg-black/40"
           />
 
-          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-4 py-1.5.5 space-y-3">
+          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-5 py-4 space-y-3">
 
             <div className="text-white text-sm">Professional Setup</div>
 
@@ -4645,7 +4645,7 @@ I will guide you in real time. Start speaking.`
     <div className="fixed inset-0 z-[210] flex items-center justify-center px-4">
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[320px] max-h-[300px] overflow-y-auto rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl"
+        className="w-full max-w-[420px] max-h-[420px] overflow-y-auto rounded-[1.4rem] [mask-image:linear-gradient(to_bottom,transparent,black_24px,black_calc(100%-24px),transparent)] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl"
       >
         <div className="flex items-center justify-between mb-2">
           <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
@@ -4748,7 +4748,7 @@ If anything changed, tell me before you continue.`
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-[420px] rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
+        className="pointer-events-auto relative w-full max-w-[420px] max-h-[520px] overflow-y-auto rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
       >
         <button
           type="button"
@@ -4766,7 +4766,7 @@ If anything changed, tell me before you continue.`
           <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
             How would you like to use LIVE assistance?
           </div>
-          <div className="mt-0.5 text-[11px] leading-4 text-neutral-400">
+          <div className="mt-1 text-[11px] leading-5 text-neutral-400">
             Use LIVE assistance for real conversations. You can speak naturally, and GEORGE will listen, learn the context, and help when needed.
           </div>
         </div>
@@ -4860,7 +4860,7 @@ setMessages([liveIntro])
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/10 bg-black/90 px-4 py-1.5.5 backdrop-blur-xl">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/10 bg-black/90 px-5 py-4 backdrop-blur-xl">
 
     <div className="text-[11px] text-white/60 mb-2">
       What happened here?
@@ -5357,7 +5357,7 @@ What are we working on?"
                 <button
                   type="button"
                   onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-1.5.5 text-sm font-medium text-black"
+                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
                 >
                   Next
                 </button>
@@ -5368,7 +5368,7 @@ What are we working on?"
                     window.localStorage.setItem("george_walkthrough_seen","1")
                     setShowWalkthrough(false)
                   }}
-                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-1.5.5 text-sm font-medium text-black"
+                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
                 >
                   End
                 </button>
@@ -5411,7 +5411,7 @@ What are we working on?"
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-2xl border transition hover:scale-[1.01] px-4 py-1.5.5 text-sm transition ${
+                      className={`rounded-2xl border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
                           : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
@@ -5431,7 +5431,7 @@ What are we working on?"
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl max-w-full border border-white/10 bg-black/40 px-4 py-1.5.5 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-2xl max-w-full border border-white/10 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -5452,7 +5452,7 @@ What are we working on?"
                   setToastMessage('GEORGE is yours now.')
                   setShowToast(true)
                 }}
-                className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-4 py-1.5.5 text-sm font-medium text-black transition hover:opacity-90"
+                className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black transition hover:opacity-90"
               >
                 Save
               </button>
@@ -5605,12 +5605,12 @@ What are we working on?"
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-1.5.5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Pro Campaign</p>
                 <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a Pro campaign.</p>
-                <p className="mt-0.5 text-[11px] leading-4 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
+                <p className="mt-1 text-[11px] leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
               </div>
               <button
                 type="button"
@@ -5621,7 +5621,7 @@ What are we working on?"
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/35 px-4 py-1.5.5 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
+            <div className="rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
               <div className="font-medium text-white/80">Pro Mode lets you:</div>
               <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
@@ -5636,7 +5636,7 @@ What are we working on?"
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-4 py-1.5.5 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-2xl max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_24px_rgba(124,140,255,0.12)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
