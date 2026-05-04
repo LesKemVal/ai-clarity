@@ -3038,7 +3038,46 @@ if (responseTimerRef.current) {
   clearTimeout(responseTimerRef.current)
 }
 
-      // 🔥 live sales signal detection
+      // ⚡ proactive conversational guidance
+      if (liveMode && liveTranscript) {
+
+        const lower = liveTranscript.toLowerCase()
+
+        const now = Date.now()
+        const delta = now - lastSpeechTsRef.current
+
+        // prevent spam
+        if (delta < 3000) return
+
+        // detect rambling (long + no question)
+        if (liveTranscript.length > 120 && !lower.includes("?")) {
+          setPendingAssistantMessage({
+            role: 'assistant',
+            content: "Cue: Pause. Ask a question."
+          })
+          return
+        }
+
+        // detect over-explaining
+        if (/because|let me explain|what i mean is/.test(lower)) {
+          setPendingAssistantMessage({
+            role: 'assistant',
+            content: "Cue: Stop explaining. Control the next sentence."
+          })
+          return
+        }
+
+        // detect loss of control
+        if (/okay|alright|i guess|if you want/.test(lower)) {
+          setPendingAssistantMessage({
+            role: 'assistant',
+            content: "Cue: You’re conceding. Reset your position."
+          })
+          return
+        }
+      }
+
+// 🔥 live sales signal detection
       if (liveMode && liveTranscript) {
 
         const intent = detectTriggerIntent(liveTranscript)
