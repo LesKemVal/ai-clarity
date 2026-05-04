@@ -3117,6 +3117,8 @@ setPendingAssistantMessage({
 
           const personProfile = detectConversationPersonProfile(input, liveTranscript)
           const profileLabel = `${personProfile.role} — ${personProfile.posture}`
+          const shouldShowProfileLabel = personProfile.confidence >= 0.55 && personProfile.role !== 'unknown'
+          const liveLineOutput = shouldShowProfileLabel ? profileLabel + "\\n" + lineText : lineText
 
           setPendingAssistantMessage({
             role: 'assistant',
