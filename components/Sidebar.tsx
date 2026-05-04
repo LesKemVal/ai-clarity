@@ -636,11 +636,25 @@ Upgrade to continue.`,
           onClick={() => {
             setActiveGoalCheck(null)
             setShowSidebar?.(false)
-            onPromptSelect({
-              label: currentGoalCheck.title,
-              text: `Goal Check: ${currentGoalCheck.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
-              context: 'goal_check_manual',
-            })
+            const todos = currentGoalCheck.todos || []
+const done = todos.filter(t => t.done).map(t => t.text)
+const open = todos.filter(t => !t.done).map(t => t.text)
+
+onPromptSelect({
+  label: currentGoalCheck.title,
+  text: `GOAL CHECK
+
+Goal: ${currentGoalCheck.title}
+
+Completed:
+${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}
+
+Open:
+${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}
+
+What is the strongest next move based on this?`,
+  context: 'goal_check_structured',
+})
           }}
           className="w-full rounded-xl bg-white text-black px-4 py-2 text-sm"
         >
