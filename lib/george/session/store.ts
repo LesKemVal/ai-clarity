@@ -114,13 +114,30 @@ export function upsertSession(session: GeorgeStoredSession) {
 }
 
 export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
+  // --- session intelligence extraction ---
+  let userGoal = undefined
+  let lastKnownState = undefined
+
+  try {
+    const lastUser = [...messages].reverse().find(m => m.role === 'user')
+    const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant')
+
+    if (lastUser?.content) {
+      userGoal = lastUser.content.slice(0, 120)
+    }
+
+    if (lastAssistant?.content) {
+      lastKnownState = lastAssistant.content.slice(0, 120)
+    }
+  } catch {}
+
   const activeId = getActiveSessionIdForMode(mode) || getActiveSessionId()
   if (!activeId) return
 
   const sessions = safeReadSessions()
   const updated = sessions.map((session) =>
     session.id === activeId
-      ? { ...session, messages, updatedAt: Date.now() }
+      ? { ...session, messages, updatedAt: Date.now(), userGoal: userGoal || session.userGoal, lastKnownState: lastKnownState || session.lastKnownState }
       : session
   )
 
