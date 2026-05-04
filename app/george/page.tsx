@@ -1146,7 +1146,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
       const rect = el.getBoundingClientRect()
       const inView = rect.top < window.innerHeight
 
-      setShowScrollHint(!inView && (isThinking || bridgeThinking))
+      setShowScrollHint(!inView)
     }
 
     window.addEventListener('scroll', checkScroll)
@@ -3066,6 +3066,7 @@ return (
     const el = e.currentTarget
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
     userPinnedBottomRef.current = nearBottom
+    setShowScrollHint(!nearBottom)
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
@@ -3762,13 +3763,26 @@ Cue:`)
   })}
   
 {showScrollHint && (
-  <div className={`pointer-events-none fixed bottom-[110px] left-1/2 z-[70] -translate-x-1/2 flex flex-col items-center gap-1 transition duration-200`}>
-    <div className="flex gap-1">
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
+  <div className="fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center">
+
+    <div className="absolute h-16 w-16 rounded-full border border-white/15 bg-black/70 shadow-[0_22px_60px_rgba(0,0,0,0.7)] backdrop-blur-xl" />
+
+    <div className="relative flex items-center justify-center h-14 w-14 rounded-full border border-white/10 bg-black/80">
+
+      <button
+        type="button"
+        onClick={() => {
+          userPinnedBottomRef.current = true
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+          setShowScrollHint(false)
+        }}
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#6F7DFF]/95 text-black shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_28px_rgba(111,125,255,0.28)] transition hover:bg-[#8D9BFF] hover:scale-[1.03]"
+        aria-label="Scroll to latest message"
+      >
+        <span className="text-[26px] font-semibold leading-none">↓</span>
+      </button>
+
     </div>
-    <span className="text-[10px] text-white/40">more below</span>
   </div>
 )}
 
