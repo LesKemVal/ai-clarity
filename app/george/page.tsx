@@ -1082,6 +1082,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     if (preLiveMessages) {
   setMessages(preLiveMessages)
   messagesRef.current = preLiveMessages
+  setTypedMessageIndex(null) // prevent re-type animation
 }
 setPreLiveMessages(null)
   }
