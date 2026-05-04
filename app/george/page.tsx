@@ -4940,6 +4940,10 @@ setMessages([liveIntro])
 
 <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
+<span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
+  {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : isSpeaking ? 'SPEAKING' : ''}
+</span>
+
 <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
 <button
