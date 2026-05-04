@@ -742,6 +742,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+      skipNextTypewriterRef.current = true
       setMessages(activeSession.messages)
       messagesRef.current = activeSession.messages
       normalSessionWriteReadyRef.current = true
