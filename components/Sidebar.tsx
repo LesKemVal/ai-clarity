@@ -266,6 +266,53 @@ export default function Sidebar({
     localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
   }
 
+  const editTodo = (goal: GoalCheckItem, todoId: string) => {
+    const targetTodo = goal.todos.find((todo) => todo.id === todoId)
+    if (!targetTodo) return
+
+    const next = window.prompt('Edit To-Do', targetTodo.text)
+    const cleanNext = next?.trim()
+
+    if (!cleanNext) return
+
+    const updated = goalChecks.map((g) =>
+      g.id === goal.id
+        ? {
+            ...g,
+            todos: g.todos.map((todo) =>
+              todo.id === todoId
+                ? {
+                    ...todo,
+                    text: cleanNext,
+                    done: false,
+                    completionNote: '',
+                  }
+                : todo
+            ),
+            updatedAt: Date.now(),
+          }
+        : g
+    )
+
+    setGoalChecks(updated)
+    localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+  }
+
+  const deleteTodo = (goal: GoalCheckItem, todoId: string) => {
+    const updated = goalChecks.map((g) =>
+      g.id === goal.id
+        ? {
+            ...g,
+            todos: g.todos.filter((todo) => todo.id !== todoId),
+            updatedAt: Date.now(),
+          }
+        : g
+    )
+
+    setGoalChecks(updated)
+    localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+  }
+
   const openGoalCheck = (item: GoalCheckItem) => {
     setActiveGoalCheck(item)
   }
@@ -631,23 +678,45 @@ Upgrade to continue.`,
           <p className="text-xs text-white/40">No to-dos yet.</p>
         ) : (
           (currentGoalCheck?.todos || []).map((todo) => (
-            <button
+            <div
               key={todo.id}
-              onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
-              className="flex w-full items-start gap-2 rounded-xl border border-white/8 bg-white/[0.025] px-3 py-2 text-left text-sm transition hover:bg-white/[0.055]"
+              className="rounded-xl border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.055]"
             >
-              <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
-              <span className="min-w-0">
-                <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
-                  {todo.text}
-                </span>
-                {todo.done && todo.completionNote && (
-                  <span className="mt-1 block text-[11px] leading-4 text-white/35">
-                    Proof: {todo.completionNote}
+              <button
+                type="button"
+                onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
+                className="flex w-full items-start gap-2 text-left"
+              >
+                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
+                <span className="min-w-0">
+                  <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
+                    {todo.text}
                   </span>
-                )}
-              </span>
-            </button>
+                  {todo.done && todo.completionNote && (
+                    <span className="mt-1 block text-[11px] leading-4 text-white/35">
+                      Proof: {todo.completionNote}
+                    </span>
+                  )}
+                </span>
+              </button>
+
+              <div className="mt-2 flex gap-2 pl-6">
+                <button
+                  type="button"
+                  onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
+                  className="text-[11px] text-white/40 transition hover:text-white"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
+                  className="text-[11px] text-red-400/70 transition hover:text-red-300"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           ))
         )}
       </div>
