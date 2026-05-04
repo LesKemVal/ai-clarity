@@ -23,6 +23,9 @@ export type GeorgeStoredSession = {
 
 export const GEORGE_SESSIONS_KEY = 'GEORGE_SESSIONS_V2'
 export const GEORGE_ACTIVE_SESSION_ID_KEY = 'GEORGE_ACTIVE_SESSION_ID'
+export const GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY = 'GEORGE_ACTIVE_NORMAL_SESSION_ID'
+export const GEORGE_ACTIVE_LIVE_SESSION_ID_KEY = 'GEORGE_ACTIVE_LIVE_SESSION_ID'
+export const GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY = 'GEORGE_ACTIVE_CAMPAIGN_SESSION_ID'
 export const GEORGE_ACTIVE_MODE_KEY = 'GEORGE_ACTIVE_MODE'
 
 export function safeReadSessions(): GeorgeStoredSession[] {
@@ -40,6 +43,35 @@ export function safeReadSessions(): GeorgeStoredSession[] {
 export function safeWriteSessions(sessions: GeorgeStoredSession[]) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(GEORGE_SESSIONS_KEY, JSON.stringify(sessions.slice(0, 50)))
+}
+
+
+export function getActiveSessionIdForMode(mode: GeorgeSessionMode) {
+  if (typeof window === 'undefined') return null
+
+  if (mode === 'live') {
+    return window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+  }
+
+  if (mode === 'campaign') {
+    return window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+  }
+
+  return window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+}
+
+export function setActiveSessionIdForMode(mode: GeorgeSessionMode, id: string) {
+  if (typeof window === 'undefined') return
+
+  if (mode === 'live') {
+    window.localStorage.setItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY, id)
+  } else if (mode === 'campaign') {
+    window.localStorage.setItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY, id)
+  } else {
+    window.localStorage.setItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY, id)
+  }
+
+  window.localStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
 }
 
 export function getActiveSessionId() {
@@ -81,8 +113,8 @@ export function upsertSession(session: GeorgeStoredSession) {
   safeWriteSessions(sessions)
 }
 
-export function updateActiveSessionMessages(messages: GeorgeStoredMessage[]) {
-  const activeId = getActiveSessionId()
+export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
+  const activeId = getActiveSessionIdForMode(mode) || getActiveSessionId()
   if (!activeId) return
 
   const sessions = safeReadSessions()
@@ -96,10 +128,18 @@ export function updateActiveSessionMessages(messages: GeorgeStoredMessage[]) {
 }
 
 export function getActiveSession() {
-  const activeId = getActiveSessionId()
+  const activeMode = getActiveMode()
+  const activeId = getActiveSessionIdForMode(activeMode) || getActiveSessionId()
   if (!activeId) return null
 
   return safeReadSessions().find((session) => session.id === activeId) || null
+}
+
+export function getActiveSessionForMode(mode: GeorgeSessionMode) {
+  const activeId = getActiveSessionIdForMode(mode)
+  if (!activeId) return null
+
+  return safeReadSessions().find((session) => session.id === activeId && session.mode === mode) || null
 }
 
 export function createSession(mode: GeorgeSessionMode, messages: GeorgeStoredMessage[], title = 'New Session') {
@@ -116,7 +156,7 @@ export function createSession(mode: GeorgeSessionMode, messages: GeorgeStoredMes
   }
 
   upsertSession(session)
-  setActiveSessionId(session.id)
+  setActiveSessionIdForMode(mode, session.id)
   setActiveMode(mode)
 
   return session

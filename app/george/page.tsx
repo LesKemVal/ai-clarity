@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile } from '@/lib/george/conversation-engine'
-import { createSession, getActiveSession, getActiveSessionId, setActiveSessionId, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -735,7 +735,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     normalSessionBootedRef.current = true
 
-    const activeSession = getActiveSession()
+    const activeMode = getActiveMode()
+    const activeSession = activeMode === 'live' ? getActiveSessionForMode('live') : getActiveSessionForMode('normal')
 
     if (activeSession?.mode === 'live' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
       setLiveMode(true)
@@ -1121,7 +1122,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   ])
 
   const enterLiveMode = () => {
-    preLiveSessionIdRef.current = getActiveSessionId()
+    preLiveSessionIdRef.current = getActiveSessionIdForMode('normal')
 setPreLiveMessages([...messagesRef.current])
     setLiveMode(true)
   }
@@ -1158,7 +1159,7 @@ setPreLiveMessages([...messagesRef.current])
     if (preLiveMessages) {
   skipNextTypewriterRef.current = true
   if (preLiveSessionIdRef.current) {
-    setActiveSessionId(preLiveSessionIdRef.current)
+    setActiveSessionIdForMode('normal', preLiveSessionIdRef.current)
   }
 
   // 🔒 FORCE NORMAL MODE + BREAK LIVE STATE
@@ -1587,7 +1588,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
     if (!messages.length) return
 
-    updateActiveSessionMessages(messages)
+    updateActiveSessionMessages(messages, 'normal')
   }, [messages, liveMode, conversationMode, activePromptContext])
 
   useEffect(() => {
@@ -1596,7 +1597,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (!liveMode && conversationMode !== 'manual_live' && activePromptContext !== 'manual_live') return
     if (!messages.length) return
 
-    updateActiveSessionMessages(messages)
+    updateActiveSessionMessages(messages, 'live')
   }, [messages, liveMode, conversationMode, activePromptContext])
 
   useEffect(() => {
