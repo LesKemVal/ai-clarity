@@ -526,13 +526,13 @@ Upgrade to continue.`,
               <div className="space-y-3">
 
         <div className="max-h-48 overflow-y-auto space-y-2">
-          {(activeGoalCheck.todos || []).length === 0 ? (
+          {(!(activeGoalCheck?.todos?.length)) ? (
             <p className="text-xs text-white/40">No to-dos yet.</p>
           ) : (
-            activeGoalCheck.todos.map((todo) => (
+            (activeGoalCheck?.todos || []).map((todo) => (
               <button
                 key={todo.id}
-                onClick={() => toggleTodo(activeGoalCheck, todo.id)}
+                onClick={() => activeGoalCheck && toggleTodo(activeGoalCheck, todo.id)}
                 className="flex w-full items-center gap-2 text-left text-sm"
               >
                 <span className={`w-4 h-4 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
@@ -545,7 +545,7 @@ Upgrade to continue.`,
         </div>
 
         <button
-          onClick={() => addTodo(activeGoalCheck)}
+          onClick={() => activeGoalCheck && addTodo(activeGoalCheck)}
           className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
         >
           + Add To-Do
