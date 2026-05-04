@@ -3063,7 +3063,11 @@ if (responseTimerRef.current) {
             }
 
             if (/not sure|maybe|i guess|i don’t know|i dont know/.test(lowerSignal)) {
-              return 'Say: “Good. Let’s make the decision clear right now.”'
+              return [
+  'Say: “Good. Let’s make the decision clear right now.”',
+  'Say: “Good — [pause] let’s get clear right now.”',
+  'Say: “Alright. Let’s lock this in — [pause] right now.”'
+][Math.floor(Date.now() % 3)]
             }
 
             return [
