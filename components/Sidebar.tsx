@@ -15,6 +15,30 @@ type PromptGroup = {
   prompts: PromptItem[]
 }
 
+type GoalCheckItem = {
+  id: string
+  title: string
+  updatedAt: number
+}
+
+const GEORGE_GOAL_CHECKS_KEY = 'GEORGE_GOAL_CHECKS'
+
+function safeReadGoalChecks(): GoalCheckItem[] {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(GEORGE_GOAL_CHECKS_KEY) || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function safeWriteGoalChecks(items: GoalCheckItem[]) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(GEORGE_GOAL_CHECKS_KEY, JSON.stringify(items.slice(0, 30)))
+}
+
 type SidebarProps = {
   showSidebar?: boolean
   setShowSidebar?: (v: boolean) => void
@@ -98,6 +122,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
+  const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
 
   useEffect(() => {
     const loadNormalSessions = () => {
@@ -112,6 +137,20 @@ export default function Sidebar({
     loadNormalSessions()
     window.addEventListener('storage', loadNormalSessions)
     return () => window.removeEventListener('storage', loadNormalSessions)
+  }, [])
+
+  useEffect(() => {
+    const loadGoalChecks = () => {
+      setGoalChecks(
+        safeReadGoalChecks()
+          .sort((a, b) => b.updatedAt - a.updatedAt)
+          .slice(0, 12)
+      )
+    }
+
+    loadGoalChecks()
+    window.addEventListener('storage', loadGoalChecks)
+    return () => window.removeEventListener('storage', loadGoalChecks)
   }, [])
 
 
@@ -142,6 +181,33 @@ export default function Sidebar({
     setActiveMode('normal')
     setShowSidebar?.(false)
     window.location.href = '/george'
+  }
+
+  const createGoalCheck = () => {
+    const title = window.prompt('Name this Goal Check')
+    const cleanTitle = title?.trim()
+
+    if (!cleanTitle) return
+
+    const next: GoalCheckItem = {
+      id: `goal_${Date.now()}`,
+      title: cleanTitle,
+      updatedAt: Date.now(),
+    }
+
+    const updated = [next, ...goalChecks].slice(0, 30)
+    setGoalChecks(updated)
+    safeWriteGoalChecks(updated)
+  }
+
+  const openGoalCheck = (item: GoalCheckItem) => {
+    setActiveMode('normal')
+    setShowSidebar?.(false)
+    onPromptSelect({
+      label: item.title,
+      text: `Goal Check: ${item.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
+      context: 'goal_check_manual',
+    })
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
@@ -266,6 +332,55 @@ return (
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-neutral-600">
                         {getSessionPreview(session)}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </section>
+
+          <section>
+            <button
+              type="button"
+              onClick={() => toggleGroup('Goal Check')}
+              className="flex w-full items-center justify-between text-left"
+            >
+              <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+                Goal Check
+              </span>
+              <span className="text-xs text-neutral-500">
+                {openGroups['Goal Check'] ? '▾' : '▸'}
+              </span>
+            </button>
+
+            {openGroups['Goal Check'] && (
+              <div className="mt-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={createGoalCheck}
+                  className="block w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-neutral-300 transition-all duration-200 ease-out hover:border-white/20 hover:bg-white/[0.06] hover:text-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.32)]"
+                >
+                  + New Goal Check
+                </button>
+
+                {goalChecks.length === 0 ? (
+                  <p className="px-2 text-xs leading-5 text-neutral-600">
+                    Manually saved goals and checks will appear here.
+                  </p>
+                ) : (
+                  goalChecks.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => openGoalCheck(item)}
+                      className="block w-full rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out hover:bg-white/[0.055] hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]"
+                    >
+                      <span className="block truncate text-sm text-neutral-300 hover:text-white">
+                        {item.title}
+                      </span>
+                      <span className="mt-1 block truncate text-[11px] text-neutral-600">
+                        Manual goal check
                       </span>
                     </button>
                   ))
