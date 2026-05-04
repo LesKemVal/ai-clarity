@@ -3059,7 +3059,7 @@ if (responseTimerRef.current) {
             }
 
             if (/send me|email me|call me later|next week|follow up/.test(lowerSignal)) {
-              return 'Say: “I can do that. Before I send it, let me confirm what actually matters to you.”'
+              return 'Say: “I can do that — [pause] but first, what actually matters most to you here?”'
             }
 
             if (/not sure|maybe|i guess|i don’t know|i dont know/.test(lowerSignal)) {
