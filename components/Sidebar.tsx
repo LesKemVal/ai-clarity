@@ -283,6 +283,11 @@ export default function Sidebar({
     [suggestedSignal]
   )
 
+
+  const currentGoalCheck = activeGoalCheck
+    ? goalChecks.find((item) => item.id === activeGoalCheck.id) || activeGoalCheck
+    : null
+
 return (
     <aside
       className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-neutral-800 bg-black transition-transform duration-300 ${
@@ -526,13 +531,13 @@ Upgrade to continue.`,
               <div className="space-y-3">
 
         <div className="max-h-48 overflow-y-auto space-y-2">
-          {(!(activeGoalCheck?.todos?.length)) ? (
+          {(!(currentGoalCheck?.todos?.length)) ? (
             <p className="text-xs text-white/40">No to-dos yet.</p>
           ) : (
-            (activeGoalCheck?.todos || []).map((todo) => (
+            (currentGoalCheck?.todos || []).map((todo) => (
               <button
                 key={todo.id}
-                onClick={() => activeGoalCheck && toggleTodo(activeGoalCheck, todo.id)}
+                onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
                 className="flex w-full items-center gap-2 text-left text-sm"
               >
                 <span className={`w-4 h-4 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
@@ -545,7 +550,7 @@ Upgrade to continue.`,
         </div>
 
         <button
-          onClick={() => activeGoalCheck && addTodo(activeGoalCheck)}
+          onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
           className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
         >
           + Add To-Do
@@ -612,7 +617,7 @@ Upgrade to continue.`,
         </div>
       </div>
     
-{activeGoalCheck && (
+{currentGoalCheck && (
   <div
     className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
     onClick={() => setActiveGoalCheck(null)}
@@ -622,7 +627,7 @@ Upgrade to continue.`,
       className="w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
     >
       <div className="mb-4 text-lg text-white font-semibold">
-        {activeGoalCheck.title}
+        {currentGoalCheck.title}
       </div>
 
       <div className="space-y-3">
@@ -632,8 +637,8 @@ Upgrade to continue.`,
             setActiveGoalCheck(null)
             setShowSidebar?.(false)
             onPromptSelect({
-              label: activeGoalCheck.title,
-              text: `Goal Check: ${activeGoalCheck.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
+              label: currentGoalCheck.title,
+              text: `Goal Check: ${currentGoalCheck.title}\n\nReview this goal with me. Help me clarify where it stands, what changed, and what the next responsible move should be.`,
               context: 'goal_check_manual',
             })
           }}
@@ -644,11 +649,11 @@ Upgrade to continue.`,
 
         <button
           onClick={() => {
-            const next = window.prompt('Rename Goal Check', activeGoalCheck.title)
+            const next = window.prompt('Rename Goal Check', currentGoalCheck.title)
             if (!next?.trim()) return
 
             const updated = goalChecks.map((g) =>
-              g.id === activeGoalCheck.id
+              g.id === currentGoalCheck.id
                 ? { ...g, title: next.trim(), updatedAt: Date.now() }
                 : g
             )
@@ -664,7 +669,7 @@ Upgrade to continue.`,
 
         <button
           onClick={() => {
-            const updated = goalChecks.filter((g) => g.id !== activeGoalCheck.id)
+            const updated = goalChecks.filter((g) => g.id !== currentGoalCheck.id)
             setGoalChecks(updated)
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
