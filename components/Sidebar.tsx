@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
 
 export type PromptItem = {
   label: string
@@ -96,8 +97,32 @@ export default function Sidebar({
   currentTier = 'smart',
 }: SidebarProps) {
   const pathname = usePathname()
+  const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
+
+  useEffect(() => {
+    const loadNormalSessions = () => {
+      setNormalSessions(
+        safeReadSessions()
+          .filter((session) => session.mode === 'normal')
+          .sort((a, b) => b.updatedAt - a.updatedAt)
+          .slice(0, 12)
+      )
+    }
+
+    loadNormalSessions()
+    window.addEventListener('storage', loadNormalSessions)
+    return () => window.removeEventListener('storage', loadNormalSessions)
+  }, [])
+
+  const openNormalSession = (session: GeorgeStoredSession) => {
+    setActiveSessionIdForMode('normal', session.id)
+    setActiveMode('normal')
+    setShowSidebar?.(false)
+    window.location.href = '/george'
+  }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    Sessions: true,
     Modes: true,
     Build: true,
     'Training Lab': true,
@@ -183,6 +208,48 @@ return (
               Make GEORGE Yours
             </button>
           </section>
+
+          <section>
+            <button
+              type="button"
+              onClick={() => toggleGroup('Sessions')}
+              className="flex w-full items-center justify-between text-left"
+            >
+              <span className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+                Sessions
+              </span>
+              <span className="text-xs text-neutral-500">
+                {openGroups.Sessions ? '▾' : '▸'}
+              </span>
+            </button>
+
+            {openGroups.Sessions && (
+              <div className="mt-4 space-y-2">
+                {normalSessions.length === 0 ? (
+                  <p className="px-2 text-xs leading-5 text-neutral-600">
+                    Normal GEORGE sessions will appear here.
+                  </p>
+                ) : (
+                  normalSessions.map((session) => (
+                    <button
+                      key={session.id}
+                      type="button"
+                      onClick={() => openNormalSession(session)}
+                      className="block w-full rounded-xl px-3 py-2 text-left transition-all duration-200 ease-out hover:bg-white/[0.055] hover:shadow-[0_8px_20px_rgba(124,140,255,0.10)]"
+                    >
+                      <span className="block truncate text-sm text-neutral-300 hover:text-white">
+                        {session.title || 'GEORGE Session'}
+                      </span>
+                      <span className="mt-1 block truncate text-[11px] text-neutral-600">
+                        {session.messages?.find((m) => m.role === 'user')?.content || session.messages?.[0]?.content || 'Saved normal session'}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </section>
+
 
           <section>
             <button
