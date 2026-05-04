@@ -15,6 +15,8 @@ export type ConversationPersonProfile = {
   role: 'doctor' | 'lawyer' | 'authority' | 'gatekeeper' | 'buyer' | 'client' | 'family' | 'unknown'
   posture: 'helpful' | 'neutral' | 'resistant' | 'rushed' | 'confused' | 'pressuring'
   guidance: string
+  confidence: number
+  signals: string[]
 }
 
 export function detectConversationPersonProfile(input: string, interimTranscript: string): ConversationPersonProfile {
@@ -66,7 +68,26 @@ export function detectConversationPersonProfile(input: string, interimTranscript
       ? 'Say the point without escalating the emotion.'
       : 'Clarify who they are, what they need, and what outcome matters.'
 
-  return { role, posture, guidance }
+  const signals: string[] = []
+
+  if (/price|cost|budget/.test(text)) signals.push("price objection")
+  if (/not interested|no thanks/.test(text)) signals.push("rejection")
+  if (/maybe|not sure|i guess/.test(text)) signals.push("hesitation")
+  if (/call me|later|next week/.test(text)) signals.push("delay")
+
+  const confidence =
+    signals.length >= 3 ? 0.85 :
+    signals.length === 2 ? 0.7 :
+    signals.length === 1 ? 0.55 :
+    0.4
+
+  return {
+    role,
+    posture,
+    guidance,
+    confidence,
+    signals
+  }
 }
 
 export type ConversationTriggerCode = {
