@@ -3066,7 +3066,11 @@ if (responseTimerRef.current) {
               return 'Say: “Good. Let’s make the decision clear right now.”'
             }
 
-            return 'Say: “Here’s the simple version — [pause] then you can decide.”'
+            return [
+  'Say: “Here’s the simple version — [pause] then you can decide.”',
+  'Say: “Let me simplify this — [pause] then you tell me.”',
+  'Say: “Quick version — [pause] then you decide.”'
+][Math.floor(Date.now() % 3)]
           })()
 
           // urgency override (instant response)
