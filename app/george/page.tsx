@@ -3061,7 +3061,7 @@ if (responseTimerRef.current) {
 setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
-              ? "Say: “Let me make this simple…”"
+              ? "Say: “Let me make this simple for you…”"
               : intent === "reword"
               ? "Try: “Let me put that another way…”"
               : intent === "cue"
