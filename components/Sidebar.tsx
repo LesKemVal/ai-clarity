@@ -146,6 +146,7 @@ export default function Sidebar({
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Sessions: true,
+    'Goal Check': true,
     Modes: true,
     Build: true,
     'Training Lab': true,
