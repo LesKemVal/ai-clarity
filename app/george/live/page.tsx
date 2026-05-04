@@ -16,7 +16,7 @@ export default function GeorgeLivePage() {
 
   function goNormal() {
     setActiveMode('normal')
-    router.push('/george')
+    window.location.href = '/george'
   }
 
   return (
