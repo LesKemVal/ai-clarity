@@ -1086,12 +1086,20 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       try {
         const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
         existing.unshift({
-          id: `session_${Date.now()}`,
-          type: "session",
-          label: sessionLabel,
+          id: `conversation_${Date.now()}`,
+          type: "conversation",
+          title: sessionLabel,
           createdAt: Date.now(),
+          updatedAt: Date.now(),
+          messages: messagesRef.current,
+          summary: "Conversation saved from LIVE mode.",
+          personOrRole: "Unknown",
+          setting: "General",
+          userGoal: "Not set",
+          lastKnownState: "Saved after user interaction.",
+          suggestedRestart: "Pick up naturally and clarify what changed."
         })
-        window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(existing.slice(0, 25)))
+        window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(existing.slice(0, 25)))
       } catch {}
     }
 
@@ -1119,7 +1127,6 @@ I’ll stay with you.`
   setMessages([openingMessage])
   messagesRef.current = [openingMessage]
 }
-    messagesRef.current = [openingMessage]
     setInput('')
     setInterimTranscript('')
     setVoiceError('')
