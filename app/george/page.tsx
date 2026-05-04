@@ -743,6 +743,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
       skipNextTypewriterRef.current = true
+      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
       setMessages(activeSession.messages)
       messagesRef.current = activeSession.messages
       normalSessionWriteReadyRef.current = true
@@ -1048,6 +1049,11 @@ const savedContext = window.localStorage.getItem('george_active_context')
 
   const assistantRevealedRef = useRef(false)
 const skipNextTypewriterRef = useRef(false)
+const restoredMessagesSignatureRef = useRef<string | null>(null)
+
+function getMessagesSignature(items: Message[]) {
+  return items.map((item) => `${item.role}:${item.content}`).join('|')
+}
 
   // CHATGPT-STYLE TYPING ENGINE
   useEffect(() => {
@@ -1060,10 +1066,20 @@ const skipNextTypewriterRef = useRef(false)
 
     if (!messages.length) return
 
+    const signature = getMessagesSignature(messages)
+    if (restoredMessagesSignatureRef.current === signature) {
+      setTypedMessageIndex(null)
+      setTypedMessageContent('')
+      return
+    }
+
     const lastIndex = messages.length - 1
     const lastMessage = messages[lastIndex]
 
-    if (lastMessage.role !== 'assistant') return
+    if (lastMessage.role !== 'assistant') {
+      restoredMessagesSignatureRef.current = null
+      return
+    }
 
     let i = 0
     const fullText = lastMessage.content || ''
