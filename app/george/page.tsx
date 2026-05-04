@@ -969,14 +969,7 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
       window.localStorage.setItem('george_voice', 'off')
     }
 
-    setPreLiveMessages((prev) => {
-      if (prev && prev.length > 0) {
-        setMessages(prev)
-        messagesRef.current = prev
-      }
-
-      return null
-    })
+    setPreLiveMessages(null)
   }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
@@ -984,10 +977,9 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
         const existing = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
         existing.unshift({
           id: `session_${Date.now()}`,
-          type: "campaign",
+          type: "session",
           label: sessionLabel,
           createdAt: Date.now(),
-          messages: messagesRef.current,
         })
         window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(existing.slice(0, 25)))
       } catch {}
@@ -1098,12 +1090,13 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
               weakSpots: []
             },
 
-            messages: [
-              {
-                role: 'assistant',
-                content: campaignContext
-              }
-            ]
+            campaignContext,
+            savedEnvironment: {
+              context: campaignContext,
+              assistMode: "professional_live",
+              outputStyle: "short_cues",
+              deliveryMode: "text"
+            }
           }
 
           const existingSessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS') || '[]')
@@ -3765,9 +3758,9 @@ Cue:`)
 {showScrollHint && (
   <div className="fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center">
 
-    <div className="absolute h-16 w-16 rounded-full border border-white/15 bg-black/70 shadow-[0_22px_60px_rgba(0,0,0,0.7)] backdrop-blur-xl" />
+    <div className="absolute h-16 w-16 rounded-full border border-[#7C8CFF]/18 bg-black/42 shadow-[0_18px_46px_rgba(0,0,0,0.48),0_0_20px_rgba(124,140,255,0.10)] backdrop-blur-xl" />
 
-    <div className="relative flex items-center justify-center h-14 w-14 rounded-full border border-white/10 bg-black/80">
+    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/8 bg-black/52 shadow-[inset_0_0_18px_rgba(255,255,255,0.025)]">
 
       <button
         type="button"
@@ -3776,10 +3769,13 @@ Cue:`)
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
           setShowScrollHint(false)
         }}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#6F7DFF]/95 text-black shadow-[0_16px_40px_rgba(0,0,0,0.5),0_0_28px_rgba(111,125,255,0.28)] transition hover:bg-[#8D9BFF] hover:scale-[1.03]"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7C8CFF]/82 text-black shadow-[0_12px_30px_rgba(0,0,0,0.36),0_0_22px_rgba(124,140,255,0.24)] transition hover:bg-[#8D9BFF]/95 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
-        <span className="text-[26px] font-semibold leading-none">↓</span>
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 5v13" />
+          <path d="m6 12 6 6 6-6" />
+        </svg>
       </button>
 
     </div>
@@ -4243,21 +4239,14 @@ I will guide you in real time. Start speaking.`
                     return
                   }
 
-                  const restoredMessages = Array.isArray(session.messages) && session.messages.length
-                    ? session.messages
-                    : [
-                        {
-                          role: 'assistant',
-                          content: 'Campaign restored.\n\nSay:\n“Let’s lock the next step.”\n\nBackup:\n“What would make this a yes today?”',
-                        },
-                      ]
-
-                  setMessages(restoredMessages)
                   setShowSessionPicker(false)
                   enterLiveMode()
-                  setConversationMode('professional_live')
-                  setActivePromptContext('professional_live')
-                  setActivePromptLabel(session.label || 'Campaign')
+                  setActiveCampaignId(session.id)
+                  setConversationMode(session.assistMode || session.savedEnvironment?.assistMode || 'professional_live')
+                  setActivePromptContext(session.assistMode || session.savedEnvironment?.assistMode || 'professional_live')
+                  setActivePromptLabel(session.label || session.title || session.name || 'Campaign')
+                  setToastMessage(`${session.label || session.title || session.name || 'Campaign'} loaded.`)
+                  setShowToast(true)
                 }}
                 className="w-full text-left rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-[12px] text-white/80 hover:bg-white/5"
               >
@@ -4453,8 +4442,8 @@ I will guide you in real time. Start speaking.`
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[96px] left-0 right-0 z-[70] mx-auto w-[calc(100%-24px)] max-w-[900px] rounded-2xl border border-white/10 bg-black/82 px-3 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
-                  <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-[10px] font-semibold tracking-[0.13em] text-white/45">
+                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
+                  <div className="flex items-center gap-3 py-3 text-white/80 text-[13px]">
                     <span className="shrink-0 text-[#7C8CFF]">LIVE ASSISTANCE</span>
 
                     <button
@@ -4575,8 +4564,13 @@ I will guide you in real time. Start speaking.`
                       type="button"
                       onClick={() => {
                         stopListening()
+                        userPinnedBottomRef.current = true
                         exitLiveMode()
                         setVoiceOn(false)
+
+                        requestAnimationFrame(() => {
+                          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
+                        })
                         setInteractionMode('text')
                         setActivePromptContext(null)
                         setActivePromptLabel(null)
