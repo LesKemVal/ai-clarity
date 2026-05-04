@@ -3065,12 +3065,25 @@ if (responseTimerRef.current) {
           // 5 second cooldown
           if (now - lastCueTsRef.current < 5000) return
 
-          lastCueTsRef.current = now
+          const isInterrupt =
+            /conceding|reset your position/.test(proactiveCue)
 
-          setPendingAssistantMessage({
-            role: 'assistant',
-            content: proactiveCue
-          })
+          const fire = () => {
+            lastCueTsRef.current = Date.now()
+            setPendingAssistantMessage({
+              role: 'assistant',
+              content: proactiveCue
+            })
+          }
+
+          if (isInterrupt) {
+            fire()
+          } else {
+            setTimeout(() => {
+              fire()
+            }, 1200)
+          }
+
           return
         }
       }
