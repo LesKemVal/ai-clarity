@@ -7,6 +7,22 @@ import { setActiveMode } from '@/lib/george/session/store'
 export default function GeorgeLivePage() {
   const router = useRouter()
   const [entering, setEntering] = useState(true)
+  const [showPrompt, setShowPrompt] = useState(false)
+  const [loading, setLoading] = useState(null)
+
+  async function startCheckout(tier) {
+    try {
+      setLoading(tier)
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      })
+      const data = await res.json()
+      if (data?.url) window.location.href = data.url
+    } catch {}
+    setLoading(null)
+  }
   const [showFullStrengthPrompt, setShowFullStrengthPrompt] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
 
@@ -37,6 +53,7 @@ export default function GeorgeLivePage() {
   useEffect(() => {
     setActiveMode('live')
     const t = setTimeout(() => setEntering(false), 550)
+    setTimeout(() => setShowPrompt(true), 1800)
     return () => clearTimeout(t)
   }, [])
 
@@ -157,7 +174,43 @@ export default function GeorgeLivePage() {
       )}
 
       {/* Transition Overlay */}
-      {entering && (
+      {showPrompt && (
+  <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black p-6">
+
+      <p className="text-lg text-white font-semibold">
+        Keep GEORGE at full strength:
+      </p>
+
+      <div className="mt-5 space-y-3">
+
+        <button
+          onClick={() => startCheckout('brilliant_day')}
+          className="w-full bg-white text-black px-4 py-3 rounded-xl"
+        >
+          Continue today — $3
+        </button>
+
+        <button
+          onClick={() => startCheckout('brilliant')}
+          className="w-full border border-white/10 px-4 py-3 rounded-xl text-white"
+        >
+          Stay Brilliant — $25/month
+        </button>
+
+        <button
+          onClick={() => setShowPrompt(false)}
+          className="w-full text-xs text-white/40"
+        >
+          Not now
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
+{entering && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl">
           <div className="text-center">
             <div className="mb-6 w-16 h-16 mx-auto rounded-full bg-white/10 shadow-[0_0_60px_rgba(124,140,255,0.5)]" />

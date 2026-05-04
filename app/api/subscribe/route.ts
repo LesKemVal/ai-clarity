@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
-type PlanTier = 'intelligent' | 'brilliant' | 'brilliant_day'
+type PlanTier = 'intelligent' | 'brilliant' | 'brilliant_day' | 'brilliant_day'
 
 function getPriceIdForTier(tier: PlanTier) {
+  if (tier === 'brilliant_day') return process.env.STRIPE_BRILLIANT_DAY_PRICE_ID
   if (tier === 'brilliant_day') return process.env.STRIPE_BRILLIANT_DAY_PRICE_ID
   if (tier === 'brilliant') return process.env.STRIPE_BRILLIANT_PRICE_ID
   return process.env.STRIPE_INTELLIGENT_PRICE_ID
@@ -56,13 +57,13 @@ export async function POST(req: NextRequest) {
       ...(tier === 'brilliant_day'
         ? {}
         : {
-            subscription_data: {
+            ...(tier === 'brilliant_day' ? {} : { subscription_data: {
               metadata: {
                 tier,
               },
-              ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
+              ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}}),
             },
-          }),
+          }}),
       success_url: `${appUrl}${tier === 'brilliant_day' ? '/george/live?daily=success' : `/george?subscription=success&tier=${tier}`}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}${tier === 'brilliant_day' ? '/george/live?daily=cancelled' : `/george?subscription=cancelled&tier=${tier}`}`,
     })
