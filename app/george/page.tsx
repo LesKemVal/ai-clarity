@@ -99,6 +99,7 @@ function detectTrainingTrack(raw: string) {
   return null
 }
 
+
 function trainingNeedsJurisdiction(raw: string) {
   return /driver|cdl|cna/.test(raw.toLowerCase())
 }
@@ -529,6 +530,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [language, setLanguage] = useState<'EN' | 'ES'>('EN')
 
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
+  const liveContextBufferRef = useRef<string[]>([])
+  const liveLastSignalRef = useRef<number>(0)
   const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
@@ -714,11 +717,53 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   }, [profileName, currentTier])
 
   
+
+const detectFriction = (text: string) => {
+  const lower = text.toLowerCase()
+
+  return (
+    lower.includes("that won’t work") ||
+    lower.includes("that wont work") ||
+    lower.includes("i’m not sure") ||
+    lower.includes("im not sure") ||
+    lower.includes("we usually don’t") ||
+    lower.includes("we usually dont") ||
+    lower.includes("what do you want to do") ||
+    lower.includes("where do we go from here")
+  )
+}
+
 const detectTriggerIntent = (text: string) => {
   const lower = text.toLowerCase()
 
+  if (
+    lower.includes("what's the word") ||
+    lower.includes("whats the word") ||
+    lower.includes("word i'm looking for") ||
+    lower.includes("word im looking for")
+  ) {
+    return "word"
+  }
+
   if (lower.includes("what should i say") || lower.includes("how do i say")) {
     return "line"
+  }
+
+  if (
+    lower.includes("to be clear") ||
+    lower.includes("to clarify") ||
+    lower.includes("what i mean is") ||
+    lower.includes("i mean") ||
+    lower.includes("let me put it another way") ||
+    lower.includes("say that better") ||
+    lower.includes("clean that up") ||
+    lower.includes("give me the word") ||
+    lower.includes("what's the word") ||
+    lower.includes("whats the word") ||
+    lower.includes("what's a better word") ||
+    lower.includes("whats a better word")
+  ) {
+    return "reword"
   }
 
   if (lower.includes("give me a second") || lower.includes("hold on")) {
@@ -933,7 +978,11 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
     return () => clearInterval(interval)
   }, [messages])
 
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+  
+const lastSpeechTsRef = useRef<number>(0)
+const responseTimerRef = useRef<any>(null)
+
+const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const speechQueueRef = useRef<string[]>([])
@@ -2689,6 +2738,16 @@ return true
       }
 
       setInterimTranscript(liveTranscript)
+      if (liveMode && liveTranscript.trim()) {
+        const cleanLiveSignal = liveTranscript.trim()
+        liveLastSignalRef.current = Date.now()
+        liveContextBufferRef.current = [...liveContextBufferRef.current, cleanLiveSignal].slice(-12)
+      }
+lastSpeechTsRef.current = Date.now()
+
+if (responseTimerRef.current) {
+  clearTimeout(responseTimerRef.current)
+}
 
       // 🔥 live sales signal detection
       if (liveMode && liveTranscript) {
@@ -2698,13 +2757,23 @@ return true
         if (intent === "listen") return
 
         if (intent) {
+
+          // urgency override (instant response)
+          if (intent === "urgent") {
+            void handleSend("Focus. Control the next sentence.")
+            return
+          }
           setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
-              ? "Say: [response forming...]"
+              ? "Say: [keep it simple and direct]"
+              : intent === "reword"
+              ? "Try: “Let me put that another way…”"
               : intent === "cue"
-              ? "Stay calm. Slow it down."
-              : "Focus. Control the next sentence."
+              ? "Cue: Slow it down. Control the next sentence."
+              : intent === "word"
+              ? "Word: [clean single word]"
+              : "Focus."
           })
           return
         }
@@ -2747,6 +2816,10 @@ return true
 
       if (finalTranscript.trim()) {
         const clean = finalTranscript.trim()
+        if (liveMode) {
+          liveLastSignalRef.current = Date.now()
+          liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
+        }
 
 const outcomeSignal = (() => {
   const text = clean.toLowerCase()
@@ -2770,27 +2843,59 @@ if (outcomeSignal) {
 }
         setInterimTranscript('')
 
+        const liveContextSnapshot = liveContextBufferRef.current.join("\n")
+        const hasEnoughLiveSignal = liveContextSnapshot.length > 40
+
         const livePrompt = liveMode
-          ? `LIVE PROSPECT:
+          ? hasEnoughLiveSignal
+            ? `LIVE CONVERSATION CONTEXT:
+${liveContextSnapshot}
+
+LATEST HEARD:
 ${clean}
 
-You are GEORGE.
-This is what the prospect just said.
+You are GEORGE in Conversation Mode.
+Respond only from what you actually heard or what the user has given you.
+If the user asks for words, give a usable line.
+If the user needs direction, give a short cue.
+If the context is still unclear, ask for one missing signal instead of guessing.
 
-Your job:
-1. Push for the close
-2. If blocked, reposition
-3. If still blocked, secure next step
-4. Always maintain control
+Return short:
+Cue:
+Line:
+Need:`
+            : `GEORGE does not have enough of the room yet.
 
-Return ONLY:
+Tell the user briefly:
+"I need more of the room. Give me who you are speaking to, what this is about, or what outcome you want."
 
-Say:
-Backup:
-Cue:`
+Do not guess.`
           : clean
 
-        void handleSend(livePrompt)
+        
+responseTimerRef.current = setTimeout(() => {
+  const now = Date.now()
+  const delta = now - lastSpeechTsRef.current
+
+  if (delta < 2500) return
+
+  const lower = livePrompt.toLowerCase()
+
+  const strongSignal =
+    lower.includes("not interested") ||
+    lower.includes("too expensive") ||
+    lower.includes("i don’t know") ||
+    lower.includes("i dont know") ||
+    lower.includes("maybe") ||
+    lower.includes("what do you think")
+
+  const friction = detectFriction(liveTranscript || "")
+
+  if (!friction) return
+
+  void handleSend(livePrompt)
+}, 2600)
+
       }
     }
 
