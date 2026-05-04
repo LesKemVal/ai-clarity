@@ -3047,6 +3047,28 @@ if (responseTimerRef.current) {
 
         if (intent) {
 
+          const lineText = (() => {
+            const lowerSignal = liveTranscript.toLowerCase()
+
+            if (/not interested|no thanks|don't need|dont need/.test(lowerSignal)) {
+              return 'Say: “I understand. Let me make this simple, then you can decide.”'
+            }
+
+            if (/too expensive|cost|price|budget/.test(lowerSignal)) {
+              return 'Say: “Fair. Let me show you what this actually saves or solves.”'
+            }
+
+            if (/send me|email me|call me later|next week|follow up/.test(lowerSignal)) {
+              return 'Say: “I can do that. Before I send it, let me confirm what actually matters to you.”'
+            }
+
+            if (/not sure|maybe|i guess|i don’t know|i dont know/.test(lowerSignal)) {
+              return 'Say: “That’s fair. Let’s make the decision clearer.”'
+            }
+
+            return 'Say: “Let me make this simple for you…”'
+          })()
+
           // urgency override (instant response)
           if (intent === "urgent") {
             stopListening()
@@ -3061,7 +3083,7 @@ if (responseTimerRef.current) {
 setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
-              ? "Say: “Let me make this simple for you…”"
+              ? lineText
               : intent === "reword"
               ? "Try: “Let me put that another way…”"
               : intent === "cue"
