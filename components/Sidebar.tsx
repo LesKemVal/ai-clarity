@@ -18,6 +18,7 @@ type PromptGroup = {
 type GoalCheckItem = {
   id: string
   title: string
+  todos: { id: string; text: string; done: boolean }[]
   updatedAt: number
 }
 
@@ -194,12 +195,52 @@ export default function Sidebar({
     const next: GoalCheckItem = {
       id: `goal_${Date.now()}`,
       title: cleanTitle,
+      todos: [],
       updatedAt: Date.now(),
     }
 
     const updated = [next, ...goalChecks].slice(0, 30)
     setGoalChecks(updated)
     safeWriteGoalChecks(updated)
+  }
+
+  
+  const addTodo = (goal: GoalCheckItem) => {
+    const text = window.prompt('New To-Do')
+    if (!text?.trim()) return
+
+    const updated = goalChecks.map((g) =>
+      g.id === goal.id
+        ? {
+            ...g,
+            todos: [
+              { id: `todo_${Date.now()}`, text: text.trim(), done: false },
+              ...(g.todos || [])
+            ],
+            updatedAt: Date.now(),
+          }
+        : g
+    )
+
+    setGoalChecks(updated)
+    localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+  }
+
+  const toggleTodo = (goal: GoalCheckItem, todoId: string) => {
+    const updated = goalChecks.map((g) =>
+      g.id === goal.id
+        ? {
+            ...g,
+            todos: g.todos.map((t) =>
+              t.id === todoId ? { ...t, done: !t.done } : t
+            ),
+            updatedAt: Date.now(),
+          }
+        : g
+    )
+
+    setGoalChecks(updated)
+    localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
   }
 
   const openGoalCheck = (item: GoalCheckItem) => {
@@ -483,6 +524,33 @@ Upgrade to continue.`,
               </p>
 
               <div className="space-y-3">
+
+        <div className="max-h-48 overflow-y-auto space-y-2">
+          {(activeGoalCheck.todos || []).length === 0 ? (
+            <p className="text-xs text-white/40">No to-dos yet.</p>
+          ) : (
+            activeGoalCheck.todos.map((todo) => (
+              <button
+                key={todo.id}
+                onClick={() => toggleTodo(activeGoalCheck, todo.id)}
+                className="flex w-full items-center gap-2 text-left text-sm"
+              >
+                <span className={`w-4 h-4 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
+                <span className={todo.done ? 'line-through text-white/40' : 'text-white'}>
+                  {todo.text}
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+
+        <button
+          onClick={() => addTodo(activeGoalCheck)}
+          className="w-full rounded-xl border border-white/10 px-4 py-2 text-sm text-white/80"
+        >
+          + Add To-Do
+        </button>
+
                 {reroutePrompt && (
                   <button
                     type="button"
