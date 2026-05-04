@@ -3049,29 +3049,19 @@ if (responseTimerRef.current) {
         // prevent spam
         if (delta < 3000) return
 
-        // detect rambling (long + no question)
-        if (liveTranscript.length > 120 && !lower.includes("?")) {
-          setPendingAssistantMessage({
-            role: 'assistant',
-            content: "Cue: Pause. Ask a question."
-          })
-          return
-        }
+        const proactiveCue =
+          /okay|alright|i guess|if you want/.test(lower)
+            ? "Cue: You’re conceding. Reset your position."
+            : /because|let me explain|what i mean is/.test(lower)
+            ? "Cue: Stop explaining. Control the next sentence."
+            : liveTranscript.length > 120 && !lower.includes("?")
+            ? "Cue: Pause. Ask a question."
+            : null
 
-        // detect over-explaining
-        if (/because|let me explain|what i mean is/.test(lower)) {
+        if (proactiveCue) {
           setPendingAssistantMessage({
             role: 'assistant',
-            content: "Cue: Stop explaining. Control the next sentence."
-          })
-          return
-        }
-
-        // detect loss of control
-        if (/okay|alright|i guess|if you want/.test(lower)) {
-          setPendingAssistantMessage({
-            role: 'assistant',
-            content: "Cue: You’re conceding. Reset your position."
+            content: proactiveCue
           })
           return
         }
