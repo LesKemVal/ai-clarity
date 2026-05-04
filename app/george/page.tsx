@@ -3080,7 +3080,7 @@ if (responseTimerRef.current) {
             return
           }
           stopListening()
-setPendingAssistantMessage({
+          setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
               ? lineText
