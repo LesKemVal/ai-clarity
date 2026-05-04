@@ -3051,6 +3051,11 @@ if (responseTimerRef.current) {
             const lowerSignal = liveTranscript.toLowerCase()
 
             const personProfile = detectConversationPersonProfile(input, liveTranscript)
+
+            const isHighConfidence = personProfile.confidence >= 0.7
+            const isResistant = personProfile.posture === 'resistant'
+            const isRushed = personProfile.posture === 'rushed'
+
             const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
             if (personProfile.role === 'doctor') {
@@ -3091,6 +3096,14 @@ if (responseTimerRef.current) {
   'Say: “Good — [pause] let’s get clear right now.”',
   'Say: “Alright. Let’s lock this in — [pause] right now.”'
 ][Math.floor(Date.now() % 3)]
+            }
+
+            if (isHighConfidence && isResistant) {
+              return 'Say: “Listen — here’s the simple version, then you decide.”'
+            }
+
+            if (isHighConfidence && isRushed) {
+              return 'Say: “Quick version — this is what matters most.”'
             }
 
             return [
