@@ -11,6 +11,64 @@ export type LiveGuidance = {
   say: string
 }
 
+export type ConversationPersonProfile = {
+  role: 'doctor' | 'lawyer' | 'authority' | 'gatekeeper' | 'buyer' | 'client' | 'family' | 'unknown'
+  posture: 'helpful' | 'neutral' | 'resistant' | 'rushed' | 'confused' | 'pressuring'
+  guidance: string
+}
+
+export function detectConversationPersonProfile(input: string, interimTranscript: string): ConversationPersonProfile {
+  const text = `${input} ${interimTranscript}`.toLowerCase().replace(/[’]/g, "'")
+
+  let role: ConversationPersonProfile['role'] = 'unknown'
+  let posture: ConversationPersonProfile['posture'] = 'neutral'
+
+  if (/doctor|physician|nurse|clinic|hospital|symptom|pain|medication|prescription|diagnosis/.test(text)) {
+    role = 'doctor'
+  } else if (/lawyer|attorney|court|case|contract|legal|rights|document|lease|police/.test(text)) {
+    role = 'lawyer'
+  } else if (/manager|supervisor|officer|case worker|caseworker|agency|authority|official/.test(text)) {
+    role = 'authority'
+  } else if (/he's not available|she's not available|who is this|what is this regarding|send an email|gatekeeper/.test(text)) {
+    role = 'gatekeeper'
+  } else if (/price|cost|budget|not interested|buyer|purchase|deal|offer/.test(text)) {
+    role = 'buyer'
+  } else if (/client|customer|prospect|lead/.test(text)) {
+    role = 'client'
+  } else if (/mom|dad|son|daughter|wife|husband|family/.test(text)) {
+    role = 'family'
+  }
+
+  if (/not interested|no thanks|don't need|dont need|already have|have someone/.test(text)) {
+    posture = 'resistant'
+  } else if (/hurry|quickly|i don't have time|dont have time|rushed|busy/.test(text)) {
+    posture = 'rushed'
+  } else if (/i don't understand|i dont understand|confused|what do you mean|say that again/.test(text)) {
+    posture = 'confused'
+  } else if (/today|right now|must|have to|deadline|pressure/.test(text)) {
+    posture = 'pressuring'
+  } else if (/yes|okay|sure|i can help|tell me more/.test(text)) {
+    posture = 'helpful'
+  }
+
+  const guidance =
+    role === 'doctor'
+      ? 'State symptoms clearly. Keep it factual. Ask what matters most next.'
+      : role === 'lawyer'
+      ? 'Ask for plain-language meaning. Do not agree to what you do not understand.'
+      : role === 'authority'
+      ? 'Stay calm. Ask for the exact requirement and next step.'
+      : role === 'gatekeeper'
+      ? 'Keep it short. Earn permission for the next 20 seconds.'
+      : role === 'buyer' || role === 'client'
+      ? 'Clarify value before defending price.'
+      : role === 'family'
+      ? 'Say the point without escalating the emotion.'
+      : 'Clarify who they are, what they need, and what outcome matters.'
+
+  return { role, posture, guidance }
+}
+
 export type ConversationTriggerCode = {
   phrase: string
   profile: ConversationProfile
