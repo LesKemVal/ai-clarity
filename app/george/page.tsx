@@ -4934,9 +4934,9 @@ setMessages([liveIntro])
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl">
-                  <div className="flex items-center gap-3 py-3 text-white/80 text-[13px]">
-                    <span className="shrink-0 text-[#7C8CFF]">LIVE ASSISTANCE</span>
+                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+                  <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
+                    <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">LIVE</span>
 
 <button
   type="button"
@@ -4952,7 +4952,7 @@ setMessages([liveIntro])
     setToastMessage('New LIVE session started.')
     setShowToast(true)
   }}
-  className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
+  className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
 >
   New
 </button>
@@ -4984,7 +4984,7 @@ setMessages([liveIntro])
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 text-[10px] px-1 py-1 opacity-60 hover:opacity-100 transition ${
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
                         !voiceOn
                           ? 'border-[#7C8CFF] text-white'
                           : 'border-transparent text-white/45 hover:text-white/75'
@@ -5010,7 +5010,7 @@ setMessages([liveIntro])
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 text-[10px] px-1 py-1 opacity-60 hover:opacity-100 transition ${
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
                         voiceOn
                           ? 'border-[#7C8CFF] text-white'
                           : 'border-transparent text-white/45 hover:text-white/75'
@@ -5040,7 +5040,7 @@ setMessages([liveIntro])
                         setToastMessage('Negotiation mode active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
                     >
                       Negotiate
                     </button>
@@ -5066,7 +5066,7 @@ setMessages([liveIntro])
                         setToastMessage('Objection handling active.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 text-[10px] px-1 py-1 text-white/55 opacity-70 transition hover:opacity-100 hover:text-white"
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
                     >
                       Objections
                     </button>
@@ -5093,7 +5093,7 @@ router.push('/george')
                         setToastMessage('Returned to normal GEORGE.')
                         setShowToast(true)
                       }}
-                      className="shrink-0 border-b border-transparent px-0.5 py-1 text-red-300/70 transition hover:border-red-300/50 hover:text-red-200"
+                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-white/72 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
                     >
                       Exit
                     </button>
