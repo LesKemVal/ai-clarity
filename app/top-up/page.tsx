@@ -146,7 +146,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant is where GEORGE shifts from thinking with you to helping you perform in real time.
+              Brilliant is where GEORGE helps you respond in real time — what to say, when to say it, and how to stay in control when outcomes matter.
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-4">
