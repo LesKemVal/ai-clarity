@@ -5158,7 +5158,181 @@ setMessages([liveIntro])
   </div>
 )}
 
+{liveMode && (
+                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+                  <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
+                    <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">LIVE</span>
 
+<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+
+<span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
+  {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : isSpeaking ? 'SPEAKING' : ''}
+</span>
+
+<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+
+<button
+  type="button"
+  onClick={() => {
+    const liveIntro: Message = {
+      role: 'assistant',
+      content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
+    }
+
+    createSession('live', [liveIntro], 'LIVE Assistance')
+    setMessages([liveIntro])
+    messagesRef.current = [liveIntro]
+    setToastMessage('New LIVE session started.')
+    setShowToast(true)
+  }}
+  className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
+>
+  New
+</button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSessionPicker(true)
+                      }}
+                      className="shrink-0 rounded-md border border-[#7C8CFF]/50 bg-[#7C8CFF]/10 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.35)] transition hover:bg-[#7C8CFF]/20 hover:text-white"
+                      aria-label="Open campaign picker"
+                    >
+                      Conversation
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVoiceOn(false)
+                        setInteractionMode('text')
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? { ...c, deliveryMode: 'text' }
+                              : c
+                          )
+                        )
+                        window.localStorage.setItem('george_voice', 'off')
+                        setToastMessage('Text guidance active.')
+                        setShowToast(true)
+                      }}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
+                        !voiceOn
+                          ? 'border-[#7C8CFF] text-white'
+                          : 'border-transparent text-white/45 hover:text-white/75'
+                      }`}
+                    >
+                      Text
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVoiceOn(true)
+                        setInteractionMode('speech')
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? { ...c, deliveryMode: 'audio' }
+                              : c
+                          )
+                        )
+                        window.localStorage.setItem('george_voice', 'on')
+                        setTimeout(() => startListening(), 120)
+                        setToastMessage('Audio guidance active.')
+                        setShowToast(true)
+                      }}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
+                        voiceOn
+                          ? 'border-[#7C8CFF] text-white'
+                          : 'border-transparent text-white/45 hover:text-white/75'
+                      }`}
+                    >
+                      Audio
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActivePromptContext('professional_negotiation')
+                        setConversationMode('professional_negotiation')
+
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? {
+                                  ...c,
+                                  assistMode: 'negotiation',
+                                  outputStyle: 'say_ask_boundary_close',
+                                }
+                              : c
+                          )
+                        )
+
+                        setToastMessage('Negotiation mode active.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
+                    >
+                      Negotiate
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActivePromptContext('professional_objection_handling')
+                        setConversationMode('professional_objection_handling')
+
+                        setCampaigns((prev) =>
+                          prev.map((c) =>
+                            c.id === activeCampaignId
+                              ? {
+                                  ...c,
+                                  assistMode: 'objection_handling',
+                                  outputStyle: 'repeatable_lines',
+                                }
+                              : c
+                          )
+                        )
+
+                        setToastMessage('Objection handling active.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
+                    >
+                      Objections
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        stopListening()
+                        userPinnedBottomRef.current = true
+                        exitLiveMode()
+                        setVoiceOn(false)
+
+                        requestAnimationFrame(() => {
+                          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
+                        })
+                        setInteractionMode('text')
+                        setActivePromptContext(null)
+                        setActivePromptLabel(null)
+                        setConversationMode(null)
+router.push('/george')
+                        window.localStorage.removeItem('george_active_context')
+                        window.localStorage.removeItem('george_active_label')
+                        window.localStorage.setItem('george_voice', 'off')
+                        setToastMessage('Returned to normal GEORGE.')
+                        setShowToast(true)
+                      }}
+                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-white/72 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
+                    >
+                      Exit
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[210px] bg-black" />
               <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[110px] bg-gradient-to-t from-black to-transparent" />
