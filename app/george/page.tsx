@@ -4853,19 +4853,43 @@ if (liveMode) {
 
             <button
               onClick={() => {
+                // CREATE CAMPAIGN OBJECT
+                const newCampaign: GeorgeCampaign = {
+                  id: 'campaign_' + Date.now(),
+                  name: proGoal || 'Campaign',
+                  mode: 'solo',
+                  productOrService: proGoal || '',
+                  targetMarket: proAudience || '',
+                  desiredOutcome: proOutcome || '',
+                  complianceBoundaries: proConstraints || '',
+                  assistMode: 'closing',
+                  outputStyle: 'repeatable_lines',
+                  deliveryMode: 'text',
+                  currentGoal: proOutcome || 'advance conversation',
+                  defaultAnswersEnabled: true,
+                }
+
+                setCampaigns((prev) => [newCampaign, ...prev])
+                setActiveCampaignId(newCampaign.id)
+
+                // ENTER PRO MODE
+                enterLiveMode()
+                setConversationMode('pro_live')
+                setActivePromptContext('pro_live')
+                setActivePromptLabel(newCampaign.name)
+
                 const msg: Message = {
                   role: 'assistant',
-                  content: `We are now in a live professional scenario.
+                  content: `Campaign loaded.
 
 Goal: ${proGoal || 'General'}
 Audience: ${proAudience || 'Unknown'}
 Outcome: ${proOutcome || 'Best outcome'}
-Constraints: ${proConstraints || 'None'}
 
-I will guide you in real time. Start speaking.`
+Proceed when ready.`
                 }
 
-                startNewGeorgeSession(msg, 'Conversation')
+                startNewGeorgeSession(msg, newCampaign.name)
                 setShowProSetup(false)
               }}
               className="w-full bg-[#22c55e]/30 border border-[#22c55e]/50 py-3 rounded text-white"
