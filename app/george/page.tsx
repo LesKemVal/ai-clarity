@@ -558,9 +558,16 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
-  const liveInterventionRef = useRef<number>(0)
-  const lastCueTsRef = useRef<number>(0)
-  const [contextTurnCount, setContextTurnCount] = useState(0)
+const liveInterventionRef = useRef<number>(0)
+const lastCueTsRef = useRef<number>(0)
+const liveConversationStateRef = useRef({
+  objectionCount: 0,
+  dismissCount: 0,
+  pressureCount: 0,
+  lastCue: ''
+})
+
+const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
