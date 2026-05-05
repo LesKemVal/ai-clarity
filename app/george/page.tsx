@@ -3069,7 +3069,7 @@ if (responseTimerRef.current) {
         const delta = now - lastSpeechTsRef.current
 
         // prevent spam
-        if (delta < 3000) return
+        if (delta < 1800) return
 
         const voiceSignal = interpretVoiceState(liveTranscript)
 
@@ -3114,6 +3114,7 @@ if (responseTimerRef.current) {
           const fire = () => {
             lastCueTsRef.current = Date.now()
             setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
               role: 'assistant',
               content: proactiveCue
@@ -3219,6 +3220,7 @@ setPendingAssistantMessage({
           const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
 setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
               role: 'assistant',
               content: 'Pause. Control the next sentence.'
@@ -3234,12 +3236,13 @@ setPendingAssistantMessage({
           const liveLineOutput = shouldShowProfileLabel ? profileLabel + "\\n" + lineText : lineText
 
           setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
               ? profileLabel + "\n" + lineText
               : intent === "reword"
-              ? "Try: “Let me put that another way…”"
+              ? "Say: “Let me put that another way…”"
               : intent === "cue"
               ? "Cue: Slow down. Control the next sentence."
               : intent === "word"
@@ -3364,6 +3367,7 @@ responseTimerRef.current = setTimeout(() => {
   if (liveMode && strongSignal) {
     stopListening()
     setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
       role: 'assistant',
       content: 'Say: “Let me make this simple…”'
@@ -3386,12 +3390,14 @@ setPendingAssistantMessage({
 
     if (score >= 5) {
       setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
         role: 'assistant',
         content: 'Pause. Take control of the next sentence.\n\nSay: “Let me clarify the main point.”'
       })
     } else {
       setPendingAssistantMessage(null);
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
         role: 'assistant',
         content: 'Cue: Slow down. Ask one clean question.'
