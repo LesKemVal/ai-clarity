@@ -400,3 +400,44 @@ export function decideNextMove({
   // fallback
   return null
 }
+
+
+export type VoiceSignal = {
+  state: 'pressuring' | 'dismissive' | 'uncertain' | 'rushed' | 'calm'
+  intensity: 1 | 2 | 3
+  control: 'low' | 'neutral' | 'high'
+}
+
+export function interpretVoiceState(interimTranscript: string): VoiceSignal {
+  const text = interimTranscript.toLowerCase()
+
+  let state: VoiceSignal['state'] = 'calm'
+  let intensity: VoiceSignal['intensity'] = 1
+  let control: VoiceSignal['control'] = 'neutral'
+
+  if (/right now|today|hurry|quick|asap/.test(text)) {
+    state = 'pressuring'
+    intensity = 3
+    control = 'high'
+  }
+
+  else if (/not interested|just send|whatever|fine/.test(text)) {
+    state = 'dismissive'
+    intensity = 2
+    control = 'low'
+  }
+
+  else if (/uh|um|i guess|maybe|not sure/.test(text)) {
+    state = 'uncertain'
+    intensity = 2
+    control = 'low'
+  }
+
+  else if (interimTranscript.length > 0 && interimTranscript.length < 25) {
+    state = 'rushed'
+    intensity = 2
+    control = 'neutral'
+  }
+
+  return { state, intensity, control }
+}
