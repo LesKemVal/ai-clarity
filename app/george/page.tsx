@@ -565,7 +565,8 @@ const liveConversationStateRef = useRef({
   dismissCount: 0,
   pressureCount: 0,
   lastCue: '',
-  outcomeState: 'neutral'
+  outcomeState: 'neutral',
+  activeGoal: 'clarity'
 })
 
 const [contextTurnCount, setContextTurnCount] = useState(0)
