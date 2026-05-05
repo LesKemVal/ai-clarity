@@ -3052,14 +3052,21 @@ if (responseTimerRef.current) {
         // prevent spam
         if (delta < 3000) return
 
-        const proactiveCue =
-          /okay|alright|i guess|if you want/.test(lower)
+        const rawProactiveCue =
+          vocalState === 'pressuring'
+            ? "Cue: They’re rushing you. Slow this down."
+            : vocalState === 'dismissive'
+            ? "Cue: They’re brushing you off. Regain control."
+            : /okay|alright|i guess|if you want/.test(lower)
             ? "Cue: You’re conceding. Reset your position."
             : /because|let me explain|what i mean is/.test(lower)
             ? "Cue: Stop explaining. Control the next sentence."
             : liveTranscript.length > 120 && !lower.includes("?")
             ? "Cue: Pause. Ask a question."
             : null
+
+        const deliveryLevel = detectUserDeliveryLevel(input, liveTranscript)
+        const proactiveCue = rawProactiveCue ? adaptCueForUser(rawProactiveCue, deliveryLevel) : null
 
         if (proactiveCue) {
           const now = Date.now()

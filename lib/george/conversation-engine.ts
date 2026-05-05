@@ -344,3 +344,25 @@ export function buildBrilliantLiveTriggerResponse(
 
   return triggerMap[text] ?? null
 }
+
+
+export type VocalState =
+  | 'calm'
+  | 'rushed'
+  | 'dismissive'
+  | 'pressuring'
+  | 'uncertain'
+
+export function detectVocalState(interimTranscript: string): VocalState {
+  const text = interimTranscript.toLowerCase()
+
+  if (/right now|today|hurry|quick|asap/.test(text)) return 'pressuring'
+
+  if (/not interested|just send|whatever|fine/.test(text)) return 'dismissive'
+
+  if (/uh|um|i guess|maybe|not sure/.test(text)) return 'uncertain'
+
+  if (interimTranscript.length > 0 && interimTranscript.length < 25) return 'rushed'
+
+  return 'calm'
+}
