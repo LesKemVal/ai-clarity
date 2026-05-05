@@ -3773,7 +3773,11 @@ return (
     >
       <div
         className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
-          m.role === 'user' ? 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.18)]' : 'max-w-full text-left'
+          m.role === 'user'
+            ? (liveMode
+              ? 'max-w-[78%] text-right rounded-[1.35rem] border border-[#6F7DE8]/20 bg-[#2f2f2f] px-5 py-4 shadow-[0_0_18px_rgba(111,125,232,0.12)]'
+              : 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.18)]')
+ : 'max-w-full text-left'
         }`}
       >
         {m.role === 'assistant' ? (
