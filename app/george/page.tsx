@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
-import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
+import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
@@ -3071,6 +3071,8 @@ if (responseTimerRef.current) {
         // prevent spam
         if (delta < 3000) return
 
+        const voiceSignal = interpretVoiceState(liveTranscript)
+
         const decisionCue = decideNextMove({
           vocalState,
           posture: 'unknown',
@@ -3078,17 +3080,24 @@ if (responseTimerRef.current) {
         })
 
         const rawProactiveCue = decisionCue
-          vocalState === 'pressuring'
-            ? "Cue: They’re rushing you. Slow this down."
-            : vocalState === 'dismissive'
-            ? "Cue: They’re brushing you off. Regain control."
-            : /okay|alright|i guess|if you want/.test(lower)
-            ? "Cue: You’re conceding. Reset your position."
-            : /because|let me explain|what i mean is/.test(lower)
-            ? "Cue: Stop explaining. Control the next sentence."
-            : liveTranscript.length > 120 && !lower.includes("?")
-            ? "Cue: Pause. Ask a question."
-            : null
+          ? decisionCue
+          : voiceSignal.state === 'pressuring' && voiceSignal.intensity >= 3
+          ? "Cue: High pressure. Slow this down now."
+          : voiceSignal.state === 'dismissive' && voiceSignal.control === 'low'
+          ? "Cue: They’re brushing you off. Ask one direct question."
+          : voiceSignal.state === 'uncertain'
+          ? "Cue: They sound unsure. Make it simple."
+          : vocalState === 'pressuring'
+          ? "Cue: They’re rushing you. Slow this down."
+          : vocalState === 'dismissive'
+          ? "Cue: They’re brushing you off. Regain control."
+          : /okay|alright|i guess|if you want/.test(lower)
+          ? "Cue: You’re conceding. Reset your position."
+          : /because|let me explain|what i mean is/.test(lower)
+          ? "Cue: Stop explaining. Control the next sentence."
+          : liveTranscript.length > 120 && !lower.includes("?")
+          ? "Cue: Pause. Ask a question."
+          : null
 
         const deliveryLevel = detectUserDeliveryLevel(input, liveTranscript)
         const proactiveCue = rawProactiveCue ? adaptCueForUser(rawProactiveCue, deliveryLevel) : null
