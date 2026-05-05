@@ -332,6 +332,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
   const [showProSetup, setShowProSetup] = useState(false)
+const [showProMenu, setShowProMenu] = useState(false)
   const [proGoal, setProGoal] = useState('')
   const [proAudience, setProAudience] = useState('')
   const [proOutcome, setProOutcome] = useState('')
@@ -479,6 +480,7 @@ const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
 const [conversationMode, setConversationMode] = useState<string | null>(null)
+const [proMode, setProMode] = useState(false)
 const [showWalkthrough, setShowWalkthrough] = useState(false)
 const [walkthroughStep, setWalkthroughStep] = useState(1)
 
@@ -757,6 +759,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setActiveMode('live')
       setLiveMode(true)
       setConversationMode('manual_live')
+
+        // PRO MODE SUPPORT (initial)
+        try {
+          window.localStorage.setItem('GEORGE_ACTIVE_MODE', 'live')
+        } catch {}
       setActivePromptContext('manual_live')
 
       const activeLiveSession = getActiveSessionForMode('live')
@@ -4980,6 +4987,67 @@ Choose one:
             ))
           })()}
         </div>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
+
+
+{showProMenu && typeof document !== 'undefined' && createPortal(
+  <>
+    <div
+      onClick={() => setShowProMenu(false)}
+      className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px]"
+    />
+
+    <div className="fixed inset-0 z-[210] flex items-center justify-center px-4">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-[420px] rounded-[1.4rem] border border-[#22c55e]/30 bg-black px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72)]"
+      >
+        <div className="text-[10px] uppercase tracking-[0.22em] text-[#22c55e] mb-2">
+          PRO MODE
+        </div>
+
+        <div className="text-[13px] text-white/70 mb-3">
+          Structured execution. Campaign-based.
+        </div>
+
+        <button
+          onClick={() => {
+            setShowProMenu(false)
+            enterLiveMode()
+
+            setConversationMode('pro_live')
+            setActivePromptContext('pro_live')
+            setActivePromptLabel('Campaign')
+          }}
+          className="w-full mb-2 text-left text-white hover:text-white/80"
+        >
+          Start Immediate Campaign
+        </button>
+
+        <button
+          onClick={() => {
+            setShowProMenu(false)
+            setShowProSetup(true)
+          }}
+          className="w-full mb-2 text-left text-white hover:text-white/80"
+        >
+          Setup Campaign
+        </button>
+
+        <button
+          onClick={() => {
+            setShowProMenu(false)
+            setShowSessionPicker(true)
+          }}
+          className="w-full text-left text-white hover:text-white/80"
+        >
+          Resume Campaign
+        </button>
+
       </div>
     </div>
   </>,
