@@ -368,9 +368,9 @@ return (
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
-              src="/branding/logo.png"
+              src="/logo900.png"
               alt="BRANESx"
-              className="h-9 w-9  rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
+              className="h-8 w-auto object-contain"
             />
           </div>
 
