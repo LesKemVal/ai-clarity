@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
-import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
+import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
 
 type Message = {
@@ -3052,7 +3052,13 @@ if (responseTimerRef.current) {
         // prevent spam
         if (delta < 3000) return
 
-        const rawProactiveCue =
+        const decisionCue = decideNextMove({
+          vocalState,
+          posture: 'unknown',
+          signals: []
+        })
+
+        const rawProactiveCue = decisionCue
           vocalState === 'pressuring'
             ? "Cue: They’re rushing you. Slow this down."
             : vocalState === 'dismissive'

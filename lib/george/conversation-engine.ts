@@ -366,3 +366,37 @@ export function detectVocalState(interimTranscript: string): VocalState {
 
   return 'calm'
 }
+
+
+export function decideNextMove({
+  vocalState,
+  posture,
+  signals,
+}: {
+  vocalState: string
+  posture: string
+  signals: string[]
+}) {
+  // highest priority — loss of control
+  if (signals.includes('conceding')) {
+    return "Cue: You’re conceding. Reset your position."
+  }
+
+  // voice pressure
+  if (vocalState === 'pressuring') {
+    return "Cue: They’re rushing you. Slow this down."
+  }
+
+  // dismissal
+  if (vocalState === 'dismissive') {
+    return "Cue: They’re brushing you off. Regain control."
+  }
+
+  // over-explaining
+  if (signals.includes('overexplaining')) {
+    return "Cue: Stop explaining. Control the next sentence."
+  }
+
+  // fallback
+  return null
+}
