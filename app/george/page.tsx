@@ -3050,10 +3050,20 @@ if (responseTimerRef.current) {
 
       // ⚡ proactive conversational guidance
       if (liveMode && liveTranscript) {
+        const state = liveConversationStateRef.current
+        if (!state.activeGoal) {
+          state.activeGoal = activeCampaign?.desiredOutcome || 'clarity'
+        }
+
         const vocalState = detectVocalState(liveTranscript)
 
 
         const lower = liveTranscript.toLowerCase()
+
+        if (/close|sell|buy|sign/.test(lower)) state.activeGoal = 'close'
+        if (/understand|clarify|explain/.test(lower)) state.activeGoal = 'clarity'
+        if (/diagnose|symptom|pain|doctor/.test(lower)) state.activeGoal = 'diagnosis'
+
 
         const now = Date.now()
         const delta = now - lastSpeechTsRef.current
