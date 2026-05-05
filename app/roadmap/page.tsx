@@ -36,15 +36,15 @@ export default function RoadmapPage() {
                   </p>
 
                   <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-white md:text-5xl lg:text-6xl">
-                    GEORGE helps you perform when it matters.
+                    Think clearly. Respond better. Move when it matters.
                   </h1>
 
                   <p className="max-w-xl text-sm leading-7 text-neutral-200 md:text-base">
-                    Start free. Upgrade when you want stronger control, sharper execution, and real-time advantage.
+                    GEORGE helps you find the next move in normal life — and tighten up when the moment turns live.
                   </p>
 
                   <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
-                    GEORGE helps you think clearly, act decisively, and stay sharp when the pressure is real.
+                    Normal GEORGE helps you think. LIVE GEORGE helps you perform. Same system — sharper when the stakes rise.
                   </div>
                 </div>
               </div>
@@ -58,7 +58,7 @@ export default function RoadmapPage() {
                 onClick={enterGeorge}
                 className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition hover:opacity-90"
               >
-                Start with GEORGE
+                Start clean
               </button>
 
               <button
@@ -66,7 +66,7 @@ export default function RoadmapPage() {
                 onClick={() => window.location.href = '/george'}
                 className="inline-flex items-center justify-center rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
               >
-                Enter GEORGE Mode
+                Open GEORGE
               </button>
 
               
@@ -76,7 +76,7 @@ export default function RoadmapPage() {
                 onClick={goHelp}
                 className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
               >
-                Learn how to win with GEORGE
+                See how it works
               </button>
             </div>
           </div>
@@ -85,10 +85,10 @@ export default function RoadmapPage() {
         <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-6">
             <div className="max-w-3xl space-y-3">              <h2 className="text-2xl font-semibold tracking-tight text-white">
-                Smart, Intelligent, Brilliant, Professional.
+                Choose the level of pressure GEORGE should carry with you.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Smart gets you moving. Intelligent sharpens continuity. Brilliant unlocks live advantage. Professional is for people whose conversations create revenue, appointments, donations, influence, or measurable outcomes.
+                Start with direction. Upgrade for continuity, sharper execution, live conversation support, and professional performance when words affect outcomes.
               </p>
             </div>
 
@@ -99,10 +99,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/45">Start here</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• See what matters instantly</li>
-                  <li>• Know your next move</li>
-                  <li>• Move without overthinking</li>
-                  <li>• Get unstuck fast</li>
+                  <li>• Find the real issue</li>
+                  <li>• See the next move</li>
+                  <li>• Cut through noise</li>
+                  <li>• Start moving again</li>
                 </ul>              </div>
 
               <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-4">
@@ -111,10 +111,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-[#D7DDFF]">Best value</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Stay on track over time</li>
-                  <li>• Think clearer and move faster</li>
-                  <li>• Improve decisions under pressure</li>
-                  <li>• Turn plans into real progress</li>
+                  <li>• Keep direction over time</li>
+                  <li>• Think cleaner under pressure</li>
+                  <li>• Make better calls</li>
+                  <li>• Turn intent into progress</li>
                 </ul>              </div>
 
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.07)]">
@@ -123,11 +123,11 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/55">Flagship</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-200">
-                  <li>• Know what to say before you say it</li>
-                  <li>• Stay composed under pressure</li>
-                  <li>• Adjust in real time</li>
-                  <li>• Handle conversations with control</li>
-                  <li>• Move forward without hesitation</li>
+                  <li>• Know what to say next</li>
+                  <li>• Stay controlled under pressure</li>
+                  <li>• Adjust while it’s happening</li>
+                  <li>• Handle the moment with control</li>
+                  <li>• Recover faster when the room shifts</li>
                 </ul>              </div>
               <div className="rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 space-y-4 shadow-[0_0_30px_rgba(34,197,94,0.07)]">
                 <div className="space-y-1">
@@ -135,10 +135,10 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/65">Performance tier</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Stay sharp on every call</li>
-                  <li>• Know what to say in real time</li>
-                  <li>• Improve results with every attempt</li>
-                  <li>• Build repeatable performance</li>
+                  <li>• Keep callers sharp</li>
+                  <li>• Give live lines and cues</li>
+                  <li>• Reduce weak repetition</li>
+                  <li>• Build disciplined performance</li>
                 </ul>
               </div>
 
