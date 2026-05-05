@@ -170,7 +170,7 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Intelligent</p>
                   <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
-                    Best value
+                    Most used
                   </span>
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
@@ -193,7 +193,7 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
-                    Full engine
+                    Live advantage
                   </span>
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
@@ -216,7 +216,7 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    ROI
+                    For closers
                   </span>
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
