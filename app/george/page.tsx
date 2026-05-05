@@ -760,7 +760,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setLiveMode(true)
       setConversationMode('manual_live')
 
-        // PRO MODE SUPPORT (initial)
+        // LIVE Pro SUPPORT (initial)
         try {
           window.localStorage.setItem('GEORGE_ACTIVE_MODE', 'live')
         } catch {}
@@ -1452,7 +1452,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
               role: 'assistant',
               content: campaignContext
             },
-            'Campaign Loaded'
+            'LIVE Pro ready'
           )
 
         } catch (e) {
@@ -4873,7 +4873,7 @@ if (liveMode) {
                 setCampaigns((prev) => [newCampaign, ...prev])
                 setActiveCampaignId(newCampaign.id)
 
-                // ENTER PRO MODE
+                // ENTER LIVE Pro
                 enterLiveMode()
                 setConversationMode('pro_live')
                 setActivePromptContext('pro_live')
@@ -4881,7 +4881,7 @@ if (liveMode) {
 
                 const msg: Message = {
                   role: 'assistant',
-                  content: `Campaign loaded.
+                  content: `LIVE Pro ready.
 
 Goal: ${proGoal || 'General'}
 Audience: ${proAudience || 'Unknown'}
@@ -5034,11 +5034,11 @@ Choose one:
         className="w-full max-w-[420px] rounded-[1.4rem] border border-[#22c55e]/30 bg-black px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72)]"
       >
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#22c55e] mb-2">
-          PRO MODE
+          LIVE Pro
         </div>
 
         <div className="text-[13px] text-white/70 mb-3">
-          Structured execution. Campaign-based.
+          Structured professional execution.
         </div>
 
         <button
@@ -5052,7 +5052,7 @@ Choose one:
           }}
           className="w-full mb-2 text-left text-white hover:text-white/80"
         >
-          Start Immediate Campaign
+          Start LIVE Pro
         </button>
 
         <button
@@ -5062,7 +5062,7 @@ Choose one:
           }}
           className="w-full mb-2 text-left text-white hover:text-white/80"
         >
-          Setup Campaign
+          Setup LIVE Pro
         </button>
 
         <button
@@ -5072,7 +5072,7 @@ Choose one:
           }}
           className="w-full text-left text-white hover:text-white/80"
         >
-          Resume Campaign
+          Resume LIVE Pro
         </button>
 
       </div>
@@ -5104,7 +5104,7 @@ Choose one:
       >
         <button
           type="button"
-          aria-label="Close LIVE ASSISTANCE menu"
+          aria-label="Close LIVE Conversation menu"
           onClick={() => setShowProLiveGate(false)}
           className="absolute right-3 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
         >
@@ -5113,10 +5113,10 @@ Choose one:
 
         <div className="mb-2 pr-8">
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">
-            LIVE ASSISTANCE
+            LIVE Conversation
           </div>
           <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
-            Start LIVE assistance
+            Start LIVE Conversation
           </div>
           <div className="mt-1 text-[11px] leading-5 text-neutral-400">
             Speak naturally. I’ll pick up context and guide you in real time.
