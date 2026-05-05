@@ -189,29 +189,6 @@ export default function TopUpPage() {
                 </button>
               </div>
 
-              <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
-                  <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    ROI
-                  </span>
-                </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
-                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Keep every call controlled</li>
-                  <li>• Get live lines and cues</li>
-                  <li>• Recover without losing position</li>
-                  <li>• Reduce weak repetition</li>
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('brilliant')}
-                  className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
-                >
-                  Start using Pro
-                </button>
-              </div>
-
               <div className="rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant</p>
@@ -232,6 +209,29 @@ export default function TopUpPage() {
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
                   Upgrade to Brilliant
+                </button>
+              </div>
+
+              <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
+                  <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
+                    ROI
+                  </span>
+                </div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
+                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
+                  <li>• Keep every call controlled</li>
+                  <li>• Get live lines and cues</li>
+                  <li>• Recover without losing position</li>
+                  <li>• Reduce weak repetition</li>
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => startCheckout('brilliant')}
+                  className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
+                >
+                  Start using Pro
                 </button>
               </div>
             </div>
