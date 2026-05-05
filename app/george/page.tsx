@@ -2105,7 +2105,7 @@ requestAnimationFrame(() => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
             mode: (conversationMode === 'pro_live')
-  ? 'pro'
+  ? 'campaign'
   : liveMode
               ? 'conversation'
               : activeCampaign
@@ -2836,6 +2836,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           liveMode ||
           activePromptContext?.includes('conversation') ||
           activePromptContext?.includes('professional') ||
+          activePromptContext === 'pro_live' ||
           activePromptContext?.includes('brilliant_live')
 
         const res = await fetch('/api/chat', {
