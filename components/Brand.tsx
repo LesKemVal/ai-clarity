@@ -12,8 +12,8 @@ export default function Brand({
   return (
     <div className="flex items-center gap-2">
       <img
-        src="/branding/logo.png"
-        alt="BRANES"
+        src="/logo900.png"
+        alt="BRANESx"
         className="h-9 w-9 rounded-full object-cover shadow-[0_0_18px_rgba(124,140,255,0.35)]"
       />
       {!compact && (
