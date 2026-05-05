@@ -2104,7 +2104,9 @@ requestAnimationFrame(() => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-            mode: liveMode
+            mode: (conversationMode === 'pro_live')
+  ? 'pro'
+  : liveMode
               ? 'conversation'
               : activeCampaign
               ? 'campaign'
