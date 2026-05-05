@@ -3104,7 +3104,8 @@ if (responseTimerRef.current) {
 
           const fire = () => {
             lastCueTsRef.current = Date.now()
-            setPendingAssistantMessage({
+            setPendingAssistantMessage(null);
+setPendingAssistantMessage({
               role: 'assistant',
               content: proactiveCue
             })
@@ -3143,23 +3144,23 @@ if (responseTimerRef.current) {
             const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
             if (personProfile.role === 'doctor') {
-              if (personProfile.posture === 'rushed') return 'Doctor — rushed\nSay: “I’ll be brief. Here are the symptoms, when they started, and what worries me most.”'
-              if (personProfile.posture === 'confused') return 'Doctor — confused\nSay: “Let me restate this clearly so I do not miss anything important.”'
+              if (personProfile.posture === 'rushed') return 'Doctor — rushed\n\nSay: “I’ll be brief. Here are the symptoms, when they started, and what worries me most.”'
+              if (personProfile.posture === 'confused') return 'Doctor — confused\n\nSay: “Let me restate this clearly so I do not miss anything important.”'
               return 'Doctor — Say: “I’ll keep this clear. Here are the symptoms, when they started, and what worries me most.”'
             }
 
             if (personProfile.role === 'lawyer') {
-              if (personProfile.posture === 'pressuring') return 'Lawyer — pressuring\nSay: “I need that explained in plain language before I agree to anything.”'
+              if (personProfile.posture === 'pressuring') return 'Lawyer — pressuring\n\nSay: “I need that explained in plain language before I agree to anything.”'
               return 'Lawyer — Say: “Explain that in plain language before I agree to anything.”'
             }
 
             if (personProfile.role === 'authority') {
-              if (personProfile.posture === 'pressuring') return 'Authority — pressuring\nSay: “I understand. Tell me the exact requirement and the next step.”'
+              if (personProfile.posture === 'pressuring') return 'Authority — pressuring\n\nSay: “I understand. Tell me the exact requirement and the next step.”'
               return 'Authority — Say: “Help me understand the exact requirement and the next step.”'
             }
 
             if (personProfile.role === 'gatekeeper') {
-              if (personProfile.posture === 'rushed') return 'Gatekeeper — rushed\nSay: “I’ll be brief — I only need 20 seconds.”'
+              if (personProfile.posture === 'rushed') return 'Gatekeeper — rushed\n\nSay: “I’ll be brief — I only need 20 seconds.”'
               return 'Gatekeeper — Say: “I only need 20 seconds to see if this belongs on their desk.”'
             }
 
@@ -3208,6 +3209,7 @@ if (responseTimerRef.current) {
             const personProfile = detectConversationPersonProfile(input, liveTranscript)
           const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
+setPendingAssistantMessage(null);
 setPendingAssistantMessage({
               role: 'assistant',
               content: 'Pause. Control the next sentence.'
@@ -3222,7 +3224,8 @@ setPendingAssistantMessage({
           const shouldShowProfileLabel = personProfile.confidence >= 0.55 && personProfile.role !== 'unknown'
           const liveLineOutput = shouldShowProfileLabel ? profileLabel + "\\n" + lineText : lineText
 
-          setPendingAssistantMessage({
+          setPendingAssistantMessage(null);
+setPendingAssistantMessage({
             role: 'assistant',
             content: intent === "line"
               ? profileLabel + "\n" + lineText
@@ -3351,7 +3354,8 @@ responseTimerRef.current = setTimeout(() => {
 
   if (liveMode && strongSignal) {
     stopListening()
-    setPendingAssistantMessage({
+    setPendingAssistantMessage(null);
+setPendingAssistantMessage({
       role: 'assistant',
       content: 'Say: “Let me make this simple…”'
     })
@@ -3372,12 +3376,14 @@ responseTimerRef.current = setTimeout(() => {
     stopListening()
 
     if (score >= 5) {
-      setPendingAssistantMessage({
+      setPendingAssistantMessage(null);
+setPendingAssistantMessage({
         role: 'assistant',
-        content: 'Pause. Take control of the next sentence.\nSay: “Let me clarify the main point.”'
+        content: 'Pause. Take control of the next sentence.\n\nSay: “Let me clarify the main point.”'
       })
     } else {
-      setPendingAssistantMessage({
+      setPendingAssistantMessage(null);
+setPendingAssistantMessage({
         role: 'assistant',
         content: 'Cue: Slow down. Ask one clean question.'
       })
