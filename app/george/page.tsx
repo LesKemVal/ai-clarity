@@ -3105,6 +3105,9 @@ if (responseTimerRef.current) {
         if (proactiveCue) {
           const now = Date.now()
 
+          // prevent repeat cue
+          if (state.lastCue === proactiveCue) return
+
           // 5 second cooldown
           if (now - lastCueTsRef.current < 5000) return
 
@@ -3113,6 +3116,7 @@ if (responseTimerRef.current) {
 
           const fire = () => {
             lastCueTsRef.current = Date.now()
+            state.lastCue = proactiveCue
             setPendingAssistantMessage(null);
 setPendingAssistantMessage(null);
 setPendingAssistantMessage({
