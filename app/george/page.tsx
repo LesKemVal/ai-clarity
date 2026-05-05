@@ -3105,8 +3105,17 @@ if (responseTimerRef.current) {
         if (proactiveCue) {
           const now = Date.now()
 
-          // prevent repeat cue
-          if (state.lastCue === proactiveCue) return
+          // prevent repeat cue by shifting angle instead of going silent
+          const finalProactiveCue =
+            state.lastCue === proactiveCue
+              ? proactiveCue.includes("Slow")
+                ? "Cue: Reset the pace. Ask one clean question."
+                : proactiveCue.includes("dismiss")
+                ? "Cue: Change angle. Make them answer one direct question."
+                : proactiveCue.includes("conceding") || proactiveCue.includes("giving in")
+                ? "Cue: Stop giving ground. Restate your point."
+                : "Cue: New angle. Say less and ask more."
+              : proactiveCue
 
           // 5 second cooldown
           if (now - lastCueTsRef.current < 5000) return
@@ -3116,12 +3125,12 @@ if (responseTimerRef.current) {
 
           const fire = () => {
             lastCueTsRef.current = Date.now()
-            state.lastCue = proactiveCue
+            state.lastCue = finalProactiveCue
             setPendingAssistantMessage(null);
 setPendingAssistantMessage(null);
 setPendingAssistantMessage({
               role: 'assistant',
-              content: proactiveCue
+              content: finalProactiveCue
             })
           }
 
