@@ -370,7 +370,7 @@ return (
             <img
               src="/logo900.png"
               alt="BRANESx"
-              className="h-8 w-auto object-contain"
+              className="h-10 w-[72px] object-contain"
             />
           </div>
 

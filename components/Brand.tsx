@@ -14,7 +14,7 @@ export default function Brand({
       <img
         src="/logo900.png"
         alt="BRANESx"
-        className={compact ? "h-7 w-auto object-contain" : "h-8 w-auto object-contain"}
+        className={compact ? "h-8 w-[52px] object-contain" : "h-10 w-[68px] object-contain"}
       />
       {!compact && (
         <div className="flex flex-col leading-tight">
