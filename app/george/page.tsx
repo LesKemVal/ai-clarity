@@ -5447,7 +5447,7 @@ I’ll stay with you.`
               <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[110px] bg-gradient-to-t from-black to-transparent" />
 
               
-{(isThinking || isSpeaking || bridgeThinking) && (
+{!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[70] flex justify-center pointer-events-none">
     <div className="text-[11px] text-white/40 tracking-[0.18em]">
       {isThinking ? (
