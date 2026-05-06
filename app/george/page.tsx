@@ -4981,22 +4981,6 @@ I will guide you in real time. Start speaking.`
 
 {showSessionPicker && typeof document !== 'undefined' && createPortal(
   <>
-    <style jsx global>{`
-      @keyframes georgePickerGlow {
-        0% {
-          box-shadow: 0 26px 80px rgba(0,0,0,0.72), 0 0 0 rgba(124,140,255,0);
-          border-color: rgba(124,140,255,0.24);
-        }
-        50% {
-          box-shadow: 0 26px 80px rgba(0,0,0,0.72), 0 0 34px rgba(124,140,255,0.55);
-          border-color: rgba(124,140,255,0.82);
-        }
-        100% {
-          box-shadow: 0 26px 80px rgba(0,0,0,0.72), 0 0 14px rgba(124,140,255,0.18);
-          border-color: rgba(124,140,255,0.30);
-        }
-      }
-    `}</style>
     <div
       role="button"
       tabIndex={0}
@@ -5023,7 +5007,6 @@ I will guide you in real time. Start speaking.`
       <div
         onClick={(e) => e.stopPropagation()}
         className={`w-full max-w-[420px] max-h-[420px] overflow-y-auto rounded-[1.4rem] [mask-image:linear-gradient(to_bottom,transparent,black_24px,black_calc(100%-24px),transparent)] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl transition-all duration-150 ease-out ${sessionPickerClosing ? 'translate-y-8 opacity-0 scale-[0.985]' : 'translate-y-0 opacity-100 scale-100'}`}
-        style={{ animation: sessionPickerClosing ? undefined : 'georgePickerGlow 360ms ease-out 0s 3' }}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
@@ -5142,6 +5125,13 @@ Choose one:
 
 {showLiveChooser && typeof document !== 'undefined' && createPortal(
   <>
+    <style jsx global>{`
+      @keyframes georgeCleanTrace {
+        0% { border-color: rgba(124,140,255,0.22); }
+        45% { border-color: rgba(124,140,255,0.9); }
+        100% { border-color: rgba(255,255,255,0.10); }
+      }
+    `}</style>
     <div
       role="button"
       tabIndex={0}
@@ -5179,7 +5169,7 @@ Choose one:
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-4">
+          <div className="rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-4" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
             <div className="text-[12px] font-semibold tracking-[0.14em] text-[#AEB6FF]">
               LIVE Conversation
             </div>
@@ -5240,7 +5230,7 @@ I’ll stay with you.`
             </button>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
             <div className="text-[12px] font-semibold tracking-[0.14em] text-white/80">
               PRO LIVE Campaign
             </div>
