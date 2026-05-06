@@ -140,6 +140,28 @@ export function getSessionsForMode(mode: GeorgeSessionMode) {
   return safeReadSessions().filter((session) => session.mode === mode)
 }
 
+export function updateCampaignSessionMetadata(
+  campaignId: string | null,
+  updater: (metadata: GeorgeStoredSessionMetadata) => GeorgeStoredSessionMetadata
+) {
+  if (!campaignId) return
+
+  const sessions = safeReadSessions()
+
+  const updated = sessions.map((session) => {
+    if (session.mode !== 'campaign') return session
+    if (session.id !== campaignId && session.metadata?.activeCampaignId !== campaignId) return session
+
+    return {
+      ...session,
+      updatedAt: Date.now(),
+      metadata: updater(session.metadata || {}),
+    }
+  })
+
+  safeWriteSessions(updated)
+}
+
 export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
   // --- session intelligence extraction ---
   let userGoal = undefined
