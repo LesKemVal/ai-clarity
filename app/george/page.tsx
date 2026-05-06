@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -831,7 +831,13 @@ if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && exi
 
       const liveIntro: Message = {
         role: 'assistant',
-        content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
+        content: `You don’t need to tell me everything right now.
+
+Start where the pressure is.
+I’ll pick up the room as we go.
+
+If you freeze, stall, lose the word, or need to pivot —
+I’ll help you recover in real time.`
       }
 
       createSession('live', [liveIntro], 'LIVE Assistance')
@@ -4951,7 +4957,7 @@ I will guide you in real time. Start speaking.`
           {(() => {
             let sessions: any[] = []
             try {
-              sessions = getCampaignSessions()
+              sessions = getSessionsForMode('live')
             } catch {
               sessions = []
             }
@@ -5317,7 +5323,7 @@ setMessages([liveIntro])
                     <button
                       type="button"
                       onClick={() => {
-                        requestExitLiveMode()
+                        exitLiveMode()
                       }}
                       className="shrink-0 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-red-200 transition hover:bg-red-500/20"
                     >
