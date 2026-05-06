@@ -1272,27 +1272,26 @@ router.push('/george')
 // save LIVE conversation if meaningful
 if (messagesRef.current.length > 2) {
   try {
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-
-    const newSession = {
-      id: `conversation_${Date.now()}`,
-      type: "conversation",
-      title: "Untitled Conversation",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+    saveSessionToV2({
+      mode: activeCampaignId ? 'campaign' : 'live',
+      title: activeCampaignId ? 'Pro LIVE Campaign' : 'LIVE Conversation',
       messages: messagesRef.current,
-      summary: "Conversation captured from LIVE mode.",
-      personOrRole: "Unknown",
-      setting: "Live interaction",
-      userGoal: "In progress",
-      lastKnownState: "User exited LIVE mode.",
-      suggestedRestart: "Resume by re-engaging naturally."
-    }
-
-    window.localStorage.setItem(
-      'GEORGE_CONVERSATIONS',
-      JSON.stringify([newSession, ...existing].slice(0, 25))
-    )
+      summary: activeCampaignId
+        ? 'Pro LIVE campaign checkpoint.'
+        : 'LIVE Conversation checkpoint.',
+      userGoal: activeCampaign?.desiredOutcome || 'In progress',
+      lastKnownState: 'User exited LIVE mode.',
+      suggestedRestart: activeCampaignId
+        ? 'Resume this Pro LIVE Campaign from the strongest operational next move.'
+        : 'Resume this LIVE Conversation naturally.',
+      metadata: {
+        activeCampaignId: activeCampaignId || null,
+        campaignName: activeCampaign?.name || null,
+        productOrService: activeCampaign?.productOrService || null,
+        targetAudience: activeCampaign?.targetMarket || null,
+        desiredOutcome: activeCampaign?.desiredOutcome || null,
+      },
+    })
   } catch {}
 }
 
@@ -2188,14 +2187,7 @@ requestAnimationFrame(() => {
       messagesRef.current = next
 
       try {
-        const activeId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
-        if (activeId) {
-          const all = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-          const updated = all.map((c: any) =>
-            c.id === activeId ? { ...c, messages: next, updatedAt: Date.now() } : c
-          )
-          window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(updated))
-        }
+        updateActiveSessionMessages(next, activeCampaignId ? 'campaign' : liveMode ? 'live' : 'normal')
       } catch {}
       return next
     })
