@@ -3535,11 +3535,11 @@ setPendingAssistantMessage({
               ? 'Voice is on.'
               : 'Voice is off.'
 
-  const showConversation = messages.length > 0 || isThinking
+  const showConversation = input.trim().length > 0 || messages.some((m) => m.role === 'user') || liveMode
   const showMobileHero = !showConversation
 
 {showMobileHero && (
-  <div className="flex flex-col items-center justify-center text-center pt-28 pb-10">
+  <div className="flex flex-col items-center justify-center text-center pt-20 pb-6 md:pt-28 md:pb-10">
 
     <div className="text-[32px] font-semibold tracking-[0.25em] text-white">
       GEORGE
@@ -3799,7 +3799,7 @@ return (
     userPinnedBottomRef.current = nearBottom
     setShowScrollHint(!nearBottom)
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[320px] space-y-5 ${showMobileHero ? "pt-5 md:pt-14" : "pt-1 md:pt-4"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[520px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-16 md:pt-10" : showMobileHero ? "pt-10 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-6 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
@@ -3810,7 +3810,7 @@ return (
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-3 flex items-center justify-center gap-[3px] px-5 py-4">
+      <div className="mt-1 flex items-center justify-center gap-[3px] px-5 py-1">
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
@@ -5007,7 +5007,7 @@ I will guide you in real time. Start speaking.`
         </div>
 
         <div className="text-[15px] font-semibold text-white">
-          {activeCampaignId ? 'Exit Pro LIVE Campaign?' : 'Exit LIVE Conversation?'}
+          Exit
         </div>
 
         <div className="mt-2 text-[12px] leading-5 text-white/50">
@@ -5295,7 +5295,7 @@ Choose one:
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[120px] left-0 right-0 z-[72] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-visible rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+                <div className="fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-visible rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-1 text-white/80 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
@@ -5579,7 +5579,7 @@ I’ll stay with you.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[48px]' : 'fixed top-[42%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
