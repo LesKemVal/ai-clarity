@@ -136,6 +136,30 @@ export function upsertSession(session: GeorgeStoredSession) {
   safeWriteSessions(sessions)
 }
 
+
+export function deleteSession(sessionId: string) {
+  if (typeof window === 'undefined') return
+
+  const sessions = safeReadSessions().filter((session) => session.id !== sessionId)
+  safeWriteSessions(sessions)
+
+  if (window.localStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  }
+
+  if (window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  }
+
+  if (window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+  }
+
+  if (window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+  }
+}
+
 export function getSessionsForMode(mode: GeorgeSessionMode) {
   return safeReadSessions().filter((session) => session.mode === mode)
 }
