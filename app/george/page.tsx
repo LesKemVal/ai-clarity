@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -4949,10 +4949,9 @@ I will guide you in real time. Start speaking.`
 
         <div className="space-y-2">
           {(() => {
-            let sessions = []
+            let sessions: any[] = []
             try {
-              sessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-              if (!Array.isArray(sessions)) sessions = []
+              sessions = getCampaignSessions()
             } catch {
               sessions = []
             }
