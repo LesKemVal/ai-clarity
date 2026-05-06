@@ -320,7 +320,10 @@ function TypewriterText({
       }
     }, speed)
 
-    return () => clearInterval(interval)
+    
+
+
+return () => clearInterval(interval)
   }, [text, speed])
 
   return <>{display}</>
@@ -728,7 +731,10 @@ useEffect(() => {
 
   syncSidebar()
   window.addEventListener('resize', syncSidebar)
-  return () => window.removeEventListener('resize', syncSidebar)
+  
+
+
+return () => window.removeEventListener('resize', syncSidebar)
 }, [])
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
 const [savePopupUpward, setSavePopupUpward] = useState(true)
@@ -849,7 +855,18 @@ const scoreFriction = (text: string) => {
 const detectFriction = (text: string) => {
   const lower = text.toLowerCase()
 
-  return (
+  
+
+
+
+// === CLEAN MODE FLAGS (UI CONTROL) ===
+const isProLive = activePromptContext === 'pro_live' || conversationMode === 'pro_live'
+const isLiveConversation =
+  liveMode &&
+  !isProLive &&
+  (activePromptContext?.includes('conversation') || activePromptContext === 'manual_live')
+
+return (
     lower.includes("that won’t work") ||
     lower.includes("that wont work") ||
     lower.includes("i’m not sure") ||
@@ -953,7 +970,10 @@ const georgeProfile = detectConversationProfile(input, interimTranscript)
       })
     }, adaptiveDelay)
 
-    return () => window.clearTimeout(timer)
+    
+
+
+return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [attemptStartTime, setAttemptStartTime] = useState<number | null>(null)
 const [showOutcomeBar, setShowOutcomeBar] = useState(false)
@@ -972,7 +992,10 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
       setUpgradeCtaWord((word) => (word === 'Intelligent' ? 'Brilliant' : 'Intelligent'))
     }, 2600)
 
-    return () => window.clearInterval(timer)
+    
+
+
+return () => window.clearInterval(timer)
   }, [currentTier])
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
   const [draftProfileName, setDraftProfileName] = useState('')
@@ -1160,7 +1183,10 @@ function getMessagesSignature(items: Message[]) {
       }
     }, 12)
 
-    return () => clearInterval(interval)
+    
+
+
+return () => clearInterval(interval)
   }, [messages])
 
   
@@ -1466,7 +1492,10 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     window.addEventListener('focus', activatePendingIntake)
     document.addEventListener('visibilitychange', activatePendingIntake)
 
-    return () => {
+    
+
+
+return () => {
       window.removeEventListener('focus', activatePendingIntake)
       document.removeEventListener('visibilitychange', activatePendingIntake)
     }
@@ -1490,7 +1519,10 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     window.addEventListener('scroll', checkScroll)
     window.addEventListener('resize', checkScroll)
 
-    return () => {
+    
+
+
+return () => {
       window.removeEventListener('scroll', checkScroll)
       window.removeEventListener('resize', checkScroll)
     }
@@ -1679,7 +1711,10 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     const timer = setTimeout(() => {
       setShowToast(false)
     }, 1600)
-    return () => clearTimeout(timer)
+    
+
+
+return () => clearTimeout(timer)
   }, [showToast])
 
   useEffect(() => {
@@ -1696,7 +1731,10 @@ requestAnimationFrame(() => {
     const interval = setInterval(() => {
       setThinkingDots((d) => (d % 3) + 1)
     }, 400)
-    return () => clearInterval(interval)
+    
+
+
+return () => clearInterval(interval)
   }, [isThinking])
 
 
@@ -1711,7 +1749,10 @@ requestAnimationFrame(() => {
       }
     }, 1000)
 
-    return () => clearInterval(interval)
+    
+
+
+return () => clearInterval(interval)
   }, [windowEndsAt])
 
 
@@ -1755,7 +1796,10 @@ requestAnimationFrame(() => {
     window.addEventListener('touchstart', handlePointerDown)
     window.addEventListener('keydown', handleKeyDown)
 
-    return () => {
+    
+
+
+return () => {
       window.removeEventListener('mousedown', handlePointerDown)
       window.removeEventListener('touchstart', handlePointerDown)
       window.removeEventListener('keydown', handleKeyDown)
@@ -1793,7 +1837,10 @@ requestAnimationFrame(() => {
 
     window.addEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
 
-    return () => {
+    
+
+
+return () => {
       window.removeEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
     }
   }, [])
@@ -3472,7 +3519,10 @@ setPendingAssistantMessage({
 
     recognitionRef.current = recognition
 
-    return () => {
+    
+
+
+return () => {
       recognition.stop?.()
       recognitionRef.current = null
     }
@@ -3520,6 +3570,9 @@ setPendingAssistantMessage({
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [showConversation])
+
+
+
 
 
 return (
@@ -3789,7 +3842,10 @@ return (
     const isLatestAssistant = m.role === 'assistant' && i === latestAssistantIndex
     const isWelcomeAssistant = m.role === 'assistant' && i === firstAssistantIndex
 
-    return (
+    
+
+
+return (
     <div
       key={i}
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -4588,7 +4644,10 @@ if (liveMode) {
             {getExistingFolders().length > 0 ? (
               <div className="space-y-3">
                 {getExistingFolders().map((folder) => {
-                  return (
+                  
+
+
+return (
                     <button
                       key={folder}
                       type="button"
@@ -4636,7 +4695,10 @@ if (liveMode) {
 
                     const isLatest = idx === 0
 
-                    return (
+                    
+
+
+return (
                       <button
                         key={idx}
                         type="button"
@@ -4946,7 +5008,10 @@ Proceed when ready.`
             }
 
             if (!sessions.length) {
-              return (
+              
+
+
+return (
                 <div className="rounded-xl border border-white/10 bg-white/[0.025] p-2 text-[12px] text-white/65">
                   No saved conversations yet.
                 </div>
