@@ -3713,7 +3713,7 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
-          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-visible px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+          <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-1.5 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-1.5.5 xl:hidden">
@@ -3799,7 +3799,7 @@ return (
     userPinnedBottomRef.current = nearBottom
     setShowScrollHint(!nearBottom)
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[520px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-16 md:pt-10" : showMobileHero ? "pt-10 md:pt-14" : "pt-1 md:pt-4"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[260px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-16 md:pt-10" : showMobileHero ? "pt-10 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-6 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
@@ -4539,7 +4539,7 @@ router.push('/george')
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`fixed bottom-[120px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-[calc(100%-24px)] max-w-[900px] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl`}>
+              <div className={`fixed bottom-[120px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl`}>
 
   <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
 
