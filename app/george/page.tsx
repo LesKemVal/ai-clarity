@@ -5265,24 +5265,7 @@ setMessages([liveIntro])
   </span>
 )}
 
-<button
-  type="button"
-  onClick={() => {
-    const liveIntro: Message = {
-      role: 'assistant',
-      content: "I’m listening. Keep it short. Tell me what is happening right now, and I’ll give you the next move."
-    }
 
-    createSession('live', [liveIntro], 'LIVE Assistance')
-    setMessages([liveIntro])
-    messagesRef.current = [liveIntro]
-    setToastMessage('New LIVE session started.')
-    setShowToast(true)
-  }}
-  className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
->
-  New
-</button>
 
                     <button
                       type="button"
@@ -5293,6 +5276,17 @@ setMessages([liveIntro])
                       aria-label="Open campaign picker"
                     >
                       Conversation
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowProLiveGate(true)
+                      }}
+                      className="shrink-0 rounded-md border border-[#7C8CFF]/35 bg-white/[0.025] px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-white/80 transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/10 hover:text-white"
+                      aria-label="Open Pro LIVE"
+                    >
+                      🎧 PRO
                     </button>
 
                     <button
@@ -5408,32 +5402,7 @@ setMessages([liveIntro])
                       Objections
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        stopListening()
-                        userPinnedBottomRef.current = true
-                        exitLiveMode()
-                        setVoiceOn(false)
-
-                        requestAnimationFrame(() => {
-                          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
-                        })
-                        setInteractionMode('text')
-                        setActivePromptContext(null)
-                        setActivePromptLabel(null)
-                        setConversationMode(null)
-router.push('/george')
-                        window.localStorage.removeItem('george_active_context')
-                        window.localStorage.removeItem('george_active_label')
-                        window.localStorage.setItem('george_voice', 'off')
-                        setToastMessage('Returned to normal GEORGE.')
-                        setShowToast(true)
-                      }}
-                      className="shrink-0 rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-white/72 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
-                    >
-                      Exit
-                    </button>
+                    
                   </div>
                 </div>
               )}
