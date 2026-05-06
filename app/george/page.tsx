@@ -714,6 +714,10 @@ const [isListening, setIsListening] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
 
+  const [showExitPopup, setShowExitPopup] = useState(false)
+  const [showSaveNaming, setShowSaveNaming] = useState(false)
+  const [pendingSessionTitle, setPendingSessionTitle] = useState('')
+
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
 
@@ -1190,6 +1194,10 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     preLiveSessionIdRef.current = getActiveSessionIdForMode('normal')
 setPreLiveMessages([...messagesRef.current])
     setLiveMode(true)
+  }
+
+  const requestExitLiveMode = () => {
+    setShowExitPopup(true)
   }
 
   const exitLiveMode = () => {
@@ -5193,7 +5201,9 @@ setMessages([liveIntro])
 {liveMode && (
                 <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
                   <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
-                    <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">LIVE</span>
+                    <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">
+                      {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
+                    </span>
 
 <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
@@ -5256,6 +5266,16 @@ setMessages([liveIntro])
                       }`}
                     >
                       Text
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        requestExitLiveMode()
+                      }}
+                      className="shrink-0 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-red-200 transition hover:bg-red-500/20"
+                    >
+                      EXIT
                     </button>
 
                     <button
