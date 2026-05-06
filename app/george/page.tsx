@@ -1344,7 +1344,7 @@ setMessages([openingMessage])
 
       window.localStorage.removeItem('george_intake_pending')
 
-      enterLiveMode()
+      router.push('/george/live')
 setAttemptStartTime(Date.now())
       setConversationMode('professional_intake')
       setActivePromptContext('professional_intake')
@@ -4924,7 +4924,7 @@ I will guide you in real time. Start speaking.`
                 key={session.id}
                 onClick={() => {
                   setShowSessionPicker(false)
-                  enterLiveMode()
+                  router.push('/george/live')
                   setConversationMode('manual_live')
                   setActivePromptContext('manual_live')
                   setActivePromptLabel(session.title || 'Conversation')
@@ -5033,7 +5033,7 @@ Choose one:
             setShowProLiveGate(false)
 
             // Save normal GEORGE state BEFORE replacing messages with LIVE intro.
-            enterLiveMode()
+            router.push('/george/live')
 
             const liveIntro: Message = {
               role: 'assistant',
