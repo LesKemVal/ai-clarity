@@ -5006,13 +5006,20 @@ I will guide you in real time. Start speaking.`
     <div className="fixed inset-0 z-[210] flex items-center justify-center px-4">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-[420px] max-h-[420px] overflow-y-auto rounded-[1.4rem] [mask-image:linear-gradient(to_bottom,transparent,black_24px,black_calc(100%-24px),transparent)] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-3 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl transition-all duration-150 ease-out ${sessionPickerClosing ? 'translate-y-8 opacity-0 scale-[0.985]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[420px] max-h-[72dvh] overflow-y-auto rounded-[1.4rem] border ${sessionPickerMode === 'campaign' ? 'border-white/15' : 'border-[#7C8CFF]/30'} bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_22px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-150 ease-out ${sessionPickerClosing ? 'translate-y-8 opacity-0 scale-[0.985]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
-          <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
-            {sessionPickerMode === 'campaign' ? 'RESUME CAMPAIGN' : 'RESUME CONVERSATION'}
+          <div className="pr-12">
+            <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
+              {sessionPickerMode === 'campaign' ? 'RESUME CAMPAIGN' : 'RESUME CONVERSATION'}
+            </div>
+            <div className="mt-1 text-[11px] text-white/45">
+              {sessionPickerMode === 'campaign' ? 'Structured Pro LIVE campaign memory.' : 'Immediate LIVE Conversation memory.'}
+            </div>
           </div>
           <button
+            type="button"
+            aria-label="Close resume picker"
             onClick={() => {
               setSessionPickerClosing(true)
               window.setTimeout(() => {
@@ -5020,7 +5027,7 @@ I will guide you in real time. Start speaking.`
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="text-white/60 hover:text-white text-sm"
+            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#7C8CFF]/50 hover:text-white"
           >
             ×
           </button>
@@ -5488,9 +5495,16 @@ setMessages([liveIntro])
 {liveMode && (
                 <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
                   <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
-                    <span className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowLiveChooser(true)
+                      }}
+                      className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)] transition hover:bg-[#7C8CFF]/20"
+                      aria-label="Open LIVE chooser"
+                    >
                       {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
-                    </span>
+                    </button>
 
 <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
