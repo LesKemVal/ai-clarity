@@ -4588,6 +4588,7 @@ router.push('/george')
       </button>
 
       {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
+        <>
         <button
           type="button"
           onClick={() => {
@@ -4616,6 +4617,67 @@ if (liveMode) {
         >
           LIVE
         </button>
+
+        {showLiveQuickMenu && !liveMode && (
+          <>
+            <button
+              type="button"
+              aria-label="Close LIVE quick menu"
+              onClick={() => setShowLiveQuickMenu(false)}
+              className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
+            />
+
+            <div className="absolute bottom-[58px] left-0 z-[95] w-[220px] rounded-[1rem] border border-[#7C8CFF]/18 bg-black/92 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveQuickMenu(false)
+
+                  const liveIntro: Message = {
+                    role: 'assistant',
+                    content: `What are we doing?
+
+You don’t have to tell me everything right now.
+Start where the pressure is.`
+                  }
+
+                  router.push('/george/live')
+
+                  createSession('live', [liveIntro], 'LIVE Assistance')
+                  liveSessionWriteReadyRef.current = true
+                  setMessages([liveIntro])
+                  messagesRef.current = [liveIntro]
+
+                  setConversationMode('manual_live')
+                  setActivePromptContext('manual_live')
+                  setActivePromptLabel('Conversation')
+
+                  setVoiceOn(true)
+                  setInteractionMode('speech')
+
+                  setTimeout(() => startListening(), 120)
+                }}
+                className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/80 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+              >
+                Start Conversation
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveQuickMenu(false)
+                  setSessionPickerClosing(false)
+                  setSessionPickerMode('live')
+                  setShowSessionPicker(true)
+                }}
+                className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/52 transition hover:bg-white/[0.05] hover:text-white/78"
+              >
+                Resume Conversation
+              </button>
+            </div>
+          </>
+        )}
+        </>
       )}
 
 
