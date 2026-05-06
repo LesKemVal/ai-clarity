@@ -762,6 +762,7 @@ const [isListening, setIsListening] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showProLiveGate, setShowProLiveGate] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
+  const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
 
   const [showExitPopup, setShowExitPopup] = useState(false)
@@ -4922,6 +4923,60 @@ I will guide you in real time. Start speaking.`
 
 
 
+{showExitPopup && typeof document !== 'undefined' && createPortal(
+  <>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => setShowExitPopup(false)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+          setShowExitPopup(false)
+        }
+      }}
+      className="fixed inset-0 z-[220] bg-black/50 backdrop-blur-[18px]"
+    />
+
+    <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
+      <div className="w-full max-w-[420px] rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,18,22,0.98),rgba(5,5,8,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl">
+        <div className="mb-2 text-[11px] tracking-[0.22em] text-[#7C8CFF]">
+          {activeCampaignId ? 'LEAVE PRO LIVE' : 'LEAVE LIVE'}
+        </div>
+
+        <div className="text-[15px] font-semibold text-white">
+          {activeCampaignId ? 'Exit Pro LIVE Campaign?' : 'Exit LIVE Conversation?'}
+        </div>
+
+        <div className="mt-2 text-[12px] leading-5 text-white/50">
+          GEORGE will return you to normal mode and preserve the session through V2 continuity.
+        </div>
+
+        <div className="mt-5 space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              setShowExitPopup(false)
+              exitLiveMode()
+            }}
+            className="w-full rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-[#7C8CFF]/20"
+          >
+            Save and exit
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowExitPopup(false)}
+            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm font-medium text-white/80 transition hover:bg-white/[0.07]"
+          >
+            Continue session
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
+
 {showSessionPicker && typeof document !== 'undefined' && createPortal(
   <>
     <div
@@ -4943,7 +4998,7 @@ I will guide you in real time. Start speaking.`
       >
         <div className="flex items-center justify-between mb-2">
           <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
-            RESUME CONVERSATION
+            {sessionPickerMode === 'campaign' ? 'RESUME CAMPAIGN' : 'RESUME CONVERSATION'}
           </div>
           <button
             onClick={() => setShowSessionPicker(false)}
@@ -4957,7 +5012,9 @@ I will guide you in real time. Start speaking.`
           {(() => {
             let sessions: any[] = []
             try {
-              sessions = getSessionsForMode('live')
+              sessions = sessionPickerMode === 'campaign'
+                ? getCampaignSessions()
+                : getSessionsForMode('live')
             } catch {
               sessions = []
             }
@@ -4965,7 +5022,7 @@ I will guide you in real time. Start speaking.`
             if (!sessions.length) {
               return (
                 <div className="rounded-xl border border-white/10 bg-white/[0.025] p-2 text-[12px] text-white/65">
-                  No saved conversations yet.
+                  {sessionPickerMode === 'campaign' ? 'No saved campaigns yet.' : 'No saved conversations yet.'}
                 </div>
               )
             }
@@ -4976,9 +5033,16 @@ I will guide you in real time. Start speaking.`
                 onClick={() => {
                   setShowSessionPicker(false)
                   router.push('/george/live')
-                  setConversationMode('manual_live')
-                  setActivePromptContext('manual_live')
-                  setActivePromptLabel(session.title || 'Conversation')
+                  if (sessionPickerMode === 'campaign') {
+                    setActiveCampaignId(typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id)
+                    setConversationMode('professional_live')
+                    setActivePromptContext('professional_live')
+                    setActivePromptLabel(session.title || 'Pro LIVE Campaign')
+                  } else {
+                    setConversationMode('manual_live')
+                    setActivePromptContext('manual_live')
+                    setActivePromptLabel(session.title || 'Conversation')
+                  }
 
                   const goal = session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'
                   const state = session.lastKnownState || session.summary || 'Unknown'
@@ -5135,6 +5199,7 @@ setMessages([liveIntro])
         <button
           onClick={() => {
             setShowProLiveGate(false)
+            setSessionPickerMode('campaign')
             setShowSessionPicker(true)
           }}
           className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
@@ -5276,10 +5341,11 @@ setMessages([liveIntro])
                     <button
                       type="button"
                       onClick={() => {
+                        setSessionPickerMode('live')
                         setShowSessionPicker(true)
                       }}
                       className="shrink-0 rounded-md border border-[#7C8CFF]/50 bg-[#7C8CFF]/10 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.35)] transition hover:bg-[#7C8CFF]/20 hover:text-white"
-                      aria-label="Open campaign picker"
+                      aria-label="Open LIVE conversation picker"
                     >
                       Conversation
                     </button>
@@ -5323,7 +5389,7 @@ setMessages([liveIntro])
                     <button
                       type="button"
                       onClick={() => {
-                        exitLiveMode()
+                        requestExitLiveMode()
                       }}
                       className="shrink-0 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-red-200 transition hover:bg-red-500/20"
                     >
