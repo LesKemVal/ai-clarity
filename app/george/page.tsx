@@ -1300,22 +1300,17 @@ setPreLiveMessages(null)
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
       try {
-        const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-        existing.unshift({
-          id: `conversation_${Date.now()}`,
-          type: "conversation",
+        saveSessionToV2({
+          mode: liveMode ? 'live' : 'normal',
           title: sessionLabel,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
           messages: messagesRef.current,
-          summary: "Conversation saved from LIVE mode.",
-          personOrRole: "Unknown",
-          setting: "General",
-          userGoal: "Not set",
-          lastKnownState: "Saved after user interaction.",
-          suggestedRestart: "Pick up naturally and clarify what changed."
+          summary: liveMode ? 'LIVE Conversation saved before starting a new session.' : 'Normal GEORGE session saved before starting a new session.',
+          userGoal: activePromptLabel || 'Not set',
+          lastKnownState: 'Saved after user interaction.',
+          suggestedRestart: liveMode
+            ? 'Resume this LIVE Conversation naturally.'
+            : 'Resume this Normal GEORGE session from the clearest next step.',
         })
-        window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(existing.slice(0, 25)))
       } catch {}
     }
 
