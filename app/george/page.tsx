@@ -5,6 +5,7 @@ import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
+import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -5128,77 +5129,16 @@ Choose one:
   document.body
 )}
 
-{showLiveChooser && typeof document !== 'undefined' && createPortal(
-  <>
-    <style jsx global>{`
-      @keyframes georgeCleanTrace {
-        0% { border-color: rgba(124,140,255,0.22); }
-        45% { border-color: rgba(124,140,255,0.9); }
-        100% { border-color: rgba(255,255,255,0.10); }
-      }
-    `}</style>
-    <div
-      role="button"
-      tabIndex={0}
-      aria-label="Close LIVE chooser"
-      onClick={() => setShowLiveChooser(false)}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-          setShowLiveChooser(false)
-        }
-      }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px] backdrop-saturate-150"
-    />
+<LiveChooser
+  open={showLiveChooser}
+  onClose={() => setShowLiveChooser(false)}
+  onStartLiveConversation={() => {
+    setShowLiveChooser(false)
+    router.push('/george/live')
 
-    <div className="pointer-events-none fixed left-0 right-0 top-5 z-[215] flex justify-center">
-      <img
-        src="/logo900.png"
-        alt="BRANESx"
-        className="h-10 w-auto object-contain opacity-70 drop-shadow-[0_0_18px_rgba(124,140,255,0.18)]"
-      />
-    </div>
-
-    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4">
-      <div className="pointer-events-auto relative w-full max-w-[760px] rounded-[1.5rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl">
-        <button
-          type="button"
-          aria-label="Close LIVE chooser"
-          onClick={() => setShowLiveChooser(false)}
-          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white transition hover:border-[#7C8CFF]"
-        >
-          ×
-        </button>
-
-        <div className="pr-10">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
-            LIVE
-          </div>
-          <div className="mt-2 text-[16px] font-semibold text-white">
-            Choose the kind of live help.
-          </div>
-          <div className="mt-2 text-[12px] leading-5 text-white/50">
-            LIVE Conversation is immediate and adaptive. Pro LIVE Campaign is structured, named, and campaign-aware.
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          <div className="rounded-[1.8rem] bg-[#7C8CFF]/[0.045] p-5" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
-            <div className="text-[12px] font-semibold tracking-[0.14em] text-[#AEB6FF]">
-              LIVE Conversation
-            </div>
-            <div className="mt-2 text-[12px] leading-5 text-white/55">
-              For personal conversations, pressure moments, doctors, lawyers, negotiations, interviews, or real-time wording help.
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowLiveChooser(false)
-                router.push('/george/live')
-
-                const liveIntro: Message = {
-                  role: 'assistant',
-                  content: `I’m listening.
+    const liveIntro: Message = {
+      role: 'assistant',
+      content: `I’m listening.
 
 You don’t have to explain everything up front.
 As you speak, I’ll pick up the room.
@@ -5211,77 +5151,37 @@ If you need help, say things like:
 “help me here”
 
 I’ll stay with you.`
-                }
+    }
 
-                createSession('live', [liveIntro], 'LIVE Assistance')
-                liveSessionWriteReadyRef.current = true
-                setMessages([liveIntro])
-                messagesRef.current = [liveIntro]
-                setConversationMode('manual_live')
-                setActivePromptContext('manual_live')
-                setActivePromptLabel('Conversation')
-                setVoiceOn(true)
-                setInteractionMode('speech')
-                setTimeout(() => startListening(), 120)
-              }}
-              className="mt-4 w-full rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-[#7C8CFF]/20"
-            >
-              Start LIVE Conversation
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowLiveChooser(false)
-                setSessionPickerClosing(false)
-                setSessionPickerMode('live')
-                setShowSessionPicker(true)
-              }}
-              className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-white/80 transition hover:bg-white/[0.06]"
-            >
-              Resume LIVE Conversation
-            </button>
-          </div>
-
-          <div className="rounded-[1.8rem] bg-white/[0.025] p-5" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
-            <div className="text-[12px] font-semibold tracking-[0.14em] text-white/80">
-              PRO LIVE Campaign
-            </div>
-            <div className="mt-2 text-[12px] leading-5 text-white/50">
-              For structured professional calls, campaigns, scripts, objections, outcomes, data capture, and repeatable workflows.
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowLiveChooser(false)
-                localStorage.setItem('george_intake_pending', 'campaign')
-                window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
-              }}
-              className="mt-4 w-full rounded-xl border border-[#7C8CFF]/25 bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-[#7C8CFF]/10"
-            >
-              Start Campaign
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowLiveChooser(false)
-                setSessionPickerClosing(false)
-                setSessionPickerMode('campaign')
-                setShowSessionPicker(true)
-              }}
-              className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3 text-left text-sm font-medium text-white/80 transition hover:bg-white/[0.06]"
-            >
-              Resume Campaign
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </>,
-  document.body
-)}
+    createSession('live', [liveIntro], 'LIVE Assistance')
+    liveSessionWriteReadyRef.current = true
+    setMessages([liveIntro])
+    messagesRef.current = [liveIntro]
+    setConversationMode('manual_live')
+    setActivePromptContext('manual_live')
+    setActivePromptLabel('Conversation')
+    setVoiceOn(true)
+    setInteractionMode('speech')
+    setTimeout(() => startListening(), 120)
+  }}
+  onResumeLiveConversation={() => {
+    setShowLiveChooser(false)
+    setSessionPickerClosing(false)
+    setSessionPickerMode('live')
+    setShowSessionPicker(true)
+  }}
+  onStartCampaign={() => {
+    setShowLiveChooser(false)
+    localStorage.setItem('george_intake_pending', 'campaign')
+    window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+  }}
+  onResumeCampaign={() => {
+    setShowLiveChooser(false)
+    setSessionPickerClosing(false)
+    setSessionPickerMode('campaign')
+    setShowSessionPicker(true)
+  }}
+/>
 
     </div>
   </div>
