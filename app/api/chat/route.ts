@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { NextResponse } from 'next/server'
 import { getGeorgeModeBlock, type GeorgeMode } from '@/lib/george/behavior/mode'
+import { getGeorgeIdentityRuntime } from '@/lib/george/identity/runtime'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -456,6 +457,8 @@ const SYSTEM_PROMPT = (
   tier: 'smart' | 'intelligent' | 'brilliant'
 ) => `
 You are GEORGE.
+
+${getGeorgeIdentityRuntime()}
 
 ${isFirstSession ? 'This is the first interaction. Do not introduce GEORGE or explain the system unless asked. Respond with presence, brevity, and control.' : ''}
 
