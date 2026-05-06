@@ -5063,13 +5063,13 @@ Choose one:
 
         <div className="mb-2 pr-8">
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">
-            LIVE ASSISTANCE
+            PRO LIVE
           </div>
           <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
-            Start LIVE assistance
+            Start Pro LIVE
           </div>
           <div className="mt-1 text-[11px] leading-5 text-neutral-400">
-            Speak naturally. I’ll pick up context and guide you in real time.
+            Resume a campaign, start a structured campaign, or enter manual live support.
           </div>
         </div>
 
@@ -5112,7 +5112,7 @@ setMessages([liveIntro])
           }}
           className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 shadow-[0_0_20px_rgba(124,140,255,0.25)] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/[0.06]"
         >
-          Start
+          Manual LIVE
         </button>
 
         <button
@@ -5123,7 +5123,7 @@ setMessages([liveIntro])
           }}
           className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
-          Setup
+          Start New Campaign
         </button>
 
         <button
@@ -5133,7 +5133,7 @@ setMessages([liveIntro])
           }}
           className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
         >
-          Sessions
+          Resume Campaign
         </button>
 
       </div>
