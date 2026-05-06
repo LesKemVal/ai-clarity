@@ -1495,8 +1495,29 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
             }
           }
 
-          const existingSessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-          window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify([newCampaign, ...(Array.isArray(existingSessions) ? existingSessions : [])].slice(0, 25)))
+          saveSessionToV2({
+            id: newCampaign.id,
+            mode: 'campaign',
+            title: newCampaign.label || 'Pro LIVE Campaign',
+            messages: [
+              {
+                role: 'assistant',
+                content: campaignContext,
+              },
+            ],
+            summary: 'Pro LIVE campaign created from setup.',
+            userGoal: newCampaign.intelligence?.campaignGoal || 'Campaign execution',
+            lastKnownState: 'Campaign context loaded.',
+            suggestedRestart: 'Resume this Pro LIVE Campaign and continue from the strongest operational next move.',
+            metadata: {
+              activeCampaignId: newCampaign.id,
+              campaignName: newCampaign.label,
+              productOrService: newCampaign.intelligence?.productOrService,
+              targetAudience: newCampaign.intelligence?.targetAudience,
+              desiredOutcome: newCampaign.intelligence?.campaignGoal,
+              campaignContext,
+            },
+          })
 
           startNewGeorgeSession(
             {
