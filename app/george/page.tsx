@@ -4604,7 +4604,7 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setShowProLiveGate(true)
+  setShowLiveChooser(true)
   setShowCampaignMenu(false)
   setShowRecentFolders(false)
 }
