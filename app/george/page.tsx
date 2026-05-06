@@ -5286,7 +5286,7 @@ I’ll stay with you.`
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.8rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+                <div className="fixed bottom-[120px] left-0 right-0 z-[72] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
