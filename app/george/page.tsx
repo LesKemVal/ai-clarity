@@ -1592,7 +1592,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (typeof window === 'undefined') return []
 
     try {
-      return JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]') || []
+      return getCampaignSessions()
     } catch {
       return []
     }
@@ -3301,7 +3301,7 @@ setPendingAssistantMessage({
         }
         const lower = liveTranscript.toLowerCase()
 
-        const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+        const existing = getCampaignSessions()
 
         const updated = existing.map((c: any) => {
           if (c.id !== activeCampaignId) return c
@@ -5182,7 +5182,7 @@ setMessages([liveIntro])
             history.unshift({ signal, context: lastOutcomeContext, ts: Date.now() })
             window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0,50)))
 
-            const sessions = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
+            const sessions = getCampaignSessions()
             const updatedSessions = Array.isArray(sessions)
               ? sessions.map((session: any) => {
                   if (activeCampaignId && session.id !== activeCampaignId) return session
