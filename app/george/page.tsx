@@ -3639,15 +3639,16 @@ return (
           }}
           onNewSession={() => {
             try {
-              const existing = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
               if (messagesRef.current.length > 1) {
-                existing.unshift({
-                  id: Date.now(),
-                  type: "campaign",
-                  createdAt: new Date().toISOString(),
-                  messages: messagesRef.current
+                saveSessionToV2({
+                  mode: 'normal',
+                  title: activePromptLabel || 'Normal GEORGE Session',
+                  messages: messagesRef.current,
+                  summary: 'Normal GEORGE session checkpoint.',
+                  userGoal: activePromptLabel || 'Not set',
+                  lastKnownState: 'Saved before starting a new Normal session.',
+                  suggestedRestart: 'Resume this Normal GEORGE session and continue from the clearest next step.',
                 })
-                window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(existing.slice(0, 25)))
               }
             } catch {}
 
