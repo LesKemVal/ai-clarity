@@ -3535,7 +3535,7 @@ setPendingAssistantMessage({
               ? 'Voice is on.'
               : 'Voice is off.'
 
-  const showConversation = messages.length > 1 || isThinking
+  const showConversation = messages.length > 0 || isThinking
   const showMobileHero = !showConversation
 
 {showMobileHero && (
