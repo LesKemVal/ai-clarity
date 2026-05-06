@@ -5,7 +5,6 @@ import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
-import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -761,7 +760,6 @@ const [isListening, setIsListening] = useState(false)
   const [birthdayMD, setBirthdayMD] = useState('')
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
-  const [showLiveChooser, setShowLiveChooser] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
   const [showProQuickMenu, setShowProQuickMenu] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
@@ -3580,7 +3578,7 @@ return (
         <Sidebar
           currentTier={currentTier}
             onOpenLiveGate={() => {
-              setShowLiveChooser(true)
+              setShowLiveQuickMenu(true)
               setShowCampaignMenu(false)
               setShowRecentFolders(false)
             }}
@@ -4605,7 +4603,7 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setShowLiveChooser(true)
+  setShowLiveQuickMenu(true)
   setShowCampaignMenu(false)
   setShowRecentFolders(false)
 }
@@ -5131,59 +5129,6 @@ Choose one:
   document.body
 )}
 
-<LiveChooser
-  open={false && showLiveChooser}
-  onClose={() => setShowLiveChooser(false)}
-  onStartLiveConversation={() => {
-    setShowLiveChooser(false)
-    router.push('/george/live')
-
-    const liveIntro: Message = {
-      role: 'assistant',
-      content: `I’m listening.
-
-You don’t have to explain everything up front.
-As you speak, I’ll pick up the room.
-
-If you need help, say things like:
-“hold on…”
-“how do I say this?”
-“what’s the word I’m looking for?”
-“let me put that another way…”
-“help me here”
-
-I’ll stay with you.`
-    }
-
-    createSession('live', [liveIntro], 'LIVE Assistance')
-    liveSessionWriteReadyRef.current = true
-    setMessages([liveIntro])
-    messagesRef.current = [liveIntro]
-    setConversationMode('manual_live')
-    setActivePromptContext('manual_live')
-    setActivePromptLabel('Conversation')
-    setVoiceOn(true)
-    setInteractionMode('speech')
-    setTimeout(() => startListening(), 120)
-  }}
-  onResumeLiveConversation={() => {
-    setShowLiveChooser(false)
-    setSessionPickerClosing(false)
-    setSessionPickerMode('live')
-    setShowSessionPicker(true)
-  }}
-  onStartCampaign={() => {
-    setShowLiveChooser(false)
-    localStorage.setItem('george_intake_pending', 'campaign')
-    window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
-  }}
-  onResumeCampaign={() => {
-    setShowLiveChooser(false)
-    setSessionPickerClosing(false)
-    setSessionPickerMode('campaign')
-    setShowSessionPicker(true)
-  }}
-/>
 
     </div>
   </div>
