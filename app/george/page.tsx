@@ -667,15 +667,21 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
     if (typeof window === 'undefined') return
 
     try {
-      const savedCampaigns = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-      const savedActiveCampaignId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
+      const savedCampaigns = getCampaignSessions().map((session: any) => ({
+        id: session.id,
+        name: session.metadata?.campaignName || session.title || 'Pro LIVE Campaign',
+        mode: 'firm',
+        productOrService: session.metadata?.productOrService || '',
+        targetMarket: session.metadata?.targetAudience || '',
+        desiredOutcome: session.metadata?.desiredOutcome || session.userGoal || '',
+        defaultAnswersEnabled: true,
+      }))
 
-      if (Array.isArray(savedCampaigns)) {
-        setCampaigns(savedCampaigns)
-      }
+      setCampaigns(savedCampaigns as GeorgeCampaign[])
 
-      if (savedActiveCampaignId) {
-        setActiveCampaignId(savedActiveCampaignId)
+      const activeCampaignSession = getActiveSessionForMode('campaign')
+      if (activeCampaignSession) {
+        setActiveCampaignId(activeCampaignSession.metadata?.activeCampaignId as string || activeCampaignSession.id)
       }
     } catch {
       setCampaigns([])
@@ -684,14 +690,8 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   }, [])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    window.localStorage.setItem('GEORGE_CONVERSATIONS', JSON.stringify(campaigns))
-
-    if (activeCampaignId) {
-      window.localStorage.setItem('GEORGE_ACTIVE_CONVERSATION_ID', activeCampaignId)
-    } else {
-      window.localStorage.removeItem('GEORGE_ACTIVE_CONVERSATION_ID')
-    }
+    // Campaign persistence is V2-owned. Keep local state only for the active UI session.
+    return
   }, [campaigns, activeCampaignId])
   const [tonePopupIndex, setTonePopupIndex] = useState<number | null>(null)
   const [tonePopupUpward, setTonePopupUpward] = useState(true)
