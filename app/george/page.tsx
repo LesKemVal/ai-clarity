@@ -762,6 +762,8 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveChooser, setShowLiveChooser] = useState(false)
+  const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
+  const [showProQuickMenu, setShowProQuickMenu] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
@@ -5130,7 +5132,7 @@ Choose one:
 )}
 
 <LiveChooser
-  open={showLiveChooser}
+  open={false && showLiveChooser}
   onClose={() => setShowLiveChooser(false)}
   onStartLiveConversation={() => {
     setShowLiveChooser(false)
@@ -5286,18 +5288,77 @@ I’ll stay with you.`
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[120px] left-0 right-0 z-[72] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-                  <div className="flex min-w-0 w-full items-center gap-2 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
+                <div className="fixed bottom-[120px] left-0 right-0 z-[72] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-visible rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-1 text-white/80 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
                       onClick={() => {
-                        setShowLiveChooser(true)
+                        setShowLiveQuickMenu((prev) => !prev)
+                        setShowProQuickMenu(false)
                       }}
                       className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
                       {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
                     </button>
+
+                    <div className="relative shrink-0">
+                      {showLiveQuickMenu && (
+                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[210px] rounded-[1rem] border border-[#7C8CFF]/20 bg-black/90 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              router.push('/george/live')
+
+                              const liveIntro: Message = {
+                                role: 'assistant',
+                                content: `I’m listening.
+
+You don’t have to explain everything up front.
+As you speak, I’ll pick up the room.
+
+If you need help, say things like:
+“hold on…”
+“how do I say this?”
+“what’s the word I’m looking for?”
+“let me put that another way…”
+“help me here”
+
+I’ll stay with you.`
+                              }
+
+                              createSession('live', [liveIntro], 'LIVE Assistance')
+                              liveSessionWriteReadyRef.current = true
+                              setMessages([liveIntro])
+                              messagesRef.current = [liveIntro]
+                              setConversationMode('manual_live')
+                              setActivePromptContext('manual_live')
+                              setActivePromptLabel('Conversation')
+                              setVoiceOn(true)
+                              setInteractionMode('speech')
+                              setTimeout(() => startListening(), 120)
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                          >
+                            Start Conversation
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              setSessionPickerClosing(false)
+                              setSessionPickerMode('live')
+                              setShowSessionPicker(true)
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/78"
+                          >
+                            Resume Conversation
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
                     <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
@@ -5431,13 +5492,61 @@ I’ll stay with you.`
                       <button
                         type="button"
                         onClick={() => {
-                          setShowLiveChooser(true)
+                          setShowProQuickMenu((prev) => !prev)
+                          setShowLiveQuickMenu(false)
                         }}
                         className="shrink-0 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:text-white"
                         aria-label="Open PRO LIVE chooser"
                       >
                         🎧 PRO
                       </button>
+
+                      <div className="relative shrink-0">
+                        {showProQuickMenu && (
+                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[220px] rounded-[1rem] border border-white/[0.09] bg-black/90 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProQuickMenu(false)
+                                localStorage.setItem('george_intake_pending', 'campaign')
+                                window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/76 transition hover:bg-white/[0.06] hover:text-white"
+                            >
+                              Start New Campaign
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProQuickMenu(false)
+                                setSessionPickerClosing(false)
+                                setSessionPickerMode('campaign')
+                                setShowSessionPicker(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/76"
+                            >
+                              Resume Campaign
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProQuickMenu(false)
+                                setActiveCampaignId(null)
+                                setConversationMode('manual_live')
+                                setActivePromptContext('manual_live')
+                                setActivePromptLabel('Conversation')
+                                setToastMessage('Back to LIVE Conversation.')
+                                setShowToast(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-[#AEB6FF]/75 transition hover:bg-[#7C8CFF]/10 hover:text-[#C9D0FF]"
+                            >
+                              Back to LIVE Conversation
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
