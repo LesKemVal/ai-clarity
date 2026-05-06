@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -3379,7 +3379,15 @@ setPendingAssistantMessage({
           return { ...c, performance: perf }
         })
 
-        window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(updated))
+        updateCampaignSessionMetadata(activeCampaignId, (metadata) => {
+          const current = (metadata.performance || {}) as any
+          const next = updated.find((item: any) => item.id === activeCampaignId)?.performance || current
+
+          return {
+            ...metadata,
+            performance: next,
+          }
+        })
       }
 
       if (finalTranscript.trim()) {
@@ -5259,7 +5267,16 @@ setMessages([liveIntro])
                 })
               : []
 
-            window.localStorage.setItem('GEORGE_SESSIONS', JSON.stringify(updatedSessions))
+            updateCampaignSessionMetadata(activeCampaignId, (metadata) => {
+              const current = (metadata.performance || {}) as any
+              const next = updatedSessions.find((item: any) => item.id === activeCampaignId)?.performance || current
+
+              return {
+                ...metadata,
+                performance: next,
+              }
+            })
+
             setShowOutcomeBar(false)
             setLastOutcomeContext(null)
           }}
