@@ -19,7 +19,7 @@ const FILES = [
   'behavior.md',
   'product-awareness.md',
   'runtime-priority.md',
-  'runtime-priority.md',
+  'eq-social-calibration.md',
 ]
 
 function clean(content: string) {
