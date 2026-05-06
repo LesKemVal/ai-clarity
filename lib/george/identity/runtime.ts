@@ -13,6 +13,13 @@ const FILES = [
   'origin.md',
   'capabilities.md',
   'limitations.md',
+  'conversation-engine.md',
+  'memory-system.md',
+  'tone.md',
+  'behavior.md',
+  'product-awareness.md',
+  'runtime-priority.md',
+  'runtime-priority.md',
 ]
 
 function clean(content: string) {
