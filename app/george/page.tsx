@@ -1105,39 +1105,6 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
     if (typeof window === 'undefined') return
 
     
-    // 🔥 RESTORE LAST ACTIVE CONVERSATION
-    try {
-      const savedId = window.localStorage.getItem('GEORGE_ACTIVE_CONVERSATION_ID')
-      const all = JSON.parse(window.localStorage.getItem('GEORGE_CONVERSATIONS') || '[]')
-
-      if (savedId && Array.isArray(all)) {
-        const found = all.find((c: any) => c.id === savedId)
-
-        if (found) {
-          const briefing: Message = {
-            role: 'assistant',
-            content: `Conversation found.
-
-Goal:
-${found.userGoal || 'Not set'}
-
-Status:
-${found.lastKnownState || 'Unknown'}
-
-Next:
-${found.suggestedRestart || 'Continue naturally.'}
-
-Say “continue” or use controls.
-You can also reload the full conversation.`
-          }
-
-          skipNextTypewriterRef.current = true
-          setMessages([briefing])
-          messagesRef.current = [briefing]
-        }
-      }
-    } catch {}
-
 const savedContext = window.localStorage.getItem('george_active_context')
     const savedLabel = window.localStorage.getItem('george_active_label')
     const savedVoice = window.localStorage.getItem('george_voice')
