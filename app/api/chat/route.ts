@@ -447,36 +447,6 @@ ${reminderRule}
   return `${commonRules}\n${contextRules[promptContext] ?? ''}`.trim()
 }
 
-
-
-function buildAdaptiveIntervention(signal: { type?: string; score?: number } | null | undefined) {
-  if (!signal) return '';
-
-  if (signal.type === 'friction') {
-    return `\n\nThat phrasing is losing momentum.\n\nUse:\n“Let me make this simple…”`;
-  }
-
-  if (signal.type === 'objection') {
-    return `\n\nObjection detected.\n\nDo NOT explain more.\nAsk:\n“What’s the main concern on your end?”`;
-  }
-
-  if (signal.type === 'control_loss') {
-    return `\n\nYou’re giving away control.\n\nReframe:\n“Before we go there, let’s lock one thing in…”`;
-  }
-
-  return '';
-}
-
-function buildAdaptiveSignal(signal: { type?: string; score?: number } | null | undefined) {
-  if (!signal) return '';
-
-  if ((signal.score ?? 0) >= 4) {
-    return `\n\nSignal:\nYou stayed in control. Keep that pace.`;
-  }
-
-  return `\n\nSignal:\nTighten your framing. You’re giving space away.`;
-}
-
 const SYSTEM_PROMPT = (
   voiceMode: boolean,
   isFirstSession: boolean,
@@ -486,6 +456,7 @@ const SYSTEM_PROMPT = (
   tier: 'smart' | 'intelligent' | 'brilliant'
 ) => `
 You are GEORGE.
+
 ${isFirstSession ? 'This is the first interaction. Do not introduce GEORGE or explain the system unless asked. Respond with presence, brevity, and control.' : ''}
 
 IDENTITY

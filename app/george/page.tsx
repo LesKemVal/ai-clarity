@@ -320,10 +320,7 @@ function TypewriterText({
       }
     }, speed)
 
-    
-
-
-return () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [text, speed])
 
   return <>{display}</>
@@ -335,7 +332,6 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
   const [showProSetup, setShowProSetup] = useState(false)
-const [showProMenu, setShowProMenu] = useState(false)
   const [proGoal, setProGoal] = useState('')
   const [proAudience, setProAudience] = useState('')
   const [proOutcome, setProOutcome] = useState('')
@@ -483,7 +479,6 @@ const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
 const [conversationMode, setConversationMode] = useState<string | null>(null)
-const [proMode, setProMode] = useState(false)
 const [showWalkthrough, setShowWalkthrough] = useState(false)
 const [walkthroughStep, setWalkthroughStep] = useState(1)
 
@@ -731,10 +726,7 @@ useEffect(() => {
 
   syncSidebar()
   window.addEventListener('resize', syncSidebar)
-  
-
-
-return () => window.removeEventListener('resize', syncSidebar)
+  return () => window.removeEventListener('resize', syncSidebar)
 }, [])
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
 const [savePopupUpward, setSavePopupUpward] = useState(true)
@@ -765,11 +757,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setActiveMode('live')
       setLiveMode(true)
       setConversationMode('manual_live')
-
-        // LIVE Pro SUPPORT (initial)
-        try {
-          window.localStorage.setItem('GEORGE_ACTIVE_MODE', 'live')
-        } catch {}
       setActivePromptContext('manual_live')
 
       const activeLiveSession = getActiveSessionForMode('live')
@@ -855,18 +842,7 @@ const scoreFriction = (text: string) => {
 const detectFriction = (text: string) => {
   const lower = text.toLowerCase()
 
-  
-
-
-
-// === CLEAN MODE FLAGS (UI CONTROL) ===
-const isProLive = activePromptContext === 'pro_live' || conversationMode === 'pro_live'
-const isLiveConversation =
-  liveMode &&
-  !isProLive &&
-  (activePromptContext?.includes('conversation') || activePromptContext === 'manual_live')
-
-return (
+  return (
     lower.includes("that won’t work") ||
     lower.includes("that wont work") ||
     lower.includes("i’m not sure") ||
@@ -970,10 +946,7 @@ const georgeProfile = detectConversationProfile(input, interimTranscript)
       })
     }, adaptiveDelay)
 
-    
-
-
-return () => window.clearTimeout(timer)
+    return () => window.clearTimeout(timer)
   }, [liveMode, currentTier, liveGuidance])
   const [attemptStartTime, setAttemptStartTime] = useState<number | null>(null)
 const [showOutcomeBar, setShowOutcomeBar] = useState(false)
@@ -992,10 +965,7 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
       setUpgradeCtaWord((word) => (word === 'Intelligent' ? 'Brilliant' : 'Intelligent'))
     }, 2600)
 
-    
-
-
-return () => window.clearInterval(timer)
+    return () => window.clearInterval(timer)
   }, [currentTier])
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
   const [draftProfileName, setDraftProfileName] = useState('')
@@ -1183,10 +1153,7 @@ function getMessagesSignature(items: Message[]) {
       }
     }, 12)
 
-    
-
-
-return () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [messages])
 
   
@@ -1478,7 +1445,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
               role: 'assistant',
               content: campaignContext
             },
-            'LIVE Pro ready'
+            'Campaign Loaded'
           )
 
         } catch (e) {
@@ -1492,10 +1459,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     window.addEventListener('focus', activatePendingIntake)
     document.addEventListener('visibilitychange', activatePendingIntake)
 
-    
-
-
-return () => {
+    return () => {
       window.removeEventListener('focus', activatePendingIntake)
       document.removeEventListener('visibilitychange', activatePendingIntake)
     }
@@ -1519,10 +1483,7 @@ return () => {
     window.addEventListener('scroll', checkScroll)
     window.addEventListener('resize', checkScroll)
 
-    
-
-
-return () => {
+    return () => {
       window.removeEventListener('scroll', checkScroll)
       window.removeEventListener('resize', checkScroll)
     }
@@ -1711,10 +1672,7 @@ return () => {
     const timer = setTimeout(() => {
       setShowToast(false)
     }, 1600)
-    
-
-
-return () => clearTimeout(timer)
+    return () => clearTimeout(timer)
   }, [showToast])
 
   useEffect(() => {
@@ -1731,10 +1689,7 @@ requestAnimationFrame(() => {
     const interval = setInterval(() => {
       setThinkingDots((d) => (d % 3) + 1)
     }, 400)
-    
-
-
-return () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [isThinking])
 
 
@@ -1749,10 +1704,7 @@ return () => clearInterval(interval)
       }
     }, 1000)
 
-    
-
-
-return () => clearInterval(interval)
+    return () => clearInterval(interval)
   }, [windowEndsAt])
 
 
@@ -1796,10 +1748,7 @@ return () => clearInterval(interval)
     window.addEventListener('touchstart', handlePointerDown)
     window.addEventListener('keydown', handleKeyDown)
 
-    
-
-
-return () => {
+    return () => {
       window.removeEventListener('mousedown', handlePointerDown)
       window.removeEventListener('touchstart', handlePointerDown)
       window.removeEventListener('keydown', handleKeyDown)
@@ -1837,10 +1786,7 @@ return () => {
 
     window.addEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
 
-    
-
-
-return () => {
+    return () => {
       window.removeEventListener('open-memory-folder', handleOpenMemoryFolder as EventListener)
     }
   }, [])
@@ -2151,9 +2097,7 @@ return () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-            mode: (conversationMode === 'pro_live')
-  ? 'campaign'
-  : liveMode
+            mode: liveMode
               ? 'conversation'
               : activeCampaign
               ? 'campaign'
@@ -2883,7 +2827,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           liveMode ||
           activePromptContext?.includes('conversation') ||
           activePromptContext?.includes('professional') ||
-          activePromptContext === 'pro_live' ||
           activePromptContext?.includes('brilliant_live')
 
         const res = await fetch('/api/chat', {
@@ -3519,10 +3462,7 @@ setPendingAssistantMessage({
 
     recognitionRef.current = recognition
 
-    
-
-
-return () => {
+    return () => {
       recognition.stop?.()
       recognitionRef.current = null
     }
@@ -3570,9 +3510,6 @@ return () => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }, [showConversation])
-
-
-
 
 
 return (
@@ -3842,10 +3779,7 @@ return (
     const isLatestAssistant = m.role === 'assistant' && i === latestAssistantIndex
     const isWelcomeAssistant = m.role === 'assistant' && i === firstAssistantIndex
 
-    
-
-
-return (
+    return (
     <div
       key={i}
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
@@ -4644,10 +4578,7 @@ if (liveMode) {
             {getExistingFolders().length > 0 ? (
               <div className="space-y-3">
                 {getExistingFolders().map((folder) => {
-                  
-
-
-return (
+                  return (
                     <button
                       key={folder}
                       type="button"
@@ -4695,10 +4626,7 @@ return (
 
                     const isLatest = idx === 0
 
-                    
-
-
-return (
+                    return (
                       <button
                         key={idx}
                         type="button"
@@ -4916,43 +4844,19 @@ return (
 
             <button
               onClick={() => {
-                // CREATE CAMPAIGN OBJECT
-                const newCampaign: GeorgeCampaign = {
-                  id: 'campaign_' + Date.now(),
-                  name: proGoal || 'Campaign',
-                  mode: 'solo',
-                  productOrService: proGoal || '',
-                  targetMarket: proAudience || '',
-                  desiredOutcome: proOutcome || '',
-                  complianceBoundaries: proConstraints || '',
-                  assistMode: 'closing',
-                  outputStyle: 'repeatable_lines',
-                  deliveryMode: 'text',
-                  currentGoal: proOutcome || 'advance conversation',
-                  defaultAnswersEnabled: true,
-                }
-
-                setCampaigns((prev) => [newCampaign, ...prev])
-                setActiveCampaignId(newCampaign.id)
-
-                // ENTER LIVE Pro
-                enterLiveMode()
-                setConversationMode('pro_live')
-                setActivePromptContext('pro_live')
-                setActivePromptLabel(newCampaign.name)
-
                 const msg: Message = {
                   role: 'assistant',
-                  content: `LIVE Pro ready.
+                  content: `We are now in a live professional scenario.
 
 Goal: ${proGoal || 'General'}
 Audience: ${proAudience || 'Unknown'}
 Outcome: ${proOutcome || 'Best outcome'}
+Constraints: ${proConstraints || 'None'}
 
-Proceed when ready.`
+I will guide you in real time. Start speaking.`
                 }
 
-                startNewGeorgeSession(msg, newCampaign.name)
+                startNewGeorgeSession(msg, 'Conversation')
                 setShowProSetup(false)
               }}
               className="w-full bg-[#22c55e]/30 border border-[#22c55e]/50 py-3 rounded text-white"
@@ -5008,10 +4912,7 @@ Proceed when ready.`
             }
 
             if (!sessions.length) {
-              
-
-
-return (
+              return (
                 <div className="rounded-xl border border-white/10 bg-white/[0.025] p-2 text-[12px] text-white/65">
                   No saved conversations yet.
                 </div>
@@ -5085,67 +4986,6 @@ Choose one:
   document.body
 )}
 
-
-{showProMenu && typeof document !== 'undefined' && createPortal(
-  <>
-    <div
-      onClick={() => setShowProMenu(false)}
-      className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px]"
-    />
-
-    <div className="fixed inset-0 z-[210] flex items-center justify-center px-4">
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[420px] rounded-[1.4rem] border border-[#22c55e]/30 bg-black px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72)]"
-      >
-        <div className="text-[10px] uppercase tracking-[0.22em] text-[#22c55e] mb-2">
-          LIVE Pro
-        </div>
-
-        <div className="text-[13px] text-white/70 mb-3">
-          Structured professional execution.
-        </div>
-
-        <button
-          onClick={() => {
-            setShowProMenu(false)
-            enterLiveMode()
-
-            setConversationMode('pro_live')
-            setActivePromptContext('pro_live')
-            setActivePromptLabel('Campaign')
-          }}
-          className="w-full mb-2 text-left text-white hover:text-white/80"
-        >
-          Start LIVE Pro
-        </button>
-
-        <button
-          onClick={() => {
-            setShowProMenu(false)
-            setShowProSetup(true)
-          }}
-          className="w-full mb-2 text-left text-white hover:text-white/80"
-        >
-          Setup LIVE Pro
-        </button>
-
-        <button
-          onClick={() => {
-            setShowProMenu(false)
-            setShowSessionPicker(true)
-          }}
-          className="w-full text-left text-white hover:text-white/80"
-        >
-          Resume LIVE Pro
-        </button>
-
-      </div>
-    </div>
-  </>,
-  document.body
-)}
-
 {showProLiveGate && typeof document !== 'undefined' && createPortal( 
   <>
    <div
@@ -5169,7 +5009,7 @@ Choose one:
       >
         <button
           type="button"
-          aria-label="Close LIVE Conversation menu"
+          aria-label="Close LIVE ASSISTANCE menu"
           onClick={() => setShowProLiveGate(false)}
           className="absolute right-3 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
         >
@@ -5178,10 +5018,10 @@ Choose one:
 
         <div className="mb-2 pr-8">
           <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">
-            LIVE Conversation
+            LIVE ASSISTANCE
           </div>
           <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
-            Start LIVE Conversation
+            Start LIVE assistance
           </div>
           <div className="mt-1 text-[11px] leading-5 text-neutral-400">
             Speak naturally. I’ll pick up context and guide you in real time.
