@@ -705,6 +705,19 @@ const [isListening, setIsListening] = useState(false)
   const [bridgeThinking, setBridgeThinking] = useState(false)
   const [conversationSignal, setConversationSignal] = useState<string | null>(null)
   const [signalTimestamp, setSignalTimestamp] = useState(0)
+
+  const [adaptiveCueLabel, setAdaptiveCueLabel] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!adaptiveCueLabel) return
+
+    const timer = setTimeout(() => {
+      setAdaptiveCueLabel(null)
+    }, 2400)
+
+    return () => clearTimeout(timer)
+  }, [adaptiveCueLabel])
+
   const [isIOS, setIsIOS] = useState(false)
   const [profileName, setProfileName] = useState('')
   const [birthdayMD, setBirthdayMD] = useState('')
@@ -2516,6 +2529,7 @@ const handleSend = useCallback(
       )
       if (brilliantLiveTrigger) {
         setConversationSignal('LIVE cue')
+        setAdaptiveCueLabel('Guidance update')
         setLastGuidedLine('Brilliant live cue used.')
         setInput('')
         setInterimTranscript('')
@@ -3247,6 +3261,7 @@ setPendingAssistantMessage({
               content: 'Pause. Control the next sentence.'
             })
             setConversationSignal('LIVE urgent')
+            setAdaptiveCueLabel('Pressure detected')
             return
           }
           stopListening()
@@ -3394,6 +3409,7 @@ setPendingAssistantMessage({
       content: 'Say: “Let me make this simple…”'
     })
     setConversationSignal('LIVE strong signal')
+    setAdaptiveCueLabel('Strong opportunity detected')
     return
   }
 
@@ -3427,6 +3443,7 @@ setPendingAssistantMessage({
 
     liveInterventionRef.current = interventionNow
     setConversationSignal('LIVE intervention')
+    setAdaptiveCueLabel(score >= 4 ? 'Objection detected' : 'Adjust delivery')
     return
   }
 
@@ -5212,6 +5229,12 @@ setMessages([liveIntro])
 </span>
 
 <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+
+{adaptiveCueLabel && (
+  <span className="shrink-0 rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-amber-100 shadow-[0_0_12px_rgba(251,191,36,0.18)]">
+    {adaptiveCueLabel}
+  </span>
+)}
 
 <button
   type="button"
