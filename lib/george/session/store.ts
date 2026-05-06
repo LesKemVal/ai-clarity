@@ -140,6 +140,12 @@ export function getSessionsForMode(mode: GeorgeSessionMode) {
   return safeReadSessions().filter((session) => session.mode === mode)
 }
 
+export function getCampaignSessions() {
+  return safeReadSessions()
+    .filter((session) => session.mode === 'campaign')
+    .sort((a, b) => b.updatedAt - a.updatedAt)
+}
+
 export function updateCampaignSessionMetadata(
   campaignId: string | null,
   updater: (metadata: GeorgeStoredSessionMetadata) => GeorgeStoredSessionMetadata
