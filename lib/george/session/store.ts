@@ -7,6 +7,18 @@ export type GeorgeStoredMessage = {
   imageDataUrl?: string | null
 }
 
+export type GeorgeStoredSessionMetadata = {
+  source?: 'normal' | 'live_conversation' | 'pro_live_campaign'
+  activeCampaignId?: string | null
+  productOrService?: string
+  targetAudience?: string
+  desiredOutcome?: string
+  campaignName?: string
+  dataToCapture?: string[]
+  reportingDestination?: string
+  [key: string]: unknown
+}
+
 export type GeorgeStoredSession = {
   id: string
   type: 'session'
@@ -19,6 +31,7 @@ export type GeorgeStoredSession = {
   userGoal?: string
   lastKnownState?: string
   suggestedRestart?: string
+  metadata?: GeorgeStoredSessionMetadata
 }
 
 export const GEORGE_SESSIONS_KEY = 'GEORGE_SESSIONS_V2'
@@ -100,17 +113,31 @@ export function clearActiveMode() {
   window.localStorage.setItem(GEORGE_ACTIVE_MODE_KEY, 'normal')
 }
 
+export function normalizeSessionMode(mode: unknown): GeorgeSessionMode {
+  return mode === 'live' || mode === 'campaign' ? mode : 'normal'
+}
+
 export function upsertSession(session: GeorgeStoredSession) {
+  const safeSession = {
+    ...session,
+    mode: normalizeSessionMode(session.mode),
+    type: 'session' as const,
+  }
+
   const sessions = safeReadSessions()
-  const existingIndex = sessions.findIndex((item) => item.id === session.id)
+  const existingIndex = sessions.findIndex((item) => item.id === safeSession.id)
 
   if (existingIndex >= 0) {
-    sessions[existingIndex] = session
+    sessions[existingIndex] = safeSession
   } else {
-    sessions.unshift(session)
+    sessions.unshift(safeSession)
   }
 
   safeWriteSessions(sessions)
+}
+
+export function getSessionsForMode(mode: GeorgeSessionMode) {
+  return safeReadSessions().filter((session) => session.mode === mode)
 }
 
 export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
@@ -136,7 +163,7 @@ export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mod
 
   const sessions = safeReadSessions()
   const updated = sessions.map((session) =>
-    session.id === activeId
+    session.id === activeId && session.mode === mode
       ? { ...session, messages, updatedAt: Date.now(), userGoal: userGoal || session.userGoal, lastKnownState: lastKnownState || session.lastKnownState, title: generateSessionTitle(userGoal || session.userGoal, lastKnownState || session.lastKnownState) }
       : session
   )
