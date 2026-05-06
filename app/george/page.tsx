@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -765,6 +765,7 @@ const [isListening, setIsListening] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
+  const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
 
   const [showExitPopup, setShowExitPopup] = useState(false)
@@ -5127,9 +5128,12 @@ I will guide you in real time. Start speaking.`
             }
 
             return sessions.slice(0, 12).map((session) => (
-              <button
+              <div
                 key={session.id}
-                onClick={() => {
+                className="group relative overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:bg-white/[0.04]"
+              >
+                <button
+                  onClick={() => {
                   setSessionPickerClosing(true)
                   window.setTimeout(() => {
                     setShowSessionPicker(false)
@@ -5186,15 +5190,44 @@ Choose one:
                   setToastMessage(`${session.title || 'Conversation'} restored.`)
                   setShowToast(true)
                 }}
-                className="w-full text-left rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-[12px] text-white/80 hover:bg-white/5"
+                className="w-full text-left px-3 py-2 pr-14 text-[12px] text-white/80"
               >
                 <div className="font-semibold text-white">
                   {session.title || session.label || session.name || 'Conversation'}
                 </div>
+
                 <div className="mt-1 text-[11px] text-neutral-500">
                   {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved conversation'}
                 </div>
               </button>
+
+              <div className="absolute right-2 top-2 hidden md:flex items-center">
+                {pendingDeleteSessionId === session.id ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      deleteSession(session.id)
+                      setPendingDeleteSessionId(null)
+                      setToastMessage('Session deleted.')
+                      setShowToast(true)
+                    }}
+                    className="rounded-full bg-red-500/14 px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-red-200 transition hover:bg-red-500/24"
+                  >
+                    CONFIRM
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPendingDeleteSessionId(session.id)
+                    }}
+                    className="rounded-full px-2 py-1 text-[14px] text-white/38 transition hover:bg-white/[0.06] hover:text-white/82"
+                  >
+                    ⋯
+                  </button>
+                )}
+              </div>
+            </div>
             ))
           })()}
         </div>
@@ -5309,7 +5342,7 @@ Choose one:
 
 {liveMode && (
                 <div className="fixed bottom-[32px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-1 text-white/80 text-[12px] [scrollbar-width:none]">
+                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0.5 text-white/80 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
                       onClick={() => {
@@ -5375,6 +5408,53 @@ I’ll stay with you.`
                             className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/78"
                           >
                             Resume Conversation
+                          </button>
+
+                          <div className="my-1 h-px bg-white/[0.08]" />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              setVoiceOn(false)
+                              setInteractionMode('text')
+                              setCampaigns((prev) =>
+                                prev.map((c) =>
+                                  c.id === activeCampaignId
+                                    ? { ...c, deliveryMode: 'text' }
+                                    : c
+                                )
+                              )
+                              window.localStorage.setItem('george_voice', 'off')
+                              setToastMessage('Text guidance active.')
+                              setShowToast(true)
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                          >
+                            Text Guidance
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              setVoiceOn(true)
+                              setInteractionMode('speech')
+                              setCampaigns((prev) =>
+                                prev.map((c) =>
+                                  c.id === activeCampaignId
+                                    ? { ...c, deliveryMode: 'audio' }
+                                    : c
+                                )
+                              )
+                              window.localStorage.setItem('george_voice', 'on')
+                              setTimeout(() => startListening(), 120)
+                              setToastMessage('Audio guidance active.')
+                              setShowToast(true)
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                          >
+                            Audio Guidance
                           </button>
                         </div>
                       )}
@@ -5547,6 +5627,50 @@ I’ll stay with you.`
                               className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/76"
                             >
                               Resume Campaign
+                            </button>
+
+                            <div className="my-1 h-px bg-white/[0.08]" />
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProQuickMenu(false)
+                                setActivePromptContext('professional_negotiation')
+                                setConversationMode('professional_negotiation')
+                                setCampaigns((prev) =>
+                                  prev.map((c) =>
+                                    c.id === activeCampaignId
+                                      ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
+                                      : c
+                                  )
+                                )
+                                setToastMessage('Negotiation mode active.')
+                                setShowToast(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            >
+                              Negotiation Mode
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowProQuickMenu(false)
+                                setActivePromptContext('professional_objection_handling')
+                                setConversationMode('professional_objection_handling')
+                                setCampaigns((prev) =>
+                                  prev.map((c) =>
+                                    c.id === activeCampaignId
+                                      ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
+                                      : c
+                                  )
+                                )
+                                setToastMessage('Objection handling active.')
+                                setShowToast(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            >
+                              Objection Handling
                             </button>
 
                             <button
