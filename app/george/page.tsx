@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -60,6 +60,43 @@ type GeorgeConversation = {
   userGoal?: string
   lastKnownState?: string
   suggestedRestart?: string
+}
+
+function saveSessionToV2(params: {
+  id?: string
+  mode: 'normal' | 'live' | 'campaign'
+  title: string
+  messages: Message[]
+  summary?: string
+  userGoal?: string
+  lastKnownState?: string
+  suggestedRestart?: string
+  metadata?: Record<string, unknown>
+}) {
+  const now = Date.now()
+
+  upsertSession({
+    id: params.id || `session_${now}`,
+    type: 'session',
+    mode: params.mode,
+    title: params.title,
+    createdAt: now,
+    updatedAt: now,
+    messages: params.messages,
+    summary: params.summary,
+    userGoal: params.userGoal,
+    lastKnownState: params.lastKnownState,
+    suggestedRestart: params.suggestedRestart,
+    metadata: {
+      source:
+        params.mode === 'campaign'
+          ? 'pro_live_campaign'
+          : params.mode === 'live'
+            ? 'live_conversation'
+            : 'normal',
+      ...params.metadata,
+    },
+  })
 }
 
 
