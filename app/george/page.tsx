@@ -4436,7 +4436,7 @@ router.push('/george')
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
+                  className="w-full rounded-xl border border-white/10 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
                 >
                   Save to {getDefaultFolder()}
                 </button>
@@ -5152,6 +5152,14 @@ Choose one:
       className="pointer-events-auto fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px] backdrop-saturate-150"
     />
 
+    <div className="pointer-events-none fixed left-0 right-0 top-5 z-[215] flex justify-center">
+      <img
+        src="/logo900.png"
+        alt="BRANESx"
+        className="h-10 w-auto object-contain opacity-70 drop-shadow-[0_0_18px_rgba(124,140,255,0.18)]"
+      />
+    </div>
+
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4">
       <div className="pointer-events-auto relative w-full max-w-[760px] rounded-[1.5rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] p-5 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl">
         <button
@@ -5176,7 +5184,7 @@ Choose one:
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-4" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
+          <div className="rounded-[1.8rem] bg-[#7C8CFF]/[0.045] p-5" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
             <div className="text-[12px] font-semibold tracking-[0.14em] text-[#AEB6FF]">
               LIVE Conversation
             </div>
@@ -5237,7 +5245,7 @@ I’ll stay with you.`
             </button>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
+          <div className="rounded-[1.8rem] bg-white/[0.025] p-5" style={{ animation: 'georgeCleanTrace 420ms ease-out 0s 1' }}>
             <div className="text-[12px] font-semibold tracking-[0.14em] text-white/80">
               PRO LIVE Campaign
             </div>
@@ -5271,119 +5279,6 @@ I’ll stay with you.`
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </>,
-  document.body
-)}
-
-{showProLiveGate && typeof document !== 'undefined' && createPortal( 
-  <>
-   <div
-      role="button"
-      tabIndex={0}
-      aria-label="Close LIVE ASSISTANT menu"
-      onClick={() => setShowProLiveGate(false)}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-          setShowProLiveGate(false)
-        }
-      }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px] backdrop-saturate-150"    />
-
-    <div
-      className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 "
-    >
-      <div
-        onClick={(event) => event.stopPropagation()}
-        className="pointer-events-auto relative w-full max-w-[420px] max-h-[520px] overflow-y-auto rounded-[1.4rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]"
-      >
-        <button
-          type="button"
-          aria-label="Close LIVE ASSISTANCE menu"
-          onClick={() => setShowProLiveGate(false)}
-          className="absolute right-3 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-[0_0_20px_rgba(124,140,255,0.25)] transition hover:scale-105 hover:border-[#7C8CFF]"
-        >
-          ×
-        </button>
-
-        <div className="mb-2 pr-8">
-          <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">
-            PRO LIVE
-          </div>
-          <div className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">
-            Start Pro LIVE
-          </div>
-          <div className="mt-1 text-[11px] leading-5 text-neutral-400">
-            Resume a campaign, start a structured campaign, or enter manual live support.
-          </div>
-        </div>
-
-        <button
-          onClick={() => {
-            setShowProLiveGate(false)
-
-            // Save normal GEORGE state BEFORE replacing messages with LIVE intro.
-            router.push('/george/live')
-
-            const liveIntro: Message = {
-              role: 'assistant',
-              content: `I’m listening.
-
-You don’t have to explain everything up front.
-As you speak, I’ll pick up the room.
-
-If you need help, say things like:
-“hold on…”
-“how do I say this?”
-“what’s the word I’m looking for?”
-“let me put that another way…”
-“help me here”
-
-I’ll stay with you.`
-            }
-
-            createSession('live', [liveIntro], 'LIVE Assistance')
-liveSessionWriteReadyRef.current = true
-setMessages([liveIntro])
-            messagesRef.current = [liveIntro]
-
-            setConversationMode('manual_live')
-            setActivePromptContext('manual_live')
-            setActivePromptLabel('Conversation')
-
-            setVoiceOn(true)
-            setInteractionMode('speech')
-            setTimeout(() => startListening(), 120)
-          }}
-          className="mt-4 w-full rounded-2xl border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 shadow-[0_0_20px_rgba(124,140,255,0.25)] px-4 py-2 text-left text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/[0.06]"
-        >
-          Manual LIVE
-        </button>
-
-        <button
-          onClick={() => {
-            localStorage.setItem('george_intake_pending', 'conversation')
-            window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
-            setShowProLiveGate(false)
-          }}
-          className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
-        >
-          Start New Campaign
-        </button>
-
-        <button
-          onClick={() => {
-            setShowProLiveGate(false)
-            setSessionPickerClosing(false)
-            setSessionPickerMode('campaign')
-            setShowSessionPicker(true)
-          }}
-          className="mt-2 w-full rounded-2xl border border-white/8 bg-white/[0.02] opacity-85 hover:opacity-100 px-4 py-2 text-left text-sm font-medium text-white transition hover:border-[#7C8CFF]/40 hover:bg-white/[0.05]"
-        >
-          Resume Campaign
-        </button>
-
       </div>
     </div>
   </>,
@@ -5493,34 +5388,32 @@ setMessages([liveIntro])
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
-                  <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
+                <div className="fixed bottom-[120px] left-0 right-0 z-[70] mx-auto flex w-[calc(100%-24px)] max-w-[900px] items-center overflow-hidden rounded-[1.8rem] border border-white/10 bg-black/88 px-3 py-2 shadow-[0_-10px_28px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+                  <div className="flex min-w-0 w-full items-center gap-2 overflow-x-auto py-1 text-white/80 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
                       onClick={() => {
                         setShowLiveChooser(true)
                       }}
-                      className="shrink-0 rounded-full border border-[#7C8CFF]/25 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#AEB6FF] shadow-[0_0_12px_rgba(124,140,255,0.22)] transition hover:bg-[#7C8CFF]/20"
+                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
                       {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
                     </button>
 
-<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+                    <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
 
-<span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
-  {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : isSpeaking ? 'SPEAKING' : ''}
-</span>
+                    {(isThinking || isSpeaking) && (
+                      <span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
+                        {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : 'SPEAKING'}
+                      </span>
+                    )}
 
-<span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
-
-{adaptiveCueLabel && (
-  <span className="shrink-0 rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-amber-100 shadow-[0_0_12px_rgba(251,191,36,0.18)]">
-    {adaptiveCueLabel}
-  </span>
-)}
-
-
+                    {adaptiveCueLabel && (
+                      <span className="shrink-0 rounded-full bg-amber-400/10 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-amber-100">
+                        {adaptiveCueLabel}
+                      </span>
+                    )}
 
                     <button
                       type="button"
@@ -5529,21 +5422,10 @@ setMessages([liveIntro])
                         setSessionPickerMode('live')
                         setShowSessionPicker(true)
                       }}
-                      className="shrink-0 rounded-md border border-[#7C8CFF]/50 bg-[#7C8CFF]/10 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.35)] transition hover:bg-[#7C8CFF]/20 hover:text-white"
-                      aria-label="Open LIVE conversation picker"
+                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[12px] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
+                      aria-label="Open LIVE conversation memory"
                     >
-                      Conversation
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowProLiveGate(true)
-                      }}
-                      className="shrink-0 rounded-md border border-[#7C8CFF]/35 bg-white/[0.025] px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-white/80 transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/10 hover:text-white"
-                      aria-label="Open Pro LIVE"
-                    >
-                      🎧 PRO
+                      ▣
                     </button>
 
                     <button
@@ -5562,23 +5444,11 @@ setMessages([liveIntro])
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
-                        !voiceOn
-                          ? 'border-[#7C8CFF] text-white'
-                          : 'border-transparent text-white/45 hover:text-white/75'
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-white/[0.06] ${
+                        !voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
                       }`}
                     >
                       Text
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        requestExitLiveMode()
-                      }}
-                      className="shrink-0 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-red-200 transition hover:bg-red-500/20"
-                    >
-                      EXIT
                     </button>
 
                     <button
@@ -5598,68 +5468,79 @@ setMessages([liveIntro])
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] opacity-70 transition hover:bg-white/[0.06] hover:opacity-100 ${
-                        voiceOn
-                          ? 'border-[#7C8CFF] text-white'
-                          : 'border-transparent text-white/45 hover:text-white/75'
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-white/[0.06] ${
+                        voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
                       }`}
                     >
                       Audio
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActivePromptContext('professional_negotiation')
-                        setConversationMode('professional_negotiation')
+                    {activeCampaignId && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActivePromptContext('professional_negotiation')
+                            setConversationMode('professional_negotiation')
+                            setCampaigns((prev) =>
+                              prev.map((c) =>
+                                c.id === activeCampaignId
+                                  ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
+                                  : c
+                              )
+                            )
+                            setToastMessage('Negotiation mode active.')
+                            setShowToast(true)
+                          }}
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-white/[0.06] hover:text-white/75"
+                        >
+                          Negotiate
+                        </button>
 
-                        setCampaigns((prev) =>
-                          prev.map((c) =>
-                            c.id === activeCampaignId
-                              ? {
-                                  ...c,
-                                  assistMode: 'negotiation',
-                                  outputStyle: 'say_ask_boundary_close',
-                                }
-                              : c
-                          )
-                        )
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActivePromptContext('professional_objection_handling')
+                            setConversationMode('professional_objection_handling')
+                            setCampaigns((prev) =>
+                              prev.map((c) =>
+                                c.id === activeCampaignId
+                                  ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
+                                  : c
+                              )
+                            )
+                            setToastMessage('Objection handling active.')
+                            setShowToast(true)
+                          }}
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-white/[0.06] hover:text-white/75"
+                        >
+                          Objections
+                        </button>
+                      </>
+                    )}
 
-                        setToastMessage('Negotiation mode active.')
-                        setShowToast(true)
-                      }}
-                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
-                    >
-                      Negotiate
-                    </button>
+                    <div className="ml-auto flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          requestExitLiveMode()
+                        }}
+                        className="shrink-0 rounded-full bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-200 transition hover:bg-red-500/18"
+                      >
+                        EXIT
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActivePromptContext('professional_objection_handling')
-                        setConversationMode('professional_objection_handling')
-
-                        setCampaigns((prev) =>
-                          prev.map((c) =>
-                            c.id === activeCampaignId
-                              ? {
-                                  ...c,
-                                  assistMode: 'objection_handling',
-                                  outputStyle: 'repeatable_lines',
-                                }
-                              : c
-                          )
-                        )
-
-                        setToastMessage('Objection handling active.')
-                        setShowToast(true)
-                      }}
-                      className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/58 transition hover:bg-white/[0.06] hover:text-white"
-                    >
-                      Objections
-                    </button>
-
-                    
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowLiveChooser(true)
+                        }}
+                        className="shrink-0 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:text-white"
+                        aria-label="Open PRO LIVE chooser"
+                      >
+                        🎧 PRO
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
