@@ -3799,7 +3799,7 @@ return (
     userPinnedBottomRef.current = nearBottom
     setShowScrollHint(!nearBottom)
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[340px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-8 md:pt-10" : showMobileHero ? "pt-8 md:pt-14" : "pt-1 md:pt-4"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[390px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-4 md:pt-10" : showMobileHero ? "pt-4 md:pt-14" : "pt-1 md:pt-4"} `}>
   {showMobileHero && (
     <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-2 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
