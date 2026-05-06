@@ -4627,7 +4627,7 @@ if (liveMode) {
               className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
             />
 
-            <div className="absolute bottom-[58px] left-0 z-[95] w-[220px] rounded-[1rem] border border-[#7C8CFF]/18 bg-black/92 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+            <div className="absolute bottom-[58px] left-0 z-[95] w-[220px] rounded-[1rem] border border-[#7C8CFF]/18 bg-[rgba(10,10,14,0.78)] p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
               <button
                 type="button"
                 onClick={() => {
@@ -5024,6 +5024,19 @@ I will guide you in real time. Start speaking.`
             className="w-full rounded-xl border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-medium text-white transition hover:bg-[#7C8CFF]/20"
           >
             Save and exit
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowExitPopup(false)
+              window.localStorage.removeItem('george_active_live_session_id')
+              window.localStorage.removeItem('george_active_campaign_session_id')
+              exitLiveMode()
+            }}
+            className="w-full rounded-xl border border-red-500/20 bg-red-500/8 px-4 py-3 text-left text-sm font-medium text-red-100 transition hover:bg-red-500/14"
+          >
+            Exit without saving
           </button>
 
           <button
@@ -5559,8 +5572,8 @@ I’ll stay with you.`
                 </div>
               )}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[210px] bg-black" />
-              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[110px] bg-gradient-to-t from-black to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[170px] bg-[rgba(0,0,0,0.78)]" />
+              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[80px] bg-gradient-to-t from-[rgba(0,0,0,0.72)] to-transparent" />
 
               
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
