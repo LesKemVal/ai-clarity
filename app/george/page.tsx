@@ -4540,7 +4540,7 @@ router.push('/george')
   })}
   
 {showScrollHint && (
-  <div className="fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center">
+  <div className={`fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center`}>
 
     <div className="absolute h-16 w-16 rounded-full border border-[#7C8CFF]/18 bg-black/42 shadow-[0_18px_46px_rgba(0,0,0,0.48),0_0_20px_rgba(124,140,255,0.10)] backdrop-blur-xl" />
 
@@ -4965,16 +4965,17 @@ I will guide you in real time. Start speaking.`
 
 
 {showEarbudOverlay && (
-  <div className="fixed inset-0 z-[260] flex items-center justify-center pointer-events-none">
-    <div className="absolute inset-0 bg-black/62 backdrop-blur-[5px]" />
-
-    <div className="relative flex flex-col items-center gap-5 px-6 text-center animate-[menuLift_700ms_ease-out]">
-      <div className="flex items-center gap-5 text-white/88 drop-shadow-[0_0_24px_rgba(124,140,255,0.28)]">
-        <div className="h-20 w-12 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
-        <div className="h-20 w-12 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
+  <div className="fixed inset-x-0 top-[96px] z-[260] flex justify-center pointer-events-none">
+    <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
+      <div className="relative flex h-24 w-28 items-center justify-center rounded-full border border-[#7C8CFF]/24 bg-black/72 shadow-[0_0_42px_rgba(124,140,255,0.22)] backdrop-blur-2xl">
+        <div className="absolute h-20 w-20 rounded-full border border-[#7C8CFF]/18 animate-spin [animation-duration:4.8s]" />
+        <div className="flex items-center gap-3">
+          <div className="h-14 w-9 rounded-full border border-[#7C8CFF]/42 bg-white/[0.035] shadow-[0_0_18px_rgba(124,140,255,0.16)] animate-pulse" />
+          <div className="h-14 w-9 rounded-full border border-[#7C8CFF]/42 bg-white/[0.035] shadow-[0_0_18px_rgba(124,140,255,0.16)] animate-pulse [animation-delay:0.25s]" />
+        </div>
       </div>
 
-      <div className="max-w-[280px] text-[13px] leading-6 text-white/76">
+      <div className="rounded-2xl border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         Use one earbud if you can.
         <br />
         GEORGE is listening live.
@@ -5696,14 +5697,14 @@ You got this.`
                 </div>
               )}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[148px] bg-black" />
-              <div className="pointer-events-none fixed bottom-[148px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[112px] bg-black" />
+              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
 
               
 
 
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
-  <div className="fixed bottom-[96px] left-0 right-0 z-[70] flex justify-center pointer-events-none">
+  <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[11px] text-white/40 tracking-[0.18em]">
       {isThinking ? (
         <>THINKING{'.'.repeat(thinkingDots)}</>
@@ -5718,7 +5719,7 @@ You got this.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[14px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
