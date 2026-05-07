@@ -4653,7 +4653,7 @@ if (liveMode) {
               className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
             />
 
-            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] animate-[menuLift_420ms_ease-out]">
               <button
                 type="button"
                 onClick={() => {
@@ -5013,6 +5013,26 @@ I will guide you in real time. Start speaking.`
       )}
 
 
+
+
+{showEarbudOverlay && (
+  <div className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 bg-black/42 backdrop-blur-[3px]" />
+
+    <div className="relative flex flex-col items-center gap-4 px-6 text-center animate-[menuLift_400ms_ease-out]">
+      <div className="flex items-center gap-5 text-white/88 drop-shadow-[0_0_24px_rgba(124,140,255,0.28)]">
+        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
+        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
+      </div>
+
+      <div className="max-w-[280px] text-[13px] leading-6 text-white/76">
+        Use one earbud if you can.
+        <br />
+        GEORGE is listening live.
+      </div>
+    </div>
+  </div>
+)}
 
 {showExitPopup && typeof document !== 'undefined' && createPortal(
   <>
@@ -5405,7 +5425,7 @@ Choose one:
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-transparent bg-black/58 px-2.5 py-1 shadow-[0_-10px_28px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-[#7C8CFF]/10 bg-black/74 px-2.5 py-1 shadow-[0_-14px_38px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
@@ -5732,24 +5752,6 @@ You got this.`
 
               
 
-{showEarbudOverlay && (
-  <div className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none">
-    <div className="absolute inset-0 bg-black/28 backdrop-blur-[2px]" />
-
-    <div className="relative flex flex-col items-center gap-4 px-6 text-center animate-[menuLift_400ms_ease-out]">
-      <div className="flex items-center gap-5 text-white/88 drop-shadow-[0_0_24px_rgba(124,140,255,0.28)]">
-        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
-        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
-      </div>
-
-      <div className="max-w-[280px] text-[13px] leading-6 text-white/76">
-        Use one earbud if you can.
-        <br />
-        GEORGE is listening live.
-      </div>
-    </div>
-  </div>
-)}
 
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[70] flex justify-center pointer-events-none">
