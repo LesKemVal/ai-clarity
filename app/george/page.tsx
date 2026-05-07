@@ -4605,7 +4605,7 @@ router.push('/george')
             : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-[#7C8CFF]/10 hover:text-white'
         }`}
         aria-label="Open memory folders"
-        title="Memory"
+        title="Resume conversation continuity"
       >
         <span className="relative flex h-4 w-4 items-center justify-center">
           <span className="absolute top-[3px] h-[2px] w-3 rounded-full bg-current opacity-80 transition group-hover:w-3.5" />
@@ -5558,9 +5558,9 @@ I’ll stay with you.`
                       }}
                       className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
                       aria-label="Open LIVE conversation memory"
-                      title="Memory"
+                      title="Resume conversation continuity"
                     >
-                      Memory
+                      Resume
                     </button>
 
                     <button
