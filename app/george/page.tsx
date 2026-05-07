@@ -4628,7 +4628,7 @@ if (liveMode) {
               className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
             />
 
-            <div className="absolute bottom-[58px] left-0 z-[95] w-[220px] rounded-[1rem] border border-[#7C8CFF]/18 bg-[rgba(10,10,14,0.78)] p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
               <button
                 type="button"
                 onClick={() => {
@@ -4658,7 +4658,7 @@ Start where the pressure is.`
 
                   setTimeout(() => startListening(), 120)
                 }}
-                className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/80 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/80 transition hover:bg-[#7C8CFF]/10 hover:text-white"
               >
                 Start Conversation
               </button>
@@ -4671,7 +4671,7 @@ Start where the pressure is.`
                   setSessionPickerMode('live')
                   setShowSessionPicker(true)
                 }}
-                className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/52 transition hover:bg-white/[0.05] hover:text-white/78"
+                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-white/[0.05] hover:text-white/78"
               >
                 Resume Conversation
               </button>
@@ -4685,7 +4685,7 @@ Start where the pressure is.`
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[140px] left-1/2 -translate-x-1/2 z-50 w-[300px] rounded-[1.4rem] border border-white/[0.07] bg-black/88 p-3 shadow-[0_16px_38px_rgba(0,0,0,0.32)] backdrop-blur-xl"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5075,13 +5075,13 @@ I will guide you in real time. Start speaking.`
           }, 170)
         }
       }}
-      className={`fixed inset-0 z-[200] bg-black/40 backdrop-blur-[16px] backdrop-saturate-150 transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[200] bg-black/20 backdrop-blur-[6px] backdrop-saturate-150 transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
     />
 
-    <div className="fixed inset-0 z-[210] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[420px] max-h-[72dvh] overflow-y-auto rounded-[1.4rem] border ${sessionPickerMode === 'campaign' ? 'border-white/15' : 'border-[#7C8CFF]/30'} bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-4 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_22px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-150 ease-out ${sessionPickerClosing ? 'translate-y-8 opacity-0 scale-[0.985]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-white/12' : 'border-[#7C8CFF]/24'} bg-[#262626]/96 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5130,7 +5130,7 @@ I will guide you in real time. Start speaking.`
             return sessions.slice(0, 12).map((session) => (
               <div
                 key={session.id}
-                className="group relative overflow-hidden rounded-xl border border-white/10 bg-black/40 transition hover:bg-white/[0.04]"
+                className="group relative overflow-hidden rounded-[1rem] border border-white/[0.08] bg-black/20 transition hover:bg-white/[0.06]"
               >
                 <button
                   onClick={() => {
@@ -5190,7 +5190,7 @@ Choose one:
                   setToastMessage(`${session.title || 'Conversation'} restored.`)
                   setShowToast(true)
                 }}
-                className="w-full text-left px-3 py-2 pr-14 text-[12px] text-white/80"
+                className="w-full text-left px-3 py-2 pr-14 text-[12px] text-white/82"
               >
                 <div className="font-semibold text-white">
                   {session.title || session.label || session.name || 'Conversation'}
@@ -5341,15 +5341,15 @@ Choose one:
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[32px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.7rem] border border-white/[0.06] bg-black/72 px-3 py-1.5 shadow-[0_-8px_22px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0.5 text-white/80 text-[12px] [scrollbar-width:none]">
+                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-white/[0.045] bg-black/58 px-2.5 py-1 shadow-[0_-6px_18px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
                       onClick={() => {
                         setShowLiveQuickMenu((prev) => !prev)
                         setShowProQuickMenu(false)
                       }}
-                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-3 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
+                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
                       {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
@@ -5357,7 +5357,7 @@ Choose one:
 
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
-                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[210px] rounded-[1rem] border border-[#7C8CFF]/20 bg-black/90 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                           <button
                             type="button"
                             onClick={() => {
@@ -5392,7 +5392,7 @@ I’ll stay with you.`
                               setInteractionMode('speech')
                               setTimeout(() => startListening(), 120)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
                             Start Conversation
                           </button>
@@ -5405,7 +5405,7 @@ I’ll stay with you.`
                               setSessionPickerMode('live')
                               setShowSessionPicker(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/78"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/78"
                           >
                             Resume Conversation
                           </button>
@@ -5429,7 +5429,7 @@ I’ll stay with you.`
                               setToastMessage('Text guidance active.')
                               setShowToast(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
                           >
                             Text Guidance
                           </button>
@@ -5452,7 +5452,7 @@ I’ll stay with you.`
                               setToastMessage('Audio guidance active.')
                               setShowToast(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
                           >
                             Audio Guidance
                           </button>
@@ -5603,7 +5603,7 @@ I’ll stay with you.`
 
                       <div className="relative shrink-0">
                         {showProQuickMenu && (
-                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[220px] rounded-[1rem] border border-white/[0.09] bg-black/90 p-1.5 shadow-[0_16px_42px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[250px] origin-bottom-right rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                             <button
                               type="button"
                               onClick={() => {
@@ -5611,7 +5611,7 @@ I’ll stay with you.`
                                 localStorage.setItem('george_intake_pending', 'campaign')
                                 window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/76 transition hover:bg-white/[0.06] hover:text-white"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/76 transition hover:bg-white/[0.06] hover:text-white"
                             >
                               Start New Campaign
                             </button>
@@ -5624,7 +5624,7 @@ I’ll stay with you.`
                                 setSessionPickerMode('campaign')
                                 setShowSessionPicker(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/76"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/76"
                             >
                               Resume Campaign
                             </button>
@@ -5647,7 +5647,7 @@ I’ll stay with you.`
                                 setToastMessage('Negotiation mode active.')
                                 setShowToast(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
                             >
                               Negotiation Mode
                             </button>
@@ -5668,7 +5668,7 @@ I’ll stay with you.`
                                 setToastMessage('Objection handling active.')
                                 setShowToast(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
                             >
                               Objection Handling
                             </button>
@@ -5684,7 +5684,7 @@ I’ll stay with you.`
                                 setToastMessage('Back to LIVE Conversation.')
                                 setShowToast(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-[#AEB6FF]/75 transition hover:bg-[#7C8CFF]/10 hover:text-[#C9D0FF]"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-[#AEB6FF]/75 transition hover:bg-[#7C8CFF]/10 hover:text-[#C9D0FF]"
                             >
                               Back to LIVE Conversation
                             </button>
@@ -5696,8 +5696,8 @@ I’ll stay with you.`
                 </div>
               )}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[150px] bg-[rgba(0,0,0,0.68)]" />
-              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[80px] bg-gradient-to-t from-[rgba(0,0,0,0.72)] to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[124px] bg-[rgba(0,0,0,0.54)]" />
+              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[56px] bg-gradient-to-t from-[rgba(0,0,0,0.52)] to-transparent" />
 
               
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
@@ -5716,7 +5716,7 @@ I’ll stay with you.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[-18px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[8px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
