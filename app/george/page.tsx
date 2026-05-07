@@ -4965,15 +4965,13 @@ I will guide you in real time. Start speaking.`
 
 
 {showEarbudOverlay && (
-  <div className="fixed inset-x-0 top-[96px] z-[260] flex justify-center pointer-events-none">
+  <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
-      <div className="relative flex h-24 w-28 items-center justify-center rounded-full border border-[#7C8CFF]/24 bg-black/72 shadow-[0_0_42px_rgba(124,140,255,0.22)] backdrop-blur-2xl">
-        <div className="absolute h-20 w-20 rounded-full border border-[#7C8CFF]/18 animate-spin [animation-duration:4.8s]" />
-        <div className="flex items-center gap-3">
-          <div className="h-14 w-9 rounded-full border border-[#7C8CFF]/42 bg-white/[0.035] shadow-[0_0_18px_rgba(124,140,255,0.16)] animate-pulse" />
-          <div className="h-14 w-9 rounded-full border border-[#7C8CFF]/42 bg-white/[0.035] shadow-[0_0_18px_rgba(124,140,255,0.16)] animate-pulse [animation-delay:0.25s]" />
-        </div>
-      </div>
+      <img
+        src="/earbuds.png"
+        alt=""
+        className="h-[118px] w-auto opacity-90 drop-shadow-[0_0_34px_rgba(124,140,255,0.26)] animate-pulse"
+      />
 
       <div className="rounded-2xl border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         Use one earbud if you can.
