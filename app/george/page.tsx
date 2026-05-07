@@ -856,6 +856,11 @@ if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && exi
         setMessages(existingLive.messages)
         messagesRef.current = existingLive.messages
         liveSessionWriteReadyRef.current = true
+        setVoiceOn(true)
+        setInteractionMode('speech')
+        setShowEarbudOverlay(true)
+        window.setTimeout(() => setShowEarbudOverlay(false), 5200)
+        setTimeout(() => startListening(), 120)
         return
       }
 
