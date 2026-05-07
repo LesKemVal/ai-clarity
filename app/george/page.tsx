@@ -3564,6 +3564,43 @@ setPendingAssistantMessage({
 
   const showConversation = input.trim().length > 0 || messages.some((m) => m.role === 'user') || liveMode
   const showMobileHero = !showConversation
+  const enterLiveConversation = () => {
+    setShowLiveQuickMenu(false)
+    setShowCampaignMenu(false)
+    setShowRecentFolders(false)
+    router.push('/george/live')
+
+    const liveIntro: Message = {
+      role: 'assistant',
+      content: `Use one earbud if you can.
+
+You don’t have to tell me everything right now.
+I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
+
+Speak naturally.
+
+You got this.`
+    }
+
+    createSession('live', [liveIntro], 'LIVE Assistance')
+    liveSessionWriteReadyRef.current = true
+    setMessages([liveIntro])
+    messagesRef.current = [liveIntro]
+
+    setConversationMode('manual_live')
+    setActivePromptContext('manual_live')
+    setActivePromptLabel('Conversation')
+    setVoiceOn(true)
+    setInteractionMode('speech')
+    setShowEarbudOverlay(true)
+
+    window.setTimeout(() => {
+      setShowEarbudOverlay(false)
+    }, 5200)
+
+    setTimeout(() => startListening(), 120)
+  }
+
 
 {false && showMobileHero && (
   <div className="flex flex-col items-center justify-center text-center pt-20 pb-6 md:pt-28 md:pb-10">
@@ -3605,9 +3642,7 @@ return (
         <Sidebar
           currentTier={currentTier}
             onOpenLiveGate={() => {
-              setShowLiveQuickMenu(true)
-              setShowCampaignMenu(false)
-              setShowRecentFolders(false)
+              enterLiveConversation()
             }}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
@@ -4630,9 +4665,7 @@ if (liveMode) {
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
 } else {
-  setShowLiveQuickMenu(true)
-  setShowCampaignMenu(false)
-  setShowRecentFolders(false)
+  enterLiveConversation()
 }
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
@@ -4644,7 +4677,7 @@ if (liveMode) {
           LIVE
         </button>
 
-        {showLiveQuickMenu && !liveMode && (
+        {false && showLiveQuickMenu && !liveMode && (
           <>
             <button
               type="button"
