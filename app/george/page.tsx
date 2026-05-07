@@ -5620,18 +5620,20 @@ I’ll stay with you.`
                               Start New Campaign
                             </button>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowProQuickMenu(false)
-                                setSessionPickerClosing(false)
-                                setSessionPickerMode('campaign')
-                                setShowSessionPicker(true)
-                              }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/76"
-                            >
-                              Resume Campaign
-                            </button>
+                            {getCampaignSessions().filter(hasMeaningfulUserMessage).length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowProQuickMenu(false)
+                                  setSessionPickerClosing(false)
+                                  setSessionPickerMode('campaign')
+                                  setShowSessionPicker(true)
+                                }}
+                                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/76"
+                              >
+                                Resume Campaign
+                              </button>
+                            )}
 
                             <div className="my-1 h-px bg-white/[0.08]" />
 
