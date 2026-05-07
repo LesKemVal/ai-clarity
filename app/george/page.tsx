@@ -699,6 +699,32 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
 const [recommendedControl, setRecommendedControl] = useState<string | null>(null)
   const [rewordPopupUpward, setRewordPopupUpward] = useState(true)
 const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
+
+const syncCampaignEnvironment = (
+  campaignId: string | null,
+  updates: Partial<{
+    assistMode: string
+    outputStyle: string
+    deliveryMode: string
+    assistTone: string
+  }>
+) => {
+  if (!campaignId) return
+
+  updateCampaignSessionMetadata(campaignId, (metadata) => {
+    const currentEnvironment = (metadata.savedEnvironment || {}) as any
+
+    return {
+      ...metadata,
+      savedEnvironment: {
+        ...currentEnvironment,
+        ...updates,
+      },
+    }
+  })
+}
+
+
 const [forceClose, setForceClose] = useState(false)
 
 const [suggestedSignal, setSuggestedSignal] = useState(0)
@@ -5467,6 +5493,10 @@ I’ll stay with you.`
                                 )
                               )
                               window.localStorage.setItem('george_voice', 'off')
+                              syncCampaignEnvironment(activeCampaignId, {
+                                deliveryMode: 'text',
+                                assistTone,
+                              })
                               setToastMessage('Text guidance active.')
                               setShowToast(true)
                             }}
@@ -5489,6 +5519,10 @@ I’ll stay with you.`
                                 )
                               )
                               window.localStorage.setItem('george_voice', 'on')
+                              syncCampaignEnvironment(activeCampaignId, {
+                                deliveryMode: 'audio',
+                                assistTone,
+                              })
                               setTimeout(() => startListening(), 120)
                               setToastMessage('Audio guidance active.')
                               setShowToast(true)
@@ -5541,6 +5575,10 @@ I’ll stay with you.`
                           )
                         )
                         window.localStorage.setItem('george_voice', 'off')
+                        syncCampaignEnvironment(activeCampaignId, {
+                          deliveryMode: 'text',
+                          assistTone,
+                        })
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
@@ -5564,6 +5602,10 @@ I’ll stay with you.`
                           )
                         )
                         window.localStorage.setItem('george_voice', 'on')
+                        syncCampaignEnvironment(activeCampaignId, {
+                          deliveryMode: 'audio',
+                          assistTone,
+                        })
                         setTimeout(() => startListening(), 120)
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
@@ -5589,6 +5631,11 @@ I’ll stay with you.`
                                   : c
                               )
                             )
+                            syncCampaignEnvironment(activeCampaignId, {
+                              assistMode: 'negotiation',
+                              outputStyle: 'say_ask_boundary_close',
+                              assistTone,
+                            })
                             setToastMessage('Negotiation mode active.')
                             setShowToast(true)
                           }}
@@ -5609,6 +5656,11 @@ I’ll stay with you.`
                                   : c
                               )
                             )
+                            syncCampaignEnvironment(activeCampaignId, {
+                              assistMode: 'objection_handling',
+                              outputStyle: 'repeatable_lines',
+                              assistTone,
+                            })
                             setToastMessage('Objection handling active.')
                             setShowToast(true)
                           }}
