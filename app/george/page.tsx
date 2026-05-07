@@ -5143,14 +5143,33 @@ I will guide you in real time. Start speaking.`
                   }, 170)
                   router.push('/george/live')
                   if (sessionPickerMode === 'campaign') {
-                    setActiveCampaignId(typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id)
-                    setConversationMode('professional_live')
-                    setActivePromptContext('professional_live')
+                    const campaignId = typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id
+                    const savedEnvironment = session.savedEnvironment || session.metadata?.savedEnvironment || {}
+                    const restoredAssistMode = savedEnvironment.assistMode || session.assistMode || 'professional_live'
+                    const restoredOutputStyle = savedEnvironment.outputStyle || session.outputStyle || 'short_cues'
+                    const restoredDeliveryMode = savedEnvironment.deliveryMode || session.deliveryMode || 'text'
+                    const restoredTone = savedEnvironment.assistTone || session.assistTone || assistTone
+
+                    setActiveCampaignId(campaignId)
+                    setConversationMode(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
+                    setActivePromptContext(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
                     setActivePromptLabel(session.title || 'Pro LIVE Campaign')
+                    setAssistTone(restoredTone)
+                    setVoiceOn(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both')
+                    setInteractionMode(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both' ? 'speech' : 'text')
+                    setCampaigns((prev) =>
+                      prev.map((c) =>
+                        c.id === campaignId
+                          ? { ...c, assistMode: restoredAssistMode, outputStyle: restoredOutputStyle, deliveryMode: restoredDeliveryMode }
+                          : c
+                      )
+                    )
                   } else {
                     setConversationMode('manual_live')
                     setActivePromptContext('manual_live')
                     setActivePromptLabel(session.title || 'Conversation')
+                    setVoiceOn(false)
+                    setInteractionMode('text')
                   }
 
                   const goal = session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'
