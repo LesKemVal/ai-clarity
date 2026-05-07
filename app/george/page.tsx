@@ -4430,14 +4430,14 @@ router.push('/george')
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 min-w-[200px] max-w-[85vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
-                  Save for repetition
+                  Save
                 </div>
 
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="flex gap-1.5">
                   {['Follow-ups'].map((folder) => (
                     <button
                       key={folder}
@@ -4446,7 +4446,7 @@ router.push('/george')
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="min-h-[42px] rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/8 px-2 py-1.5 text-[11px] font-semibold text-white/82 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/14 hover:text-white"
+                      className="flex-1 rounded-lg border border-[#7C8CFF]/18 bg-[#7C8CFF]/8 px-2 py-1.5 text-[10px] font-medium text-white/76 transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/14 hover:text-white"
                     >
                       {folder}
                     </button>
@@ -4460,14 +4460,14 @@ router.push('/george')
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-xl border border-[#7C8CFF]/24 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
+                  className="w-full rounded-lg border border-[#7C8CFF]/20 bg-[#7C8CFF]/8 px-2.5 py-2 text-[11px] font-medium leading-4 text-white/86 transition hover:border-[#7C8CFF]/50 hover:bg-[#7C8CFF]/14"
                 >
                   Save to {getDefaultFolder()}
                 </button>
 
                 {getExistingFolders().length > 0 && (
                   <div className="space-y-1.5">
-                    <div className="text-[11px] text-neutral-500">Recent folders</div>
+                    <div className="text-[10px] text-neutral-500">Recent</div>
                     <div className="flex flex-wrap gap-1">
                       {getExistingFolders().map((folder) => (
                         <button
@@ -4497,7 +4497,7 @@ router.push('/george')
                 )}
 
                 <div className="space-y-1.5">
-                  <div className="text-[11px] text-neutral-500">Create folder</div>
+                  <div className="text-[10px] text-neutral-500">New folder</div>
                   <div className="flex flex-col gap-1.5">
                     <input
                       value={newFolderName}
