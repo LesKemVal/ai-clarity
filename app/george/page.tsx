@@ -787,6 +787,7 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
+const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
@@ -5428,18 +5429,14 @@ Choose one:
 
                               const liveIntro: Message = {
                                 role: 'assistant',
-                                content: `Use GEORGE in any room by earbud first, or by text when you need silence.
+                                content: `Use one earbud if you can.
 
-GEORGE will listen with you, track what is happening, and help you respond in real time.
+You don’t have to tell me everything right now.
+I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
 
-Say what is happening naturally. If you need help, say:
-“hold on…”
-“how do I say this?”
-“what’s the word I’m looking for?”
-“help me respond”
-“give me the next line”
+Speak naturally.
 
-I’ll stay with you and keep the room clear.`
+You got this.`
                               }
 
                               createSession('live', [liveIntro], 'LIVE Assistance')
@@ -5451,6 +5448,12 @@ I’ll stay with you and keep the room clear.`
                               setActivePromptLabel('Conversation')
                               setVoiceOn(true)
                               setInteractionMode('speech')
+                              setShowEarbudOverlay(true)
+
+                              window.setTimeout(() => {
+                                setShowEarbudOverlay(false)
+                              }, 5200)
+
                               setTimeout(() => startListening(), 120)
                             }}
                             className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
@@ -5728,6 +5731,26 @@ I’ll stay with you and keep the room clear.`
               <div className="pointer-events-none fixed bottom-[148px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
 
               
+
+{showEarbudOverlay && (
+  <div className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 bg-black/28 backdrop-blur-[2px]" />
+
+    <div className="relative flex flex-col items-center gap-4 px-6 text-center animate-[menuLift_400ms_ease-out]">
+      <div className="flex items-center gap-5 text-white/88 drop-shadow-[0_0_24px_rgba(124,140,255,0.28)]">
+        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
+        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
+      </div>
+
+      <div className="max-w-[280px] text-[13px] leading-6 text-white/76">
+        Use one earbud if you can.
+        <br />
+        GEORGE is listening live.
+      </div>
+    </div>
+  </div>
+)}
+
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[70] flex justify-center pointer-events-none">
     <div className="text-[11px] text-white/40 tracking-[0.18em]">
