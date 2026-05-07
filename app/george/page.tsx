@@ -4540,7 +4540,7 @@ router.push('/george')
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`fixed bottom-[120px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center justify-between rounded-2xl border border-white/10 bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl`}>
+              <div className={`fixed bottom-[120px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center justify-between rounded-2xl border border-transparent bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl`}>
 
   <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
 
@@ -5002,7 +5002,7 @@ I will guide you in real time. Start speaking.`
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className="w-full max-w-[420px] rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,18,22,0.98),rgba(5,5,8,0.98))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl">
+      <div className="w-full max-w-[420px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-[linear-gradient(180deg,rgba(8,10,18,0.98),rgba(0,0,0,0.98))] ring-1 ring-[#7C8CFF]/10 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl">
         <div className="mb-2 text-[11px] tracking-[0.22em] text-[#7C8CFF]">
           {activeCampaignId ? 'LEAVE PRO LIVE' : 'LEAVE LIVE'}
         </div>
@@ -5043,7 +5043,7 @@ I will guide you in real time. Start speaking.`
           <button
             type="button"
             onClick={() => setShowExitPopup(false)}
-            className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm font-medium text-white/80 transition hover:bg-white/[0.07]"
+            className="w-full rounded-xl border border-[#7C8CFF]/16 bg-[#7C8CFF]/8 px-4 py-3 text-left text-sm font-medium text-white/80 transition hover:bg-white/[0.07]"
           >
             Continue session
           </button>
@@ -5931,7 +5931,7 @@ What are we working on?"
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 ring-1 ring-[#7C8CFF]/10 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
@@ -5971,7 +5971,7 @@ What are we working on?"
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] bg-neutral-950/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 ring-1 ring-[#7C8CFF]/10/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -6018,7 +6018,7 @@ What are we working on?"
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl max-w-full border border-white/10 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-2xl max-w-full border border-[#7C8CFF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -6083,7 +6083,7 @@ What are we working on?"
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[420px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
+        className="pointer-events-auto w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 text-center">
