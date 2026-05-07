@@ -5556,10 +5556,11 @@ I’ll stay with you.`
                         setSessionPickerMode('live')
                         setShowSessionPicker(true)
                       }}
-                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[12px] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
+                      className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
                       aria-label="Open LIVE conversation memory"
+                      title="Memory"
                     >
-                      ▣
+                      Memory
                     </button>
 
                     <button
