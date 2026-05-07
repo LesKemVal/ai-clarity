@@ -1398,7 +1398,7 @@ setMessages([openingMessage])
 
       window.localStorage.removeItem('george_intake_pending')
 
-      router.push('/george/live')
+      // LIVE handled by state/session
 setAttemptStartTime(Date.now())
       setConversationMode('professional_intake')
       setActivePromptContext('professional_intake')
@@ -3568,7 +3568,7 @@ setPendingAssistantMessage({
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
-    router.push('/george/live')
+    // LIVE handled by state/session
 
     const liveIntro: Message = {
       role: 'assistant',
@@ -4677,67 +4677,7 @@ if (liveMode) {
           LIVE
         </button>
 
-        {false && showLiveQuickMenu && !liveMode && (
-          <>
-            <button
-              type="button"
-              aria-label="Close LIVE quick menu"
-              onClick={() => setShowLiveQuickMenu(false)}
-              className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
-            />
-
-            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] animate-[menuLift_420ms_ease-out]">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLiveQuickMenu(false)
-
-                  const liveIntro: Message = {
-                    role: 'assistant',
-                    content: `What are we doing?
-
-You don’t have to tell me everything right now.
-Start where the pressure is.`
-                  }
-
-                  router.push('/george/live')
-
-                  createSession('live', [liveIntro], 'LIVE Assistance')
-                  liveSessionWriteReadyRef.current = true
-                  setMessages([liveIntro])
-                  messagesRef.current = [liveIntro]
-
-                  setConversationMode('manual_live')
-                  setActivePromptContext('manual_live')
-                  setActivePromptLabel('Conversation')
-
-                  setVoiceOn(true)
-                  setInteractionMode('speech')
-
-                  setTimeout(() => startListening(), 120)
-                }}
-                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/80 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-              >
-                Start Conversation
-              </button>
-
-              {getSessionsForMode('live').filter(hasMeaningfulUserMessage).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowLiveQuickMenu(false)
-                    setSessionPickerClosing(false)
-                    setSessionPickerMode('live')
-                    setShowSessionPicker(true)
-                  }}
-                  className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
-                >
-                  Resume Conversation
-                </button>
-              )}
-            </div>
-          </>
-        )}
+        
         </>
       )}
 
@@ -5219,7 +5159,7 @@ I will guide you in real time. Start speaking.`
                     setShowSessionPicker(false)
                     setSessionPickerClosing(false)
                   }, 170)
-                  router.push('/george/live')
+                  // LIVE handled by state/session
                   if (sessionPickerMode === 'campaign') {
                     const campaignId = typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id
                     const savedEnvironment = session.savedEnvironment || session.metadata?.savedEnvironment || {}
@@ -5478,7 +5418,7 @@ Choose one:
                             type="button"
                             onClick={() => {
                               setShowLiveQuickMenu(false)
-                              router.push('/george/live')
+                              // LIVE handled by state/session
 
                               const liveIntro: Message = {
                                 role: 'assistant',
