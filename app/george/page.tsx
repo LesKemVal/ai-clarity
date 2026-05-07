@@ -5391,46 +5391,6 @@ Choose one:
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
                         <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowLiveQuickMenu(false)
-                              // LIVE handled by state/session
-
-                              const liveIntro: Message = {
-                                role: 'assistant',
-                                content: `Use one earbud if you can.
-
-You don’t have to tell me everything right now.
-I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
-
-Speak naturally.
-
-You got this.`
-                              }
-
-                              createSession('live', [liveIntro], 'LIVE Assistance')
-                              liveSessionWriteReadyRef.current = true
-                              setMessages([liveIntro])
-                              messagesRef.current = [liveIntro]
-                              setConversationMode('manual_live')
-                              setActivePromptContext('manual_live')
-                              setActivePromptLabel('Conversation')
-                              setVoiceOn(true)
-                              setInteractionMode('speech')
-                              setShowEarbudOverlay(true)
-
-                              window.setTimeout(() => {
-                                setShowEarbudOverlay(false)
-                              }, 5200)
-
-                              setTimeout(() => startListening(), 120)
-                            }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                          >
-                            Start Conversation
-                          </button>
-
                           {getSessionsForMode('live').filter(hasMeaningfulUserMessage).length > 0 && (
                             <button
                               type="button"
