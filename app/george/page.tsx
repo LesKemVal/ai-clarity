@@ -3837,23 +3837,14 @@ return (
       </div>
 
       <div className="mt-1 flex items-center justify-center gap-[3px] px-5 py-1">
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.2s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.4s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.6s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.8s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.6s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.8s]" />
       </div>
     </div>
   )}
-
-  {showConversation && !liveMode && (
-    <div className="fixed left-0 right-0 top-[50px] z-[45] flex justify-center md:hidden pointer-events-none">
-      <div className="rounded-full bg-black/72 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-white/48 backdrop-blur-xl">
-        GEORGE
-      </div>
-    </div>
-  )}
-
   {bridgeThinking && (
     <div className="text-sm leading-7 text-white/70">
       Thinking...
@@ -5437,19 +5428,18 @@ Choose one:
 
                               const liveIntro: Message = {
                                 role: 'assistant',
-                                content: `I’m listening.
+                                content: `Use GEORGE in any room by earbud first, or by text when you need silence.
 
-You don’t have to explain everything up front.
-As you speak, I’ll pick up the room.
+GEORGE will listen with you, track what is happening, and help you respond in real time.
 
-If you need help, say things like:
+Say what is happening naturally. If you need help, say:
 “hold on…”
 “how do I say this?”
 “what’s the word I’m looking for?”
-“let me put that another way…”
-“help me here”
+“help me respond”
+“give me the next line”
 
-I’ll stay with you.`
+I’ll stay with you and keep the room clear.`
                               }
 
                               createSession('live', [liveIntro], 'LIVE Assistance')
@@ -5734,8 +5724,8 @@ I’ll stay with you.`
                 </div>
               )}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-[rgba(0,0,0,0.48)]" />
-              <div className="pointer-events-none fixed bottom-[178px] left-0 right-0 xl:left-[280px] z-[55] h-[38px] bg-gradient-to-t from-[rgba(0,0,0,0.42)] to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[148px] bg-black" />
+              <div className="pointer-events-none fixed bottom-[148px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
 
               
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
@@ -5754,7 +5744,7 @@ I’ll stay with you.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[14px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[14px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
@@ -5850,7 +5840,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[14px]' : 'fixed top-[58%] md:t
                         }}
                       />
                       {pendingImage && (
-                        <div className="mb-1.5 flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-white/8 bg-white/[0.03] px-2 py-1.5">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#7C8CFF]/18 bg-black/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
