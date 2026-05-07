@@ -5579,20 +5579,6 @@ I’ll stay with you.`
                     <button
                       type="button"
                       onClick={() => {
-                        setSessionPickerClosing(false)
-                        setSessionPickerMode('live')
-                        setShowSessionPicker(true)
-                      }}
-                      className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
-                      aria-label="Open LIVE conversation memory"
-                      title="Resume conversation continuity"
-                    >
-                      Resume
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
                         setVoiceOn(false)
                         setInteractionMode('text')
                         setCampaigns((prev) =>
@@ -5712,6 +5698,20 @@ I’ll stay with you.`
                     )}
 
                     <div className="ml-auto flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSessionPickerClosing(false)
+                          setSessionPickerMode('live')
+                          setShowSessionPicker(true)
+                        }}
+                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
+                        aria-label="Open LIVE conversation memory"
+                        title="Resume conversation continuity"
+                      >
+                        Resume
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => {
