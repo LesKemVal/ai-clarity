@@ -4384,8 +4384,8 @@ router.push('/george')
               type="button"
               onClick={() => {
                 const prompt = "Simplify your last response into plain language with only what matters most."
-                setInput(prompt)
-                void handleSend(prompt)
+                setConversationSignal('Simplifying…')
+                void handleSend(prompt, { hidden: true })
               }}
               className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
