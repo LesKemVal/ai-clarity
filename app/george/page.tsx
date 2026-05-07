@@ -5049,13 +5049,13 @@ I will guide you in real time. Start speaking.`
 
 
 {showEarbudOverlay && (
-  <div className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none">
-    <div className="absolute inset-0 bg-black/42 backdrop-blur-[3px]" />
+  <div className="fixed inset-0 z-[260] flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 bg-black/62 backdrop-blur-[5px]" />
 
-    <div className="relative flex flex-col items-center gap-4 px-6 text-center animate-[menuLift_400ms_ease-out]">
+    <div className="relative flex flex-col items-center gap-5 px-6 text-center animate-[menuLift_700ms_ease-out]">
       <div className="flex items-center gap-5 text-white/88 drop-shadow-[0_0_24px_rgba(124,140,255,0.28)]">
-        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
-        <div className="h-12 w-9 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
+        <div className="h-20 w-12 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse" />
+        <div className="h-20 w-12 rounded-full border border-[#7C8CFF]/30 bg-white/[0.03] backdrop-blur-xl animate-pulse [animation-delay:0.35s]" />
       </div>
 
       <div className="max-w-[280px] text-[13px] leading-6 text-white/76">
