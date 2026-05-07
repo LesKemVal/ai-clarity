@@ -5697,7 +5697,7 @@ I’ll stay with you.`
                       </>
                     )}
 
-                    <div className="ml-auto flex items-center gap-3">
+                    <div className="ml-auto flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -5717,7 +5717,7 @@ I’ll stay with you.`
                         onClick={() => {
                           requestExitLiveMode()
                         }}
-                        className="shrink-0 rounded-full bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-200 transition hover:bg-red-500/18"
+                        className="shrink-0 rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-200/85 transition hover:bg-red-500/14 hover:text-red-100"
                       >
                         EXIT
                       </button>
