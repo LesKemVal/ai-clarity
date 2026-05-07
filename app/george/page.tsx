@@ -861,19 +861,25 @@ if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && exi
 
       const liveIntro: Message = {
         role: 'assistant',
-        content: `You don’t need to tell me everything right now.
+        content: `Use one earbud if you can.
 
-Start where the pressure is.
-I’ll pick up the room as we go.
+You don’t have to tell me everything right now.
+I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
 
-If you freeze, stall, lose the word, or need to pivot —
-I’ll help you recover in real time.`
+Speak naturally.
+
+You got this.`
       }
 
       createSession('live', [liveIntro], 'LIVE Assistance')
       setMessages([liveIntro])
       messagesRef.current = [liveIntro]
       liveSessionWriteReadyRef.current = true
+      setVoiceOn(true)
+      setInteractionMode('speech')
+      setShowEarbudOverlay(true)
+      window.setTimeout(() => setShowEarbudOverlay(false), 5200)
+      setTimeout(() => startListening(), 120)
       return
     }
 
@@ -3568,37 +3574,7 @@ setPendingAssistantMessage({
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
-    // LIVE handled by state/session
-
-    const liveIntro: Message = {
-      role: 'assistant',
-      content: `Use one earbud if you can.
-
-You don’t have to tell me everything right now.
-I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
-
-Speak naturally.
-
-You got this.`
-    }
-
-    createSession('live', [liveIntro], 'LIVE Assistance')
-    liveSessionWriteReadyRef.current = true
-    setMessages([liveIntro])
-    messagesRef.current = [liveIntro]
-
-    setConversationMode('manual_live')
-    setActivePromptContext('manual_live')
-    setActivePromptLabel('Conversation')
-    setVoiceOn(true)
-    setInteractionMode('speech')
-    setShowEarbudOverlay(true)
-
-    window.setTimeout(() => {
-      setShowEarbudOverlay(false)
-    }, 5200)
-
-    setTimeout(() => startListening(), 120)
+    router.push('/george/live')
   }
 
 
