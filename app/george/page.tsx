@@ -5582,8 +5582,10 @@ I’ll stay with you.`
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-[#7C8CFF]/10 ${
-                        !voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
+                      className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
+                        !voiceOn
+                          ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
+                          : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
                       }`}
                     >
                       Text
@@ -5610,8 +5612,10 @@ I’ll stay with you.`
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-[#7C8CFF]/10 ${
-                        voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
+                      className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
+                        voiceOn
+                          ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
+                          : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
                       }`}
                     >
                       Audio
@@ -5639,9 +5643,13 @@ I’ll stay with you.`
                             setToastMessage('Negotiation mode active.')
                             setShowToast(true)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-white/75"
+                          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
+                            conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation'
+                              ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
+                              : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                          }`}
                         >
-                          Negotiate
+                          ⚡ Negotiate
                         </button>
 
                         <button
@@ -5664,9 +5672,13 @@ I’ll stay with you.`
                             setToastMessage('Objection handling active.')
                             setShowToast(true)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-white/75"
+                          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
+                            conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling'
+                              ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
+                              : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                          }`}
                         >
-                          Objections
+                          ⛨ Objections
                         </button>
                       </>
                     )}
