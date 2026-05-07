@@ -192,6 +192,24 @@ export function updateCampaignSessionMetadata(
   safeWriteSessions(updated)
 }
 
+export function hasMeaningfulUserMessage(session: any) {
+  try {
+    const messages = Array.isArray(session?.messages) ? session.messages : []
+    return messages.some((message: any) => {
+      if (message?.role !== 'user') return false
+      const content = typeof message?.content === 'string' ? message.content.trim() : ''
+      if (!content) return false
+      const lower = content.toLowerCase()
+      if (lower === 'start conversation') return false
+      if (lower === 'start live') return false
+      if (lower === 'resume conversation') return false
+      return true
+    })
+  } catch {
+    return false
+  }
+}
+
 export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
   // --- session intelligence extraction ---
   let userGoal = undefined
