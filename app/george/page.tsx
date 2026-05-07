@@ -787,7 +787,6 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
-  const [showProQuickMenu, setShowProQuickMenu] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
@@ -5412,7 +5411,6 @@ Choose one:
                       type="button"
                       onClick={() => {
                         setShowLiveQuickMenu((prev) => !prev)
-                        setShowProQuickMenu(false)
                       }}
                       className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
@@ -5723,111 +5721,6 @@ I’ll stay with you.`
                       >
                         EXIT
                       </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowProQuickMenu((prev) => !prev)
-                          setShowLiveQuickMenu(false)
-                        }}
-                        className="hidden shrink-0 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:text-white"
-                        aria-label="Open PRO LIVE chooser"
-                      >
-                        🎧 PRO
-                      </button>
-
-                      <div className="hidden relative shrink-0">
-                        {showProQuickMenu && (
-                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[250px] origin-bottom-right rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowProQuickMenu(false)
-                                localStorage.setItem('george_intake_pending', 'campaign')
-                                window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
-                              }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/76 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                            >
-                              Start New Campaign
-                            </button>
-
-                            {getCampaignSessions().filter(hasMeaningfulUserMessage).length > 0 && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setShowProQuickMenu(false)
-                                  setSessionPickerClosing(false)
-                                  setSessionPickerMode('campaign')
-                                  setShowSessionPicker(true)
-                                }}
-                                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/76"
-                              >
-                                Resume Campaign
-                              </button>
-                            )}
-
-                            <div className="my-1 h-px bg-white/[0.08]" />
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowProQuickMenu(false)
-                                setActivePromptContext('professional_negotiation')
-                                setConversationMode('professional_negotiation')
-                                setCampaigns((prev) =>
-                                  prev.map((c) =>
-                                    c.id === activeCampaignId
-                                      ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
-                                      : c
-                                  )
-                                )
-                                setToastMessage('Negotiation mode active.')
-                                setShowToast(true)
-                              }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                            >
-                              Negotiation Mode
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowProQuickMenu(false)
-                                setActivePromptContext('professional_objection_handling')
-                                setConversationMode('professional_objection_handling')
-                                setCampaigns((prev) =>
-                                  prev.map((c) =>
-                                    c.id === activeCampaignId
-                                      ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
-                                      : c
-                                  )
-                                )
-                                setToastMessage('Objection handling active.')
-                                setShowToast(true)
-                              }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                            >
-                              Objection Handling
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowProQuickMenu(false)
-                                setActiveCampaignId(null)
-                                setConversationMode('manual_live')
-                                setActivePromptContext('manual_live')
-                                setActivePromptLabel('Conversation')
-                                setToastMessage('Back to LIVE Conversation.')
-                                setShowToast(true)
-                              }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-[#AEB6FF]/75 transition hover:bg-[#7C8CFF]/10 hover:text-[#C9D0FF]"
-                            >
-                              Back to LIVE Conversation
-                            </button>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
