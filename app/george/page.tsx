@@ -5194,11 +5194,29 @@ Choose one:
                 }}
                 className="w-full text-left px-3 py-2 pr-14 text-[12px] text-white/82"
               >
-                <div className="font-semibold text-white">
-                  {session.title || session.label || session.name || 'Conversation'}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 font-semibold text-white">
+                    {session.title || session.label || session.name || 'Conversation'}
+                  </div>
+
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[0.14em] ${
+                    sessionPickerMode === 'campaign'
+                      ? 'bg-[#7C8CFF]/14 text-[#C8CEFF]'
+                      : 'bg-white/[0.04] text-white/52'
+                  }`}>
+                    {sessionPickerMode === 'campaign' ? '⚡ Campaign' : '◉ LIVE'}
+                  </span>
                 </div>
 
-                <div className="mt-1 text-[11px] text-neutral-500">
+                <div className="mt-1.5 line-clamp-1 text-[11px] text-white/55">
+                  Goal: {session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'}
+                </div>
+
+                <div className="mt-0.5 line-clamp-1 text-[11px] text-white/38">
+                  Last state: {session.lastKnownState || session.summary || 'No state captured yet'}
+                </div>
+
+                <div className="mt-1.5 text-[10px] text-neutral-600">
                   {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved conversation'}
                 </div>
               </button>
