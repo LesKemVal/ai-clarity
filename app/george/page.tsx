@@ -5157,7 +5157,7 @@ I will guide you in real time. Start speaking.`
 
                   const restartBrief: Message = {
                     role: 'assistant',
-                    content: `Smart Resume.
+                    content: `Welcome back.
 
 Goal:
 ${goal}
@@ -5178,7 +5178,7 @@ Choose one:
                     ? session.messages
                     : []
 
-                  // Smart Resume FIRST (promoted)
+                  // Welcome back restore message FIRST
                   const smartResumeEntry: Message = restartBrief
 
                   // keep history behind it (hidden until user scrolls)
