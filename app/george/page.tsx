@@ -5483,6 +5483,35 @@ I’ll stay with you.`
                             type="button"
                             onClick={() => {
                               setShowLiveQuickMenu(false)
+                              localStorage.setItem('george_intake_pending', 'campaign')
+                              window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                          >
+                            Start New Campaign
+                          </button>
+
+                          {getCampaignSessions().filter(hasMeaningfulUserMessage).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowLiveQuickMenu(false)
+                                setSessionPickerClosing(false)
+                                setSessionPickerMode('campaign')
+                                setShowSessionPicker(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
+                            >
+                              Resume Campaign
+                            </button>
+                          )}
+
+                          <div className="my-1 h-px bg-white/[0.08]" />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
                               setVoiceOn(false)
                               setInteractionMode('text')
                               setCampaigns((prev) =>
@@ -5701,13 +5730,13 @@ I’ll stay with you.`
                           setShowProQuickMenu((prev) => !prev)
                           setShowLiveQuickMenu(false)
                         }}
-                        className="shrink-0 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:text-white"
+                        className="hidden shrink-0 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:text-white"
                         aria-label="Open PRO LIVE chooser"
                       >
                         🎧 PRO
                       </button>
 
-                      <div className="relative shrink-0">
+                      <div className="hidden relative shrink-0">
                         {showProQuickMenu && (
                           <div className="absolute bottom-full right-0 z-[95] mb-2 w-[250px] origin-bottom-right rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                             <button
