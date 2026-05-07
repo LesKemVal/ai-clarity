@@ -3812,11 +3812,11 @@ return (
       </div>
 
       <div className="mt-1 flex items-center justify-center gap-[3px] px-5 py-1">
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.6s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.8s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.2s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.4s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.6s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.8s]" />
       </div>
     </div>
   )}
@@ -4012,12 +4012,12 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {rewordPopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-xl border border-white/10 bg-black/95 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 text-[11px] text-white/72 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${
             rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
-          <div className="flex items-center justify-between px-2 py-1 border-b border-white/10">
-            <span className="text-[10px] tracking-[0.12em] text-white/50">REWORD</span>
+          <div className="flex items-center justify-between px-2 py-1 border-b border-[#7C8CFF]/10">
+            <span className="text-[10px] tracking-[0.12em] text-white/62">REWORD</span>
             <button
               onClick={() => setRewordPopupIndex(null)}
               className="text-white/40 hover:text-white transition text-[12px]"
@@ -4048,7 +4048,7 @@ Cue:`
                   setRewordPopupIndex(null)
                   void handleSend(prompt)
                 }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
               >
                 {action}
               </button>
@@ -4136,7 +4136,7 @@ Say:
 Backup:
 Cue:`)
       }}
-      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
       title="Screener"
     >
       🎯
@@ -4145,12 +4145,12 @@ Cue:`)
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-xl border border-white/10 bg-black/95 text-[11px] text-white/70 shadow-[0_12px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 text-[11px] text-white/72 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${
             tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
-          <div className="flex items-center justify-between px-2 py-1 border-b border-white/10">
-            <span className="text-[10px] tracking-[0.12em] text-white/50">TONE</span>
+          <div className="flex items-center justify-between px-2 py-1 border-b border-[#7C8CFF]/10">
+            <span className="text-[10px] tracking-[0.12em] text-white/62">TONE</span>
             <button
               onClick={() => setTonePopupIndex(null)}
               className="text-white/40 hover:text-white transition text-[12px]"
@@ -4169,7 +4169,7 @@ Cue:`)
                   setToastMessage(`Tone: ${tone}`)
                   setShowToast(true)
                 }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
               >
                 {tone}
               </button>
@@ -4197,9 +4197,9 @@ Cue:`)
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
               <div className="flex items-center gap-1.5 pl-1">
-                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
-                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
-                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] animate-pulse" />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] " />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] " />
+                <span className="h-1 w-4 rounded-full bg-[#7C8CFF] " />
               </div>
               <span className="text-xs text-[#7C8CFF]">
                 This requires deeper support.
@@ -4295,7 +4295,7 @@ router.push('/george')
       setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
               <span className="h-1 w-1 rounded-full bg-[#7C8CFF]" />
               
@@ -4315,7 +4315,7 @@ router.push('/george')
                   }
                 } catch {}
               }}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
               Share
             </button>
@@ -4327,7 +4327,7 @@ router.push('/george')
                 setInput(prompt)
                 void handleSend(prompt)
               }}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition hover:border-white/20 hover:text-white"
+              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
               Simplify
             </button>
@@ -4406,7 +4406,7 @@ router.push('/george')
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 min-w-[200px] max-w-[85vw] rounded-[1.1rem] border border-[#7C8CFF]/25 bg-[#070A12]/98 p-2 shadow-[0_26px_86px_rgba(0,0,0,0.72),0_0_34px_rgba(124,140,255,0.14)] backdrop-blur-2xl ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 min-w-[200px] max-w-[85vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -4436,7 +4436,7 @@ router.push('/george')
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-xl border border-white/10 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
+                  className="w-full rounded-xl border border-[#7C8CFF]/24 bg-[#7C8CFF]/10 px-3 py-3 text-[12px] font-semibold leading-4 text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/15"
                 >
                   Save to {getDefaultFolder()}
                 </button>
@@ -4456,7 +4456,7 @@ router.push('/george')
                           className={`max-w-full break-words rounded-full border px-2 py-1 text-[10px] leading-4 transition ${
                             activeMemoryFolder === folder
                               ? 'border-[#7C8CFF]/50 bg-[#7C8CFF]/10 text-white'
-                              : 'border-white/10 text-neutral-300 hover:border-white/20 hover:text-white'
+                              : 'border-white/10 text-neutral-300 hover:border-[#7C8CFF]/35 hover:text-white'
                           }`}
                         >
                           {folder}
@@ -4467,7 +4467,7 @@ router.push('/george')
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-1.5 text-[10px] leading-4 text-neutral-400 break-words">
+                  <div className="rounded-xl border border-[#7C8CFF]/14 bg-black/35 p-1.5 text-[10px] leading-4 text-neutral-400 break-words">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
@@ -4479,7 +4479,7 @@ router.push('/george')
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="New folder"
-                      className="w-full rounded-xl border border-white/10 bg-transparent px-2.5 py-1.5 text-[11px] leading-4 text-white outline-none placeholder:text-neutral-500"
+                      className="w-full rounded-xl border border-[#7C8CFF]/14 bg-black/30 px-2.5 py-1.5 text-[11px] leading-4 text-white outline-none placeholder:text-neutral-500"
                     />
                     <button
                       type="button"
@@ -4488,7 +4488,7 @@ router.push('/george')
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="w-full rounded-xl border border-white/10 px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-white/20"
+                      className="w-full rounded-xl border border-white/10 px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10"
                     >
                       Save
                     </button>
@@ -4576,7 +4576,7 @@ router.push('/george')
         className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
             ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF] shadow-[0_0_14px_rgba(124,140,255,0.28)]'
-            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
+            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-[#7C8CFF]/10 hover:text-white'
         }`}
         aria-label="Open memory folders"
         title="Memory"
@@ -4628,7 +4628,7 @@ if (liveMode) {
               className="fixed inset-0 z-[88] bg-black/10 backdrop-blur-[2px]"
             />
 
-            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+            <div className="absolute bottom-[58px] left-0 z-[95] w-[230px] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
               <button
                 type="button"
                 onClick={() => {
@@ -4671,7 +4671,7 @@ Start where the pressure is.`
                   setSessionPickerMode('live')
                   setShowSessionPicker(true)
                 }}
-                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-white/[0.05] hover:text-white/78"
+                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
               >
                 Resume Conversation
               </button>
@@ -4685,7 +4685,7 @@ Start where the pressure is.`
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -4720,7 +4720,7 @@ Start where the pressure is.`
             )}
 
             {activeMemoryFolder && (
-              <div className="mt-3 border-t border-white/[0.06] pt-3">
+              <div className="mt-3 border-t border-transparent pt-3">
                 <div className="mb-2 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-white/35">
                   <span>{activeMemoryFolder}</span>
                   <button
@@ -4764,7 +4764,7 @@ Start where the pressure is.`
                         className={`block w-full rounded-xl border px-4 py-1.5 text-left text-xs transition ${
                           isLatest
                             ? 'border-[#7C8CFF]/40 bg-[#7C8CFF]/10 text-white'
-                            : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-white/20 hover:text-white'
+                            : 'border-[#7C8CFF]/14 bg-black/35 text-neutral-300 hover:border-[#7C8CFF]/35 hover:text-white'
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between gap-1.5">
@@ -4807,7 +4807,7 @@ Start where the pressure is.`
               : 'bg-white/85'
           } ${
             suggestedSignal || rerouteSignal
-              ? 'ring-1 ring-[#7C8CFF]/45 shadow-[0_0_6px_#7C8CFF,0_0_12px_#7C8CFF] animate-pulse'
+              ? 'ring-1 ring-[#7C8CFF]/45 shadow-[0_0_6px_#7C8CFF,0_0_12px_#7C8CFF] '
               : ''
           }`}
         />
@@ -4816,7 +4816,7 @@ Start where the pressure is.`
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-xl border border-white/10 bg-neutral-950/95 px-2.5 py-1.5 shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5011,7 +5011,7 @@ I will guide you in real time. Start speaking.`
           Exit
         </div>
 
-        <div className="mt-2 text-[12px] leading-5 text-white/50">
+        <div className="mt-2 text-[12px] leading-5 text-white/62">
           GEORGE will return you to normal mode and preserve the session through V2 continuity.
         </div>
 
@@ -5081,7 +5081,7 @@ I will guide you in real time. Start speaking.`
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-white/12' : 'border-[#7C8CFF]/24'} bg-[#262626]/96 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-[#7C8CFF]/20' : 'border-[#7C8CFF]/28'} bg-black/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5130,7 +5130,7 @@ I will guide you in real time. Start speaking.`
             return sessions.slice(0, 12).map((session) => (
               <div
                 key={session.id}
-                className="group relative overflow-hidden rounded-[1rem] border border-white/[0.08] bg-black/20 transition hover:bg-white/[0.06]"
+                className="group relative overflow-hidden rounded-[1rem] border border-transparent bg-black/20 transition hover:bg-[#7C8CFF]/10"
               >
                 <button
                   onClick={() => {
@@ -5221,7 +5221,7 @@ Choose one:
                     onClick={() => {
                       setPendingDeleteSessionId(session.id)
                     }}
-                    className="rounded-full px-2 py-1 text-[14px] text-white/38 transition hover:bg-white/[0.06] hover:text-white/82"
+                    className="rounded-full px-2 py-1 text-[14px] text-white/38 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                   >
                     ⋯
                   </button>
@@ -5249,7 +5249,7 @@ Choose one:
     className="inline-flex items-center gap-1 whitespace-nowrap px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
   >
     <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>
-    <span className={`inline-block text-[#7C8CFF] transition-all duration-300 ease-out ${currentTier === 'brilliant' ? '' : 'animate-pulse'}`}>
+    <span className={`inline-block text-[#7C8CFF] transition-all duration-300 ease-out ${currentTier === 'brilliant' ? '' : ''}`}>
       {currentTier === 'brilliant' ? 'Brilliant' : upgradeCtaWord}
     </span>
   </button>
@@ -5341,7 +5341,7 @@ Choose one:
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-white/[0.045] bg-black/58 px-2.5 py-1 shadow-[0_-6px_18px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-transparent bg-black/58 px-2.5 py-1 shadow-[0_-10px_28px_rgba(0,0,0,0.22)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
@@ -5357,7 +5357,7 @@ Choose one:
 
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
-                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                           <button
                             type="button"
                             onClick={() => {
@@ -5405,7 +5405,7 @@ I’ll stay with you.`
                               setSessionPickerMode('live')
                               setShowSessionPicker(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/78"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
                           >
                             Resume Conversation
                           </button>
@@ -5429,7 +5429,7 @@ I’ll stay with you.`
                               setToastMessage('Text guidance active.')
                               setShowToast(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
                             Text Guidance
                           </button>
@@ -5452,7 +5452,7 @@ I’ll stay with you.`
                               setToastMessage('Audio guidance active.')
                               setShowToast(true)
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
                             Audio Guidance
                           </button>
@@ -5460,7 +5460,7 @@ I’ll stay with you.`
                       )}
                     </div>
 
-                    <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 animate-pulse" />
+                    <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 " />
 
                     {(isThinking || isSpeaking) && (
                       <span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
@@ -5503,7 +5503,7 @@ I’ll stay with you.`
                         setToastMessage('Text guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-white/[0.06] ${
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-[#7C8CFF]/10 ${
                         !voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
                       }`}
                     >
@@ -5527,7 +5527,7 @@ I’ll stay with you.`
                         setToastMessage('Audio guidance active.')
                         setShowToast(true)
                       }}
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-white/[0.06] ${
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition hover:bg-[#7C8CFF]/10 ${
                         voiceOn ? 'text-white/85' : 'text-white/38 hover:text-white/70'
                       }`}
                     >
@@ -5551,7 +5551,7 @@ I’ll stay with you.`
                             setToastMessage('Negotiation mode active.')
                             setShowToast(true)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-white/[0.06] hover:text-white/75"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-white/75"
                         >
                           Negotiate
                         </button>
@@ -5571,7 +5571,7 @@ I’ll stay with you.`
                             setToastMessage('Objection handling active.')
                             setShowToast(true)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-white/[0.06] hover:text-white/75"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-white/75"
                         >
                           Objections
                         </button>
@@ -5603,7 +5603,7 @@ I’ll stay with you.`
 
                       <div className="relative shrink-0">
                         {showProQuickMenu && (
-                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[250px] origin-bottom-right rounded-[1.35rem] border border-[#7C8CFF]/16 bg-[#2a2a2f]/94 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-white/[0.04] transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+                          <div className="absolute bottom-full right-0 z-[95] mb-2 w-[250px] origin-bottom-right rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                             <button
                               type="button"
                               onClick={() => {
@@ -5611,7 +5611,7 @@ I’ll stay with you.`
                                 localStorage.setItem('george_intake_pending', 'campaign')
                                 window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/76 transition hover:bg-white/[0.06] hover:text-white"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/76 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                             >
                               Start New Campaign
                             </button>
@@ -5624,7 +5624,7 @@ I’ll stay with you.`
                                 setSessionPickerMode('campaign')
                                 setShowSessionPicker(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/76"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/76"
                             >
                               Resume Campaign
                             </button>
@@ -5647,7 +5647,7 @@ I’ll stay with you.`
                                 setToastMessage('Negotiation mode active.')
                                 setShowToast(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                             >
                               Negotiation Mode
                             </button>
@@ -5668,7 +5668,7 @@ I’ll stay with you.`
                                 setToastMessage('Objection handling active.')
                                 setShowToast(true)
                               }}
-                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/58 transition hover:bg-white/[0.05] hover:text-white/82"
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                             >
                               Objection Handling
                             </button>
@@ -5716,7 +5716,7 @@ I’ll stay with you.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[8px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-white/10 bg-black px-2 py-1.5 shadow-[0_-10px_30px_rgba(0,0,0,0.45)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[8px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
@@ -6001,7 +6001,7 @@ What are we working on?"
                       className={`rounded-2xl border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
-                          : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:text-white'
+                          : 'border-[#7C8CFF]/14 bg-black/35 text-neutral-400 hover:text-white'
                       }`}
                     >
                       {voice.label}
@@ -6083,7 +6083,7 @@ What are we working on?"
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[420px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[420px] rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 text-center">
@@ -6122,7 +6122,7 @@ What are we working on?"
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/14 bg-black/35 px-4 py-3 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
             <div className="mt-1 text-xs leading-5 text-neutral-400">
@@ -6192,7 +6192,7 @@ What are we working on?"
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Pro Campaign</p>
@@ -6202,7 +6202,7 @@ What are we working on?"
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-neutral-400 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white"
+                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-400 transition hover:border-white/25 hover:bg-[#7C8CFF]/10 hover:text-white"
               >
                 Close
               </button>
