@@ -4663,18 +4663,20 @@ Start where the pressure is.`
                 Start Conversation
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLiveQuickMenu(false)
-                  setSessionPickerClosing(false)
-                  setSessionPickerMode('live')
-                  setShowSessionPicker(true)
-                }}
-                className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
-              >
-                Resume Conversation
-              </button>
+              {getSessionsForMode('live').filter(hasMeaningfulUserMessage).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLiveQuickMenu(false)
+                    setSessionPickerClosing(false)
+                    setSessionPickerMode('live')
+                    setShowSessionPicker(true)
+                  }}
+                  className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/52 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
+                >
+                  Resume Conversation
+                </button>
+              )}
             </div>
           </>
         )}
@@ -5397,18 +5399,20 @@ I’ll stay with you.`
                             Start Conversation
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowLiveQuickMenu(false)
-                              setSessionPickerClosing(false)
-                              setSessionPickerMode('live')
-                              setShowSessionPicker(true)
-                            }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
-                          >
-                            Resume Conversation
-                          </button>
+                          {getSessionsForMode('live').filter(hasMeaningfulUserMessage).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowLiveQuickMenu(false)
+                                setSessionPickerClosing(false)
+                                setSessionPickerMode('live')
+                                setShowSessionPicker(true)
+                              }}
+                              className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/62 transition hover:bg-[#7C8CFF]/10 hover:text-white/78"
+                            >
+                              Resume Conversation
+                            </button>
+                          )}
 
                           <div className="my-1 h-px bg-white/[0.08]" />
 
