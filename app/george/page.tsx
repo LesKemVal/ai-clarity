@@ -3825,10 +3825,10 @@ return (
     userPinnedBottomRef.current = nearBottom
     setShowScrollHint(!nearBottom)
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[470px] md:px-6 md:pb-[340px] space-y-5 ${liveMode ? "pt-4 md:pt-10" : showMobileHero ? "pt-4 md:pt-14" : "pt-1 md:pt-4"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[300px] space-y-4 ${liveMode ? "pt-4 md:pt-10" : showMobileHero ? "pt-3 md:pt-14" : "pt-14 md:pt-6"} `}>
   {showMobileHero && (
-    <div className="flex min-h-[calc(100dvh-560px)] flex-col items-center justify-start px-4 pt-2 md:hidden">
-      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[30px] md:text-3xl font-semibold tracking-[0.12em] text-transparent">
+    <div className="flex min-h-[calc(100dvh-430px)] flex-col items-center justify-start px-4 pt-2 md:hidden">
+      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[28px] md:text-3xl font-bold tracking-[0.08em] text-transparent">
         GEORGE
       </div>
 
@@ -3842,6 +3842,14 @@ return (
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.4s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.6s]" />
         <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF]  [animation-delay:0.8s]" />
+      </div>
+    </div>
+  )}
+
+  {showConversation && !liveMode && (
+    <div className="fixed left-0 right-0 top-[50px] z-[45] flex justify-center md:hidden pointer-events-none">
+      <div className="rounded-full bg-black/72 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-white/48 backdrop-blur-xl">
+        GEORGE
       </div>
     </div>
   )}
@@ -3868,8 +3876,8 @@ return (
         className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[78%] text-right rounded-[1.35rem] border border-[#6F7DE8]/20 bg-[#2f2f2f] px-5 py-4 shadow-[0_0_18px_rgba(111,125,232,0.12)]'
-              : 'max-w-[78%] text-right rounded-[1.35rem] border border-white/6 bg-white/[0.03] px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.18)]')
+              ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
+              : 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/18 bg-transparent px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         }`}
       >
@@ -5726,8 +5734,8 @@ I’ll stay with you.`
                 </div>
               )}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[124px] bg-[rgba(0,0,0,0.54)]" />
-              <div className="pointer-events-none fixed bottom-[210px] left-0 right-0 xl:left-[280px] z-[55] h-[56px] bg-gradient-to-t from-[rgba(0,0,0,0.52)] to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-[rgba(0,0,0,0.48)]" />
+              <div className="pointer-events-none fixed bottom-[178px] left-0 right-0 xl:left-[280px] z-[55] h-[38px] bg-gradient-to-t from-[rgba(0,0,0,0.42)] to-transparent" />
 
               
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
@@ -5746,7 +5754,7 @@ I’ll stay with you.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[8px]' : 'fixed top-[66%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[14px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[60] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[60] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
