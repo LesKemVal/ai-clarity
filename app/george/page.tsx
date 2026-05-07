@@ -787,6 +787,7 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
+  const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
 const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
@@ -3579,6 +3580,20 @@ setPendingAssistantMessage({
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
+    setShowLiveEntryChoice(true)
+  }
+
+  const startNewLiveConversation = () => {
+    try {
+      window.localStorage.removeItem('george_active_live_session_id')
+    } catch {}
+
+    setShowLiveEntryChoice(false)
+    router.push('/george/live')
+  }
+
+  const resumeLiveConversation = () => {
+    setShowLiveEntryChoice(false)
     router.push('/george/live')
   }
 
@@ -4985,6 +5000,52 @@ I will guide you in real time. Start speaking.`
       </div>
     </div>
   </div>
+)}
+
+{showLiveEntryChoice && typeof document !== 'undefined' && createPortal(
+  <>
+    <button
+      type="button"
+      aria-label="Close LIVE chooser"
+      onClick={() => setShowLiveEntryChoice(false)}
+      className="fixed inset-0 z-[220] bg-black/58 backdrop-blur-[10px]"
+    />
+
+    <div className="fixed inset-0 z-[230] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
+      <div className="w-full max-w-[380px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-black/94 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.72),0_0_28px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+        <div className="mb-1 text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
+          GEORGE LIVE
+        </div>
+
+        <div className="text-[15px] font-semibold text-white">
+          Enter live assistance.
+        </div>
+
+        <div className="mt-2 text-[12px] leading-5 text-white/58">
+          Use one earbud if you can. GEORGE will listen with you and help you respond in real time.
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <button
+            type="button"
+            onClick={startNewLiveConversation}
+            className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-[#7C8CFF]/16"
+          >
+            Start New LIVE Conversation
+          </button>
+
+          <button
+            type="button"
+            onClick={resumeLiveConversation}
+            className="w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-[#7C8CFF]/24 hover:bg-[#7C8CFF]/8 hover:text-white"
+          >
+            Resume LIVE Conversation
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
 )}
 
 {showExitPopup && typeof document !== 'undefined' && createPortal(
