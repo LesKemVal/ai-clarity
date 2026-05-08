@@ -378,11 +378,6 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   const [input, setInput] = useState('')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
-  const [showProSetup, setShowProSetup] = useState(false)
-  const [proGoal, setProGoal] = useState('')
-  const [proAudience, setProAudience] = useState('')
-  const [proOutcome, setProOutcome] = useState('')
-  const [proConstraints, setProConstraints] = useState('')
 
   function getVisitCount() {
     if (typeof window === 'undefined') return 0
@@ -1298,7 +1293,6 @@ router.push('/george')
     setShowConversationMenu(false)
     setConversationMenuLane('selector')
     setShowSessionPicker(false)
-    setShowProSetup(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
     setActivePromptContext(null)
@@ -4971,76 +4965,6 @@ if (liveMode) {
         </div>
       )}
 
-      
-      {showProSetup && (
-        <>
-          <button
-            type="button"
-            onClick={() => setShowProSetup(false)}
-            className="fixed inset-0 z-[90] bg-black/40"
-          />
-
-          <div className="fixed bottom-[140px] left-1/2 z-[100] w-[min(360px,calc(100vw-28px))] -translate-x-1/2 rounded-[1.6rem] border border-[#22c55e]/30 bg-black px-5 py-4 space-y-3">
-
-            <div className="text-white text-sm">Professional Setup</div>
-
-            <textarea
-              placeholder="What are you doing?"
-              value={proGoal}
-              onChange={(e)=>setProGoal(e.target.value)}
-              className="w-full p-2 bg-black border border-white/10 rounded text-white"
-            />
-
-            <textarea
-              placeholder="Who are you speaking to?"
-              value={proAudience}
-              onChange={(e)=>setProAudience(e.target.value)}
-              className="w-full p-2 bg-black border border-white/10 rounded text-white"
-            />
-
-            <textarea
-              placeholder="What outcome matters most?"
-              value={proOutcome}
-              onChange={(e)=>setProOutcome(e.target.value)}
-              className="w-full p-2 bg-black border border-white/10 rounded text-white"
-            />
-
-            <textarea
-              placeholder="Constraints (optional)"
-              value={proConstraints}
-              onChange={(e)=>setProConstraints(e.target.value)}
-              className="w-full p-2 bg-black border border-white/10 rounded text-white"
-            />
-
-            <button
-              onClick={() => {
-                const msg: Message = {
-                  role: 'assistant',
-                  content: `We are now in a live professional scenario.
-
-Goal: ${proGoal || 'General'}
-Audience: ${proAudience || 'Unknown'}
-Outcome: ${proOutcome || 'Best outcome'}
-Constraints: ${proConstraints || 'None'}
-
-I will guide you in real time. Start speaking.`
-                }
-
-                startNewGeorgeSession(msg, 'Conversation')
-                setShowProSetup(false)
-              }}
-              className="w-full bg-[#22c55e]/30 border border-[#22c55e]/50 py-3 rounded text-white"
-            >
-              Start Session
-            </button>
-
-          </div>
-        </>
-      )}
-
-
-
-
 {showEarbudOverlay && (
   <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
@@ -5307,15 +5231,15 @@ I will guide you in real time. Start speaking.`
                   if (sessionPickerMode === 'campaign') {
                     const campaignId = typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id
                     const savedEnvironment = session.savedEnvironment || session.metadata?.savedEnvironment || {}
-                    const restoredAssistMode = savedEnvironment.assistMode || session.assistMode || 'professional_live'
+                    const restoredAssistMode = savedEnvironment.assistMode || session.assistMode || 'live_assist'
                     const restoredOutputStyle = savedEnvironment.outputStyle || session.outputStyle || 'short_cues'
                     const restoredDeliveryMode = savedEnvironment.deliveryMode || session.deliveryMode || 'text'
                     const restoredTone = savedEnvironment.assistTone || session.assistTone || assistTone
 
                     setActiveCampaignId(campaignId)
-                    setConversationMode(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
-                    setActivePromptContext(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
-                    setActivePromptLabel(session.title || 'Pro LIVE Campaign · Beta')
+                    setConversationMode(restoredAssistMode === 'negotiation' ? 'live_negotiation' : restoredAssistMode === 'objection_handling' ? 'live_response' : 'live_assist')
+                    setActivePromptContext(restoredAssistMode === 'negotiation' ? 'live_negotiation' : restoredAssistMode === 'objection_handling' ? 'live_response' : 'live_assist')
+                    setActivePromptLabel(session.title || 'LIVE Session')
                     setAssistTone(restoredTone)
                     setVoiceOn(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both')
                     setInteractionMode(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both' ? 'speech' : 'text')
