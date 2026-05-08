@@ -734,6 +734,13 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
 const [recommendedControl, setRecommendedControl] = useState<string | null>(null)
   const [rewordPopupUpward, setRewordPopupUpward] = useState(true)
 const [assistTone, setAssistTone] = useState<'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'>('direct')
+const resolvedAssistTone =
+  assistTone ||
+  (resolvedLivePosture === 'negotiation'
+    ? 'firm'
+    : resolvedLivePosture === 'response'
+      ? 'calm'
+      : 'direct')
 
 const syncCampaignEnvironment = (
   campaignId: string | null,
@@ -4225,7 +4232,7 @@ const prompt = `GEORGE, give me the next live cue.${closingDirective}
 Goal: ${goal}
 Mode: ${mode}
 Output style: ${style}
-Tone: ${assistTone}
+Tone: ${resolvedAssistTone}
 Delivery: ${delivery}
 
 Use the active campaign context, constraints, and what is happening now.
