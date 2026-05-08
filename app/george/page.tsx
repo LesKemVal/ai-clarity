@@ -766,6 +766,87 @@ const syncCampaignEnvironment = (
   })
 }
 
+const replaceLastLiveGuidance = (guidance: string) => {
+  const existingMessages = [...messagesRef.current]
+  const lastMessage = existingMessages[existingMessages.length - 1]
+
+  const shouldReplaceLastGuidance =
+    lastMessage?.role === 'assistant' &&
+    typeof lastMessage?.content === 'string' &&
+    (
+      lastMessage.content.includes('reduce leakage') ||
+      lastMessage.content.includes('without overexplaining')
+    )
+
+  const nextMessages = shouldReplaceLastGuidance
+    ? [
+        ...existingMessages.slice(0, -1),
+        {
+          role: 'assistant' as const,
+          content: guidance,
+        },
+      ]
+    : [
+        ...existingMessages,
+        {
+          role: 'assistant' as const,
+          content: guidance,
+        },
+      ]
+
+  window.setTimeout(() => {
+    setMessages(nextMessages)
+    messagesRef.current = nextMessages
+  }, 220)
+}
+
+const activateNegotiationPosture = () => {
+  setActivePromptContext('live_negotiation')
+  setConversationMode('live_negotiation')
+
+  if (activeCampaignId) {
+    setCampaigns((prev) =>
+      prev.map((c) =>
+        c.id === activeCampaignId
+          ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
+          : c
+      )
+    )
+    syncCampaignEnvironment(activeCampaignId, {
+      assistMode: 'negotiation',
+      outputStyle: 'say_ask_boundary_close',
+      assistTone,
+    })
+  }
+
+  setToastMessage('Negotiation guidance active.')
+  setShowToast(true)
+  replaceLastLiveGuidance('Good. I’ll help you stay composed, reduce leakage, and move toward leverage.')
+}
+
+const activateResponsePosture = () => {
+  setActivePromptContext('live_response')
+  setConversationMode('live_response')
+
+  if (activeCampaignId) {
+    setCampaigns((prev) =>
+      prev.map((c) =>
+        c.id === activeCampaignId
+          ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
+          : c
+      )
+    )
+    syncCampaignEnvironment(activeCampaignId, {
+      assistMode: 'objection_handling',
+      outputStyle: 'repeatable_lines',
+      assistTone,
+    })
+  }
+
+  setToastMessage('Response handling active.')
+  setShowToast(true)
+  replaceLastLiveGuidance('Good. I’ll help you answer pressure, objections, or confusion without overexplaining.')
+}
 
 const [forceClose, setForceClose] = useState(false)
 
@@ -5656,62 +5737,7 @@ Choose one:
                     <>
                         <button
                           type="button"
-                          onClick={() => {
-                            setActivePromptContext('live_negotiation')
-                            setConversationMode('live_negotiation')
-                            if (activeCampaignId) {
-                              setCampaigns((prev) =>
-                                prev.map((c) =>
-                                  c.id === activeCampaignId
-                                    ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
-                                    : c
-                                )
-                              )
-                              syncCampaignEnvironment(activeCampaignId, {
-                                assistMode: 'negotiation',
-                                outputStyle: 'say_ask_boundary_close',
-                                assistTone,
-                              })
-                            }
-                            setToastMessage('Negotiation guidance active.')
-                            setShowToast(true)
-
-                            const negotiationGuidance =
-                              'Good. I’ll help you stay composed, reduce leakage, and move toward leverage.'
-
-                            const existingMessages = [...messagesRef.current]
-
-                            const lastMessage = existingMessages[existingMessages.length - 1]
-
-                            const shouldReplaceLastGuidance =
-                              lastMessage?.role === 'assistant' &&
-                              typeof lastMessage?.content === 'string' &&
-                              (
-                                lastMessage.content.includes('reduce leakage') ||
-                                lastMessage.content.includes('without overexplaining')
-                              )
-
-                            const nextMessages = shouldReplaceLastGuidance
-                              ? [
-                                  ...existingMessages.slice(0, -1),
-                                  {
-                                    role: 'assistant' as const,
-                                    content: negotiationGuidance,
-                                  },
-                                ]
-                              : [
-                                  ...existingMessages,
-                                  {
-                                    role: 'assistant' as const,
-                                    content: negotiationGuidance,
-                                  },
-                                ]
-
-                            window.setTimeout(() => {
-                              setMessages(nextMessages)
-                              messagesRef.current = nextMessages
-                            }, 220)
-                          }}
+                          onClick={activateNegotiationPosture}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             isNegotiationStyle
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
@@ -5723,62 +5749,7 @@ Choose one:
 
                         <button
                           type="button"
-                          onClick={() => {
-                            setActivePromptContext('live_response')
-                            setConversationMode('live_response')
-                            if (activeCampaignId) {
-                              setCampaigns((prev) =>
-                                prev.map((c) =>
-                                  c.id === activeCampaignId
-                                    ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
-                                    : c
-                                )
-                              )
-                              syncCampaignEnvironment(activeCampaignId, {
-                                assistMode: 'objection_handling',
-                                outputStyle: 'repeatable_lines',
-                                assistTone,
-                              })
-                            }
-                            setToastMessage('Response handling active.')
-                            setShowToast(true)
-
-                            const responseGuidance =
-                              'Good. I’ll help you answer pressure, objections, or confusion without overexplaining.'
-
-                            const existingMessages = [...messagesRef.current]
-
-                            const lastMessage = existingMessages[existingMessages.length - 1]
-
-                            const shouldReplaceLastGuidance =
-                              lastMessage?.role === 'assistant' &&
-                              typeof lastMessage?.content === 'string' &&
-                              (
-                                lastMessage.content.includes('reduce leakage') ||
-                                lastMessage.content.includes('without overexplaining')
-                              )
-
-                            const nextMessages = shouldReplaceLastGuidance
-                              ? [
-                                  ...existingMessages.slice(0, -1),
-                                  {
-                                    role: 'assistant' as const,
-                                    content: responseGuidance,
-                                  },
-                                ]
-                              : [
-                                  ...existingMessages,
-                                  {
-                                    role: 'assistant' as const,
-                                    content: responseGuidance,
-                                  },
-                                ]
-
-                            window.setTimeout(() => {
-                              setMessages(nextMessages)
-                              messagesRef.current = nextMessages
-                            }, 220)
-                          }}
+                          onClick={activateResponsePosture}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             isResponseStyle
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
