@@ -5469,12 +5469,25 @@ Choose one:
                 <div className="pointer-events-none fixed inset-0 z-[71] bg-black/56" />
               )}
 
-{liveMode && (
+{liveMode && (() => {
+                const isNegotiationStyle =
+                  conversationMode === 'live_negotiation' ||
+                  activePromptContext === 'live_negotiation' ||
+                  conversationMode === 'professional_negotiation' ||
+                  activePromptContext === 'professional_negotiation'
+
+                const isResponseStyle =
+                  conversationMode === 'live_response' ||
+                  activePromptContext === 'live_response' ||
+                  conversationMode === 'professional_objection_handling' ||
+                  activePromptContext === 'professional_objection_handling'
+
+                return (
                 <div
                   className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-300 ${
-                    conversationMode === 'professional_negotiation'
+                    isNegotiationStyle
                       ? 'border-[#7C8CFF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
-                      : conversationMode === 'professional_objection_handling'
+                      : isResponseStyle
                         ? 'border-white/10 bg-[rgba(10,10,12,0.78)] shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
                         : 'border-[#7C8CFF]/10 bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
                   }`}
@@ -5669,7 +5682,7 @@ Choose one:
                             }, 220)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
-                            (conversationMode === 'live_negotiation' || activePromptContext === 'live_negotiation' || conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation')
+                            isNegotiationStyle
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
                               : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
@@ -5736,7 +5749,7 @@ Choose one:
                             }, 220)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
-                            (conversationMode === 'live_response' || activePromptContext === 'live_response' || conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling')
+                            isResponseStyle
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
                               : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
@@ -5772,7 +5785,8 @@ Choose one:
                     </div>
                   </div>
                 </div>
-              )}
+                )
+              })()}
 
               <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[112px] bg-black" />
               <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
