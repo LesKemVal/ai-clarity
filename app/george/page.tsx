@@ -5546,7 +5546,15 @@ Choose one:
               )}
 
 {liveMode && (
-                <div className="fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-[#7C8CFF]/10 bg-black/74 px-2.5 py-1 shadow-[0_-14px_38px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+                <div
+                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-300 ${
+                    conversationMode === 'professional_negotiation'
+                      ? 'border-[#7C8CFF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
+                      : conversationMode === 'professional_objection_handling'
+                        ? 'border-white/10 bg-[rgba(10,10,12,0.78)] shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
+                        : 'border-[#7C8CFF]/10 bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
+                  }`}
+                >
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
