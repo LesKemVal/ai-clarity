@@ -3587,8 +3587,22 @@ setPendingAssistantMessage({
   const startNewLiveConversation = () => {
     try {
       window.localStorage.removeItem('george_active_live_session_id')
+      window.localStorage.removeItem('george_active_campaign_session_id')
+      window.localStorage.removeItem('george_active_campaign')
+      window.localStorage.removeItem('george_active_context')
+      window.localStorage.removeItem('george_active_label')
     } catch {}
 
+    setActiveCampaignId(null)
+    setCampaigns((prev) =>
+      prev.map((c) => ({
+        ...c,
+        active: false,
+      }))
+    )
+    setConversationMode('manual_live')
+    setActivePromptContext('manual_live')
+    setActivePromptLabel('Conversation')
     setShowLiveEntryChoice(false)
     router.push('/george/live')
   }
