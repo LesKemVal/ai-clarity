@@ -5697,7 +5697,7 @@ Choose one:
                                 assistTone,
                               })
                             }
-                            setToastMessage('Negotiation mode active.')
+                            setToastMessage('Negotiation guidance active.')
                             setShowToast(true)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
@@ -5706,7 +5706,7 @@ Choose one:
                               : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
                           }`}
                         >
-                          ⚡ Negotiate
+                          Negotiate
                         </button>
 
                         <button
@@ -5728,7 +5728,7 @@ Choose one:
                                 assistTone,
                               })
                             }
-                            setToastMessage('Objection handling active.')
+                            setToastMessage('Response handling active.')
                             setShowToast(true)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
@@ -5737,7 +5737,7 @@ Choose one:
                               : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
                           }`}
                         >
-                          ⛨ Objections
+                          Respond
                         </button>
                     </>
 
