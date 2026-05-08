@@ -5774,8 +5774,7 @@ Choose one:
 
                     </div>
 
-                    <div className="ml-auto flex items-center gap-2">
-                      <div className="relative shrink-0">
+                    <div className="relative shrink-0">
                         {showLiveToolsMenu && (
                           <>
                             <button
@@ -5785,60 +5784,108 @@ Choose one:
                               className="fixed inset-0 z-[91] cursor-default bg-transparent"
                             />
 
-                            <div className="absolute bottom-full right-0 z-[95] mb-2 w-[220px]">
-                              <div className="rounded-[1.25rem] border border-[#7C8CFF]/28 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.16)] backdrop-blur-2xl">
+                            <div className="absolute bottom-full left-0 z-[95] mb-3 w-[240px]">
+                              <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/92 shadow-[0_20px_70px_rgba(0,0,0,0.78),0_0_24px_rgba(124,140,255,0.12)] backdrop-blur-2xl">
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setVoiceOn(false)
-                                    setInteractionMode('text')
-                                    setShowLiveToolsMenu(false)
-                                    setToastMessage('Text guidance active.')
-                                    setShowToast(true)
-                                  }}
-                                  className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                                >
-                                  Text Guidance
-                                </button>
+                                <div className="flex items-center justify-between px-5 pt-4 pb-2">
+                                  <div className="text-[11px] tracking-[0.32em] text-[#8E96FF]">
+                                    TOOLS
+                                  </div>
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setVoiceOn(true)
-                                    setInteractionMode('speech')
-                                    setShowLiveToolsMenu(false)
-                                    setTimeout(() => startListening(), 120)
-                                    setToastMessage('Audio guidance active.')
-                                    setShowToast(true)
-                                  }}
-                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                                >
-                                  Audio Guidance
-                                </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowLiveToolsMenu(false)}
+                                    className="text-white/72 transition hover:text-white"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    activateNegotiationPosture()
-                                    setShowLiveToolsMenu(false)
-                                  }}
-                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                                >
-                                  Negotiation Mode
-                                </button>
+                                <div className="px-4 pb-4">
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    activateResponsePosture()
-                                    setShowLiveToolsMenu(false)
-                                  }}
-                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
-                                >
-                                  Response Mode
-                                </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      activateResponsePosture()
+                                      setShowLiveToolsMenu(false)
+                                    }}
+                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.03]"
+                                  >
+                                    <div className="pt-[1px] text-[#8E96FF]">✎</div>
+                                    <div>
+                                      <div className="text-[15px] text-white/92">Reword</div>
+                                      <div className="mt-0.5 text-[12px] text-white/38">
+                                        Rewrite this for impact
+                                      </div>
+                                    </div>
+                                  </button>
 
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setShowLiveQuickMenu(true)
+                                      setShowLiveToolsMenu(false)
+                                    }}
+                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.03]"
+                                  >
+                                    <div className="pt-[1px] text-[#8E96FF]">⚡</div>
+                                    <div>
+                                      <div className="text-[15px] text-white/92">Cue</div>
+                                      <div className="mt-0.5 text-[12px] text-white/38">
+                                        Get the next live cue
+                                      </div>
+                                    </div>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={activateNegotiationPosture}
+                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.03]"
+                                  >
+                                    <div className="pt-[1px] text-[#8E96FF]">◎</div>
+                                    <div>
+                                      <div className="text-[15px] text-white/92">Screener</div>
+                                      <div className="mt-0.5 text-[12px] text-white/38">
+                                        Handle gatekeepers
+                                      </div>
+                                    </div>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAssistTone('firm')
+                                      setShowLiveToolsMenu(false)
+                                    }}
+                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.03]"
+                                  >
+                                    <div className="pt-[1px] text-[#8E96FF]">≋</div>
+                                    <div>
+                                      <div className="text-[15px] text-white/92">Tone</div>
+                                      <div className="mt-0.5 text-[12px] text-white/38">
+                                        Adjust tone & style
+                                      </div>
+                                    </div>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setActiveSaveIndex(messages.length - 1)
+                                      setShowLiveToolsMenu(false)
+                                    }}
+                                    className="flex w-full items-start gap-3 px-2 pt-3 pb-1 text-left transition hover:bg-white/[0.03]"
+                                  >
+                                    <div className="pt-[1px] text-[#8E96FF]">⌑</div>
+                                    <div>
+                                      <div className="text-[15px] text-white/92">Save</div>
+                                      <div className="mt-0.5 text-[12px] text-white/38">
+                                        Save to memory or folder
+                                      </div>
+                                    </div>
+                                  </button>
+
+                                </div>
                               </div>
                             </div>
                           </>
@@ -5855,6 +5902,8 @@ Choose one:
                           Tools
                         </button>
                       </div>
+
+                    <div className="ml-auto flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
