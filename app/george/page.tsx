@@ -669,7 +669,7 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
     try {
       const savedCampaigns = getCampaignSessions().map((session: any) => ({
         id: session.id,
-        name: session.metadata?.campaignName || session.title || 'Pro LIVE Campaign',
+        name: session.metadata?.campaignName || session.title || 'Pro LIVE Campaign · Beta',
         mode: 'firm',
         productOrService: session.metadata?.productOrService || '',
         targetMarket: session.metadata?.targetAudience || '',
@@ -1328,7 +1328,7 @@ if (messagesRef.current.length > 2) {
   try {
     saveSessionToV2({
       mode: activeCampaignId ? 'campaign' : 'live',
-      title: activeCampaignId ? 'Pro LIVE Campaign' : 'LIVE Conversation',
+      title: activeCampaignId ? 'Pro LIVE Campaign · Beta' : 'LIVE Conversation',
       messages: messagesRef.current,
       summary: activeCampaignId
         ? 'Pro LIVE campaign checkpoint.'
@@ -1336,7 +1336,7 @@ if (messagesRef.current.length > 2) {
       userGoal: activeCampaign?.desiredOutcome || 'In progress',
       lastKnownState: 'User exited LIVE mode.',
       suggestedRestart: activeCampaignId
-        ? 'Resume this Pro LIVE Campaign from the strongest operational next move.'
+        ? 'Resume this Pro LIVE Campaign · Beta from the strongest operational next move.'
         : 'Resume this LIVE Conversation naturally.',
       metadata: {
         activeCampaignId: activeCampaignId || null,
@@ -1513,7 +1513,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
           saveSessionToV2({
             id: newCampaign.id,
             mode: 'campaign',
-            title: newCampaign.label || 'Pro LIVE Campaign',
+            title: newCampaign.label || 'Pro LIVE Campaign · Beta',
             messages: [
               {
                 role: 'assistant',
@@ -1523,7 +1523,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
             summary: 'Pro LIVE campaign created from setup.',
             userGoal: newCampaign.intelligence?.campaignGoal || 'Campaign execution',
             lastKnownState: 'Campaign context loaded.',
-            suggestedRestart: 'Resume this Pro LIVE Campaign and continue from the strongest operational next move.',
+            suggestedRestart: 'Resume this Pro LIVE Campaign · Beta and continue from the strongest operational next move.',
             metadata: {
               activeCampaignId: newCampaign.id,
               campaignName: newCampaign.label,
@@ -5266,7 +5266,7 @@ I will guide you in real time. Start speaking.`
                     setActiveCampaignId(campaignId)
                     setConversationMode(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
                     setActivePromptContext(restoredAssistMode === 'negotiation' ? 'professional_negotiation' : restoredAssistMode === 'objection_handling' ? 'professional_objection_handling' : 'professional_live')
-                    setActivePromptLabel(session.title || 'Pro LIVE Campaign')
+                    setActivePromptLabel(session.title || 'Pro LIVE Campaign · Beta')
                     setAssistTone(restoredTone)
                     setVoiceOn(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both')
                     setInteractionMode(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both' ? 'speech' : 'text')
@@ -5517,7 +5517,7 @@ Choose one:
                             }}
                             className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
-                            New LIVE Conversation
+                            Refresh LIVE Conversation
                           </button>
 
                           <button
@@ -5529,13 +5529,20 @@ Choose one:
                             }}
                             className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
-                            New LIVE Campaign
+                            New LIVE Campaign · Beta
                           </button>
                         </div>
                       )}
                     </div>
 
-                    <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-[#7C8CFF]/70 " />
+                    <span
+                      title={voiceOn ? 'Audio guidance active' : 'Audio guidance off'}
+                      className={`mx-1 shrink-0 h-2 w-2 rounded-full transition ${
+                        voiceOn
+                          ? 'bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.75)]'
+                          : 'bg-[#7C8CFF]/55'
+                      }`}
+                    />
 
                     {(isThinking || isSpeaking) && (
                       <span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
