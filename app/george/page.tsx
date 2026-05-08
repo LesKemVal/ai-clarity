@@ -5741,6 +5741,17 @@ Choose one:
                             }
                             setToastMessage('Response handling active.')
                             setShowToast(true)
+
+                            const nextMessages = [
+                              ...messagesRef.current,
+                              {
+                                role: 'assistant' as const,
+                                content: 'Good. I’ll help you answer pressure, objections, or confusion without overexplaining.',
+                              },
+                            ]
+
+                            setMessages(nextMessages)
+                            messagesRef.current = nextMessages
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling'
