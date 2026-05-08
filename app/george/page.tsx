@@ -363,6 +363,16 @@ function TypewriterText({
   return <>{display}</>
 }
 
+function renderAssistantContent(text: string, liveMode: boolean) {
+  if (!liveMode) return text
+
+  return text.split(/\n{2,}/).map((paragraph, index) => (
+    <span key={index} className={index === 0 ? 'block' : 'mt-5 block'}>
+      {paragraph}
+    </span>
+  ))
+}
+
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
@@ -3952,10 +3962,9 @@ return (
         }`}
       >
         {m.role === 'assistant' ? (
-          typedMessageIndex === i ? (
-            typedMessageContent || m.content
-          ) : (
-            m.content
+          renderAssistantContent(
+            typedMessageIndex === i ? (typedMessageContent || m.content) : m.content,
+            liveMode
           )
         ) : (
           <>
