@@ -5689,8 +5689,8 @@ Choose one:
                         <button
                           type="button"
                           onClick={() => {
-                            setActivePromptContext('professional_negotiation')
-                            setConversationMode('professional_negotiation')
+                            setActivePromptContext('live_negotiation')
+                            setConversationMode('live_negotiation')
                             if (activeCampaignId) {
                               setCampaigns((prev) =>
                                 prev.map((c) =>
@@ -5745,7 +5745,7 @@ Choose one:
                             }, 220)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
-                            conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation'
+                            (conversationMode === 'live_negotiation' || activePromptContext === 'live_negotiation' || conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation')
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
                               : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
@@ -5756,8 +5756,8 @@ Choose one:
                         <button
                           type="button"
                           onClick={() => {
-                            setActivePromptContext('professional_objection_handling')
-                            setConversationMode('professional_objection_handling')
+                            setActivePromptContext('live_response')
+                            setConversationMode('live_response')
                             if (activeCampaignId) {
                               setCampaigns((prev) =>
                                 prev.map((c) =>
@@ -5812,7 +5812,7 @@ Choose one:
                             }, 220)
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
-                            conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling'
+                            (conversationMode === 'live_response' || activePromptContext === 'live_response' || conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling')
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
                               : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
