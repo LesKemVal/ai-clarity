@@ -3749,6 +3749,7 @@ setPendingAssistantMessage({
     setActivePromptLabel('Conversation')
     setShowLiveEntryChoice(false)
     router.push('/george/live')
+    router.refresh()
   }
 
   const resumeLiveConversation = () => {
