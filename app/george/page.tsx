@@ -4232,7 +4232,7 @@ I am listening now. Speak naturally. I will respond ${
       {m.role === 'assistant' && (
         <div className="relative space-y-2">
 
-          {(isLatestAssistant && liveMode) && (
+          {false && (isLatestAssistant && liveMode) && (
   <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-white/55">
 
     <button onClick={() => saveMemory(m, i)}>
@@ -5636,7 +5636,7 @@ Choose one:
                             onClick={() => setShowLiveQuickMenu(false)}
                             className="fixed inset-0 z-[91] cursor-default bg-transparent"
                           />
-                          <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px]">
+                          <div className="absolute bottom-full left-[-6px] z-[95] mb-1.5 w-[230px]">
                             <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.18)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                           <button
                             type="button"
@@ -5784,7 +5784,7 @@ Choose one:
                               className="fixed inset-0 z-[91] cursor-default bg-transparent"
                             />
 
-                            <div className="absolute bottom-full left-0 z-[95] mb-3 w-[240px]">
+                            <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
                               <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/92 shadow-[0_20px_70px_rgba(0,0,0,0.78),0_0_24px_rgba(124,140,255,0.12)] backdrop-blur-2xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
