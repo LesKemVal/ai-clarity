@@ -877,6 +877,7 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
 
 
 You don’t have to tell me everything right now.
+
 I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
 
 Speak naturally.
