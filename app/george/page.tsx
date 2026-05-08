@@ -3877,6 +3877,16 @@ return (
       </div>
     </div>
   )}
+  {liveMode && (
+    <div className="pointer-events-none flex justify-center pt-2 pb-1">
+      <img
+        src="/earbud02.png"
+        alt=""
+        className="h-[92px] w-auto opacity-90 drop-shadow-[0_0_30px_rgba(124,140,255,0.24)] animate-pulse"
+      />
+    </div>
+  )}
+
   {bridgeThinking && (
     <div className="text-sm leading-7 text-white/70">
       Thinking...
@@ -4988,7 +4998,7 @@ I will guide you in real time. Start speaking.`
   <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
       <img
-        src="/earbuds.png"
+        src="/earbud02.png"
         alt=""
         className="h-[118px] w-auto opacity-90 drop-shadow-[0_0_34px_rgba(124,140,255,0.26)] animate-pulse"
       />
