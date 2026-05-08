@@ -4233,7 +4233,7 @@ I am listening now. Speak naturally. I will respond ${
         <div className="relative space-y-2">
 
           {(isLatestAssistant && liveMode) && (
-  <div className="flex items-center gap-2 mt-2 text-[11px] text-white/70">
+  <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-white/55">
 
     <button onClick={() => saveMemory(m, i)}>
       Quick Save
