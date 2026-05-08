@@ -3729,6 +3729,29 @@ setPendingAssistantMessage({
 
   const startNewLiveConversation = () => {
     try {
+      if (messagesRef.current.length > 2) {
+        saveSessionToV2({
+          mode: activeCampaignId ? 'campaign' : 'live',
+          title: activeCampaignId ? 'LIVE Session' : 'LIVE Conversation',
+          messages: messagesRef.current,
+          summary: activeCampaignId
+            ? 'Structured LIVE checkpoint before new LIVE conversation.'
+            : 'LIVE Conversation checkpoint before new LIVE conversation.',
+          userGoal: activeCampaign?.desiredOutcome || 'In progress',
+          lastKnownState: 'User started a new LIVE conversation.',
+          suggestedRestart: activeCampaignId
+            ? 'Resume this LIVE Session from the strongest operational next move.'
+            : 'Resume this LIVE Conversation naturally.',
+          metadata: {
+            activeCampaignId: activeCampaignId || null,
+            campaignName: activeCampaign?.name || null,
+            productOrService: activeCampaign?.productOrService || null,
+            targetAudience: activeCampaign?.targetMarket || null,
+            desiredOutcome: activeCampaign?.desiredOutcome || null,
+          },
+        })
+      }
+
       window.localStorage.setItem('george_start_new_live', '1')
       window.localStorage.removeItem('george_active_live_session_id')
       window.localStorage.removeItem('george_active_campaign_session_id')
@@ -3737,6 +3760,8 @@ setPendingAssistantMessage({
       window.localStorage.removeItem('george_active_label')
     } catch {}
 
+    setShowLiveQuickMenu(false)
+    setShowLiveToolsMenu(false)
     setActiveCampaignId(null)
     setCampaigns((prev) =>
       prev.map((c) => ({
@@ -3748,8 +3773,11 @@ setPendingAssistantMessage({
     setActivePromptContext('manual_live')
     setActivePromptLabel('Conversation')
     setShowLiveEntryChoice(false)
-    router.push('/george/live')
-    router.refresh()
+    setMessages([])
+    messagesRef.current = []
+    liveSessionWriteReadyRef.current = false
+
+    window.location.href = '/george/live'
   }
 
   const resumeLiveConversation = () => {
