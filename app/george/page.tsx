@@ -5683,18 +5683,20 @@ Choose one:
                           onClick={() => {
                             setActivePromptContext('professional_negotiation')
                             setConversationMode('professional_negotiation')
-                            setCampaigns((prev) =>
-                              prev.map((c) =>
-                                c.id === activeCampaignId
-                                  ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
-                                  : c
+                            if (activeCampaignId) {
+                              setCampaigns((prev) =>
+                                prev.map((c) =>
+                                  c.id === activeCampaignId
+                                    ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
+                                    : c
+                                )
                               )
-                            )
-                            syncCampaignEnvironment(activeCampaignId, {
-                              assistMode: 'negotiation',
-                              outputStyle: 'say_ask_boundary_close',
-                              assistTone,
-                            })
+                              syncCampaignEnvironment(activeCampaignId, {
+                                assistMode: 'negotiation',
+                                outputStyle: 'say_ask_boundary_close',
+                                assistTone,
+                              })
+                            }
                             setToastMessage('Negotiation mode active.')
                             setShowToast(true)
                           }}
@@ -5712,18 +5714,20 @@ Choose one:
                           onClick={() => {
                             setActivePromptContext('professional_objection_handling')
                             setConversationMode('professional_objection_handling')
-                            setCampaigns((prev) =>
-                              prev.map((c) =>
-                                c.id === activeCampaignId
-                                  ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
-                                  : c
+                            if (activeCampaignId) {
+                              setCampaigns((prev) =>
+                                prev.map((c) =>
+                                  c.id === activeCampaignId
+                                    ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
+                                    : c
+                                )
                               )
-                            )
-                            syncCampaignEnvironment(activeCampaignId, {
-                              assistMode: 'objection_handling',
-                              outputStyle: 'repeatable_lines',
-                              assistTone,
-                            })
+                              syncCampaignEnvironment(activeCampaignId, {
+                                assistMode: 'objection_handling',
+                                outputStyle: 'repeatable_lines',
+                                assistTone,
+                              })
+                            }
                             setToastMessage('Objection handling active.')
                             setShowToast(true)
                           }}
