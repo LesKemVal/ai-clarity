@@ -619,6 +619,15 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
             : isManualLive
               ? 'manual'
               : 'default'
+
+  const resolvedOutputStyle =
+    activeCampaign?.outputStyle ||
+    (resolvedLivePosture === 'negotiation'
+      ? 'say_ask_boundary_close'
+      : resolvedLivePosture === 'response'
+        ? 'repeatable_lines'
+        : 'short_cues')
+
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
@@ -4201,7 +4210,7 @@ Cue:`
     <button onClick={() => {
       const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
       const mode = resolvedLivePosture || 'manual'
-      const style = activeCampaign?.outputStyle || 'short_cues'
+      const style = resolvedOutputStyle
       const delivery = activeCampaign?.deliveryMode || 'text'
       const closingDirective = forceClose
   ? "\n\n[DIRECTIVE: Stay in close. Continue pushing for a decision. Do not drift.]"
