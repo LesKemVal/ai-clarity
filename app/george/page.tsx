@@ -4160,7 +4160,7 @@ I am listening now. Speak naturally. I will respond ${
                 key={action}
                 onClick={() => {
                   const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-                  const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+                  const mode = resolvedLivePosture || 'manual'
                   const prompt = `Rewrite the line below for a live call.
 
 Goal: ${goal}
@@ -4200,7 +4200,7 @@ Cue:`
 
     <button onClick={() => {
       const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-      const mode = activeCampaign?.assistMode || conversationMode || activePromptContext || 'manual'
+      const mode = resolvedLivePosture || 'manual'
       const style = activeCampaign?.outputStyle || 'short_cues'
       const delivery = activeCampaign?.deliveryMode || 'text'
       const closingDirective = forceClose
