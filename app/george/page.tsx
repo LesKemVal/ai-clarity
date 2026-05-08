@@ -628,6 +628,10 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         ? 'repeatable_lines'
         : 'short_cues')
 
+  const resolvedDeliveryMode =
+    activeCampaign?.deliveryMode ||
+    (voiceOn ? 'audio' : 'text')
+
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
@@ -4211,7 +4215,7 @@ Cue:`
       const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
       const mode = resolvedLivePosture || 'manual'
       const style = resolvedOutputStyle
-      const delivery = activeCampaign?.deliveryMode || 'text'
+      const delivery = resolvedDeliveryMode
       const closingDirective = forceClose
   ? "\n\n[DIRECTIVE: Stay in close. Continue pushing for a decision. Do not drift.]"
   : ""
