@@ -5677,8 +5677,7 @@ Choose one:
                       Audio
                     </button>
 
-                    {activeCampaignId && (
-                      <>
+                    <>
                         <button
                           type="button"
                           onClick={() => {
@@ -5736,8 +5735,7 @@ Choose one:
                         >
                           ⛨ Objections
                         </button>
-                      </>
-                    )}
+                    </>
 
                     <div className="ml-auto flex items-center gap-2">
                       <button
