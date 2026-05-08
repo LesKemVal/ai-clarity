@@ -3852,11 +3852,25 @@ return (
 )}
 <div
   ref={scrollHostRef}
+  tabIndex={0}
   onScroll={(e) => {
     const el = e.currentTarget
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120
     userPinnedBottomRef.current = nearBottom
     setShowScrollHint(!nearBottom)
+  }}
+  onKeyDown={(e) => {
+    const el = e.currentTarget
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      el.scrollBy({ top: 120, behavior: 'smooth' })
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      el.scrollBy({ top: -120, behavior: 'smooth' })
+    }
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[300px] space-y-4 ${liveMode ? "pt-4 md:pt-10" : showMobileHero ? "pt-3 md:pt-14" : "pt-14 md:pt-6"} `}>
   {showMobileHero && (
@@ -3907,7 +3921,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] leading-8 landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
+        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[2.35]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
