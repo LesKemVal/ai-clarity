@@ -922,6 +922,7 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
+  const [showLiveToolsMenu, setShowLiveToolsMenu] = useState(false)
   const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
 const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
@@ -5595,7 +5596,7 @@ Choose one:
   </div>
 )}
 
-{liveMode && showLiveQuickMenu && (
+{liveMode && (showLiveQuickMenu || showLiveToolsMenu) && (
                 <div className="pointer-events-none fixed inset-0 z-[71] bg-black/56" />
               )}
 
@@ -5618,6 +5619,7 @@ Choose one:
                       type="button"
                       onClick={() => {
                         setShowLiveQuickMenu((prev) => !prev)
+                        setShowLiveToolsMenu(false)
                       }}
                       className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
@@ -5773,13 +5775,86 @@ Choose one:
                     </div>
 
                     <div className="ml-auto flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setShowLiveQuickMenu((prev) => !prev)}
-                        className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
-                      >
-                        Tools
-                      </button>
+                      <div className="relative shrink-0">
+                        {showLiveToolsMenu && (
+                          <>
+                            <button
+                              type="button"
+                              aria-label="Close LIVE tools"
+                              onClick={() => setShowLiveToolsMenu(false)}
+                              className="fixed inset-0 z-[91] cursor-default bg-transparent"
+                            />
+
+                            <div className="absolute bottom-full right-0 z-[95] mb-2 w-[220px]">
+                              <div className="rounded-[1.25rem] border border-[#7C8CFF]/28 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.16)] backdrop-blur-2xl">
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVoiceOn(false)
+                                    setInteractionMode('text')
+                                    setShowLiveToolsMenu(false)
+                                    setToastMessage('Text guidance active.')
+                                    setShowToast(true)
+                                  }}
+                                  className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                                >
+                                  Text Guidance
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setVoiceOn(true)
+                                    setInteractionMode('speech')
+                                    setShowLiveToolsMenu(false)
+                                    setTimeout(() => startListening(), 120)
+                                    setToastMessage('Audio guidance active.')
+                                    setShowToast(true)
+                                  }}
+                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                                >
+                                  Audio Guidance
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    activateNegotiationPosture()
+                                    setShowLiveToolsMenu(false)
+                                  }}
+                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                                >
+                                  Negotiation Mode
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    activateResponsePosture()
+                                    setShowLiveToolsMenu(false)
+                                  }}
+                                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] text-white/72 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                                >
+                                  Response Mode
+                                </button>
+
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowLiveToolsMenu((prev) => !prev)
+                            setShowLiveQuickMenu(false)
+                          }}
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
+                        >
+                          Tools
+                        </button>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
