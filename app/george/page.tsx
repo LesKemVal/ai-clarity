@@ -5641,7 +5641,7 @@ Choose one:
                       className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                         !voiceOn
                           ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
-                          : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                          : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                       }`}
                     >
                       Text
@@ -5671,7 +5671,7 @@ Choose one:
                       className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                         voiceOn
                           ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
-                          : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                          : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                       }`}
                     >
                       Audio
@@ -5739,7 +5739,7 @@ Choose one:
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation'
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
-                              : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                              : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
                         >
                           Negotiate
@@ -5806,7 +5806,7 @@ Choose one:
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             conversationMode === 'professional_objection_handling' || activePromptContext === 'professional_objection_handling'
                               ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/12 text-white shadow-[0_0_14px_rgba(124,140,255,0.12)]'
-                              : 'border-transparent text-white/35 hover:bg-[#7C8CFF]/10 hover:text-white/72'
+                              : 'border-transparent text-white/26 hover:bg-[#7C8CFF]/7 hover:text-white/62'
                           }`}
                         >
                           Respond
