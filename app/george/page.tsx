@@ -367,7 +367,7 @@ function renderAssistantContent(text: string, liveMode: boolean) {
   if (!liveMode) return text
 
   return text.split(/\n{2,}/).map((paragraph, index) => (
-    <span key={index} className={index === 0 ? 'block' : 'mt-5 block'}>
+    <span key={index} className={index === 0 ? 'block' : 'mt-6 block'}>
       {paragraph}
     </span>
   ))
@@ -5502,6 +5502,10 @@ Choose one:
   </div>
 )}
 
+{liveMode && showLiveQuickMenu && (
+                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/56" />
+              )}
+
 {liveMode && (
                 <div className="fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-[#7C8CFF]/10 bg-black/74 px-2.5 py-1 shadow-[0_-14px_38px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
@@ -5518,7 +5522,15 @@ Choose one:
 
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
-                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+                        <>
+                          <button
+                            type="button"
+                            aria-label="Close LIVE chooser"
+                            onClick={() => setShowLiveQuickMenu(false)}
+                            className="fixed inset-0 z-[91] cursor-default bg-transparent"
+                          />
+                          <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px]">
+                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.18)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
                           <button
                             type="button"
                             onClick={() => {
@@ -5541,7 +5553,9 @@ Choose one:
                           >
                             New LIVE Campaign · Beta
                           </button>
-                        </div>
+                            </div>
+                          </div>
+                        </>
                       )}
                     </div>
 
