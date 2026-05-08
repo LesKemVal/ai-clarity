@@ -5517,7 +5517,7 @@ Choose one:
                             }}
                             className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
-                            Refresh LIVE Conversation
+                            New LIVE Conversation
                           </button>
 
                           <button
