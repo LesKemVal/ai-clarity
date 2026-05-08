@@ -3796,7 +3796,7 @@ return (
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-1.5 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <div className="flex items-center gap-1.5.5 xl:hidden">
+                <div className="flex items-center gap-3 xl:hidden">
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
@@ -3942,7 +3942,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.85]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
+        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.7]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
@@ -5493,7 +5493,7 @@ Choose one:
 )}
 
 {liveMode && (
-                <div className="fixed bottom-[82px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-[#7C8CFF]/10 bg-black/74 px-2.5 py-1 shadow-[0_-14px_38px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+                <div className="fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border border-[#7C8CFF]/10 bg-black/74 px-2.5 py-1 shadow-[0_-14px_38px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                   <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
                     <button
                       type="button"
