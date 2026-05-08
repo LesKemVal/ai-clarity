@@ -527,7 +527,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
   useEffect(() => {
     // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
-    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+    if (liveMode || isManualLive) return
 
     const greeting = getInitialGreeting()
 
@@ -592,6 +592,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
   const [activePromptLabel, setActivePromptLabel] = useState<string | null>(null)
   const [activePromptContext, setActivePromptContext] = useState<string | null>(null)
+  const isManualLive =
+    conversationMode === 'manual_live' ||
+    activePromptContext === 'manual_live'
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
   const [showCampaignMenu, setShowCampaignMenu] = useState(false)
@@ -903,7 +906,7 @@ You got this.`
       return
     }
 
-    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+    if (liveMode || isManualLive) return
 
     normalSessionBootedRef.current = true
 
@@ -1752,7 +1755,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (!normalSessionWriteReadyRef.current) return
-    if (liveMode || conversationMode === 'manual_live' || activePromptContext === 'manual_live') return
+    if (liveMode || isManualLive) return
     if (!messages.length) return
 
     updateActiveSessionMessages(messages, 'normal')
@@ -1761,7 +1764,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (!liveSessionWriteReadyRef.current) return
-    if (!liveMode && conversationMode !== 'manual_live' && activePromptContext !== 'manual_live') return
+    if (!liveMode && !isManualLive) return
     if (!messages.length) return
 
     updateActiveSessionMessages(messages, 'live')
