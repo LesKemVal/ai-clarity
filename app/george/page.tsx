@@ -800,6 +800,7 @@ const [isListening, setIsListening] = useState(false)
   const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
 const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
+  const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
@@ -5112,6 +5113,44 @@ I will guide you in real time. Start speaking.`
   document.body
 )}
 
+
+{showProLiveComingSoon && typeof document !== 'undefined' && createPortal(
+  <>
+    <button
+      type="button"
+      aria-label="Close Pro LIVE notice"
+      onClick={() => setShowProLiveComingSoon(false)}
+      className="fixed inset-0 z-[240] bg-black/60 backdrop-blur-[10px]"
+    />
+
+    <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
+          PRO LIVE
+        </div>
+
+        <div className="mt-2 text-[16px] font-semibold text-white">
+          Coming soon.
+        </div>
+
+        <div className="mt-3 text-[12px] leading-5 text-white/58">
+          GEORGE LIVE is currently focused on stabilizing individual real-time assistance before expanding into structured Pro LIVE environments.
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowProLiveComingSoon(false)}
+          className="mt-5 w-full rounded-xl border border-[#7C8CFF]/24 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-medium text-white transition hover:bg-[#7C8CFF]/16"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
+
+
 {showExitPopup && typeof document !== 'undefined' && createPortal(
   <>
     <div
@@ -5129,7 +5168,7 @@ I will guide you in real time. Start speaking.`
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
       <div className="w-full max-w-[420px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-[linear-gradient(180deg,rgba(8,10,18,0.98),rgba(0,0,0,0.98))] ring-1 ring-[#7C8CFF]/10 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl">
         <div className="mb-2 text-[11px] tracking-[0.22em] text-[#7C8CFF]">
-          {activeCampaignId ? 'LEAVE PRO LIVE' : 'LEAVE LIVE'}
+          LEAVE LIVE
         </div>
 
         <div className="text-[15px] font-semibold text-white">
@@ -5517,7 +5556,7 @@ Choose one:
                       className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
-                      {activeCampaignId ? '🎧 PRO' : '◉ LIVE'}
+                      ◉ LIVE
                     </button>
 
                     <div className="relative shrink-0">
@@ -5546,8 +5585,7 @@ Choose one:
                             type="button"
                             onClick={() => {
                               setShowLiveQuickMenu(false)
-                              localStorage.setItem('george_intake_pending', 'campaign')
-                              window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                              setShowProLiveComingSoon(true)
                             }}
                             className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
