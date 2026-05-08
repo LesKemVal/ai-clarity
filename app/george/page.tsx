@@ -601,6 +601,24 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [language, setLanguage] = useState<'EN' | 'ES'>('EN')
 
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
+  const resolvedLivePosture =
+    activeCampaign?.assistMode === 'negotiation'
+      ? 'negotiation'
+      : activeCampaign?.assistMode === 'objection_handling'
+        ? 'response'
+        : conversationMode === 'live_negotiation' ||
+            activePromptContext === 'live_negotiation' ||
+            conversationMode === 'professional_negotiation' ||
+            activePromptContext === 'professional_negotiation'
+          ? 'negotiation'
+          : conversationMode === 'live_response' ||
+              activePromptContext === 'live_response' ||
+              conversationMode === 'professional_objection_handling' ||
+              activePromptContext === 'professional_objection_handling'
+            ? 'response'
+            : isManualLive
+              ? 'manual'
+              : 'default'
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
@@ -5473,17 +5491,8 @@ Choose one:
               )}
 
 {liveMode && (() => {
-                const isNegotiationStyle =
-                  conversationMode === 'live_negotiation' ||
-                  activePromptContext === 'live_negotiation' ||
-                  conversationMode === 'professional_negotiation' ||
-                  activePromptContext === 'professional_negotiation'
-
-                const isResponseStyle =
-                  conversationMode === 'live_response' ||
-                  activePromptContext === 'live_response' ||
-                  conversationMode === 'professional_objection_handling' ||
-                  activePromptContext === 'professional_objection_handling'
+                const isNegotiationStyle = resolvedLivePosture === 'negotiation'
+                const isResponseStyle = resolvedLivePosture === 'response'
 
                 return (
                 <div
