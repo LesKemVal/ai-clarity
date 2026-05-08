@@ -5163,7 +5163,7 @@ if (liveMode) {
   <>
     <button
       type="button"
-      aria-label="Close Pro LIVE notice"
+      aria-label="Close structured LIVE notice"
       onClick={() => setShowProLiveComingSoon(false)}
       className="fixed inset-0 z-[240] bg-black/60 backdrop-blur-[10px]"
     />
@@ -5171,7 +5171,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
       <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
-          PRO LIVE
+          STRUCTURED LIVE
         </div>
 
         <div className="mt-2 text-[16px] font-semibold text-white">
@@ -5179,7 +5179,7 @@ if (liveMode) {
         </div>
 
         <div className="mt-3 text-[12px] leading-5 text-white/58">
-          GEORGE LIVE is currently focused on stabilizing individual real-time assistance before expanding into structured Pro LIVE environments.
+          GEORGE LIVE is currently focused on stabilizing individual real-time assistance before expanding into structured LIVE environments.
         </div>
 
         <button
@@ -6291,9 +6291,9 @@ What are we working on?"
           <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Pro Campaign</p>
-                <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a Pro campaign.</p>
-                <p className="mt-1 text-[11px] leading-5 text-neutral-400">Campaign context stays locked until Pro access is active.</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Structured LIVE</p>
+                <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a structured LIVE session.</p>
+                <p className="mt-1 text-[11px] leading-5 text-neutral-400">Structured LIVE continuity is not active yet.</p>
               </div>
               <button
                 type="button"
@@ -6305,7 +6305,7 @@ What are we working on?"
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/35 px-5 py-4 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
-              <div className="font-medium text-white/80">Pro Mode lets you:</div>
+              <div className="font-medium text-white/80">Structured LIVE will let you:</div>
               <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
                 <div>• use scripts and guided flow</div>
