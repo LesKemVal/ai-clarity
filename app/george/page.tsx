@@ -5700,13 +5700,36 @@ Choose one:
                             setToastMessage('Negotiation guidance active.')
                             setShowToast(true)
 
-                            const nextMessages = [
-                              ...messagesRef.current,
-                              {
-                                role: 'assistant' as const,
-                                content: 'Good. I’ll help you stay composed, reduce leakage, and move toward leverage.',
-                              },
-                            ]
+                            const negotiationGuidance =
+                              'Good. I’ll help you stay composed, reduce leakage, and move toward leverage.'
+
+                            const existingMessages = [...messagesRef.current]
+
+                            const lastMessage = existingMessages[existingMessages.length - 1]
+
+                            const shouldReplaceLastGuidance =
+                              lastMessage?.role === 'assistant' &&
+                              typeof lastMessage?.content === 'string' &&
+                              (
+                                lastMessage.content.includes('reduce leakage') ||
+                                lastMessage.content.includes('without overexplaining')
+                              )
+
+                            const nextMessages = shouldReplaceLastGuidance
+                              ? [
+                                  ...existingMessages.slice(0, -1),
+                                  {
+                                    role: 'assistant' as const,
+                                    content: negotiationGuidance,
+                                  },
+                                ]
+                              : [
+                                  ...existingMessages,
+                                  {
+                                    role: 'assistant' as const,
+                                    content: negotiationGuidance,
+                                  },
+                                ]
 
                             setMessages(nextMessages)
                             messagesRef.current = nextMessages
@@ -5742,13 +5765,36 @@ Choose one:
                             setToastMessage('Response handling active.')
                             setShowToast(true)
 
-                            const nextMessages = [
-                              ...messagesRef.current,
-                              {
-                                role: 'assistant' as const,
-                                content: 'Good. I’ll help you answer pressure, objections, or confusion without overexplaining.',
-                              },
-                            ]
+                            const responseGuidance =
+                              'Good. I’ll help you answer pressure, objections, or confusion without overexplaining.'
+
+                            const existingMessages = [...messagesRef.current]
+
+                            const lastMessage = existingMessages[existingMessages.length - 1]
+
+                            const shouldReplaceLastGuidance =
+                              lastMessage?.role === 'assistant' &&
+                              typeof lastMessage?.content === 'string' &&
+                              (
+                                lastMessage.content.includes('reduce leakage') ||
+                                lastMessage.content.includes('without overexplaining')
+                              )
+
+                            const nextMessages = shouldReplaceLastGuidance
+                              ? [
+                                  ...existingMessages.slice(0, -1),
+                                  {
+                                    role: 'assistant' as const,
+                                    content: responseGuidance,
+                                  },
+                                ]
+                              : [
+                                  ...existingMessages,
+                                  {
+                                    role: 'assistant' as const,
+                                    content: responseGuidance,
+                                  },
+                                ]
 
                             setMessages(nextMessages)
                             messagesRef.current = nextMessages
