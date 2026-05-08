@@ -849,9 +849,15 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       // do not auto-restore LIVE session by default
       // user can resume later via sessions if needed
 
+      const startNewLiveRequested = window.localStorage.getItem('george_start_new_live') === '1'
+      if (startNewLiveRequested) {
+        window.localStorage.removeItem('george_start_new_live')
+        setActiveCampaignId(null)
+      }
+
       let existingLive = getActiveSessionForMode('live')
 
-if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
+if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
         skipNextTypewriterRef.current = true
         restoredMessagesSignatureRef.current = getMessagesSignature(existingLive.messages)
         setMessages(existingLive.messages)
@@ -3586,6 +3592,7 @@ setPendingAssistantMessage({
 
   const startNewLiveConversation = () => {
     try {
+      window.localStorage.setItem('george_start_new_live', '1')
       window.localStorage.removeItem('george_active_live_session_id')
       window.localStorage.removeItem('george_active_campaign_session_id')
       window.localStorage.removeItem('george_active_campaign')
@@ -5080,6 +5087,14 @@ I will guide you in real time. Start speaking.`
           >
             Resume LIVE Conversation
           </button>
+
+          <button
+            type="button"
+            onClick={() => setShowLiveEntryChoice(false)}
+            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/45 transition hover:bg-white/[0.035] hover:text-white/72"
+          >
+            Stay here
+          </button>
         </div>
       </div>
     </div>
@@ -5493,7 +5508,30 @@ Choose one:
 
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
-                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">                        </div>
+                        <div className="absolute bottom-full left-0 z-[95] mb-2 w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              startNewLiveConversation()
+                            }}
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                          >
+                            New LIVE Conversation
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveQuickMenu(false)
+                              localStorage.setItem('george_intake_pending', 'campaign')
+                              window.open('https://mpek4nlbcqc.typeform.com/to/Mu2TBl0G', '_blank')
+                            }}
+                            className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                          >
+                            New LIVE Campaign
+                          </button>
+                        </div>
                       )}
                     </div>
 
