@@ -869,6 +869,7 @@ if (existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && exi
         role: 'assistant',
         content: `Use one earbud if you can.
 
+
 You don’t have to tell me everything right now.
 I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
 
