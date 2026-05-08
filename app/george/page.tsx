@@ -674,7 +674,7 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
     try {
       const savedCampaigns = getCampaignSessions().map((session: any) => ({
         id: session.id,
-        name: session.metadata?.campaignName || session.title || 'Pro LIVE Campaign · Beta',
+        name: session.metadata?.campaignName || session.title || 'LIVE Session',
         mode: 'firm',
         productOrService: session.metadata?.productOrService || '',
         targetMarket: session.metadata?.targetAudience || '',
@@ -1334,15 +1334,15 @@ if (messagesRef.current.length > 2) {
   try {
     saveSessionToV2({
       mode: activeCampaignId ? 'campaign' : 'live',
-      title: activeCampaignId ? 'Pro LIVE Campaign · Beta' : 'LIVE Conversation',
+      title: activeCampaignId ? 'LIVE Session' : 'LIVE Conversation',
       messages: messagesRef.current,
       summary: activeCampaignId
-        ? 'Pro LIVE campaign checkpoint.'
+        ? 'Structured LIVE checkpoint.'
         : 'LIVE Conversation checkpoint.',
       userGoal: activeCampaign?.desiredOutcome || 'In progress',
       lastKnownState: 'User exited LIVE mode.',
       suggestedRestart: activeCampaignId
-        ? 'Resume this Pro LIVE Campaign · Beta from the strongest operational next move.'
+        ? 'Resume this LIVE Session from the strongest operational next move.'
         : 'Resume this LIVE Conversation naturally.',
       metadata: {
         activeCampaignId: activeCampaignId || null,
@@ -1519,17 +1519,17 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
           saveSessionToV2({
             id: newCampaign.id,
             mode: 'campaign',
-            title: newCampaign.label || 'Pro LIVE Campaign · Beta',
+            title: newCampaign.label || 'LIVE Session',
             messages: [
               {
                 role: 'assistant',
                 content: campaignContext,
               },
             ],
-            summary: 'Pro LIVE campaign created from setup.',
-            userGoal: newCampaign.intelligence?.campaignGoal || 'Campaign execution',
-            lastKnownState: 'Campaign context loaded.',
-            suggestedRestart: 'Resume this Pro LIVE Campaign · Beta and continue from the strongest operational next move.',
+            summary: 'Structured LIVE session created from setup.',
+            userGoal: newCampaign.intelligence?.campaignGoal || 'LIVE continuity',
+            lastKnownState: 'LIVE continuity loaded.',
+            suggestedRestart: 'Resume this LIVE Session and continue from the strongest operational next move.',
             metadata: {
               activeCampaignId: newCampaign.id,
               campaignName: newCampaign.label,
@@ -1545,7 +1545,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
               role: 'assistant',
               content: campaignContext
             },
-            'Campaign Loaded'
+            'LIVE Loaded'
           )
 
         } catch (e) {
@@ -5174,10 +5174,10 @@ if (liveMode) {
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
             <div className="text-[11px] tracking-[0.18em] text-[#7C8CFF]">
-              {sessionPickerMode === 'campaign' ? 'RESUME CAMPAIGN' : 'RESUME CONVERSATION'}
+              {sessionPickerMode === 'campaign' ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
             </div>
             <div className="mt-1 text-[11px] text-white/45">
-              {sessionPickerMode === 'campaign' ? 'Structured Pro LIVE campaign memory.' : 'Immediate LIVE Conversation memory.'}
+              {sessionPickerMode === 'campaign' ? 'Structured LIVE continuity memory.' : 'Immediate LIVE Conversation memory.'}
             </div>
           </div>
           <button
@@ -5309,7 +5309,7 @@ Choose one:
                       ? 'bg-[#7C8CFF]/14 text-[#C8CEFF]'
                       : 'bg-white/[0.04] text-white/52'
                   }`}>
-                    {sessionPickerMode === 'campaign' ? '⚡ Campaign' : '◉ LIVE'}
+                    {sessionPickerMode === 'campaign' ? '⚡ Structured' : '◉ LIVE'}
                   </span>
                 </div>
 
@@ -5521,7 +5521,7 @@ Choose one:
                             }}
                             className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
                           >
-                            New LIVE Campaign · Beta
+                            New LIVE Session
                           </button>
                             </div>
                           </div>
