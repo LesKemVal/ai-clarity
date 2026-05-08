@@ -5561,7 +5561,7 @@ Choose one:
 
                     <div className="relative shrink-0">
                       {showLiveQuickMenu && (
-                        <>
+                        <div className="ml-1 flex items-center gap-1 border-l border-white/10 pl-2">
                           <button
                             type="button"
                             aria-label="Close LIVE chooser"
@@ -5593,7 +5593,7 @@ Choose one:
                           </button>
                             </div>
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
 
