@@ -366,11 +366,20 @@ function TypewriterText({
 function renderAssistantContent(text: string, liveMode: boolean) {
   if (!liveMode) return text
 
-  return text.split(/\n{2,}/).map((paragraph, index) => (
-    <span key={index} className={index === 0 ? 'block' : 'mt-6 block'}>
-      {paragraph}
-    </span>
-  ))
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+
+  return (
+    <div className="flex flex-col gap-7">
+      {paragraphs.map((paragraph, index) => (
+        <div key={index} className="block">
+          {paragraph}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
@@ -4020,9 +4029,9 @@ return (
       el.scrollBy({ top: -120, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 pb-[300px] md:px-6 md:pb-[300px] space-y-4 ${liveMode ? "pt-4 md:pt-10" : showMobileHero ? "pt-3 md:pt-14" : "pt-14 md:pt-6"} `}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-4 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="flex min-h-[calc(100dvh-430px)] flex-col items-center justify-start px-4 pt-2 md:hidden">
+    <div className="flex min-h-[165px] flex-col items-center justify-start px-4 pt-8 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[28px] md:text-3xl font-bold tracking-[0.08em] text-transparent">
         GEORGE
       </div>
@@ -4069,7 +4078,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.55]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
+        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.72]' : 'leading-8'} landscape:leading-9 tracking-[0.01em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
@@ -5675,6 +5684,7 @@ Choose one:
                       </span>
                     )}
 
+                    <div className="hidden">
                     <button
                       type="button"
                       onClick={() => {
@@ -5760,7 +5770,16 @@ Choose one:
                         </button>
                     </>
 
+                    </div>
+
                     <div className="ml-auto flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowLiveQuickMenu((prev) => !prev)}
+                        className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
+                      >
+                        Tools
+                      </button>
                       <button
                         type="button"
                         onClick={() => {
@@ -5812,7 +5831,7 @@ Choose one:
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[58%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:top-[58%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
 
                       <input
