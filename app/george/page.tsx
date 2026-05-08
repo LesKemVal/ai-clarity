@@ -5699,6 +5699,17 @@ Choose one:
                             }
                             setToastMessage('Negotiation guidance active.')
                             setShowToast(true)
+
+                            const nextMessages = [
+                              ...messagesRef.current,
+                              {
+                                role: 'assistant' as const,
+                                content: 'Good. I’ll help you stay composed, reduce leakage, and move toward leverage.',
+                              },
+                            ]
+
+                            setMessages(nextMessages)
+                            messagesRef.current = nextMessages
                           }}
                           className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] transition ${
                             conversationMode === 'professional_negotiation' || activePromptContext === 'professional_negotiation'
