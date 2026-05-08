@@ -17,7 +17,7 @@ export default function Brand({
         className={compact ? "h-8 w-[42px] object-contain" : "h-10 w-[68px] object-contain"}
       />
       {!compact && (
-        <div className="flex flex-col leading-tight">
+        <div className="ml-1.5 flex flex-col leading-tight">
           {showCore && (
             <span className="text-[11px] tracking-widest text-white/40">
               BRANES
