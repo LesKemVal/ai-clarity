@@ -628,10 +628,6 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         ? 'repeatable_lines'
         : 'short_cues')
 
-  const resolvedDeliveryMode =
-    activeCampaign?.deliveryMode ||
-    (voiceOn ? 'audio' : 'text')
-
   const liveContextBufferRef = useRef<string[]>([])
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
@@ -769,6 +765,9 @@ const [forceClose, setForceClose] = useState(false)
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
+  const resolvedDeliveryMode =
+    activeCampaign?.deliveryMode ||
+    (voiceOn ? 'audio' : 'text')
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
   const [voiceType, setVoiceType] = useState('ash')
   
