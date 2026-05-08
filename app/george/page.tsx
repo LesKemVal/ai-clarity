@@ -3914,11 +3914,11 @@ return (
     </div>
   )}
   {liveMode && (
-    <div className="pointer-events-none flex justify-center pt-2 pb-1">
+    <div className="pointer-events-none flex justify-center pt-1 pb-0 overflow-visible">
       <img
         src="/earbud400.png"
         alt=""
-        className="h-[92px] w-auto opacity-90 drop-shadow-[0_0_30px_rgba(124,140,255,0.24)] animate-pulse"
+        className="h-[76px] w-auto max-w-[78vw] object-contain opacity-88 drop-shadow-[0_0_26px_rgba(124,140,255,0.22)] animate-pulse"
       />
     </div>
   )}
@@ -3942,7 +3942,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[2.35]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
+        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.85]' : 'leading-8'} landscape:leading-9 tracking-[0.015em] font-[ui-monospace,Menlo,Monaco,Consolas,'Courier_New',monospace] text-white/92 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
