@@ -382,6 +382,68 @@ function renderAssistantContent(text: string, liveMode: boolean) {
   )
 }
 
+function governLiveResponse(raw: string, opts: { audio: boolean }) {
+  const text = String(raw || '').trim()
+  if (!text) return text
+
+  const cleaned = text
+    .replace(/\r/g, '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => !/^(strongest move|clean opener|next move|quick prep|close|if they|if he|if she|if budget|if timing|if pushback|what number|one thing|your opener|use this instead|try|consider|you should|lead with|drop)/i.test(line))
+    .filter((line) => !/^(budget|timing|performance|band|market|low counter|process|hr|title-first|vague no):/i.test(line))
+    .join('\n')
+
+  const sayMatch = cleaned.match(/Say:\s*\n?([\s\S]*?)(?=\n(?:Backup:|Cue:|Do:|Boundary:|Ask:|$))/i)
+  const backupMatch = cleaned.match(/Backup:\s*\n?([\s\S]*?)(?=\n(?:Say:|Cue:|Do:|Boundary:|Ask:|$))/i)
+  const cueMatch = cleaned.match(/(?:Cue:|Do:)\s*\n?([\s\S]*?)(?=\n(?:Say:|Backup:|Boundary:|Ask:|$))/i)
+
+  const normalizeLine = (value: string, maxWords: number) => {
+    let line = String(value || '')
+      .split('\n')
+      .map((part) => part.replace(/^[-•]\s*/, '').trim())
+      .filter(Boolean)[0] || ''
+
+    line = line.replace(/\[[^\]]+\]/g, '').replace(/\s+/g, ' ').trim()
+
+    const words = line.split(/\s+/).filter(Boolean)
+    if (words.length > maxWords) {
+      line = words.slice(0, maxWords).join(' ')
+      line = line.replace(/[,:;.-]*$/, '')
+    }
+
+    return line
+  }
+
+  const fallbackLine = (() => {
+    const firstQuoted = cleaned.match(/[“"]([^”"]{3,160})[”"]/)
+    if (firstQuoted?.[1]) return `“${firstQuoted[1]}”`
+
+    const firstUsable = cleaned
+      .split('\n')
+      .map((line) => line.replace(/^[-•]\s*/, '').trim())
+      .find((line) => line && !/^(Say|Backup|Cue|Do|Ask|Boundary):/i.test(line))
+
+    return firstUsable || 'Stay calm. Let them answer.'
+  })()
+
+  const say = normalizeLine(sayMatch?.[1] || fallbackLine, opts.audio ? 10 : 18)
+  const backup = normalizeLine(backupMatch?.[1] || '', opts.audio ? 10 : 16)
+  const cue = normalizeLine(cueMatch?.[1] || 'Pause. Let them answer.', opts.audio ? 8 : 10)
+
+  if (opts.audio) {
+    return say || cue
+  }
+
+  return [
+    say ? `Say:\n${say}` : '',
+    backup ? `\nBackup:\n${backup}` : '',
+    cue ? `\nCue:\n${cue}` : '',
+  ].filter(Boolean).join('\n').trim()
+}
+
+
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
@@ -3139,6 +3201,10 @@ ${finalContent}`
 
 ${finalContent}`
           }
+        }
+
+        if (!constrained && typeof finalContent === 'string' && liveMode) {
+          finalContent = governLiveResponse(finalContent, { audio: voiceOn })
         }
 
         const assistantMessage: Message = {
