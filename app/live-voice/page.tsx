@@ -15,6 +15,7 @@ import { georgeConfidenceEngine } from '@/lib/george/live-voice/runtime/confiden
 import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '@/lib/george/live-voice/runtime/delivery-profile'
 import { georgeSilenceIntelligence } from '@/lib/george/live-voice/runtime/silence-intelligence'
 import { georgeLoadManager } from '@/lib/george/live-voice/runtime/load-manager'
+import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -212,6 +213,7 @@ export default function LiveVoicePage() {
     partialTranscriptRuntime.clear()
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
+    georgeEmotionalVelocity.clear()
     setLatency(georgeLatencyMetrics.get())
 
     try {
@@ -387,19 +389,34 @@ export default function LiveVoicePage() {
                   partialTranscriptRuntime.isPredictionFresh(),
               })
 
+            const velocityState = georgeEmotionalVelocity.update({
+              text,
+              roomPressure: nextPacket.roomPressure,
+              interruptionRisk: nextPacket.interruptionRisk,
+              timestamp: Date.now(),
+            })
+
             const loadDecision = georgeLoadManager.decide({
               confidence: nextPacket.confidence,
-              interruptionRisk: nextPacket.interruptionRisk,
-              roomPressure: nextPacket.roomPressure,
+              interruptionRisk:
+                velocityState.velocity === 'spiking'
+                  ? Math.max(nextPacket.interruptionRisk || 0, 0.85)
+                  : nextPacket.interruptionRisk,
+              roomPressure:
+                velocityState.velocity === 'spiking'
+                  ? 'high'
+                  : nextPacket.roomPressure,
               speaker: nextPacket.speaker,
             })
 
             nextPacket.volley = georgeLoadManager.compress(
               nextPacket.volley,
-              loadDecision.maxWords
+              velocityState.velocity === 'spiking'
+                ? Math.min(loadDecision.maxWords, 5)
+                : loadDecision.maxWords
             )
 
-            nextPacket.status = `${nextPacket.status} ${loadDecision.reason}`.trim()
+            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -409,6 +426,7 @@ export default function LiveVoicePage() {
             setPacket({ ...nextPacket })
 
             pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
+            pushLog(`Velocity: ${velocityState.velocity} — ${velocityState.reason}`)
           }
 
           const silenceDecision = nextPacket
@@ -514,6 +532,7 @@ export default function LiveVoicePage() {
     partialTranscriptRuntime.clear()
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
+    georgeEmotionalVelocity.clear()
     setLatency(georgeLatencyMetrics.get())
     setShadowMap('')
     lastGovernedRef.current = ''
