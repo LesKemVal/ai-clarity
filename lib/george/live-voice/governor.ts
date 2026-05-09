@@ -1,4 +1,5 @@
 import type { LiveSpeakerRole, LiveVoiceGovernorInput, LiveVoicePacket } from './types'
+import { analyzeRoom } from './runtime/room-analyzer'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -49,6 +50,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   const shadowMap = String(input.shadowMap || '').trim()
   const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
   const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
+  const room = analyzeRoom(shadowMap)
+
 
   let packet: LiveVoicePacket = {
     speaker,
@@ -58,6 +61,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     status: hasShadow ? 'Using room-state shadow.' : 'Reading the room.',
     confidence: 0.62,
     shadowUsed: hasShadow,
+    roomPressure: room.pressure,
+    interruptionRisk: room.interruptionRisk,
   }
 
   if (!transcript) {
@@ -76,7 +81,10 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     packet = {
       speaker,
       shouldSpeak: true,
-      volley: 'Yes, officer. May I reach for it?',
+      volley:
+        room.pressure === 'authority'
+          ? 'Yes, officer. May I reach for it?'
+          : 'Let me answer that carefully.',
       cue: 'Hands visible. Move slowly.',
       status: 'Authority context. Stay calm.',
       confidence: 0.86,
@@ -96,7 +104,10 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     packet = {
       speaker,
       shouldSpeak: true,
-      volley: 'Pause. Let them answer.',
+      volley:
+        room.interruptionRisk > 0.7
+          ? 'Stop talking. Let them finish.'
+          : 'Pause. Let them answer.',
       cue: 'Hold eye contact.',
       status: 'User already spoke. Preserve momentum.',
       confidence: 0.68,

@@ -13,6 +13,8 @@ type LivePacket = {
   status: string
   confidence: number
   shadowUsed?: boolean
+  roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
+  interruptionRisk?: number
 }
 
 export default function LiveVoicePage() {
@@ -336,6 +338,8 @@ export default function LiveVoicePage() {
               <p><span className="text-white/35">Status:</span> {packet.status || '—'}</p>
               <p><span className="text-white/35">Confidence:</span> {packet.confidence}</p>
               <p><span className="text-white/35">Shadow used:</span> {String(Boolean(packet.shadowUsed))}</p>
+              <p><span className="text-white/35">Room pressure:</span> {packet.roomPressure || 'low'}</p>
+              <p><span className="text-white/35">Interruption risk:</span> {packet.interruptionRisk || 0}</p>
             </div>
           ) : (
             <p className="mt-3 text-sm text-white/45">No packet yet.</p>

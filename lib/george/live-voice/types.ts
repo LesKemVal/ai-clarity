@@ -12,6 +12,8 @@ export type LiveVoicePacket = {
   status: string
   confidence: number
   shadowUsed?: boolean
+  roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
+  interruptionRisk?: number
 }
 
 export type LiveVoiceGovernorInput = {
