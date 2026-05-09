@@ -46,13 +46,18 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   const transcript = String(input.transcript || '').trim()
   const speaker = inferSpeaker(transcript)
 
+  const shadowMap = String(input.shadowMap || '').trim()
+  const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
+  const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
+
   let packet: LiveVoicePacket = {
     speaker,
     shouldSpeak: true,
     volley: '',
     cue: '',
-    status: 'Reading the room.',
+    status: hasShadow ? 'Using room-state shadow.' : 'Reading the room.',
     confidence: 0.62,
+    shadowUsed: hasShadow,
   }
 
   if (!transcript) {
@@ -63,6 +68,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: '',
       status: 'No live signal.',
       confidence: 0,
+      shadowUsed: false,
     }
   }
 
@@ -74,6 +80,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: 'Hands visible. Move slowly.',
       status: 'Authority context. Stay calm.',
       confidence: 0.86,
+      shadowUsed: hasShadow,
     }
   } else if (speaker === 'other_party') {
     packet = {
@@ -83,6 +90,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: 'Slow down. Do not rush.',
       status: 'They asked for a response.',
       confidence: 0.7,
+      shadowUsed: hasShadow,
     }
   } else if (speaker === 'user') {
     packet = {
@@ -92,6 +100,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: 'Hold eye contact.',
       status: 'User already spoke. Preserve momentum.',
       confidence: 0.68,
+      shadowUsed: hasShadow,
     }
   } else {
     packet = {
@@ -101,6 +110,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: 'Short. Calm. Direct.',
       status: 'Instruction received.',
       confidence: 0.6,
+      shadowUsed: hasShadow,
     }
   }
 

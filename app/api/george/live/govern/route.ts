@@ -10,6 +10,8 @@ export async function POST(req: Request) {
       mode: body?.mode === 'voice_live' ? 'voice_live' : 'text_test',
       audio: Boolean(body?.audio),
       contextHint: typeof body?.contextHint === 'string' ? body.contextHint : '',
+      shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
+      lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
     })
 
     return NextResponse.json(packet)

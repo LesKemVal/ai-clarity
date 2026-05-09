@@ -1,6 +1,9 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { georgeAudioQueue } from '@/lib/george/live-voice/runtime/queue'
+import { georgeTurnManager } from '@/lib/george/live-voice/runtime/turn-manager'
+import { transcriptBuffer } from '@/lib/george/live-voice/runtime/transcript-buffer'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -9,6 +12,7 @@ type LivePacket = {
   cue: string
   status: string
   confidence: number
+  shadowUsed?: boolean
 }
 
 export default function LiveVoicePage() {
@@ -17,12 +21,33 @@ export default function LiveVoicePage() {
   const [packet, setPacket] = useState<LivePacket | null>(null)
   const [log, setLog] = useState<string[]>([])
   const [error, setError] = useState('')
+  const [shadowMap, setShadowMap] = useState('')
+
 
   const socketRef = useRef<WebSocket | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const lastGovernedRef = useRef('')
+  const processingQueueRef = useRef(false)
+
+  async function processAudioQueue() {
+    if (processingQueueRef.current) return
+
+    processingQueueRef.current = true
+
+    try {
+      while (georgeAudioQueue.size() > 0) {
+        const next = georgeAudioQueue.next()
+        if (!next) continue
+
+        await speak(next.text)
+      }
+    } finally {
+      processingQueueRef.current = false
+    }
+  }
+
 
   function pushLog(line: string) {
     setLog((prev) => [`${new Date().toLocaleTimeString()} — ${line}`, ...prev].slice(0, 12))
@@ -41,6 +66,8 @@ export default function LiveVoicePage() {
         transcript: clean,
         mode: 'voice_live',
         audio,
+        shadowMap,
+        lastFiveSeconds: clean,
       }),
     })
 
@@ -56,6 +83,13 @@ export default function LiveVoicePage() {
 
   async function speak(text: string) {
     if (!text.trim()) return
+
+    if (georgeTurnManager.shouldInterruptGeorge()) {
+      pushLog('Speech interrupted by room activity.')
+      return
+    }
+
+    georgeTurnManager.markGeorgeSpeaking()
 
     const res = await fetch('/api/george/live/tts', {
       method: 'POST',
@@ -80,6 +114,10 @@ export default function LiveVoicePage() {
     await audioRef.current.play().catch(() => {
       pushLog('Audio blocked until user interaction.')
     })
+
+    audioRef.current.onended = () => {
+      georgeTurnManager.markIdle()
+    }
   }
 
   async function start() {
@@ -147,10 +185,43 @@ export default function LiveVoicePage() {
 
         if (isFinal) {
           pushLog(`Heard: ${text}`)
+
+          const inferredSpeaker =
+            /\?|do you|can you|where are you|why did you/i.test(text)
+              ? 'other_party'
+              : 'user'
+
+          georgeTurnManager.update({
+            transcript: text,
+            isFinal,
+            speaker: inferredSpeaker,
+            timestamp: Date.now(),
+          })
+
+          transcriptBuffer.add({
+            id: crypto.randomUUID(),
+            text,
+            speaker: inferredSpeaker,
+            createdAt: Date.now(),
+          })
+
+          setShadowMap(transcriptBuffer.buildShadowMap())
+
           const nextPacket = await govern(text, true)
 
-          if (nextPacket?.shouldSpeak && nextPacket.volley) {
-            await speak(nextPacket.volley)
+          if (
+            nextPacket?.shouldSpeak &&
+            nextPacket.volley &&
+            georgeTurnManager.canGeorgeSpeak()
+          ) {
+            georgeAudioQueue.enqueue(
+              nextPacket.volley,
+              nextPacket.speaker === 'other_party' ? 10 : 1
+            )
+
+            await processAudioQueue()
+          } else {
+            pushLog('Speech suppressed by turn manager.')
           }
         }
       }
@@ -264,10 +335,21 @@ export default function LiveVoicePage() {
               <p><span className="text-white/35">Cue:</span> {packet.cue || '—'}</p>
               <p><span className="text-white/35">Status:</span> {packet.status || '—'}</p>
               <p><span className="text-white/35">Confidence:</span> {packet.confidence}</p>
+              <p><span className="text-white/35">Shadow used:</span> {String(Boolean(packet.shadowUsed))}</p>
             </div>
           ) : (
             <p className="mt-3 text-sm text-white/45">No packet yet.</p>
           )}
+        </section>
+
+        <section className="rounded-3xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-cyan-100/45">
+            Shadow Map
+          </p>
+
+          <pre className="mt-4 whitespace-pre-wrap text-xs leading-6 text-cyan-50/70">
+{shadowMap || 'No room-state memory yet.'}
+          </pre>
         </section>
 
         <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">

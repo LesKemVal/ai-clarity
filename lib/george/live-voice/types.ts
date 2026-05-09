@@ -11,6 +11,7 @@ export type LiveVoicePacket = {
   cue: string
   status: string
   confidence: number
+  shadowUsed?: boolean
 }
 
 export type LiveVoiceGovernorInput = {
@@ -18,4 +19,6 @@ export type LiveVoiceGovernorInput = {
   mode?: 'text_test' | 'voice_live'
   audio?: boolean
   contextHint?: string
+  shadowMap?: string
+  lastFiveSeconds?: string
 }
