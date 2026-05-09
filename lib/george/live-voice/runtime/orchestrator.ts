@@ -175,11 +175,17 @@ export function orchestrateLiveTurn(
   )
 
   if (
-    escalationLikelihood > 0.72 ||
-    pressureMemory.fatigueScore > 0.76
+    runtimeConfig.allowAggressiveIntervention &&
+    (
+      escalationLikelihood > 0.72 ||
+      pressureMemory.fatigueScore > 0.76
+    )
   ) {
     interventionUrgency = 'high'
-  } else if (escalationLikelihood > 0.48) {
+  } else if (
+    escalationLikelihood >
+    (0.48 + (1 - runtimeConfig.interventionSensitivity) * 0.18)
+  ) {
     interventionUrgency = 'moderate'
   }
 
@@ -205,11 +211,14 @@ export function orchestrateLiveTurn(
     activeObjective
   )
 
+  const runtimeWordLimit =
+    velocityState.velocity === 'spiking'
+      ? Math.min(runtimeConfig.maxSpokenWords, 5)
+      : runtimeConfig.maxSpokenWords
+
   nextPacket.volley = georgeLoadManager.compress(
     nextPacket.volley,
-    velocityState.velocity === 'spiking'
-      ? Math.min(loadDecision.maxWords, 5)
-      : loadDecision.maxWords
+    Math.min(loadDecision.maxWords, runtimeWordLimit)
   )
 
   nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
