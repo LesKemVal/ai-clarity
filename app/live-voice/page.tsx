@@ -10,6 +10,7 @@ import { georgeInterruptionEngine } from '@/lib/george/live-voice/runtime/interr
 import { georgeSilenceDetector } from '@/lib/george/live-voice/runtime/silence-detector'
 import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-stream'
 import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-voice/runtime/latency-metrics'
+import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenarios'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -411,6 +412,29 @@ export default function LiveVoicePage() {
     if (nextPacket?.volley) pushLog(`Test packet: ${nextPacket.volley}`)
   }
 
+  async function runScenario(lines: string[]) {
+    setTranscript('')
+    setPacket(null)
+
+    for (const line of lines) {
+      pushLog(`Scenario input: ${line}`)
+
+      setTranscript((prev) =>
+        `${prev}\n${line}`.trim()
+      )
+
+      const nextPacket = await govern(line, false)
+
+      if (nextPacket?.volley) {
+        pushLog(`Scenario output: ${nextPacket.volley}`)
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 650)
+      )
+    }
+  }
+
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white">
       <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -457,6 +481,17 @@ export default function LiveVoicePage() {
             >
               Test: raise opener
             </button>
+
+            {LIVE_TEXT_SCENARIOS.map((scenario) => (
+              <button
+                key={scenario.id}
+                type="button"
+                onClick={() => runScenario(scenario.transcript)}
+                className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] px-5 py-3 text-sm text-cyan-100/75 transition hover:bg-cyan-400/[0.12]"
+              >
+                Scenario: {scenario.label}
+              </button>
+            ))}
           </div>
 
           {error && (
