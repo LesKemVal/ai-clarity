@@ -21,6 +21,7 @@ import { georgePowerDynamics } from '@/lib/george/live-voice/runtime/power-dynam
 import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveObjectiveId } from '@/lib/george/live-voice/runtime/objective-engine'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
+import { georgeRecoveryEngine } from '@/lib/george/live-voice/runtime/recovery-engine'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -432,6 +433,14 @@ export default function LiveVoicePage() {
               powerFrame: powerState.frame,
             })
 
+            const recoveryState = georgeRecoveryEngine.detect({
+              text,
+              trajectory: trajectoryState.trajectory,
+              powerFrame: powerState.frame,
+              emotionalVelocity: velocityState.velocity,
+              interruptionRisk: nextPacket.interruptionRisk,
+            })
+
             const postureDecision = georgePostureEngine.decide({
               speaker: nextPacket.speaker,
               roomPressure:
@@ -441,8 +450,9 @@ export default function LiveVoicePage() {
                   : nextPacket.roomPressure,
               interruptionRisk:
                 powerState.frame === 'other_party_controls' ||
-                trajectoryState.recommendedAction === 'hold'
-                  ? Math.max(nextPacket.interruptionRisk || 0, 0.72)
+                trajectoryState.recommendedAction === 'hold' ||
+                recoveryState.shouldReset
+                  ? Math.max(nextPacket.interruptionRisk || 0, 0.82)
                   : nextPacket.interruptionRisk,
               confidence: nextPacket.confidence,
               emotionalVelocity: velocityState.velocity,
@@ -474,9 +484,9 @@ export default function LiveVoicePage() {
                 : loadDecision.maxWords
             )
 
-            nextPacket.cue = `${postureDecision.cuePrefix} ${nextPacket.cue || ''}`.trim()
+            nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
 
-            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason}`.trim()
+            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -491,6 +501,7 @@ export default function LiveVoicePage() {
             pushLog(`Power: ${powerState.frame} — ${powerState.reason}`)
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
             pushLog(`Trajectory: ${trajectoryState.trajectory} — ${trajectoryState.reason}`)
+            pushLog(`Recovery: ${recoveryState.state} — ${recoveryState.reason}`)
           }
 
           const silenceDecision = nextPacket
