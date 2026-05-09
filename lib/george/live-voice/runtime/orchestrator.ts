@@ -11,6 +11,7 @@ import { georgeSilenceIntelligence } from './silence-intelligence'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from './live-runtime-state'
 import { partialTranscriptRuntime } from './partial-stream'
 import { georgeDecisionWindow } from './decision-window'
+import { georgePressureMemory } from './pressure-memory'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -99,6 +100,15 @@ export function orchestrateLiveTurn(
     emotionalVelocity: velocityState.velocity,
   })
 
+  const pressureMemory = georgePressureMemory.update({
+    text,
+    trajectory: trajectoryState.trajectory,
+    recovery: recoveryState.state,
+    roomPressure: nextPacket.roomPressure,
+    interruptionRisk: nextPacket.interruptionRisk,
+    decisionAction: decisionWindow.action,
+  })
+
   const postureDecision = georgePostureEngine.decide({
     speaker: nextPacket.speaker,
     roomPressure:
@@ -110,6 +120,7 @@ export function orchestrateLiveTurn(
       powerState.frame === 'other_party_controls' ||
       trajectoryState.recommendedAction === 'hold' ||
       decisionWindow.action === 'hold' ||
+      pressureMemory.fatigueScore > 0.72 ||
       recoveryState.shouldReset
         ? Math.max(nextPacket.interruptionRisk || 0, 0.82)
         : nextPacket.interruptionRisk,
@@ -121,7 +132,8 @@ export function orchestrateLiveTurn(
     confidence: nextPacket.confidence,
     interruptionRisk:
       postureDecision.posture === 'silent' ||
-      velocityState.velocity === 'spiking'
+      velocityState.velocity === 'spiking' ||
+      pressureMemory.fatigueScore > 0.72
         ? Math.max(nextPacket.interruptionRisk || 0, 0.85)
         : nextPacket.interruptionRisk,
     roomPressure:
@@ -145,7 +157,7 @@ export function orchestrateLiveTurn(
 
   nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason}`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary}`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -174,6 +186,7 @@ export function orchestrateLiveTurn(
     confidence: nextPacket.confidence,
     interruptionRisk:
       decisionWindow.action === 'hold' ||
+      pressureMemory.fatigueScore > 0.72 ||
       nextPacket.status?.includes('Interaction is accelerating toward conflict')
         ? Math.max(nextPacket.interruptionRisk || 0, 0.86)
         : nextPacket.interruptionRisk,

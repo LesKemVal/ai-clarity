@@ -23,6 +23,7 @@ import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
 import { georgeRecoveryEngine } from '@/lib/george/live-voice/runtime/recovery-engine'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/live-voice/runtime/live-runtime-state'
+import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-memory'
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 
 type LivePacket = {
@@ -223,6 +224,7 @@ export default function LiveVoicePage() {
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
     georgeEmotionalVelocity.clear()
+    georgePressureMemory.clear()
     setRuntimeState(georgeLiveRuntimeState.clear())
     setLatency(georgeLatencyMetrics.get())
 
@@ -512,6 +514,7 @@ export default function LiveVoicePage() {
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
     georgeEmotionalVelocity.clear()
+    georgePressureMemory.clear()
     setRuntimeState(georgeLiveRuntimeState.clear())
     setLatency(georgeLatencyMetrics.get())
     setShadowMap('')
