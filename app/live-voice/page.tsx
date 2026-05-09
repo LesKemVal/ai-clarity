@@ -275,11 +275,20 @@ export default function LiveVoicePage() {
             text.trim().toLowerCase()
           )
 
-          if (cachedPrewarm) {
+          const nextPacket = await govern(text, true)
+
+          if (
+            cachedPrewarm &&
+            nextPacket &&
+            nextPacket.speaker === 'other_party'
+          ) {
+            nextPacket.volley = cachedPrewarm.volley
+            nextPacket.cue = cachedPrewarm.cue
+            nextPacket.status = 'Used prewarmed next move.'
+            nextPacket.confidence = Math.max(nextPacket.confidence || 0, 0.74)
+            setPacket({ ...nextPacket })
             pushLog(`Using prewarm cache.`)
           }
-
-          const nextPacket = await govern(text, true)
 
           if (
             nextPacket?.shouldSpeak &&
