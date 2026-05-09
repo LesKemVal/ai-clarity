@@ -62,6 +62,7 @@ function isForceIntervention(text: string) {
   const lastGovernedRef = useRef('')
   const processingQueueRef = useRef(false)
   const wakeLockRef = useRef<any>(null)
+  const lastGovernAtRef = useRef(0)
 
 
   function getAdaptiveDeliverable(text: string) {
@@ -210,6 +211,20 @@ function isForceIntervention(text: string) {
 
 
   async function govern(text: string, audio = false, transcriptAt = Date.now(), generation = georgeCancelEngine.current()) {
+
+    const now = Date.now()
+
+    if (
+      liveTier === 'intelligent' &&
+      now - lastGovernAtRef.current < 1100
+    ) {
+      pushLog('Intelligent cadence throttle engaged.')
+      return
+    }
+
+    lastGovernAtRef.current = now
+
+
     const clean = text.trim()
     const governStart = Date.now()
     if (!clean || clean === lastGovernedRef.current) return
