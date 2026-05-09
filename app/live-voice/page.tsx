@@ -59,6 +59,7 @@ function isForceIntervention(text: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const lastGovernedRef = useRef('')
   const processingQueueRef = useRef(false)
+  const wakeLockRef = useRef<any>(null)
 
 
   function getAdaptiveDeliverable(text: string) {
@@ -91,6 +92,30 @@ function isForceIntervention(text: string) {
     ) {
       navigator.vibrate(pattern)
     }
+  }
+
+
+
+  async function requestWakeLock() {
+    try {
+      if (
+        typeof navigator !== 'undefined' &&
+        'wakeLock' in navigator
+      ) {
+        wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
+        pushLog('Wake lock active.')
+      }
+    } catch {
+      pushLog('Wake lock unavailable.')
+    }
+  }
+
+  async function releaseWakeLock() {
+    try {
+      await wakeLockRef.current?.release?.()
+      wakeLockRef.current = null
+      pushLog('Wake lock released.')
+    } catch {}
   }
 
 
@@ -306,6 +331,7 @@ function isForceIntervention(text: string) {
       socket.onopen = () => {
         pushLog('Deepgram socket opened.')
         setRunning(true)
+        void requestWakeLock()
 
         const recorder = new MediaRecorder(stream, {
           mimeType: 'audio/webm',
@@ -582,8 +608,15 @@ function isForceIntervention(text: string) {
     streamRef.current = null
 
     setRunning(false)
+    releaseWakeLock()
     pushLog('Stopped.')
   }
+
+  useEffect(() => {
+    return () => {
+      releaseWakeLock()
+    }
+  }, [])
 
   async function testText(value: string) {
     setTranscript(value)
