@@ -13,6 +13,7 @@ import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-vo
 import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenarios'
 import { georgeConfidenceEngine } from '@/lib/george/live-voice/runtime/confidence-engine'
 import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '@/lib/george/live-voice/runtime/delivery-profile'
+import { georgeSilenceIntelligence } from '@/lib/george/live-voice/runtime/silence-intelligence'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -393,9 +394,24 @@ export default function LiveVoicePage() {
             setPacket({ ...nextPacket })
           }
 
+          const silenceDecision = nextPacket
+            ? georgeSilenceIntelligence.decide({
+                confidence: nextPacket.confidence,
+                interruptionRisk: nextPacket.interruptionRisk,
+                roomPressure: nextPacket.roomPressure,
+                speaker: nextPacket.speaker,
+                deliveryProfile: deliveryProfileId,
+              })
+            : { shouldHold: true, reason: 'No packet.' }
+
+          if (silenceDecision.shouldHold) {
+            pushLog(`Hold: ${silenceDecision.reason}`)
+          }
+
           if (
             nextPacket?.shouldSpeak &&
             nextPacket.volley &&
+            !silenceDecision.shouldHold &&
             georgeTurnManager.canGeorgeSpeak() &&
             georgeSilenceDetector.isSilenceWindow()
           ) {
