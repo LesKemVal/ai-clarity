@@ -382,7 +382,7 @@ function renderAssistantContent(text: string, liveMode: boolean) {
   )
 }
 
-function governLiveResponse(raw: string, opts: { audio: boolean }) {
+function governLiveResponse(raw: string, opts: { audio: boolean; userText?: string }) {
   const text = String(raw || '').trim()
   if (!text) return text
 
@@ -428,9 +428,21 @@ function governLiveResponse(raw: string, opts: { audio: boolean }) {
     return firstUsable || 'Stay calm. Let them answer.'
   })()
 
-  const say = normalizeLine(sayMatch?.[1] || fallbackLine, opts.audio ? 10 : 18)
-  const backup = normalizeLine(backupMatch?.[1] || '', opts.audio ? 10 : 16)
-  const cue = normalizeLine(cueMatch?.[1] || 'Pause. Let them answer.', opts.audio ? 8 : 10)
+  let backup = normalizeLine(backupMatch?.[1] || '', opts.audio ? 10 : 16)
+  if (/^(budget|timing|performance|band|market|low counter|process|hr|title|if)\b/i.test(backup)) {
+    backup = ''
+  }
+
+  const liveUserText = String(opts.userText || '').toLowerCase()
+  let say = normalizeLine(sayMatch?.[1] || fallbackLine, opts.audio ? 10 : 18)
+
+  if (/raise|compensation|pay/.test(liveUserText) && /sir|discuss|talk|raise|compensation|pay/.test(liveUserText)) {
+    if (/book|schedule|set .*minute|grab .*minute|this week|email|chat|slack/i.test(say)) {
+      say = '“I wanted to talk about my compensation for a minute.”'
+    }
+  }
+
+  const cue = normalizeLine(cueMatch?.[1] || 'Slow down. Let him answer.', opts.audio ? 8 : 10)
 
   if (opts.audio) {
     return say || cue
@@ -3204,7 +3216,7 @@ ${finalContent}`
         }
 
         if (!constrained && typeof finalContent === 'string' && liveMode) {
-          finalContent = governLiveResponse(finalContent, { audio: voiceOn })
+          finalContent = governLiveResponse(finalContent, { audio: voiceOn, userText: text })
         }
 
         const assistantMessage: Message = {
