@@ -134,6 +134,49 @@ export function orchestrateLiveTurn(
     emotionalVelocity: velocityState.velocity,
   })
 
+
+  let leverageState = 'stable'
+  let escalationLikelihood = 0.18
+  let interventionUrgency = 'low'
+
+  if (
+    powerState.frame === 'other_party_controls' ||
+    controlSnapshot.owner === 'other_party'
+  ) {
+    leverageState = 'user_losing_leverage'
+    escalationLikelihood += 0.28
+  }
+
+  if (
+    powerState.frame === 'user_controls' &&
+    trajectoryState.trajectory === 'positive'
+  ) {
+    leverageState = 'user_gaining_leverage'
+    escalationLikelihood -= 0.08
+  }
+
+  if (
+    trajectoryState.trajectory === 'escalating_conflict' ||
+    velocityState.velocity === 'spiking'
+  ) {
+    escalationLikelihood += 0.38
+  }
+
+  escalationLikelihood = Math.max(
+    0,
+    Math.min(1, Number(escalationLikelihood.toFixed(2)))
+  )
+
+  if (
+    escalationLikelihood > 0.72 ||
+    pressureMemory.fatigueScore > 0.76
+  ) {
+    interventionUrgency = 'high'
+  } else if (escalationLikelihood > 0.48) {
+    interventionUrgency = 'moderate'
+  }
+
+
   const loadDecision = georgeLoadManager.decide({
     confidence: nextPacket.confidence,
     interruptionRisk:
@@ -181,7 +224,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -206,6 +249,9 @@ export function orchestrateLiveTurn(
     status: nextPacket.status,
     onDeck: shapedResponse.onDeck || '',
     calmingLine: shapedResponse.calmingLine || '',
+    leverageState,
+    escalationLikelihood,
+    interventionUrgency,
   })
 
   const silence = georgeSilenceIntelligence.decide({
