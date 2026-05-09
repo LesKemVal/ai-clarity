@@ -739,6 +739,9 @@ function isForceIntervention(text: string) {
             <p>Load: {runtimeState.load}</p>
             <p>Silence: {runtimeState.silence}</p>
             <p>Delivery: {runtimeState.deliveryProfile}</p>
+            <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
+            <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
+            <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
           </div>
 
           <div className="mt-4 space-y-3">
