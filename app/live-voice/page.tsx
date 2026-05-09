@@ -98,9 +98,18 @@ export default function LiveVoicePage() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
+      const tokenRes = await fetch('/api/george/live/stt-token')
+
+      if (!tokenRes.ok) {
+        setError('Failed to obtain temporary Deepgram token.')
+        return
+      }
+
+      const tokenData = await tokenRes.json()
+
       const socket = new WebSocket(
         'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
-        ['token', process.env.NEXT_PUBLIC_DEEPGRAM_BROWSER_TOKEN || '']
+        ['token', tokenData.token]
       )
 
       socketRef.current = socket
