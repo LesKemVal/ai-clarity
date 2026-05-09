@@ -17,6 +17,7 @@ import { georgeSilenceIntelligence } from '@/lib/george/live-voice/runtime/silen
 import { georgeLoadManager } from '@/lib/george/live-voice/runtime/load-manager'
 import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
 import { georgePostureEngine } from '@/lib/george/live-voice/runtime/posture-engine'
+import { georgePowerDynamics } from '@/lib/george/live-voice/runtime/power-dynamics'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -397,10 +398,24 @@ export default function LiveVoicePage() {
               timestamp: Date.now(),
             })
 
-            const postureDecision = georgePostureEngine.decide({
+            const powerState = georgePowerDynamics.analyze({
+              text,
               speaker: nextPacket.speaker,
               roomPressure: nextPacket.roomPressure,
               interruptionRisk: nextPacket.interruptionRisk,
+              emotionalVelocity: velocityState.velocity,
+            })
+
+            const postureDecision = georgePostureEngine.decide({
+              speaker: nextPacket.speaker,
+              roomPressure:
+                powerState.frame === 'authority_controls'
+                  ? 'authority'
+                  : nextPacket.roomPressure,
+              interruptionRisk:
+                powerState.frame === 'other_party_controls'
+                  ? Math.max(nextPacket.interruptionRisk || 0, 0.72)
+                  : nextPacket.interruptionRisk,
               confidence: nextPacket.confidence,
               emotionalVelocity: velocityState.velocity,
             })
@@ -428,7 +443,7 @@ export default function LiveVoicePage() {
 
             nextPacket.cue = `${postureDecision.cuePrefix} ${nextPacket.cue || ''}`.trim()
 
-            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason}`.trim()
+            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -440,6 +455,7 @@ export default function LiveVoicePage() {
             pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
             pushLog(`Velocity: ${velocityState.velocity} — ${velocityState.reason}`)
             pushLog(`Posture: ${postureDecision.posture} — ${postureDecision.reason}`)
+            pushLog(`Power: ${powerState.frame} — ${powerState.reason}`)
           }
 
           const silenceDecision = nextPacket
