@@ -18,6 +18,7 @@ import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/live-voice/runtime/live-runtime-state'
 import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-memory'
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
+import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engine'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -113,7 +114,7 @@ export default function LiveVoicePage() {
     pushLog(`Prewarmed: ${guessVolley}`)
   }
 
-  async function govern(text: string, audio = false, transcriptAt = Date.now()) {
+  async function govern(text: string, audio = false, transcriptAt = Date.now(), generation = georgeCancelEngine.current()) {
     const clean = text.trim()
     const governStart = Date.now()
     if (!clean || clean === lastGovernedRef.current) return
@@ -133,6 +134,11 @@ export default function LiveVoicePage() {
     })
 
     const nextPacket = await res.json()
+
+    if (georgeCancelEngine.isExpired(generation)) {
+      pushLog('Dropped stale LIVE response.')
+      return
+    }
 
     setLatency(
       georgeLatencyMetrics.update({
@@ -380,7 +386,13 @@ export default function LiveVoicePage() {
                 : objectiveId
             ]
 
-          const nextPacket = await govern(text, true, messageReceivedAt)
+          const generation = georgeCancelEngine.bump()
+          const nextPacket = await govern(text, true, messageReceivedAt, generation)
+
+          if (georgeCancelEngine.isExpired(generation)) {
+            pushLog('Skipped stale LIVE orchestration.')
+            return
+          }
 
           const usedPrewarm =
             Boolean(cachedPrewarm) &&
@@ -409,6 +421,11 @@ export default function LiveVoicePage() {
             : null
 
           if (orchestrated) {
+            if (georgeCancelEngine.isExpired(generation)) {
+              pushLog('Skipped stale LIVE packet commit.')
+              return
+            }
+
             setRuntimeState(orchestrated.runtimeSnapshot)
             setPacket({ ...orchestrated.packet })
 
@@ -421,6 +438,7 @@ export default function LiveVoicePage() {
           }
 
           if (
+            !georgeCancelEngine.isExpired(generation) &&
             orchestrated?.packet.shouldSpeak &&
             orchestrated.queueText &&
             !orchestrated.silence.shouldHold &&
