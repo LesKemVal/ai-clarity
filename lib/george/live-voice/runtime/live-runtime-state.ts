@@ -18,6 +18,8 @@ export type LiveRuntimeSnapshot = {
   nextMove: string
   cue: string
   status: string
+  onDeck?: string
+  calmingLine?: string
 }
 
 const EMPTY_STATE: LiveRuntimeSnapshot = {
@@ -40,6 +42,8 @@ const EMPTY_STATE: LiveRuntimeSnapshot = {
   nextMove: '',
   cue: '',
   status: '',
+  onDeck: '',
+  calmingLine: '',
 }
 
 class GeorgeLiveRuntimeState {

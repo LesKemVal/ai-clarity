@@ -8,12 +8,25 @@ export type ResponseShapeInput = {
   decisionAction: string
   roomPressure?: string
   fatigueScore?: number
+  emotionalVelocity?: 'stable' | 'rising' | 'spiking'
+  transcript?: string
 }
 
 export type ResponseShapeResult = {
   volley: string
   cue: string
   reason: string
+  onDeck?: string
+  calmingLine?: string
+}
+
+const SHADOW_PATTERNS: Record<string, string> = {
+  budget: 'What budget range already exists?',
+  risk: 'What risk concerns them most?',
+  approval: 'Who ultimately approves this?',
+  deadline: 'What timeline matters most here?',
+  liability: 'What outcome are they trying to avoid?',
+  authority: 'Who actually controls the decision?',
 }
 
 class GeorgeResponseShaper {
@@ -22,12 +35,39 @@ class GeorgeResponseShaper {
     let cue = input.cue.trim()
     const reasons: string[] = []
 
+    let onDeck = ''
+    let calmingLine = ''
+
     if (!volley) {
       return {
         volley,
         cue,
         reason: 'No response to shape.',
       }
+    }
+
+    const transcript = (input.transcript || '').toLowerCase()
+
+    for (const [signal, question] of Object.entries(SHADOW_PATTERNS)) {
+      if (transcript.includes(signal)) {
+        onDeck = question
+        reasons.push(`shadow:${signal}`)
+        break
+      }
+    }
+
+    if (
+      input.emotionalVelocity === 'spiking' ||
+      input.posture === 'deescalating'
+    ) {
+      calmingLine = 'Slow down. One clean sentence.'
+
+      cue = this.prependCue(
+        cue,
+        'Lower your pace. Do not rush.'
+      )
+
+      reasons.push('counter-velocity calming')
     }
 
     if (input.roomPressure === 'authority') {
@@ -76,6 +116,8 @@ class GeorgeResponseShaper {
       volley,
       cue,
       reason: reasons.length ? reasons.join(', ') : 'No shaping needed.',
+      onDeck,
+      calmingLine,
     }
   }
 

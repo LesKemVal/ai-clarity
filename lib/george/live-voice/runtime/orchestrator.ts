@@ -174,6 +174,8 @@ export function orchestrateLiveTurn(
     decisionAction: decisionWindow.action,
     roomPressure: nextPacket.roomPressure,
     fatigueScore: pressureMemory.fatigueScore,
+    emotionalVelocity: velocityState.velocity,
+    transcript: text,
   })
 
   nextPacket.volley = shapedResponse.volley
@@ -202,6 +204,8 @@ export function orchestrateLiveTurn(
     nextMove: nextPacket.volley,
     cue: `${decisionWindow.action.toUpperCase()}: ${nextPacket.cue}`.trim(),
     status: nextPacket.status,
+    onDeck: shapedResponse.onDeck || '',
+    calmingLine: shapedResponse.calmingLine || '',
   })
 
   const silence = georgeSilenceIntelligence.decide({
