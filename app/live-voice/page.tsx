@@ -20,6 +20,7 @@ import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-m
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engine'
 import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
+import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -51,6 +52,7 @@ function isForceIntervention(text: string) {
   const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
   const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
   const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
+  const [liveTier, setLiveTier] = useState<LiveRuntimeTier>('brilliant')
 
 
   const socketRef = useRef<WebSocket | null>(null)
@@ -194,6 +196,18 @@ function isForceIntervention(text: string) {
 
     pushLog(`Prewarmed: ${guessVolley}`)
   }
+
+
+  useEffect(() => {
+    try {
+      const savedTier = window.localStorage.getItem('george_tier')
+
+      if (savedTier === 'intelligent' || savedTier === 'brilliant') {
+        setLiveTier(savedTier)
+      }
+    } catch {}
+  }, [])
+
 
   async function govern(text: string, audio = false, transcriptAt = Date.now(), generation = georgeCancelEngine.current()) {
     const clean = text.trim()
@@ -538,6 +552,7 @@ function isForceIntervention(text: string) {
                 activeObjective,
                 deliveryProfileId,
                 usedPrewarm,
+                tier: liveTier,
               })
             : null
 
