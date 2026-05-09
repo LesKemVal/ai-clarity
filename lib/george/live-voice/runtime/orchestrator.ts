@@ -8,6 +8,10 @@ import { reinforceObjective, type LiveObjective } from './objective-engine'
 import { georgeTrajectoryEngine } from './trajectory-engine'
 import { georgeRecoveryEngine } from './recovery-engine'
 import { georgeSilenceIntelligence } from './silence-intelligence'
+import {
+  getLiveRuntimeConfig,
+  type LiveRuntimeTier,
+} from './tier-runtime'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from './live-runtime-state'
 import { partialTranscriptRuntime } from './partial-stream'
 import { georgeDecisionWindow } from './decision-window'
@@ -34,6 +38,7 @@ export type LiveOrchestratorInput = {
   activeObjective: LiveObjective
   deliveryProfileId: DeliveryProfileId
   usedPrewarm: boolean
+  tier?: LiveRuntimeTier
 }
 
 export type LiveOrchestratorResult = {
@@ -49,8 +54,10 @@ export type LiveOrchestratorResult = {
 export function orchestrateLiveTurn(
   input: LiveOrchestratorInput
 ): LiveOrchestratorResult {
-  const { text, activeObjective, deliveryProfileId, usedPrewarm } = input
+  const { text, activeObjective, deliveryProfileId, usedPrewarm, tier = 'brilliant' } = input
+  const runtimeConfig = getLiveRuntimeConfig(tier)
   const nextPacket = { ...input.packet }
+  void runtimeConfig
 
   nextPacket.confidence =
     georgeConfidenceEngine.compute({
