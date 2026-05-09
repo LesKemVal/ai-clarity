@@ -12,6 +12,7 @@ import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from './live-runtime
 import { partialTranscriptRuntime } from './partial-stream'
 import { georgeDecisionWindow } from './decision-window'
 import { georgePressureMemory } from './pressure-memory'
+import { georgeResponseShaper } from './response-shaper'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -157,7 +158,22 @@ export function orchestrateLiveTurn(
 
   nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary}`.trim()
+  const shapedResponse = georgeResponseShaper.shape({
+    volley: nextPacket.volley,
+    cue: nextPacket.cue,
+    objectiveId: activeObjective.id,
+    posture: postureDecision.posture,
+    trajectory: trajectoryState.trajectory,
+    recovery: recoveryState.state,
+    decisionAction: decisionWindow.action,
+    roomPressure: nextPacket.roomPressure,
+    fatigueScore: pressureMemory.fatigueScore,
+  })
+
+  nextPacket.volley = shapedResponse.volley
+  nextPacket.cue = shapedResponse.cue
+
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
