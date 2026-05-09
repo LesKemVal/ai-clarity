@@ -20,6 +20,7 @@ import { georgePostureEngine } from '@/lib/george/live-voice/runtime/posture-eng
 import { georgePowerDynamics } from '@/lib/george/live-voice/runtime/power-dynamics'
 import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveObjectiveId } from '@/lib/george/live-voice/runtime/objective-engine'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
+import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -422,14 +423,25 @@ export default function LiveVoicePage() {
               emotionalVelocity: velocityState.velocity,
             })
 
+            const trajectoryState = georgeTrajectoryEngine.evaluate({
+              text,
+              objectiveId: activeObjective.id,
+              roomPressure: nextPacket.roomPressure,
+              interruptionRisk: nextPacket.interruptionRisk,
+              emotionalVelocity: velocityState.velocity,
+              powerFrame: powerState.frame,
+            })
+
             const postureDecision = georgePostureEngine.decide({
               speaker: nextPacket.speaker,
               roomPressure:
-                powerState.frame === 'authority_controls'
+                powerState.frame === 'authority_controls' ||
+                trajectoryState.trajectory === 'authority_risk'
                   ? 'authority'
                   : nextPacket.roomPressure,
               interruptionRisk:
-                powerState.frame === 'other_party_controls'
+                powerState.frame === 'other_party_controls' ||
+                trajectoryState.recommendedAction === 'hold'
                   ? Math.max(nextPacket.interruptionRisk || 0, 0.72)
                   : nextPacket.interruptionRisk,
               confidence: nextPacket.confidence,
@@ -464,7 +476,7 @@ export default function LiveVoicePage() {
 
             nextPacket.cue = `${postureDecision.cuePrefix} ${nextPacket.cue || ''}`.trim()
 
-            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason}`.trim()
+            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -478,12 +490,16 @@ export default function LiveVoicePage() {
             pushLog(`Posture: ${postureDecision.posture} — ${postureDecision.reason}`)
             pushLog(`Power: ${powerState.frame} — ${powerState.reason}`)
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
+            pushLog(`Trajectory: ${trajectoryState.trajectory} — ${trajectoryState.reason}`)
           }
 
           const silenceDecision = nextPacket
             ? georgeSilenceIntelligence.decide({
                 confidence: nextPacket.confidence,
-                interruptionRisk: nextPacket.interruptionRisk,
+                interruptionRisk:
+                  nextPacket.status?.includes('Interaction is accelerating toward conflict')
+                    ? Math.max(nextPacket.interruptionRisk || 0, 0.86)
+                    : nextPacket.interruptionRisk,
                 roomPressure: nextPacket.roomPressure,
                 speaker: nextPacket.speaker,
                 deliveryProfile: deliveryProfileId,
