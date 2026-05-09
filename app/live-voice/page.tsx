@@ -9,6 +9,7 @@ import { georgePrewarmCache } from '@/lib/george/live-voice/runtime/prewarm-cach
 import { georgeInterruptionEngine } from '@/lib/george/live-voice/runtime/interruption-engine'
 import { georgeSilenceDetector } from '@/lib/george/live-voice/runtime/silence-detector'
 import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-stream'
+import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-voice/runtime/latency-metrics'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -29,6 +30,7 @@ export default function LiveVoicePage() {
   const [log, setLog] = useState<string[]>([])
   const [error, setError] = useState('')
   const [shadowMap, setShadowMap] = useState('')
+  const [latency, setLatency] = useState<LatencySnapshot>(georgeLatencyMetrics.get())
 
 
   const socketRef = useRef<WebSocket | null>(null)
@@ -100,8 +102,9 @@ export default function LiveVoicePage() {
     pushLog(`Prewarmed: ${guessVolley}`)
   }
 
-  async function govern(text: string, audio = false) {
+  async function govern(text: string, audio = false, transcriptAt = Date.now()) {
     const clean = text.trim()
+    const governStart = Date.now()
     if (!clean || clean === lastGovernedRef.current) return
 
     lastGovernedRef.current = clean
@@ -119,6 +122,14 @@ export default function LiveVoicePage() {
     })
 
     const nextPacket = await res.json()
+
+    setLatency(
+      georgeLatencyMetrics.update({
+        transcriptToGovernMs: governStart - transcriptAt,
+        governMs: Date.now() - governStart,
+      })
+    )
+
     setPacket(nextPacket)
 
     if (nextPacket?.shouldSpeak && nextPacket?.volley) {
@@ -130,6 +141,8 @@ export default function LiveVoicePage() {
 
   async function speak(text: string) {
     if (!text.trim()) return
+
+    const ttsStart = Date.now()
 
     if (georgeTurnManager.shouldInterruptGeorge()) {
       pushLog('Speech interrupted by room activity.')
@@ -150,6 +163,17 @@ export default function LiveVoicePage() {
     }
 
     const blob = await res.blob()
+
+    setLatency((prev) =>
+      georgeLatencyMetrics.update({
+        ttsMs: Date.now() - ttsStart,
+        totalMs:
+          prev.transcriptToGovernMs +
+          prev.governMs +
+          (Date.now() - ttsStart),
+      })
+    )
+
     const url = URL.createObjectURL(blob)
 
     if (!audioRef.current) {
@@ -174,6 +198,8 @@ export default function LiveVoicePage() {
     lastGovernedRef.current = ''
     partialTranscriptRuntime.clear()
     finalTranscriptRuntime.clear()
+    georgeLatencyMetrics.clear()
+    setLatency(georgeLatencyMetrics.get())
 
     try {
       const tokenCheck = await fetch('/api/george/live/stt-token')
@@ -222,6 +248,7 @@ export default function LiveVoicePage() {
 
       socket.onmessage = async (message) => {
         const data = JSON.parse(message.data)
+        const messageReceivedAt = Date.now()
         const text = data?.channel?.alternatives?.[0]?.transcript || ''
         const isFinal = Boolean(data?.is_final)
 
@@ -302,7 +329,7 @@ export default function LiveVoicePage() {
             text.trim().toLowerCase()
           )
 
-          const nextPacket = await govern(text, true)
+          const nextPacket = await govern(text, true, messageReceivedAt)
 
           if (
             cachedPrewarm &&
@@ -464,6 +491,19 @@ export default function LiveVoicePage() {
           ) : (
             <p className="mt-3 text-sm text-white/45">No packet yet.</p>
           )}
+        </section>
+
+        <section className="rounded-3xl border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-emerald-100/45">
+            Latency
+          </p>
+
+          <div className="mt-4 grid gap-2 text-sm text-emerald-50/70">
+            <p>Transcript → Govern: {latency.transcriptToGovernMs}ms</p>
+            <p>Governor: {latency.governMs}ms</p>
+            <p>TTS: {latency.ttsMs}ms</p>
+            <p>Total measured: {latency.totalMs}ms</p>
+          </div>
         </section>
 
         <section className="rounded-3xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
