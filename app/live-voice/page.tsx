@@ -772,6 +772,18 @@ function isForceIntervention(text: string) {
                 </p>
               </div>
             ) : null}
+
+            {runtimeState.postureCue ? (
+              <div className="rounded-2xl border border-fuchsia-400/15 bg-fuchsia-400/[0.05] px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-fuchsia-100/45">
+                  Physical Cue
+                </p>
+
+                <p className="mt-1 text-sm font-medium tracking-[0.08em] text-fuchsia-50/90">
+                  {runtimeState.postureCue}
+                </p>
+              </div>
+            ) : null}
           </div>
         </section>
 
