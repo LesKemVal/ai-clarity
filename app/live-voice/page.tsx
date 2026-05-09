@@ -34,6 +34,13 @@ type LivePacket = {
 }
 
 export default function LiveVoicePage() {
+
+function isForceIntervention(text: string) {
+  return /george|help me|what do i say|tell me what to say|say something|jump in|i need help/i.test(
+    text.toLowerCase()
+  )
+}
+
   const [running, setRunning] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [packet, setPacket] = useState<LivePacket | null>(null)
@@ -332,6 +339,21 @@ export default function LiveVoicePage() {
             pushLog('Conversation interruption detected.')
           }
 
+          const forcedIntervention =
+            inferredSpeaker.speaker === 'user' &&
+            isForceIntervention(text)
+
+          if (forcedIntervention) {
+            pushLog('FORCE_INTERVENTION triggered.')
+          }
+
+          if (inferredSpeaker.speaker === 'user') {
+            georgeAudioQueue.clear()
+            georgeCancelEngine.bump()
+
+            pushLog('Yield protocol: cleared LIVE audio queue.')
+          }
+
           georgeTurnManager.update({
             transcript: text,
             isFinal,
@@ -438,8 +460,14 @@ export default function LiveVoicePage() {
             !georgeCancelEngine.isExpired(generation) &&
             orchestrated?.packet.shouldSpeak &&
             orchestrated.queueText &&
-            !orchestrated.silence.shouldHold &&
-            georgeTurnManager.canGeorgeSpeak() &&
+            (
+              forcedIntervention ||
+              !orchestrated.silence.shouldHold
+            ) &&
+            (
+              forcedIntervention ||
+              georgeTurnManager.canGeorgeSpeak()
+            ) &&
             georgeSilenceDetector.isSilenceWindow()
           ) {
             georgeAudioQueue.enqueue(
@@ -458,7 +486,10 @@ export default function LiveVoicePage() {
 
             await processAudioQueue()
           } else {
-            if (!georgeSilenceDetector.isSilenceWindow()) {
+            if (
+              !forcedIntervention &&
+              !georgeSilenceDetector.isSilenceWindow()
+            ) {
               pushLog('Waiting for silence window.')
             } else {
               pushLog('Speech suppressed by turn manager.')
