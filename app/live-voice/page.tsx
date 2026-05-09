@@ -741,9 +741,35 @@ function isForceIntervention(text: string) {
             <p>Delivery: {runtimeState.deliveryProfile}</p>
           </div>
 
-          <p className="mt-4 text-sm text-amber-50/70">
-            Next: {runtimeState.nextMove || '—'}
-          </p>
+          <div className="mt-4 space-y-3">
+            <p className="text-sm text-amber-50/70">
+              Next: {runtimeState.nextMove || '—'}
+            </p>
+
+            {runtimeState.onDeck ? (
+              <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.05] px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-cyan-100/45">
+                  On Deck
+                </p>
+
+                <p className="mt-1 text-sm text-cyan-50/80">
+                  {runtimeState.onDeck}
+                </p>
+              </div>
+            ) : null}
+
+            {runtimeState.calmingLine ? (
+              <div className="rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.05] px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/45">
+                  Counter Velocity
+                </p>
+
+                <p className="mt-1 text-sm text-emerald-50/80">
+                  {runtimeState.calmingLine}
+                </p>
+              </div>
+            ) : null}
+          </div>
         </section>
 
         <section className="rounded-3xl border border-purple-400/20 bg-purple-400/[0.06] p-5">
