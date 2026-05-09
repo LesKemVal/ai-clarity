@@ -752,7 +752,15 @@ function isForceIntervention(text: string) {
           </p>
         </section>
 
-        <section className="rounded-3xl border border-amber-300/15 bg-amber-300/[0.04] p-5">
+        <section
+          className={`rounded-3xl border p-5 transition-all duration-500 ${
+            runtimeState.interventionUrgency === 'high'
+              ? 'border-red-400/35 bg-red-500/[0.08] shadow-[0_0_45px_rgba(255,40,40,0.16)]'
+              : runtimeState.leverageState === 'user_gaining_leverage'
+                ? 'border-emerald-400/25 bg-emerald-500/[0.06] shadow-[0_0_38px_rgba(16,185,129,0.12)]'
+                : 'border-amber-300/15 bg-amber-300/[0.04]'
+          }`}
+        >
           <p className="text-xs uppercase tracking-[0.25em] text-amber-100/45">
             Unified Runtime State
           </p>
