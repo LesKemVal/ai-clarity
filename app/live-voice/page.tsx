@@ -415,15 +415,46 @@ export default function LiveVoicePage() {
   async function runScenario(lines: string[]) {
     setTranscript('')
     setPacket(null)
+    transcriptBuffer.clear()
+    partialTranscriptRuntime.clear()
+    finalTranscriptRuntime.clear()
+    georgeLatencyMetrics.clear()
+    setLatency(georgeLatencyMetrics.get())
+    setShadowMap('')
+    lastGovernedRef.current = ''
 
     for (const line of lines) {
+      const receivedAt = Date.now()
+
       pushLog(`Scenario input: ${line}`)
 
       setTranscript((prev) =>
         `${prev}\n${line}`.trim()
       )
 
-      const nextPacket = await govern(line, false)
+      const inferredSpeaker =
+        /\?|do you|can you|where are you|why did you|what did|why do/i.test(line)
+          ? 'other_party'
+          : 'user'
+
+      georgeTurnManager.update({
+        transcript: line,
+        isFinal: true,
+        speaker: inferredSpeaker,
+        timestamp: receivedAt,
+      })
+
+      transcriptBuffer.add({
+        id: crypto.randomUUID(),
+        text: line,
+        speaker: inferredSpeaker,
+        createdAt: receivedAt,
+      })
+
+      const nextShadowMap = transcriptBuffer.buildShadowMap()
+      setShadowMap(nextShadowMap)
+
+      const nextPacket = await govern(line, false, receivedAt)
 
       if (nextPacket?.volley) {
         pushLog(`Scenario output: ${nextPacket.volley}`)
