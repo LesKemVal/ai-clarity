@@ -18,6 +18,7 @@ import { georgeLoadManager } from '@/lib/george/live-voice/runtime/load-manager'
 import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
 import { georgePostureEngine } from '@/lib/george/live-voice/runtime/posture-engine'
 import { georgePowerDynamics } from '@/lib/george/live-voice/runtime/power-dynamics'
+import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveObjectiveId } from '@/lib/george/live-voice/runtime/objective-engine'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -41,6 +42,7 @@ export default function LiveVoicePage() {
   const [shadowMap, setShadowMap] = useState('')
   const [latency, setLatency] = useState<LatencySnapshot>(georgeLatencyMetrics.get())
   const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
+  const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
 
 
   const socketRef = useRef<WebSocket | null>(null)
@@ -363,6 +365,20 @@ export default function LiveVoicePage() {
             return
           }
 
+          const inferredObjective = inferObjectiveFromText(text)
+
+          if (objectiveId === 'clarify' && inferredObjective !== 'clarify') {
+            setObjectiveId(inferredObjective)
+            pushLog(`Objective: ${LIVE_OBJECTIVES[inferredObjective].label}`)
+          }
+
+          const activeObjective =
+            LIVE_OBJECTIVES[
+              objectiveId === 'clarify'
+                ? inferredObjective
+                : objectiveId
+            ]
+
           const nextPacket = await govern(text, true, messageReceivedAt)
 
           const usedPrewarm =
@@ -434,6 +450,11 @@ export default function LiveVoicePage() {
               speaker: nextPacket.speaker,
             })
 
+            nextPacket.volley = reinforceObjective(
+              nextPacket.volley,
+              activeObjective
+            )
+
             nextPacket.volley = georgeLoadManager.compress(
               nextPacket.volley,
               velocityState.velocity === 'spiking'
@@ -443,7 +464,7 @@ export default function LiveVoicePage() {
 
             nextPacket.cue = `${postureDecision.cuePrefix} ${nextPacket.cue || ''}`.trim()
 
-            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason}`.trim()
+            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -456,6 +477,7 @@ export default function LiveVoicePage() {
             pushLog(`Velocity: ${velocityState.velocity} — ${velocityState.reason}`)
             pushLog(`Posture: ${postureDecision.posture} — ${postureDecision.reason}`)
             pushLog(`Power: ${powerState.frame} — ${powerState.reason}`)
+            pushLog(`Objective anchor: ${activeObjective.anchor}`)
           }
 
           const silenceDecision = nextPacket
@@ -597,6 +619,13 @@ export default function LiveVoicePage() {
       const nextShadowMap = transcriptBuffer.buildShadowMap()
       setShadowMap(nextShadowMap)
 
+      const inferredObjective = inferObjectiveFromText(line)
+
+      if (objectiveId === 'clarify' && inferredObjective !== 'clarify') {
+        setObjectiveId(inferredObjective)
+        pushLog(`Objective: ${LIVE_OBJECTIVES[inferredObjective].label}`)
+      }
+
       const nextPacket = await govern(line, false, receivedAt)
 
       if (nextPacket?.volley) {
@@ -621,6 +650,26 @@ export default function LiveVoicePage() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {(Object.values(LIVE_OBJECTIVES)).map((objective) => (
+              <button
+                key={objective.id}
+                type="button"
+                onClick={() => {
+                  setObjectiveId(objective.id)
+                  pushLog(`Objective: ${objective.label}`)
+                }}
+                className={`rounded-2xl border px-4 py-2 text-xs transition ${
+                  objectiveId === objective.id
+                    ? 'border-emerald-300/40 bg-emerald-300/15 text-emerald-50'
+                    : 'border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
+                }`}
+              >
+                {objective.label}
+              </button>
+            ))}
+          </div>
+
           <div className="mb-4 flex flex-wrap gap-2">
             {(Object.values(DELIVERY_PROFILES)).map((profile) => (
               <button
