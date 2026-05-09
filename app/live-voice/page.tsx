@@ -22,6 +22,7 @@ import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveO
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
 import { georgeRecoveryEngine } from '@/lib/george/live-voice/runtime/recovery-engine'
+import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/live-voice/runtime/live-runtime-state'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -45,6 +46,7 @@ export default function LiveVoicePage() {
   const [latency, setLatency] = useState<LatencySnapshot>(georgeLatencyMetrics.get())
   const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
   const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
+  const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
 
 
   const socketRef = useRef<WebSocket | null>(null)
@@ -220,6 +222,7 @@ export default function LiveVoicePage() {
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
     georgeEmotionalVelocity.clear()
+    setRuntimeState(georgeLiveRuntimeState.clear())
     setLatency(georgeLatencyMetrics.get())
 
     try {
@@ -493,6 +496,27 @@ export default function LiveVoicePage() {
                 nextPacket.confidence
               )
 
+            const runtimeSnapshot = georgeLiveRuntimeState.update({
+              transcript: text,
+              speaker: nextPacket.speaker,
+              objective: activeObjective.id,
+              confidence: nextPacket.confidence,
+              roomPressure: nextPacket.roomPressure || 'low',
+              interruptionRisk: nextPacket.interruptionRisk || 0,
+              velocity: velocityState.velocity,
+              powerFrame: powerState.frame,
+              trajectory: trajectoryState.trajectory,
+              recovery: recoveryState.state,
+              posture: postureDecision.posture,
+              load: loadDecision.state,
+              deliveryProfile: deliveryProfileId,
+              shouldSpeak: nextPacket.shouldSpeak,
+              nextMove: nextPacket.volley,
+              cue: nextPacket.cue,
+              status: nextPacket.status,
+            })
+
+            setRuntimeState(runtimeSnapshot)
             setPacket({ ...nextPacket })
 
             pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
@@ -516,6 +540,12 @@ export default function LiveVoicePage() {
                 deliveryProfile: deliveryProfileId,
               })
             : { shouldHold: true, reason: 'No packet.' }
+
+          setRuntimeState(
+            georgeLiveRuntimeState.update({
+              silence: silenceDecision.shouldHold ? 'hold' : 'speak',
+            })
+          )
 
           if (silenceDecision.shouldHold) {
             pushLog(`Hold: ${silenceDecision.reason}`)
@@ -611,6 +641,7 @@ export default function LiveVoicePage() {
     finalTranscriptRuntime.clear()
     georgeLatencyMetrics.clear()
     georgeEmotionalVelocity.clear()
+    setRuntimeState(georgeLiveRuntimeState.clear())
     setLatency(georgeLatencyMetrics.get())
     setShadowMap('')
     lastGovernedRef.current = ''
@@ -775,6 +806,31 @@ export default function LiveVoicePage() {
           <p className="text-xs uppercase tracking-[0.25em] text-white/35">Transcript</p>
           <p className="mt-3 min-h-20 whitespace-pre-wrap text-lg leading-8 text-white/80">
             {transcript || 'No transcript yet.'}
+          </p>
+        </section>
+
+        <section className="rounded-3xl border border-amber-300/15 bg-amber-300/[0.04] p-5">
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-100/45">
+            Unified Runtime State
+          </p>
+
+          <div className="mt-4 grid gap-2 text-xs leading-5 text-amber-50/75 md:grid-cols-2">
+            <p>Objective: {runtimeState.objective}</p>
+            <p>Speaker: {runtimeState.speaker}</p>
+            <p>Confidence: {runtimeState.confidence}</p>
+            <p>Pressure: {runtimeState.roomPressure}</p>
+            <p>Velocity: {runtimeState.velocity}</p>
+            <p>Power: {runtimeState.powerFrame}</p>
+            <p>Trajectory: {runtimeState.trajectory}</p>
+            <p>Recovery: {runtimeState.recovery}</p>
+            <p>Posture: {runtimeState.posture}</p>
+            <p>Load: {runtimeState.load}</p>
+            <p>Silence: {runtimeState.silence}</p>
+            <p>Delivery: {runtimeState.deliveryProfile}</p>
+          </div>
+
+          <p className="mt-4 text-sm text-amber-50/70">
+            Next: {runtimeState.nextMove || '—'}
           </p>
         </section>
 
