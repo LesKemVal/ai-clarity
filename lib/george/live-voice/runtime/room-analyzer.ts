@@ -1,3 +1,75 @@
+
+export type LiveSpeaker =
+  | 'other_party'
+  | 'user'
+  | 'unclear'
+
+export type SpeakerInference = {
+  speaker: LiveSpeaker
+  confidence: number
+  reason: string
+}
+
+const DIRECT_QUESTION_PATTERNS =
+  /(\?|do you|can you|could you|would you|where are you|why did you|what did|why do|did you|are you|will you)/i
+
+const AUTHORITY_COMMAND_PATTERNS =
+  /(step out|show me|give me|answer me|stop talking|listen|hold on|wait|let me finish)/i
+
+const USER_REQUEST_PATTERNS =
+  /(george|help me|what should i say|how do i respond|give me|tell me|coach me)/i
+
+export function inferLiveSpeaker(
+  text: string,
+  shadowMap = ''
+): SpeakerInference {
+  const clean = text.trim()
+
+  if (!clean) {
+    return {
+      speaker: 'unclear',
+      confidence: 0,
+      reason: 'Empty transcript.',
+    }
+  }
+
+  if (USER_REQUEST_PATTERNS.test(clean)) {
+    return {
+      speaker: 'user',
+      confidence: 0.86,
+      reason: 'User appears to be asking GEORGE for assistance.',
+    }
+  }
+
+  if (
+    AUTHORITY_COMMAND_PATTERNS.test(clean) ||
+    DIRECT_QUESTION_PATTERNS.test(clean)
+  ) {
+    return {
+      speaker: 'other_party',
+      confidence: 0.78,
+      reason: 'Transcript appears directed at the user.',
+    }
+  }
+
+  const room = analyzeRoom(`${shadowMap}\n${clean}`)
+
+  if (room.likelySpeakerControl === 'other_party') {
+    return {
+      speaker: 'other_party',
+      confidence: 0.62,
+      reason: 'Room control appears held by the other party.',
+    }
+  }
+
+  return {
+    speaker: 'unclear',
+    confidence: 0.41,
+    reason: 'Speaker could not be determined safely.',
+  }
+}
+
+
 export type RoomPressure =
   | 'low'
   | 'moderate'

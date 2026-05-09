@@ -19,6 +19,7 @@ import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/l
 import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-memory'
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engine'
+import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -280,15 +281,12 @@ export default function LiveVoicePage() {
 
         if (!text.trim()) return
 
-        const partialSpeaker =
-          /\?|do you|can you|where are you|why did you/i.test(text)
-            ? 'other_party'
-            : 'user'
+        const partialSpeaker = inferLiveSpeaker(text, shadowMap)
 
         const partialChanged = partialTranscriptRuntime.update({
           text,
           receivedAt: Date.now(),
-          speaker: partialSpeaker,
+          speaker: partialSpeaker.speaker,
         })
 
         georgeSilenceDetector.markSpeech()
@@ -319,15 +317,14 @@ export default function LiveVoicePage() {
           partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
 
-          const inferredSpeaker =
-            /\?|do you|can you|where are you|why did you/i.test(text)
-              ? 'other_party'
-              : 'user'
+          const inferredSpeaker = inferLiveSpeaker(text, shadowMap)
+
+          pushLog(`Speaker: ${inferredSpeaker.speaker} (${Math.round(inferredSpeaker.confidence * 100)}%)`)
 
           const interruptionDetected =
             georgeInterruptionEngine.detect({
               text,
-              speaker: inferredSpeaker,
+              speaker: inferredSpeaker.speaker,
               timestamp: Date.now(),
             })
 
@@ -338,14 +335,14 @@ export default function LiveVoicePage() {
           georgeTurnManager.update({
             transcript: text,
             isFinal,
-            speaker: inferredSpeaker,
+            speaker: inferredSpeaker.speaker,
             timestamp: Date.now(),
           })
 
           transcriptBuffer.add({
             id: crypto.randomUUID(),
             text,
-            speaker: inferredSpeaker,
+            speaker: inferredSpeaker.speaker,
             createdAt: Date.now(),
           })
 
@@ -540,22 +537,21 @@ export default function LiveVoicePage() {
         `${prev}\n${line}`.trim()
       )
 
-      const inferredSpeaker =
-        /\?|do you|can you|where are you|why did you|what did|why do/i.test(line)
-          ? 'other_party'
-          : 'user'
+      const inferredSpeaker = inferLiveSpeaker(line, transcriptBuffer.buildShadowMap())
+
+      pushLog(`Scenario speaker: ${inferredSpeaker.speaker} (${Math.round(inferredSpeaker.confidence * 100)}%)`)
 
       georgeTurnManager.update({
         transcript: line,
         isFinal: true,
-        speaker: inferredSpeaker,
+        speaker: inferredSpeaker.speaker,
         timestamp: receivedAt,
       })
 
       transcriptBuffer.add({
         id: crypto.randomUUID(),
         text: line,
-        speaker: inferredSpeaker,
+        speaker: inferredSpeaker.speaker,
         createdAt: receivedAt,
       })
 
