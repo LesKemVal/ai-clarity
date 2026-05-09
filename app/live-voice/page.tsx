@@ -7,6 +7,7 @@ import { transcriptBuffer } from '@/lib/george/live-voice/runtime/transcript-buf
 import { partialTranscriptRuntime } from '@/lib/george/live-voice/runtime/partial-stream'
 import { georgePrewarmCache } from '@/lib/george/live-voice/runtime/prewarm-cache'
 import { georgeInterruptionEngine } from '@/lib/george/live-voice/runtime/interruption-engine'
+import { georgeSilenceDetector } from '@/lib/george/live-voice/runtime/silence-detector'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -234,6 +235,10 @@ export default function LiveVoicePage() {
           speaker: partialSpeaker,
         })
 
+        georgeSilenceDetector.markSpeech()
+
+        georgeSilenceDetector.markSpeech()
+
         if (
           !isFinal &&
           partialTranscriptRuntime.shouldPrewarm(text)
@@ -305,7 +310,8 @@ export default function LiveVoicePage() {
           if (
             nextPacket?.shouldSpeak &&
             nextPacket.volley &&
-            georgeTurnManager.canGeorgeSpeak()
+            georgeTurnManager.canGeorgeSpeak() &&
+            georgeSilenceDetector.isSilenceWindow()
           ) {
             georgeAudioQueue.enqueue(
               nextPacket.volley,
@@ -323,7 +329,11 @@ export default function LiveVoicePage() {
 
             await processAudioQueue()
           } else {
-            pushLog('Speech suppressed by turn manager.')
+            if (!georgeSilenceDetector.isSilenceWindow()) {
+              pushLog('Waiting for silence window.')
+            } else {
+              pushLog('Speech suppressed by turn manager.')
+            }
           }
         }
       }
