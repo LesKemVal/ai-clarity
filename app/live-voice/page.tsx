@@ -83,6 +83,17 @@ function isForceIntervention(text: string) {
   }
 
 
+
+  function triggerHaptic(pattern: number | number[]) {
+    if (
+      typeof window !== 'undefined' &&
+      'vibrate' in navigator
+    ) {
+      navigator.vibrate(pattern)
+    }
+  }
+
+
   async function processAudioQueue() {
     if (processingQueueRef.current) return
 
@@ -478,6 +489,21 @@ function isForceIntervention(text: string) {
 
             setRuntimeState(orchestrated.runtimeSnapshot)
             setPacket({ ...orchestrated.packet })
+
+            if (
+              orchestrated.runtimeSnapshot.interventionUrgency === 'high'
+            ) {
+              triggerHaptic([120, 80, 120])
+            } else if (
+              (orchestrated.runtimeSnapshot.escalationLikelihood || 0) > 0.72
+            ) {
+              triggerHaptic([90, 60, 90])
+            } else if (
+              orchestrated.packet.shouldSpeak &&
+              !orchestrated.silence.shouldHold
+            ) {
+              triggerHaptic(40)
+            }
 
             pushLog(`Runtime: ${orchestrated.runtimeSnapshot.trajectory} / ${orchestrated.runtimeSnapshot.posture} / ${orchestrated.runtimeSnapshot.load}`)
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
