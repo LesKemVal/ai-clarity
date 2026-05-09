@@ -8,6 +8,7 @@ import { partialTranscriptRuntime } from '@/lib/george/live-voice/runtime/partia
 import { georgePrewarmCache } from '@/lib/george/live-voice/runtime/prewarm-cache'
 import { georgeInterruptionEngine } from '@/lib/george/live-voice/runtime/interruption-engine'
 import { georgeSilenceDetector } from '@/lib/george/live-voice/runtime/silence-detector'
+import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-stream'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -171,6 +172,8 @@ export default function LiveVoicePage() {
     setTranscript('')
     setPacket(null)
     lastGovernedRef.current = ''
+    partialTranscriptRuntime.clear()
+    finalTranscriptRuntime.clear()
 
     try {
       const tokenCheck = await fetch('/api/george/live/stt-token')
@@ -229,13 +232,15 @@ export default function LiveVoicePage() {
             ? 'other_party'
             : 'user'
 
-        partialTranscriptRuntime.update({
+        const partialChanged = partialTranscriptRuntime.update({
           text,
           receivedAt: Date.now(),
           speaker: partialSpeaker,
         })
 
         georgeSilenceDetector.markSpeech()
+
+        if (!partialChanged && !isFinal) return
 
         georgeSilenceDetector.markSpeech()
 
@@ -253,6 +258,11 @@ export default function LiveVoicePage() {
         })
 
         if (isFinal) {
+          if (!finalTranscriptRuntime.shouldAccept(text)) {
+            pushLog('Ignored duplicate final transcript.')
+            return
+          }
+
           partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
 
