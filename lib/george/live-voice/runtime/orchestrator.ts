@@ -10,6 +10,7 @@ import { georgeRecoveryEngine } from './recovery-engine'
 import { georgeSilenceIntelligence } from './silence-intelligence'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from './live-runtime-state'
 import { partialTranscriptRuntime } from './partial-stream'
+import { georgeDecisionWindow } from './decision-window'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -87,6 +88,17 @@ export function orchestrateLiveTurn(
     interruptionRisk: nextPacket.interruptionRisk,
   })
 
+  const decisionWindow = georgeDecisionWindow.evaluate({
+    text,
+    confidence: nextPacket.confidence,
+    roomPressure: nextPacket.roomPressure,
+    interruptionRisk: nextPacket.interruptionRisk,
+    trajectory: trajectoryState.trajectory,
+    recovery: recoveryState.state,
+    powerFrame: powerState.frame,
+    emotionalVelocity: velocityState.velocity,
+  })
+
   const postureDecision = georgePostureEngine.decide({
     speaker: nextPacket.speaker,
     roomPressure:
@@ -97,6 +109,7 @@ export function orchestrateLiveTurn(
     interruptionRisk:
       powerState.frame === 'other_party_controls' ||
       trajectoryState.recommendedAction === 'hold' ||
+      decisionWindow.action === 'hold' ||
       recoveryState.shouldReset
         ? Math.max(nextPacket.interruptionRisk || 0, 0.82)
         : nextPacket.interruptionRisk,
@@ -132,7 +145,7 @@ export function orchestrateLiveTurn(
 
   nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason}`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason}`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -153,13 +166,14 @@ export function orchestrateLiveTurn(
     deliveryProfile: deliveryProfileId,
     shouldSpeak: nextPacket.shouldSpeak,
     nextMove: nextPacket.volley,
-    cue: nextPacket.cue,
+    cue: `${decisionWindow.action.toUpperCase()}: ${nextPacket.cue}`.trim(),
     status: nextPacket.status,
   })
 
   const silence = georgeSilenceIntelligence.decide({
     confidence: nextPacket.confidence,
     interruptionRisk:
+      decisionWindow.action === 'hold' ||
       nextPacket.status?.includes('Interaction is accelerating toward conflict')
         ? Math.max(nextPacket.interruptionRisk || 0, 0.86)
         : nextPacket.interruptionRisk,
