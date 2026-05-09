@@ -14,6 +14,7 @@ import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenar
 import { georgeConfidenceEngine } from '@/lib/george/live-voice/runtime/confidence-engine'
 import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '@/lib/george/live-voice/runtime/delivery-profile'
 import { georgeSilenceIntelligence } from '@/lib/george/live-voice/runtime/silence-intelligence'
+import { georgeLoadManager } from '@/lib/george/live-voice/runtime/load-manager'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -386,12 +387,28 @@ export default function LiveVoicePage() {
                   partialTranscriptRuntime.isPredictionFresh(),
               })
 
+            const loadDecision = georgeLoadManager.decide({
+              confidence: nextPacket.confidence,
+              interruptionRisk: nextPacket.interruptionRisk,
+              roomPressure: nextPacket.roomPressure,
+              speaker: nextPacket.speaker,
+            })
+
+            nextPacket.volley = georgeLoadManager.compress(
+              nextPacket.volley,
+              loadDecision.maxWords
+            )
+
+            nextPacket.status = `${nextPacket.status} ${loadDecision.reason}`.trim()
+
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
                 nextPacket.confidence
               )
 
             setPacket({ ...nextPacket })
+
+            pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
           }
 
           const silenceDecision = nextPacket
