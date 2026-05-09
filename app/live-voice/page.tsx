@@ -23,6 +23,7 @@ import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
 import { georgeRecoveryEngine } from '@/lib/george/live-voice/runtime/recovery-engine'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/live-voice/runtime/live-runtime-state'
+import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -402,175 +403,45 @@ export default function LiveVoicePage() {
             pushLog(`Using prewarm cache.`)
           }
 
-          if (nextPacket) {
-            nextPacket.confidence =
-              georgeConfidenceEngine.compute({
-                interruptionRisk: nextPacket.interruptionRisk,
-                roomPressure: nextPacket.roomPressure,
+          const orchestrated = nextPacket
+            ? orchestrateLiveTurn({
+                text,
+                packet: nextPacket,
+                activeObjective,
+                deliveryProfileId,
                 usedPrewarm,
-                partialFresh:
-                  partialTranscriptRuntime.isPredictionFresh(),
               })
+            : null
 
-            const velocityState = georgeEmotionalVelocity.update({
-              text,
-              roomPressure: nextPacket.roomPressure,
-              interruptionRisk: nextPacket.interruptionRisk,
-              timestamp: Date.now(),
-            })
+          if (orchestrated) {
+            setRuntimeState(orchestrated.runtimeSnapshot)
+            setPacket({ ...orchestrated.packet })
 
-            const powerState = georgePowerDynamics.analyze({
-              text,
-              speaker: nextPacket.speaker,
-              roomPressure: nextPacket.roomPressure,
-              interruptionRisk: nextPacket.interruptionRisk,
-              emotionalVelocity: velocityState.velocity,
-            })
-
-            const trajectoryState = georgeTrajectoryEngine.evaluate({
-              text,
-              objectiveId: activeObjective.id,
-              roomPressure: nextPacket.roomPressure,
-              interruptionRisk: nextPacket.interruptionRisk,
-              emotionalVelocity: velocityState.velocity,
-              powerFrame: powerState.frame,
-            })
-
-            const recoveryState = georgeRecoveryEngine.detect({
-              text,
-              trajectory: trajectoryState.trajectory,
-              powerFrame: powerState.frame,
-              emotionalVelocity: velocityState.velocity,
-              interruptionRisk: nextPacket.interruptionRisk,
-            })
-
-            const postureDecision = georgePostureEngine.decide({
-              speaker: nextPacket.speaker,
-              roomPressure:
-                powerState.frame === 'authority_controls' ||
-                trajectoryState.trajectory === 'authority_risk'
-                  ? 'authority'
-                  : nextPacket.roomPressure,
-              interruptionRisk:
-                powerState.frame === 'other_party_controls' ||
-                trajectoryState.recommendedAction === 'hold' ||
-                recoveryState.shouldReset
-                  ? Math.max(nextPacket.interruptionRisk || 0, 0.82)
-                  : nextPacket.interruptionRisk,
-              confidence: nextPacket.confidence,
-              emotionalVelocity: velocityState.velocity,
-            })
-
-            const loadDecision = georgeLoadManager.decide({
-              confidence: nextPacket.confidence,
-              interruptionRisk:
-                postureDecision.posture === 'silent' ||
-                velocityState.velocity === 'spiking'
-                  ? Math.max(nextPacket.interruptionRisk || 0, 0.85)
-                  : nextPacket.interruptionRisk,
-              roomPressure:
-                velocityState.velocity === 'spiking'
-                  ? 'high'
-                  : nextPacket.roomPressure,
-              speaker: nextPacket.speaker,
-            })
-
-            nextPacket.volley = reinforceObjective(
-              nextPacket.volley,
-              activeObjective
-            )
-
-            nextPacket.volley = georgeLoadManager.compress(
-              nextPacket.volley,
-              velocityState.velocity === 'spiking'
-                ? Math.min(loadDecision.maxWords, 5)
-                : loadDecision.maxWords
-            )
-
-            nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
-
-            nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason}`.trim()
-
-            nextPacket.shouldSpeak =
-              georgeConfidenceEngine.shouldSpeak(
-                nextPacket.confidence
-              )
-
-            const runtimeSnapshot = georgeLiveRuntimeState.update({
-              transcript: text,
-              speaker: nextPacket.speaker,
-              objective: activeObjective.id,
-              confidence: nextPacket.confidence,
-              roomPressure: nextPacket.roomPressure || 'low',
-              interruptionRisk: nextPacket.interruptionRisk || 0,
-              velocity: velocityState.velocity,
-              powerFrame: powerState.frame,
-              trajectory: trajectoryState.trajectory,
-              recovery: recoveryState.state,
-              posture: postureDecision.posture,
-              load: loadDecision.state,
-              deliveryProfile: deliveryProfileId,
-              shouldSpeak: nextPacket.shouldSpeak,
-              nextMove: nextPacket.volley,
-              cue: nextPacket.cue,
-              status: nextPacket.status,
-            })
-
-            setRuntimeState(runtimeSnapshot)
-            setPacket({ ...nextPacket })
-
-            pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
-            pushLog(`Velocity: ${velocityState.velocity} — ${velocityState.reason}`)
-            pushLog(`Posture: ${postureDecision.posture} — ${postureDecision.reason}`)
-            pushLog(`Power: ${powerState.frame} — ${powerState.reason}`)
+            pushLog(`Runtime: ${orchestrated.runtimeSnapshot.trajectory} / ${orchestrated.runtimeSnapshot.posture} / ${orchestrated.runtimeSnapshot.load}`)
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
-            pushLog(`Trajectory: ${trajectoryState.trajectory} — ${trajectoryState.reason}`)
-            pushLog(`Recovery: ${recoveryState.state} — ${recoveryState.reason}`)
-          }
 
-          const silenceDecision = nextPacket
-            ? georgeSilenceIntelligence.decide({
-                confidence: nextPacket.confidence,
-                interruptionRisk:
-                  nextPacket.status?.includes('Interaction is accelerating toward conflict')
-                    ? Math.max(nextPacket.interruptionRisk || 0, 0.86)
-                    : nextPacket.interruptionRisk,
-                roomPressure: nextPacket.roomPressure,
-                speaker: nextPacket.speaker,
-                deliveryProfile: deliveryProfileId,
-              })
-            : { shouldHold: true, reason: 'No packet.' }
-
-          setRuntimeState(
-            georgeLiveRuntimeState.update({
-              silence: silenceDecision.shouldHold ? 'hold' : 'speak',
-            })
-          )
-
-          if (silenceDecision.shouldHold) {
-            pushLog(`Hold: ${silenceDecision.reason}`)
+            if (orchestrated.silence.shouldHold) {
+              pushLog(`Hold: ${orchestrated.silence.reason}`)
+            }
           }
 
           if (
-            nextPacket?.shouldSpeak &&
-            nextPacket.volley &&
-            !silenceDecision.shouldHold &&
+            orchestrated?.packet.shouldSpeak &&
+            orchestrated.queueText &&
+            !orchestrated.silence.shouldHold &&
             georgeTurnManager.canGeorgeSpeak() &&
             georgeSilenceDetector.isSilenceWindow()
           ) {
             georgeAudioQueue.enqueue(
-              compressForDelivery(
-                nextPacket.volley,
-                DELIVERY_PROFILES[deliveryProfileId]
-              ),
+              orchestrated.queueText,
               (
-                nextPacket.speaker === 'other_party'
+                orchestrated.packet.speaker === 'other_party'
                   ? 10
                   : 1
               ) + georgeInterruptionEngine.getPriorityBoost(),
-              nextPacket.roomPressure === 'authority'
+              orchestrated.packet.roomPressure === 'authority'
                 ? 3500
-                : nextPacket.interruptionRisk && nextPacket.interruptionRisk > 0.7
+                : orchestrated.packet.interruptionRisk && orchestrated.packet.interruptionRisk > 0.7
                   ? 1200
                   : 2200
             )
