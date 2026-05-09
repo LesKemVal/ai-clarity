@@ -11,6 +11,7 @@ import { georgeSilenceDetector } from '@/lib/george/live-voice/runtime/silence-d
 import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-stream'
 import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-voice/runtime/latency-metrics'
 import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenarios'
+import { georgeConfidenceEngine } from '@/lib/george/live-voice/runtime/confidence-engine'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -332,6 +333,11 @@ export default function LiveVoicePage() {
 
           const nextPacket = await govern(text, true, messageReceivedAt)
 
+          const usedPrewarm =
+            Boolean(cachedPrewarm) &&
+            Boolean(nextPacket) &&
+            nextPacket?.speaker === 'other_party'
+
           if (
             cachedPrewarm &&
             nextPacket &&
@@ -340,9 +346,25 @@ export default function LiveVoicePage() {
             nextPacket.volley = cachedPrewarm.volley
             nextPacket.cue = cachedPrewarm.cue
             nextPacket.status = 'Used prewarmed next move.'
-            nextPacket.confidence = Math.max(nextPacket.confidence || 0, 0.74)
-            setPacket({ ...nextPacket })
             pushLog(`Using prewarm cache.`)
+          }
+
+          if (nextPacket) {
+            nextPacket.confidence =
+              georgeConfidenceEngine.compute({
+                interruptionRisk: nextPacket.interruptionRisk,
+                roomPressure: nextPacket.roomPressure,
+                usedPrewarm,
+                partialFresh:
+                  partialTranscriptRuntime.isPredictionFresh(),
+              })
+
+            nextPacket.shouldSpeak =
+              georgeConfidenceEngine.shouldSpeak(
+                nextPacket.confidence
+              )
+
+            setPacket({ ...nextPacket })
           }
 
           if (
