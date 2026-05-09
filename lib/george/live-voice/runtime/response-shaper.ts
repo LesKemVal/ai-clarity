@@ -18,6 +18,7 @@ export type ResponseShapeResult = {
   reason: string
   onDeck?: string
   calmingLine?: string
+  postureCue?: string
 }
 
 const SHADOW_PATTERNS: Record<string, string> = {
@@ -37,6 +38,7 @@ class GeorgeResponseShaper {
 
     let onDeck = ''
     let calmingLine = ''
+    let postureCue = ''
 
     if (!volley) {
       return {
@@ -69,6 +71,31 @@ class GeorgeResponseShaper {
 
       reasons.push('counter-velocity calming')
     }
+
+
+    if (input.posture === 'deescalating') {
+      postureCue = '[LOWER YOUR PACE]'
+
+      if (
+        /sorry|i just|maybe|i guess|i don’t know|i don't know/i.test(transcript)
+      ) {
+        volley = 'Let’s look at the actual issue.'
+        reasons.push('defensive posture reset')
+      }
+    }
+
+    if (input.posture === 'directing') {
+      postureCue = '[CHEST UP]'
+    }
+
+    if (input.posture === 'deferential') {
+      postureCue = '[STEADY MOVEMENTS]'
+    }
+
+    if (input.posture === 'calming') {
+      postureCue = '[SLOW BREATH]'
+    }
+
 
     if (input.roomPressure === 'authority') {
       volley = this.shorten(volley, 7)
@@ -118,6 +145,7 @@ class GeorgeResponseShaper {
       reason: reasons.length ? reasons.join(', ') : 'No shaping needed.',
       onDeck,
       calmingLine,
+      postureCue,
     }
   }
 

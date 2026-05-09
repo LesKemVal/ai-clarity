@@ -20,6 +20,7 @@ export type LiveRuntimeSnapshot = {
   status: string
   onDeck?: string
   calmingLine?: string
+  postureCue?: string
   leverageState?: string
   escalationLikelihood?: number
   interventionUrgency?: string
@@ -47,6 +48,7 @@ const EMPTY_STATE: LiveRuntimeSnapshot = {
   status: '',
   onDeck: '',
   calmingLine: '',
+  postureCue: '',
   leverageState: 'stable',
   escalationLikelihood: 0,
   interventionUrgency: 'low',

@@ -249,6 +249,7 @@ export function orchestrateLiveTurn(
     status: nextPacket.status,
     onDeck: shapedResponse.onDeck || '',
     calmingLine: shapedResponse.calmingLine || '',
+    postureCue: shapedResponse.postureCue || '',
     leverageState,
     escalationLikelihood,
     interventionUrgency,
