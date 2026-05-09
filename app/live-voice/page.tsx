@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { georgeAudioQueue } from '@/lib/george/live-voice/runtime/queue'
 import { georgeTurnManager } from '@/lib/george/live-voice/runtime/turn-manager'
 import { transcriptBuffer } from '@/lib/george/live-voice/runtime/transcript-buffer'
+import { partialTranscriptRuntime } from '@/lib/george/live-voice/runtime/partial-stream'
+import { georgePrewarmCache } from '@/lib/george/live-voice/runtime/prewarm-cache'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -60,6 +62,39 @@ export default function LiveVoicePage() {
 
   function pushLog(line: string) {
     setLog((prev) => [`${new Date().toLocaleTimeString()} — ${line}`, ...prev].slice(0, 12))
+  }
+
+  async function prewarm(text: string) {
+    const clean = text.trim().toLowerCase()
+
+    if (!clean) return
+
+    const existing = georgePrewarmCache.get(clean)
+
+    if (existing) {
+      pushLog(`Prewarm cache hit: ${clean}`)
+      return
+    }
+
+    const guessVolley =
+      /id|license|registration|insurance/i.test(clean)
+        ? 'Yes, officer. One moment.'
+        : /raise|salary|compensation/i.test(clean)
+          ? 'I wanted a direct conversation.'
+          : 'Let me answer that clearly.'
+
+    const guessCue =
+      /officer|license|registration/i.test(clean)
+        ? 'Slow movements.'
+        : 'Stay composed.'
+
+    georgePrewarmCache.set(
+      clean,
+      guessVolley,
+      guessCue
+    )
+
+    pushLog(`Prewarmed: ${guessVolley}`)
   }
 
   async function govern(text: string, audio = false) {
@@ -187,12 +222,32 @@ export default function LiveVoicePage() {
 
         if (!text.trim()) return
 
+        const partialSpeaker =
+          /\?|do you|can you|where are you|why did you/i.test(text)
+            ? 'other_party'
+            : 'user'
+
+        partialTranscriptRuntime.update({
+          text,
+          receivedAt: Date.now(),
+          speaker: partialSpeaker,
+        })
+
+        if (
+          !isFinal &&
+          partialTranscriptRuntime.shouldPrewarm(text)
+        ) {
+          pushLog(`Prewarming: ${text}`)
+          await prewarm(text)
+        }
+
         setTranscript((prev) => {
           if (isFinal) return `${prev} ${text}`.trim()
           return prev
         })
 
         if (isFinal) {
+          partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
 
           const inferredSpeaker =
@@ -215,6 +270,14 @@ export default function LiveVoicePage() {
           })
 
           setShadowMap(transcriptBuffer.buildShadowMap())
+
+          const cachedPrewarm = georgePrewarmCache.get(
+            text.trim().toLowerCase()
+          )
+
+          if (cachedPrewarm) {
+            pushLog(`Using prewarm cache.`)
+          }
 
           const nextPacket = await govern(text, true)
 
