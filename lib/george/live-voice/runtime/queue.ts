@@ -41,6 +41,10 @@ export class GeorgeAudioQueue {
     this.queue = []
   }
 
+  invalidate(predicate: (job: AudioJob) => boolean) {
+    this.queue = this.queue.filter((job) => !predicate(job))
+  }
+
   setSpeaking(value: boolean) {
     this.speaking = value
   }

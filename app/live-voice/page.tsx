@@ -412,7 +412,10 @@ function isForceIntervention(text: string) {
             isForceIntervention(text)
 
           if (forcedIntervention) {
+            georgeAudioQueue.clear()
+
             pushLog('FORCE_INTERVENTION triggered.')
+            pushLog('Force intervention cleared queued speech.')
           }
 
           if (inferredSpeaker.speaker === 'user') {
@@ -534,6 +537,13 @@ function isForceIntervention(text: string) {
             pushLog(`Runtime: ${orchestrated.runtimeSnapshot.trajectory} / ${orchestrated.runtimeSnapshot.posture} / ${orchestrated.runtimeSnapshot.load}`)
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
 
+            if (
+              orchestrated.runtimeSnapshot.interventionUrgency === 'high'
+            ) {
+              orchestrated.silence.shouldHold = false
+              pushLog('Escalation override bypassed hold state.')
+            }
+
             if (orchestrated.silence.shouldHold) {
               pushLog(`Hold: ${orchestrated.silence.reason}`)
             }
@@ -555,11 +565,13 @@ function isForceIntervention(text: string) {
           ) {
             georgeAudioQueue.enqueue(
               orchestrated.queueText,
-              (
-                orchestrated.packet.speaker === 'other_party'
-                  ? 10
-                  : 1
-              ) + georgeInterruptionEngine.getPriorityBoost(),
+              forcedIntervention
+                ? 40
+                : (
+                    orchestrated.packet.speaker === 'other_party'
+                      ? 10
+                      : 1
+                  ) + georgeInterruptionEngine.getPriorityBoost(),
               orchestrated.packet.roomPressure === 'authority'
                 ? 3500
                 : orchestrated.packet.interruptionRisk && orchestrated.packet.interruptionRisk > 0.7
