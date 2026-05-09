@@ -6,6 +6,7 @@ import { georgeTurnManager } from '@/lib/george/live-voice/runtime/turn-manager'
 import { transcriptBuffer } from '@/lib/george/live-voice/runtime/transcript-buffer'
 import { partialTranscriptRuntime } from '@/lib/george/live-voice/runtime/partial-stream'
 import { georgePrewarmCache } from '@/lib/george/live-voice/runtime/prewarm-cache'
+import { georgeInterruptionEngine } from '@/lib/george/live-voice/runtime/interruption-engine'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -255,6 +256,17 @@ export default function LiveVoicePage() {
               ? 'other_party'
               : 'user'
 
+          const interruptionDetected =
+            georgeInterruptionEngine.detect({
+              text,
+              speaker: inferredSpeaker,
+              timestamp: Date.now(),
+            })
+
+          if (interruptionDetected) {
+            pushLog('Conversation interruption detected.')
+          }
+
           georgeTurnManager.update({
             transcript: text,
             isFinal,
@@ -297,7 +309,11 @@ export default function LiveVoicePage() {
           ) {
             georgeAudioQueue.enqueue(
               nextPacket.volley,
-              nextPacket.speaker === 'other_party' ? 10 : 1,
+              (
+                nextPacket.speaker === 'other_party'
+                  ? 10
+                  : 1
+              ) + georgeInterruptionEngine.getPriorityBoost(),
               nextPacket.roomPressure === 'authority'
                 ? 3500
                 : nextPacket.interruptionRisk && nextPacket.interruptionRisk > 0.7
