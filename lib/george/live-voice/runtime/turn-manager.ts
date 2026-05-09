@@ -54,6 +54,14 @@ class GeorgeTurnManager {
     )
   }
 
+  shouldSuppressStaleCue(createdAt: number, now = Date.now()) {
+    return (
+      this.roomState === 'other_party_speaking' &&
+      now - createdAt > 1400
+    )
+  }
+
+
   canGeorgeSpeak(now = Date.now()) {
     if (this.roomState === 'idle') return true
 

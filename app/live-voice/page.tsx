@@ -43,6 +43,13 @@ export default function LiveVoicePage() {
         const next = georgeAudioQueue.next()
         if (!next) continue
 
+        if (
+          georgeTurnManager.shouldSuppressStaleCue(next.createdAt)
+        ) {
+          pushLog('Dropped stale LIVE cue.')
+          continue
+        }
+
         await speak(next.text)
       }
     } finally {
@@ -218,7 +225,12 @@ export default function LiveVoicePage() {
           ) {
             georgeAudioQueue.enqueue(
               nextPacket.volley,
-              nextPacket.speaker === 'other_party' ? 10 : 1
+              nextPacket.speaker === 'other_party' ? 10 : 1,
+              nextPacket.roomPressure === 'authority'
+                ? 3500
+                : nextPacket.interruptionRisk && nextPacket.interruptionRisk > 0.7
+                  ? 1200
+                  : 2200
             )
 
             await processAudioQueue()

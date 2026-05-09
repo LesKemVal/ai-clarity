@@ -3,20 +3,24 @@ type AudioJob = {
   text: string
   priority: number
   createdAt: number
+  expiresAt: number
 }
 
 export class GeorgeAudioQueue {
   private queue: AudioJob[] = []
   private speaking = false
 
-  enqueue(text: string, priority = 0) {
+  enqueue(text: string, priority = 0, ttlMs = 2200) {
     if (!text.trim()) return
+
+    const now = Date.now()
 
     this.queue.push({
       id: crypto.randomUUID(),
       text,
       priority,
-      createdAt: Date.now(),
+      createdAt: now,
+      expiresAt: now + ttlMs,
     })
 
     this.queue.sort((a, b) => {
@@ -26,6 +30,10 @@ export class GeorgeAudioQueue {
   }
 
   next() {
+    const now = Date.now()
+
+    this.queue = this.queue.filter((job) => job.expiresAt > now)
+
     return this.queue.shift() || null
   }
 
@@ -42,6 +50,8 @@ export class GeorgeAudioQueue {
   }
 
   size() {
+    const now = Date.now()
+    this.queue = this.queue.filter((job) => job.expiresAt > now)
     return this.queue.length
   }
 }
