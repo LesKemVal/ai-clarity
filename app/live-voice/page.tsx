@@ -16,6 +16,7 @@ import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '
 import { georgeSilenceIntelligence } from '@/lib/george/live-voice/runtime/silence-intelligence'
 import { georgeLoadManager } from '@/lib/george/live-voice/runtime/load-manager'
 import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
+import { georgePostureEngine } from '@/lib/george/live-voice/runtime/posture-engine'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
@@ -396,9 +397,18 @@ export default function LiveVoicePage() {
               timestamp: Date.now(),
             })
 
+            const postureDecision = georgePostureEngine.decide({
+              speaker: nextPacket.speaker,
+              roomPressure: nextPacket.roomPressure,
+              interruptionRisk: nextPacket.interruptionRisk,
+              confidence: nextPacket.confidence,
+              emotionalVelocity: velocityState.velocity,
+            })
+
             const loadDecision = georgeLoadManager.decide({
               confidence: nextPacket.confidence,
               interruptionRisk:
+                postureDecision.posture === 'silent' ||
                 velocityState.velocity === 'spiking'
                   ? Math.max(nextPacket.interruptionRisk || 0, 0.85)
                   : nextPacket.interruptionRisk,
@@ -416,7 +426,9 @@ export default function LiveVoicePage() {
                 : loadDecision.maxWords
             )
 
-            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason}`.trim()
+            nextPacket.cue = `${postureDecision.cuePrefix} ${nextPacket.cue || ''}`.trim()
+
+            nextPacket.status = `${nextPacket.status} ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason}`.trim()
 
             nextPacket.shouldSpeak =
               georgeConfidenceEngine.shouldSpeak(
@@ -427,6 +439,7 @@ export default function LiveVoicePage() {
 
             pushLog(`Load: ${loadDecision.state} — ${loadDecision.reason}`)
             pushLog(`Velocity: ${velocityState.velocity} — ${velocityState.reason}`)
+            pushLog(`Posture: ${postureDecision.posture} — ${postureDecision.reason}`)
           }
 
           const silenceDecision = nextPacket
