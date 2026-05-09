@@ -12,6 +12,8 @@ import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-st
 import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-voice/runtime/latency-metrics'
 import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenarios'
 import { georgeConfidenceEngine } from '@/lib/george/live-voice/runtime/confidence-engine'
+import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '@/lib/george/live-voice/runtime/delivery-profile'
+import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -33,6 +35,7 @@ export default function LiveVoicePage() {
   const [error, setError] = useState('')
   const [shadowMap, setShadowMap] = useState('')
   const [latency, setLatency] = useState<LatencySnapshot>(georgeLatencyMetrics.get())
+  const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
 
 
   const socketRef = useRef<WebSocket | null>(null)
@@ -142,7 +145,13 @@ export default function LiveVoicePage() {
   }
 
   async function speak(text: string) {
-    if (!text.trim()) return
+    const deliveryProfile = DELIVERY_PROFILES[deliveryProfileId]
+    const deliverable = compressForDelivery(text, deliveryProfile)
+
+    if (!deliverable.trim()) {
+      pushLog('Silent profile suppressed speech.')
+      return
+    }
 
     const ttsStart = Date.now()
 
@@ -156,7 +165,7 @@ export default function LiveVoicePage() {
     const res = await fetch('/api/george/live/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text: deliverable }),
     })
 
     if (!res.ok) {
@@ -183,7 +192,7 @@ export default function LiveVoicePage() {
     }
 
     audioRef.current.src = url
-    audioRef.current.volume = 0.7
+    audioRef.current.volume = deliveryProfile.volume
     await audioRef.current.play().catch(() => {
       pushLog('Audio blocked until user interaction.')
     })
@@ -331,6 +340,23 @@ export default function LiveVoicePage() {
             text.trim().toLowerCase()
           )
 
+          const safety = evaluateLiveSafety(text)
+
+          if (!safety.allowed) {
+            pushLog(`Safety gate: ${safety.reason}`)
+
+            setPacket({
+              speaker: 'george_instruction',
+              shouldSpeak: false,
+              volley: '',
+              cue: '',
+              status: safety.reason,
+              confidence: 0,
+            })
+
+            return
+          }
+
           const nextPacket = await govern(text, true, messageReceivedAt)
 
           const usedPrewarm =
@@ -374,7 +400,10 @@ export default function LiveVoicePage() {
             georgeSilenceDetector.isSilenceWindow()
           ) {
             georgeAudioQueue.enqueue(
-              nextPacket.volley,
+              compressForDelivery(
+                nextPacket.volley,
+                DELIVERY_PROFILES[deliveryProfileId]
+              ),
               (
                 nextPacket.speaker === 'other_party'
                   ? 10
@@ -430,8 +459,19 @@ export default function LiveVoicePage() {
 
   async function testText(value: string) {
     setTranscript(value)
+
+    const safety = evaluateLiveSafety(value)
+
+    if (!safety.allowed) {
+      pushLog(`Safety gate: ${safety.reason}`)
+      return
+    }
+
     const nextPacket = await govern(value, false)
-    if (nextPacket?.volley) pushLog(`Test packet: ${nextPacket.volley}`)
+
+    if (nextPacket?.volley) {
+      pushLog(`Test packet: ${nextPacket.volley}`)
+    }
   }
 
   async function runScenario(lines: string[]) {
@@ -500,6 +540,26 @@ export default function LiveVoicePage() {
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {(Object.values(DELIVERY_PROFILES)).map((profile) => (
+              <button
+                key={profile.id}
+                type="button"
+                onClick={() => {
+                  setDeliveryProfileId(profile.id)
+                  pushLog(`Delivery profile: ${profile.label}`)
+                }}
+                className={`rounded-2xl border px-4 py-2 text-xs transition ${
+                  deliveryProfileId === profile.id
+                    ? 'border-purple-300/40 bg-purple-300/15 text-purple-50'
+                    : 'border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
+                }`}
+              >
+                {profile.label}
+              </button>
+            ))}
+          </div>
+
           <div className="flex flex-wrap gap-3">
             {!running ? (
               <button
