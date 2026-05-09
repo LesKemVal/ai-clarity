@@ -60,6 +60,29 @@ function isForceIntervention(text: string) {
   const lastGovernedRef = useRef('')
   const processingQueueRef = useRef(false)
 
+
+  function getAdaptiveDeliverable(text: string) {
+    if (latency.totalMs > 2400) {
+      return ''
+    }
+
+    const profile = DELIVERY_PROFILES[deliveryProfileId]
+    const compressed = compressForDelivery(text, profile)
+
+    if (latency.totalMs > 1400) {
+      return compressed
+        .replace(/\s+/g, ' ')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 4)
+        .join(' ')
+    }
+
+    return compressed
+  }
+
+
   async function processAudioQueue() {
     if (processingQueueRef.current) return
 
@@ -166,11 +189,19 @@ function isForceIntervention(text: string) {
 
   async function speak(text: string) {
     const deliveryProfile = DELIVERY_PROFILES[deliveryProfileId]
-    const deliverable = compressForDelivery(text, deliveryProfile)
+    const deliverable = getAdaptiveDeliverable(text)
 
     if (!deliverable.trim()) {
-      pushLog('Silent profile suppressed speech.')
+      if (latency.totalMs > 2400) {
+        pushLog('Latency too high. Using visual cues only.')
+      } else {
+        pushLog('Silent profile suppressed speech.')
+      }
       return
+    }
+
+    if (latency.totalMs > 1400) {
+      pushLog('Latency elevated. Compacting spoken cue.')
     }
 
     const ttsStart = Date.now()
