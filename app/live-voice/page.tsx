@@ -119,6 +119,20 @@ function isForceIntervention(text: string) {
   }
 
 
+
+  function stopGeorgeAudio(reason = 'Playback interrupted.') {
+    if (!audioRef.current) return
+
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    audioRef.current.src = ''
+
+    georgeTurnManager.markIdle()
+
+    pushLog(reason)
+  }
+
+
   async function processAudioQueue() {
     if (processingQueueRef.current) return
 
@@ -278,13 +292,28 @@ function isForceIntervention(text: string) {
       audioRef.current = new Audio()
     }
 
+    if (
+      georgeTurnManager.shouldInterruptGeorge()
+    ) {
+      pushLog('Playback invalidated before audio start.')
+      return
+    }
+
     audioRef.current.src = url
     audioRef.current.volume = deliveryProfile.volume
     await audioRef.current.play().catch(() => {
       pushLog('Audio blocked until user interaction.')
     })
 
+    const interruptionPoll = window.setInterval(() => {
+      if (georgeTurnManager.shouldInterruptGeorge()) {
+        stopGeorgeAudio('LIVE playback interrupted by room activity.')
+        window.clearInterval(interruptionPoll)
+      }
+    }, 120)
+
     audioRef.current.onended = () => {
+      window.clearInterval(interruptionPoll)
       georgeTurnManager.markIdle()
     }
   }
@@ -421,6 +450,8 @@ function isForceIntervention(text: string) {
           if (inferredSpeaker.speaker === 'user') {
             georgeAudioQueue.clear()
             georgeCancelEngine.bump()
+
+            stopGeorgeAudio('Yield protocol interrupted LIVE playback.')
 
             pushLog('Yield protocol: cleared LIVE audio queue.')
           }
