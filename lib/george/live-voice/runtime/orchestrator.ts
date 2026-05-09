@@ -14,6 +14,7 @@ import { georgeDecisionWindow } from './decision-window'
 import { georgePressureMemory } from './pressure-memory'
 import { georgeResponseShaper } from './response-shaper'
 import { georgeTurnManager } from './turn-manager'
+import { georgeSilenceDetector } from './silence-detector'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -215,10 +216,13 @@ export function orchestrateLiveTurn(
     roomPressure: nextPacket.roomPressure,
     speaker: nextPacket.speaker,
     deliveryProfile: deliveryProfileId,
+    controlOwner: controlSnapshot.owner,
+    msSinceSpeech: georgeSilenceDetector.msSinceSpeech(),
+    forcedIntervention: /george|help me|what do i say|tell me what to say|say something|jump in|i need help/i.test(text.toLowerCase()),
   })
 
   const silenceSnapshot = georgeLiveRuntimeState.update({
-    silence: silence.shouldHold ? 'hold' : 'speak',
+    silence: silence.shouldHold ? 'hold' : `speak:${silence.silenceType}`,
   })
 
   return {
