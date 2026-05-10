@@ -50,6 +50,14 @@ class GeorgeResponseShaper {
     let calmingLine = ''
     let postureCue = ''
 
+    if (input.deliveryStyle === 'silence' || input.intervention === 'hold') {
+      return {
+        volley: '',
+        cue,
+        reason: 'Policy requested silence.',
+      }
+    }
+
     if (!volley) {
       return {
         volley,
