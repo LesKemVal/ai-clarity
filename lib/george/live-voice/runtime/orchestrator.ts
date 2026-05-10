@@ -111,6 +111,8 @@ export function orchestrateLiveTurn(
     emotionalVelocity: velocityState.velocity,
   })
 
+  const dominantRoleState = transcriptBuffer.getDominantRole()
+
   const pressureMemory = georgePressureMemory.update({
     text,
     trajectory: trajectoryState.trajectory,
@@ -119,11 +121,15 @@ export function orchestrateLiveTurn(
     interruptionRisk: nextPacket.interruptionRisk,
     decisionAction: decisionWindow.action,
     memoryWindow: runtimeConfig.memoryWindow,
+    dominantRole: dominantRoleState.role,
   })
 
-  const controlSnapshot = georgeTurnManager.getControlSnapshot()
+  const strongestRolePressure = Object.entries(pressureMemory.rolePressure).reduce(
+    (strongest, current) => current[1] > strongest[1] ? current : strongest,
+    ['neutral', 0]
+  )
 
-  const dominantRoleState = transcriptBuffer.getDominantRole()
+  const controlSnapshot = georgeTurnManager.getControlSnapshot()
 
   const postureDecision = georgePostureEngine.decide({
     dominantRole: dominantRoleState.role,
@@ -247,7 +253,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)

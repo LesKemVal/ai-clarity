@@ -6,6 +6,7 @@ export type PressureMemoryInput = {
   interruptionRisk?: number
   decisionAction?: string
   memoryWindow?: number
+  dominantRole?: string | null
 }
 
 export type PressureMemoryState = {
@@ -14,6 +15,7 @@ export type PressureMemoryState = {
   failedCloseTurns: number
   overexplainTurns: number
   fatigueScore: number
+  rolePressure: Record<string, number>
   summary: string
 }
 
@@ -22,6 +24,42 @@ class GeorgePressureMemory {
   private interruptionTurns = 0
   private failedCloseTurns = 0
   private overexplainTurns = 0
+  private rolePressure: Record<string, number> = {
+    authority: 0,
+    skeptic: 0,
+    gatekeeper: 0,
+    ally: 0,
+  }
+
+  private updateRolePressure(input: PressureMemoryInput) {
+    const role = input.dominantRole
+
+    Object.keys(this.rolePressure).forEach((key) => {
+      this.rolePressure[key] = Math.max(0, this.rolePressure[key] - 0.25)
+    })
+
+    if (!role || role === 'neutral' || role === 'unclear' || role === 'user') return
+    if (!(role in this.rolePressure)) return
+
+    const pressure =
+      input.trajectory === 'escalating_conflict' ||
+      input.trajectory === 'resistance_hardening' ||
+      input.decisionAction === 'redirect' ||
+      (input.interruptionRisk || 0) > 0.72 ||
+      input.roomPressure === 'high' ||
+      input.roomPressure === 'authority'
+
+    const support =
+      role === 'ally' &&
+      (
+        input.trajectory === 'positive' ||
+        input.trajectory === 'decision_ready'
+      )
+
+    if (pressure || support) {
+      this.rolePressure[role] = Math.min(5, this.rolePressure[role] + (support ? 0.7 : 1))
+    }
+  }
 
   update(input: PressureMemoryInput): PressureMemoryState {
     const text = input.text.toLowerCase()
@@ -69,6 +107,8 @@ class GeorgePressureMemory {
       this.overexplainTurns = Math.max(0, this.overexplainTurns - decayStep)
     }
 
+    this.updateRolePressure(input)
+
     const fatigueScore = Math.min(
       1,
       Number(
@@ -87,6 +127,7 @@ class GeorgePressureMemory {
       failedCloseTurns: this.failedCloseTurns,
       overexplainTurns: this.overexplainTurns,
       fatigueScore,
+      rolePressure: { ...this.rolePressure },
       summary:
         fatigueScore > 0.72
           ? 'Pressure memory high. Simplify and reduce output.'
@@ -101,6 +142,12 @@ class GeorgePressureMemory {
     this.interruptionTurns = 0
     this.failedCloseTurns = 0
     this.overexplainTurns = 0
+    this.rolePressure = {
+      authority: 0,
+      skeptic: 0,
+      gatekeeper: 0,
+      ally: 0,
+    }
   }
 }
 
