@@ -129,6 +129,12 @@ export function orchestrateLiveTurn(
     ['neutral', 0]
   )
 
+  const partialForecast =
+    partialTranscriptRuntime.getLatest()?.forecast || 'none'
+
+  const partialForecastConfidence =
+    partialTranscriptRuntime.getLatest()?.forecastConfidence || 0
+
   const controlSnapshot = georgeTurnManager.getControlSnapshot()
 
   const postureDecision = georgePostureEngine.decide({
@@ -255,7 +261,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -286,6 +292,8 @@ export function orchestrateLiveTurn(
     interventionUrgency,
     dominantRole: dominantRoleState.role ?? 'neutral',
     dominantRoleScore: dominantRoleState.score,
+    forecast: partialForecast,
+    forecastConfidence: partialForecastConfidence,
   })
 
   const silence = georgeSilenceIntelligence.decide({
