@@ -280,6 +280,11 @@ export function orchestrateLiveTurn(
     emotionalVelocity: velocityState.velocity,
     transcript: text,
     strongestRolePressure,
+    responseMode: nextPacket.responseMode,
+    responseTone: nextPacket.responseTone,
+    responseCompression: nextPacket.responseCompression,
+    deliveryStyle: nextPacket.deliveryStyle,
+    intervention: nextPacket.intervention,
   })
 
   nextPacket.volley = shapedResponse.volley

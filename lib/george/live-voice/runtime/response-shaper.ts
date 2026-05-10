@@ -15,6 +15,11 @@ export type ResponseShapeInput = {
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   transcript?: string
   strongestRolePressure?: [string, number]
+  responseMode?: string
+  responseTone?: string
+  responseCompression?: string
+  deliveryStyle?: string
+  intervention?: string
 }
 
 export type ResponseShapeResult = {
