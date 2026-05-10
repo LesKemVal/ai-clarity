@@ -18,6 +18,7 @@ import { georgeDecisionWindow } from './decision-window'
 import { georgePressureMemory } from './pressure-memory'
 import { georgeResponseShaper } from './response-shaper'
 import { georgeTurnManager } from './turn-manager'
+import { georgeLiveRuntimeEvents } from './runtime-events'
 import { transcriptBuffer } from './transcript-buffer'
 import { georgeSilenceDetector } from './silence-detector'
 
@@ -347,6 +348,51 @@ export function orchestrateLiveTurn(
   const silenceSnapshot = georgeLiveRuntimeState.update({
     silence: silence.shouldHold ? 'hold' : `speak:${silence.silenceType}`,
   })
+
+  if (silence.shouldHold) {
+    georgeLiveRuntimeEvents.emit('silence_required', {
+      reason: silence.reason,
+      responseMode: nextPacket.responseMode,
+      deliveryStyle: nextPacket.deliveryStyle,
+      intervention: nextPacket.intervention,
+      interruptionRisk: normalizedInterruptionRisk,
+      silence: silence.silenceType,
+    })
+  } else {
+    georgeLiveRuntimeEvents.emit('cue_ready', {
+      reason: silence.reason,
+      cue: nextPacket.cue,
+      nextMove: nextPacket.volley,
+      responseMode: nextPacket.responseMode,
+      deliveryStyle: nextPacket.deliveryStyle,
+      intervention: nextPacket.intervention,
+      confidence: nextPacket.confidence,
+      escalationLikelihood,
+    })
+  }
+
+  if (nextPacket.responseMode === 'proof') {
+    georgeLiveRuntimeEvents.emit('proof_mode', {
+      cue: nextPacket.cue,
+      nextMove: nextPacket.volley,
+      confidence: nextPacket.confidence,
+    })
+  }
+
+  if (nextPacket.responseMode === 'opening') {
+    georgeLiveRuntimeEvents.emit('opening_detected', {
+      cue: nextPacket.cue,
+      nextMove: nextPacket.volley,
+      confidence: nextPacket.confidence,
+    })
+  }
+
+  if (Number(normalizedInterruptionRisk || 0) > 0.78) {
+    georgeLiveRuntimeEvents.emit('interruption_risk_high', {
+      interruptionRisk: normalizedInterruptionRisk,
+      responseMode: nextPacket.responseMode,
+    })
+  }
 
   return {
     packet: nextPacket,
