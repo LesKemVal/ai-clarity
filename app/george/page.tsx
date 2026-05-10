@@ -495,22 +495,12 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     : "Good evening."
 
   const firstTimeGreeting = `${timeGreeting}
-Whatever it is you want to do, just say so—right now.
 
-I’ll map a step-by-step path for you from A to Z.
-
-I’ll do most of the heavy lifting once you set the direction.
-
-Ready?`
+Start where the pressure is.`
 
   const earlyUserGreeting = `${timeGreeting}
-Whatever it is you want to do, just say so—right now.
 
-I’ll map a step-by-step path for you from A to Z.
-
-I’ll do most of the heavy lifting once you set the direction.
-
-Ready?`
+Tell me what matters first.`
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
@@ -4144,7 +4134,7 @@ return (
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82 backdrop-blur-2xl px-4 py-1.5 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <div className="flex items-center gap-3 xl:hidden">
+                <div className="flex items-center gap-2 xl:hidden">
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
@@ -4160,9 +4150,18 @@ return (
                     </span>
                   </button>
 
-                  <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/22">
-                    GEORGE
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
+                    }}
+                    className="flex h-8 items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.025] px-2 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:text-white/75"
+                    aria-label="Change language"
+                  >
+                    <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
+                    <span>{language}</span>
+                  </button>
                 </div>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-6">
@@ -4244,20 +4243,18 @@ return (
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
-      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[24px] md:text-3xl font-semibold tracking-[0.06em] text-transparent">
+      <div className="text-center text-[22px] md:text-[28px] font-[300] tracking-[0.22em] text-white/34">
         GEORGE
       </div>
 
-      <div className="mt-1.5 text-center text-[11px] tracking-[0.18em] text-neutral-500">
+      <div className="mt-[2px] text-center text-[11px] font-[300] tracking-[0.24em] text-white/18">
         Smart. Intelligent. Brilliant.
       </div>
 
-      <div className="mt-1 flex items-center justify-center gap-[3px] px-5 py-1">
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-70" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-55" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-40" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-28" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-18" />
+      <div className="mt-2 flex items-center justify-center gap-[8px] px-5 py-1">
+        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/55 animate-pulse" style={{ animationDuration: '1.8s' }} />
+        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/38 animate-pulse" style={{ animationDelay: '0.22s', animationDuration: '1.8s' }} />
+        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/24 animate-pulse" style={{ animationDelay: '0.44s', animationDuration: '1.8s' }} />
       </div>
     </div>
   )}
@@ -4989,32 +4986,27 @@ router.push('/george')
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               
 
-              <div className={`fixed bottom-[120px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center justify-between rounded-2xl border border-transparent bg-black/82 px-4 py-1.5 shadow-[0_-10px_28px_rgba(0,0,0,0.30)] backdrop-blur-xl`}>
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
+                <button
+                  type="button"
+                  onClick={() => window.open('/help','_blank')}
+                  className="pointer-events-auto rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-white/72"
+                >
+                  Help
+                </button>
 
+                <button
+                  type="button"
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="pointer-events-auto rounded-full border border-[#7C8CFF]/12 bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-[#C7D0FF]"
+                >
+                  {currentTier === 'brilliant' ? 'Stay Brilliant' : `Go ${upgradeCtaWord}`}
+                </button>
+              </div>
+
+              <div className="hidden">
   <div className="flex items-center gap-4 py-3 text-white/80 text-[13px]">
-
-    <button
-      type="button"
-      onClick={() => window.open('/help','_blank')}
-      className="transition hover:text-white"
-    >
-      Help
-    </button>
-
     <div className="relative flex items-center gap-2">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
-        }}
-        className="relative flex items-center gap-1 border-b border-transparent px-1 py-1 text-[11px] font-medium tracking-[0.12em] text-white/65 transition hover:border-[#7C8CFF]/50 hover:text-white"
-        aria-label="Change language"
-      >
-        <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
-        <span>{language}</span>
-      </button>
-
       <button
         type="button"
         onClick={(e) => {
@@ -6659,13 +6651,13 @@ What are we working on?"
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
+        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.08] bg-[#11131A]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.54)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 text-center">
-          <p className="text-sm font-medium text-red-400">Stay Brilliant.</p>
+          <p className="text-sm font-medium text-[#C7D0FF]">Stay Brilliant.</p>
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            You are already operating at a higher level. Choose how much control and execution support you want.
+            Choose the level of continuity, control, and execution support you want.
           </p>
         </div>
 
@@ -6698,7 +6690,7 @@ What are we working on?"
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/14 bg-black/35 px-4 py-3 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
+            className="block w-full rounded-2xl max-w-full border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-left transition hover:border-[#7C8CFF]/24 hover:bg-white/[0.05]"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
             <div className="mt-1 text-xs leading-5 text-neutral-500">
@@ -6734,7 +6726,7 @@ What are we working on?"
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-left transition hover:border-[#7C8CFF] hover:bg-[#7C8CFF]/15"
+            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/24 bg-[#7C8CFF]/8 px-4 py-3 text-left transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/12"
           >
             <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
             <div className="mt-1 text-xs leading-5 text-neutral-300">
