@@ -19,6 +19,7 @@ import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/l
 import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-memory'
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engine'
+import { georgeDeliverySessionManager } from '@/lib/george/live-voice/runtime/delivery-session-manager'
 import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
 import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
@@ -132,6 +133,7 @@ function isForceIntervention(text: string) {
     audioRef.current.src = ''
 
     georgeTurnManager.markIdle()
+    void georgeDeliverySessionManager.interrupt(reason)
 
     pushLog(reason)
   }
