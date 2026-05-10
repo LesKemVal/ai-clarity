@@ -89,7 +89,7 @@ export type RoomAnalysis = {
 }
 
 const AUTHORITY_PATTERNS =
-  /(license|registration|insurance|officer|step out|compliance|policy|security)/i
+  /(\bid\b|identification|license|registration|insurance|officer|step out|compliance|policy|security)/i
 
 const PRESSURE_PATTERNS =
   /(why did you|explain|problem|issue|concern|late|deadline|raise|performance|fired|warning)/i

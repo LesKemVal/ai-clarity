@@ -35,7 +35,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
 
   const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
   const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
-  const room = analyzeRoom(shadowMap)
+  const room = analyzeRoom(`${shadowMap}\n${lastFiveSeconds}\n${transcript}`)
 
 
   let packet: LiveVoicePacket = {
@@ -76,13 +76,33 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       shadowUsed: hasShadow,
     }
   } else if (speaker === 'other_party') {
+    const lowerTranscript = transcript.toLowerCase()
+
     packet = {
       speaker,
       shouldSpeak: true,
-      volley: 'Let me answer that directly.',
-      cue: 'Slow down. Do not rush.',
-      status: 'They asked for a response.',
-      confidence: 0.7,
+      volley: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+        ? ''
+        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+          ? 'The clearest proof is this.'
+          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+            ? 'Here is the point.'
+            : 'Let me answer that directly.',
+      cue: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+        ? 'Do not speak. Let them finish.'
+        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+          ? 'Proof first. No extra words.'
+          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+            ? 'Use the opening.'
+            : 'Slow down. Do not rush.',
+      status: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+        ? 'Other party holding the floor.'
+        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+          ? 'Proof challenge detected.'
+          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+            ? 'Opening detected.'
+            : 'They asked for a response.',
+      confidence: Math.max(0.7, speakerInference.confidence || 0),
       shadowUsed: hasShadow,
     }
   } else {
