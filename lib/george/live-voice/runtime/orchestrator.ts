@@ -31,6 +31,11 @@ export type OrchestratorPacket = {
   shadowUsed?: boolean
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   interruptionRisk?: number
+  responseMode?: string
+  responseTone?: string
+  responseCompression?: string
+  deliveryStyle?: string
+  intervention?: string
 }
 
 export type LiveOrchestratorInput = {

@@ -76,6 +76,11 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     status: policy.status,
     confidence: policy.confidence ?? Math.max(0.7, speakerInference.confidence || 0),
     shadowUsed: hasShadow,
+    responseMode: policy.mode,
+    responseTone: policy.tone,
+    responseCompression: policy.compression,
+    deliveryStyle: policy.deliveryStyle,
+    intervention: policy.intervention,
   }
 
   packet.volley = cleanLine(packet.volley, input.audio ? 7 : 12)
