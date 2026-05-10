@@ -28,6 +28,7 @@ export type LiveRuntimeSnapshot = {
   dominantRoleScore?: number
   forecast?: string
   forecastConfidence?: number
+  forecastBias?: string
 }
 
 const EMPTY_STATE: LiveRuntimeSnapshot = {
@@ -60,6 +61,7 @@ const EMPTY_STATE: LiveRuntimeSnapshot = {
   dominantRoleScore: 0,
   forecast: 'none',
   forecastConfidence: 0,
+  forecastBias: 'none',
 }
 
 class GeorgeLiveRuntimeState {

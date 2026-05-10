@@ -135,6 +135,21 @@ export function orchestrateLiveTurn(
   const partialForecastConfidence =
     partialTranscriptRuntime.getLatest()?.forecastConfidence || 0
 
+  const forecastBias =
+    partialForecastConfidence < 0.55
+      ? 'none'
+      : partialForecast === 'interruption_likely'
+        ? 'hold'
+        : partialForecast === 'authority_takeover'
+          ? 'minimal'
+          : partialForecast === 'hesitation_detected'
+            ? 'support'
+            : partialForecast === 'objection_forming'
+              ? 'proof'
+              : partialForecast === 'close_window_forming'
+                ? 'advance'
+                : 'none'
+
   const controlSnapshot = georgeTurnManager.getControlSnapshot()
 
   const postureDecision = georgePostureEngine.decide({
@@ -161,7 +176,9 @@ export function orchestrateLiveTurn(
 
   let leverageState = 'stable'
   let escalationLikelihood = 0.18
-  let interventionUrgency = 'low'
+  let interventionUrgency = forecastBias === 'advance' || forecastBias === 'support'
+    ? 'moderate'
+    : 'low'
 
   if (
     powerState.frame === 'other_party_controls' ||
@@ -261,7 +278,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Forecast bias: ${forecastBias}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -294,6 +311,7 @@ export function orchestrateLiveTurn(
     dominantRoleScore: dominantRoleState.score,
     forecast: partialForecast,
     forecastConfidence: partialForecastConfidence,
+    forecastBias,
   })
 
   const silence = georgeSilenceIntelligence.decide({
