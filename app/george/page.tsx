@@ -6418,7 +6418,7 @@ What are we working on?"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[17px] leading-7 font-normal tracking-[0.005em] text-white/92 outline-none placeholder:text-white/34 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[16.5px] leading-[1.72] font-normal tracking-[0em] text-white/90 outline-none placeholder:text-white/22 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -6456,11 +6456,11 @@ What are we working on?"
                               className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
                                   currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT
                                     ? 'text-amber-300'
-                                    : 'text-white/90 hover:text-white'
+                                    : 'text-white/52 hover:text-white/82'
                                 } disabled:cursor-not-allowed disabled:opacity-40`}
                               aria-label="Use speech"
                             >
-                              <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/>
                                 <path d="M19 10a7 7 0 0 1-14 0"/>
                                 <path d="M12 17v4"/>
@@ -6476,10 +6476,10 @@ What are we working on?"
                             console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF] text-black transition hover:opacity-90"
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#7C8CFF]/22 bg-[#7C8CFF]/10 text-[#C7D0FF] transition hover:bg-[#7C8CFF]/16 hover:text-white"
                           aria-label="Send"
                         >
-                          <svg viewBox="0 0 24 24" className="h-5.5 w-5.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 19V5"/>
                             <path d="m5 12 7-7 7 7"/>
                           </svg>
