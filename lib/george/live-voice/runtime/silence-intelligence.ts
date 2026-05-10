@@ -7,6 +7,7 @@ export type SilenceDecisionInput = {
   controlOwner?: 'other_party' | 'user' | 'balanced' | 'unclear'
   msSinceSpeech?: number
   forcedIntervention?: boolean
+  strongestRolePressure?: [string, number]
 }
 
 export type SilenceDecision = {
@@ -26,12 +27,65 @@ class GeorgeSilenceIntelligence {
     const confidence = input.confidence ?? 0
     const interruptionRisk = input.interruptionRisk ?? 0
     const msSinceSpeech = input.msSinceSpeech ?? 0
+    const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
 
     if (input.forcedIntervention) {
       return {
         shouldHold: false,
         reason: 'User directly requested intervention.',
         silenceType: 'forced_intervention',
+      }
+    }
+
+    if (
+      role === 'authority' &&
+      rolePressure > 1.2 &&
+      input.controlOwner === 'other_party' &&
+      msSinceSpeech < 2400
+    ) {
+      return {
+        shouldHold: true,
+        reason: 'Authority pressure persists. Do not interrupt the floor.',
+        silenceType: 'processing_silence',
+      }
+    }
+
+    if (
+      role === 'skeptic' &&
+      rolePressure > 1.4 &&
+      input.controlOwner === 'other_party' &&
+      msSinceSpeech < 2000
+    ) {
+      return {
+        shouldHold: true,
+        reason: 'Skeptic pressure persists. Wait for a cleaner proof window.',
+        silenceType: 'processing_silence',
+      }
+    }
+
+    if (
+      role === 'gatekeeper' &&
+      rolePressure > 1.4 &&
+      input.controlOwner === 'other_party' &&
+      msSinceSpeech < 2200
+    ) {
+      return {
+        shouldHold: true,
+        reason: 'Gatekeeper pressure persists. Hold for an access gap.',
+        silenceType: 'processing_silence',
+      }
+    }
+
+    if (
+      role === 'ally' &&
+      rolePressure > 1.2 &&
+      input.controlOwner !== 'other_party' &&
+      confidence >= 0.5
+    ) {
+      return {
+        shouldHold: false,
+        reason: 'Ally opening present. Use the window.',
+        silenceType: 'none',
       }
     }
 

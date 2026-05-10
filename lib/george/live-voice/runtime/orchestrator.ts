@@ -249,6 +249,7 @@ export function orchestrateLiveTurn(
     allowAggressiveIntervention: runtimeConfig.allowAggressiveIntervention,
     emotionalVelocity: velocityState.velocity,
     transcript: text,
+    strongestRolePressure,
   })
 
   nextPacket.volley = shapedResponse.volley
@@ -302,6 +303,7 @@ export function orchestrateLiveTurn(
     controlOwner: controlSnapshot.owner,
     msSinceSpeech: georgeSilenceDetector.msSinceSpeech(),
     forcedIntervention: /george|help me|what do i say|tell me what to say|say something|jump in|i need help/i.test(text.toLowerCase()),
+    strongestRolePressure,
   })
 
   const silenceSnapshot = georgeLiveRuntimeState.update({

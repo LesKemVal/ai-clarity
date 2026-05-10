@@ -12,6 +12,7 @@ export type ResponseShapeInput = {
   allowAggressiveIntervention?: boolean
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   transcript?: string
+  strongestRolePressure?: [string, number]
 }
 
 export type ResponseShapeResult = {
@@ -51,6 +52,31 @@ class GeorgeResponseShaper {
     }
 
     const transcript = (input.transcript || '').toLowerCase()
+    const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
+
+    if (role === 'authority' && rolePressure > 1.2) {
+      volley = this.shorten(volley, 5)
+      cue = this.prependCue(cue, 'Comply first. Do not challenge.')
+      reasons.push('authority pressure shaping')
+    }
+
+    if (role === 'skeptic' && rolePressure > 1.4) {
+      volley = this.forceProof(volley)
+      cue = this.prependCue(cue, 'Proof first. No extra explanation.')
+      reasons.push('skeptic pressure shaping')
+    }
+
+    if (role === 'gatekeeper' && rolePressure > 1.4) {
+      volley = this.forceAccessBridge(volley)
+      cue = this.prependCue(cue, 'Lower friction. Ask for the right path.')
+      reasons.push('gatekeeper access shaping')
+    }
+
+    if (role === 'ally' && rolePressure > 1.2 && input.decisionAction !== 'hold') {
+      volley = this.forceClose(volley, input.objectiveId)
+      cue = this.prependCue(cue, 'Use the opening.')
+      reasons.push('ally opening shaping')
+    }
 
     for (const [signal, question] of Object.entries(SHADOW_PATTERNS)) {
       if (transcript.includes(signal)) {
@@ -212,6 +238,25 @@ class GeorgeResponseShaper {
     }
 
     return 'Let’s narrow this to the next real issue.'
+  }
+
+  private forceProof(text: string) {
+    const clean = text.trim()
+
+    if (!clean) return 'Here is the proof point.'
+
+    return clean
+      .replace(/^(i think|maybe|honestly|basically|just)\s+/i, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  private forceAccessBridge(text: string) {
+    if (!text.trim()) {
+      return 'Who is the right person to speak with?'
+    }
+
+    return 'Who is the right person to speak with?'
   }
 
   private forceReframe(text: string) {
