@@ -339,6 +339,9 @@ export function orchestrateLiveTurn(
     trajectory: trajectoryState.trajectory,
     decisionAction: decisionWindow.action,
     forecastBias,
+    responseMode: nextPacket.responseMode,
+    deliveryStyle: nextPacket.deliveryStyle,
+    intervention: nextPacket.intervention,
   })
 
   const silenceSnapshot = georgeLiveRuntimeState.update({
