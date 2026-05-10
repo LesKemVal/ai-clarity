@@ -4,11 +4,18 @@ import type {
   LiveAudioAdapterState,
 } from './audio-adapter-interface'
 import type { LiveDeliveryDirective } from '../delivery-router'
+import { georgeDeliveryRouter } from '../delivery-router'
 
 class GeorgeElevenLabsAdapter implements LiveAudioAdapter {
   name = 'elevenlabs'
   private state: LiveAudioAdapterState = 'idle'
   private queue: LiveDeliveryDirective[] = []
+
+  constructor() {
+    georgeDeliveryRouter.subscribe((directive) => {
+      void this.deliver(directive)
+    })
+  }
 
   getState(): LiveAudioAdapterState {
     return this.state
