@@ -88,21 +88,27 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
           ? 'The clearest proof is this.'
           : signals.has('opening_window')
             ? 'Here is the point.'
-            : 'Let me answer that directly.',
+            : signals.has('resistance')
+              ? 'What would make this worth a short look?'
+              : 'Let me answer that directly.',
       cue: signals.has('interruption_attempt')
         ? 'Do not speak. Let them finish.'
         : signals.has('proof_challenge')
           ? 'Proof first. No extra words.'
           : signals.has('opening_window')
             ? 'Use the opening.'
-            : 'Slow down. Do not rush.',
+            : signals.has('resistance')
+              ? 'Redirect. Do not push harder.'
+              : 'Slow down. Do not rush.',
       status: signals.has('interruption_attempt')
         ? 'Other party holding the floor.'
         : signals.has('proof_challenge')
           ? 'Proof challenge detected.'
           : signals.has('opening_window')
             ? 'Opening detected.'
-            : 'They asked for a response.',
+            : signals.has('resistance')
+              ? 'Resistance detected.'
+              : 'They asked for a response.',
       confidence: Math.max(0.7, speakerInference.confidence || 0),
       shadowUsed: hasShadow,
     }
