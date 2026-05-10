@@ -630,10 +630,21 @@ function isForceIntervention(text: string) {
               forcedIntervention
                 ? 40
                 : (
-                    orchestrated.packet.speaker === 'other_party'
-                      ? 10
-                      : 1
-                  ) + georgeInterruptionEngine.getPriorityBoost(),
+                    (
+                      orchestrated.packet.speaker === 'other_party'
+                        ? (
+                            liveTier === 'brilliant'
+                              ? 10
+                              : 4
+                          )
+                        : 1
+                    ) +
+                    (
+                      liveTier === 'brilliant'
+                        ? georgeInterruptionEngine.getPriorityBoost()
+                        : 0
+                    )
+                  ),
               orchestrated.packet.roomPressure === 'authority'
                 ? 3500
                 : orchestrated.packet.interruptionRisk && orchestrated.packet.interruptionRisk > 0.7
