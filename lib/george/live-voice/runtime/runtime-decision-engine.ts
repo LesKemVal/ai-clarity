@@ -55,6 +55,14 @@ class GeorgeRuntimeDecisionEngine {
     if (authority.arbitrationVerdict === 'interrupt') return 'interrupt'
     if (authority.adaptiveProfile === 'silent') return 'hold'
     if (authority.adaptiveProfile === 'cautious') return 'whisper'
+
+    if (
+      authority.canSpeak &&
+      !authority.silenceWindowOpen
+    ) {
+      return 'queue'
+    }
+
     if (authority.canSpeak) return 'speak'
 
     return 'hold'
