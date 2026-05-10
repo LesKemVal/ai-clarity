@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 type InterruptionSignal = {
   text: string
   speaker: 'other_party' | 'user' | 'unclear'
@@ -11,9 +13,10 @@ class GeorgeInterruptionEngine {
 
   detect(signal: InterruptionSignal) {
     const text = signal.text.toLowerCase()
+    const signals = detectConversationSignals(text)
 
     const interruption =
-      /wait|hold on|stop|listen|no,|you're not hearing|let me finish/i.test(text)
+      signals.has('interruption_attempt')
 
     if (interruption) {
       this.lastInterruptionAt = signal.timestamp

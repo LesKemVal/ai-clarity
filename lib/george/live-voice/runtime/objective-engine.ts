@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type LiveObjectiveId =
   | 'stay_safe'
   | 'secure_raise'
@@ -54,6 +56,7 @@ export const LIVE_OBJECTIVES: Record<LiveObjectiveId, LiveObjective> = {
 
 export function inferObjectiveFromText(text: string): LiveObjectiveId {
   const clean = text.toLowerCase()
+  const signals = detectConversationSignals(clean)
 
   if (/officer|license|registration|insurance|pulled you over|id\b/.test(clean)) {
     return 'stay_safe'
@@ -71,7 +74,7 @@ export function inferObjectiveFromText(text: string): LiveObjectiveId {
     return 'deescalate'
   }
 
-  if (/prove|why should|convince|not enough|boundary/.test(clean)) {
+  if (signals.has('proof_challenge')) {
     return 'hold_frame'
   }
 
