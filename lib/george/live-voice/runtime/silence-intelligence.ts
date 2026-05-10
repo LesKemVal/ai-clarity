@@ -8,6 +8,8 @@ export type SilenceDecisionInput = {
   msSinceSpeech?: number
   forcedIntervention?: boolean
   strongestRolePressure?: [string, number]
+  trajectory?: string
+  decisionAction?: string
 }
 
 export type SilenceDecision = {
@@ -20,6 +22,14 @@ export type SilenceDecision = {
     | 'processing_silence'
     | 'forced_intervention'
     | 'profile_silence'
+  pauseType?:
+    | 'none'
+    | 'hesitation'
+    | 'authority_hold'
+    | 'processing'
+    | 'invitation'
+    | 'trap_pause'
+    | 'overlap_risk'
 }
 
 class GeorgeSilenceIntelligence {
@@ -28,12 +38,14 @@ class GeorgeSilenceIntelligence {
     const interruptionRisk = input.interruptionRisk ?? 0
     const msSinceSpeech = input.msSinceSpeech ?? 0
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
+    const pauseType = this.classifyPause(input, role, rolePressure)
 
     if (input.forcedIntervention) {
       return {
         shouldHold: false,
         reason: 'User directly requested intervention.',
         silenceType: 'forced_intervention',
+        pauseType,
       }
     }
 
@@ -47,6 +59,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Authority pressure persists. Do not interrupt the floor.',
         silenceType: 'processing_silence',
+        pauseType,
       }
     }
 
@@ -60,6 +73,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Skeptic pressure persists. Wait for a cleaner proof window.',
         silenceType: 'processing_silence',
+        pauseType,
       }
     }
 
@@ -73,6 +87,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Gatekeeper pressure persists. Hold for an access gap.',
         silenceType: 'processing_silence',
+        pauseType,
       }
     }
 
@@ -86,6 +101,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: false,
         reason: 'Ally opening present. Use the window.',
         silenceType: 'none',
+        pauseType,
       }
     }
 
@@ -94,6 +110,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Silent profile active.',
         silenceType: 'profile_silence',
+        pauseType,
       }
     }
 
@@ -107,6 +124,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: false,
         reason: 'User appears stuck after holding the floor.',
         silenceType: 'dead_silence',
+        pauseType,
       }
     }
 
@@ -118,6 +136,25 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Other party appears to be processing or holding the floor.',
         silenceType: 'processing_silence',
+        pauseType,
+      }
+    }
+
+    if (pauseType === 'invitation') {
+      return {
+        shouldHold: false,
+        reason: 'Invitation gap detected. Take the opening.',
+        silenceType: 'none',
+        pauseType,
+      }
+    }
+
+    if (pauseType === 'trap_pause') {
+      return {
+        shouldHold: true,
+        reason: 'Trap pause detected. Do not fill the silence.',
+        silenceType: 'processing_silence',
+        pauseType,
       }
     }
 
@@ -126,6 +163,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: false,
         reason: 'Authority context requires timely cue.',
         silenceType: 'none',
+        pauseType,
       }
     }
 
@@ -138,6 +176,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'User has momentum. Hold.',
         silenceType: 'thinking_silence',
+        pauseType,
       }
     }
 
@@ -146,6 +185,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'Confidence too low. Hold.',
         silenceType: 'thinking_silence',
+        pauseType,
       }
     }
 
@@ -154,6 +194,7 @@ class GeorgeSilenceIntelligence {
         shouldHold: true,
         reason: 'High interruption risk. Hold.',
         silenceType: 'processing_silence',
+        pauseType,
       }
     }
 
@@ -161,7 +202,69 @@ class GeorgeSilenceIntelligence {
       shouldHold: false,
       reason: 'Speech window acceptable.',
       silenceType: 'none',
+      pauseType,
     }
+  }
+
+  private classifyPause(
+    input: SilenceDecisionInput,
+    role: string,
+    rolePressure: number
+  ): SilenceDecision['pauseType'] {
+    const msSinceSpeech = input.msSinceSpeech ?? 0
+    const interruptionRisk = input.interruptionRisk ?? 0
+
+    if (
+      role === 'authority' &&
+      rolePressure > 1.2 &&
+      input.controlOwner === 'other_party'
+    ) {
+      return 'authority_hold'
+    }
+
+    if (
+      role === 'skeptic' &&
+      rolePressure > 1.4 &&
+      (
+        input.trajectory === 'resistance_hardening' ||
+        input.decisionAction === 'redirect'
+      )
+    ) {
+      return 'trap_pause'
+    }
+
+    if (
+      input.controlOwner === 'other_party' &&
+      msSinceSpeech < 1800
+    ) {
+      return 'processing'
+    }
+
+    if (
+      input.controlOwner !== 'other_party' &&
+      (
+        input.decisionAction === 'close' ||
+        input.trajectory === 'decision_ready' ||
+        role === 'ally'
+      ) &&
+      msSinceSpeech >= 700
+    ) {
+      return 'invitation'
+    }
+
+    if (
+      input.speaker === 'user' &&
+      msSinceSpeech > 1600 &&
+      interruptionRisk < 0.55
+    ) {
+      return 'hesitation'
+    }
+
+    if (interruptionRisk > 0.78) {
+      return 'overlap_risk'
+    }
+
+    return 'none'
   }
 }
 

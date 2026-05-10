@@ -304,6 +304,8 @@ export function orchestrateLiveTurn(
     msSinceSpeech: georgeSilenceDetector.msSinceSpeech(),
     forcedIntervention: /george|help me|what do i say|tell me what to say|say something|jump in|i need help/i.test(text.toLowerCase()),
     strongestRolePressure,
+    trajectory: trajectoryState.trajectory,
+    decisionAction: decisionWindow.action,
   })
 
   const silenceSnapshot = georgeLiveRuntimeState.update({
