@@ -3,6 +3,7 @@ import { georgeConversationWindow } from './conversation-window'
 import { georgeDeliveryArbitrator } from './delivery-arbitrator'
 import { georgeInterruptionEngine } from './interruption-engine'
 import { georgeProviderHealth } from './provider-health'
+import { georgeSilenceDetector } from './silence-detector'
 import { georgeTurnManager } from './turn-manager'
 
 export type LiveRuntimeAuthoritySnapshot = {
@@ -15,6 +16,8 @@ export type LiveRuntimeAuthoritySnapshot = {
   arbitrationVerdict: string
   adaptiveProfile: string
   providerStatus: string
+  silenceWindowOpen: boolean
+  msSinceSpeech: number
   reason: string
   checkedAt: number
 }
@@ -30,6 +33,8 @@ class GeorgeRuntimeAuthority {
     arbitrationVerdict: 'unknown',
     adaptiveProfile: 'balanced',
     providerStatus: 'unknown',
+    silenceWindowOpen: false,
+    msSinceSpeech: 0,
     reason: 'Runtime authority has not been evaluated yet.',
     checkedAt: 0,
   }
@@ -40,6 +45,7 @@ class GeorgeRuntimeAuthority {
     const arbitration = georgeDeliveryArbitrator.getSnapshot()
     const adaptive = georgeAdaptiveDeliveryPolicy.evaluate()
     const provider = georgeProviderHealth.check()
+    const msSinceSpeech = georgeSilenceDetector.msSinceSpeech()
 
     const snapshot: LiveRuntimeAuthoritySnapshot = {
       roomState: georgeTurnManager.getState(),
@@ -51,6 +57,8 @@ class GeorgeRuntimeAuthority {
       arbitrationVerdict: arbitration.verdict,
       adaptiveProfile: adaptive.profile,
       providerStatus: provider.status,
+      silenceWindowOpen: georgeSilenceDetector.isSilenceWindow(),
+      msSinceSpeech,
       reason: this.resolveReason({
         controlOwner: control.owner,
         arbitrationVerdict: arbitration.verdict,
@@ -78,6 +86,8 @@ class GeorgeRuntimeAuthority {
       arbitrationVerdict: 'unknown',
       adaptiveProfile: 'balanced',
       providerStatus: 'unknown',
+      silenceWindowOpen: false,
+      msSinceSpeech: 0,
       reason: 'Runtime authority has been reset.',
       checkedAt: 0,
     }
