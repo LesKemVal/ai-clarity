@@ -22,6 +22,7 @@ import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engin
 import { georgeDeliverySessionManager } from '@/lib/george/live-voice/runtime/delivery-session-manager'
 import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
 import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
+import { georgeRuntimeDecisionEngine } from '@/lib/george/live-voice/runtime/runtime-decision-engine'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LivePacket = {
@@ -580,6 +581,10 @@ function isForceIntervention(text: string) {
               })
             : null
 
+          let shouldHoldByRuntime = true
+          let shouldQueueByRuntime = false
+          let runtimeDecisionReason = 'No runtime decision available.'
+
           if (orchestrated) {
             if (georgeCancelEngine.isExpired(generation)) {
               pushLog('Skipped stale LIVE packet commit.')
@@ -588,6 +593,20 @@ function isForceIntervention(text: string) {
 
             setRuntimeState(orchestrated.runtimeSnapshot)
             setPacket({ ...orchestrated.packet })
+
+            const runtimeDecision = georgeRuntimeDecisionEngine.decide()
+            shouldHoldByRuntime =
+              runtimeDecision.decision === 'hold' ||
+              runtimeDecision.decision === 'yield' ||
+              runtimeDecision.decision === 'suppress'
+            shouldQueueByRuntime =
+              runtimeDecision.decision === 'speak' ||
+              runtimeDecision.decision === 'whisper' ||
+              runtimeDecision.decision === 'interrupt' ||
+              runtimeDecision.decision === 'queue'
+            runtimeDecisionReason = runtimeDecision.reason
+
+            pushLog(`Runtime decision: ${runtimeDecision.decision} (${Math.round(runtimeDecision.confidence * 100)}%)`)
 
             if (
               orchestrated.runtimeSnapshot.interventionUrgency === 'high'
@@ -599,7 +618,7 @@ function isForceIntervention(text: string) {
               triggerHaptic([90, 60, 90])
             } else if (
               orchestrated.packet.shouldSpeak &&
-              !orchestrated.silence.shouldHold
+              !shouldHoldByRuntime
             ) {
               triggerHaptic(40)
             }
@@ -611,12 +630,12 @@ function isForceIntervention(text: string) {
               liveTier === 'brilliant' &&
               orchestrated.runtimeSnapshot.interventionUrgency === 'high'
             ) {
-              orchestrated.silence.shouldHold = false
-              pushLog('Brilliant escalation override bypassed hold state.')
+              shouldHoldByRuntime = false
+              pushLog('Brilliant escalation override bypassed runtime hold state.')
             }
 
-            if (orchestrated.silence.shouldHold) {
-              pushLog(`Hold: ${orchestrated.silence.reason}`)
+            if (shouldHoldByRuntime) {
+              pushLog(`Hold: ${runtimeDecisionReason}`)
             }
           }
 
@@ -626,7 +645,7 @@ function isForceIntervention(text: string) {
             orchestrated.queueText &&
             (
               forcedIntervention ||
-              !orchestrated.silence.shouldHold
+              shouldQueueByRuntime
             ) &&
             (
               forcedIntervention ||
