@@ -10,6 +10,7 @@ export type SilenceDecisionInput = {
   strongestRolePressure?: [string, number]
   trajectory?: string
   decisionAction?: string
+  forecastBias?: string
 }
 
 export type SilenceDecision = {
@@ -38,6 +39,7 @@ class GeorgeSilenceIntelligence {
     const interruptionRisk = input.interruptionRisk ?? 0
     const msSinceSpeech = input.msSinceSpeech ?? 0
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
+    const forecastBias = input.forecastBias ?? 'none'
     const pauseType = this.classifyPause(input, role, rolePressure)
 
     if (input.forcedIntervention) {
@@ -100,6 +102,47 @@ class GeorgeSilenceIntelligence {
       return {
         shouldHold: false,
         reason: 'Ally opening present. Use the window.',
+        silenceType: 'none',
+        pauseType,
+      }
+    }
+
+    if (
+      forecastBias === 'hold' &&
+      input.controlOwner === 'other_party' &&
+      msSinceSpeech < 2400
+    ) {
+      return {
+        shouldHold: true,
+        reason: 'Forecast bias hold. Preserve the floor.',
+        silenceType: 'processing_silence',
+        pauseType,
+      }
+    }
+
+    if (
+      forecastBias === 'support' &&
+      input.controlOwner !== 'other_party' &&
+      confidence >= 0.5 &&
+      msSinceSpeech > 900
+    ) {
+      return {
+        shouldHold: false,
+        reason: 'Forecast bias support. Assist during the hesitation window.',
+        silenceType: 'none',
+        pauseType,
+      }
+    }
+
+    if (
+      forecastBias === 'advance' &&
+      input.controlOwner !== 'other_party' &&
+      confidence >= 0.5 &&
+      msSinceSpeech > 700
+    ) {
+      return {
+        shouldHold: false,
+        reason: 'Forecast bias advance. Use the opening.',
         silenceType: 'none',
         pauseType,
       }

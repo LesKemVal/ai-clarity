@@ -333,6 +333,7 @@ export function orchestrateLiveTurn(
     strongestRolePressure,
     trajectory: trajectoryState.trajectory,
     decisionAction: decisionWindow.action,
+    forecastBias,
   })
 
   const silenceSnapshot = georgeLiveRuntimeState.update({
