@@ -10,24 +10,26 @@ export default function Brand({
   showCore = true,
 }: BrandProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 overflow-hidden">
       <img
         src="/logo900.png"
         alt="BRANESx"
-        className={compact
-          ? "h-6 w-auto object-contain opacity-90"
-          : "h-7 w-auto object-contain opacity-90"}
+        className={
+          compact
+            ? "h-[18px] w-[18px] shrink-0 rounded-[4px] object-cover opacity-90"
+            : "h-[22px] w-[22px] shrink-0 rounded-[5px] object-cover opacity-90"
+        }
       />
 
       {!compact && (
         <div className="ml-1 flex flex-col leading-tight">
           {showCore && (
-            <span className="text-[10px] tracking-[0.22em] text-white/34">
+            <span className="text-[9px] tracking-[0.18em] text-white/30">
               BRANES
             </span>
           )}
 
-          <span className="text-xs text-white/62">
+          <span className="text-[11px] text-white/62">
             {subtitle}
           </span>
         </div>
