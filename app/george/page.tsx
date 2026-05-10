@@ -4497,7 +4497,7 @@ Cue:`
                   setRewordPopupIndex(null)
                   void handleSend(prompt)
                 }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.04] hover:text-white/92"
               >
                 {action}
               </button>
@@ -4585,7 +4585,7 @@ Say:
 Backup:
 Cue:`)
       }}
-      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-white/[0.04] hover:text-white/92"
       title="Screener"
     >
       🎯
@@ -4618,7 +4618,7 @@ Cue:`)
                   setToastMessage(`Tone: ${tone}`)
                   setShowToast(true)
                 }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.04] hover:text-white/92"
               >
                 {tone}
               </button>
@@ -4744,7 +4744,7 @@ router.push('/george')
       setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/10 hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-white/[0.04] hover:text-white/92"
             >
               <span className="h-1 w-1 rounded-full bg-[#7C8CFF]" />
               
@@ -4764,7 +4764,7 @@ router.push('/george')
                   }
                 } catch {}
               }}
-              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/10 hover:text-white"
+              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-white/[0.04] hover:text-white/92"
             >
               Send
             </button>
@@ -4776,7 +4776,7 @@ router.push('/george')
                 setConversationSignal('Clarifying…')
                 void handleSend(prompt, { hidden: true })
               }}
-              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
+              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-white/[0.04] hover:text-white/92"
             >
               Clarify
             </button>
@@ -4855,7 +4855,7 @@ router.push('/george')
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -5024,8 +5024,8 @@ router.push('/george')
         }}
         className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_14px_rgba(124,140,255,0.28)]'
-            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-[#7C8CFF]/10 hover:text-white'
+            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(124,140,255,0.16)]'
+            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-white/[0.04] hover:text-white/92'
         }`}
         aria-label="Open memory folders"
         title="Resume conversation continuity"
@@ -5074,7 +5074,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5205,7 +5205,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5313,7 +5313,7 @@ if (liveMode) {
       <img
         src="/earbud400.png"
         alt=""
-        className="h-[118px] w-auto opacity-90 drop-shadow-[0_0_34px_rgba(124,140,255,0.26)] animate-pulse"
+        className="h-[118px] w-auto opacity-90 drop-shadow-[0_0_18px_rgba(124,140,255,0.14)]"
       />
 
       <div className="rounded-2xl border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
@@ -5637,7 +5637,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-[#7C8CFF]/20' : 'border-[#7C8CFF]/28'} bg-black/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-[#7C8CFF]/20' : 'border-[#7C8CFF]/28'} bg-[#11131A]/90 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5814,7 +5814,7 @@ Choose one:
                     onClick={() => {
                       setPendingDeleteSessionId(session.id)
                     }}
-                    className="rounded-full px-2 py-1 text-[14px] text-white/38 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                    className="rounded-full px-2 py-1 text-[14px] text-white/38 transition hover:bg-white/[0.04] hover:text-white/92"
                   >
                     ⋯
                   </button>
@@ -5974,14 +5974,14 @@ Choose one:
                             className="fixed inset-0 z-[91] cursor-default bg-transparent"
                           />
                           <div className="absolute bottom-full left-[-6px] z-[95] mb-1.5 w-[230px]">
-                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.18)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]">
+                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_16px_42px_rgba(0,0,0,0.52)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]">
                           <button
                             type="button"
                             onClick={() => {
                               setShowLiveQuickMenu(false)
                               startNewLiveConversation()
                             }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-white/[0.04] hover:text-white/92"
                           >
                             New LIVE Conversation
                           </button>
@@ -5992,7 +5992,7 @@ Choose one:
                               setShowLiveQuickMenu(false)
                               setShowProLiveComingSoon(true)
                             }}
-                            className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-[#7C8CFF]/10 hover:text-white"
+                            className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-white/[0.04] hover:text-white/92"
                           >
                             New LIVE Session
                           </button>
@@ -6122,7 +6122,7 @@ Choose one:
                             />
 
                             <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
-                              <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-black/92 shadow-[0_20px_70px_rgba(0,0,0,0.78),0_0_24px_rgba(124,140,255,0.12)] backdrop-blur-2xl">
+                              <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-[#11131A]/90 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-2xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
                                   <div className="text-[11px] tracking-[0.32em] text-[#8E96FF]">
@@ -6388,7 +6388,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:to
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#7C8CFF]/18 bg-black/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#7C8CFF]/18 bg-[#11131A]/90 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -6507,7 +6507,7 @@ What are we working on?"
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 ring-1 ring-[#7C8CFF]/10 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 ring-1 ring-[#7C8CFF]/10 p-6 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
@@ -6547,7 +6547,7 @@ What are we working on?"
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 ring-1 ring-[#7C8CFF]/10/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 ring-1 ring-[#7C8CFF]/10/95 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -6659,7 +6659,7 @@ What are we working on?"
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/28 bg-black/92 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
+        className="pointer-events-auto w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.12)] ring-1 ring-[#7C8CFF]/10"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 text-center">
@@ -6778,7 +6778,7 @@ What are we working on?"
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.04] hover:text-white/92"
               >
                 Close
               </button>
