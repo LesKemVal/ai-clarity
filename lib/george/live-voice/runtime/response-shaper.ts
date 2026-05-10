@@ -8,6 +8,8 @@ export type ResponseShapeInput = {
   decisionAction: string
   roomPressure?: string
   fatigueScore?: number
+  failedCloseTurns?: number
+  allowAggressiveIntervention?: boolean
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   transcript?: string
 }
@@ -103,7 +105,15 @@ class GeorgeResponseShaper {
       reasons.push('authority-safe phrasing')
     }
 
-    if (input.decisionAction === 'close') {
+    if (
+      input.allowAggressiveIntervention &&
+      (input.failedCloseTurns || 0) >= 2 &&
+      input.decisionAction === 'close'
+    ) {
+      volley = this.forceRedirect(volley, input.objectiveId)
+      cue = this.prependCue(cue, 'Pivot. Stop pushing the same door.')
+      reasons.push('failed close pivot')
+    } else if (input.decisionAction === 'close') {
       volley = this.forceClose(volley, input.objectiveId)
       cue = this.prependCue(cue, 'Ask cleanly.')
       reasons.push('close window')

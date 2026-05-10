@@ -234,6 +234,8 @@ export function orchestrateLiveTurn(
     decisionAction: decisionWindow.action,
     roomPressure: nextPacket.roomPressure,
     fatigueScore: pressureMemory.fatigueScore,
+    failedCloseTurns: pressureMemory.failedCloseTurns,
+    allowAggressiveIntervention: runtimeConfig.allowAggressiveIntervention,
     emotionalVelocity: velocityState.velocity,
     transcript: text,
   })
