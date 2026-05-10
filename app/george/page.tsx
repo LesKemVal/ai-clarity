@@ -2075,8 +2075,40 @@ requestAnimationFrame(() => {
     }
 
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const tag = target?.tagName?.toLowerCase()
+
+      const typing =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        target?.isContentEditable
+
       if (event.key === 'Escape') {
         setShowPromptMenu(false)
+      }
+
+      if (typing) return
+
+      const scrollHost = scrollHostRef.current
+
+      if (!scrollHost) return
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+
+        scrollHost.scrollBy({
+          top: 120,
+          behavior: 'smooth',
+        })
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+
+        scrollHost.scrollBy({
+          top: -120,
+          behavior: 'smooth',
+        })
       }
     }
 
