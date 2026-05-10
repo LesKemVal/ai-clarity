@@ -3996,7 +3996,7 @@ setPendingAssistantMessage({
 
 
 return (
-    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
+    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
