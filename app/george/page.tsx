@@ -4189,11 +4189,11 @@ return (
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white"
+                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-white/42 transition hover:text-white/72"
                       aria-label="Send George"
                       title="Send George"
                     >
-                      <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase">SEND <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
                   </div>
                 </div>
@@ -4201,11 +4201,11 @@ return (
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white xl:hidden"
+                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-white/42 transition hover:text-white/72 xl:hidden"
                   aria-label="Send George"
                   title="Send George"
                 >
-                      <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase">SEND <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
               </div>
             </header>
@@ -4233,12 +4233,12 @@ return (
 
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      el.scrollBy({ top: 120, behavior: 'smooth' })
+      el.scrollBy({ top: 96, behavior: 'smooth' })
     }
 
     if (e.key === 'ArrowUp') {
       e.preventDefault()
-      el.scrollBy({ top: -120, behavior: 'smooth' })
+      el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
@@ -4953,7 +4953,7 @@ router.push('/george')
   })}
   
 {showScrollHint && (
-  <div className={`fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center`}>
+  <div className={`fixed bottom-[210px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center`}>
 
     <div className="absolute h-12 w-12 rounded-full border border-[#7C8CFF]/12 bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34),0_0_14px_rgba(124,140,255,0.08)] backdrop-blur-md" />
 
