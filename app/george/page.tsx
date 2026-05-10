@@ -4389,7 +4389,7 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'up'
-                ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
+                ? 'text-[#AEB6FF]/82'
                 : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs up"
@@ -4793,7 +4793,7 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'up'
-                  ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
+                  ? 'text-[#AEB6FF]/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-up`]
@@ -4826,7 +4826,7 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'down'
-                  ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
+                  ? 'text-[#AEB6FF]/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-down`]
@@ -5024,7 +5024,7 @@ router.push('/george')
         }}
         className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 tracking-[0.12em] text-[10px] shadow-[0_0_14px_rgba(124,140,255,0.28)]'
+            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_14px_rgba(124,140,255,0.28)]'
             : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-[#7C8CFF]/10 hover:text-white'
         }`}
         aria-label="Open memory folders"
@@ -5958,7 +5958,7 @@ Choose one:
                         setShowLiveQuickMenu((prev) => !prev)
                         setShowLiveToolsMenu(false)
                       }}
-                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF]/82 tracking-[0.12em] text-[10px] transition hover:bg-[#7C8CFF]/18"
+                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF]/82 transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
                       ◉ LIVE
@@ -6234,7 +6234,7 @@ Choose one:
                             setShowLiveToolsMenu((prev) => !prev)
                             setShowLiveQuickMenu(false)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.16em] text-white/42 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82"
                         >
                           Tools
                         </button>
@@ -6248,7 +6248,7 @@ Choose one:
                           setSessionPickerMode('live')
                           setShowSessionPicker(true)
                         }}
-                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]"
+                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-white/32 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82"
                         aria-label="Open LIVE conversation memory"
                         title="Resume conversation continuity"
                       >
@@ -6492,9 +6492,9 @@ What are we working on?"
                   {voiceError ? (
                     <span className="block w-full text-center text-neutral-500">{voiceError}</span>
                   ) : currentTier === 'smart' ? (
-                    <span className="text-neutral-500">Voice expands beyond Smart.</span>
+                    <span className="text-neutral-500">Voice expands with Intelligent and Brilliant.</span>
                   ) : (
-                    <span className={isListening ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]' : ''}>
+                    <span className={isListening ? 'text-[#AEB6FF]/82' : ''}>
                       {isListening ? 'VOICE ACTIVE' : ''}
                     </span>
                   )}
