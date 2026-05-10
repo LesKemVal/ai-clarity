@@ -1008,7 +1008,9 @@ const [isListening, setIsListening] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
   const [showLiveToolsMenu, setShowLiveToolsMenu] = useState(false)
   const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
-const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
+  const [showLiveSegue, setShowLiveSegue] = useState(false)
+  const [liveSegueIndex, setLiveSegueIndex] = useState(0)
+  const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
@@ -1043,6 +1045,25 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [memoryVersion, setMemoryVersion] = useState(0)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
+
+  const LIVE_SEGUES = [
+    {
+      title: 'LIVE listens with you.',
+      body: 'Use one earbud if you can. GEORGE helps with timing, pressure, escalation, hesitation, and next responses in real time.'
+    },
+    {
+      title: 'You do not need to explain everything first.',
+      body: 'LIVE is designed for movement. Interviews, negotiation, conflict, uncertainty, pressure, sales, and difficult conversations.'
+    },
+    {
+      title: 'GEORGE watches the room.',
+      body: 'LIVE cues help you slow down, redirect, recover control, or sharpen the next sentence before momentum slips.'
+    },
+    {
+      title: 'This is not normal chat mode.',
+      body: 'LIVE is optimized for timing and response delivery while conversations are actually happening.'
+    }
+  ]
   const [isSharingGeorgeLink, setIsSharingGeorgeLink] = useState(false)
   const [typedMessageIndex, setTypedMessageIndex] = useState<number | null>(null)
   const [typedMessageContent, setTypedMessageContent] = useState('')
@@ -3812,7 +3833,9 @@ setPendingAssistantMessage({
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
-    setShowLiveEntryChoice(true)
+    setShowLiveEntryChoice(false)
+    setLiveSegueIndex(Math.floor(Math.random() * LIVE_SEGUES.length))
+    setShowLiveSegue(true)
   }
 
   const startNewLiveConversation = () => {
@@ -5229,6 +5252,70 @@ if (liveMode) {
       </div>
     </div>
   </div>
+)}
+
+{showLiveSegue && typeof document !== 'undefined' && createPortal(
+  <>
+    <button
+      type="button"
+      aria-label="Close LIVE segue"
+      onClick={() => {
+        setShowLiveSegue(false)
+        if (currentTier !== 'smart') setShowLiveEntryChoice(true)
+      }}
+      className="fixed inset-0 z-[240] bg-black/64 backdrop-blur-[12px]"
+    />
+
+    <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
+      <div className="w-full max-w-[390px] rounded-[1.6rem] border border-[#7C8CFF]/30 bg-black/95 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.78),0_0_34px_rgba(124,140,255,0.12)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+        <div className="mb-2 text-[10px] uppercase tracking-[0.24em] text-[#7C8CFF]">
+          LIVE CONVERSATION
+        </div>
+
+        <div className="text-[16px] font-semibold text-white">
+          {LIVE_SEGUES[liveSegueIndex]?.title || 'LIVE listens with you.'}
+        </div>
+
+        <div className="mt-3 text-[12px] leading-5 text-white/62">
+          {currentTier === 'smart'
+            ? 'LIVE Conversation is built for real-time guidance while life is happening. Upgrade to access LIVE mode.'
+            : LIVE_SEGUES[liveSegueIndex]?.body}
+        </div>
+
+        <div className="mt-5 flex gap-2">
+          {currentTier === 'smart' ? (
+            <button
+              type="button"
+              onClick={() => window.open('/top-up','_blank')}
+              className="flex-1 rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/12 px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#7C8CFF]/18"
+            >
+              Top up
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setShowLiveSegue(false)
+                setShowLiveEntryChoice(true)
+              }}
+              className="flex-1 rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/12 px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#7C8CFF]/18"
+            >
+              Continue
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setShowLiveSegue(false)}
+            className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-medium text-white/55 transition hover:text-white"
+          >
+            Not now
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
 )}
 
 {showLiveEntryChoice && typeof document !== 'undefined' && createPortal(
