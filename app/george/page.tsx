@@ -5343,29 +5343,29 @@ if (liveMode) {
 
       <div className="relative mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[860px] flex-col justify-center">
         <div className="mb-5 inline-flex w-fit items-center rounded-full border border-[#7C8CFF]/25 bg-white/[0.055] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.28em] text-[#B8C1FF] shadow-[0_0_30px_rgba(124,140,255,0.12)]">
-          LIVE MODE TRANSITION
+          LIVE
         </div>
 
-        <div className="max-w-[780px] text-[42px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:text-[64px]">
-          GEORGE is now listening with you.
+        <div className="max-w-[780px] text-[38px] font-semibold leading-[1.02] tracking-[-0.05em] text-white md:text-[64px]">
+          GEORGE enters the conversation with you.
         </div>
 
-        <div className="mt-6 max-w-[660px] text-[18px] leading-8 text-white/72 md:text-[20px] md:leading-9">
+        <div className="mt-6 max-w-[660px] text-[17px] leading-[1.9] text-white/64 md:text-[19px] md:leading-[1.9]">
           {currentTier === 'smart'
             ? 'LIVE is built for moments where timing matters: pressure, hesitation, negotiation, conflict, interviews, sales, and real conversation. It requires Intelligent or Brilliant access.'
-            : 'This is not normal chat mode. LIVE helps you catch timing, pressure, hesitation, escalation, and the next useful line while the conversation is actually happening.'}
+            : 'LIVE tracks timing, pressure, hesitation, escalation, and the next useful move while the conversation unfolds.'}
         </div>
 
         <div className="mt-8 grid gap-3 md:grid-cols-2">
           {[
             'Use one earbud if you can.',
             'Ask for a line, cue, pivot, or next move.',
-            'GEORGE watches timing and pressure.',
+            'GEORGE tracks timing and pressure.',
             'You stay in the conversation.'
           ].map((item) => (
             <div
               key={item}
-              className="rounded-[1.35rem] border border-white/10 bg-white/[0.065] px-4 py-4 text-[14px] leading-6 text-white/72 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl"
+              className="rounded-[1.35rem] border border-white/10 bg-white/[0.045] px-4 py-4 text-[14px] leading-6 text-white/72 shadow-[0_14px_36px_rgba(0,0,0,0.14)] backdrop-blur-xl"
             >
               {item}
             </div>
