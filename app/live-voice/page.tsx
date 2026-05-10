@@ -926,6 +926,10 @@ function isForceIntervention(text: string) {
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
             <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
+            <p>Pressure Memory: {runtimeState.status.includes('Pressure memory')
+              ? runtimeState.status.match(/Pressure memory[^.]*\./)?.[0] || 'stable'
+              : 'stable'}
+            </p>
           </div>
 
           <div className="mt-4 space-y-3">
