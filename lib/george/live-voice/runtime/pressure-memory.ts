@@ -25,7 +25,11 @@ class GeorgePressureMemory {
 
   update(input: PressureMemoryInput): PressureMemoryState {
     const text = input.text.toLowerCase()
-    const decayStep = input.memoryWindow && input.memoryWindow >= 10 ? 0.5 : 1
+    const persistentMemory =
+      input.memoryWindow && input.memoryWindow >= 10
+
+    const decayStep = persistentMemory ? 0.5 : 1
+    const failedCloseDecay = persistentMemory ? 0.35 : 1
 
     if (
       input.roomPressure === 'high' ||
@@ -53,7 +57,7 @@ class GeorgePressureMemory {
     ) {
       this.failedCloseTurns += 1
     } else {
-      this.failedCloseTurns = Math.max(0, this.failedCloseTurns - decayStep)
+      this.failedCloseTurns = Math.max(0, this.failedCloseTurns - failedCloseDecay)
     }
 
     if (
