@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type Trajectory =
   | 'positive'
   | 'neutral'
@@ -26,6 +28,7 @@ export type TrajectoryState = {
 class GeorgeTrajectoryEngine {
   evaluate(input: TrajectoryInput): TrajectoryState {
     const text = input.text.toLowerCase()
+    const signals = detectConversationSignals(text)
 
     if (input.roomPressure === 'authority') {
       return {
@@ -39,7 +42,7 @@ class GeorgeTrajectoryEngine {
     if (
       input.emotionalVelocity === 'spiking' ||
       (input.interruptionRisk || 0) > 0.78 ||
-      /stop|wait|hold on|listen|no\b|not hearing/i.test(text)
+      signals.has('interruption_attempt')
     ) {
       return {
         trajectory: 'escalating_conflict',
@@ -49,7 +52,7 @@ class GeorgeTrajectoryEngine {
       }
     }
 
-    if (/not interested|send an email|too busy|no budget|not now/i.test(text)) {
+    if (signals.has('resistance')) {
       return {
         trajectory: 'resistance_hardening',
         score: 0.72,
@@ -67,7 +70,7 @@ class GeorgeTrajectoryEngine {
       }
     }
 
-    if (/maybe|i guess|not sure|we will see|later/i.test(text)) {
+    if (signals.has('hesitation')) {
       return {
         trajectory: 'drifting',
         score: 0.62,
