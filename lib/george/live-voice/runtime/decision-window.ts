@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type DecisionWindowAction =
   | 'speak_now'
   | 'hold'
@@ -28,6 +30,7 @@ export type DecisionWindow = {
 class GeorgeDecisionWindow {
   evaluate(input: DecisionWindowInput): DecisionWindow {
     const text = input.text.toLowerCase()
+    const signals = detectConversationSignals(text)
     const confidence = input.confidence ?? 0.5
     const interruptionRisk = input.interruptionRisk ?? 0
 
@@ -64,7 +67,7 @@ class GeorgeDecisionWindow {
 
     if (
       input.trajectory === 'resistance_hardening' ||
-      /not interested|too busy|no budget|send an email/i.test(text)
+      signals.has('resistance')
     ) {
       return {
         action: 'redirect',

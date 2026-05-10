@@ -1,5 +1,6 @@
 import type { LiveSpeakerRole, LiveVoiceGovernorInput, LiveVoicePacket } from './types'
 import { analyzeRoom, inferLiveSpeaker } from './runtime/room-analyzer'
+import { detectConversationSignals } from './runtime/conversation-signals'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -36,7 +37,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
   const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
   const room = analyzeRoom(`${shadowMap}\n${lastFiveSeconds}\n${transcript}`)
-
+  const signals = detectConversationSignals(`${shadowMap}\n${lastFiveSeconds}\n${transcript}`)
 
   let packet: LiveVoicePacket = {
     speaker,
@@ -62,7 +63,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     }
   }
 
-  if (speaker === 'other_party' && AUTHORITY_QUESTION.test(transcript)) {
+  if (speaker === 'other_party' && (AUTHORITY_QUESTION.test(transcript) || signals.has('authority_pressure'))) {
     packet = {
       speaker,
       shouldSpeak: true,
@@ -81,25 +82,25 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     packet = {
       speaker,
       shouldSpeak: true,
-      volley: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+      volley: signals.has('interruption_attempt')
         ? ''
-        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+        : signals.has('proof_challenge')
           ? 'The clearest proof is this.'
-          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+          : signals.has('opening_window')
             ? 'Here is the point.'
             : 'Let me answer that directly.',
-      cue: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+      cue: signals.has('interruption_attempt')
         ? 'Do not speak. Let them finish.'
-        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+        : signals.has('proof_challenge')
           ? 'Proof first. No extra words.'
-          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+          : signals.has('opening_window')
             ? 'Use the opening.'
             : 'Slow down. Do not rush.',
-      status: /hold on|wait|let me finish|stop/i.test(lowerTranscript)
+      status: signals.has('interruption_attempt')
         ? 'Other party holding the floor.'
-        : /why should i believe|prove|evidence|that does not sound right|that doesn't sound right/i.test(lowerTranscript)
+        : signals.has('proof_challenge')
           ? 'Proof challenge detected.'
-          : /okay,? go ahead|go ahead|you can answer|your turn|i'?m listening/i.test(lowerTranscript)
+          : signals.has('opening_window')
             ? 'Opening detected.'
             : 'They asked for a response.',
       confidence: Math.max(0.7, speakerInference.confidence || 0),

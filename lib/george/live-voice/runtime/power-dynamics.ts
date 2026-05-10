@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type PowerFrame =
   | 'balanced'
   | 'other_party_controls'
@@ -23,6 +25,7 @@ export type PowerDynamicsState = {
 class GeorgePowerDynamics {
   analyze(input: PowerDynamicsInput): PowerDynamicsState {
     const text = input.text.toLowerCase()
+    const signals = detectConversationSignals(text)
     let score = 0.5
 
     if (input.roomPressure === 'authority') {
@@ -33,7 +36,7 @@ class GeorgePowerDynamics {
       }
     }
 
-    if (/why should|prove|convince me|what makes you|that's not enough/i.test(text)) {
+    if (signals.has('proof_challenge')) {
       return {
         frame: 'other_party_controls',
         score: 0.78,
@@ -41,7 +44,7 @@ class GeorgePowerDynamics {
       }
     }
 
-    if (/sorry|i just|i was only|i don't know|maybe|i guess/i.test(text)) {
+    if (signals.has('defensive_language') || signals.has('hesitation')) {
       return {
         frame: 'user_defensive',
         score: 0.72,

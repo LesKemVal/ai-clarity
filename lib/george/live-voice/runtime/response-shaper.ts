@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type ResponseShapeInput = {
   volley: string
   cue: string
@@ -52,6 +54,7 @@ class GeorgeResponseShaper {
     }
 
     const transcript = (input.transcript || '').toLowerCase()
+    const signals = detectConversationSignals(transcript)
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
 
     if (role === 'authority' && rolePressure > 1.2) {
@@ -105,7 +108,7 @@ class GeorgeResponseShaper {
       postureCue = '[LOWER YOUR PACE]'
 
       if (
-        /sorry|i just|maybe|i guess|i don’t know|i don't know/i.test(transcript)
+        signals.has('defensive_language') || signals.has('hesitation')
       ) {
         volley = 'Let’s look at the actual issue.'
         reasons.push('defensive posture reset')
