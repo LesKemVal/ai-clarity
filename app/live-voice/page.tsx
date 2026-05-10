@@ -688,7 +688,7 @@ function isForceIntervention(text: string) {
             ) {
               pushLog('Waiting for silence window.')
             } else {
-              pushLog('Speech suppressed by turn manager.')
+              pushLog(`Speech suppressed by runtime decision: ${runtimeDecisionReason}`)
             }
           }
         }
