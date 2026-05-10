@@ -3975,7 +3975,7 @@ setPendingAssistantMessage({
       GEORGE
     </div>
 
-    <div className="mt-2 text-[12px] tracking-[0.18em] text-neutral-400">
+    <div className="mt-2 text-[12px] tracking-[0.18em] text-neutral-500">
       Smart. Intelligent. Brilliant.
     </div>
 
@@ -4389,7 +4389,7 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'up'
-                ? 'text-[#AEB6FF]'
+                ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
                 : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs up"
@@ -4729,7 +4729,7 @@ router.push('/george')
 
           {!isWelcomeAssistant &&
             !liveMode && (
-          <div className="flex items-center gap-2 flex-nowrap overflow-x-auto divide-x divide-white/10 text-[11px] text-neutral-400">
+          <div className="flex items-center gap-2 flex-nowrap overflow-x-auto divide-x divide-white/10 text-[11px] text-neutral-500">
             {!isWelcomeAssistant && (
               <>
             <button
@@ -4793,7 +4793,7 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'up'
-                  ? 'text-[#AEB6FF]'
+                  ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-up`]
@@ -4826,7 +4826,7 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'down'
-                  ? 'text-[#AEB6FF]'
+                  ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-down`]
@@ -4916,7 +4916,7 @@ router.push('/george')
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-[#7C8CFF]/14 bg-black/35 p-1.5 text-[10px] leading-4 text-neutral-400 break-words">
+                  <div className="rounded-xl border border-[#7C8CFF]/14 bg-black/35 p-1.5 text-[10px] leading-4 text-neutral-500 break-words">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
@@ -5024,7 +5024,7 @@ router.push('/george')
         }}
         className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF] shadow-[0_0_14px_rgba(124,140,255,0.28)]'
+            ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 tracking-[0.12em] text-[10px] shadow-[0_0_14px_rgba(124,140,255,0.28)]'
             : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-[#7C8CFF]/10 hover:text-white'
         }`}
         aria-label="Open memory folders"
@@ -5789,7 +5789,7 @@ Choose one:
                   Last state: {session.lastKnownState || session.summary || 'No state captured yet'}
                 </div>
 
-                <div className="mt-1.5 text-[10px] text-neutral-600">
+                <div className="mt-1.5 text-[10px] text-neutral-500">
                   {session.createdAt ? new Date(session.createdAt).toLocaleString() : 'Saved conversation'}
                 </div>
               </button>
@@ -5958,7 +5958,7 @@ Choose one:
                         setShowLiveQuickMenu((prev) => !prev)
                         setShowLiveToolsMenu(false)
                       }}
-                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF] transition hover:bg-[#7C8CFF]/18"
+                      className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF]/82 tracking-[0.12em] text-[10px] transition hover:bg-[#7C8CFF]/18"
                       aria-label="Open LIVE chooser"
                     >
                       ◉ LIVE
@@ -6234,7 +6234,7 @@ Choose one:
                             setShowLiveToolsMenu((prev) => !prev)
                             setShowLiveQuickMenu(false)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]"
                         >
                           Tools
                         </button>
@@ -6248,7 +6248,7 @@ Choose one:
                           setSessionPickerMode('live')
                           setShowSessionPicker(true)
                         }}
-                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]"
+                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-white/35 transition hover:bg-[#7C8CFF]/10 hover:text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]"
                         aria-label="Open LIVE conversation memory"
                         title="Resume conversation continuity"
                       >
@@ -6458,7 +6458,7 @@ What are we working on?"
                                     ? 'text-amber-300'
                                     : 'text-white/52 hover:text-white/82'
                                 } disabled:cursor-not-allowed disabled:opacity-40`}
-                              aria-label="Use speech"
+                              aria-label="Voice"
                             >
                               <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/>
@@ -6490,12 +6490,12 @@ What are we working on?"
 
                 <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
-                    <span className="block w-full text-center text-neutral-400">{voiceError}</span>
+                    <span className="block w-full text-center text-neutral-500">{voiceError}</span>
                   ) : currentTier === 'smart' ? (
-                    <span className="text-neutral-600">Voice unlocks above Smart.</span>
+                    <span className="text-neutral-500">Voice expands beyond Smart.</span>
                   ) : (
-                    <span className={isListening ? 'text-[#AEB6FF]' : ''}>
-                      {isListening ? 'Voice is listening…' : ''}
+                    <span className={isListening ? 'text-[#AEB6FF]/82 tracking-[0.12em] text-[10px]' : ''}>
+                      {isListening ? 'VOICE ACTIVE' : ''}
                     </span>
                   )}
                 </div>
@@ -6552,7 +6552,7 @@ What are we working on?"
           >
             <div className="mb-6 text-center">
               <p className="text-sm font-medium text-white">Make GEORGE yours</p>
-              <p className="mt-1 text-xs leading-5 text-neutral-400">
+              <p className="mt-1 text-xs leading-5 text-neutral-500">
                 Optional. Same mind. Same standards. Choose GEORGE or GEORGette, then keep the name or make it yours.
               </p>
             </div>
@@ -6577,7 +6577,7 @@ What are we working on?"
                       className={`rounded-2xl border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
-                          : 'border-[#7C8CFF]/14 bg-black/35 text-neutral-400 hover:text-white'
+                          : 'border-[#7C8CFF]/14 bg-black/35 text-neutral-500 hover:text-white'
                       }`}
                     >
                       {voice.label}
@@ -6594,7 +6594,7 @@ What are we working on?"
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl max-w-full border border-[#7C8CFF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-2xl max-w-full border border-[#7C8CFF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -6664,7 +6664,7 @@ What are we working on?"
       >
         <div className="mb-6 text-center">
           <p className="text-sm font-medium text-red-400">Stay Brilliant.</p>
-          <p className="mt-1 text-xs leading-6 text-neutral-400">
+          <p className="mt-1 text-xs leading-6 text-neutral-500">
             You are already operating at a higher level. Choose how much control and execution support you want.
           </p>
         </div>
@@ -6701,7 +6701,7 @@ What are we working on?"
             className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/14 bg-black/35 px-4 py-3 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10"
           >
             <div className="text-sm font-medium text-white">Move with Intelligent</div>
-            <div className="mt-1 text-xs leading-5 text-neutral-400">
+            <div className="mt-1 text-xs leading-5 text-neutral-500">
               Structure your moves, remove hesitation, and make consistent progress.
             </div>
           </button>
@@ -6773,12 +6773,12 @@ What are we working on?"
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Structured LIVE</p>
                 <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a structured LIVE session.</p>
-                <p className="mt-1 text-[11px] leading-5 text-neutral-400">Structured LIVE continuity is not active yet.</p>
+                <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE continuity is not active yet.</p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-400 transition hover:border-white/25 hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-[#7C8CFF]/10 hover:text-white"
               >
                 Close
               </button>
