@@ -20,6 +20,7 @@ import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-m
 import { orchestrateLiveTurn } from '@/lib/george/live-voice/runtime/orchestrator'
 import { georgeCancelEngine } from '@/lib/george/live-voice/runtime/cancel-engine'
 import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
+import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LivePacket = {
@@ -492,12 +493,18 @@ function isForceIntervention(text: string) {
             timestamp: Date.now(),
           })
 
+          const inferredRole = inferSpeakerRole(text, inferredSpeaker.speaker)
+
           transcriptBuffer.add({
             id: crypto.randomUUID(),
             text,
             speaker: inferredSpeaker.speaker,
+            role: inferredRole.role,
+            roleConfidence: inferredRole.confidence,
             createdAt: Date.now(),
           })
+
+          pushLog(`Speaker role: ${inferredRole.role} (${Math.round(inferredRole.confidence * 100)}%)`)
 
           setShadowMap(transcriptBuffer.buildShadowMap())
 
@@ -754,12 +761,18 @@ function isForceIntervention(text: string) {
         timestamp: receivedAt,
       })
 
+      const inferredRole = inferSpeakerRole(line, inferredSpeaker.speaker)
+
       transcriptBuffer.add({
         id: crypto.randomUUID(),
         text: line,
         speaker: inferredSpeaker.speaker,
+        role: inferredRole.role,
+        roleConfidence: inferredRole.confidence,
         createdAt: receivedAt,
       })
+
+      pushLog(`Scenario role: ${inferredRole.role} (${Math.round(inferredRole.confidence * 100)}%)`)
 
       const nextShadowMap = transcriptBuffer.buildShadowMap()
       setShadowMap(nextShadowMap)

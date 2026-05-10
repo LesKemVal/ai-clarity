@@ -1,7 +1,11 @@
+import type { SpeakerRole } from './speaker-role'
+
 export type TranscriptEvent = {
   id: string
   text: string
   speaker: 'other_party' | 'user' | 'unclear'
+  role?: SpeakerRole
+  roleConfidence?: number
   createdAt: number
 }
 
@@ -33,7 +37,10 @@ class TranscriptBuffer {
     const joined = this.events
       .slice(0, 20)
       .reverse()
-      .map((e) => `[${e.speaker}] ${e.text}`)
+      .map((e) => {
+        const role = e.role ? `[${e.role}]` : ''
+        return `[${e.speaker}]${role} ${e.text}`
+      })
       .join('\n')
 
     return joined
