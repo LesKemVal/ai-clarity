@@ -4243,12 +4243,12 @@ return (
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-4 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="flex min-h-[165px] flex-col items-center justify-start px-4 pt-8 md:hidden">
-      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[28px] md:text-3xl font-bold tracking-[0.08em] text-transparent">
+    <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
+      <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[24px] md:text-3xl font-semibold tracking-[0.06em] text-transparent">
         GEORGE
       </div>
 
-      <div className="mt-2 text-center text-[12px] tracking-[0.22em] text-neutral-400">
+      <div className="mt-1.5 text-center text-[11px] tracking-[0.18em] text-neutral-500">
         Smart. Intelligent. Brilliant.
       </div>
 
