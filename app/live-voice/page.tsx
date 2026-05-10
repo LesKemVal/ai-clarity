@@ -599,10 +599,11 @@ function isForceIntervention(text: string) {
             pushLog(`Objective anchor: ${activeObjective.anchor}`)
 
             if (
+              liveTier === 'brilliant' &&
               orchestrated.runtimeSnapshot.interventionUrgency === 'high'
             ) {
               orchestrated.silence.shouldHold = false
-              pushLog('Escalation override bypassed hold state.')
+              pushLog('Brilliant escalation override bypassed hold state.')
             }
 
             if (orchestrated.silence.shouldHold) {
