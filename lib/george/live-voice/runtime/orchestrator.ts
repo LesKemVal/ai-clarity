@@ -215,6 +215,7 @@ export function orchestrateLiveTurn(
         ? 'high'
         : nextPacket.roomPressure,
     speaker: nextPacket.speaker,
+    strongestRolePressure,
   })
 
   nextPacket.volley = reinforceObjective(

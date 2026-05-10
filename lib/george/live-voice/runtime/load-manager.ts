@@ -5,6 +5,7 @@ export type LoadInput = {
   interruptionRisk?: number
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   speaker?: 'other_party' | 'user' | 'george_instruction' | 'unclear'
+  strongestRolePressure?: [string, number]
 }
 
 export type LoadDecision = {
@@ -18,6 +19,43 @@ class GeorgeLoadManager {
   decide(input: LoadInput): LoadDecision {
     const confidence = input.confidence ?? 0.5
     const interruptionRisk = input.interruptionRisk ?? 0
+    const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
+
+    if (role === 'authority' && rolePressure > 1.2) {
+      return {
+        state: 'overload',
+        maxWords: 5,
+        cadence: 'minimal',
+        reason: 'Authority pressure persisting. Minimal cue.',
+      }
+    }
+
+    if (role === 'skeptic' && rolePressure > 1.4) {
+      return {
+        state: 'high',
+        maxWords: 6,
+        cadence: 'minimal',
+        reason: 'Skeptic pressure persisting. Proof must be compressed.',
+      }
+    }
+
+    if (role === 'gatekeeper' && rolePressure > 1.4) {
+      return {
+        state: 'high',
+        maxWords: 7,
+        cadence: 'minimal',
+        reason: 'Gatekeeper pressure persisting. Reduce friction.',
+      }
+    }
+
+    if (role === 'ally' && rolePressure > 1.2 && interruptionRisk < 0.55) {
+      return {
+        state: 'managed',
+        maxWords: 10,
+        cadence: 'normal',
+        reason: 'Ally opening detected. Use room without crowding.',
+      }
+    }
 
     if (input.roomPressure === 'authority') {
       return {
