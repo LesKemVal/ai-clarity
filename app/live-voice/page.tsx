@@ -649,7 +649,7 @@ function isForceIntervention(text: string) {
             ) &&
             (
               forcedIntervention ||
-              georgeTurnManager.canGeorgeSpeak()
+              shouldQueueByRuntime
             ) &&
             georgeSilenceDetector.isSilenceWindow()
           ) {
