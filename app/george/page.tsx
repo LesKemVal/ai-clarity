@@ -4142,7 +4142,7 @@ return (
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/5 bg-black/96 backdrop-blur-xl px-4 py-1.5 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
+            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82 backdrop-blur-2xl px-4 py-1.5 transition duration-200 ${showSidebar ? "z-10 md:z-50" : "z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-3 xl:hidden">
                   <button
@@ -4150,7 +4150,7 @@ return (
                     onClick={() => setShowSidebar(true)}
                     onTouchStart={() => setShowSidebar(true)}
                     onPointerDown={() => setShowSidebar(true)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black text-[#7C8CFF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
                     aria-label="Open menu"
                   >
                     <span className="flex flex-col items-center justify-center gap-[3px]">
@@ -4160,7 +4160,7 @@ return (
                     </span>
                   </button>
 
-                  <span className="text-[12px] font-medium uppercase tracking-[0.28em] text-white/28">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-white/22">
                     GEORGE
                   </span>
                 </div>
@@ -4171,7 +4171,7 @@ return (
 
                   <div className="flex justify-center">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[12px] font-medium uppercase tracking-[0.18em] text-white/18">
+                      <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/20">
                         GEORGE
                       </span>
                       {!showMobileHero && (
@@ -4189,7 +4189,7 @@ return (
                     <button
                       type="button"
                       onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white"
+                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white"
                       aria-label="Share George"
                       title="Share George"
                     >
@@ -4201,7 +4201,7 @@ return (
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#d7dcff] drop-shadow-[0_0_10px_rgba(124,140,255,0.28)] transition hover:text-white xl:hidden"
+                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white xl:hidden"
                   aria-label="Share George"
                   title="Share George"
                 >
