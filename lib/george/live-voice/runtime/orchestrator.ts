@@ -152,23 +152,33 @@ export function orchestrateLiveTurn(
 
   const controlSnapshot = georgeTurnManager.getControlSnapshot()
 
+  const normalizedRoomPressure =
+    powerState.frame === 'authority_controls' ||
+    trajectoryState.trajectory === 'authority_risk'
+      ? 'authority'
+      : velocityState.velocity === 'spiking'
+        ? 'high'
+        : nextPacket.roomPressure
+
+  const normalizedPressureReasons = [
+    powerState.frame === 'other_party_controls' ? 'other-party-control' : '',
+    trajectoryState.recommendedAction === 'hold' ? 'trajectory-hold' : '',
+    decisionWindow.action === 'hold' ? 'decision-hold' : '',
+    pressureMemory.fatigueScore > 0.72 ? 'fatigue' : '',
+    recoveryState.shouldReset ? 'recovery-reset' : '',
+    controlSnapshot.owner === 'other_party' ? 'other-party-floor' : '',
+    velocityState.velocity === 'spiking' ? 'velocity-spike' : '',
+  ].filter(Boolean)
+
+  const normalizedInterruptionRisk = normalizedPressureReasons.length
+    ? Math.max(nextPacket.interruptionRisk || 0, 0.84)
+    : nextPacket.interruptionRisk
+
   const postureDecision = georgePostureEngine.decide({
     dominantRole: dominantRoleState.role,
     speaker: nextPacket.speaker,
-    roomPressure:
-      powerState.frame === 'authority_controls' ||
-      trajectoryState.trajectory === 'authority_risk'
-        ? 'authority'
-        : nextPacket.roomPressure,
-    interruptionRisk:
-      powerState.frame === 'other_party_controls' ||
-      trajectoryState.recommendedAction === 'hold' ||
-      decisionWindow.action === 'hold' ||
-      pressureMemory.fatigueScore > 0.72 ||
-      recoveryState.shouldReset ||
-      controlSnapshot.owner === 'other_party'
-        ? Math.max(nextPacket.interruptionRisk || 0, 0.82)
-        : nextPacket.interruptionRisk,
+    roomPressure: normalizedRoomPressure,
+    interruptionRisk: normalizedInterruptionRisk,
     confidence: nextPacket.confidence,
     emotionalVelocity: velocityState.velocity,
   })
@@ -226,17 +236,8 @@ export function orchestrateLiveTurn(
 
   const loadDecision = georgeLoadManager.decide({
     confidence: nextPacket.confidence,
-    interruptionRisk:
-      postureDecision.posture === 'silent' ||
-      velocityState.velocity === 'spiking' ||
-      pressureMemory.fatigueScore > 0.72 ||
-      controlSnapshot.owner === 'other_party'
-        ? Math.max(nextPacket.interruptionRisk || 0, 0.85)
-        : nextPacket.interruptionRisk,
-    roomPressure:
-      velocityState.velocity === 'spiking'
-        ? 'high'
-        : nextPacket.roomPressure,
+    interruptionRisk: normalizedInterruptionRisk,
+    roomPressure: normalizedRoomPressure,
     speaker: nextPacket.speaker,
     strongestRolePressure,
     forecastBias,
@@ -279,7 +280,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Forecast bias: ${forecastBias}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Forecast bias: ${forecastBias}. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -317,14 +318,8 @@ export function orchestrateLiveTurn(
 
   const silence = georgeSilenceIntelligence.decide({
     confidence: nextPacket.confidence,
-    interruptionRisk:
-      decisionWindow.action === 'hold' ||
-      pressureMemory.fatigueScore > 0.72 ||
-      controlSnapshot.owner === 'other_party' ||
-      nextPacket.status?.includes('Interaction is accelerating toward conflict')
-        ? Math.max(nextPacket.interruptionRisk || 0, 0.86)
-        : nextPacket.interruptionRisk,
-    roomPressure: nextPacket.roomPressure,
+    interruptionRisk: normalizedInterruptionRisk,
+    roomPressure: normalizedRoomPressure,
     speaker: nextPacket.speaker,
     deliveryProfile: deliveryProfileId,
     controlOwner: controlSnapshot.owner,
