@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type RecoveryState =
   | 'stable'
   | 'overexplaining'
@@ -25,10 +27,9 @@ export type RecoveryDecision = {
 class GeorgeRecoveryEngine {
   detect(input: RecoveryInput): RecoveryDecision {
     const text = input.text.toLowerCase()
+    const signals = detectConversationSignals(text)
 
-    if (
-      /sorry|i just|what i meant|let me explain|that's not what i meant/i.test(text)
-    ) {
+    if (signals.has('defensive_language')) {
       return {
         state: 'defensive_spiral',
         repair: 'Shorten. Re-center. One clean sentence.',
@@ -71,7 +72,7 @@ class GeorgeRecoveryEngine {
       }
     }
 
-    if (/...|uh|um|hold on/i.test(text)) {
+    if (/\.\.\.|uh|um/i.test(text) || signals.has('interruption_attempt')) {
       return {
         state: 'awkward_silence',
         repair: 'Do not rush to fill silence.',

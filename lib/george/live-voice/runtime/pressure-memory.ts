@@ -1,3 +1,5 @@
+import { detectConversationSignals } from './conversation-signals'
+
 export type PressureMemoryInput = {
   text: string
   trajectory?: string
@@ -63,6 +65,7 @@ class GeorgePressureMemory {
 
   update(input: PressureMemoryInput): PressureMemoryState {
     const text = input.text.toLowerCase()
+    const signals = detectConversationSignals(text)
     const persistentMemory =
       input.memoryWindow && input.memoryWindow >= 10
 
@@ -81,7 +84,7 @@ class GeorgePressureMemory {
     }
 
     if (
-      /wait|hold on|stop|listen|no\b|let me finish/i.test(text) ||
+      signals.has('interruption_attempt') ||
       (input.interruptionRisk || 0) > 0.78
     ) {
       this.interruptionTurns += 1
@@ -100,7 +103,7 @@ class GeorgePressureMemory {
 
     if (
       input.recovery === 'defensive_spiral' ||
-      /sorry|i just|let me explain|what i meant/i.test(text)
+      signals.has('defensive_language')
     ) {
       this.overexplainTurns += 1
     } else {
