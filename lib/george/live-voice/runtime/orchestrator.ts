@@ -117,6 +117,7 @@ export function orchestrateLiveTurn(
     roomPressure: nextPacket.roomPressure,
     interruptionRisk: nextPacket.interruptionRisk,
     decisionAction: decisionWindow.action,
+    memoryWindow: runtimeConfig.memoryWindow,
   })
 
   const controlSnapshot = georgeTurnManager.getControlSnapshot()

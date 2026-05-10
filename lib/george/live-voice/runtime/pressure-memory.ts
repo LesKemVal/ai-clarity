@@ -5,6 +5,7 @@ export type PressureMemoryInput = {
   roomPressure?: string
   interruptionRisk?: number
   decisionAction?: string
+  memoryWindow?: number
 }
 
 export type PressureMemoryState = {
@@ -24,6 +25,7 @@ class GeorgePressureMemory {
 
   update(input: PressureMemoryInput): PressureMemoryState {
     const text = input.text.toLowerCase()
+    const decayStep = input.memoryWindow && input.memoryWindow >= 10 ? 0.5 : 1
 
     if (
       input.roomPressure === 'high' ||
@@ -33,7 +35,7 @@ class GeorgePressureMemory {
     ) {
       this.tensionTurns += 1
     } else {
-      this.tensionTurns = Math.max(0, this.tensionTurns - 1)
+      this.tensionTurns = Math.max(0, this.tensionTurns - decayStep)
     }
 
     if (
@@ -42,7 +44,7 @@ class GeorgePressureMemory {
     ) {
       this.interruptionTurns += 1
     } else {
-      this.interruptionTurns = Math.max(0, this.interruptionTurns - 1)
+      this.interruptionTurns = Math.max(0, this.interruptionTurns - decayStep)
     }
 
     if (
@@ -51,7 +53,7 @@ class GeorgePressureMemory {
     ) {
       this.failedCloseTurns += 1
     } else {
-      this.failedCloseTurns = Math.max(0, this.failedCloseTurns - 1)
+      this.failedCloseTurns = Math.max(0, this.failedCloseTurns - decayStep)
     }
 
     if (
@@ -60,7 +62,7 @@ class GeorgePressureMemory {
     ) {
       this.overexplainTurns += 1
     } else {
-      this.overexplainTurns = Math.max(0, this.overexplainTurns - 1)
+      this.overexplainTurns = Math.max(0, this.overexplainTurns - decayStep)
     }
 
     const fatigueScore = Math.min(
