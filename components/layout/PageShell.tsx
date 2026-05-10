@@ -81,7 +81,7 @@ export default function PageShell({
   }
 
   return (
-    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-gradient-to-b from-black via-neutral-950 to-black text-neutral-100">
+    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {withSidebar && showSidebar && (
           <div

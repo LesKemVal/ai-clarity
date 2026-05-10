@@ -131,10 +131,10 @@ export default function TopUpPage() {
   return (
     <PageShell backToGeorge withSidebar={false}>
       <div className="space-y-8">
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <div className="max-w-5xl space-y-6">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
-              BRANESx Beta
+              BRANESx
             </p>
 
             <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
@@ -150,7 +150,7 @@ export default function TopUpPage() {
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-4">
-              <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
+              <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
@@ -189,7 +189,7 @@ export default function TopUpPage() {
                 </button>
               </div>
 
-              <div className="rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
+              <div className="rounded-[1.8rem] border border-white/10 bg-[#171B26]/46 p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
@@ -212,7 +212,7 @@ export default function TopUpPage() {
                 </button>
               </div>
 
-              <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_0_40px_rgba(34,197,94,0.08)]">
+              <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
@@ -241,7 +241,7 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="feedback" className="scroll-mt-24 rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div id="feedback" className="scroll-mt-24 rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Comments and suggestions</p>
               <p className="text-sm leading-7 text-neutral-300">
@@ -251,7 +251,7 @@ export default function TopUpPage() {
               <select
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none"
+                className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none"
               >
                 <option value="suggestion">Suggestion</option>
                 <option value="bug">Bug</option>
@@ -264,7 +264,7 @@ export default function TopUpPage() {
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={6}
                 placeholder="What should change?"
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
               />
 
               <button
