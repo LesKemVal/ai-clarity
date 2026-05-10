@@ -5337,20 +5337,36 @@ if (liveMode) {
       className="fixed inset-0 z-[240] bg-black/64 backdrop-blur-[12px]"
     />
 
-    <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[390px] rounded-[1.6rem] border border-[#7C8CFF]/30 bg-black/95 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.78),0_0_34px_rgba(124,140,255,0.12)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
-        <div className="mb-2 text-[10px] uppercase tracking-[0.24em] text-[#7C8CFF]">
+    <div className="fixed inset-0 z-[250] flex items-center justify-center px-5">
+      <div className="w-full max-w-[620px] rounded-[2rem] border border-[#7C8CFF]/28 bg-black/96 p-7 shadow-[0_40px_120px_rgba(0,0,0,0.82),0_0_44px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+        <div className="mb-3 text-[11px] uppercase tracking-[0.32em] text-[#7C8CFF]">
           LIVE CONVERSATION
         </div>
 
-        <div className="text-[16px] font-semibold text-white">
+        <div className="max-w-[520px] text-[28px] font-semibold leading-[1.15] tracking-[-0.03em] text-white">
           {LIVE_SEGUES[liveSegueIndex]?.title || 'LIVE listens with you.'}
         </div>
 
-        <div className="mt-3 text-[12px] leading-5 text-white/62">
+        <div className="mt-4 max-w-[560px] text-[15px] leading-7 text-white/68">
           {currentTier === 'smart'
-            ? 'LIVE Conversation is built for real-time guidance while life is happening. Upgrade to access LIVE mode.'
+            ? 'LIVE Conversation is built for real-time guidance while life is happening. Upgrade or enter a founder code to access LIVE mode.'
             : LIVE_SEGUES[liveSegueIndex]?.body}
+        </div>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          {[
+            'Real-time response help',
+            'Timing, pressure, and escalation cues',
+            'Interviews, negotiation, conflict, sales',
+            'Best with one earbud'
+          ].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-[12px] leading-5 text-white/68"
+            >
+              {item}
+            </div>
+          ))}
         </div>
 
         {currentTier === 'smart' && (
