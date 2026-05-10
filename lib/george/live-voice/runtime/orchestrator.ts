@@ -151,7 +151,7 @@ export function orchestrateLiveTurn(
     controlSnapshot.owner === 'other_party'
   ) {
     leverageState = 'user_losing_leverage'
-    escalationLikelihood += 0.28
+    escalationLikelihood += runtimeConfig.allowTrajectoryPrediction ? 0.28 : 0.16
   }
 
   if (
@@ -166,7 +166,7 @@ export function orchestrateLiveTurn(
     trajectoryState.trajectory === 'escalating_conflict' ||
     velocityState.velocity === 'spiking'
   ) {
-    escalationLikelihood += 0.38
+    escalationLikelihood += runtimeConfig.allowAggressiveIntervention ? 0.38 : 0.22
   }
 
   escalationLikelihood = Math.max(
