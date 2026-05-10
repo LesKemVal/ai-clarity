@@ -1010,6 +1010,9 @@ const [isListening, setIsListening] = useState(false)
   const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
   const [showLiveSegue, setShowLiveSegue] = useState(false)
   const [liveSegueIndex, setLiveSegueIndex] = useState(0)
+  const [showAccessCodeEntry, setShowAccessCodeEntry] = useState(false)
+  const [accessCode, setAccessCode] = useState('')
+  const [accessCodeError, setAccessCodeError] = useState('')
   const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
@@ -1045,6 +1048,42 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [memoryVersion, setMemoryVersion] = useState(0)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
+
+  const ACCESS_CODES: Record<string, 'intelligent' | 'brilliant'> = {
+    ...Object.fromEntries(
+      Array.from({ length: 100 }, (_, index) => [
+        `INTEL-FOUNDER-${String(index + 1).padStart(3, '0')}`,
+        'intelligent' as const,
+      ])
+    ),
+    'BRILLIANT-FOUNDERS': 'brilliant',
+  }
+
+  const redeemAccessCode = () => {
+    const normalized = accessCode.trim().toUpperCase()
+
+    const tier = ACCESS_CODES[normalized]
+
+    if (!tier) {
+      setAccessCodeError('Invalid access code.')
+      return
+    }
+
+    setCurrentTier(tier)
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('george_tier', tier)
+    }
+
+    setAccessCode('')
+    setAccessCodeError('')
+    setShowAccessCodeEntry(false)
+    setShowLiveSegue(false)
+
+    setTimeout(() => {
+      setShowLiveEntryChoice(true)
+    }, 180)
+  }
 
   const LIVE_SEGUES = [
     {
@@ -5313,6 +5352,49 @@ if (liveMode) {
             ? 'LIVE Conversation is built for real-time guidance while life is happening. Upgrade to access LIVE mode.'
             : LIVE_SEGUES[liveSegueIndex]?.body}
         </div>
+
+        {currentTier === 'smart' && (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-3">
+            <button
+              type="button"
+              onClick={() => setShowAccessCodeEntry((value) => !value)}
+              className="w-full text-left text-[12px] font-medium text-white/70 transition hover:text-white"
+            >
+              Have an access code?
+            </button>
+
+            {showAccessCodeEntry && (
+              <div className="mt-3 space-y-2">
+                <input
+                  value={accessCode}
+                  onChange={(event) => {
+                    setAccessCode(event.target.value)
+                    setAccessCodeError('')
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') redeemAccessCode()
+                  }}
+                  placeholder="Enter access code"
+                  className="w-full rounded-xl border border-[#7C8CFF]/18 bg-black/50 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#7C8CFF]/45"
+                />
+
+                {accessCodeError && (
+                  <div className="text-[11px] text-red-300">
+                    {accessCodeError}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={redeemAccessCode}
+                  className="w-full rounded-xl border border-[#7C8CFF]/28 bg-[#7C8CFF]/12 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#7C8CFF]/18"
+                >
+                  Unlock access
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mt-5 flex gap-2">
           {currentTier === 'smart' ? (
