@@ -202,6 +202,12 @@ class GeorgeResponseShaper {
       reasons.push('policy calm tone')
     }
 
+    if (input.deliveryStyle === 'proof') {
+      volley = this.forceProof(volley)
+      cue = this.prependCue(cue, 'Lead with proof.')
+      reasons.push('policy proof delivery')
+    }
+
     return {
       volley,
       cue,
