@@ -16,6 +16,30 @@ export type SilenceDecisionInput = {
   intervention?: string
 }
 
+type ModeTimingProfile = {
+  floorHoldMs: number
+  invitationMs: number
+  proofHoldMs: number
+  interruptionTolerance: number
+}
+
+function getModeTimingProfile(responseMode?: string): ModeTimingProfile {
+  switch (responseMode) {
+    case 'authority':
+      return { floorHoldMs: 1600, invitationMs: 650, proofHoldMs: 1900, interruptionTolerance: 0.72 }
+    case 'proof':
+      return { floorHoldMs: 2100, invitationMs: 900, proofHoldMs: 2400, interruptionTolerance: 0.7 }
+    case 'hold_floor':
+      return { floorHoldMs: 2600, invitationMs: 1200, proofHoldMs: 2400, interruptionTolerance: 0.62 }
+    case 'opening':
+      return { floorHoldMs: 1500, invitationMs: 550, proofHoldMs: 1800, interruptionTolerance: 0.8 }
+    case 'resistance':
+      return { floorHoldMs: 2300, invitationMs: 1000, proofHoldMs: 2300, interruptionTolerance: 0.66 }
+    default:
+      return { floorHoldMs: 1800, invitationMs: 700, proofHoldMs: 2000, interruptionTolerance: 0.78 }
+  }
+}
+
 export type SilenceDecision = {
   shouldHold: boolean
   reason: string
@@ -43,6 +67,7 @@ class GeorgeSilenceIntelligence {
     const msSinceSpeech = input.msSinceSpeech ?? 0
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
     const forecastBias = input.forecastBias ?? 'none'
+    const timing = getModeTimingProfile(input.responseMode)
     const pauseType = this.classifyPause(input, role, rolePressure)
 
     if (input.forcedIntervention) {
@@ -67,7 +92,7 @@ class GeorgeSilenceIntelligence {
       role === 'authority' &&
       rolePressure > 1.2 &&
       input.controlOwner === 'other_party' &&
-      msSinceSpeech < 2400
+      msSinceSpeech < timing.floorHoldMs
     ) {
       return {
         shouldHold: true,
@@ -81,7 +106,7 @@ class GeorgeSilenceIntelligence {
       role === 'skeptic' &&
       rolePressure > 1.4 &&
       input.controlOwner === 'other_party' &&
-      msSinceSpeech < 2000
+      msSinceSpeech < timing.proofHoldMs
     ) {
       return {
         shouldHold: true,
@@ -95,7 +120,7 @@ class GeorgeSilenceIntelligence {
       role === 'gatekeeper' &&
       rolePressure > 1.4 &&
       input.controlOwner === 'other_party' &&
-      msSinceSpeech < 2200
+      msSinceSpeech < timing.floorHoldMs
     ) {
       return {
         shouldHold: true,
@@ -122,7 +147,7 @@ class GeorgeSilenceIntelligence {
     if (
       forecastBias === 'hold' &&
       input.controlOwner === 'other_party' &&
-      msSinceSpeech < 2400
+      msSinceSpeech < timing.floorHoldMs
     ) {
       return {
         shouldHold: true,
@@ -136,7 +161,7 @@ class GeorgeSilenceIntelligence {
       forecastBias === 'support' &&
       input.controlOwner !== 'other_party' &&
       confidence >= 0.5 &&
-      msSinceSpeech > 900
+      msSinceSpeech > timing.invitationMs
     ) {
       return {
         shouldHold: false,
@@ -150,7 +175,7 @@ class GeorgeSilenceIntelligence {
       forecastBias === 'advance' &&
       input.controlOwner !== 'other_party' &&
       confidence >= 0.5 &&
-      msSinceSpeech > 700
+      msSinceSpeech > timing.invitationMs
     ) {
       return {
         shouldHold: false,
@@ -185,7 +210,7 @@ class GeorgeSilenceIntelligence {
 
     if (
       input.controlOwner === 'other_party' &&
-      msSinceSpeech < 1800
+      msSinceSpeech < timing.floorHoldMs
     ) {
       return {
         shouldHold: true,
