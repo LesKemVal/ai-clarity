@@ -303,7 +303,18 @@ function isForceIntervention(text: string) {
     })
 
     if (!res.ok) {
-      pushLog('TTS unavailable. Check ElevenLabs env vars.')
+      pushLog('ElevenLabs unavailable. Falling back to browser voice.')
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        const utterance = new SpeechSynthesisUtterance(deliverable)
+        utterance.rate = 1
+        utterance.pitch = 1
+        utterance.volume = deliveryProfile.volume
+        window.speechSynthesis.speak(utterance)
+      }
+
+      georgeTurnManager.markIdle()
       return
     }
 
