@@ -6012,8 +6012,8 @@ Choose one:
                     />
 
                     {(isThinking || isSpeaking) && (
-                      <span className="shrink-0 text-[10px] text-white/30 tracking-[0.18em]">
-                        {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : 'SPEAKING'}
+                      <span className="shrink-0 text-[10px] text-white/24 tracking-[0.16em]">
+                        {isThinking ? `WORKING${'.'.repeat(thinkingDots)}` : 'VOICE'}
                       </span>
                     )}
 
@@ -6278,13 +6278,13 @@ Choose one:
 
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
-    <div className="text-[11px] text-white/30 tracking-[0.18em]">
+    <div className="text-[10px] text-white/24 tracking-[0.16em]">
       {isThinking ? (
-        <>THINKING{'.'.repeat(thinkingDots)}</>
+        <>WORKING{'.'.repeat(thinkingDots)}</>
       ) : isSpeaking ? (
-        <>SPEAKING…</>
+        <>VOICE…</>
       ) : (
-        <>PROCESSING…</>
+        <>MOVING…</>
       )}
     </div>
   </div>
