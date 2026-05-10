@@ -24,6 +24,8 @@ export type LiveRuntimeSnapshot = {
   leverageState?: string
   escalationLikelihood?: number
   interventionUrgency?: string
+  dominantRole?: string
+  dominantRoleScore?: number
 }
 
 const EMPTY_STATE: LiveRuntimeSnapshot = {
@@ -52,6 +54,8 @@ const EMPTY_STATE: LiveRuntimeSnapshot = {
   leverageState: 'stable',
   escalationLikelihood: 0,
   interventionUrgency: 'low',
+  dominantRole: 'neutral',
+  dominantRoleScore: 0,
 }
 
 class GeorgeLiveRuntimeState {

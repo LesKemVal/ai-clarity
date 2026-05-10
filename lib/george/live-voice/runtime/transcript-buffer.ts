@@ -29,6 +29,35 @@ class TranscriptBuffer {
     return this.events[0] || null
   }
 
+  getDominantRole(window = 8) {
+    const scores = new Map<SpeakerRole, number>()
+
+    this.events.slice(0, window).forEach((event, index) => {
+      if (!event.role || event.role === 'user' || event.role === 'unclear') return
+
+      const recencyWeight = 1 / (index + 1)
+      const confidence = event.roleConfidence ?? 0.5
+      const current = scores.get(event.role) || 0
+
+      scores.set(event.role, current + confidence * recencyWeight)
+    })
+
+    let dominantRole: SpeakerRole | null = null
+    let dominantScore = 0
+
+    scores.forEach((score, role) => {
+      if (score > dominantScore) {
+        dominantRole = role
+        dominantScore = score
+      }
+    })
+
+    return {
+      role: dominantRole,
+      score: Number(dominantScore.toFixed(2)),
+    }
+  }
+
   clear() {
     this.events = []
   }

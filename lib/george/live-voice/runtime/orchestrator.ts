@@ -18,6 +18,7 @@ import { georgeDecisionWindow } from './decision-window'
 import { georgePressureMemory } from './pressure-memory'
 import { georgeResponseShaper } from './response-shaper'
 import { georgeTurnManager } from './turn-manager'
+import { transcriptBuffer } from './transcript-buffer'
 import { georgeSilenceDetector } from './silence-detector'
 
 export type OrchestratorPacket = {
@@ -122,7 +123,10 @@ export function orchestrateLiveTurn(
 
   const controlSnapshot = georgeTurnManager.getControlSnapshot()
 
+  const dominantRoleState = transcriptBuffer.getDominantRole()
+
   const postureDecision = georgePostureEngine.decide({
+    dominantRole: dominantRoleState.role,
     speaker: nextPacket.speaker,
     roomPressure:
       powerState.frame === 'authority_controls' ||
@@ -243,7 +247,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -272,6 +276,8 @@ export function orchestrateLiveTurn(
     leverageState,
     escalationLikelihood,
     interventionUrgency,
+    dominantRole: dominantRoleState.role ?? 'neutral',
+    dominantRoleScore: dominantRoleState.score,
   })
 
   const silence = georgeSilenceIntelligence.decide({

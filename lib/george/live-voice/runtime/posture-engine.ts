@@ -12,6 +12,7 @@ export type PostureInput = {
   interruptionRisk?: number
   confidence?: number
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
+  dominantRole?: string | null
 }
 
 export type PostureDecision = {
@@ -24,6 +25,38 @@ class GeorgePostureEngine {
   decide(input: PostureInput): PostureDecision {
     const interruptionRisk = input.interruptionRisk ?? 0
     const confidence = input.confidence ?? 0.5
+
+    if (input.dominantRole === 'authority') {
+      return {
+        posture: 'deferential',
+        cuePrefix: 'Respectfully.',
+        reason: 'Authority speaker is dominating the room.',
+      }
+    }
+
+    if (input.dominantRole === 'skeptic') {
+      return {
+        posture: 'directing',
+        cuePrefix: 'Answer with proof.',
+        reason: 'Skeptic pressure is dominating the room.',
+      }
+    }
+
+    if (input.dominantRole === 'gatekeeper') {
+      return {
+        posture: 'calming',
+        cuePrefix: 'Reduce friction.',
+        reason: 'Gatekeeper pressure is controlling access.',
+      }
+    }
+
+    if (input.dominantRole === 'ally') {
+      return {
+        posture: 'directing',
+        cuePrefix: 'Use the opening.',
+        reason: 'Ally signal detected. Move cleanly.',
+      }
+    }
 
     if (input.roomPressure === 'authority') {
       return {
