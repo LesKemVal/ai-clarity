@@ -4469,7 +4469,7 @@ I am listening now. Speak naturally. I will respond ${
             <span className="text-[10px] tracking-[0.12em] text-white/62">REWORD</span>
             <button
               onClick={() => setRewordPopupIndex(null)}
-              className="text-white/40 hover:text-white transition text-[12px]"
+              className="text-white/30 hover:text-white transition text-[12px]"
             >
               ✕
             </button>
@@ -4602,7 +4602,7 @@ Cue:`)
             <span className="text-[10px] tracking-[0.12em] text-white/62">TONE</span>
             <button
               onClick={() => setTonePopupIndex(null)}
-              className="text-white/40 hover:text-white transition text-[12px]"
+              className="text-white/30 hover:text-white transition text-[12px]"
             >
               ✕
             </button>
@@ -5103,7 +5103,7 @@ if (liveMode) {
                 })}
               </div>
             ) : (
-              <div className="text-[13px] text-white/40">
+              <div className="text-[13px] text-white/30">
                 No saved memories yet
               </div>
             )}
@@ -5115,7 +5115,7 @@ if (liveMode) {
                   <button
                     type="button"
                     onClick={() => setActiveMemoryFolder(null)}
-                    className="text-white/40 transition hover:text-white"
+                    className="text-white/30 transition hover:text-white"
                   >
                     Back
                   </button>
@@ -6012,7 +6012,7 @@ Choose one:
                     />
 
                     {(isThinking || isSpeaking) && (
-                      <span className="shrink-0 text-[10px] text-white/40 tracking-[0.18em]">
+                      <span className="shrink-0 text-[10px] text-white/30 tracking-[0.18em]">
                         {isThinking ? `THINKING${'.'.repeat(thinkingDots)}` : 'SPEAKING'}
                       </span>
                     )}
@@ -6270,15 +6270,15 @@ Choose one:
                 )
               })()}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[112px] bg-black" />
-              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-black to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[112px] bg-[#0B0D12]" />
+              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
 
               
 
 
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
-    <div className="text-[11px] text-white/40 tracking-[0.18em]">
+    <div className="text-[11px] text-white/30 tracking-[0.18em]">
       {isThinking ? (
         <>THINKING{'.'.repeat(thinkingDots)}</>
       ) : isSpeaking ? (
@@ -6292,7 +6292,7 @@ Choose one:
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:top-[58%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:top-[58%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/88 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/96 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.95rem] border border-white/[0.08] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
 
                       <input
