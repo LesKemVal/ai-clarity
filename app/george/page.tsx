@@ -560,7 +560,7 @@ Ready?`
           text: 'Want to get something done? GEORGE is your guide.',
           url,
         }).catch(() => {
-          setToastMessage('iPhone: Share → Edit Actions → Add to Home Screen')
+          setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
           setShowToast(true)
         })
         return
@@ -569,7 +569,7 @@ Ready?`
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(url).catch(() => {})
       }
-      setToastMessage('iPhone: Share → Edit Actions → Add to Home Screen')
+      setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
       setShowToast(true)
       return
     }
@@ -2795,7 +2795,7 @@ if (activePromptContext || activePromptLabel) {
           context: 'constraints',
         },
         {
-          label: 'Simplify',
+          label: 'Clarify',
           text: 'Can we simplify this into one clear move?',
           context: 'simplify',
         },
@@ -4190,8 +4190,8 @@ return (
                       type="button"
                       onClick={handleInstallGeorge}
                       className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white"
-                      aria-label="Share George"
-                      title="Share George"
+                      aria-label="Send George"
+                      title="Send George"
                     >
                       <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
@@ -4202,8 +4202,8 @@ return (
                   type="button"
                   onClick={handleInstallGeorge}
                   className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#C7D0FF]/72 transition hover:text-white xl:hidden"
-                  aria-label="Share George"
-                  title="Share George"
+                  aria-label="Send George"
+                  title="Send George"
                 >
                       <span className="tracking-[0.18em] uppercase">SHARE <span className="text-[#7C8CFF]">G.</span></span>
                     </button>
@@ -4379,7 +4379,7 @@ I am listening now. Speak naturally. I will respond ${
       )}
 
       {(m.role === 'user' || isWelcomeAssistant) && (
-        <div className="flex items-center gap-2 text-white/85">
+        <div className="flex items-center gap-1.5 text-white/72">
           <button
             type="button"
             onClick={() => {
@@ -4389,14 +4389,14 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'up'
-                ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
-                : 'text-white/85 hover:text-white'
+                ? 'text-[#AEB6FF]'
+                : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs up"
           >
             <svg
               viewBox="0 0 24 24"
-              className="h-[18px] w-[18px]"
+              className="h-[17px] w-[17px]"
               fill={feedback[i] === 'up' ? 'currentColor' : 'none'}
               stroke="currentColor"
               strokeWidth="1.9"
@@ -4418,14 +4418,14 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'down'
-                ? 'text-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]'
-                : 'text-white/85 hover:text-white'
+                ? 'text-red-200'
+                : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs down"
           >
             <svg
               viewBox="0 0 24 24"
-              className="h-[18px] w-[18px]"
+              className="h-[17px] w-[17px]"
               fill={feedback[i] === 'down' ? 'currentColor' : 'none'}
               stroke="currentColor"
               strokeWidth="1.9"
@@ -4441,7 +4441,7 @@ I am listening now. Speak naturally. I will respond ${
       )}
 
       {m.role === 'assistant' && (
-        <div className="relative space-y-2">
+        <div className="relative space-y-1.5">
 
           {false && (isLatestAssistant && liveMode) && (
   <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-white/55">
@@ -4766,19 +4766,19 @@ router.push('/george')
               }}
               className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
-              Share
+              Send
             </button>
 
             <button
               type="button"
               onClick={() => {
-                const prompt = "Simplify your last response into plain language with only what matters most."
-                setConversationSignal('Simplifying…')
+                const prompt = "Clarify your last response into plain language with only what matters most."
+                setConversationSignal('Clarifying…')
                 void handleSend(prompt, { hidden: true })
               }}
               className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
-              Simplify
+              Clarify
             </button>
 
               </>
@@ -4793,8 +4793,8 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'up'
-                  ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
-                  : 'text-white/85 hover:text-white'
+                  ? 'text-[#AEB6FF]'
+                  : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-up`]
                   ? 'scale-125 drop-shadow-[0_0_12px_rgba(124,140,255,0.55)]'
@@ -4804,7 +4804,7 @@ router.push('/george')
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-[18px] w-[18px]"
+                className="h-[17px] w-[17px]"
                 fill={feedback[i] === 'up' ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth="1.9"
@@ -4826,8 +4826,8 @@ router.push('/george')
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'down'
-                  ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]'
-                  : 'text-white/85 hover:text-white'
+                  ? 'text-[#AEB6FF]'
+                  : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-down`]
                   ? 'scale-125 drop-shadow-[0_0_12px_rgba(124,140,255,0.55)]'
@@ -4837,7 +4837,7 @@ router.push('/george')
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-[18px] w-[18px]"
+                className="h-[17px] w-[17px]"
                 fill={feedback[i] === 'down' ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth="1.9"
@@ -6494,7 +6494,7 @@ What are we working on?"
                   ) : currentTier === 'smart' ? (
                     <span className="text-neutral-600">Voice unlocks above Smart.</span>
                   ) : (
-                    <span className={isListening ? 'text-[#7C8CFF] drop-shadow-[0_0_10px_rgba(124,140,255,0.35)]' : ''}>
+                    <span className={isListening ? 'text-[#AEB6FF]' : ''}>
                       {isListening ? 'Voice is listening…' : ''}
                     </span>
                   )}
