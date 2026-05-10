@@ -6,6 +6,7 @@ export type LoadInput = {
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   speaker?: 'other_party' | 'user' | 'george_instruction' | 'unclear'
   strongestRolePressure?: [string, number]
+  forecastBias?: string
 }
 
 export type LoadDecision = {
@@ -20,6 +21,52 @@ class GeorgeLoadManager {
     const confidence = input.confidence ?? 0.5
     const interruptionRisk = input.interruptionRisk ?? 0
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
+    const forecastBias = input.forecastBias ?? 'none'
+
+    if (forecastBias === 'minimal') {
+      return {
+        state: 'overload',
+        maxWords: 5,
+        cadence: 'minimal',
+        reason: 'Forecast bias minimal. Compress before room turns.',
+      }
+    }
+
+    if (forecastBias === 'hold') {
+      return {
+        state: 'high',
+        maxWords: 6,
+        cadence: 'minimal',
+        reason: 'Forecast bias hold. Reduce output before interruption.',
+      }
+    }
+
+    if (forecastBias === 'proof') {
+      return {
+        state: 'high',
+        maxWords: 7,
+        cadence: 'minimal',
+        reason: 'Forecast bias proof. Keep evidence tight.',
+      }
+    }
+
+    if (forecastBias === 'support' && interruptionRisk < 0.55) {
+      return {
+        state: 'managed',
+        maxWords: 10,
+        cadence: 'normal',
+        reason: 'Forecast bias support. Give useful help without crowding.',
+      }
+    }
+
+    if (forecastBias === 'advance' && interruptionRisk < 0.6) {
+      return {
+        state: 'managed',
+        maxWords: 10,
+        cadence: 'normal',
+        reason: 'Forecast bias advance. Preserve forward momentum.',
+      }
+    }
 
     if (role === 'authority' && rolePressure > 1.2) {
       return {
