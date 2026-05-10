@@ -197,6 +197,11 @@ class GeorgeResponseShaper {
       reasons.push('policy high compression')
     }
 
+    if (input.responseTone === 'calm') {
+      cue = this.prependCue(cue, 'Stay measured.')
+      reasons.push('policy calm tone')
+    }
+
     return {
       volley,
       cue,
