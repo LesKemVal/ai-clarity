@@ -4290,7 +4290,7 @@ return (
       className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[16px] md:text-[17px] landscape:text-[19px] ${liveMode ? 'leading-[1.72]' : 'leading-8'} landscape:leading-9 tracking-[0.01em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/92 ${
+        className={`whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
