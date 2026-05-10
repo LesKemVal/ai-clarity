@@ -1,36 +1,11 @@
 import type { LiveSpeakerRole, LiveVoiceGovernorInput, LiveVoicePacket } from './types'
-import { analyzeRoom } from './runtime/room-analyzer'
+import { analyzeRoom, inferLiveSpeaker } from './runtime/room-analyzer'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
 
 const AUTHORITY_QUESTION =
   /(do you have (an )?id|license|registration|insurance|step out|where are you going|where are you coming from)/i
-
-const DIRECT_QUESTION =
-  /(\?|^(do|did|can|could|would|will|are|is|was|were|have|has|why|what|where|when|who|how)\b)/i
-
-function inferSpeaker(transcript: string): LiveSpeakerRole {
-  const text = transcript.trim().toLowerCase()
-
-  if (!text) return 'unclear'
-
-  if (/^(george|g\?|cue me|help me|what do i say|give me|respond|reword)/i.test(text)) {
-    return 'george_instruction'
-  }
-
-  if (AUTHORITY_QUESTION.test(text)) return 'other_party'
-
-  if (DIRECT_QUESTION.test(text) && !/\b(i|me|my|we|our)\b/i.test(text)) {
-    return 'other_party'
-  }
-
-  if (/\b(i said|i told|i need to say|i want to ask|my boss|my doctor|the officer)\b/i.test(text)) {
-    return 'george_instruction'
-  }
-
-  return 'user'
-}
 
 function cleanLine(value: string, maxWords: number) {
   const words = value
@@ -45,9 +20,19 @@ function cleanLine(value: string, maxWords: number) {
 
 export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket {
   const transcript = String(input.transcript || '').trim()
-  const speaker = inferSpeaker(transcript)
 
   const shadowMap = String(input.shadowMap || '').trim()
+
+  const speakerInference = inferLiveSpeaker(
+    transcript,
+    shadowMap
+  )
+
+  const speaker =
+    speakerInference.speaker === 'user'
+      ? 'george_instruction'
+      : speakerInference.speaker
+
   const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
   const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
   const room = analyzeRoom(shadowMap)
@@ -98,19 +83,6 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       cue: 'Slow down. Do not rush.',
       status: 'They asked for a response.',
       confidence: 0.7,
-      shadowUsed: hasShadow,
-    }
-  } else if (speaker === 'user') {
-    packet = {
-      speaker,
-      shouldSpeak: true,
-      volley:
-        room.interruptionRisk > 0.7
-          ? 'Stop talking. Let them finish.'
-          : 'Pause. Let them answer.',
-      cue: 'Hold eye contact.',
-      status: 'User already spoke. Preserve momentum.',
-      confidence: 0.68,
       shadowUsed: hasShadow,
     }
   } else {

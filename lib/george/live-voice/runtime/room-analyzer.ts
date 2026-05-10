@@ -16,6 +16,9 @@ const DIRECT_QUESTION_PATTERNS =
 const AUTHORITY_COMMAND_PATTERNS =
   /(step out|show me|give me|answer me|stop talking|listen|hold on|wait|let me finish)/i
 
+const INVITATION_PATTERNS =
+  /(okay,? go ahead|go ahead|you can answer|what do you say|your turn|i'm listening|im listening)/i
+
 const USER_REQUEST_PATTERNS =
   /(george|help me|what should i say|how do i respond|give me|tell me|coach me)/i
 
@@ -43,7 +46,8 @@ export function inferLiveSpeaker(
 
   if (
     AUTHORITY_COMMAND_PATTERNS.test(clean) ||
-    DIRECT_QUESTION_PATTERNS.test(clean)
+    DIRECT_QUESTION_PATTERNS.test(clean) ||
+    INVITATION_PATTERNS.test(clean)
   ) {
     return {
       speaker: 'other_party',
