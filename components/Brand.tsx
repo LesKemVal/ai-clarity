@@ -14,16 +14,20 @@ export default function Brand({
       <img
         src="/logo900.png"
         alt="BRANESx"
-        className={compact ? "h-8 w-[42px] object-contain" : "h-10 w-[68px] object-contain"}
+        className={compact
+          ? "h-6 w-auto object-contain opacity-90"
+          : "h-7 w-auto object-contain opacity-90"}
       />
+
       {!compact && (
-        <div className="ml-1.5 flex flex-col leading-tight">
+        <div className="ml-1 flex flex-col leading-tight">
           {showCore && (
-            <span className="text-[11px] tracking-widest text-white/40">
+            <span className="text-[10px] tracking-[0.22em] text-white/34">
               BRANES
             </span>
           )}
-          <span className="text-sm text-white/80">
+
+          <span className="text-xs text-white/62">
             {subtitle}
           </span>
         </div>

@@ -5337,32 +5337,35 @@ if (liveMode) {
       className="fixed inset-0 z-[240] bg-black/64 backdrop-blur-[12px]"
     />
 
-    <div className="fixed inset-0 z-[250] flex items-center justify-center px-5">
-      <div className="w-full max-w-[620px] rounded-[2rem] border border-[#7C8CFF]/28 bg-black/96 p-7 shadow-[0_40px_120px_rgba(0,0,0,0.82),0_0_44px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
-        <div className="mb-3 text-[11px] uppercase tracking-[0.32em] text-[#7C8CFF]">
-          LIVE CONVERSATION
+    <div className="fixed inset-0 z-[250] overflow-y-auto bg-[radial-gradient(circle_at_top,#17245f_0%,#070915_42%,#020204_100%)] px-5 py-8 text-white">
+      <div className="pointer-events-none absolute left-1/2 top-[-120px] h-[360px] w-[360px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/18 blur-[90px]" />
+      <div className="pointer-events-none absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-[#9B6CFF]/12 blur-[110px]" />
+
+      <div className="relative mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[860px] flex-col justify-center">
+        <div className="mb-5 inline-flex w-fit items-center rounded-full border border-[#7C8CFF]/25 bg-white/[0.055] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.28em] text-[#B8C1FF] shadow-[0_0_30px_rgba(124,140,255,0.12)]">
+          LIVE MODE TRANSITION
         </div>
 
-        <div className="max-w-[520px] text-[28px] font-semibold leading-[1.15] tracking-[-0.03em] text-white">
-          {LIVE_SEGUES[liveSegueIndex]?.title || 'LIVE listens with you.'}
+        <div className="max-w-[780px] text-[42px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:text-[64px]">
+          GEORGE is now listening with you.
         </div>
 
-        <div className="mt-4 max-w-[560px] text-[15px] leading-7 text-white/68">
+        <div className="mt-6 max-w-[660px] text-[18px] leading-8 text-white/72 md:text-[20px] md:leading-9">
           {currentTier === 'smart'
-            ? 'LIVE Conversation is built for real-time guidance while life is happening. Upgrade or enter a founder code to access LIVE mode.'
-            : LIVE_SEGUES[liveSegueIndex]?.body}
+            ? 'LIVE is built for moments where timing matters: pressure, hesitation, negotiation, conflict, interviews, sales, and real conversation. It requires Intelligent or Brilliant access.'
+            : 'This is not normal chat mode. LIVE helps you catch timing, pressure, hesitation, escalation, and the next useful line while the conversation is actually happening.'}
         </div>
 
-        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+        <div className="mt-8 grid gap-3 md:grid-cols-2">
           {[
-            'Real-time response help',
-            'Timing, pressure, and escalation cues',
-            'Interviews, negotiation, conflict, sales',
-            'Best with one earbud'
+            'Use one earbud if you can.',
+            'Ask for a line, cue, pivot, or next move.',
+            'GEORGE watches timing and pressure.',
+            'You stay in the conversation.'
           ].map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-white/10 bg-white/[0.035] px-3.5 py-3 text-[12px] leading-5 text-white/68"
+              className="rounded-[1.35rem] border border-white/10 bg-white/[0.065] px-4 py-4 text-[14px] leading-6 text-white/72 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl"
             >
               {item}
             </div>
