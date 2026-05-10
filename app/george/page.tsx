@@ -6293,7 +6293,7 @@ Choose one:
 <div className={`
 
 ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:top-[58%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-black/92 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-black px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.34)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="relative flex-1 rounded-[1.8rem] border border-white/10 bg-black/60 backdrop-blur-xl">
+                    <div className="relative flex-1 rounded-[1.95rem] border border-white/[0.08] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
 
                       <input
                         ref={fileInputRef}
@@ -6418,7 +6418,7 @@ What are we working on?"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[17px] leading-7 font-medium tracking-[0.01em] text-white outline-none placeholder:text-white/60 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[17px] leading-7 font-normal tracking-[0.005em] text-white/92 outline-none placeholder:text-white/34 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
