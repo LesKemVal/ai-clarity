@@ -20,16 +20,16 @@ export default function HelpPage() {
           </p>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <p className="text-xl font-semibold text-white">
-            GEORGE is not a chatbot. GEORGE is a clarity and execution system.
+            GEORGE is a clarity and execution system.
           </p>
           <p className="text-neutral-400 leading-7 mt-2">
             In normal mode, GEORGE helps you think. In LIVE mode, GEORGE helps you perform. Same system — tighter when the pressure rises.
           </p>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">The Operating Model</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Direction — identify what actually matters</li>
@@ -39,7 +39,7 @@ export default function HelpPage() {
           <p className="text-white mt-3">You bring the objective. GEORGE narrows the path.</p>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">How to Start</h2>
           <p className="text-neutral-300">Tell GEORGE what you want to happen.</p>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
@@ -68,18 +68,18 @@ export default function HelpPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Use the Buttons as Next Moves</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Keep this — save something worth returning to</li>
-            <li>Share / Send this — move the response outside GEORGE</li>
-            <li>Make it clearer — tighten the wording</li>
+            <li>Send — move the response where it needs to go</li>
+            <li>Clarify — sharpen the signal without losing intent</li>
             <li>Reword — reshape the line for the moment you are in</li>
             <li>LIVE — enter real-time support</li>
           </ul>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Professional Mode</h2>
           <p className="text-neutral-300">
             Professional Mode is for conversations tied to results: calls, appointments, donations, sales, consulting, outreach, recruiting, or any situation where words create measurable outcomes.
@@ -92,7 +92,7 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Tiers</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Smart → direction and big-picture clarity</li>
@@ -102,7 +102,7 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <p className="text-white text-lg font-medium">
             The simple rule: in normal mode, give GEORGE the objective. In LIVE mode, just talk.
           </p>

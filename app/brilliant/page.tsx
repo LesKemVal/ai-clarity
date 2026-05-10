@@ -160,7 +160,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Wake trigger</p>
               <div className="grid gap-3">
@@ -177,7 +177,7 @@ export default function BrilliantPage() {
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Mode trigger</p>
               <div className="grid gap-3">
@@ -196,7 +196,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Response trigger</p>
               <div className="grid gap-3">
@@ -213,7 +213,7 @@ export default function BrilliantPage() {
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Human assist</p>
               <div className="grid gap-3">
@@ -232,7 +232,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Phrases</p>
 
@@ -242,7 +242,7 @@ export default function BrilliantPage() {
                   value={triggerPhrase}
                   onChange={(e) => setTriggerPhrase(e.target.value)}
                   placeholder="George"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                  className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
                 />
               </div>
 
@@ -252,7 +252,7 @@ export default function BrilliantPage() {
                   value={modePhrase}
                   onChange={(e) => setModePhrase(e.target.value)}
                   placeholder="negotiation"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                  className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
                 />
               </div>
 
@@ -262,7 +262,7 @@ export default function BrilliantPage() {
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Privacy</p>
 

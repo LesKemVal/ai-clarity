@@ -41,7 +41,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Conversation Assistance
           </h2>
@@ -93,7 +93,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Change GEORGE Mid-Conversation
           </h2>
@@ -107,7 +107,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Return Fast
           </h2>
