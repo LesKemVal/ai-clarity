@@ -4253,11 +4253,11 @@ return (
       </div>
 
       <div className="mt-1 flex items-center justify-center gap-[3px] px-5 py-1">
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.2s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.4s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.6s]" />
-        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] animate-pulse [animation-delay:0.8s]" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-70" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-55" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-40" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-28" />
+        <span className="h-[2px] w-[2px] rounded-full bg-[#7C8CFF] opacity-18" />
       </div>
     </div>
   )}
@@ -4266,7 +4266,7 @@ return (
       <img
         src="/earbud400.png"
         alt=""
-        className="h-[76px] w-auto max-w-[78vw] object-contain opacity-88 drop-shadow-[0_0_26px_rgba(124,140,255,0.22)] animate-pulse"
+        className="h-[76px] w-auto max-w-[78vw] object-contain opacity-72 drop-shadow-[0_0_18px_rgba(124,140,255,0.12)]"
       />
     </div>
   )}
@@ -4461,7 +4461,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {rewordPopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_180ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
             rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
@@ -4594,7 +4594,7 @@ Cue:`)
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_180ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
             tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
@@ -4855,7 +4855,7 @@ router.push('/george')
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -5074,7 +5074,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-black/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5205,7 +5205,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5974,7 +5974,7 @@ Choose one:
                             className="fixed inset-0 z-[91] cursor-default bg-transparent"
                           />
                           <div className="absolute bottom-full left-[-6px] z-[95] mb-1.5 w-[230px]">
-                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.18)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_180ms_ease-out]">
+                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_22px_60px_rgba(0,0,0,0.72),0_0_24px_rgba(124,140,255,0.18)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]">
                           <button
                             type="button"
                             onClick={() => {
@@ -6006,7 +6006,7 @@ Choose one:
                       title={voiceOn ? 'Audio guidance active' : 'Audio guidance off'}
                       className={`mx-1 shrink-0 h-2 w-2 rounded-full transition ${
                         voiceOn
-                          ? 'bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.75)]'
+                          ? 'bg-[#7C8CFF]/72 shadow-[0_0_8px_rgba(124,140,255,0.28)]'
                           : 'bg-[#7C8CFF]/55'
                       }`}
                     />
