@@ -4241,7 +4241,7 @@ return (
       el.scrollBy({ top: -120, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-4 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
       <div className="bg-gradient-to-r from-white via-[#d8dcff] to-[#7C8CFF] bg-clip-text text-center text-[24px] md:text-3xl font-semibold tracking-[0.06em] text-transparent">
@@ -4287,7 +4287,7 @@ return (
     return (
     <div
       key={i}
-      className={`space-y-1.5 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
+      className={`space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
         className={`whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
@@ -4461,7 +4461,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {rewordPopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 text-[11px] text-white/72 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_180ms_ease-out] ${
             rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
@@ -4594,7 +4594,7 @@ Cue:`)
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-black/92 text-[11px] text-white/72 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_180ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_180ms_ease-out] ${
             tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
