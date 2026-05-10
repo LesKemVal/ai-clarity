@@ -5457,44 +5457,44 @@ if (liveMode) {
       type="button"
       aria-label="Close LIVE chooser"
       onClick={() => setShowLiveEntryChoice(false)}
-      className="fixed inset-0 z-[220] bg-black/58 backdrop-blur-[10px]"
+      className="fixed inset-0 z-[220] bg-black/46 backdrop-blur-[8px]"
     />
 
     <div className="fixed inset-0 z-[230] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
-      <div className="w-full max-w-[380px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-black/94 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.72),0_0_28px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+      <div className="w-full max-w-[380px] rounded-[1.55rem] border border-white/[0.08] bg-[#11131A]/92 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.58)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
         <div className="mb-1 text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
-          GEORGE LIVE
+          LIVE
         </div>
 
         <div className="text-[15px] font-semibold text-white">
-          Enter live assistance.
+          Enter LIVE.
         </div>
 
         <div className="mt-2 text-[12px] leading-5 text-white/58">
-          Use one earbud if you can. GEORGE will listen with you and help you respond in real time.
+          Use one earbud if you can. GEORGE will track timing and help with the next move.
         </div>
 
         <div className="mt-4 space-y-2">
           <button
             type="button"
             onClick={startNewLiveConversation}
-            className="w-full rounded-xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-[#7C8CFF]/16"
+            className="w-full rounded-xl border border-[#7C8CFF]/22 bg-[#7C8CFF]/8 px-4 py-3 text-left text-sm font-semibold text-white/90 transition hover:bg-[#7C8CFF]/12"
           >
-            Start New LIVE Conversation
+            Start new LIVE conversation
           </button>
 
           <button
             type="button"
             onClick={resumeLiveConversation}
-            className="w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-[#7C8CFF]/24 hover:bg-[#7C8CFF]/8 hover:text-white"
+            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-left text-sm font-medium text-white/66 transition hover:border-[#7C8CFF]/18 hover:bg-[#7C8CFF]/6 hover:text-white/88"
           >
-            Resume LIVE Conversation
+            Resume LIVE conversation
           </button>
 
           <button
             type="button"
             onClick={() => setShowLiveEntryChoice(false)}
-            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/45 transition hover:bg-white/[0.035] hover:text-white/72"
+            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/38 transition hover:bg-white/[0.025] hover:text-white/62"
           >
             Stay here
           </button>
@@ -5526,7 +5526,7 @@ if (liveMode) {
         </div>
 
         <div className="mt-3 text-[12px] leading-5 text-white/58">
-          GEORGE LIVE is currently focused on stabilizing individual real-time assistance before expanding into structured LIVE environments.
+          LIVE is currently focused on stabilizing individual real-time assistance before expanding into structured LIVE environments.
         </div>
 
         <button
