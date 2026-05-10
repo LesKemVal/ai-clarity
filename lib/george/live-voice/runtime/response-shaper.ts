@@ -191,6 +191,12 @@ class GeorgeResponseShaper {
       reasons.push('fatigue compression')
     }
 
+    if (input.responseCompression === 'high') {
+      volley = this.shorten(volley, 5)
+      cue = this.prependCue(cue, 'Keep it tight.')
+      reasons.push('policy high compression')
+    }
+
     return {
       volley,
       cue,
