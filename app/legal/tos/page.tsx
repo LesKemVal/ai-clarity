@@ -7,7 +7,7 @@ export default function TosPage() {
     <PageShell eyebrow="Legal" title="Terms of Service" backToGeorge>
       <div className="max-w-4xl space-y-8">
 
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 md:p-8">
+        <section className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6 md:p-8">
           <div className="space-y-4 max-w-3xl">
             <h1 className="text-3xl md:text-4xl font-semibold text-white">
               Terms of Service
@@ -25,42 +25,42 @@ export default function TosPage() {
 
         <section className="grid gap-4">
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">Use of Service</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               GEORGE is designed for clarity, direction, planning, communication support, and execution assistance. It is a software system, not a substitute for legal, medical, tax, investment, or emergency judgment.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">No Guaranteed Results</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               Outcomes depend on your judgment, timing, actions, market conditions, and other factors outside our control.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">User Responsibility</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               You remain responsible for decisions, filings, purchases, relationships, negotiations, health choices, and financial actions.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">Acceptable Use</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               Do not use the service for fraud, harassment, abuse, illegal conduct, security attacks, impersonation, or rights violations.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">Billing</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               Paid subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan details, renewal terms, and cancellation timing.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6">
             <h2 className="text-white text-xl font-semibold">Availability</h2>
             <p className="mt-3 text-neutral-400 leading-7">
               Features, pricing, models, responses, and availability may change, improve, or be withdrawn over time. Continued use of the service means you accept those changes.
