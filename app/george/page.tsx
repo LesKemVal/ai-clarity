@@ -423,7 +423,11 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
     const firstUsable = cleaned
       .split('\n')
       .map((line) => line.replace(/^[-•]\s*/, '').trim())
-      .find((line) => line && !/^(Say|Backup|Cue|Do|Ask|Boundary):/i.test(line))
+      .find((line) =>
+        line &&
+        !/^(Say|Backup|Cue|Do|Ask|Boundary):/i.test(line) &&
+        !/GEORGE|clarity, direction|execution system|You are GEORGE|not a chatbot|not a therapist/i.test(line)
+      )
 
     return firstUsable || 'Stay calm. Let them answer.'
   })()
@@ -442,7 +446,13 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
     }
   }
 
-  const cue = normalizeLine(cueMatch?.[1] || 'Slow down. Let him answer.', opts.audio ? 8 : 10)
+  if (/\bid\b|identification|license|registration/i.test(liveUserText)) {
+    if (/GEORGE|clarity, direction|execution system|not a chatbot|not a therapist/i.test(say) || !say) {
+      say = '“Yes, officer. May I reach for it?”'
+    }
+  }
+
+  const cue = normalizeLine(cueMatch?.[1] || (/\bid\b|identification|license|registration/i.test(liveUserText) ? 'Hands visible. Move slowly.' : 'Slow down. Let him answer.'), opts.audio ? 8 : 10)
 
   if (opts.audio) {
     return say || cue
