@@ -4293,8 +4293,8 @@ return (
         className={`whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/26 bg-transparent px-3.5 py-2.5 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
-              : 'max-w-[82%] text-right rounded-[1.15rem] border border-[#7C8CFF]/18 bg-transparent px-3.5 py-2.5 shadow-none')
+              ? 'max-w-[82%] text-right rounded-[1.25rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/5 px-3.5 py-2.5 shadow-none'
+              : 'max-w-[82%] text-right rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         }`}
       >
