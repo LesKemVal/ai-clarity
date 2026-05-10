@@ -4955,9 +4955,9 @@ router.push('/george')
 {showScrollHint && (
   <div className={`fixed bottom-[235px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center`}>
 
-    <div className="absolute h-16 w-16 rounded-full border border-[#7C8CFF]/18 bg-black/42 shadow-[0_18px_46px_rgba(0,0,0,0.48),0_0_20px_rgba(124,140,255,0.10)] backdrop-blur-xl" />
+    <div className="absolute h-12 w-12 rounded-full border border-[#7C8CFF]/12 bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34),0_0_14px_rgba(124,140,255,0.08)] backdrop-blur-md" />
 
-    <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/8 bg-black/52 shadow-[inset_0_0_18px_rgba(255,255,255,0.025)]">
+    <div className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
       <button
         type="button"
@@ -4966,10 +4966,10 @@ router.push('/george')
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
           setShowScrollHint(false)
         }}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#7C8CFF]/82 text-black shadow-[0_12px_30px_rgba(0,0,0,0.36),0_0_22px_rgba(124,140,255,0.24)] transition hover:bg-[#8D9BFF]/95 hover:scale-[1.03]"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(124,140,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
-        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 5v13" />
           <path d="m6 12 6 6 6-6" />
         </svg>
