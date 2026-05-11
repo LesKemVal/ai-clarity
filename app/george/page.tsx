@@ -1385,6 +1385,40 @@ const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+const redeemFounderCode = () => {
+  const code = window.prompt('Enter founder access code')
+
+  if (!code) return
+
+  const normalized = code.trim().toUpperCase()
+
+  const intelligentFounder = /^INTEL-FOUNDER-\d{3}$/.test(normalized)
+  const brilliantFounder = normalized === 'BRILLIANT-FOUNDER'
+
+  if (intelligentFounder) {
+    setCurrentTier('intelligent')
+    window.localStorage.setItem('george_tier', 'intelligent')
+    window.localStorage.setItem('george_founder_code', normalized)
+    setToastMessage('Founder Intelligent access activated.')
+    setShowToast(true)
+    setShowUpgradeModal(false)
+    return
+  }
+
+  if (brilliantFounder) {
+    setCurrentTier('brilliant')
+    window.localStorage.setItem('george_tier', 'brilliant')
+    window.localStorage.setItem('george_founder_code', normalized)
+    setToastMessage('Founder Brilliant access activated.')
+    setShowToast(true)
+    setShowUpgradeModal(false)
+    return
+  }
+
+  setToastMessage('Invalid founder code.')
+  setShowToast(true)
+}
+
   const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
   const [upgradeCtaWord, setUpgradeCtaWord] = useState<'Intelligent' | 'Brilliant'>('Intelligent')
 
@@ -6937,7 +6971,10 @@ Got a question?"
                 const response = await fetch('/api/subscribe', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tier: 'intelligent', email: subscriberEmail }),
+                  body: JSON.stringify({
+                    tier: 'intelligent',
+                    email: subscriberEmail || undefined,
+                  }),
                 })
 
                 const data = await response.json()
@@ -6981,7 +7018,10 @@ Got a question?"
                 const response = await fetch('/api/subscribe', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tier: 'brilliant', email: subscriberEmail }),
+                  body: JSON.stringify({
+                    tier: 'brilliant',
+                    email: subscriberEmail || undefined,
+                  }),
                 })
 
                 const data = await response.json()
@@ -7019,22 +7059,32 @@ Got a question?"
           </button>
         </div>
 
-        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
+        <div className="mt-5 border-t border-white/5 pt-4 space-y-3">
           <button
             type="button"
-            onClick={() => setShowUpgradeModal(false)}
-            className="text-xs text-neutral-500 transition hover:text-white"
+            onClick={redeemFounderCode}
+            className="w-full rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
           >
-            Close
+            Enter Founder Code
           </button>
 
-          <button
-            type="button"
-            onClick={() => window.open('/top-up','_blank')}
-            className="text-xs text-[#7C8CFF] transition hover:opacity-80"
-          >
-            See full options
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setShowUpgradeModal(false)}
+              className="text-xs text-neutral-500 transition hover:text-white"
+            >
+              Close
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.open('/top-up','_blank')}
+              className="text-xs text-[#7C8CFF] transition hover:opacity-80"
+            >
+              See full options
+            </button>
+          </div>
         </div>
       </div>
     </div>
