@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
 import Brand from '@/components/Brand'
 
@@ -20,6 +20,73 @@ export default function PageShell({
   withSidebar = true,
 }: PageShellProps) {
   const [showSidebar, setShowSidebar] = useState(false)
+  const [subscriberEmail, setSubscriberEmail] = useState('')
+  const [subscriberTier, setSubscriberTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
+
+  useEffect(() => {
+    try {
+      const email = window.localStorage.getItem('george_email')?.trim().toLowerCase() || ''
+      const savedTier = window.localStorage.getItem('george_tier')
+      const tier = savedTier === 'intelligent' || savedTier === 'brilliant' ? savedTier : 'smart'
+
+      setSubscriberEmail(email)
+      setSubscriberTier(tier)
+    } catch {}
+  }, [])
+
+  const isSubscriber = useMemo(() => Boolean(subscriberEmail.trim()), [subscriberEmail])
+
+  const forgetThisDevice = () => {
+    try {
+      window.localStorage.removeItem('george_email')
+      window.localStorage.removeItem('george_tier')
+      window.localStorage.removeItem('GEORGE_SESSIONS_V2')
+      window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
+      window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
+      window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
+      window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
+      window.location.reload()
+    } catch {}
+  }
+
+  const IdentitySurface = () => (
+    isSubscriber ? (
+      <div className="flex max-w-[230px] items-center gap-2 rounded-full border border-[#7C8CFF]/16 bg-[#7C8CFF]/[0.07] px-3 py-1.5">
+        <div className="flex min-w-0 flex-col leading-tight">
+          <span className="text-[10px] uppercase tracking-[0.18em] text-[#AEB6FF]/72">
+            {subscriberTier}
+          </span>
+          <span className="max-w-[160px] truncate text-[11px] text-white/72">
+            {subscriberEmail}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={forgetThisDevice}
+          className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-white/34 transition hover:text-white/70"
+        >
+          Forget
+        </button>
+      </div>
+    ) : (
+      <div className="flex max-w-[235px] items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
+        <div className="flex min-w-0 flex-col leading-tight">
+          <span className="text-[10px] uppercase tracking-[0.18em] text-white/30">
+            Anonymous
+          </span>
+          <span className="truncate text-[11px] text-white/46">
+            LIVE requires continuity
+          </span>
+        </div>
+        <a
+          href="/top-up"
+          className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
+        >
+          Continue
+        </a>
+      </div>
+    )
+  )
 
   const goToGeorge = (prompt?: PromptItem) => {
     if (!prompt) {
@@ -151,15 +218,19 @@ export default function PageShell({
                     )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
-                      aria-label="Share G."
-                      title="Share G."
-                    >
-                      Share G.
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <IdentitySurface />
+
+                      <button
+                        type="button"
+                        onClick={handleInstallGeorge}
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        aria-label="Share G."
+                        title="Share G."
+                      >
+                        Share G.
+                      </button>
+                    </div>
                   </div>
 
                   {/* DESKTOP */}
@@ -183,15 +254,19 @@ export default function PageShell({
                     )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleInstallGeorge}
-                      className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
-                      aria-label="Share G."
-                      title="Share G."
-                    >
-                      Share G.
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <IdentitySurface />
+
+                      <button
+                        type="button"
+                        onClick={handleInstallGeorge}
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        aria-label="Share G."
+                        title="Share G."
+                      >
+                        Share G.
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
