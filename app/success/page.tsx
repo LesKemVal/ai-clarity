@@ -6,7 +6,7 @@ export default function SuccessPage() {
   return (
     <PageShell
       title="You’re in."
-      eyebrow="Beta"
+      eyebrow="Access active"
       backToGeorge
       withSidebar={false}
     >
@@ -18,11 +18,11 @@ export default function SuccessPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              Your access is active. GEORGE is in beta, and early users get early access as the system improves.
+              Your access is active. GEORGE can now restore subscriber continuity on this device and support the tier you selected.
             </p>
 
             <p className="text-sm text-white">
-              Continue now, or make GEORGE yours when you are ready.
+              Continue now, or personalize GEORGE when you are ready.
             </p>
           </div>
         </section>

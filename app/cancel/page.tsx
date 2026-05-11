@@ -6,7 +6,7 @@ export default function CancelPage() {
   return (
     <PageShell
       title="Nothing was submitted"
-      eyebrow="Beta"
+      eyebrow="Access"
       backToGeorge
       withSidebar={false}
     >
@@ -18,7 +18,7 @@ export default function CancelPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              Nothing was submitted. You can return to GEORGE, join the waitlist later, or leave feedback when you are ready.
+              Nothing was submitted. You can return to GEORGE now or continue setting up subscriber continuity when you are ready.
             </p>
           </div>
         </section>
@@ -37,7 +37,7 @@ export default function CancelPage() {
             onClick={() => (window.open('/top-up','_blank','noopener,noreferrer'))}
             className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
           >
-            Back to beta access
+            Back to continuity options
           </button>
         </section>
       </div>
