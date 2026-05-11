@@ -1016,6 +1016,7 @@ const [isListening, setIsListening] = useState(false)
 
   const [isIOS, setIsIOS] = useState(false)
   const [profileName, setProfileName] = useState('')
+  const [subscriberEmail, setSubscriberEmail] = useState('')
   const [birthdayMD, setBirthdayMD] = useState('')
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
@@ -1412,6 +1413,10 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
     const tierParam = params.get('tier')
     const subStatus = params.get('subscription')
     const savedTier = window.localStorage.getItem('george_tier')
+    const savedEmail = window.localStorage.getItem('george_email') || ''
+    const cleanSavedEmail = savedEmail.trim().toLowerCase()
+    if (cleanSavedEmail) setSubscriberEmail(cleanSavedEmail)
+
     const validTier = tierParam === 'smart' || tierParam === 'intelligent' || tierParam === 'brilliant'
 
     if (validTier) {
@@ -1432,12 +1437,21 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
       return
     }
 
-    void fetch('/api/subscription-state')
+    void fetch(`/api/subscription-state${cleanSavedEmail ? `?email=${encodeURIComponent(cleanSavedEmail)}` : ''}`)
       .then((res) => res.json())
       .then((data) => {
         const serverTier = data?.currentTier
+        if (data?.email) {
+          const restoredEmail = String(data.email).trim().toLowerCase()
+          if (restoredEmail) {
+            setSubscriberEmail(restoredEmail)
+            window.localStorage.setItem('george_email', restoredEmail)
+          }
+        }
+
         if (serverTier === 'intelligent' || serverTier === 'brilliant') {
           setCurrentTier(serverTier)
+          window.localStorage.setItem('george_tier', serverTier)
         } else {
           setCurrentTier('smart')
         }
@@ -6701,6 +6715,30 @@ Got a question?"
         </div>
 
         <div className="space-y-4">
+          <div className="rounded-2xl border border-white/[0.08] bg-black/28 px-4 py-3">
+            <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+              Email for access
+            </label>
+            <input
+              type="email"
+              value={subscriberEmail}
+              onChange={(event) => {
+                const value = event.target.value.trim().toLowerCase()
+                setSubscriberEmail(value)
+                if (value) {
+                  window.localStorage.setItem('george_email', value)
+                } else {
+                  window.localStorage.removeItem('george_email')
+                }
+              }}
+              placeholder="you@example.com"
+              className="mt-2 w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-700"
+            />
+            <p className="mt-2 text-[11px] leading-5 text-neutral-500">
+              GEORGE uses this to remember your access on this device and restore your tier after checkout.
+            </p>
+          </div>
+
           <button
             type="button"
             onClick={async () => {
@@ -6708,7 +6746,7 @@ Got a question?"
                 const response = await fetch('/api/subscribe', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tier: 'intelligent' }),
+                  body: JSON.stringify({ tier: 'intelligent', email: subscriberEmail }),
                 })
 
                 const data = await response.json()
@@ -6744,7 +6782,7 @@ Got a question?"
                 const response = await fetch('/api/subscribe', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tier: 'brilliant' }),
+                  body: JSON.stringify({ tier: 'brilliant', email: subscriberEmail }),
                 })
 
                 const data = await response.json()
