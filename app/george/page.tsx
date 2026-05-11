@@ -4011,33 +4011,21 @@ setPendingAssistantMessage({
               ? 'Voice is on.'
               : 'Voice is off.'
 
-  const showConversation = input.trim().length > 0 || messages.some((m) => m.role === 'user') || liveMode
+  const hasVisibleThread = messages.some((m) => {
+    if (m.role === 'system') return false
+    const clean = (m.content || '').trim()
+    if (!clean) return false
+    if (m.role === 'assistant' && clean === greeting.trim()) return false
+    return m.role === 'user'
+  })
+
+  const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
   const showMobileHero = !showConversation
   const enterLiveConversation = () => {
-    const email = subscriberEmail.trim().toLowerCase()
-    const continuityVerified =
-      typeof window !== 'undefined' &&
-      window.localStorage.getItem('george_verified_continuity') === 'true'
-
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
     setShowLiveEntryChoice(false)
-
-    if (!email || !continuityVerified) {
-      setToastMessage('Verify continuity by email to use LIVE.')
-      setShowToast(true)
-      setShowUpgradeModal(true)
-      return
-    }
-
-    if (currentTier === 'smart') {
-      setToastMessage('LIVE requires Intelligent or Brilliant access.')
-      setShowToast(true)
-      setShowUpgradeModal(true)
-      return
-    }
-
     setLiveSegueIndex(Math.floor(Math.random() * LIVE_SEGUES.length))
     setShowLiveSegue(true)
   }
