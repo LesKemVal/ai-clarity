@@ -1623,7 +1623,7 @@ BRILLIANT LIVE ENGINE
     if (isDegraded && needsMemory) {
       capacityNotice = "I don't have full context for this."
     } else if (isDegraded && needsDepth) {
-      capacityNotice = 'I’ll help you get this done with the resources I have, but I will one hundred percent get you through this step by step post top up.'
+      capacityNotice = 'I’ll help you move this forward with the resources available here. For deeper step-by-step continuity, upgrade when you want stronger execution support.'
     }
 
     if (capacityNotice && !reply.includes(capacityNotice)) {

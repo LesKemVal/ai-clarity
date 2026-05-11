@@ -3293,7 +3293,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         let finalContent = firstResponseOverride ?? (constrained
           ? `We can go further here.
 
-This takes more time and step-by-step work than this tier allows. Top up to continue.`
+For deeper step-by-step work, upgrade when you want stronger continuity and execution support.`
           : data.message)
 
         if (!constrained && typeof finalContent === 'string') {
