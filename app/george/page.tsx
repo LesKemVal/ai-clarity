@@ -2276,7 +2276,8 @@ requestAnimationFrame(() => {
         setShowPromptMenu(false)
       }
 
-      if (typing) return
+      if (typing && event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+      if (typing && event.shiftKey) return
 
       const scrollHost = scrollHostRef.current
 
