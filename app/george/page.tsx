@@ -3480,7 +3480,7 @@ return true
     if (!supported) {
       setVoiceError(
         isIOS
-          ? 'Enhanced voice support is rolling out during beta.'
+          ? 'Enhanced voice support is still expanding.'
           : 'Voice input is not available in this browser session.'
       )
       return
@@ -6927,7 +6927,7 @@ Got a question?"
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Structured LIVE</p>
                 <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a structured LIVE session.</p>
-                <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE continuity is not active yet.</p>
+                <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE continuity is being prepared.</p>
               </div>
               <button
                 type="button"
