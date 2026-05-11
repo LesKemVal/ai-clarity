@@ -6,3 +6,7 @@ node_modules
 backups
 *.bak-*
 .DS_Store
+
+# Local subscriber/continuity test data
+data/subscribers.json
+data/continuity-tokens.json
