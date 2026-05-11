@@ -4407,7 +4407,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-white/42">
@@ -4561,7 +4561,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {(m.role === 'user' || isWelcomeAssistant) && (
+      {(m.role === 'user') && (
         <div className="flex items-center gap-1.5 text-white/72">
           <button
             type="button"
