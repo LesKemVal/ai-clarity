@@ -4357,9 +4357,17 @@ return (
             type="button"
             onClick={() => {
               setSubscriberEmail('')
+              setCurrentTier('smart')
               window.localStorage.removeItem('george_email')
               window.localStorage.removeItem('george_tier')
-              setCurrentTier('smart')
+              window.localStorage.removeItem('GEORGE_SESSIONS_V2')
+              window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
+              window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
+              window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
+              window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
+              setMessages([])
+              messagesRef.current = []
+              window.location.reload()
             }}
             className="text-[10px] uppercase tracking-[0.16em] text-white/28 transition hover:text-white/58"
           >
