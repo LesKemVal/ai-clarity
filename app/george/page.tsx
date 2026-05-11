@@ -466,6 +466,34 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
 }
 
 
+
+const georgeAmbientPulseStyles = `
+@keyframes terminalDot {
+  0%, 100% {
+    opacity: 0.24;
+    transform: translateY(0) scale(0.82);
+    filter: blur(0px);
+  }
+  42% {
+    opacity: 0.95;
+    transform: translateY(-1px) scale(1);
+    filter: blur(0.15px);
+  }
+}
+
+.pulse-dot-1,
+.pulse-dot-2,
+.pulse-dot-3,
+.pulse-dot-4 {
+  animation: terminalDot 0.82s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(174, 182, 255, 0.22);
+}
+
+.pulse-dot-2 { animation-delay: 90ms; opacity: 0.72; }
+.pulse-dot-3 { animation-delay: 180ms; opacity: 0.52; }
+.pulse-dot-4 { animation-delay: 270ms; opacity: 0.36; }
+`
+
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
@@ -3982,7 +4010,9 @@ setPendingAssistantMessage({
 
 
 return (
-    <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
+    <>
+      <style>{georgeAmbientPulseStyles}</style>
+      <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
@@ -6815,6 +6845,7 @@ Got a question?"
           </div>
         </div>
       )}
-</main>
+      </main>
+    </>
   )
 }
