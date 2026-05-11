@@ -4567,7 +4567,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {(m.role === 'user') && (
+      {(m.role === 'user' || isWelcomeAssistant) && (
         <div className="flex items-center gap-1.5 text-white/72">
           <button
             type="button"
