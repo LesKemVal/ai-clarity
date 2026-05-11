@@ -4341,6 +4341,27 @@ return (
         Direction. Execution. Continuity.
       </div>
 
+      {subscriberEmail.trim() && (
+        <div className="mt-4 flex items-center gap-2 rounded-full border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.05] px-3 py-1.5">
+          <div className="h-2 w-2 rounded-full bg-[#7C8CFF]/80" />
+          <span className="max-w-[190px] truncate text-[11px] font-medium tracking-[0.02em] text-white/58">
+            Continuing as {subscriberEmail.trim().toLowerCase()}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setSubscriberEmail('')
+              window.localStorage.removeItem('george_email')
+              window.localStorage.removeItem('george_tier')
+              setCurrentTier('smart')
+            }}
+            className="text-[10px] uppercase tracking-[0.16em] text-white/28 transition hover:text-white/58"
+          >
+            Not you?
+          </button>
+        </div>
+      )}
+
       <div className="mt-4 flex items-center justify-center gap-[7px] px-5 py-1">
         <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
         <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 pulse-dot-2" />
