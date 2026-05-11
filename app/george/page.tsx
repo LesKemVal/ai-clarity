@@ -686,7 +686,13 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         ...prev,
         [pulseKey]: false,
       }))
-    }, 260)
+
+      setFeedback((prev) => {
+        const next = { ...prev }
+        delete next[index]
+        return next
+      })
+    }, 520)
 
     const msg = messagesRef.current[index]
     if (!msg || msg.role !== 'assistant') return
