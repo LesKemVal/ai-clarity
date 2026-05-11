@@ -146,10 +146,10 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant unlocks LIVE GEORGE — remembered continuity, real-time response support, saved LIVE sessions, and operational assistance when pressure changes outcomes.
+              GEORGE scales from clarity → continuity → live operational support. The deeper the tier, the longer GEORGE stays with you under pressure.
             </div>
 
-            <div className="grid gap-4 pt-2 lg:grid-cols-4">
+            <div className="grid gap-4 pt-2 lg:grid-cols-3">
               <div className="rounded-[1.8rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
@@ -159,10 +159,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Use GEORGE anonymously</li>
-                  <li>• Get direction and clarity</li>
-                  <li>• Think through real situations</li>
-                  <li>• No subscriber identity required</li>
+                  <li>• Clarity and directional reasoning</li>
+                  <li>• Lightweight execution help</li>
+                  <li>• Basic voice and runtime access</li>
+                  <li>• Use GEORGE immediately</li>
                 </ul>
               </div>
 
@@ -170,22 +170,22 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Intelligent</p>
                   <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
-                    Most used
+                    Operational tier
                   </span>
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Remember continuity across returns</li>
-                  <li>• Restore sessions automatically</li>
-                  <li>• Maintain stronger execution over time</li>
-                  <li>• Unlock subscriber continuity</li>
+                  <li>• Expanded continuity and persistence</li>
+                  <li>• Stronger operational assistance</li>
+                  <li>• Better pressure navigation</li>
+                  <li>• Expanded LIVE/runtime access</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
                   className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
                 >
-                  Continue with Intelligent
+                  Enter Intelligent
                 </button>
               </div>
 
@@ -193,22 +193,22 @@ export default function TopUpPage() {
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
-                    Live advantage
+                    LIVE runtime
                   </span>
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Access LIVE GEORGE</li>
-                  <li>• Restore LIVE conversations</li>
-                  <li>• Save subscriber-bound sessions</li>
-                  <li>• Get real-time response support</li>
+                  <li>• Real-time LIVE conversational support</li>
+                  <li>• Timing and pressure awareness</li>
+                  <li>• Earbud-aware LIVE assistance</li>
+                  <li>• Deepest continuity and runtime presence</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
-                  Enter Brilliant
+                  Enter Brilliant LIVE
                 </button>
               </div>
 
