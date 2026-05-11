@@ -6888,22 +6888,22 @@ Got a question?"
       >
         <div className="mb-5 text-center">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[#C7D0FF]/78">
-            GEORGE Access
+            GEORGE Continuity
           </p>
 
           <p className="mt-3 text-sm font-medium text-white">
-            Continuity and LIVE access
+            Restore continuity and LIVE runtime
           </p>
 
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Verify identity, restore access, or upgrade your level of support.
+            Restore how GEORGE recognizes you, your tier, and your LIVE continuity.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-2xl border border-white/[0.08] bg-black/28 px-4 py-3">
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Email for access
+              Continuity identity
             </label>
             <input
               type="email"
