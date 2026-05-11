@@ -5535,12 +5535,12 @@ if (liveMode) {
           GEORGE by BRANESx
         </div>
 
-        <div className="relative mt-5 flex h-[72px] w-[110px] items-center justify-center md:mt-7 md:h-[96px] md:w-[150px]">
-          <div className="absolute h-[68px] w-[68px] rounded-full bg-white/70 blur-xl md:h-[86px] md:w-[86px]" />
+        <div className="relative mt-5 flex h-[46px] w-[78px] items-center justify-center md:mt-6 md:h-[62px] md:w-[104px]">
+          <div className="absolute h-[42px] w-[42px] rounded-full bg-white/70 blur-lg md:h-[54px] md:w-[54px]" />
           <img
             src="/earbud400.png"
             alt="LIVE earbuds"
-            className="relative h-[58px] w-auto object-contain drop-shadow-[0_12px_28px_rgba(17,19,26,0.14)] md:h-[78px]"
+            className="relative h-[36px] w-auto object-contain opacity-90 drop-shadow-[0_8px_18px_rgba(17,19,26,0.10)] md:h-[48px]"
           />
         </div>
 
