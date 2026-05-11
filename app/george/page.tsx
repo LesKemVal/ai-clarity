@@ -5187,6 +5187,21 @@ router.push('/george')
 
                 <button
                   type="button"
+                  onClick={() => {
+                    if (currentTier === 'smart') {
+                      setShowLiveSegue(true)
+                      return
+                    }
+
+                    setShowLiveEntryChoice(true)
+                  }}
+                  className="pointer-events-auto rounded-full border border-[#7C8CFF]/16 bg-[#11131A]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#C7D0FF]/84 shadow-[0_0_18px_rgba(124,140,255,0.08)] transition hover:border-[#7C8CFF]/28 hover:bg-[#7C8CFF]/10 hover:text-white"
+                >
+                  ◉ LIVE
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setShowUpgradeModal(true)}
                   className="pointer-events-auto rounded-full border border-[#7C8CFF]/12 bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-[#C7D0FF]"
                 >
