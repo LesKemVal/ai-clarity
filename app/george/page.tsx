@@ -1436,9 +1436,55 @@ const [showUpgradeModal, setShowUpgradeModal] = useState(false)
     if (typeof window === 'undefined') return
 
     const params = new URLSearchParams(window.location.search)
+    const continuityToken = params.get('continuity')
     const tierParam = params.get('tier')
     const subStatus = params.get('subscription')
     const savedTier = window.localStorage.getItem('george_tier')
+
+    if (continuityToken) {
+      void fetch('/api/continuity/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: continuityToken }),
+      })
+        .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (!ok) {
+            setToastMessage(data?.error || 'Continuity link could not be verified.')
+            setShowToast(true)
+            window.history.replaceState({}, '', window.location.pathname)
+            return
+          }
+
+          const verifiedEmail = String(data?.email || '').trim().toLowerCase()
+          const verifiedTier = data?.currentTier
+
+          if (verifiedEmail) {
+            setSubscriberEmail(verifiedEmail)
+            window.localStorage.setItem('george_email', verifiedEmail)
+            window.localStorage.setItem('george_verified_continuity', 'true')
+          }
+
+          if (verifiedTier === 'intelligent' || verifiedTier === 'brilliant') {
+            setCurrentTier(verifiedTier)
+            window.localStorage.setItem('george_tier', verifiedTier)
+          } else {
+            setCurrentTier('smart')
+            window.localStorage.setItem('george_tier', 'smart')
+          }
+
+          setToastMessage('Continuity verified.')
+          setShowToast(true)
+          window.history.replaceState({}, '', window.location.pathname)
+        })
+        .catch(() => {
+          setToastMessage('Continuity link could not be verified.')
+          setShowToast(true)
+          window.history.replaceState({}, '', window.location.pathname)
+        })
+
+      return
+    }
     const savedEmail = window.localStorage.getItem('george_email') || ''
     const cleanSavedEmail = savedEmail.trim().toLowerCase()
     if (cleanSavedEmail) setSubscriberEmail(cleanSavedEmail)
