@@ -494,13 +494,9 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
-  const firstTimeGreeting = `${timeGreeting}
+  const firstTimeGreeting = '' 
 
-Start where the pressure is.`
-
-  const earlyUserGreeting = `${timeGreeting}
-
-Tell me what matters first.`
+  const earlyUserGreeting = '' 
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
@@ -4243,18 +4239,18 @@ return (
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[240px] md:pb-[280px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
-      <div className="text-center text-[22px] md:text-[28px] font-[300] tracking-[0.22em] text-white/34">
+      <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-white/42">
         GEORGE
       </div>
 
-      <div className="mt-[2px] text-center text-[11px] font-[300] tracking-[0.24em] text-white/18">
-        Smart. Intelligent. Brilliant.
+      <div className="mt-2 text-center text-[12px] font-[300] tracking-[0.28em] text-white/22">
+        Direction. Execution. Continuity.
       </div>
 
-      <div className="mt-2 flex items-center justify-center gap-[8px] px-5 py-1">
-        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/55 animate-pulse" style={{ animationDuration: '1.8s' }} />
-        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/38 animate-pulse" style={{ animationDelay: '0.22s', animationDuration: '1.8s' }} />
-        <span className="h-[5px] w-[5px] rounded-full bg-[#AEB6FF]/24 animate-pulse" style={{ animationDelay: '0.44s', animationDuration: '1.8s' }} />
+      <div className="mt-4 flex items-center justify-center gap-[7px] px-5 py-1">
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 shadow-[0_0_10px_rgba(174,182,255,0.30)] animate-[terminalDot_0.95s_ease-in-out_infinite]" />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 shadow-[0_0_8px_rgba(174,182,255,0.22)] animate-[terminalDot_0.95s_ease-in-out_infinite_120ms]" />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 shadow-[0_0_6px_rgba(174,182,255,0.16)] animate-[terminalDot_0.95s_ease-in-out_infinite_240ms]" />
       </div>
     </div>
   )}
@@ -4987,13 +4983,28 @@ router.push('/george')
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
-                <button
-                  type="button"
-                  onClick={() => window.open('/help','_blank')}
-                  className="pointer-events-auto rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-white/72"
-                >
-                  Help
-                </button>
+                <div className="pointer-events-auto flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => window.open('/help','_blank')}
+                    className="rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-white/72"
+                  >
+                    Help
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
+                    }}
+                    className="rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.04] hover:text-white/72"
+                    aria-label="Change language"
+                  >
+                    <span className="mr-1">{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
+                    {language}
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -6271,13 +6282,11 @@ Choose one:
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[10px] text-white/24 tracking-[0.16em]">
-      {isThinking ? (
-        <>WORKING{'.'.repeat(thinkingDots)}</>
-      ) : isSpeaking ? (
-        <>VOICE…</>
-      ) : (
-        <>MOVING…</>
-      )}
+      <span className="inline-flex items-center gap-[5px]">
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 shadow-[0_0_8px_rgba(174,182,255,0.24)] animate-[terminalDot_0.95s_ease-in-out_infinite]" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 shadow-[0_0_7px_rgba(174,182,255,0.18)] animate-[terminalDot_0.95s_ease-in-out_infinite_120ms]" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 shadow-[0_0_6px_rgba(174,182,255,0.12)] animate-[terminalDot_0.95s_ease-in-out_infinite_240ms]" />
+      </span>
     </div>
   </div>
 )}
@@ -6406,7 +6415,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:to
                         onKeyDown={handleComposerKeyDown}
                         placeholder="
 
-What are we working on?"
+Got a question?"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
