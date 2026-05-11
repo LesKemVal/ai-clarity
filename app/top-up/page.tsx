@@ -101,7 +101,7 @@ export default function TopUpPage() {
     setFeedback('')
   }
 
-  async function startCheckout(tier: 'intelligent' | 'brilliant') {
+  async function startCheckout(tier: 'intelligent' | 'brilliant' | 'brilliant_day') {
     try {
       setMessage('Opening secure checkout...')
 
@@ -128,6 +128,47 @@ export default function TopUpPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+
+  async function redeemFounderCode() {
+    const code = window.prompt('Enter founder access code')
+
+    if (!code) return
+
+    const normalized = code.trim().toUpperCase()
+
+    const intelligentFounder =
+      /^INTEL-FOUNDER-\d{3}$/.test(normalized)
+
+    const brilliantFounder =
+      normalized === 'BRILLIANT-FOUNDER'
+
+    if (intelligentFounder) {
+      localStorage.setItem('george_tier', 'intelligent')
+      localStorage.setItem('george_founder_code', normalized)
+
+      setMessage('Founder Intelligent access activated.')
+      setTimeout(() => {
+        window.location.href = '/george?tier=intelligent'
+      }, 500)
+
+      return
+    }
+
+    if (brilliantFounder) {
+      localStorage.setItem('george_tier', 'brilliant')
+      localStorage.setItem('george_founder_code', normalized)
+
+      setMessage('Founder Brilliant access activated.')
+      setTimeout(() => {
+        window.location.href = '/george?tier=brilliant'
+      }, 500)
+
+      return
+    }
+
+    setMessage('Invalid founder code.')
+  }
+
   return (
     <PageShell backToGeorge withSidebar={false}>
       <div className="space-y-8">
@@ -147,6 +188,21 @@ export default function TopUpPage() {
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
               These are not feature buckets. They are levels of runtime continuity, pressure support, and operational presence.
+            </div>
+
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={redeemFounderCode}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10 hover:text-white"
+              >
+                Enter Founder Code
+              </button>
+
+              <span className="text-[11px] tracking-[0.08em] text-white/35">
+                Founder access restores runtime entitlements instantly.
+              </span>
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
@@ -205,7 +261,7 @@ export default function TopUpPage() {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => startCheckout('brilliant')}
+                  onClick={() => startCheckout('brilliant_day')}
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
                   Enter Brilliant LIVE
