@@ -4015,14 +4015,17 @@ setPendingAssistantMessage({
   const showMobileHero = !showConversation
   const enterLiveConversation = () => {
     const email = subscriberEmail.trim().toLowerCase()
+    const continuityVerified =
+      typeof window !== 'undefined' &&
+      window.localStorage.getItem('george_verified_continuity') === 'true'
 
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
     setShowLiveEntryChoice(false)
 
-    if (!email) {
-      setToastMessage('Enter your email to use LIVE.')
+    if (!email || !continuityVerified) {
+      setToastMessage('Verify continuity by email to use LIVE.')
       setShowToast(true)
       setShowUpgradeModal(true)
       return
@@ -4406,6 +4409,7 @@ return (
               setCurrentTier('smart')
               window.localStorage.removeItem('george_email')
               window.localStorage.removeItem('george_tier')
+              window.localStorage.removeItem('george_verified_continuity')
               window.localStorage.removeItem('GEORGE_SESSIONS_V2')
               window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
               window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
