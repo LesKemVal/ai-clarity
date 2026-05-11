@@ -5542,13 +5542,13 @@ if (liveMode) {
       className="fixed inset-0 z-[240] bg-[#F5F1E8]"
     />
 
-    <div className="fixed inset-0 z-[250] overflow-y-auto bg-[#F5F1E8] px-4 py-5 text-[#11131A]">
+    <div className="fixed inset-0 z-[250] overflow-hidden bg-[#F5F1E8] px-4 py-5 text-[#11131A]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-[-240px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/10 blur-[120px]" />
         <div className="absolute bottom-[-260px] right-[-180px] h-[460px] w-[460px] rounded-full bg-[#D9C9A7]/18 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[620px] flex-col items-center text-center">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-[460px] flex-col items-center justify-center text-center">
         <div className="text-[10px] font-medium tracking-[0.18em] text-[#11131A]/42">
           GEORGE by BRANESx
         </div>
@@ -5572,21 +5572,18 @@ if (liveMode) {
             : 'GEORGE listens with you, tracks pressure and timing, and gives you the next useful move while the moment is unfolding.'}
         </div>
 
-        <div className="mt-5 grid w-full gap-2 md:grid-cols-2">
+        <div className="mt-5 w-full rounded-[1.25rem] border border-[#11131A]/10 bg-white/34 p-3 text-left backdrop-blur-xl">
           {[
-            ['What to say', 'Get a line, reply, pivot, or boundary.'],
-            ['When to pause', 'Know when silence is stronger.'],
-            ['How to recover', 'Regain control when pressure shifts.'],
-            ['Read the room', 'Track timing, hesitation, and openings.'],
-            ['Stay composed', 'Use short cues without rambling.'],
-            ['Keep position', 'Move toward the outcome in real time.'],
+            ['Say', 'Get the next line, reply, pivot, or boundary.'],
+            ['Pause', 'Know when silence is stronger.'],
+            ['Recover', 'Regain position when pressure shifts.'],
           ].map(([label, body]) => (
             <div
               key={label}
-              className="rounded-[1.15rem] border border-[#11131A]/10 bg-white/34 px-3.5 py-3 text-left backdrop-blur-xl"
+              className="flex items-start gap-3 border-b border-[#11131A]/8 py-2.5 last:border-b-0"
             >
-              <div className="text-[13px] font-semibold text-[#11131A]">{label}</div>
-              <div className="mt-1.5 text-[12px] leading-5 text-[#343844]/62 md:text-[13px] md:leading-6">{body}</div>
+              <div className="min-w-[58px] text-[12px] font-semibold text-[#11131A]">{label}</div>
+              <div className="text-[12px] leading-5 text-[#343844]/62">{body}</div>
             </div>
           ))}
         </div>
