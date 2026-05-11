@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { NextRequest, NextResponse } from 'next/server'
+import { upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
@@ -24,6 +25,8 @@ export async function POST(req: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
     const priceId = getPriceIdForTier(tier)
+    const email = String(body?.email || '').trim().toLowerCase()
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({ error: 'Missing STRIPE_SECRET_KEY' }, { status: 500 })
@@ -40,6 +43,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (email && !validEmail) {
+      return NextResponse.json({ error: 'Enter a valid email address.' }, { status: 400 })
+    }
+
+    if (validEmail) {
+      upsertSubscriber({ email, currentTier: 'smart' })
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: tier === 'brilliant_day' ? 'payment' : 'subscription',
       payment_method_types: ['card'],
@@ -52,13 +63,16 @@ export async function POST(req: NextRequest) {
       ],
       metadata: {
         tier,
+        ...(validEmail ? { email } : {}),
       },
+      ...(validEmail ? { customer_email: email } : {}),
       ...(tier === 'brilliant_day'
         ? {}
         : {
             subscription_data: {
               metadata: {
                 tier,
+                ...(validEmail ? { email } : {}),
               },
               ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
             },

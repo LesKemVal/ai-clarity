@@ -2,6 +2,7 @@ import Stripe from 'stripe'
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+import { getSubscriberByCustomerId, upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
@@ -87,10 +88,24 @@ export async function POST(req: NextRequest) {
               : existing.lastCustomerId,
         })
 
+        upsertSubscriber({
+          email: session.customer_details?.email || session.metadata?.email,
+          currentTier:
+            session.metadata?.tier === 'brilliant'
+              ? 'brilliant'
+              : session.metadata?.tier === 'intelligent'
+              ? 'intelligent'
+              : existing.currentTier,
+          stripeCustomerId: session.customer,
+          lastCheckoutSessionId: session.id,
+          lastSubscriptionId: session.subscription,
+        })
+
         console.log('checkout.session.completed', {
           id: session.id,
           customer: session.customer,
           subscription: session.subscription,
+          email: session.customer_details?.email || session.metadata?.email || null,
           tier: session.metadata?.tier ?? null,
         })
         break
@@ -106,16 +121,30 @@ export async function POST(req: NextRequest) {
         const existing = readStore()
         const mappedTier = getTierFromPriceIds(priceIds)
 
+        const customerId =
+          typeof subscription.customer === 'string'
+            ? subscription.customer
+            : existing.lastCustomerId
+
+        const nextTier = activeStatuses.includes(subscription.status)
+          ? (mappedTier ?? existing.currentTier)
+          : 'smart'
+
         writeStore({
-          currentTier: activeStatuses.includes(subscription.status)
-            ? (mappedTier ?? existing.currentTier)
-            : 'smart',
+          currentTier: nextTier,
           lastCheckoutSessionId: existing.lastCheckoutSessionId,
           lastSubscriptionId: subscription.id,
-          lastCustomerId:
-            typeof subscription.customer === 'string'
-              ? subscription.customer
-              : existing.lastCustomerId,
+          lastCustomerId: customerId,
+        })
+
+        const subscriber = getSubscriberByCustomerId(customerId)
+
+        upsertSubscriber({
+          email: subscription.metadata?.email || subscriber?.email,
+          currentTier: nextTier,
+          stripeCustomerId: customerId,
+          lastCheckoutSessionId: existing.lastCheckoutSessionId,
+          lastSubscriptionId: subscription.id,
         })
 
         console.log(event.type, {
