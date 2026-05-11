@@ -5525,66 +5525,60 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[250] overflow-y-auto bg-[#F5F1E8] px-5 py-6 text-[#11131A]">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-[-260px] h-[540px] w-[540px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/10 blur-[120px]" />
-        <div className="absolute bottom-[-280px] right-[-180px] h-[500px] w-[500px] rounded-full bg-[#D9C9A7]/22 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-[-240px] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/10 blur-[120px]" />
+        <div className="absolute bottom-[-260px] right-[-180px] h-[460px] w-[460px] rounded-full bg-[#D9C9A7]/18 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-[980px] flex-col justify-center">
-        <div className="mb-8 text-center text-[10px] font-medium uppercase tracking-[0.22em] text-[#11131A]/42">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-[720px] flex-col items-center justify-center text-center">
+        <div className="text-[10px] font-medium tracking-[0.18em] text-[#11131A]/42">
           GEORGE by BRANESx
         </div>
 
-        <div className="grid items-center gap-9 md:grid-cols-[1fr_260px]">
-          <div className="text-center md:text-left">
-            <div className="text-[13px] font-semibold tracking-[0.18em] text-[#11131A]/42">
-              LIVE MODE
-            </div>
-
-            <h1 className="mt-4 text-[42px] font-semibold leading-[0.98] tracking-[-0.07em] text-[#11131A] md:text-[76px]">
-              Stay in the<br />conversation.
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-[620px] text-[16px] leading-7 text-[#343844]/66 md:mx-0 md:text-[19px] md:leading-8">
-              {currentTier === 'smart'
-                ? 'LIVE is built for moments where timing, pressure, hesitation, or consequences matter. Intelligent or Brilliant access is required.'
-                : 'GEORGE listens with you, tracks the room, and gives you the next useful move before momentum is lost.'}
-            </p>
-          </div>
-
-          <div className="relative mx-auto flex h-[210px] w-[250px] items-center justify-center">
-            <div className="absolute h-[165px] w-[165px] rounded-full bg-white/70 blur-2xl" />
-            <img
-              src="/earbud400.png"
-              alt="Earbuds recommended for LIVE"
-              className="relative h-[132px] w-auto object-contain drop-shadow-[0_22px_45px_rgba(17,19,26,0.16)]"
-            />
-          </div>
+        <div className="relative mt-5 flex h-[72px] w-[110px] items-center justify-center md:mt-7 md:h-[96px] md:w-[150px]">
+          <div className="absolute h-[68px] w-[68px] rounded-full bg-white/70 blur-xl md:h-[86px] md:w-[86px]" />
+          <img
+            src="/earbud400.png"
+            alt="LIVE earbuds"
+            className="relative h-[58px] w-auto object-contain drop-shadow-[0_12px_28px_rgba(17,19,26,0.14)] md:h-[78px]"
+          />
         </div>
 
-        <div className="mx-auto mt-10 grid w-full max-w-[860px] gap-3 md:grid-cols-4">
+        <h1 className="mt-5 max-w-[650px] text-[34px] font-semibold leading-[1.02] tracking-[-0.055em] text-[#11131A] md:mt-7 md:text-[64px]">
+          Stay in the conversation with GEORGE LIVE.
+        </h1>
+
+        <div className="mt-6 max-w-[620px] text-[14px] leading-6 text-[#343844]/66 md:mt-8 md:text-[17px] md:leading-8">
+          {currentTier === 'smart'
+            ? 'LIVE is built for moments where timing, pressure, hesitation, or consequences matter. Intelligent or Brilliant access is required.'
+            : 'GEORGE listens with you, tracks pressure and timing, and gives you the next useful move while the moment is unfolding.'}
+        </div>
+
+        <div className="mt-7 grid w-full gap-2.5 md:mt-10 md:grid-cols-3 md:gap-3">
           {[
-            ['Listen', 'Use one earbud if possible.'],
-            ['Cue', 'Ask for a line, pivot, or response.'],
-            ['Read', 'GEORGE tracks pressure and timing.'],
-            ['Stay', 'You remain fully present.'],
+            ['What to say', 'Get a line, reply, pivot, or boundary.'],
+            ['When to pause', 'Know when silence is stronger.'],
+            ['How to recover', 'Regain control when pressure shifts.'],
+            ['Read the room', 'Track timing, hesitation, and openings.'],
+            ['Stay composed', 'Use short cues without rambling.'],
+            ['Keep position', 'Move toward the outcome in real time.'],
           ].map(([label, body]) => (
             <div
               key={label}
-              className="rounded-[1.35rem] border border-[#11131A]/10 bg-white/42 px-4 py-4 text-left shadow-[0_18px_46px_rgba(17,19,26,0.06)] backdrop-blur-xl"
+              className="rounded-[1.25rem] border border-[#11131A]/10 bg-white/34 px-4 py-3.5 text-left backdrop-blur-xl md:rounded-[1.6rem] md:py-5"
             >
               <div className="text-[13px] font-semibold text-[#11131A]">{label}</div>
-              <div className="mt-2 text-[12px] leading-5 text-[#343844]/62">{body}</div>
+              <div className="mt-1.5 text-[12px] leading-5 text-[#343844]/62 md:text-[13px] md:leading-6">{body}</div>
             </div>
           ))}
         </div>
 
         {currentTier === 'smart' && (
-          <div className="mx-auto mt-5 w-full max-w-[560px] rounded-[1.35rem] border border-[#11131A]/10 bg-white/42 p-3 shadow-[0_18px_46px_rgba(17,19,26,0.05)] backdrop-blur-xl">
+          <div className="mt-5 w-full max-w-[500px] rounded-2xl border border-[#11131A]/10 bg-white/34 p-3 backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setShowAccessCodeEntry((value) => !value)}
-              className="w-full text-left text-[12px] font-semibold text-[#11131A]/70 transition hover:text-[#11131A]"
+              className="w-full text-left text-[12px] font-semibold text-[#11131A]/66 transition hover:text-[#11131A]"
             >
               Have an access code?
             </button>
@@ -5601,7 +5595,7 @@ if (liveMode) {
                     if (event.key === 'Enter') redeemAccessCode()
                   }}
                   placeholder="Enter access code"
-                  className="w-full rounded-xl border border-[#11131A]/10 bg-white/70 px-3 py-2.5 text-sm text-[#11131A] outline-none placeholder:text-[#11131A]/32 focus:border-[#7C8CFF]/45"
+                  className="w-full rounded-xl border border-[#11131A]/10 bg-white/65 px-3 py-2.5 text-sm text-[#11131A] outline-none placeholder:text-[#11131A]/34 focus:border-[#7C8CFF]/45"
                 />
 
                 {accessCodeError && (
@@ -5622,12 +5616,12 @@ if (liveMode) {
           </div>
         )}
 
-        <div className="mx-auto mt-6 flex w-full max-w-[560px] gap-2">
+        <div className="mt-7 flex w-full max-w-[500px] flex-col gap-2.5 md:mt-10 md:gap-3">
           {currentTier === 'smart' ? (
             <button
               type="button"
               onClick={() => window.open('/top-up','_blank')}
-              className="flex-1 rounded-2xl bg-[#11131A] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_20px_60px_rgba(17,19,26,0.14)] transition hover:bg-[#1B2230]"
+              className="rounded-2xl bg-[#11131A] px-6 py-3.5 text-[15px] font-semibold text-white shadow-[0_20px_60px_rgba(17,19,26,0.16)] transition hover:translate-y-[-1px] hover:bg-[#1B2230] md:py-4"
             >
               Continue to access
             </button>
@@ -5638,7 +5632,7 @@ if (liveMode) {
                 setShowLiveSegue(false)
                 setShowLiveEntryChoice(true)
               }}
-              className="flex-1 rounded-2xl bg-[#11131A] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_20px_60px_rgba(17,19,26,0.14)] transition hover:bg-[#1B2230]"
+              className="rounded-2xl bg-[#11131A] px-6 py-3.5 text-[15px] font-semibold text-white shadow-[0_20px_60px_rgba(17,19,26,0.16)] transition hover:translate-y-[-1px] hover:bg-[#1B2230] md:py-4"
             >
               Enter LIVE
             </button>
@@ -5647,13 +5641,13 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => setShowLiveSegue(false)}
-            className="rounded-2xl border border-[#11131A]/10 bg-white/52 px-5 py-3.5 text-sm font-semibold text-[#11131A]/58 shadow-[0_18px_40px_rgba(17,19,26,0.05)] backdrop-blur-xl transition hover:bg-white hover:text-[#11131A]"
+            className="rounded-2xl border border-[#11131A]/10 bg-white/55 px-6 py-3.5 text-[15px] font-semibold text-[#11131A]/72 shadow-[0_18px_40px_rgba(17,19,26,0.05)] backdrop-blur-xl transition hover:bg-white hover:text-[#11131A] md:py-4"
           >
             Not now
           </button>
         </div>
 
-        <div className="mt-7 text-center text-[10px] uppercase tracking-[0.18em] text-[#11131A]/32">
+        <div className="mt-6 text-[10px] tracking-[0.16em] text-[#11131A]/34">
           One ear. One moment. Stay in it.
         </div>
       </div>
