@@ -6901,6 +6901,26 @@ Got a question?"
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
               Continuity identity
             </label>
+            <ContinuityCapsule
+              email={subscriberEmail}
+              label="Recognized as"
+              onClear={() => {
+                setSubscriberEmail('')
+                window.localStorage.removeItem('george_email')
+                window.localStorage.removeItem('george_verified_continuity')
+              }}
+            />
+
+            <ContinuityCapsule
+              email={subscriberEmail}
+              label="Recognized as"
+              onClear={() => {
+                setSubscriberEmail('')
+                window.localStorage.removeItem('george_email')
+                window.localStorage.removeItem('george_verified_continuity')
+              }}
+            />
+
             <input
               type="email"
               value={subscriberEmail}
