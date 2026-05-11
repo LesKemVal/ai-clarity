@@ -24,9 +24,9 @@ export default function TopUpPage() {
       return 'Activate Conversation Assistance.'
     }
     if (intent === 'pro') {
-      return 'Continue into Pro Conversation Partner.'
+      return 'Continue into Brilliant Day.'
     }
-    return 'Decide how much continuity and live support you want.'
+    return 'Choose how deeply GEORGE stays with you.'
   }, [intent])
 
   async function playVoiceSample(voice: string, label: string) {
@@ -76,9 +76,9 @@ export default function TopUpPage() {
       return 'Conversation Assistance includes Brilliant access with live guidance, cues, exact lines, timing help, and pressure support when words matter.'
     }
     if (intent === 'pro') {
-      return 'Pro Conversation Partner includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
+      return 'Brilliant Day includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
     }
-    return 'Use GEORGE anonymously for free. Become a subscriber when you want remembered continuity, LIVE access, saved sessions, and stronger execution support.'
+    return 'GEORGE scales from clarity → operational continuity → real-time LIVE support. The deeper the tier, the longer GEORGE stays with you under pressure.'
   }, [intent])
 
   function submitFeedback() {
@@ -146,7 +146,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              GEORGE scales from clarity → continuity → live operational support. The deeper the tier, the longer GEORGE stays with you under pressure.
+              These are not feature buckets. They are levels of runtime continuity, pressure support, and operational presence.
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
@@ -159,10 +159,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Clarity and directional reasoning</li>
-                  <li>• Lightweight execution help</li>
-                  <li>• Basic voice and runtime access</li>
-                  <li>• Use GEORGE immediately</li>
+                  <li>• Clarify what matters</li>
+                  <li>• Reduce drift and confusion</li>
+                  <li>• Lightweight operational guidance</li>
+                  <li>• Immediate anonymous access</li>
                 </ul>
               </div>
 
@@ -176,9 +176,9 @@ export default function TopUpPage() {
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
                   <li>• Expanded continuity and persistence</li>
-                  <li>• Stronger operational assistance</li>
-                  <li>• Better pressure navigation</li>
-                  <li>• Expanded LIVE/runtime access</li>
+                  <li>• Stronger execution support</li>
+                  <li>• Better pressure handling</li>
+                  <li>• Expanded runtime access</li>
                 </ul>
                 <button
                   type="button"
@@ -198,10 +198,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Real-time LIVE conversational support</li>
+                  <li>• Real-time LIVE assistance</li>
                   <li>• Timing and pressure awareness</li>
-                  <li>• Earbud-aware LIVE assistance</li>
-                  <li>• Deepest continuity and runtime presence</li>
+                  <li>• Conversational pacing + response shaping</li>
+                  <li>• Strongest continuity and runtime presence</li>
                 </ul>
                 <button
                   type="button"
@@ -214,24 +214,24 @@ export default function TopUpPage() {
 
               <div className="rounded-[1.8rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Pro Conversation Partner</p>
+                  <p className="text-base font-semibold text-white">Brilliant Day</p>
                   <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    For closers
+                    Temporary runtime elevation
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
+                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$5 Day Pass</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Structured LIVE assistance</li>
-                  <li>• Persistent operational continuity</li>
-                  <li>• Real-time scripts and recovery cues</li>
-                  <li>• Campaign-grade conversation support</li>
+                  <li>• Temporary Brilliant access</li>
+                  <li>• Interviews and negotiations</li>
+                  <li>• Sales calls and difficult conversations</li>
+                  <li>• LIVE support when the moment matters</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
                 >
-                  Continue into Pro
+                  Activate Brilliant Day
                 </button>
               </div>
             </div>

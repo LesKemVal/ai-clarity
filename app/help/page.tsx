@@ -22,10 +22,10 @@ export default function HelpPage() {
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <p className="text-xl font-semibold text-white">
-            GEORGE is a clarity and execution system.
+            GEORGE is a clarity, execution, and continuity system.
           </p>
           <p className="text-neutral-400 leading-7 mt-2">
-            In normal mode, GEORGE helps you think. In LIVE mode, GEORGE helps you perform. Same system — tighter when the pressure rises.
+            Normal GEORGE helps you think clearly. LIVE GEORGE helps you stay composed while the moment is moving.
           </p>
         </section>
 
@@ -95,10 +95,10 @@ export default function HelpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Tiers</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Smart → anonymous direction and big-picture clarity</li>
-            <li>Intelligent → subscriber continuity, session restoration, and stronger execution</li>
-            <li>Brilliant → LIVE support, real-time pressure guidance, and saved continuity</li>
-            <li>Pro → structured professional workflows as the product layer matures</li>
+            <li>Smart → clarity and directional reasoning</li>
+            <li>Intelligent → operational continuity and stronger execution support</li>
+            <li>Brilliant → real-time LIVE assistance and strongest runtime continuity</li>
+            <li>Brilliant Day → temporary LIVE runtime elevation</li>
           </ul>
         </section>
 

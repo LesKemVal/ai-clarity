@@ -14,10 +14,10 @@ export default function ConversationPage() {
         <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-6 md:p-8">
           <div className="space-y-4">
             <p className="text-2xl font-semibold text-white">
-              Words matter when the moment is live.
+              Stay composed while the moment is happening.
             </p>
             <p className="leading-7 text-neutral-200">
-              GEORGE helps you think, respond, hold leverage, and move outcomes in real time.
+              GEORGE helps you respond clearly, protect leverage, and stay operational under pressure.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
@@ -47,7 +47,7 @@ export default function ConversationPage() {
           </h2>
 
           <div className="space-y-3 text-neutral-300">
-            <p>Built for individuals.</p>
+            <p>For individuals navigating real conversations.</p>
 
             <ul className="list-disc pl-5 space-y-2 text-neutral-400">
               <li>Exact lines</li>
@@ -73,15 +73,15 @@ export default function ConversationPage() {
           </h2>
 
           <div className="space-y-3 text-neutral-200">
-            <p>Built for reps, callers, teams, and firms.</p>
+            <p>Structured professional workflows are coming online progressively.</p>
 
             <ul className="list-disc pl-5 space-y-2 text-neutral-300">
-              <li>Scripts</li>
-              <li>Guardrails</li>
-              <li>Callbacks</li>
-              <li>Objection handling</li>
-              <li>Repeatable winning lines</li>
-              <li>Campaign discipline</li>
+              <li>Campaign continuity</li>
+              <li>Structured LIVE assistance</li>
+              <li>Conversation recovery</li>
+              <li>Pressure-aware response support</li>
+              <li>Operational continuity</li>
+              <li>Professional runtime direction</li>
             </ul>
 
             <a
