@@ -1540,7 +1540,6 @@ const redeemFounderCode = () => {
 
     if (savedTier === 'intelligent' || savedTier === 'brilliant') {
       setCurrentTier(savedTier)
-      return
     }
 
     void fetch(`/api/subscription-state${cleanSavedEmail ? `?email=${encodeURIComponent(cleanSavedEmail)}` : ''}`)
