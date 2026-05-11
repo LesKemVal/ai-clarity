@@ -6853,10 +6853,17 @@ Got a question?"
         className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.08] bg-[#11131A]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.54)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-6 text-center">
-          <p className="text-sm font-medium text-[#C7D0FF]">Stay Brilliant.</p>
+        <div className="mb-5 text-center">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-[#C7D0FF]/78">
+            GEORGE Access
+          </p>
+
+          <p className="mt-3 text-sm font-medium text-white">
+            Continuity and LIVE access
+          </p>
+
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Choose the level of continuity, control, and execution support you want.
+            Verify identity, restore access, or upgrade your level of support.
           </p>
         </div>
 
@@ -6881,7 +6888,7 @@ Got a question?"
               className="mt-2 w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-700"
             />
             <p className="mt-2 text-[11px] leading-5 text-neutral-500">
-              GEORGE uses this to remember your access on this device and restore your tier after checkout.
+              Your continuity link restores your tier and LIVE access on this device.
             </p>
 
             <button
@@ -6953,9 +6960,17 @@ Got a question?"
             }}
             className="block w-full rounded-2xl max-w-full border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-left transition hover:border-[#7C8CFF]/24 hover:bg-white/[0.05]"
           >
-            <div className="text-sm font-medium text-white">Move with Intelligent</div>
-            <div className="mt-1 text-xs leading-5 text-neutral-500">
-              Structure your moves, remove hesitation, and make consistent progress.
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium text-white">Intelligent</div>
+                <div className="mt-1 text-xs leading-5 text-neutral-500">
+                  Subscriber continuity and stronger execution support.
+                </div>
+              </div>
+
+              <div className="text-[11px] font-medium text-[#C7D0FF]">
+                $9.99
+              </div>
             </div>
           </button>
 
@@ -6989,9 +7004,17 @@ Got a question?"
             }}
             className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/24 bg-[#7C8CFF]/8 px-4 py-3 text-left transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/12"
           >
-            <div className="text-sm font-medium text-white">Enter Brilliant Mode</div>
-            <div className="mt-1 text-xs leading-5 text-neutral-300">
-              Real-time execution when words, timing, and pressure matter.
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium text-white">Brilliant</div>
+                <div className="mt-1 text-xs leading-5 text-neutral-300">
+                  LIVE conversational assistance and restored LIVE continuity.
+                </div>
+              </div>
+
+              <div className="text-[11px] font-medium text-[#C7D0FF]">
+                $25
+              </div>
             </div>
           </button>
         </div>
