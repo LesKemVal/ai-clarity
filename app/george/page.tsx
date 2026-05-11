@@ -3993,10 +3993,10 @@ setPendingAssistantMessage({
       Smart. Intelligent. Brilliant.
     </div>
 
-    <div className="mt-4 flex items-center gap-1.5">
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite]" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite_0.2s]" />
-      <span className="h-1 w-1 rounded-full bg-[#7C8CFF] animate-[pulse_1.2s_ease-in-out_infinite_0.4s]" />
+    <div className="mt-4 flex items-center gap-[7px]">
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 pulse-dot-2" />
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 pulse-dot-3" />
     </div>
 
   </div>
@@ -4278,9 +4278,9 @@ return (
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-[7px] px-5 py-1">
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 shadow-[0_0_10px_rgba(174,182,255,0.30)] animate-[terminalDot_0.95s_ease-in-out_infinite]" />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 shadow-[0_0_8px_rgba(174,182,255,0.22)] animate-[terminalDot_0.95s_ease-in-out_infinite_120ms]" />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 shadow-[0_0_6px_rgba(174,182,255,0.16)] animate-[terminalDot_0.95s_ease-in-out_infinite_240ms]" />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 pulse-dot-2" />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 pulse-dot-3" />
       </div>
     </div>
   )}
@@ -6313,9 +6313,9 @@ Choose one:
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[10px] text-white/24 tracking-[0.16em]">
       <span className="inline-flex items-center gap-[5px]">
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 shadow-[0_0_8px_rgba(174,182,255,0.24)] animate-[terminalDot_0.95s_ease-in-out_infinite]" />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 shadow-[0_0_7px_rgba(174,182,255,0.18)] animate-[terminalDot_0.95s_ease-in-out_infinite_120ms]" />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 shadow-[0_0_6px_rgba(174,182,255,0.12)] animate-[terminalDot_0.95s_ease-in-out_infinite_240ms]" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 pulse-dot-1" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 pulse-dot-2" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 pulse-dot-3" />
       </span>
     </div>
   </div>
