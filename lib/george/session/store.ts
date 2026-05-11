@@ -271,6 +271,41 @@ export function getActiveSessionForMode(mode: GeorgeSessionMode) {
   return safeReadSessions().find((session) => session.id === activeId && session.mode === mode) || null
 }
 
+
+export function getLatestSubscriberSession(
+  subscriberEmail: string,
+  mode?: GeorgeSessionMode
+) {
+  const clean = subscriberEmail.trim().toLowerCase()
+
+  if (!clean) {
+    return null
+  }
+
+  return safeReadSessions()
+    .filter((session) => {
+      const sessionEmail =
+        typeof session.metadata?.subscriberEmail === 'string'
+          ? session.metadata.subscriberEmail.trim().toLowerCase()
+          : ''
+
+      if (!sessionEmail) {
+        return false
+      }
+
+      if (sessionEmail !== clean) {
+        return false
+      }
+
+      if (mode && session.mode !== mode) {
+        return false
+      }
+
+      return true
+    })
+    .sort((a, b) => b.updatedAt - a.updatedAt)[0] || null
+}
+
 export function createSession(
   mode: GeorgeSessionMode,
   messages: GeorgeStoredMessage[],

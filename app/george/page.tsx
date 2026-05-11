@@ -8,7 +8,7 @@ import Sidebar from '@/components/Sidebar'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession } from '@/lib/george/session/store'
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -1165,7 +1165,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         setActiveCampaignId(null)
       }
 
-      let existingLive = getActiveSessionForMode('live')
+      let existingLive =
+        subscriberEmail.trim()
+          ? getLatestSubscriberSession(subscriberEmail, 'live')
+          : null
 
 if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
         skipNextTypewriterRef.current = true
@@ -1216,7 +1219,10 @@ You got this.`
 
     // /george always boots into normal GEORGE.
     setActiveMode('normal')
-    const activeSession = getActiveSessionForMode('normal')
+    const activeSession =
+      subscriberEmail.trim()
+        ? getLatestSubscriberSession(subscriberEmail, 'normal')
+        : null
 
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
