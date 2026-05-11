@@ -3962,10 +3962,27 @@ setPendingAssistantMessage({
   const showConversation = input.trim().length > 0 || messages.some((m) => m.role === 'user') || liveMode
   const showMobileHero = !showConversation
   const enterLiveConversation = () => {
+    const email = subscriberEmail.trim().toLowerCase()
+
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
     setShowRecentFolders(false)
     setShowLiveEntryChoice(false)
+
+    if (!email) {
+      setToastMessage('Enter your email to use LIVE.')
+      setShowToast(true)
+      setShowUpgradeModal(true)
+      return
+    }
+
+    if (currentTier === 'smart') {
+      setToastMessage('LIVE requires Intelligent or Brilliant access.')
+      setShowToast(true)
+      setShowUpgradeModal(true)
+      return
+    }
+
     setLiveSegueIndex(Math.floor(Math.random() * LIVE_SEGUES.length))
     setShowLiveSegue(true)
   }
