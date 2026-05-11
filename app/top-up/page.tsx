@@ -24,9 +24,9 @@ export default function TopUpPage() {
       return 'Activate Conversation Assistance.'
     }
     if (intent === 'pro') {
-      return 'Start using Pro Conversation Partner.'
+      return 'Continue into Pro Conversation Partner.'
     }
-    return 'Decide how much control you want in the moment.'
+    return 'Decide how much continuity and live support you want.'
   }, [intent])
 
   async function playVoiceSample(voice: string, label: string) {
@@ -78,7 +78,7 @@ export default function TopUpPage() {
     if (intent === 'pro') {
       return 'Pro Conversation Partner includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
     }
-    return 'Start free. Upgrade when you want tighter thinking, faster decisions, and real-time support when words and timing matter.'
+    return 'Use GEORGE anonymously for free. Become a subscriber when you want remembered continuity, LIVE access, saved sessions, and stronger execution support.'
   }, [intent])
 
   function submitFeedback() {
@@ -146,7 +146,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
-              Brilliant is where GEORGE helps you respond in real time — what to say, when to say it, and how to stay in control when outcomes matter.
+              Brilliant unlocks LIVE GEORGE — remembered continuity, real-time response support, saved LIVE sessions, and operational assistance when pressure changes outcomes.
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-4">
@@ -159,10 +159,10 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Find the real issue</li>
-                  <li>• See the next move</li>
-                  <li>• Move in the right sequence</li>
-                  <li>• Start with the strongest move</li>
+                  <li>• Use GEORGE anonymously</li>
+                  <li>• Get direction and clarity</li>
+                  <li>• Think through real situations</li>
+                  <li>• No subscriber identity required</li>
                 </ul>
               </div>
 
@@ -175,17 +175,17 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Hold direction over time</li>
-                  <li>• Make better calls under pressure</li>
-                  <li>• Think cleaner and move faster</li>
-                  <li>• Turn intent into progress</li>
+                  <li>• Remember continuity across returns</li>
+                  <li>• Restore sessions automatically</li>
+                  <li>• Maintain stronger execution over time</li>
+                  <li>• Unlock subscriber continuity</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
                   className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
                 >
-                  Upgrade to Intelligent
+                  Continue with Intelligent
                 </button>
               </div>
 
@@ -198,17 +198,17 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Know what to say next</li>
-                  <li>• Stay controlled under pressure</li>
-                  <li>• Read the room and adjust</li>
-                  <li>• Move without hesitation</li>
+                  <li>• Access LIVE GEORGE</li>
+                  <li>• Restore LIVE conversations</li>
+                  <li>• Save subscriber-bound sessions</li>
+                  <li>• Get real-time response support</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
-                  Upgrade to Brilliant
+                  Enter Brilliant
                 </button>
               </div>
 
@@ -221,17 +221,17 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$49+</div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Keep every call controlled</li>
-                  <li>• Get live lines and cues</li>
-                  <li>• Recover without losing position</li>
-                  <li>• Reduce weak repetition</li>
+                  <li>• Structured LIVE assistance</li>
+                  <li>• Persistent operational continuity</li>
+                  <li>• Real-time scripts and recovery cues</li>
+                  <li>• Campaign-grade conversation support</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
                 >
-                  Start using Pro
+                  Continue into Pro
                 </button>
               </div>
             </div>
