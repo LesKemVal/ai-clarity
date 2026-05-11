@@ -55,7 +55,7 @@ export default function HelpPage() {
 
           <div className="space-y-4 text-neutral-300">
             <p className="text-white font-medium">Just talk.</p>
-            <p className="text-neutral-400">LIVE GEORGE listens for pressure, confusion, timing, and opportunity. You do not need to explain everything first.</p>
+            <p className="text-neutral-400">LIVE GEORGE listens for pressure, confusion, timing, and opportunity. LIVE requires subscriber identity because it depends on remembered continuity and session recovery.</p>
 
             <p className="text-white font-medium">Cues</p>
             <p className="text-neutral-400">GEORGE gives short next-move guidance when the moment is moving fast.</p>
@@ -75,14 +75,14 @@ export default function HelpPage() {
             <li>Send — move the response where it needs to go</li>
             <li>Clarify — sharpen the signal without losing intent</li>
             <li>Reword — reshape the line for the moment you are in</li>
-            <li>LIVE — enter real-time support</li>
+            <li>LIVE — enter real-time support when subscriber continuity is active</li>
           </ul>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Professional Mode</h2>
           <p className="text-neutral-300">
-            Professional Mode is for conversations tied to results: calls, appointments, donations, sales, consulting, outreach, recruiting, or any situation where words create measurable outcomes.
+            Professional Mode is the structured workflow layer for conversations tied to results: calls, appointments, donations, sales, consulting, outreach, recruiting, or any situation where words create measurable outcomes. It is coming online progressively.
           </p>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Load a campaign</li>
@@ -95,16 +95,16 @@ export default function HelpPage() {
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Tiers</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Smart → direction and big-picture clarity</li>
-            <li>Intelligent → deeper structure, continuity, and progress</li>
-            <li>Brilliant → LIVE support and real-time conversation advantage</li>
-            <li>Pro → campaign discipline and measurable performance improvement</li>
+            <li>Smart → anonymous direction and big-picture clarity</li>
+            <li>Intelligent → subscriber continuity, session restoration, and stronger execution</li>
+            <li>Brilliant → LIVE support, real-time pressure guidance, and saved continuity</li>
+            <li>Pro → structured professional workflows as the product layer matures</li>
           </ul>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <p className="text-white text-lg font-medium">
-            The simple rule: in normal mode, give GEORGE the objective. In LIVE mode, just talk.
+            The simple rule: use normal GEORGE anonymously when you just need direction. Use subscriber continuity when you want GEORGE to remember, restore, and support LIVE execution.
           </p>
         </section>
 

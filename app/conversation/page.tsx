@@ -62,7 +62,7 @@ export default function ConversationPage() {
               href="/top-up?intent=conversation"
               className="inline-flex rounded-full bg-[#7C8CFF] px-5 py-3 text-sm font-semibold text-black"
             >
-              Activate Conversation Engine
+              Continue to Brilliant
             </a>
           </div>
         </section>
@@ -88,7 +88,7 @@ export default function ConversationPage() {
               href="/top-up?intent=pro"
               className="inline-flex rounded-full border border-[#22c55e]/40 bg-[#22c55e]/20 px-5 py-3 text-sm font-semibold text-white"
             >
-              Activate Pro Conversation Partner
+              View Pro Direction
             </a>
           </div>
         </section>
@@ -103,7 +103,7 @@ export default function ConversationPage() {
             <p>Switch to short cues.</p>
             <p>Move into negotiation mode.</p>
             <p>Turn audio on or off.</p>
-            <p>GEORGE keeps your campaign, script, and guardrails active while changing how it helps.</p>
+            <p>When subscriber continuity is active, GEORGE can keep the conversation state, script direction, and guardrails available while changing how it helps.</p>
           </div>
         </section>
 
@@ -114,9 +114,9 @@ export default function ConversationPage() {
 
           <div className="space-y-2 text-neutral-300">
             <p>Open GEORGE.</p>
-            <p>Choose campaign or script.</p>
+            <p>Return through subscriber continuity.</p>
             <p>Tap LIVE.</p>
-            <p>GEORGE resumes instantly.</p>
+            <p>With subscriber continuity active, GEORGE can restore the last saved conversation state.</p>
           </div>
         </section>
 

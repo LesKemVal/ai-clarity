@@ -88,7 +88,7 @@ export default function RoadmapPage() {
                 Choose the level of pressure GEORGE should carry with you.
               </h2>
               <p className="text-sm leading-7 text-neutral-300 md:text-base">
-                Start with direction. Upgrade for continuity, sharper execution, live conversation support, and professional performance when words affect outcomes.
+                Start anonymously with direction. Add subscriber identity when you want remembered continuity, restored sessions, LIVE support, and stronger execution when words affect outcomes.
               </p>
             </div>
 
@@ -111,8 +111,8 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-[#D7DDFF]">Best value</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Keep direction over time</li>
-                  <li>• Think cleaner under pressure</li>
+                  <li>• Restore subscriber continuity</li>
+                  <li>• Save and return to sessions</li>
                   <li>• Make better calls</li>
                   <li>• Turn intent into progress</li>
                 </ul>              </div>
@@ -123,9 +123,9 @@ export default function RoadmapPage() {
                   <p className="text-xs uppercase tracking-[0.18em] text-white/55">Flagship</p>
                 </div>
                 <ul className="space-y-2 text-sm leading-6 text-neutral-200">
-                  <li>• Know what to say next</li>
+                  <li>• Access LIVE GEORGE</li>
                   <li>• Stay controlled under pressure</li>
-                  <li>• Adjust while it’s happening</li>
+                  <li>• Restore LIVE conversations</li>
                   <li>• Handle the moment with control</li>
                   <li>• Recover faster when the room shifts</li>
                 </ul>              </div>
@@ -138,7 +138,7 @@ export default function RoadmapPage() {
                   <li>• Keep callers sharp</li>
                   <li>• Give live lines and cues</li>
                   <li>• Reduce weak repetition</li>
-                  <li>• Build disciplined performance</li>
+                  <li>• Structured workflows coming online progressively</li>
                 </ul>
               </div>
 
