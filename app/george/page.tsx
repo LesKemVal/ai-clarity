@@ -94,6 +94,7 @@ function saveSessionToV2(params: {
           : params.mode === 'live'
             ? 'live_conversation'
             : 'normal',
+      subscriberEmail: typeof window !== 'undefined' ? window.localStorage.getItem('george_email') || undefined : undefined,
       ...params.metadata,
     },
   })
@@ -1017,6 +1018,12 @@ const [isListening, setIsListening] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [profileName, setProfileName] = useState('')
   const [subscriberEmail, setSubscriberEmail] = useState('')
+
+  const getSubscriberSessionMetadata = useCallback(() => {
+    const email = subscriberEmail.trim().toLowerCase()
+    return email ? { subscriberEmail: email } : {}
+  }, [subscriberEmail])
+
   const [birthdayMD, setBirthdayMD] = useState('')
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
@@ -1181,7 +1188,7 @@ Speak naturally.
 You got this.`
       }
 
-      createSession('live', [liveIntro], 'LIVE Assistance')
+      createSession('live', [liveIntro], 'LIVE Assistance', getSubscriberSessionMetadata())
       setMessages([liveIntro])
       messagesRef.current = [liveIntro]
       liveSessionWriteReadyRef.current = true
@@ -1215,7 +1222,7 @@ You got this.`
     bumpVisitCount()
 
     const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
-    createSession('normal', firstMessage, 'Untitled session')
+    createSession('normal', firstMessage, 'Untitled session', getSubscriberSessionMetadata())
     setMessages(firstMessage)
     messagesRef.current = firstMessage
     normalSessionWriteReadyRef.current = true
@@ -1697,12 +1704,12 @@ If you need help, just say things like:
 I’ll stay with you.`
   }
 
-  createSession('live', [liveIntro], 'LIVE Assistance')
+  createSession('live', [liveIntro], 'LIVE Assistance', getSubscriberSessionMetadata())
 liveSessionWriteReadyRef.current = true
 setMessages([liveIntro])
   messagesRef.current = [liveIntro]
 } else {
-  createSession('live', [openingMessage], 'LIVE Assistance')
+  createSession('live', [openingMessage], 'LIVE Assistance', getSubscriberSessionMetadata())
 liveSessionWriteReadyRef.current = true
 setMessages([openingMessage])
   messagesRef.current = [openingMessage]
@@ -2058,7 +2065,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (liveMode || isManualLive) return
     if (!messages.length) return
 
-    updateActiveSessionMessages(messages, 'normal')
+    updateActiveSessionMessages(messages, 'normal', getSubscriberSessionMetadata())
   }, [messages, liveMode, conversationMode, activePromptContext])
 
   useEffect(() => {
@@ -2067,7 +2074,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     if (!liveMode && !isManualLive) return
     if (!messages.length) return
 
-    updateActiveSessionMessages(messages, 'live')
+    updateActiveSessionMessages(messages, 'live', getSubscriberSessionMetadata())
   }, [messages, liveMode, conversationMode, activePromptContext])
 
   useEffect(() => {
@@ -2577,7 +2584,7 @@ requestAnimationFrame(() => {
       messagesRef.current = next
 
       try {
-        updateActiveSessionMessages(next, activeCampaignId ? 'campaign' : liveMode ? 'live' : 'normal')
+        updateActiveSessionMessages(next, activeCampaignId ? 'campaign' : liveMode ? 'live' : 'normal', getSubscriberSessionMetadata())
       } catch {}
       return next
     })

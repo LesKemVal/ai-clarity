@@ -210,7 +210,11 @@ export function hasMeaningfulUserMessage(session: any) {
   }
 }
 
-export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mode: GeorgeSessionMode = getActiveMode()) {
+export function updateActiveSessionMessages(
+  messages: GeorgeStoredMessage[],
+  mode: GeorgeSessionMode = getActiveMode(),
+  metadataUpdates: GeorgeStoredSessionMetadata = {}
+) {
   // --- session intelligence extraction ---
   let userGoal = undefined
   let lastKnownState = undefined
@@ -234,7 +238,18 @@ export function updateActiveSessionMessages(messages: GeorgeStoredMessage[], mod
   const sessions = safeReadSessions()
   const updated = sessions.map((session) =>
     session.id === activeId && session.mode === mode
-      ? { ...session, messages, updatedAt: Date.now(), userGoal: userGoal || session.userGoal, lastKnownState: lastKnownState || session.lastKnownState, title: generateSessionTitle(userGoal || session.userGoal, lastKnownState || session.lastKnownState) }
+      ? {
+          ...session,
+          messages,
+          updatedAt: Date.now(),
+          userGoal: userGoal || session.userGoal,
+          lastKnownState: lastKnownState || session.lastKnownState,
+          title: generateSessionTitle(userGoal || session.userGoal, lastKnownState || session.lastKnownState),
+          metadata: {
+            ...(session.metadata || {}),
+            ...metadataUpdates,
+          },
+        }
       : session
   )
 
@@ -256,7 +271,12 @@ export function getActiveSessionForMode(mode: GeorgeSessionMode) {
   return safeReadSessions().find((session) => session.id === activeId && session.mode === mode) || null
 }
 
-export function createSession(mode: GeorgeSessionMode, messages: GeorgeStoredMessage[], title = 'New Session') {
+export function createSession(
+  mode: GeorgeSessionMode,
+  messages: GeorgeStoredMessage[],
+  title = 'New Session',
+  metadata: GeorgeStoredSessionMetadata = {}
+) {
   const now = Date.now()
 
   const session: GeorgeStoredSession = {
@@ -267,6 +287,7 @@ export function createSession(mode: GeorgeSessionMode, messages: GeorgeStoredMes
     createdAt: now,
     updatedAt: now,
     messages,
+    metadata,
   }
 
   upsertSession(session)
