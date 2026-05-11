@@ -6872,6 +6872,44 @@ Got a question?"
             <p className="mt-2 text-[11px] leading-5 text-neutral-500">
               GEORGE uses this to remember your access on this device and restore your tier after checkout.
             </p>
+
+            <button
+              type="button"
+              onClick={async () => {
+                const email = subscriberEmail.trim().toLowerCase()
+
+                if (!email) {
+                  setToastMessage('Enter your email first.')
+                  setShowToast(true)
+                  return
+                }
+
+                try {
+                  const response = await fetch('/api/continuity/request-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                  })
+
+                  const data = await response.json()
+
+                  if (!response.ok) {
+                    setToastMessage(data?.error || 'Unable to send continuity link.')
+                    setShowToast(true)
+                    return
+                  }
+
+                  setToastMessage('Continuity link sent.')
+                  setShowToast(true)
+                } catch {
+                  setToastMessage('Unable to send continuity link.')
+                  setShowToast(true)
+                }
+              }}
+              className="mt-3 w-full rounded-full border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.06] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#C7D0FF] transition hover:bg-[#7C8CFF]/[0.12] hover:text-white"
+            >
+              Send continuity link
+            </button>
           </div>
 
           <button
