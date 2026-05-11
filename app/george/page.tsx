@@ -5,6 +5,7 @@ import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
+import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -4417,35 +4418,24 @@ return (
         Direction. Execution. Continuity.
       </div>
 
-      {subscriberEmail.trim() && (
-        <div className="mt-4 flex items-center gap-2 rounded-full border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.05] px-3 py-1.5">
-          <div className="h-2 w-2 rounded-full bg-[#7C8CFF]/80" />
-          <span className="max-w-[190px] truncate text-[11px] font-medium tracking-[0.02em] text-white/58">
-            Continuing as {subscriberEmail.trim().toLowerCase()}
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              setSubscriberEmail('')
-              setCurrentTier('smart')
-              window.localStorage.removeItem('george_email')
-              window.localStorage.removeItem('george_tier')
-              window.localStorage.removeItem('george_verified_continuity')
-              window.localStorage.removeItem('GEORGE_SESSIONS_V2')
-              window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
-              window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
-              window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
-              window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
-              setMessages([])
-              messagesRef.current = []
-              window.location.reload()
-            }}
-            className="text-[10px] uppercase tracking-[0.16em] text-white/28 transition hover:text-white/58"
-          >
-            Not you?
-          </button>
-        </div>
-      )}
+      <ContinuityCapsule
+        email={subscriberEmail}
+        onClear={() => {
+          setSubscriberEmail('')
+          setCurrentTier('smart')
+          window.localStorage.removeItem('george_email')
+          window.localStorage.removeItem('george_tier')
+          window.localStorage.removeItem('george_verified_continuity')
+          window.localStorage.removeItem('GEORGE_SESSIONS_V2')
+          window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
+          window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
+          window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
+          window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
+          setMessages([])
+          messagesRef.current = []
+          window.location.reload()
+        }}
+      />
 
       <div className="mt-4 flex items-center justify-center gap-[7px] px-5 py-1">
         <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
