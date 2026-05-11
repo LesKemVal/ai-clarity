@@ -6512,7 +6512,7 @@ Choose one:
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[54%] md:top-[58%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/88 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/96 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/88 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/96 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[1.95rem] border border-white/[0.08] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
 
                       <input
