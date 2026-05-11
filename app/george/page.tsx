@@ -5187,14 +5187,7 @@ router.push('/george')
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (currentTier === 'smart') {
-                      setShowLiveSegue(true)
-                      return
-                    }
-
-                    setShowLiveEntryChoice(true)
-                  }}
+                  onClick={enterLiveConversation}
                   className="pointer-events-auto rounded-full border border-[#7C8CFF]/16 bg-[#11131A]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#C7D0FF]/84 shadow-[0_0_18px_rgba(124,140,255,0.08)] transition hover:border-[#7C8CFF]/28 hover:bg-[#7C8CFF]/10 hover:text-white"
                 >
                   ◉ LIVE
@@ -5534,26 +5527,42 @@ if (liveMode) {
       className="fixed inset-0 z-[240] bg-black/64 backdrop-blur-[12px]"
     />
 
-    <div className="fixed inset-0 z-[250] overflow-y-auto bg-[radial-gradient(circle_at_top,#17245f_0%,#070915_42%,#020204_100%)] px-5 py-8 text-white">
-      <div className="pointer-events-none absolute left-1/2 top-[-120px] h-[360px] w-[360px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/18 blur-[90px]" />
-      <div className="pointer-events-none absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-[#9B6CFF]/12 blur-[110px]" />
+    <div className="fixed inset-0 z-[250] overflow-y-auto bg-[#F4EFE6] px-5 py-8 text-[#111318]">
+      <div className="pointer-events-none absolute left-1/2 top-[-160px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-white/70 blur-[90px]" />
+      <div className="pointer-events-none absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-[#E8DFD2]/80 blur-[110px]" />
 
       <div className="relative mx-auto flex min-h-[calc(100vh-64px)] w-full max-w-[860px] flex-col justify-center">
-        <div className="mb-5 inline-flex w-fit items-center rounded-full border border-[#7C8CFF]/25 bg-white/[0.055] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.28em] text-[#B8C1FF] shadow-[0_0_30px_rgba(124,140,255,0.12)]">
-          LIVE
+        <div className="mb-5 text-center text-[11px] font-medium uppercase tracking-[0.36em] text-neutral-400">
+          GEORGE by BRANESx
         </div>
 
-        <div className="max-w-[780px] text-[38px] font-semibold leading-[1.02] tracking-[-0.05em] text-white md:text-[64px]">
-          GEORGE enters the conversation with you.
+        <div className="grid items-center gap-8 md:grid-cols-[1fr_220px]">
+          <div className="text-center md:text-left">
+            <div className="text-[42px] font-semibold leading-[0.98] tracking-[-0.07em] text-[#111318] md:text-[72px]">
+              Enter GEORGE<br />LIVE.
+            </div>
+            <div className="mt-5 text-[18px] leading-8 text-neutral-500 md:text-[20px]">
+              Real-time support when the conversation matters.
+            </div>
+          </div>
+
+          <div className="relative mx-auto hidden h-[190px] w-[220px] items-center justify-center md:flex">
+            <div className="absolute h-28 w-28 rounded-full bg-white/70 blur-2xl" />
+            <img
+              src="/earbud400.png"
+              alt="Earbuds recommended for LIVE"
+              className="relative h-[150px] w-auto object-contain drop-shadow-[0_18px_34px_rgba(0,0,0,0.18)]"
+            />
+          </div>
         </div>
 
-        <div className="mt-6 max-w-[660px] text-[17px] leading-[1.9] text-white/64 md:text-[19px] md:leading-[1.9]">
+        <div className="mx-auto mt-8 max-w-[720px] text-center text-[17px] leading-[1.9] text-neutral-500 md:text-[19px] md:leading-[1.9]">
           {currentTier === 'smart'
             ? 'LIVE is built for moments where timing matters: pressure, hesitation, negotiation, conflict, interviews, sales, and real conversation. It requires Intelligent or Brilliant access.'
             : 'LIVE tracks timing, pressure, hesitation, escalation, and the next useful move while the conversation unfolds.'}
         </div>
 
-        <div className="mt-8 grid gap-3 md:grid-cols-2">
+        <div className="mx-auto mt-10 grid max-w-[860px] gap-4 md:grid-cols-2">
           {[
             'Use one earbud if you can.',
             'Ask for a line, cue, pivot, or next move.',
@@ -5562,7 +5571,7 @@ if (liveMode) {
           ].map((item) => (
             <div
               key={item}
-              className="rounded-[1.35rem] border border-white/10 bg-white/[0.045] px-4 py-4 text-[14px] leading-6 text-white/72 shadow-[0_14px_36px_rgba(0,0,0,0.14)] backdrop-blur-xl"
+              className="rounded-[1.35rem] border border-black/10 bg-white/45 px-4 py-4 text-[14px] leading-6 text-neutral-600 shadow-[0_18px_50px_rgba(0,0,0,0.08)] backdrop-blur-xl"
             >
               {item}
             </div>
@@ -5570,7 +5579,7 @@ if (liveMode) {
         </div>
 
         {currentTier === 'smart' && (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] p-3">
+          <div className="mx-auto mt-4 max-w-[620px] rounded-2xl border border-black/10 bg-white/45 p-3">
             <button
               type="button"
               onClick={() => setShowAccessCodeEntry((value) => !value)}
