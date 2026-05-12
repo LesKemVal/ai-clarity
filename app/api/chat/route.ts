@@ -1246,8 +1246,6 @@ export async function POST(req: Request) {
       )
     }
 
-    const recentMessages = messages.slice(-10)
-
     const latestUserRaw =
       [...messages].reverse().find((m) => m.role === 'user')?.content || ''
 
@@ -1257,6 +1255,10 @@ export async function POST(req: Request) {
     const builderSubtype = detectBuilderSubtype(latestUserRaw)
     const cadenceAvoid = detectCadenceAvoidance(messages)
     const liveScenario = detectLiveScenario(latestUserRaw)
+
+    const recentMessages = messages.slice(
+      liveScenario.active || control.pressureLevel === 'HIGH' ? -6 : -10
+    )
 
     const hasImageInput = recentMessages.some(
       (m) => m.role === 'user' && (Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
