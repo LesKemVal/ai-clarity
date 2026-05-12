@@ -51,21 +51,31 @@ export default function PageShell({
 
   const IdentitySurface = () => (
     isSubscriber ? (
-      <div className="flex max-w-[230px] items-center gap-2 rounded-full border border-[#7C8CFF]/16 bg-[#7C8CFF]/[0.07] px-3 py-1.5">
-        <div className="flex min-w-0 flex-col leading-tight">
-          <span className="text-[10px] uppercase tracking-[0.18em] text-[#AEB6FF]/72">
-            {subscriberTier}
-          </span>
-          <span className="max-w-[160px] truncate text-[11px] text-white/72">
-            {subscriberEmail}
-          </span>
+      <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.045] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+        <div className="relative flex h-2.5 w-2.5 items-center justify-center">
+          <span className={`absolute inline-flex h-full w-full rounded-full ${
+            subscriberTier === 'brilliant'
+              ? 'animate-ping bg-emerald-400/45'
+              : 'animate-ping bg-[#7C8CFF]/40'
+          }`} />
+
+          <span className={`relative h-2 w-2 rounded-full ${
+            subscriberTier === 'brilliant'
+              ? 'bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]'
+              : 'bg-[#7C8CFF] shadow-[0_0_10px_rgba(124,140,255,0.9)]'
+          }`} />
         </div>
+
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/52">
+          {subscriberTier}
+        </span>
+
         <button
           type="button"
           onClick={forgetThisDevice}
-          className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-white/34 transition hover:text-white/70"
+          className="text-[10px] uppercase tracking-[0.16em] text-red-300/45 transition hover:text-red-200"
         >
-          Forget
+          Reset
         </button>
       </div>
     ) : (

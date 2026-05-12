@@ -5555,7 +5555,10 @@ if (liveMode) {
       </button>
 
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7">
-        <div className="mx-auto w-full max-w-[460px] rounded-[30px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+        <div className="relative mx-auto w-full max-w-[460px] rounded-[30px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+          <div className="pointer-events-none absolute inset-[-2px] rounded-[32px] border border-[#7C8CFF]/28 opacity-70 shadow-[0_0_38px_rgba(124,140,255,0.22)] animate-pulse" />
+          <div className="pointer-events-none absolute -inset-8 rounded-[42px] bg-[#7C8CFF]/10 blur-3xl animate-pulse" />
+          <div className="relative z-10">
           <div className="mb-4 flex items-center justify-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.9)] animate-pulse" />
             <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#C7D0FF]/82">
@@ -5608,6 +5611,7 @@ if (liveMode) {
             >
               Not now
             </button>
+          </div>
           </div>
         </div>
       </div>
