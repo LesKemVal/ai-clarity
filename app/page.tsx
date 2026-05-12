@@ -20,12 +20,11 @@ export default function RootPage() {
 
       <div className="relative z-10 w-full max-w-[920px]">
         <div className="mx-auto flex w-full max-w-[760px] flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.08] px-4 py-2 shadow-[0_18px_50px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.8)]" />
-            <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#C7D0FF]/82">
-              GEORGE by BRANESx
-            </span>
-          </div>
+          <img
+            src="/bxx34.png"
+            alt="BRANESx"
+            className="h-10 w-auto object-contain opacity-95 drop-shadow-[0_18px_42px_rgba(0,0,0,0.32)] md:h-12"
+          />
 
           <h1 className="mt-5 max-w-[760px] text-[34px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:mt-7 md:text-[70px] md:leading-[1.02]">
             Whatever you want to be, or build — just ask GEORGE.
