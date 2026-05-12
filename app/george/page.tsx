@@ -5535,15 +5535,14 @@ if (liveMode) {
 
 {showLiveSegue && typeof document !== 'undefined' && createPortal(
   <>
-    <div className="fixed inset-0 z-[240] overflow-hidden bg-black text-white">
+    <div className="fixed inset-0 z-[240] h-[100dvh] w-screen overflow-hidden bg-black text-white">
       <img
         src="/live/earbud1010.png"
         alt="GEORGE LIVE"
-        className="absolute inset-0 h-full w-full object-cover opacity-80"
+        className="absolute inset-0 !h-full !w-full !max-w-none object-cover object-center opacity-90"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/34 to-black/86" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(124,140,255,0.18),transparent_36%)]" />
+      <div className="absolute inset-0 bg-black/8" />
 
       <button
         type="button"
@@ -5554,7 +5553,7 @@ if (liveMode) {
         ×
       </button>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-7">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-[max(1.75rem,env(safe-area-inset-bottom))] md:bottom-auto md:top-1/2 md:-translate-y-1/2">
         <div className="relative mx-auto w-full max-w-[460px] rounded-[30px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
           <div className="pointer-events-none absolute inset-[-2px] rounded-[32px] border border-[#7C8CFF]/28 opacity-70 shadow-[0_0_38px_rgba(124,140,255,0.22)] animate-pulse" />
           <div className="pointer-events-none absolute -inset-8 rounded-[42px] bg-[#7C8CFF]/10 blur-3xl animate-pulse" />
