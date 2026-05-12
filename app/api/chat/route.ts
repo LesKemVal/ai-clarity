@@ -12,6 +12,7 @@ type IncomingMessage = {
   content?: string
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
+  source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
 } | null
 
 type FilteredIncomingMessage = {
@@ -19,6 +20,7 @@ type FilteredIncomingMessage = {
   content: string
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
+  source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
 }
 
 type CleanMessage = {
@@ -26,6 +28,7 @@ type CleanMessage = {
   content: string
   imageDataUrl?: string | null
   imageDataUrls?: string[] | null
+  source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
 }
 
 type ActiveCampaign = {
@@ -1285,6 +1288,13 @@ export async function POST(req: Request) {
         content: m.content.trim(),
         imageDataUrl: typeof m.imageDataUrl === 'string' ? m.imageDataUrl : null,
         imageDataUrls: Array.isArray(m.imageDataUrls) ? m.imageDataUrls.filter((src) => typeof src === 'string').slice(0, 10) : null,
+        source:
+          m.source === 'sidebar_prompt' ||
+          m.source === 'live_transcript' ||
+          m.source === 'third_party_speech' ||
+          m.source === 'system_override'
+            ? m.source
+            : 'user_input',
       }))
       .filter((m: CleanMessage) => m.content.length > 0 || Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
 
@@ -1295,8 +1305,11 @@ export async function POST(req: Request) {
       )
     }
 
-    const latestUserRaw =
-      [...messages].reverse().find((m) => m.role === 'user')?.content || ''
+    const latestUserMessage =
+      [...messages].reverse().find((m) => m.role === 'user') || null
+
+    const latestUserRaw = latestUserMessage?.content || ''
+    const latestUserSource = latestUserMessage?.source || 'user_input'
 
     const control = classifyControlState(latestUserRaw)
     const scores = scoreRuntimeSignals(latestUserRaw)
@@ -1352,6 +1365,13 @@ LANGUAGE MODE: SPANISH
 ${getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled)}
 
 ${activeCampaign ? getOutputStyleRules(activeCampaign) : ''}
+
+MESSAGE SOURCE
+- Latest user message source: ${latestUserSource}
+- If source is sidebar_prompt, treat the message as user intent or selected direction, not third-party speech.
+- If source is user_input, treat it as the user's own typed instruction unless they explicitly quote another person.
+- If source is third_party_speech or live_transcript, treat it as room/dialogue input to respond to.
+- In LIVE mode, sidebar_prompt must not be interpreted as what the other party said.
 
 CONTROL STATE
 - User state: ${control.userState}
@@ -1714,16 +1734,16 @@ BRILLIANT LIVE ENGINE
       )
     }
 
-    const latestUserMessage =
-      [...messages].reverse().find((m) => m.role === 'user')?.content.toLowerCase() || ''
+    const latestUserText =
+      latestUserRaw.toLowerCase()
 
     const isDegraded = messages.length > 10
 
     const needsMemory =
-      /before|earlier|remember|last time|continue|pick up where we left off|as i said/i.test(latestUserMessage)
+      /before|earlier|remember|last time|continue|pick up where we left off|as i said/i.test(latestUserText)
 
     const needsDepth =
-      /plan|step by step|full plan|walk me through|break it down|roadmap|strategy|build this|launch/i.test(latestUserMessage)
+      /plan|step by step|full plan|walk me through|break it down|roadmap|strategy|build this|launch/i.test(latestUserText)
 
     let capacityNotice = ''
 
@@ -1740,10 +1760,10 @@ BRILLIANT LIVE ENGINE
     let riskDisclaimer = ''
 
     const legalHighRisk =
-      /lawsuit|sue|court|judge|appeal|petition|hearing|motion|complaint|affidavit|charged|arrested|statute|case number/i.test(latestUserMessage)
+      /lawsuit|sue|court|judge|appeal|petition|hearing|motion|complaint|affidavit|charged|arrested|statute|case number/i.test(latestUserText)
 
     const medicalHighRisk =
-      /chest pain|stroke|heart attack|diagnosis|diagnose|prescription|medication|hospital|severe pain|symptoms|treatment/i.test(latestUserMessage)
+      /chest pain|stroke|heart attack|diagnosis|diagnose|prescription|medication|hospital|severe pain|symptoms|treatment/i.test(latestUserText)
 
     if (legalHighRisk) {
       riskDisclaimer = 'Use this as preparation, not legal advice.'
