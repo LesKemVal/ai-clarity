@@ -1668,9 +1668,9 @@ BRILLIANT LIVE ENGINE
     let capacityNotice = ''
 
     if (isDegraded && needsMemory) {
-      capacityNotice = "I don't have full context for this."
+      capacityNotice = "I may be missing earlier context. Give me the missing piece and I’ll reconnect it."
     } else if (isDegraded && needsDepth) {
-      capacityNotice = 'I’ll help you move this forward with the resources available here. For deeper step-by-step continuity, upgrade when you want stronger execution support.'
+      capacityNotice = 'I can move this forward here. Stronger continuity helps when you want GEORGE to carry the thread across longer work.'
     }
 
     if (capacityNotice && !reply.includes(capacityNotice)) {
@@ -1686,9 +1686,9 @@ BRILLIANT LIVE ENGINE
       /chest pain|stroke|heart attack|diagnosis|diagnose|prescription|medication|hospital|severe pain|symptoms|treatment/i.test(latestUserMessage)
 
     if (legalHighRisk) {
-      riskDisclaimer = 'This is not a substitute for competent legal counsel.'
+      riskDisclaimer = 'Use this as preparation, not legal advice.'
     } else if (medicalHighRisk) {
-      riskDisclaimer = 'This is not a substitute for competent medical care.'
+      riskDisclaimer = 'Use this to prepare better questions, not as medical advice.'
     }
 
     if (riskDisclaimer && !reply.includes(riskDisclaimer)) {
