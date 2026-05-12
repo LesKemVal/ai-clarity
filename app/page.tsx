@@ -27,12 +27,12 @@ export default function RootPage() {
             </span>
           </div>
 
-          <h1 className="mt-6 max-w-[740px] text-[38px] font-semibold leading-[0.98] tracking-[-0.065em] text-white md:mt-8 md:text-[76px]">
+          <h1 className="mt-6 max-w-[780px] text-[36px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:mt-8 md:text-[72px] md:leading-[1.02]">
             Whatever you want to be, build, or go — ask GEORGE.
           </h1>
 
           <p className="mt-6 max-w-[680px] text-[15px] leading-7 text-white/68 md:mt-7 md:text-[18px] md:leading-8">
-            Tell GEORGE what you are trying to do. Build a business, plan a launch, write the message, study faster, prepare for the interview, handle the meeting, or find the next move when pressure hits. In LIVE, GEORGE can come with you and help you stay on objective while the conversation is happening.
+            Build something with GEORGE. Practice for the interview with GEORGE. Walk GEORGE into negotiations, briefings, meetings, presentations, or wherever words matter. Use normal GEORGE to think, plan, write, learn, and decide. Use LIVE when the conversation is happening and you need to stay on objective. You + GEORGE = whatever — and much more.
           </p>
 
           <div className="mt-7 flex w-full max-w-[520px] flex-col gap-3 md:mt-9">
