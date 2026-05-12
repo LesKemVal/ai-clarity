@@ -4962,13 +4962,13 @@ router.push('/george')
             <button
               type="button"
               onClick={() => {
-                const prompt = "Clarify your last response into plain language with only what matters most."
-                setConversationSignal('Clarifying…')
+                const prompt = "Simplify your last response into short, plain, everyday language. Remove jargon, business terms like KPI, ROI, funnel, wedge, SKU, ACV, and any unnecessary explanation. Keep the meaning. Keep only what matters most."
+                setConversationSignal('Simplifying…')
                 void handleSend(prompt, { hidden: true })
               }}
               className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-white/[0.04] hover:text-white/92"
             >
-              Clarify
+              Simplify
             </button>
 
               </>
