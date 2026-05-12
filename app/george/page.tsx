@@ -1989,6 +1989,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   const [showScrollHint, setShowScrollHint] = useState(false)
+  const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({})
 
   useEffect(() => {
     const checkScroll = () => {
@@ -3552,6 +3553,28 @@ return true
 )
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    const textarea = event.currentTarget
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      const atTop = textarea.scrollTop <= 0
+      const atBottom =
+        textarea.scrollTop + textarea.clientHeight >= textarea.scrollHeight - 4
+
+      if (
+        (event.key === 'ArrowUp' && atTop) ||
+        (event.key === 'ArrowDown' && atBottom)
+      ) {
+        event.preventDefault()
+
+        scrollHostRef.current?.scrollBy({
+          top: event.key === 'ArrowDown' ? 120 : -120,
+          behavior: 'smooth',
+        })
+
+        return
+      }
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
       if (isThinking) return
@@ -4480,12 +4503,16 @@ return (
       className={`space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
+        className={`relative whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.25rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/5 px-3.5 py-2.5 shadow-none'
               : 'max-w-[82%] text-right rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
+        } ${
+          !expandedMessages[i] && (m.content || '').length > 420
+            ? 'max-h-[220px] overflow-hidden'
+            : ''
         }`}
       >
         {m.role === 'assistant' ? (
@@ -4506,6 +4533,21 @@ return (
           </>
         )}
       </div>
+
+      {(m.content || '').length > 420 && (
+        <button
+          type="button"
+          onClick={() =>
+            setExpandedMessages((prev) => ({
+              ...prev,
+              [i]: !prev[i],
+            }))
+          }
+          className="mt-1 px-1 text-[11px] tracking-[0.12em] text-white/34 transition hover:text-white/62"
+        >
+          {expandedMessages[i] ? 'See less' : 'See more'}
+        </button>
+      )}
 
       {false && m.role === 'assistant' && m.content.includes('How should GEORGE assist?') && (
         <div className="flex flex-wrap gap-2">
