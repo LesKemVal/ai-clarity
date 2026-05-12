@@ -9,40 +9,44 @@ export default function HelpPage() {
       eyebrow="Help"
       backToGeorge
     >
-      <div className="space-y-8">
+      <div className="space-y-7">
 
-        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-6 md:p-8">
-          <p className="text-white text-sm leading-7">
+        <section className="rounded-3xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.06] p-6 md:p-8">
+          <p className="text-sm leading-7 text-white">
             GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
           </p>
-          <p className="text-neutral-400 mt-2 text-sm leading-7">
+          <p className="mt-3 text-sm leading-7 text-neutral-400">
             You choose the direction. GEORGE helps you think clearly, move deliberately, and respond better when the moment matters.
           </p>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
-          <p className="text-xl font-semibold text-white">
-            GEORGE is a clarity, execution, and continuity system.
+          <p className="text-xl font-semibold tracking-[-0.03em] text-white">
+            GEORGE is built for clarity, execution, and continuity.
           </p>
-          <p className="text-neutral-400 leading-7 mt-2">
-            Normal GEORGE helps you think clearly. LIVE GEORGE helps you stay composed while the moment is moving.
+          <p className="mt-3 leading-7 text-neutral-400">
+            Normal GEORGE helps you think through the situation. LIVE helps you carry that clarity into real conversations when timing, pressure, or hesitation matters.
           </p>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">The Operating Model</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Direction — identify what actually matters</li>
-            <li>Action — choose the next useful move</li>
-            <li>Signal — learn from what happens next</li>
+            <li>Direction — identify what actually matters.</li>
+            <li>Action — choose the next useful move.</li>
+            <li>Signal — learn from what happens next.</li>
           </ul>
-          <p className="text-white mt-3">You bring the objective. GEORGE narrows the path.</p>
+          <p className="mt-4 text-neutral-300">
+            You bring the objective. GEORGE narrows the path.
+          </p>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">How to Start</h2>
-          <p className="text-neutral-300">Tell GEORGE what you want to happen.</p>
-          <ul className="list-disc space-y-2 pl-5 text-neutral-400">
+          <p className="leading-7 text-neutral-300">
+            Give GEORGE the real situation, not a perfect prompt.
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-neutral-400">
             <li>“I need to make a decision.”</li>
             <li>“I need to say this the right way.”</li>
             <li>“I need a plan I can actually follow.”</li>
@@ -50,61 +54,65 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-6 md:p-8">
+        <section className="rounded-3xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.06] p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">LIVE Mode</h2>
 
-          <div className="space-y-4 text-neutral-300">
-            <p className="text-white font-medium">Just talk.</p>
-            <p className="text-neutral-400">LIVE GEORGE listens for pressure, confusion, timing, and opportunity. LIVE requires subscriber identity because it depends on remembered continuity and session recovery.</p>
+          <div className="space-y-5">
+            <div>
+              <p className="font-medium text-white">Carry GEORGE into the room.</p>
+              <p className="mt-2 leading-7 text-neutral-400">
+                LIVE is for interviews, negotiations, boardrooms, presentations, difficult conversations, and pressure moments where words and timing matter.
+              </p>
+            </div>
 
-            <p className="text-white font-medium">Cues</p>
-            <p className="text-neutral-400">GEORGE gives short next-move guidance when the moment is moving fast.</p>
+            <div>
+              <p className="font-medium text-white">Get short cues and repeatable lines.</p>
+              <p className="mt-2 leading-7 text-neutral-400">
+                GEORGE can help you frame what to say next, recover when the room shifts, and stay composed without turning the moment into a lecture.
+              </p>
+            </div>
 
-            <p className="text-white font-medium">Lines</p>
-            <p className="text-neutral-400">When words matter, GEORGE can give you something usable to say next.</p>
-
-            <p className="text-white font-medium">Control</p>
-            <p className="text-neutral-400">When the room shifts, GEORGE helps you recover without rambling, freezing, or chasing the wrong issue.</p>
+            <div>
+              <p className="font-medium text-white">Use continuity when the situation already has context.</p>
+              <p className="mt-2 leading-7 text-neutral-400">
+                If you have been using GEORGE to prepare for a business, interview, negotiation, relationship issue, or personal objective, LIVE can help you carry that context into the conversation.
+              </p>
+            </div>
           </div>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
-          <h2 className="mb-4 text-xl font-semibold text-white">Use the Buttons as Next Moves</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Use the Controls as Next Moves</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Keep this — save something worth returning to</li>
-            <li>Send — move the response where it needs to go</li>
-            <li>Clarify — sharpen the signal without losing intent</li>
-            <li>Reword — reshape the line for the moment you are in</li>
-            <li>LIVE — enter real-time support when subscriber continuity is active</li>
+            <li>Keep this — save something worth returning to.</li>
+            <li>Share — move useful guidance outside GEORGE.</li>
+            <li>Related — surface nearby context.</li>
+            <li>Simplify — reduce the answer to what matters most.</li>
+            <li>Reword — reshape a line for the moment you are in.</li>
+            <li>LIVE — enter real-time conversation support when access is active.</li>
           </ul>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
-          <h2 className="mb-4 text-xl font-semibold text-white">Professional Mode</h2>
-          <p className="text-neutral-300">
-            Professional Mode is the structured workflow layer for conversations tied to results: calls, appointments, donations, sales, consulting, outreach, recruiting, or any situation where words create measurable outcomes. It is coming online progressively.
+          <h2 className="mb-4 text-xl font-semibold text-white">Continuity</h2>
+          <p className="leading-7 text-neutral-400">
+            Continuity lets GEORGE restore your tier, remember the active direction, and reduce repeated setup. Anonymous use is available for simple direction. Subscriber continuity is for restored access, stronger runtime context, and LIVE support.
           </p>
-          <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Load a campaign</li>
-            <li>Use scripts, cues, and repeatable lines</li>
-            <li>Track wins, losses, objections, and follow-ups</li>
-            <li>Reduce weak repetition across reps or attempts</li>
-          </ul>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
           <h2 className="mb-4 text-xl font-semibold text-white">Tiers</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
-            <li>Smart → clarity and directional reasoning</li>
-            <li>Intelligent → operational continuity and stronger execution support</li>
-            <li>Brilliant → real-time LIVE assistance and strongest runtime continuity</li>
-            <li>Brilliant Day → temporary LIVE runtime elevation</li>
+            <li>Smart — clarity and directional reasoning.</li>
+            <li>Intelligent — stronger continuity and execution support.</li>
+            <li>Brilliant — LIVE assistance and the strongest runtime continuity.</li>
+            <li>Brilliant Day — temporary LIVE runtime elevation.</li>
           </ul>
         </section>
 
         <section className="rounded-3xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
-          <p className="text-white text-lg font-medium">
-            The simple rule: use normal GEORGE anonymously when you just need direction. Use subscriber continuity when you want GEORGE to remember, restore, and support LIVE execution.
+          <p className="text-lg font-medium leading-8 text-white">
+            The simple rule: use normal GEORGE when you need direction. Use continuity when you want GEORGE to remember, restore, and support the situation as it develops.
           </p>
         </section>
 
