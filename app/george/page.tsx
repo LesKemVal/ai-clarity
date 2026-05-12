@@ -17,6 +17,7 @@ type Message = {
   constrained?: boolean
   imageDataUrl?: string | null
   simplifiedFromIndex?: number
+  source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
 }
 
 type PromptSelection = {
@@ -3012,7 +3013,13 @@ function detectDomain(text: string) {
 }
 
 const handleSend = useCallback(
-    async (overrideText?: string, options?: { hidden?: boolean }) => {
+    async (
+      overrideText?: string,
+      options?: {
+        hidden?: boolean
+        source?: Message['source']
+      }
+    ) => {
       let text = (overrideText ?? input).trim()
       console.log('[GEORGE handleSend]', {
         overrideText,
@@ -3395,7 +3402,8 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
                 ...updatedMessages,
                 {
                   role: 'system',
-                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + firstResponseOverride
+                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + firstResponseOverride,
+                  source: 'system_override'
                 }
               ]
             : updatedMessages,
@@ -4286,7 +4294,7 @@ return (
 
                 const nextMessages: Message[] = [
                   ...messagesRef.current,
-                  { role: 'user', content: coursePrompt },
+                  { role: 'user', content: coursePrompt, source: 'sidebar_prompt' },
                   {
                     role: 'assistant',
                     content: assistantText || "Good. We are building a passing path.",
@@ -4309,7 +4317,7 @@ return (
 
                 const nextMessages: Message[] = [
                   ...messagesRef.current,
-                  { role: 'user', content: prompt.text },
+                  { role: 'user', content: prompt.text, source: 'sidebar_prompt' },
                   {
                     role: 'assistant',
                     content: "There are other courses not shown here. Some could help you now. Some may mean nothing right now. Some may even be boring to you. Tell me what you want to earn, fix, avoid, build, understand, or become—and I’ll point to what matters.",
@@ -4324,7 +4332,7 @@ return (
               }
 
               setShowSidebar(false)
-              void handleSend(prompt.text)
+              void handleSend(prompt.text, { source: 'sidebar_prompt' })
             }}
         />
 
@@ -5568,7 +5576,7 @@ if (liveMode) {
                   setActivePromptContext(prompt.context)
                   if (prompt.context?.startsWith('brilliant_')) setConversationMode(prompt.context)
                   setShowPromptMenu(false)
-                  void handleSend(prompt.text)
+                  void handleSend(prompt.text, { source: 'sidebar_prompt' })
                 }}
                 className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#7C8CFF]"
               >
