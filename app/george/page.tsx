@@ -16,6 +16,7 @@ type Message = {
   content: string
   constrained?: boolean
   imageDataUrl?: string | null
+  simplifiedFromIndex?: number
 }
 
 type PromptSelection = {
@@ -5004,7 +5005,28 @@ router.push('/george')
             <button
               type="button"
               onClick={() => {
-                const prompt = "Simplify your last response into short, plain, everyday language. Remove jargon, business terms like KPI, ROI, funnel, wedge, SKU, ACV, and any unnecessary explanation. Keep the meaning. Keep only what matters most."
+                const simplifyTarget = m.content
+
+                const prompt = `Simplify this GEORGE response into short, plain, everyday language.
+
+Remove:
+- jargon
+- business language
+- complicated explanations
+- unnecessary detail
+
+Replace terms like:
+KPI, ROI, funnel, wedge, SKU, ACV, positioning, conversion, objection handling
+
+with normal human language.
+
+Keep the meaning.
+Keep the tone calm and direct.
+Return ONLY the simplified response.
+
+Response:
+${simplifyTarget}`
+
                 setConversationSignal('Simplifying…')
                 void handleSend(prompt, { hidden: true })
               }}
