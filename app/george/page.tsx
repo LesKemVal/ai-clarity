@@ -5554,7 +5554,8 @@ if (liveMode) {
         </div>
 
         <div className="relative mt-4 flex h-[42px] w-[72px] items-center justify-center">
-          <div className="absolute h-[42px] w-[42px] rounded-full bg-white/70 blur-lg md:h-[54px] md:w-[54px]" />
+          <div className="absolute h-[44px] w-[44px] rounded-full bg-[#7C8CFF]/28 blur-xl animate-pulse md:h-[56px] md:w-[56px]" />
+          <div className="absolute h-[24px] w-[24px] rounded-full bg-[#7C8CFF]/40 blur-md animate-ping" />
           <img
             src="/earbud400.png"
             alt="LIVE earbuds"
@@ -5567,6 +5568,15 @@ if (liveMode) {
         </h1>
 
         <div className="mt-4 max-w-[540px] text-[13px] leading-6 text-[#343844]/66 md:text-[15px]">
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-2 text-[10px] font-medium tracking-[0.22em] text-[#7C8CFF]/75">
+            <span>INTERVIEWS</span>
+            <span>•</span>
+            <span>NEGOTIATIONS</span>
+            <span>•</span>
+            <span>BOARDROOMS</span>
+            <span>•</span>
+            <span>PRESENTATIONS</span>
+          </div>
           {currentTier === 'smart'
             ? 'LIVE is built for moments where timing, pressure, hesitation, or consequences matter. Intelligent or Brilliant access is required.'
             : 'GEORGE listens with you, tracks pressure and timing, and gives you the next useful move while the moment is unfolding.'}
