@@ -1182,22 +1182,38 @@ function detectCadenceAvoidance(messages: CleanMessage[]) {
   return [...new Set(avoid)].slice(0, 5)
 }
 
-function detectLiveScenario(input: string) {
+function detectLiveScenario(input: string, promptContext?: string | null) {
   const t = input.toLowerCase().trim()
+  const context = (promptContext || '').toLowerCase()
 
-  if (/interview|hiring manager|recruiter/.test(t)) {
+  if (
+    context.includes('manual_live') ||
+    context.includes('brilliant_live') ||
+    context.includes('conversation_assist') ||
+    context.includes('professional_')
+  ) {
+    return { active: true, type: 'live-context' }
+  }
+
+  if (/interview|hiring manager|recruiter|job offer|salary question|tell me about yourself/.test(t)) {
     return { active: true, type: 'interview' }
   }
-  if (/boss|manager|coworker|hr|meeting/.test(t)) {
+  if (/boss|manager|coworker|hr|meeting|presentation|briefing|workplace|supervisor|employee/.test(t)) {
     return { active: true, type: 'workplace' }
   }
-  if (/deal|price|seller|dealer|negotiat/.test(t)) {
+  if (/deal|price|seller|dealer|negotiat|offer|counter|terms|discount/.test(t)) {
     return { active: true, type: 'negotiation' }
   }
-  if (/girlfriend|boyfriend|wife|husband|dating|text her|text him|relationship/.test(t)) {
+  if (/girlfriend|boyfriend|wife|husband|dating|text her|text him|relationship|argument|apologize|family/.test(t)) {
     return { active: true, type: 'relationship' }
   }
-  if (/call in 5|about to call|right now talking|live conversation|on the phone/.test(t)) {
+  if (/doctor|nurse|hospital|appointment|diagnosis|symptoms|medication|insurance/.test(t)) {
+    return { active: true, type: 'advocacy' }
+  }
+  if (/customer|client|prospect|lead|objection|close|follow up|follow-up|sales call|cold call/.test(t)) {
+    return { active: true, type: 'sales' }
+  }
+  if (/call in 5|about to call|right now talking|live conversation|on the phone|in the room|they just said|he just said|she just said/.test(t)) {
     return { active: true, type: 'immediate-live' }
   }
 
@@ -1269,7 +1285,7 @@ export async function POST(req: Request) {
     const bottleneck = detectLikelyBottleneck(latestUserRaw)
     const builderSubtype = detectBuilderSubtype(latestUserRaw)
     const cadenceAvoid = detectCadenceAvoidance(messages)
-    const liveScenario = detectLiveScenario(latestUserRaw)
+    const liveScenario = detectLiveScenario(latestUserRaw, promptContext)
 
     const recentMessages = messages.slice(
       liveScenario.active || control.pressureLevel === 'HIGH' ? -6 : -10
