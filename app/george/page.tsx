@@ -4617,7 +4617,7 @@ I am listening now. Speak naturally. I will respond ${
             type="button"
             onClick={() => {
               handleFeedback(i, 'up')
-              setToastMessage('Noted')
+              setToastMessage('Saved')
               setShowToast(true)
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
@@ -4646,7 +4646,7 @@ I am listening now. Speak naturally. I will respond ${
             type="button"
             onClick={() => {
               handleFeedback(i, 'down')
-              setToastMessage('Noted')
+              setToastMessage('Saved')
               setShowToast(true)
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
@@ -4902,7 +4902,7 @@ Cue:`)
                   setVoiceOn(false)
                   setInteractionMode('text')
                   window.localStorage.setItem('george_voice', 'off')
-                  setToastMessage('Text Assist active.')
+                  setToastMessage('Text guidance active')
                   setShowToast(true)
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
@@ -4921,7 +4921,7 @@ Cue:`)
                   setInteractionMode('speech')
                   window.localStorage.setItem('george_voice', 'on')
                   setTimeout(() => startListening(), 120)
-                  setToastMessage('Audio Assist active.')
+                  setToastMessage('Audio guidance active')
                   setShowToast(true)
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
@@ -4950,7 +4950,7 @@ router.push('/george')
                   window.localStorage.removeItem('george_active_context')
                   window.localStorage.removeItem('george_active_label')
                   window.localStorage.setItem('george_voice', 'off')
-                  setToastMessage('Returned to normal GEORGE.')
+                  setToastMessage('Back to GEORGE')
                   setShowToast(true)
                 }}
                 className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition hover:border-red-300/45 hover:bg-red-500/15"
@@ -4992,7 +4992,7 @@ router.push('/george')
                     await navigator.share({ title: 'GEORGE by BRANESx', text: `Want to get something done? GEORGE is your guide.\n\n${shareText}`, url: window.location.origin + '/george' })
                   } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(shareText)
-                    setToastMessage('Copied to clipboard')
+                    setToastMessage('Copied')
                     setShowToast(true)
                   }
                 } catch {}
@@ -5042,7 +5042,7 @@ ${simplifyTarget}`
               type="button"
               onClick={() => {
                 handleFeedback(i, 'up')
-                setToastMessage('Noted')
+                setToastMessage('Saved')
                 setShowToast(true)
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
@@ -5075,7 +5075,7 @@ ${simplifyTarget}`
               type="button"
               onClick={() => {
                 handleFeedback(i, 'down')
-                setToastMessage('Got it')
+                setToastMessage('Feedback received')
                 setShowToast(true)
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
@@ -5321,7 +5321,7 @@ if (liveMode) {
   setConversationMenuLane('selector')
   setActivePromptContext(null)
   setActivePromptLabel(null)
-  setToastMessage('Returned to normal GEORGE.')
+  setToastMessage('Back to GEORGE')
   setShowToast(true)
   window.localStorage.removeItem('george_active_context')
   window.localStorage.removeItem('george_active_label')
@@ -5508,7 +5508,7 @@ if (liveMode) {
                 setVoiceOn(nextVoice)
                 setInteractionMode(nextVoice ? 'speech' : 'text')
                 window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-                setToastMessage(nextVoice ? 'Voice replies on' : 'Voice replies off')
+                setToastMessage(nextVoice ? 'Voice on' : 'Voice off')
                 setShowToast(true)
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white"
