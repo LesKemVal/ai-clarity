@@ -4338,7 +4338,7 @@ return (
                     onClick={() => setShowSidebar(true)}
                     onTouchStart={() => setShowSidebar(true)}
                     onPointerDown={() => setShowSidebar(true)}
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.08] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
                     aria-label="Open menu"
                   >
                     <span className="flex flex-col items-center justify-center gap-[3px]">
@@ -5207,11 +5207,11 @@ ${simplifyTarget}`
   })}
   
 {showScrollHint && (
-  <div className={`fixed bottom-[210px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center`}>
+  <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center opacity-70 transition hover:opacity-100`}>
 
-    <div className="absolute h-12 w-12 rounded-full border border-[#7C8CFF]/12 bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34),0_0_14px_rgba(124,140,255,0.08)] backdrop-blur-md" />
+    <div className="absolute h-10 w-10 rounded-full border border-[#7C8CFF]/12 bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34),0_0_14px_rgba(124,140,255,0.08)] backdrop-blur-md" />
 
-    <div className="relative flex h-11 w-11 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
+    <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
       <button
         type="button"
@@ -5220,10 +5220,10 @@ ${simplifyTarget}`
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
           setShowScrollHint(false)
         }}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#7C8CFF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(124,140,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7C8CFF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(124,140,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 5v13" />
           <path d="m6 12 6 6 6-6" />
         </svg>
@@ -5294,7 +5294,7 @@ ${simplifyTarget}`
           setShowRecentFolders(prev => !prev)
           setActiveMemoryFolder(null)
         }}
-        className={`group relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-300 ${
+        className={`group relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
             ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(124,140,255,0.16)]'
             : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-white/[0.04] hover:text-white/92'
@@ -5457,7 +5457,7 @@ if (liveMode) {
           setShowPromptMenu((prev) => !prev)
           setShowConversationMenu(false)
         }}
-        className="relative flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
+        className="relative flex h-8 w-8 items-center justify-center text-white/85 transition hover:text-white"
         aria-label="Make a better move"
       >
         <span className="text-[34px] leading-none">+</span>
@@ -5890,7 +5890,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#7C8CFF]/50 hover:text-white"
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#7C8CFF]/50 hover:text-white"
           >
             ×
           </button>
@@ -6642,9 +6642,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="
-
-Got a question?"
+                        placeholder="Ask GEORGE"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
@@ -6683,7 +6681,7 @@ Got a question?"
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
+                              className={`flex h-8 w-8 items-center justify-center rounded-full transition ${
                                   currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT
                                     ? 'text-amber-300'
                                     : 'text-white/52 hover:text-white/82'
@@ -6706,7 +6704,7 @@ Got a question?"
                             console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#7C8CFF]/22 bg-[#7C8CFF]/10 text-[#C7D0FF] transition hover:bg-[#7C8CFF]/16 hover:text-white"
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-[#7C8CFF]/22 bg-[#7C8CFF]/10 text-[#C7D0FF] transition hover:bg-[#7C8CFF]/16 hover:text-white"
                           aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
