@@ -1163,8 +1163,23 @@ function detectCadenceAvoidance(messages: CleanMessage[]) {
   if (recentAssistant.some((t) => t.includes('bottleneck'))) {
     avoid.push('leading with bottleneck wording')
   }
+  if (recentAssistant.some((t) => t.includes('absolutely.'))) {
+    avoid.push('hard-opening with Absolutely')
+  }
+  if (recentAssistant.some((t) => t.includes('strong path exists'))) {
+    avoid.push('phrase strong path exists')
+  }
+  if (recentAssistant.some((t) => t.includes('the strongest move'))) {
+    avoid.push('phrase the strongest move')
+  }
+  if (recentAssistant.some((t) => t.includes('here’s what i’d do'))) {
+    avoid.push('phrase here’s what I’d do')
+  }
+  if (recentAssistant.some((t) => t.includes('let’s narrow'))) {
+    avoid.push('phrase let’s narrow')
+  }
 
-  return avoid.slice(0, 3)
+  return [...new Set(avoid)].slice(0, 5)
 }
 
 function detectLiveScenario(input: string) {
