@@ -31,7 +31,7 @@ export default function RootPage() {
           </h1>
 
           <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/64 md:mt-6 md:text-[18px] md:leading-8">
-            Build with GEORGE. Interview with GEORGE. Walk GEORGE into meetings, negotiations, briefings, and pressure conversations. Use LIVE when words, timing, and direction matter.
+            Ask GEORGE anything — or wear one earbud and use GEORGE in interviews, meetings, appointments, negotiations, sales calls, and wherever words matter. Keep the conversational advantage.
           </p>
 
           <div className="mt-6 flex w-full max-w-[500px] flex-col gap-3 md:mt-8">

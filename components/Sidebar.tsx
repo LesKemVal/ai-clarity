@@ -289,9 +289,9 @@ return (
         <div className="relative flex items-center justify-between opacity-92">
           <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
-              src="/logo900.png"
+              src="/bxx34.png"
               alt="BRANESx"
-              className="h-10 w-[72px] object-contain"
+              className="h-8 w-auto object-contain opacity-95"
             />
           </div>
 
