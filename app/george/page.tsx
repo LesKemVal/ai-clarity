@@ -4067,7 +4067,7 @@ setPendingAssistantMessage({
     : isSpeaking
       ? 'GEORGE is speaking...'
       : isThinking
-        ? 'GEORGE is thinking...'
+        ? 'GEORGE is working...'
         : isListening
           ? 'GEORGE is listening...'
           : isIOS
@@ -4487,7 +4487,7 @@ return (
 
   {bridgeThinking && (
     <div className="text-sm leading-7 text-white/70">
-      Thinking...
+      GEORGE is working
     </div>
   )}
   {messages
@@ -6245,7 +6245,7 @@ Choose one:
 
                     {(isThinking || isSpeaking) && (
                       <span className="shrink-0 text-[10px] text-white/24 tracking-[0.16em]">
-                        {isThinking ? `WORKING${'.'.repeat(thinkingDots)}` : 'VOICE'}
+                        {isThinking ? `GEORGE${'.'.repeat(thinkingDots)}` : 'VOICE'}
                       </span>
                     )}
 
