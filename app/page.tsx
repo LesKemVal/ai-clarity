@@ -31,8 +31,8 @@ export default function RootPage() {
             Whatever you want to be, build, or go — ask GEORGE.
           </h1>
 
-          <p className="mt-6 max-w-[650px] text-[15px] leading-7 text-white/68 md:mt-7 md:text-[18px] md:leading-8">
-            GEORGE helps you move from uncertainty to direction, from direction to action, and from action to signal — with continuity when the work matters.
+          <p className="mt-6 max-w-[680px] text-[15px] leading-7 text-white/68 md:mt-7 md:text-[18px] md:leading-8">
+            Tell GEORGE what you are trying to do. Build a business, plan a launch, write the message, study faster, prepare for the interview, handle the meeting, or find the next move when pressure hits. In LIVE, GEORGE can come with you and help you stay on objective while the conversation is happening.
           </p>
 
           <div className="mt-7 flex w-full max-w-[520px] flex-col gap-3 md:mt-9">
@@ -51,26 +51,19 @@ export default function RootPage() {
             </Link>
           </div>
 
-          <div className="mt-8 grid w-full gap-3 md:mt-11 md:grid-cols-3">
-            {[
-              ['Smart', 'Clarity, direction, and everyday support.'],
-              ['Intelligent', 'Stronger continuity and execution support.'],
-              ['Brilliant', 'LIVE assistance and premium runtime continuity.'],
-            ].map(([title, body]) => (
-              <div
-                key={title}
-                className="rounded-[1.5rem] border border-white/[0.08] bg-white/[0.055] px-4 py-4 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)] backdrop-blur-xl md:rounded-[1.8rem] md:p-5"
+          <div className="mt-8 flex max-w-[720px] flex-wrap justify-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/50 md:mt-10">
+            {['Build', 'Decide', 'Write', 'Learn', 'Prepare', 'Negotiate', 'Interview', 'Meet'].map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.06] px-3.5 py-2 backdrop-blur-xl"
               >
-                <div className="text-[13px] font-semibold text-white">{title}</div>
-                <div className="mt-2 text-[12px] leading-5 text-white/54 md:text-[13px] md:leading-6">
-                  {body}
-                </div>
-              </div>
+                {item}
+              </span>
             ))}
           </div>
 
-          <div className="mt-7 max-w-[660px] rounded-[1.6rem] border border-[#D9C9A7]/12 bg-[#D9C9A7]/[0.055] px-5 py-4 text-[13px] leading-6 text-white/58 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:mt-9 md:text-[14px] md:leading-7">
-            Use normal GEORGE for direction. Use LIVE when timing, pressure, interviews, boardrooms, negotiations, or difficult conversations require sharper support.
+          <div className="mt-7 max-w-[660px] rounded-[1.6rem] border border-[#D9C9A7]/12 bg-[#D9C9A7]/[0.045] px-5 py-4 text-[13px] leading-6 text-white/54 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:mt-9 md:text-[14px] md:leading-7">
+            Normal GEORGE helps you think and act. GEORGE LIVE helps you carry that direction into real conversations.
           </div>
 
           <div className="mt-7 text-[10px] tracking-[0.18em] text-white/28">
