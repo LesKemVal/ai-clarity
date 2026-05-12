@@ -5629,9 +5629,9 @@ if (liveMode) {
       </button>
 
       <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-[max(1.75rem,env(safe-area-inset-bottom))] md:bottom-auto md:top-1/2 md:-translate-y-1/2">
-        <div className="relative mx-auto w-full max-w-[460px] rounded-[30px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
-          <div className="pointer-events-none absolute inset-[-2px] rounded-[32px] border border-[#7C8CFF]/28 opacity-70 shadow-[0_0_38px_rgba(124,140,255,0.22)] animate-pulse" />
-          <div className="pointer-events-none absolute -inset-8 rounded-[42px] bg-[#7C8CFF]/10 blur-3xl animate-pulse" />
+        <div className="relative mx-auto w-full max-w-[360px] rounded-[24px] border border-white/8 bg-black/34 p-4 shadow-[0_18px_52px_rgba(0,0,0,0.42)] backdrop-blur-md">
+          <div className="pointer-events-none absolute inset-[-2px] rounded-[26px] border border-[#7C8CFF]/28 opacity-70 shadow-[0_0_38px_rgba(124,140,255,0.22)] animate-pulse" />
+          <div className="pointer-events-none absolute -inset-4 rounded-[34px] bg-[#7C8CFF]/7 blur-2xl animate-pulse" />
           <div className="relative z-10">
           <div className="mb-4 flex items-center justify-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.9)] animate-pulse" />
@@ -5640,28 +5640,20 @@ if (liveMode) {
             </span>
           </div>
 
-          <h1 className="text-center text-[28px] font-semibold leading-[1.02] tracking-[-0.045em] text-white">
+          <h1 className="text-center text-[24px] font-semibold leading-[1.02] tracking-[-0.045em] text-white">
             Carry GEORGE into...
           </h1>
 
-          <div className="mt-5 flex flex-wrap justify-center gap-2 text-[10px] font-medium tracking-[0.18em] text-white/62">
-            {['INTERVIEWS', 'BOARDROOMS', 'NEGOTIATIONS', 'PRESENTATIONS', 'PRESSURE MOMENTS'].map((item) => (
-              <span key={item} className="rounded-full border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.07] px-3 py-1.5">
-                {item}
-              </span>
-            ))}
-          </div>
-
-          <p className="mt-5 text-center text-[13px] leading-6 text-white/68">
+          <p className="mt-4 text-center text-[13px] leading-6 text-white/66">
             GEORGE listens with you, helps you stay composed, and gives you short useful lines while the moment is still moving.
           </p>
 
-          <div className="mt-6 flex flex-col gap-2.5">
+          <div className="mt-5 flex flex-col gap-2">
             {currentTier === 'smart' ? (
               <button
                 type="button"
                 onClick={() => window.open('/top-up','_blank')}
-                className="rounded-2xl bg-white px-5 py-3 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
+                className="rounded-xl bg-white px-5 py-2.5 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
               >
                 Continue to access
               </button>
@@ -5672,7 +5664,7 @@ if (liveMode) {
                   setShowLiveSegue(false)
                   setShowLiveEntryChoice(true)
                 }}
-                className="rounded-2xl bg-white px-5 py-3 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
+                className="rounded-xl bg-white px-5 py-2.5 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
               >
                 Enter LIVE
               </button>
@@ -5681,7 +5673,7 @@ if (liveMode) {
             <button
               type="button"
               onClick={() => setShowLiveSegue(false)}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3 text-[14px] font-medium text-white/68 transition hover:bg-white/[0.08] hover:text-white"
+              className="rounded-xl border border-white/10 bg-white/[0.035] px-5 py-2.5 text-[14px] font-medium text-white/68 transition hover:bg-white/[0.08] hover:text-white"
             >
               Not now
             </button>

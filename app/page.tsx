@@ -6,10 +6,10 @@ export default function RootPage() {
       <img
         src="/landing/city02.png"
         alt=""
-        className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-[0.46] blur-[1.5px]"
+        className="absolute inset-0 h-full w-full scale-[1.02] object-cover opacity-[0.42] blur-[0.8px]"
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(124,140,255,0.20),transparent_38%),linear-gradient(180deg,rgba(8,10,18,0.58)_0%,rgba(8,10,18,0.80)_48%,rgba(8,10,18,0.96)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(124,140,255,0.14),transparent_36%),linear-gradient(180deg,rgba(8,10,18,0.62)_0%,rgba(8,10,18,0.82)_52%,rgba(8,10,18,0.96)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,10,18,0.94)_0%,rgba(8,10,18,0.66)_48%,rgba(8,10,18,0.94)_100%)]" />
 
       <div className="pointer-events-none absolute inset-0">
@@ -27,15 +27,15 @@ export default function RootPage() {
             </span>
           </div>
 
-          <h1 className="mt-6 max-w-[780px] text-[36px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:mt-8 md:text-[72px] md:leading-[1.02]">
+          <h1 className="mt-5 max-w-[760px] text-[34px] font-semibold leading-[1.04] tracking-[-0.055em] text-white md:mt-7 md:text-[70px] md:leading-[1.02]">
             Whatever you want to be, or build — just ask GEORGE.
           </h1>
 
-          <p className="mt-6 max-w-[680px] text-[15px] leading-7 text-white/68 md:mt-7 md:text-[18px] md:leading-8">
+          <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/64 md:mt-6 md:text-[18px] md:leading-8">
             Build with GEORGE. Interview with GEORGE. Walk GEORGE into meetings, negotiations, briefings, and pressure conversations. Use LIVE when words, timing, and direction matter.
           </p>
 
-          <div className="mt-7 flex w-full max-w-[520px] flex-col gap-3 md:mt-9">
+          <div className="mt-6 flex w-full max-w-[500px] flex-col gap-3 md:mt-8">
             <Link
               href="/george"
               className="rounded-2xl bg-white px-6 py-3.5 text-[15px] font-semibold text-[#11131A] shadow-[0_22px_70px_rgba(255,255,255,0.12)] transition hover:translate-y-[-1px] hover:bg-[#F5F1E8] md:py-4"
@@ -49,21 +49,6 @@ export default function RootPage() {
             >
               Enter GEORGE LIVE
             </Link>
-          </div>
-
-          <div className="mt-8 flex max-w-[720px] flex-wrap justify-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-white/50 md:mt-10">
-            {['Build', 'Decide', 'Write', 'Learn', 'Prepare', 'Negotiate', 'Interview', 'Meet'].map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.06] px-3.5 py-2 backdrop-blur-xl"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-7 max-w-[660px] rounded-[1.6rem] border border-[#D9C9A7]/12 bg-[#D9C9A7]/[0.045] px-5 py-4 text-[13px] leading-6 text-white/54 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:mt-9 md:text-[14px] md:leading-7">
-            Normal GEORGE helps you think and act. GEORGE LIVE helps you carry that direction into real conversations.
           </div>
 
           <div className="mt-7 text-[10px] tracking-[0.18em] text-white/28">
