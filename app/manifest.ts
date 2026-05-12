@@ -11,14 +11,14 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#7C8CFF',
     icons: [
       {
-        src: '/logo900.png',
+        src: '/earbud400.png',
         sizes: '512x512',
         type: 'image/png',
       },
       {
-        src: '/logo900.png',
+        src: '/earbud400.png',
         sizes: 'any',
-        type: 'image/svg+xml',
+        type: 'image/png',
       },
     ],
   }
