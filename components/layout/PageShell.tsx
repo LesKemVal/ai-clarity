@@ -176,10 +176,6 @@ export default function PageShell({
               window.location.href = '/george'
             }}
             onPromptSelect={(prompt) => goToGeorge(prompt)}
-            suggestedPrompts={[]}
-            suggestedSignal={0}
-            reroutePrompt={null}
-            rerouteSignal={0}
             activePromptLabel={null}
           />
         )}

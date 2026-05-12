@@ -10,11 +10,6 @@ export type PromptItem = {
   context: string
 }
 
-type PromptGroup = {
-  title: string
-  prompts: PromptItem[]
-}
-
 type GoalCheckItem = {
   id: string
   title: string
@@ -46,10 +41,6 @@ type SidebarProps = {
   voiceActive: boolean
   onNewSession: () => void
   onPromptSelect: (prompt: PromptItem) => void
-  reroutePrompt?: PromptItem | null
-  rerouteSignal?: number
-  suggestedPrompts?: PromptItem[]
-  suggestedSignal?: number
   activePromptLabel?: string | null
   activePromptContext?: string | null
   onToggleScripture?: () => void
@@ -57,64 +48,12 @@ type SidebarProps = {
   currentTier?: 'smart' | 'intelligent' | 'brilliant'
 }
 
-const promptGroups: PromptGroup[] = [
-  {
-    title: 'Build',
-    prompts: [
-      {
-        label: 'Build a Business',
-        text: 'Help me build a business that fits my situation and goals.',
-        context: 'build_start',
-      },
-      {
-        label: 'Improve Money',
-        text: 'Show me the strongest move to improve my money situation.',
-        context: 'money_this_week',
-      },
-      {
-        label: 'Improve Credit',
-        text: 'Help me improve my credit and approvals with the strongest path.',
-        context: 'problem_step_by_step',
-      },
-      {
-        label: 'Solve a Problem',
-        text: 'Help me solve the real problem here and show me the strongest next move.',
-        context: 'problem_untangle',
-      },
-    ],
-  },
-  {
-    title: 'Training Lab',
-    prompts: [
-      {
-        label: "Pass Driver's Test",
-        text: "I need to pass my driver's license test.",
-        context: 'training_drivers_license',
-      },
-      {
-        label: 'CDL Path',
-        text: 'I need to pass my CDL test.',
-        context: 'training_cdl',
-      },
-      {
-        label: 'Interview Win',
-        text: 'I need to prepare for a job interview.',
-        context: 'training_interview',
-      },
-    ],
-  },
-]
-
 export default function Sidebar({
   showSidebar = false,
   setShowSidebar,
   voiceActive,
   onNewSession,
   onPromptSelect,
-  reroutePrompt = null,
-  rerouteSignal = 0,
-  suggestedPrompts = [],
-  suggestedSignal = 0,
   activePromptLabel = null,
   activePromptContext = null,
   onToggleScripture = () => {},
@@ -321,8 +260,6 @@ export default function Sidebar({
     Sessions: true,
     'Goal Check': true,
     Modes: true,
-    Build: true,
-    'Training Lab': true,
     Account: true,
   })
 
@@ -333,26 +270,10 @@ export default function Sidebar({
     }))
   }
 
-  const handlePromptTap = (prompt: PromptItem) => {
-    setShowSidebar?.(false)
-    onPromptSelect(prompt)
-  }
-
   const linkClass = (path: string) =>
     `block text-sm transition ${
       pathname === path ? 'text-[#7C8CFF]' : 'text-white/52 hover:text-[#7C8CFF]'
     }`
-
-  const rerouteAnimationClass = useMemo(
-    () => (rerouteSignal > 0 ? 'glow-twice' : ''),
-    [rerouteSignal]
-  )
-
-  const suggestedAnimationClass = useMemo(
-    () => (suggestedSignal > 0 ? 'glow-twice' : ''),
-    [suggestedSignal]
-  )
-
 
   const currentGoalCheck = activeGoalCheck
     ? goalChecks.find((item) => item.id === activeGoalCheck.id) || activeGoalCheck
@@ -555,73 +476,6 @@ Upgrade to continue.`,
             )}
 
           </section>
-
-          {promptGroups.map((group) => (
-            <section key={group.title}>
-              <button
-                type="button"
-                onClick={() => toggleGroup(group.title)}
-                className="flex w-full items-center justify-between text-left"
-              >
-                <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                  {group.title}
-                </span>
-                <span className="text-[11px] text-white/32">
-                  {openGroups[group.title] ? '▾' : '▸'}
-                </span>
-              </button>
-
-              {openGroups[group.title] && (
-                <div className="mt-4 space-y-2">
-                  {group.prompts.map((prompt) => (
-                    <button
-                      key={prompt.label}
-                      type="button"
-                      onClick={() => handlePromptTap(prompt)}
-                      className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition ${
-                        activePromptLabel === prompt.label
-                          ? 'bg-[#7C8CFF]/8 text-white'
-                          : 'text-white/52 hover:bg-white/[0.035] hover:text-white'
-                      }`}
-                    >
-                      {prompt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </section>
-          ))}
-
-          {(reroutePrompt || suggestedPrompts.length > 0) && (
-            <section>
-              <p className="mb-4 text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Signal
-              </p>
-
-              <div className="space-y-2.5">
-                {reroutePrompt && (
-                  <button
-                    type="button"
-                    onClick={() => handlePromptTap(reroutePrompt)}
-                    className={`block w-full rounded-lg bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-[#AEB6FF] transition hover:bg-[#7C8CFF]/15 hover:text-white ${rerouteAnimationClass}`}
-                  >
-                    {reroutePrompt.label}
-                  </button>
-                )}
-
-                {suggestedPrompts.map((prompt) => (
-                  <button
-                    key={`${prompt.context}:${prompt.label}`}
-                    type="button"
-                    onClick={() => handlePromptTap(prompt)}
-                    className={`block w-full rounded-lg px-3 py-2 text-left text-sm text-white/72 transition duration-150 hover:bg-white/[0.03] hover:text-white ${suggestedAnimationClass}`}
-                  >
-                    {prompt.label}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
 
           <section>
             <button

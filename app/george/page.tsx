@@ -4209,10 +4209,6 @@ return (
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
           voiceActive={voiceOn}
-          reroutePrompt={reroutePrompt}
-          rerouteSignal={rerouteSignal}
-          suggestedPrompts={suggestedPrompts}
-          suggestedSignal={suggestedSignal}
           activePromptLabel={activePromptLabel}
           activePromptContext={activePromptContext}
           onToggleScripture={() => {
