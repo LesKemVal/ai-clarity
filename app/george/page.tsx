@@ -419,9 +419,16 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
     line = line.replace(/\[[^\]]+\]/g, '').replace(/\s+/g, ' ').trim()
 
     const words = line.split(/\s+/).filter(Boolean)
-    if (words.length > maxWords) {
-      line = words.slice(0, maxWords).join(' ')
-      line = line.replace(/[,:;.-]*$/, '')
+    const maxChars = maxWords <= 10 ? 120 : 180
+
+    if (words.length > maxWords && line.length > maxChars) {
+      const sentenceEnd = line.slice(0, maxChars).match(/^([\s\S]*?[.!?][”"]?)(\s|$)/)
+      const clauseEnd = line.slice(0, maxChars).match(/^([\s\S]*?[,;:][”"]?)(\s|$)/)
+
+      line =
+        sentenceEnd?.[1]?.trim() ||
+        clauseEnd?.[1]?.replace(/[,;:][”"]?$/, '').trim() ||
+        words.slice(0, maxWords).join(' ').replace(/[,:;.-]*$/, '').trim()
     }
 
     return line
