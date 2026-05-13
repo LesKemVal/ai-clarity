@@ -77,7 +77,7 @@ export default function RootPage() {
         </p>
 
         <Link
-          href="/george?live=1"
+          href="/george?live=segue"
           className="mt-7 flex w-full max-w-[420px] items-center justify-center rounded-[1.15rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
         >
           Enter GEORGE LIVE
