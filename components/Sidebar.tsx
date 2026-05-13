@@ -510,7 +510,7 @@ Upgrade to continue.`,
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-sm rounded-2xl bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
+      className="w-full max-w-sm rounded-[1rem] bg-black p-5 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
     >
       <div className="mb-4 text-lg text-white font-semibold">
         {currentGoalCheck.title}

@@ -16,7 +16,7 @@ export default function MobileHeader({
   alertDot = false,
 }: MobileHeaderProps) {
   return (
-    <div className="sticky top-0 z-40 border-b border-neutral-800 bg-black/90 backdrop-blur xl:hidden">
+    <div className="sticky top-0 z-40 border-b border-white/[0.045] bg-black/90 backdrop-blur xl:hidden">
       <div className="flex items-center justify-between px-4 py-3">
         <button
           type="button"

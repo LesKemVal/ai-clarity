@@ -830,7 +830,7 @@ function isForceIntervention(text: string) {
 
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white">
-      <div className="mx-auto flex max-w-3xl flex-col gap-6">
+      <div className="mx-auto flex max-w-3xl flex-col gap-5">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-white/35">BRANESx / GEORGE</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">LIVE Voice Sandbox</h1>
@@ -839,7 +839,7 @@ function isForceIntervention(text: string) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/[0.05] bg-white/[0.035] p-5 shadow-2xl">
+        <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.035] p-5 shadow-2xl">
           <div className="mb-4 flex flex-wrap gap-2">
             {(Object.values(LIVE_OBJECTIVES)).map((objective) => (
               <button
@@ -849,7 +849,7 @@ function isForceIntervention(text: string) {
                   setObjectiveId(objective.id)
                   pushLog(`Objective: ${objective.label}`)
                 }}
-                className={`rounded-2xl border px-4 py-2 text-xs transition ${
+                className={`rounded-[1rem] border px-4 py-2 text-xs transition ${
                   objectiveId === objective.id
                     ? 'border-emerald-300/40 bg-emerald-300/15 text-emerald-50'
                     : 'border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
@@ -869,7 +869,7 @@ function isForceIntervention(text: string) {
                   setDeliveryProfileId(profile.id)
                   pushLog(`Delivery profile: ${profile.label}`)
                 }}
-                className={`rounded-2xl border px-4 py-2 text-xs transition ${
+                className={`rounded-[1rem] border px-4 py-2 text-xs transition ${
                   deliveryProfileId === profile.id
                     ? 'border-purple-300/40 bg-purple-300/15 text-purple-50'
                     : 'border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80'
@@ -885,7 +885,7 @@ function isForceIntervention(text: string) {
               <button
                 type="button"
                 onClick={start}
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/85"
+                className="rounded-[1rem] bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/85"
               >
                 Start LIVE mic
               </button>
@@ -893,7 +893,7 @@ function isForceIntervention(text: string) {
               <button
                 type="button"
                 onClick={stop}
-                className="rounded-2xl border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="rounded-[1rem] border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Stop
               </button>
@@ -902,7 +902,7 @@ function isForceIntervention(text: string) {
             <button
               type="button"
               onClick={() => testText('do you have an ID?')}
-              className="rounded-2xl border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
+              className="rounded-[1rem] border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
             >
               Test: ID question
             </button>
@@ -910,7 +910,7 @@ function isForceIntervention(text: string) {
             <button
               type="button"
               onClick={() => testText("sir, let's discuss a raise")}
-              className="rounded-2xl border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
+              className="rounded-[1rem] border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
             >
               Test: raise opener
             </button>
@@ -920,7 +920,7 @@ function isForceIntervention(text: string) {
                 key={scenario.id}
                 type="button"
                 onClick={() => runScenario(scenario.transcript)}
-                className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] px-5 py-3 text-sm text-cyan-100/75 transition hover:bg-cyan-400/[0.12]"
+                className="rounded-[1rem] border border-cyan-400/15 bg-cyan-400/[0.04] px-5 py-3 text-sm text-cyan-100/75 transition hover:bg-cyan-400/[0.12]"
               >
                 Scenario: {scenario.label}
               </button>
@@ -928,13 +928,13 @@ function isForceIntervention(text: string) {
           </div>
 
           {error && (
-            <p className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+            <p className="mt-4 rounded-[1rem] border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-100">
               {error}
             </p>
           )}
         </div>
 
-        <section className="rounded-2xl border border-white/[0.05] bg-white/[0.018] p-5">
+        <section className="rounded-[1rem] border border-white/[0.05] bg-white/[0.018] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-white/35">Transcript</p>
           <p className="mt-3 min-h-20 whitespace-pre-wrap text-lg leading-8 text-white/80">
             {transcript || 'No transcript yet.'}
@@ -942,7 +942,7 @@ function isForceIntervention(text: string) {
         </section>
 
         <section
-          className={`rounded-2xl border p-5 transition-all duration-500 ${
+          className={`rounded-[1rem] border p-5 transition-all duration-500 ${
             runtimeState.interventionUrgency === 'high'
               ? 'border-red-400/35 bg-red-500/[0.08] shadow-[0_0_45px_rgba(255,40,40,0.16)]'
               : runtimeState.leverageState === 'user_gaining_leverage'
@@ -983,7 +983,7 @@ function isForceIntervention(text: string) {
             </p>
 
             {runtimeState.onDeck ? (
-              <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.05] px-4 py-3">
+              <div className="rounded-[1rem] border border-cyan-400/15 bg-cyan-400/[0.05] px-4 py-3">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-cyan-100/45">
                   On Deck
                 </p>
@@ -995,7 +995,7 @@ function isForceIntervention(text: string) {
             ) : null}
 
             {runtimeState.calmingLine ? (
-              <div className="rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.05] px-4 py-3">
+              <div className="rounded-[1rem] border border-emerald-400/15 bg-emerald-400/[0.05] px-4 py-3">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-emerald-100/45">
                   Counter Velocity
                 </p>
@@ -1007,7 +1007,7 @@ function isForceIntervention(text: string) {
             ) : null}
 
             {runtimeState.postureCue ? (
-              <div className="rounded-2xl border border-fuchsia-400/15 bg-fuchsia-400/[0.05] px-4 py-3">
+              <div className="rounded-[1rem] border border-fuchsia-400/15 bg-fuchsia-400/[0.05] px-4 py-3">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-fuchsia-100/45">
                   Physical Cue
                 </p>
@@ -1020,7 +1020,7 @@ function isForceIntervention(text: string) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] p-5">
+        <section className="rounded-[1rem] border border-purple-400/20 bg-purple-400/[0.06] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-purple-100/45">Governor Packet</p>
 
           {packet ? (
@@ -1040,7 +1040,7 @@ function isForceIntervention(text: string) {
           )}
         </section>
 
-        <section className="rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
+        <section className="rounded-[1rem] border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-emerald-100/45">
             Latency
           </p>
@@ -1053,7 +1053,7 @@ function isForceIntervention(text: string) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
+        <section className="rounded-[1rem] border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-cyan-100/45">
             Shadow Map
           </p>
@@ -1063,7 +1063,7 @@ function isForceIntervention(text: string) {
           </pre>
         </section>
 
-        <section className="rounded-2xl border border-white/[0.05] bg-white/[0.018] p-5">
+        <section className="rounded-[1rem] border border-white/[0.05] bg-white/[0.018] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-white/35">Runtime Log</p>
           <div className="mt-4 flex flex-col gap-2 text-sm text-white/55">
             {log.length ? log.map((line, index) => <p key={index}>{line}</p>) : <p>No events yet.</p>}

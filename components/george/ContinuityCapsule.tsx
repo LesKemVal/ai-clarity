@@ -13,7 +13,7 @@ export default function ContinuityCapsule({
   if (!cleanEmail) return null
 
   return (
-    <div className="mt-3 flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.022] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+    <div className="mt-3 flex items-center gap-2 rounded-full border border-white/[0.045] bg-white/[0.022] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
       <div className="relative flex h-2.5 w-2.5 items-center justify-center">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/45" />
         <span className="relative h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]" />

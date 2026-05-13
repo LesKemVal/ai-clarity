@@ -51,7 +51,7 @@ export default function PageShell({
 
   const IdentitySurface = () => (
     isSubscriber ? (
-      <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.045] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+      <div className="flex items-center gap-2 rounded-full border border-white/[0.045] bg-white/[0.045] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
         <div className="relative flex h-2.5 w-2.5 items-center justify-center">
           <span className={`absolute inline-flex h-full w-full rounded-full ${
             subscriberTier === 'brilliant'
@@ -230,7 +230,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
                         aria-label="Share G."
                         title="Share G."
                       >
@@ -266,7 +266,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
                         aria-label="Share G."
                         title="Share G."
                       >
