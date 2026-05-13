@@ -83,6 +83,59 @@ export function selectLiveResponsePolicy(input: {
     }
   }
 
+
+  if (speaker === 'other_party' && signals.has('interviewer_probe')) {
+    return {
+      mode: 'direct',
+      volley: 'Give them the clearest version.',
+      cue: 'Confident. Specific. No rambling.',
+      status: 'Interview probe detected.',
+      tone: 'calm',
+      compression: 'high',
+      deliveryStyle: 'direct',
+      intervention: 'speak',
+    }
+  }
+
+  if (speaker === 'other_party' && signals.has('behavioral_question')) {
+    return {
+      mode: 'direct',
+      volley: 'Use one strong example.',
+      cue: 'Situation. Action. Result.',
+      status: 'Behavioral interview question detected.',
+      tone: 'neutral',
+      compression: 'high',
+      deliveryStyle: 'direct',
+      intervention: 'speak',
+    }
+  }
+
+  if (speaker === 'other_party' && signals.has('competency_test')) {
+    return {
+      mode: 'proof',
+      volley: 'Answer with direct experience.',
+      cue: 'Specific tools. Specific results.',
+      status: 'Competency verification detected.',
+      tone: 'firm',
+      compression: 'medium',
+      deliveryStyle: 'proof',
+      intervention: 'speak',
+    }
+  }
+
+  if (speaker === 'other_party' && signals.has('weak_confidence')) {
+    return {
+      mode: 'instruction',
+      volley: 'Remove uncertainty from the answer.',
+      cue: 'Shorter. Firmer. Cleaner.',
+      status: 'Weak confidence language detected.',
+      tone: 'firm',
+      compression: 'high',
+      deliveryStyle: 'direct',
+      intervention: 'redirect',
+    }
+  }
+
   if (speaker === 'other_party' && signals.has('resistance')) {
     return {
       mode: 'resistance',
