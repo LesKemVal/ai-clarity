@@ -126,7 +126,7 @@ export default function Sidebar({
   }
 
   const createGoalCheck = () => {
-    const title = window.prompt('Name this Goal Check')
+    const title = window.prompt('Name this Focus')
     const cleanTitle = title?.trim()
 
     if (!cleanTitle) return
@@ -145,7 +145,7 @@ export default function Sidebar({
 
   
   const addTodo = (goal: GoalCheckItem) => {
-    const text = window.prompt('New To-Do')
+    const text = window.prompt('New Item')
     if (!text?.trim()) return
 
     const updated = goalChecks.map((g) =>
@@ -209,7 +209,7 @@ export default function Sidebar({
     const targetTodo = goal.todos.find((todo) => todo.id === todoId)
     if (!targetTodo) return
 
-    const next = window.prompt('Edit To-Do', targetTodo.text)
+    const next = window.prompt('Edit Item', targetTodo.text)
     const cleanNext = next?.trim()
 
     if (!cleanNext) return
@@ -259,7 +259,7 @@ export default function Sidebar({
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Modes: true,
     Account: true,
-    'Goal Check': false,
+    'Focus': false,
     Sessions: false,
   })
 
@@ -271,7 +271,7 @@ export default function Sidebar({
   }
 
   const linkClass = (path: string) =>
-    `block text-sm transition ${
+    `block text-[13px] transition ${
       pathname === path ? 'text-[#7C8CFF]' : 'text-white/52 hover:text-[#7C8CFF]'
     }`
 
@@ -281,7 +281,7 @@ export default function Sidebar({
 
 return (
     <aside
-      className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-white/[0.045] bg-[#08080B]/88 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[120] flex h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.045] bg-[#08080B]/88 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
@@ -306,8 +306,8 @@ return (
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5">
-        <div className="space-y-5">
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4">
+        <div className="space-y-4">
           <section className="space-y-2.5">
             <button
               type="button"
@@ -315,9 +315,9 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-lg bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-white/90 transition hover:bg-[#7C8CFF]/15 hover:text-white"
+              className="block w-full rounded-[0.8rem] bg-[#7C8CFF]/8 px-3 py-2 text-left text-[13px] text-white/90 transition hover:bg-[#7C8CFF]/15 hover:text-white"
             >
-              New Session
+              New Thread
             </button>
 
             <button
@@ -326,7 +326,7 @@ return (
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
+              className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
               Make GEORGE Yours
             </button>
@@ -335,25 +335,25 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Goal Check')}
+              onClick={() => toggleGroup('Focus')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Goal Check
+                Focus
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups['Goal Check'] ? '▾' : '▸'}
+                {openGroups['Focus'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups['Goal Check'] && (
+            {openGroups['Focus'] && (
               <div className="mt-4 space-y-2">
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/72 transition hover:border-white/20 hover:bg-white/[0.035] hover:text-white"
+                  className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.035] hover:text-white"
                 >
-                  + New Goal Check
+                  + New Focus
                 </button>
 
                 {goalChecks.length === 0 ? (
@@ -364,13 +364,13 @@ return (
                       key={item.id}
                       type="button"
                       onClick={() => openGoalCheck(item)}
-                      className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.022]"
+                      className="block w-full rounded-[0.8rem] px-3 py-2 text-left transition hover:bg-white/[0.022]"
                     >
-                      <span className="block truncate text-sm text-white/72 hover:text-white">
+                      <span className="block truncate text-[13px] text-white/72 hover:text-white">
                         {item.title}
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-white/32">
-                        Manual goal check
+                        Operational review
                       </span>
                     </button>
                   ))
@@ -423,10 +423,10 @@ Upgrade to continue.`,
 
                     onOpenLiveGate?.()
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-white/72 transition hover:bg-white/[0.022] hover:text-white"
+                  className="flex w-full items-center gap-2 rounded-[0.8rem] px-2 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.022] hover:text-white"
                 >
                   <span className="text-[#7C8CFF]">⚡</span>
-                  <span>Conversation Assistant</span>
+                  <span>GEORGE LIVE</span>
                 </button>
 
               </div>
@@ -464,7 +464,7 @@ Upgrade to continue.`,
           </section>
 
           <section className="border-t border-white/[0.04] pt-3">
-            <a href="/legal/toa" className="block rounded-lg px-3 py-2 text-sm text-white/38 transition hover:bg-white/[0.022] hover:text-white">
+            <a href="/legal/toa" className="block rounded-[0.8rem] px-3 py-2 text-[13px] text-white/38 transition hover:bg-white/[0.022] hover:text-white">
               Terms
             </a>
           </section>
@@ -476,7 +476,7 @@ Upgrade to continue.`,
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/30">
-                Recent
+                Continuity
               </span>
               <span className="text-[11px] text-white/24">
                 {openGroups.Sessions ? '▾' : '▸'}
@@ -523,7 +523,7 @@ Upgrade to continue.`,
           (currentGoalCheck?.todos || []).map((todo) => (
             <div
               key={todo.id}
-              className="rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.022]"
+              className="rounded-[0.8rem] border border-white/8 bg-white/[0.025] px-3 py-2 text-[13px] transition hover:bg-white/[0.022]"
             >
               <button
                 type="button"
@@ -567,9 +567,9 @@ Upgrade to continue.`,
       <div className="space-y-2.5">
         <button
           onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
+          className="w-full rounded-[0.8rem] px-4 py-2 text-[13px] text-white/80"
         >
-          + Add To-Do
+          + Add Item
         </button>
 
         <button
@@ -600,14 +600,14 @@ What is the strongest next move based on this?`,
   context: 'goal_check_structured',
 })
           }}
-          className="w-full rounded-lg bg-white text-black px-4 py-2 text-sm"
+          className="w-full rounded-[0.8rem] bg-white text-black px-4 py-2 text-[13px]"
         >
           Review with GEORGE
         </button>
 
         <button
           onClick={() => {
-            const next = window.prompt('Rename Goal Check', currentGoalCheck.title)
+            const next = window.prompt('Rename Focus', currentGoalCheck.title)
             if (!next?.trim()) return
 
             const updated = goalChecks.map((g) =>
@@ -620,7 +620,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
+          className="w-full rounded-[0.8rem] px-4 py-2 text-[13px] text-white/80"
         >
           Rename
         </button>
@@ -632,7 +632,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400"
+          className="w-full rounded-[0.8rem] border border-red-500/30 px-4 py-2 text-[13px] text-red-400"
         >
           Delete
         </button>
