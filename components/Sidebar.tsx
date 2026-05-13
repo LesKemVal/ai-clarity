@@ -257,7 +257,7 @@ export default function Sidebar({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    Modes: true,
+    'Intelligent Utility': true,
     Account: true,
     'Focus': false,
     Sessions: false,
@@ -383,18 +383,18 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Modes')}
+              onClick={() => toggleGroup('Intelligent Utility')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
                 Modes
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups.Modes ? '▾' : '▸'}
+                {openGroups['Intelligent Utility'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups.Modes && (
+            {openGroups['Intelligent Utility'] && (
               <div className="mt-3 space-y-2">
 
                 <button
@@ -403,21 +403,7 @@ return (
                     setShowSidebar?.(false)
 
                     if (currentTier !== 'brilliant') {
-                      onPromptSelect({
-                        label: 'Conversation Mode',
-                        text: `Conversation Mode is where GEORGE works with you in real time.
-
-Brilliant gives you live guidance.
-Pro turns GEORGE into a full execution system:
-- scripts
-- cues
-- objection handling
-- campaign memory
-- performance tracking
-
-Upgrade to continue.`,
-                        context: 'conversation_mode_info'
-                      })
+                      window.location.href = '/top-up?intent=conversation'
                       return
                     }
 
