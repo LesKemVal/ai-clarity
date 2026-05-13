@@ -12,10 +12,7 @@ export default function WelcomePage() {
   const [name, setName] = useState('')
   const [mission, setMission] = useState('')
   const [priority, setPriority] = useState('')
-  const [weeklyTime, setWeeklyTime] = useState('')
   const [learningStyle, setLearningStyle] = useState('')
-  const [tone, setTone] = useState('')
-  const [friction, setFriction] = useState('')
   const [adaptiveAnswer, setAdaptiveAnswer] = useState('')
   const [adaptiveQuestion, setAdaptiveQuestion] = useState('')
 
@@ -24,10 +21,7 @@ export default function WelcomePage() {
     setName(localStorage.getItem('george_name') || '')
     setMission(localStorage.getItem('george_user_mission') || '')
     setPriority(localStorage.getItem('george_user_priority') || '')
-    setWeeklyTime(localStorage.getItem('george_user_weekly_time') || '')
     setLearningStyle(localStorage.getItem('george_user_learning_style') || '')
-    setTone(localStorage.getItem('george_user_tone') || '')
-    setFriction(localStorage.getItem('george_user_friction') || '')
     setAdaptiveAnswer(localStorage.getItem('george_user_adaptive_answer') || '')
     setReady(true)
   }, [])
@@ -40,9 +34,9 @@ export default function WelcomePage() {
   }, [ready, tier])
 
   const adaptivePrompt = useMemo(() => {
-    const text = `${mission} ${priority} ${friction}`.toLowerCase()
+    const text = `${mission} ${priority}`.toLowerCase()
 
-    if (!mission && !priority && !friction) {
+    if (!mission && !priority) {
       return 'What are you trying to become, build, fix, or handle right now?'
     }
 
@@ -59,23 +53,23 @@ export default function WelcomePage() {
     }
 
     if (/learn|study|test|exam|license|school|training|skill/.test(text)) {
-      return 'When you learn, what usually breaks momentum: time, focus, confidence, boredom, confusion, or not knowing what to do next?'
+      return 'Do you learn better through repetition, conversation, pressure, structure, visuals, or direct execution?'
     }
 
     if (/credit|debt|bill|approval|car|house|loan/.test(text)) {
       return 'What matters most right now: faster approval, lower monthly pressure, cleaner credit profile, or avoiding a bad deal?'
     }
 
-    return 'What should GEORGE understand about how you move under pressure?'
-  }, [mission, priority, friction])
+    return 'What should GEORGE understand about how you operate, decide, or communicate?'
+  }, [mission, priority])
 
   useEffect(() => {
     setAdaptiveQuestion(adaptivePrompt)
   }, [adaptivePrompt])
 
   const valid = useMemo(() => {
-    return !!(name && mission && priority && weeklyTime && learningStyle && tone && friction && adaptiveAnswer)
-  }, [name, mission, priority, weeklyTime, learningStyle, tone, friction, adaptiveAnswer])
+    return !!(name && mission && priority && learningStyle && adaptiveAnswer)
+  }, [name, mission, priority, learningStyle, adaptiveAnswer])
 
   function save() {
     if (!valid) return
@@ -85,10 +79,7 @@ export default function WelcomePage() {
     localStorage.setItem('george_name', name)
     localStorage.setItem('george_user_mission', mission)
     localStorage.setItem('george_user_priority', priority)
-    localStorage.setItem('george_user_weekly_time', weeklyTime)
     localStorage.setItem('george_user_learning_style', learningStyle)
-    localStorage.setItem('george_user_tone', tone)
-    localStorage.setItem('george_user_friction', friction)
     localStorage.setItem('george_user_adaptive_question', adaptiveQuestion)
     localStorage.setItem('george_user_adaptive_answer', adaptiveAnswer)
 
@@ -109,6 +100,12 @@ export default function WelcomePage() {
         </button>
 
         <div className="space-y-6 rounded-[1.05rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
+          <img
+            src="/bxnew20.png"
+            alt="BRANESx"
+            className="h-8 w-auto object-contain opacity-80 md:h-10"
+          />
+
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.28em] text-[#7C8CFF]">
               Make GEORGE yours
@@ -140,33 +137,17 @@ export default function WelcomePage() {
               placeholder="What matters most right now?"
               className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
-            <input
-              value={weeklyTime}
-              onChange={(e) => setWeeklyTime(e.target.value)}
-              placeholder="How much time can you really give this weekly?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
+
             <input
               value={learningStyle}
               onChange={(e) => setLearningStyle(e.target.value)}
-              placeholder="How do you learn best?"
+              placeholder="How do you absorb or retain information best?"
               className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
-            <input
-              value={tone}
-              onChange={(e) => setTone(e.target.value)}
-              placeholder="How should GEORGE speak to you?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
+
           </div>
 
-          <textarea
-            value={friction}
-            onChange={(e) => setFriction(e.target.value)}
-            rows={4}
-            placeholder="What usually gets in your way?"
-            className="w-full rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-          />
+
 
           <div className="rounded-[1rem] border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.055] p-4">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/80">
