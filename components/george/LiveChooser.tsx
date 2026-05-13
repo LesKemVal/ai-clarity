@@ -13,7 +13,7 @@ type LiveChooserProps = {
   onEnterCode?: () => void
 }
 
-const lineOne = 'Take advantage of advanced runtime logic and take GEORGE LIVE anywhere.'
+const lineOne = 'Take advantage of advanced runtime logic, real-time conversational awareness, and live response shaping — and take GEORGE LIVE anywhere.'
 const lineTwo = 'Interviews · Boardrooms · Sales · Negotiations · Classrooms · Everyday conversation'
 const lineThree = 'Upload your résumé. Prepare for the room. Adapt in real time.'
 

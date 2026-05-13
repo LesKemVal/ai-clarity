@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -45,9 +52,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased"
+      className={`h-full antialiased ${inter.variable}`}
     >
-      <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation">
+      <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation font-[var(--font-inter)]">
         <MobileHeaderGate />
         <div className="flex-1 pt-[max(env(safe-area-inset-top),0px)]">
           {children}
