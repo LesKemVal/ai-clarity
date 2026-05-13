@@ -19,7 +19,7 @@ export default function RootPage() {
       <div className="relative z-10 mx-auto flex w-full max-w-[760px] flex-col items-center px-6 text-center">
 
         <img
-          src="/bxx34.png"
+          src="/bxnew20.png"
           alt="BRANESx"
           className="mb-6 h-8 w-auto object-contain opacity-75"
         />

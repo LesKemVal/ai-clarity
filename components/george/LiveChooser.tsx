@@ -39,7 +39,7 @@ export default function LiveChooser({
         <div className="relative z-10 flex flex-col items-center px-6 py-8 text-center">
 
           <img
-            src="/bxx34.png"
+            src="/bxnew20.png"
             alt="BRANESx"
             className="mb-4 h-7 w-auto object-contain opacity-64"
           />
