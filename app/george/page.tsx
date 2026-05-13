@@ -4102,7 +4102,7 @@ setPendingAssistantMessage({
   })
 
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
-  const showMobileHero = !showConversation
+  const showMobileHero = !showConversation && messages.length <= 1
   const enterLiveConversation = () => {
     setShowLiveQuickMenu(false)
     setShowCampaignMenu(false)
