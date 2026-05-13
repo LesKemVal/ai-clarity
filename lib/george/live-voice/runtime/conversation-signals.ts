@@ -6,6 +6,10 @@ export type ConversationalSignal =
   | 'hesitation'
   | 'resistance'
   | 'defensive_language'
+  | 'interviewer_probe'
+  | 'behavioral_question'
+  | 'competency_test'
+  | 'weak_confidence'
 
 export type ConversationSignalState = {
   signals: ConversationalSignal[]
@@ -33,6 +37,18 @@ const SIGNAL_PATTERNS: Record<ConversationalSignal, RegExp> = {
 
   defensive_language:
     /(sorry|i just|what i meant|i was only|let me explain)/i,
+
+  interviewer_probe:
+    /(tell me about yourself|walk me through|why do you want|why should we hire|what are your strengths|what are your weaknesses)/i,
+
+  behavioral_question:
+    /(tell me about a time|give me an example|describe a time|how did you handle|what would you do if)/i,
+
+  competency_test:
+    /(experience with|familiar with|how would you approach|what tools|what systems|what process|can you explain)/i,
+
+  weak_confidence:
+    /\b(i think|kind of|sort of|maybe|i guess|not really sure|i don't know)\b/i,
 }
 
 export function detectConversationSignals(
