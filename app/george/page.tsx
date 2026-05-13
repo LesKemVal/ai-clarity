@@ -4343,7 +4343,7 @@ return (
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82 backdrop-blur-2xl px-4 py-1.5 transition duration-200 ${"z-50"}`}>
+            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82 backdrop-blur-xl px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-2 xl:hidden">
                   <button
@@ -4351,7 +4351,7 @@ return (
                     onClick={() => setShowSidebar(true)}
                     onTouchStart={() => setShowSidebar(true)}
                     onPointerDown={() => setShowSidebar(true)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.045] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
                     aria-label="Open menu"
                   >
                     <span className="flex flex-col items-center justify-center gap-[3px]">
@@ -4367,7 +4367,7 @@ return (
                       e.stopPropagation()
                       setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
                     }}
-                    className="flex h-8 items-center gap-1 rounded-full border border-white/[0.06] bg-white/[0.025] px-2 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:text-white/75"
+                    className="flex h-8 items-center gap-1 rounded-full border border-white/[0.04] bg-white/[0.015] px-2 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:text-white/75"
                     aria-label="Change language"
                   >
                     <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
@@ -4521,7 +4521,7 @@ return (
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[1.25rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/5 px-3.5 py-2.5 shadow-none'
-              : 'max-w-[82%] text-right rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] px-3.5 py-2.5 shadow-none')
+              : 'max-w-[82%] text-right rounded-[1.25rem] border border-white/[0.045] bg-white/[0.02] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         } ${
           !expandedMessages[i] && (m.content || '').length > 420
@@ -4540,7 +4540,7 @@ return (
               <img
                 src={m.imageDataUrl}
                 alt="Uploaded image"
-                className="mb-2 max-h-40 w-full rounded-2xl max-w-full border border-white/[0.05] object-cover"
+                className="mb-2 max-h-40 w-full rounded-[1rem] max-w-full border border-white/[0.05] object-cover"
               />
             )}
             <span>{m.content}</span>
@@ -4707,7 +4707,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {rewordPopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
             rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
@@ -4840,7 +4840,7 @@ Cue:`)
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-2xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
             tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
           }`}
         >
@@ -5122,7 +5122,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -5261,7 +5261,7 @@ ${simplifyTarget}`
                   <button
                     type="button"
                     onClick={() => window.open('/help','_blank')}
-                    className="rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-white/72"
+                    className="rounded-full border border-white/[0.04] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-white/72"
                   >
                     Help
                   </button>
@@ -5272,7 +5272,7 @@ ${simplifyTarget}`
                       e.stopPropagation()
                       setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
                     }}
-                    className="rounded-full border border-white/[0.06] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-white/72"
+                    className="rounded-full border border-white/[0.04] bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-white/72"
                     aria-label="Change language"
                   >
                     <span className="mr-1">{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
@@ -5310,7 +5310,7 @@ ${simplifyTarget}`
         className={`group relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
             ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(124,140,255,0.16)]'
-            : 'border-white/10 bg-white/[0.025] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
+            : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
         }`}
         aria-label="Open memory folders"
         title="Resume conversation continuity"
@@ -5359,7 +5359,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.35rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5490,7 +5490,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5601,7 +5601,7 @@ if (liveMode) {
         className="h-[84px] w-auto opacity-55 drop-shadow-[0_0_10px_rgba(124,140,255,0.08)]"
       />
 
-      <div className="rounded-2xl border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
+      <div className="rounded-[1rem] border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         Use one earbud if you can.
         <br />
         GEORGE is listening live.
@@ -5674,7 +5674,7 @@ if (liveMode) {
             <button
               type="button"
               onClick={() => setShowLiveSegue(false)}
-              className="rounded-xl border border-white/[0.05] bg-white/[0.035] px-5 py-2.5 text-[14px] font-medium text-white/68 transition hover:bg-white/[0.08] hover:text-white"
+              className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-5 py-2.5 text-[14px] font-medium text-white/68 transition hover:bg-white/[0.08] hover:text-white"
             >
               Not now
             </button>
@@ -5697,7 +5697,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[230] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
-      <div className="w-full max-w-[380px] rounded-[1.55rem] border border-white/[0.08] bg-[#11131A]/92 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.58)] backdrop-blur-2xl ring-1 ring-white/[0.04]">
+      <div className="w-full max-w-[380px] rounded-[1.15rem] border border-white/[0.045] bg-[#11131A]/92 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.58)] backdrop-blur-xl ring-1 ring-white/[0.04]">
         <div className="mb-1 text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
           LIVE
         </div>
@@ -5722,7 +5722,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={resumeLiveConversation}
-            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-left text-sm font-medium text-white/66 transition hover:border-[#7C8CFF]/18 hover:bg-[#7C8CFF]/6 hover:text-white/88"
+            className="w-full rounded-xl border border-white/[0.045] bg-white/[0.015] px-4 py-3 text-left text-sm font-medium text-white/66 transition hover:border-[#7C8CFF]/18 hover:bg-[#7C8CFF]/6 hover:text-white/88"
           >
             Resume LIVE conversation
           </button>
@@ -5730,7 +5730,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => setShowLiveEntryChoice(false)}
-            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/38 transition hover:bg-white/[0.025] hover:text-white/62"
+            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/38 transition hover:bg-white/[0.015] hover:text-white/62"
           >
             Stay here
           </button>
@@ -5752,7 +5752,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
           STRUCTURED LIVE
         </div>
@@ -5794,7 +5794,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className="w-full max-w-[420px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-[linear-gradient(180deg,rgba(8,10,18,0.98),rgba(0,0,0,0.98))] ring-1 ring-[#7C8CFF]/10 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-2xl">
+      <div className="w-full max-w-[420px] rounded-[1.5rem] border border-[#7C8CFF]/28 bg-[linear-gradient(180deg,rgba(8,10,18,0.98),rgba(0,0,0,0.98))] ring-1 ring-[#7C8CFF]/10 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-xl">
         <div className="mb-2 text-[11px] tracking-[0.22em] text-[#7C8CFF]">
           LEAVE LIVE
         </div>
@@ -5873,7 +5873,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-[#7C8CFF]/20' : 'border-[#7C8CFF]/28'} bg-[#11131A]/90 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-2xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.35rem] border ${sessionPickerMode === 'campaign' ? 'border-[#7C8CFF]/20' : 'border-[#7C8CFF]/28'} bg-[#11131A]/90 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5913,7 +5913,7 @@ if (liveMode) {
 
             if (!sessions.length) {
               return (
-                <div className="rounded-xl border border-white/[0.05] bg-white/[0.025] p-2 text-[12px] text-white/65">
+                <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-2 text-[12px] text-white/65">
                   {sessionPickerMode === 'campaign' ? 'No saved campaigns yet.' : 'No saved conversations yet.'}
                 </div>
               )
@@ -6087,7 +6087,7 @@ Choose one:
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/90 px-5 py-4 backdrop-blur-xl">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/82 px-5 py-4 backdrop-blur-xl">
 
     <div className="text-[11px] text-white/60 mb-2">
       What happened here?
@@ -6179,7 +6179,7 @@ Choose one:
 
                 return (
                 <div
-                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.55rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-300 ${
+                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-300 ${
                     isNegotiationStyle
                       ? 'border-[#7C8CFF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
                       : isResponseStyle
@@ -6324,7 +6324,7 @@ Choose one:
                             />
 
                             <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
-                              <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-[#11131A]/90 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-2xl">
+                              <div className="overflow-hidden rounded-[1.4rem] border border-[#7C8CFF]/20 bg-[#11131A]/90 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
                                   <div className="text-[11px] tracking-[0.32em] text-[#8E96FF]">
@@ -6493,7 +6493,7 @@ Choose one:
 <div className={`
 
 ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/88 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/96 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="relative flex-1 rounded-[1.95rem] border border-white/[0.08] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
+                    <div className="relative flex-1 rounded-[1.25rem] border border-white/[0.045] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-xl">
 
                       <input
                         ref={fileInputRef}
@@ -6718,7 +6718,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                 <button
                   type="button"
                   onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
+                  className="w-full rounded-[1rem] max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
                 >
                   Next
                 </button>
@@ -6729,7 +6729,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                     window.localStorage.setItem("george_walkthrough_seen","1")
                     setShowWalkthrough(false)
                   }}
-                  className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
+                  className="w-full rounded-[1rem] max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black"
                 >
                   End
                 </button>
@@ -6772,7 +6772,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-2xl border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
+                      className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/15 text-white'
                           : 'border-[#7C8CFF]/14 bg-black/35 text-neutral-500 hover:text-white'
@@ -6792,7 +6792,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-2xl max-w-full border border-[#7C8CFF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-[#7C8CFF]/50"
+                  className="w-full rounded-[1rem] max-w-full border border-[#7C8CFF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-[#7C8CFF]/50"
                 />
               </div>
 
@@ -6813,7 +6813,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                   setToastMessage('GEORGE is yours now.')
                   setShowToast(true)
                 }}
-                className="w-full rounded-2xl max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black transition hover:opacity-55"
+                className="w-full rounded-[1rem] max-w-full bg-[#7C8CFF] px-5 py-4 text-sm font-medium text-black transition hover:opacity-55"
               >
                 Save
               </button>
@@ -6857,7 +6857,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.08] bg-[#11131A]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.54)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.045] bg-[#11131A]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.54)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 text-center">
@@ -6875,7 +6875,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-white/[0.08] bg-black/28 px-4 py-3">
+          <div className="rounded-[1rem] border border-white/[0.045] bg-black/28 px-4 py-3">
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
               Continuity identity
             </label>
@@ -6988,7 +6988,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-left transition hover:border-[#7C8CFF]/24 hover:bg-white/[0.05]"
+            className="block w-full rounded-[1rem] max-w-full border border-white/[0.045] bg-white/[0.02] px-4 py-3 text-left transition hover:border-[#7C8CFF]/24 hover:bg-white/[0.05]"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -7035,7 +7035,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-2xl max-w-full border border-[#7C8CFF]/24 bg-[#7C8CFF]/8 px-4 py-3 text-left transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/12"
+            className="block w-full rounded-[1rem] max-w-full border border-[#7C8CFF]/24 bg-[#7C8CFF]/8 px-4 py-3 text-left transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/12"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -7056,7 +7056,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
           <button
             type="button"
             onClick={redeemFounderCode}
-            className="w-full rounded-full border border-white/[0.08] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
+            className="w-full rounded-full border border-white/[0.045] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
           >
             Enter Founder Code
           </button>
@@ -7087,7 +7087,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/10">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Structured LIVE</p>
@@ -7103,7 +7103,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
               </button>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.05] bg-black/35 px-5 py-4 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
+            <div className="rounded-[1rem] border border-white/[0.05] bg-black/35 px-5 py-4 text-xs leading-6 text-neutral-300 shadow-inner shadow-black/30">
               <div className="font-medium text-white/80">Structured LIVE will let you:</div>
               <div className="mt-1.5 space-y-1">
                 <div>• resume structured conversations</div>
@@ -7118,7 +7118,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-2xl max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(124,140,255,0.08)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-[1rem] max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(124,140,255,0.08)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
