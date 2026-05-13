@@ -34,7 +34,7 @@ export default function RootPage() {
 
         <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
           Ask GEORGE anything.
-          The power of OpenAI aligned with GEORGE’s core principles.
+          The power of OpenAI aligned with YOUR core principles.
           GEORGE will not contradict The Holy Bible (KJV).
         </p>
 
@@ -52,7 +52,7 @@ export default function RootPage() {
         </h2>
 
         <p className="mt-4 max-w-[700px] text-[15px] leading-7 text-white/62 md:text-[17px]">
-          Take advantage of advanced runtime logic and take GEORGE LIVE anywhere.
+          Take advantage of advanced runtime logic, real-time conversational awareness, and live response shaping — and take GEORGE LIVE anywhere.
         </p>
 
         <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] tracking-[0.14em] text-white/40 md:text-[12px]">

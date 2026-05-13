@@ -5288,13 +5288,6 @@ ${simplifyTarget}`
                   ◉ LIVE
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setShowUpgradeModal(true)}
-                  className="pointer-events-auto rounded-full border border-[#7C8CFF]/12 bg-[#11131A]/72 px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-[#C7D0FF]"
-                >
-                  {currentTier === 'brilliant' ? 'Stay Brilliant' : `Go ${upgradeCtaWord}`}
-                </button>
               </div>
 
               <div className="hidden">
@@ -6069,19 +6062,6 @@ Choose one:
 
     </div>
   </div>
-
-  <button
-    type="button"
-    onClick={() => {
-      setShowUpgradeModal(true)
-    }}
-    className="inline-flex items-center gap-1 whitespace-nowrap px-1.5 py-1 text-[11px] font-medium tracking-[0.12em] text-white/55 transition hover:text-[#7C8CFF]"
-  >
-    <span>{currentTier === 'brilliant' ? 'Stay' : 'Go'}</span>
-    <span className={`inline-block text-[#7C8CFF] transition-all duration-300 ease-out ${currentTier === 'brilliant' ? '' : ''}`}>
-      {currentTier === 'brilliant' ? 'Brilliant' : upgradeCtaWord}
-    </span>
-  </button>
 
 </div>
 
