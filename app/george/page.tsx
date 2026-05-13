@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
+import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -1061,6 +1062,7 @@ const [isListening, setIsListening] = useState(false)
   const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
+  const [showLiveChooser, setShowLiveChooser] = useState(false)
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
@@ -6189,7 +6191,7 @@ Choose one:
                     <button
                       type="button"
                       onClick={() => {
-                        setShowLiveQuickMenu((prev) => !prev)
+                        setShowLiveChooser(true)
                         setShowLiveToolsMenu(false)
                       }}
                       className="shrink-0 rounded-full bg-[#7C8CFF]/10 px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF]/82 transition hover:bg-[#7C8CFF]/18"
@@ -6199,41 +6201,7 @@ Choose one:
                     </button>
 
                     <div className="relative shrink-0">
-                      {showLiveQuickMenu && (
-                        <div className="ml-1 flex items-center gap-1 border-l border-white/10 pl-2">
-                          <button
-                            type="button"
-                            aria-label="Close LIVE chooser"
-                            onClick={() => setShowLiveQuickMenu(false)}
-                            className="fixed inset-0 z-[91] cursor-default bg-transparent"
-                          />
-                          <div className="absolute bottom-full left-[-6px] z-[95] mb-1.5 w-[230px]">
-                            <div className="relative w-[230px] origin-bottom-left rounded-[1.35rem] border border-[#7C8CFF]/34 bg-black/94 p-2 shadow-[0_16px_42px_rgba(0,0,0,0.52)] backdrop-blur-2xl ring-1 ring-[#7C8CFF]/12 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowLiveQuickMenu(false)
-                              startNewLiveConversation()
-                            }}
-                            className="w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/78 transition hover:bg-white/[0.022] hover:text-white/92"
-                          >
-                            New LIVE Conversation
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowLiveQuickMenu(false)
-                              setShowProLiveComingSoon(true)
-                            }}
-                            className="mt-1 w-full rounded-[0.8rem] px-3 py-1.5 text-left text-[12px] font-medium text-white/70 transition hover:bg-white/[0.022] hover:text-white/92"
-                          >
-                            New LIVE Session
-                          </button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                      
                     </div>
 
                     <span
@@ -7166,6 +7134,32 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
         </div>
       )}
       </main>
+
+      <LiveChooser
+        open={showLiveChooser}
+        hasAccess={
+          currentTier === 'intelligent' ||
+          currentTier === 'brilliant'
+        }
+        onClose={() => setShowLiveChooser(false)}
+        onStartLiveConversation={() => {
+          setShowLiveChooser(false)
+          startNewLiveConversation()
+        }}
+        onResumeLiveConversation={() => {
+          setShowLiveChooser(false)
+          resumeLiveConversation()
+        }}
+        onUpgrade={() => {
+          setShowLiveChooser(false)
+          router.push('/top-up')
+        }}
+        onEnterCode={() => {
+          setShowLiveChooser(false)
+          setShowUpgradeModal(true)
+        }}
+      />
+
     </>
   )
 }
