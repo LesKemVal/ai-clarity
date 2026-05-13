@@ -257,10 +257,10 @@ export default function Sidebar({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    Sessions: true,
-    'Goal Check': true,
     Modes: true,
     Account: true,
+    'Goal Check': false,
+    Sessions: false,
   })
 
   const toggleGroup = (title: string) => {
@@ -335,47 +335,6 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Sessions')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Sessions
-              </span>
-              <span className="text-[11px] text-white/32">
-                {openGroups.Sessions ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {openGroups.Sessions && (
-              <div className="mt-4 space-y-2">
-                {normalSessions.length === 0 ? (
-                  <p className="px-2 text-xs leading-5 text-white/32">
-                    Normal GEORGE sessions will appear here.
-                  </p>
-                ) : (
-                  normalSessions.map((session) => (
-                    <button
-                      key={session.id}
-                      type="button"
-                      onClick={() => openNormalSession(session)}
-                      className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.04]"
-                    >
-                      <span className="block truncate text-sm text-white/72 hover:text-white">
-                        {getSessionTitle(session)}
-                      </span>
-                      <span className="mt-1 block truncate text-[11px] text-white/32">
-                        {getSessionPreview(session)}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <button
-              type="button"
               onClick={() => toggleGroup('Goal Check')}
               className="flex w-full items-center justify-between text-left"
             >
@@ -398,9 +357,7 @@ return (
                 </button>
 
                 {goalChecks.length === 0 ? (
-                  <p className="px-2 text-xs leading-5 text-white/32">
-                    Manually saved goals and checks will appear here.
-                  </p>
+                  null
                 ) : (
                   goalChecks.map((item) => (
                     <button
@@ -510,6 +467,38 @@ Upgrade to continue.`,
             <a href="/legal/toa" className="block rounded-lg px-3 py-2 text-sm text-white/38 transition hover:bg-white/[0.04] hover:text-white">
               Terms
             </a>
+          </section>
+
+          <section className="border-t border-white/[0.04] pt-4">
+            <button
+              type="button"
+              onClick={() => toggleGroup('Sessions')}
+              className="flex w-full items-center justify-between text-left"
+            >
+              <span className="text-[10px] uppercase tracking-[0.22em] text-white/30">
+                Recent
+              </span>
+              <span className="text-[11px] text-white/24">
+                {openGroups.Sessions ? '▾' : '▸'}
+              </span>
+            </button>
+
+            {openGroups.Sessions && normalSessions.length > 0 && (
+              <div className="mt-3 space-y-1">
+                {normalSessions.map((session) => (
+                  <button
+                    key={session.id}
+                    type="button"
+                    onClick={() => openNormalSession(session)}
+                    className="block w-full rounded-md px-2 py-1.5 text-left transition hover:bg-white/[0.03]"
+                  >
+                    <span className="block truncate text-[13px] text-white/54 hover:text-white/80">
+                      {getSessionTitle(session)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </div>
