@@ -5661,7 +5661,7 @@ if (liveMode) {
               <button
                 type="button"
                 onClick={() => {
-                  setShowLiveEntryChoice(true)
+                  startNewLiveConversation()
                 }}
                 className="rounded-xl bg-white px-5 py-2.5 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
               >
