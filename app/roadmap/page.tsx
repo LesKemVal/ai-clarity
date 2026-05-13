@@ -20,7 +20,7 @@ export default function RoadmapPage() {
   return (
     <PageShell title="" eyebrow="" backToGeorge withSidebar={false}>
       <div className="max-w-6xl space-y-8">
-        <section className="overflow-hidden rounded-[2rem] border border-white/[0.08] bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
+        <section className="overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
           <div className="relative overflow-hidden">
             <img
               src="/roadmap/earbuds-clean.png"
@@ -82,7 +82,7 @@ export default function RoadmapPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
           <div className="space-y-6">
             <div className="max-w-3xl space-y-3">              <h2 className="text-2xl font-semibold tracking-tight text-white">
                 Choose the level of pressure GEORGE should carry with you.
@@ -117,7 +117,7 @@ export default function RoadmapPage() {
                   <li>• Turn intent into progress</li>
                 </ul>              </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 space-y-4 shadow-[0_0_30px_rgba(124,140,255,0.07)]">
+              <div className="rounded-2xl border border-white/[0.05] bg-white/[0.022] p-5 space-y-4 shadow-[0_0_16px_rgba(124,140,255,0.045)]">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Brilliant</p>
                   <p className="text-xs uppercase tracking-[0.18em] text-white/55">Flagship</p>

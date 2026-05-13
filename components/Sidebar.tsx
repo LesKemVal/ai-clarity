@@ -291,7 +291,7 @@ return (
             <img
               src="/bxx34.png"
               alt="BRANESx"
-              className="h-8 w-auto object-contain opacity-95"
+              className="h-[12px] w-[68px] object-contain opacity-82"
             />
           </div>
 
@@ -326,7 +326,7 @@ return (
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/52 transition duration-150 hover:bg-white/[0.03] hover:text-white"
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
               Make GEORGE Yours
             </button>
@@ -364,7 +364,7 @@ return (
                       key={item.id}
                       type="button"
                       onClick={() => openGoalCheck(item)}
-                      className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.04]"
+                      className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.022]"
                     >
                       <span className="block truncate text-sm text-white/72 hover:text-white">
                         {item.title}
@@ -423,7 +423,7 @@ Upgrade to continue.`,
 
                     onOpenLiveGate?.()
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-white/72 transition hover:bg-white/[0.04] hover:text-white"
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-white/72 transition hover:bg-white/[0.022] hover:text-white"
                 >
                   <span className="text-[#7C8CFF]">⚡</span>
                   <span>Conversation Assistant</span>
@@ -464,7 +464,7 @@ Upgrade to continue.`,
           </section>
 
           <section className="border-t border-white/[0.04] pt-3">
-            <a href="/legal/toa" className="block rounded-lg px-3 py-2 text-sm text-white/38 transition hover:bg-white/[0.04] hover:text-white">
+            <a href="/legal/toa" className="block rounded-lg px-3 py-2 text-sm text-white/38 transition hover:bg-white/[0.022] hover:text-white">
               Terms
             </a>
           </section>
@@ -490,7 +490,7 @@ Upgrade to continue.`,
                     key={session.id}
                     type="button"
                     onClick={() => openNormalSession(session)}
-                    className="block w-full rounded-md px-2 py-1.5 text-left transition hover:bg-white/[0.03]"
+                    className="block w-full rounded-md px-2 py-1.5 text-left transition hover:bg-white/[0.018]"
                   >
                     <span className="block truncate text-[13px] text-white/54 hover:text-white/80">
                       {getSessionTitle(session)}
@@ -523,7 +523,7 @@ Upgrade to continue.`,
           (currentGoalCheck?.todos || []).map((todo) => (
             <div
               key={todo.id}
-              className="rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.04]"
+              className="rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.022]"
             >
               <button
                 type="button"

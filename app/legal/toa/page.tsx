@@ -56,7 +56,7 @@ export default function TOAPage() {
   return (
     <PageShell title="Terms of Access" eyebrow="Agreement" backToGeorge withSidebar={false}>
       <div className="max-w-4xl space-y-8">
-        <section className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
           <div className="max-w-3xl space-y-4">
             <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
               Terms of Access
@@ -76,7 +76,7 @@ export default function TOAPage() {
           {sections.map((section) => (
             <div
               key={section.title}
-              className="rounded-3xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8"
+              className="rounded-2xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8"
             >
               <h2 className="text-xl font-semibold text-white">
                 {section.title}
@@ -104,7 +104,7 @@ export default function TOAPage() {
           ))}
         </section>
 
-        <section className="rounded-3xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
           <div className="max-w-3xl space-y-4">
             <p className="text-sm font-medium text-white md:text-base">
               Final position

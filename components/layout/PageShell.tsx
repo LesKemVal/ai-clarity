@@ -79,7 +79,7 @@ export default function PageShell({
         </button>
       </div>
     ) : (
-      <div className="flex max-w-[235px] items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
+      <div className="flex max-w-[235px] items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5">
         <div className="flex min-w-0 flex-col leading-tight">
           <span className="text-[10px] uppercase tracking-[0.18em] text-white/30">
             Anonymous
@@ -188,7 +188,7 @@ export default function PageShell({
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
-                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/85 transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8 xl:hidden"
+                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.018] text-white/85 transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8 xl:hidden"
                     aria-label="Open menu"
                   >
                     <svg

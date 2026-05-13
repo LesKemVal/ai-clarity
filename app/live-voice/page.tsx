@@ -839,7 +839,7 @@ function isForceIntervention(text: string) {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl">
+        <div className="rounded-2xl border border-white/[0.05] bg-white/[0.035] p-5 shadow-2xl">
           <div className="mb-4 flex flex-wrap gap-2">
             {(Object.values(LIVE_OBJECTIVES)).map((objective) => (
               <button
@@ -902,7 +902,7 @@ function isForceIntervention(text: string) {
             <button
               type="button"
               onClick={() => testText('do you have an ID?')}
-              className="rounded-2xl border border-white/10 px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
+              className="rounded-2xl border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
             >
               Test: ID question
             </button>
@@ -910,7 +910,7 @@ function isForceIntervention(text: string) {
             <button
               type="button"
               onClick={() => testText("sir, let's discuss a raise")}
-              className="rounded-2xl border border-white/10 px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
+              className="rounded-2xl border border-white/[0.05] px-5 py-3 text-sm text-white/75 transition hover:bg-white/10"
             >
               Test: raise opener
             </button>
@@ -934,7 +934,7 @@ function isForceIntervention(text: string) {
           )}
         </div>
 
-        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+        <section className="rounded-2xl border border-white/[0.05] bg-white/[0.018] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-white/35">Transcript</p>
           <p className="mt-3 min-h-20 whitespace-pre-wrap text-lg leading-8 text-white/80">
             {transcript || 'No transcript yet.'}
@@ -942,7 +942,7 @@ function isForceIntervention(text: string) {
         </section>
 
         <section
-          className={`rounded-3xl border p-5 transition-all duration-500 ${
+          className={`rounded-2xl border p-5 transition-all duration-500 ${
             runtimeState.interventionUrgency === 'high'
               ? 'border-red-400/35 bg-red-500/[0.08] shadow-[0_0_45px_rgba(255,40,40,0.16)]'
               : runtimeState.leverageState === 'user_gaining_leverage'
@@ -1020,7 +1020,7 @@ function isForceIntervention(text: string) {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-purple-400/20 bg-purple-400/[0.06] p-5">
+        <section className="rounded-2xl border border-purple-400/20 bg-purple-400/[0.06] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-purple-100/45">Governor Packet</p>
 
           {packet ? (
@@ -1040,7 +1040,7 @@ function isForceIntervention(text: string) {
           )}
         </section>
 
-        <section className="rounded-3xl border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
+        <section className="rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-emerald-100/45">
             Latency
           </p>
@@ -1053,7 +1053,7 @@ function isForceIntervention(text: string) {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
+        <section className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-cyan-100/45">
             Shadow Map
           </p>
@@ -1063,7 +1063,7 @@ function isForceIntervention(text: string) {
           </pre>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+        <section className="rounded-2xl border border-white/[0.05] bg-white/[0.018] p-5">
           <p className="text-xs uppercase tracking-[0.25em] text-white/35">Runtime Log</p>
           <div className="mt-4 flex flex-col gap-2 text-sm text-white/55">
             {log.length ? log.map((line, index) => <p key={index}>{line}</p>) : <p>No events yet.</p>}
