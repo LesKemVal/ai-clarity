@@ -289,7 +289,7 @@ return (
         <div className="relative flex items-center justify-between opacity-92">
           <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
-              src="/bxx34.png"
+              src="/bxnew20.png"
               alt="BRANESx"
               className="h-[12px] w-[68px] object-contain opacity-82"
             />
