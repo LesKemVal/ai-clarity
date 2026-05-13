@@ -1055,6 +1055,21 @@ const [isListening, setIsListening] = useState(false)
   const [showLiveToolsMenu, setShowLiveToolsMenu] = useState(false)
   const [showLiveEntryChoice, setShowLiveEntryChoice] = useState(false)
   const [showLiveSegue, setShowLiveSegue] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const liveParam = new URLSearchParams(window.location.search).get('live')
+    const openLiveSegue = window.localStorage.getItem('george_open_live_segue') === '1'
+
+    if (liveParam === '1' || liveParam === 'segue' || openLiveSegue) {
+      window.localStorage.removeItem('george_open_live_segue')
+      setLiveMode(false)
+      setShowLiveSegue(true)
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
   const [liveSegueIndex, setLiveSegueIndex] = useState(0)
   const [showAccessCodeEntry, setShowAccessCodeEntry] = useState(false)
   const [accessCode, setAccessCode] = useState('')
@@ -1165,7 +1180,9 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     if (typeof window === 'undefined') return
     if (normalSessionBootedRef.current) return
 
-    if (forceLive) {
+    const liveParam = new URLSearchParams(window.location.search).get('live')
+
+    if (forceLive && liveParam !== 'segue') {
       normalSessionBootedRef.current = true
       setActiveMode('live')
       setLiveMode(true)
@@ -2422,14 +2439,6 @@ requestAnimationFrame(() => {
     const prompt = params.get('prompt')
     const context = params.get('context')
     const label = params.get('label')
-    const liveParam = params.get('live')
-
-    if (liveParam === '1' || liveParam === 'segue') {
-      setLiveMode(false)
-      setShowLiveSegue(true)
-      window.history.replaceState({}, '', window.location.pathname)
-    }
-
     if (shared) {
       setInput(shared)
       if (textareaRef.current) {
@@ -4169,12 +4178,12 @@ setPendingAssistantMessage({
     messagesRef.current = []
     liveSessionWriteReadyRef.current = false
 
-    window.location.href = '/george/live'
+    setShowLiveSegue(true)
   }
 
   const resumeLiveConversation = () => {
     setShowLiveEntryChoice(false)
-    router.push('/george/live')
+    setShowLiveSegue(true)
   }
 
 
