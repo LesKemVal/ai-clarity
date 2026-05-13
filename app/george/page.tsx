@@ -5605,14 +5605,18 @@ if (liveMode) {
 
 {showLiveSegue && typeof document !== 'undefined' && createPortal(
   <>
-    <div className="fixed inset-0 z-[240] h-[100dvh] w-screen overflow-hidden bg-black text-white">
+    <div className="fixed inset-0 z-[240] flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
       <img
-        src="/live/earbud1010.png"
-        alt="GEORGE LIVE"
-        className="absolute inset-0 !h-full !w-full !max-w-none object-cover object-center opacity-55"
+        src="/landing/city02.png"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover opacity-[0.26]"
       />
 
-      <div className="absolute inset-0 bg-black/8" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,7,10,0.72)_0%,rgba(6,7,10,0.90)_52%,rgba(6,7,10,0.98)_100%)]" />
+
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/[0.055] blur-[120px]" />
+      </div>
 
       <button
         type="button"
@@ -5623,57 +5627,73 @@ if (liveMode) {
         ×
       </button>
 
-      <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-[max(1.75rem,env(safe-area-inset-bottom))] md:bottom-auto md:top-1/2 md:-translate-y-1/2">
-        <div className="relative mx-auto w-full max-w-[360px] rounded-[24px] border border-white/8 bg-black/34 p-4 shadow-[0_18px_52px_rgba(0,0,0,0.42)] backdrop-blur-md">
-          <div className="pointer-events-none absolute inset-[-2px] rounded-[26px] border border-[#7C8CFF]/28 opacity-70 shadow-[0_0_38px_rgba(124,140,255,0.22)] animate-pulse" />
-          <div className="pointer-events-none absolute -inset-4 rounded-[34px] bg-[#7C8CFF]/7 blur-2xl animate-pulse" />
-          <div className="relative z-10">
-          <div className="mb-4 flex items-center justify-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#7C8CFF] shadow-[0_0_14px_rgba(124,140,255,0.9)] animate-pulse" />
-            <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#C7D0FF]/82">
-              GEORGE LIVE
-            </span>
-          </div>
+      <div className="relative z-10 mx-auto flex w-full max-w-[760px] flex-col items-center px-6 text-center">
+        <img
+          src="/bxx34.png"
+          alt="BRANESx"
+          className="mb-6 h-10 w-auto object-contain opacity-90 md:h-12"
+        />
 
-          <h1 className="text-center text-[24px] font-semibold leading-[1.02] tracking-[-0.045em] text-white">
-            Carry GEORGE into...
-          </h1>
+        <h2 className="text-[28px] font-semibold tracking-[-0.045em] text-white md:text-[40px]">
+          GEORGE LIVE
+        </h2>
 
-          <p className="mt-4 text-center text-[13px] leading-6 text-white/66">
-            GEORGE listens with you, helps you stay composed, and gives you short useful lines while the moment is still moving.
-          </p>
+        <p className="mt-4 max-w-[700px] text-[15px] leading-7 text-white/62 md:text-[17px]">
+          Take advantage of advanced runtime logic, real-time conversational awareness, and live response shaping — and take GEORGE LIVE anywhere.
+        </p>
 
-          <div className="mt-5 flex flex-col gap-2">
-            {currentTier === 'smart' ? (
-              <button
-                type="button"
-                onClick={() => window.open('/top-up','_blank')}
-                className="rounded-xl bg-white px-5 py-2.5 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
-              >
-                Continue to access
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  startNewLiveConversation()
-                }}
-                className="rounded-xl bg-white px-5 py-2.5 text-[14px] font-semibold text-[#11131A] transition hover:bg-[#F5F1E8]"
-              >
-                Enter LIVE
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setShowLiveSegue(false)}
-              className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-5 py-2.5 text-[14px] font-medium text-white/68 transition hover:bg-white/[0.08] hover:text-white"
-            >
-              Not now
-            </button>
-          </div>
-          </div>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] tracking-[0.14em] text-white/40 md:text-[12px]">
+          <span>INTERVIEWS</span>
+          <span>•</span>
+          <span>BOARDROOMS</span>
+          <span>•</span>
+          <span>CLASSROOMS</span>
+          <span>•</span>
+          <span>SALES</span>
+          <span>•</span>
+          <span>NEGOTIATIONS</span>
+          <span>•</span>
+          <span>APPOINTMENTS</span>
+          <span>•</span>
+          <span>EVERYDAY CONVERSATION</span>
         </div>
+
+        <p className="mt-6 max-w-[620px] text-[14px] leading-7 text-white/48">
+          Upload your résumé. Prepare for the room. Adapt in real time.
+          The more context GEORGE has, the sharper the assistance becomes.
+        </p>
+
+        {currentTier === 'smart' ? (
+          <button
+            type="button"
+            onClick={() => {
+              setShowLiveSegue(false)
+              window.location.href = '/top-up?intent=conversation'
+            }}
+            className="mt-7 flex w-full max-w-[420px] items-center justify-center rounded-[1.15rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+          >
+            Continue to access
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setShowLiveSegue(false)
+              startNewLiveConversation()
+            }}
+            className="mt-7 flex w-full max-w-[420px] items-center justify-center rounded-[1.15rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+          >
+            Enter GEORGE LIVE
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowLiveSegue(false)}
+          className="mt-5 text-[13px] text-white/34 transition hover:text-white/62"
+        >
+          Not now
+        </button>
       </div>
     </div>
   </>,
@@ -5684,49 +5704,96 @@ if (liveMode) {
   <>
     <button
       type="button"
-      aria-label="Close LIVE chooser"
+      aria-label="Close GEORGE LIVE entry"
       onClick={() => setShowLiveEntryChoice(false)}
-      className="fixed inset-0 z-[220] bg-black/46 backdrop-blur-[8px]"
+      className="fixed inset-0 z-[240] bg-black/72 backdrop-blur-md"
     />
 
-    <div className="fixed inset-0 z-[230] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
-      <div className="w-full max-w-[380px] rounded-[1.15rem] border border-white/[0.045] bg-[#11131A]/92 p-4 shadow-[0_24px_70px_rgba(0,0,0,0.58)] backdrop-blur-xl ring-1 ring-white/[0.04]">
-        <div className="mb-1 text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
-          LIVE
+    <div className="fixed inset-x-4 top-1/2 z-[250] mx-auto max-w-[760px] -translate-y-1/2 overflow-hidden rounded-[2rem] border border-white/[0.10] bg-[#080A12] text-white shadow-[0_40px_140px_rgba(0,0,0,0.82)]">
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="/earbud400.png"
+          alt=""
+          className="absolute right-[-70px] top-[-50px] hidden h-[360px] w-[360px] object-contain opacity-[0.18] md:block"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_16%,rgba(124,140,255,0.18),transparent_38%),linear-gradient(180deg,rgba(8,10,18,0.88)_0%,rgba(8,10,18,0.96)_100%)]" />
+      </div>
+
+      <div className="relative grid gap-6 p-6 md:grid-cols-[1fr_0.72fr] md:p-8">
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <p className="text-[11px] uppercase tracking-[0.30em] text-[#7C8CFF]">
+              GEORGE LIVE
+            </p>
+
+            <h2 className="text-3xl font-semibold leading-[1.02] tracking-[-0.05em] text-white md:text-5xl">
+              Carry GEORGE into the room.
+            </h2>
+
+            <p className="max-w-xl text-sm leading-7 text-white/64 md:text-[15px]">
+              Use advanced runtime logic, real-time conversational awareness, timing cues, and live response shaping when words matter.
+            </p>
+          </div>
+
+          <div className="grid gap-2 text-sm leading-6 text-white/72 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] px-4 py-3">
+              Interviews
+            </div>
+            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] px-4 py-3">
+              Negotiations
+            </div>
+            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] px-4 py-3">
+              Meetings
+            </div>
+            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.035] px-4 py-3">
+              Difficult conversations
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {currentTier === 'brilliant' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveEntryChoice(false)
+                  setLiveMode(true)
+                }}
+                className="rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-[#11131A] shadow-[0_22px_70px_rgba(255,255,255,0.12)] transition hover:translate-y-[-1px] hover:bg-[#F5F1E8]"
+              >
+                Enter GEORGE LIVE
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLiveEntryChoice(false)
+                  window.location.href = '/top-up?intent=conversation'
+                }}
+                className="rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-[#11131A] shadow-[0_22px_70px_rgba(255,255,255,0.12)] transition hover:translate-y-[-1px] hover:bg-[#F5F1E8]"
+              >
+                Upgrade for LIVE
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setShowLiveEntryChoice(false)}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-white/72 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
+            >
+              Not now
+            </button>
+          </div>
         </div>
 
-        <div className="text-[15px] font-semibold text-white">
-          Enter LIVE.
-        </div>
-
-        <div className="mt-2 text-[12px] leading-5 text-white/58">
-          Use one earbud if you can. GEORGE will track timing and help with the next move.
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <button
-            type="button"
-            onClick={startNewLiveConversation}
-            className="w-full rounded-xl border border-[#7C8CFF]/22 bg-[#7C8CFF]/8 px-4 py-3 text-left text-sm font-semibold text-white/90 transition hover:bg-[#7C8CFF]/12"
-          >
-            Start new LIVE conversation
-          </button>
-
-          <button
-            type="button"
-            onClick={resumeLiveConversation}
-            className="w-full rounded-xl border border-white/[0.045] bg-white/[0.015] px-4 py-3 text-left text-sm font-medium text-white/66 transition hover:border-[#7C8CFF]/18 hover:bg-[#7C8CFF]/6 hover:text-white/88"
-          >
-            Resume LIVE conversation
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowLiveEntryChoice(false)}
-            className="w-full rounded-xl border border-transparent px-4 py-2.5 text-left text-sm font-medium text-white/38 transition hover:bg-white/[0.015] hover:text-white/62"
-          >
-            Stay here
-          </button>
+        <div className="hidden items-end justify-center md:flex">
+          <div className="rounded-[1.8rem] border border-[#7C8CFF]/22 bg-[#7C8CFF]/[0.08] p-5 shadow-[0_0_48px_rgba(124,140,255,0.10)]">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-[#C7D0FF]">
+              Runtime support
+            </p>
+            <p className="mt-3 text-sm leading-7 text-white/72">
+              GEORGE stays quiet until the moment calls for a cue, line, correction, or next move.
+            </p>
+          </div>
         </div>
       </div>
     </div>
