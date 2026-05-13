@@ -19,6 +19,9 @@ const AUTHORITY_COMMAND_PATTERNS =
 const INVITATION_PATTERNS =
   /(okay,? go ahead|go ahead|you can answer|what do you say|your turn|i'm listening|im listening)/i
 
+const INTERVIEWER_QUESTION_PATTERNS =
+  /(tell me about yourself|tell me about a time|give me an example|walk me through|why should we hire|why do you want|what are your strengths|what are your weaknesses|what systems are you familiar with|describe a time|how did you handle)/i
+
 const USER_REQUEST_PATTERNS =
   /(george|help me|what should i say|how do i respond|give me|tell me|coach me)/i
 
@@ -33,6 +36,14 @@ export function inferLiveSpeaker(
       speaker: 'unclear',
       confidence: 0,
       reason: 'Empty transcript.',
+    }
+  }
+
+  if (INTERVIEWER_QUESTION_PATTERNS.test(clean)) {
+    return {
+      speaker: 'other_party',
+      confidence: 0.82,
+      reason: 'Transcript appears to be an interview prompt directed at the user.',
     }
   }
 
