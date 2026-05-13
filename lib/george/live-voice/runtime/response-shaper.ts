@@ -191,6 +191,24 @@ class GeorgeResponseShaper {
       reasons.push('fatigue compression')
     }
 
+    if (signals.has('weak_confidence')) {
+      volley = this.removeWeakConfidence(volley)
+      volley = this.shorten(volley, 6)
+      cue = this.prependCue(cue, 'Sound certain. No filler.')
+      reasons.push('weak confidence tightening')
+    }
+
+    if (signals.has('behavioral_question')) {
+      cue = this.prependCue(cue, 'Use one example. Result last.')
+      reasons.push('behavioral answer framing')
+    }
+
+    if (signals.has('competency_test')) {
+      volley = this.forceProof(volley)
+      cue = this.prependCue(cue, 'Answer with direct experience.')
+      reasons.push('competency proof framing')
+    }
+
     if (input.responseCompression === 'high') {
       volley = this.shorten(volley, 5)
       cue = this.prependCue(cue, 'Keep it tight.')
@@ -245,6 +263,18 @@ class GeorgeResponseShaper {
       .replace(/\bI just\b/gi, 'I')
       .replace(/\bSorry,?\s*/gi, '')
       .replace(/\bWhat I meant was\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+  }
+
+  private removeWeakConfidence(text: string) {
+    return text
+      .replace(/\bI think\b/gi, 'I')
+      .replace(/\bkind of\b/gi, '')
+      .replace(/\bsort of\b/gi, '')
+      .replace(/\bmaybe\b/gi, '')
+      .replace(/\bI guess\b/gi, '')
+      .replace(/\bnot really sure\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim()
   }
