@@ -6509,6 +6509,15 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                           const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
                           const isDocx = file.type.includes('officedocument.wordprocessingml.document') || file.name.toLowerCase().endsWith('.docx')
 
+                          const lowerFileName = file.name.toLowerCase()
+                          const looksLikeResume =
+                            lowerFileName.includes('resume') ||
+                            lowerFileName.includes('résumé') ||
+                            lowerFileName.includes('cv') ||
+                            lowerFileName.includes('cover-letter') ||
+                            lowerFileName.includes('cover_letter')
+
+
                           if (isPdf || isDocx) {
                             const formData = new FormData()
                             formData.append('file', file)
@@ -6555,7 +6564,9 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                               setPendingImage(null)
                               setInput(`I uploaded text file: ${file.name}.
 
-Tell me what this is, what matters most, and how I should use it.
+${looksLikeResume
+  ? 'This looks like a résumé or career document. Help me use it for interviews, role positioning, answer framing, and live conversation preparation. Pull out what matters most and what I should be ready to say.'
+  : 'Tell me what this is, what matters most, and how I should use it.'}
 
 ${clipped}`)
                               setToastMessage(`${file.name} loaded into GEORGE.`)
