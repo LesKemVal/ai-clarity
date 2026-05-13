@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
 
@@ -65,7 +65,6 @@ export default function Sidebar({
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
 
-
   useEffect(() => {
     const loadNormalSessions = () => {
       setNormalSessions(
@@ -95,7 +94,6 @@ export default function Sidebar({
     return () => window.removeEventListener('storage', loadGoalChecks)
   }, [])
 
-
   const getSessionTitle = (session: GeorgeStoredSession) => {
     const firstUserMessage = session.messages?.find((message) => message.role === 'user')?.content?.trim()
     const firstAssistantMessage = session.messages?.find((message) => message.role === 'assistant')?.content?.trim()
@@ -107,15 +105,6 @@ export default function Sidebar({
         : firstUserMessage || firstAssistantMessage || 'Untitled session'
 
     return source.replace(/\s+/g, ' ').slice(0, 42)
-  }
-
-  const getSessionPreview = (session: GeorgeStoredSession) => {
-    const preview =
-      session.messages?.find((message) => message.role === 'user')?.content?.trim() ||
-      session.messages?.find((message) => message.role === 'assistant')?.content?.trim() ||
-      'Saved normal session'
-
-    return preview.replace(/\s+/g, ' ').slice(0, 64)
   }
 
   const openNormalSession = (session: GeorgeStoredSession) => {
@@ -143,7 +132,6 @@ export default function Sidebar({
     safeWriteGoalChecks(updated)
   }
 
-  
   const addTodo = (goal: GoalCheckItem) => {
     const text = window.prompt('New To-Do')
     if (!text?.trim()) return
@@ -257,7 +245,7 @@ export default function Sidebar({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    Modes: true,
+    'Intelligent Utility': true,
     Account: true,
     'Goal Check': false,
     Sessions: false,
@@ -279,20 +267,24 @@ export default function Sidebar({
     ? goalChecks.find((item) => item.id === activeGoalCheck.id) || activeGoalCheck
     : null
 
-return (
+  return (
     <aside
       className={`fixed left-0 top-0 z-[120] flex h-screen w-[280px] flex-col overflow-hidden border-r border-white/[0.045] bg-[#08080B]/88 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
-      <div className="border-b border-white/[0.04] px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
+      <div className="border-b border-white/[0.04] px-4 pb-3 pt-3 xl:h-[64px] xl:flex xl:items-center">
         <div className="relative flex items-center justify-between opacity-92">
-          <div className="flex items-center gap-2.5 translate-y-[4px]">
+          <div className="flex items-center gap-2.5 translate-y-[2px]">
             <img
               src="/bxx34.png"
               alt="BRANESx"
               className="h-8 w-auto object-contain opacity-95"
             />
+            <div className="leading-none">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Intelligent</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]/70">Utility</p>
+            </div>
           </div>
 
           <button
@@ -315,9 +307,10 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-lg bg-[#7C8CFF]/8 px-3 py-2 text-left text-sm text-white/90 transition hover:bg-[#7C8CFF]/15 hover:text-white"
+              className="block w-full rounded-xl border border-white/[0.06] bg-white/[0.035] px-3 py-2.5 text-left text-sm font-medium text-white/90 transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/10 hover:text-white"
             >
-              New Session
+              Normal GEORGE
+              <span className="mt-1 block text-[11px] font-normal text-white/38">One tap back to direction.</span>
             </button>
 
             <button
@@ -326,7 +319,7 @@ return (
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/52 transition duration-150 hover:bg-white/[0.03] hover:text-white"
+              className="block w-full rounded-xl px-3 py-2 text-left text-sm text-white/52 transition duration-150 hover:bg-white/[0.03] hover:text-white"
             >
               Make GEORGE Yours
             </button>
@@ -356,82 +349,65 @@ return (
                   + New Goal Check
                 </button>
 
-                {goalChecks.length === 0 ? (
-                  null
-                ) : (
-                  goalChecks.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => openGoalCheck(item)}
-                      className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.04]"
-                    >
-                      <span className="block truncate text-sm text-white/72 hover:text-white">
-                        {item.title}
-                      </span>
-                      <span className="mt-1 block truncate text-[11px] text-white/32">
-                        Manual goal check
-                      </span>
-                    </button>
-                  ))
-                )}
+                {goalChecks.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => openGoalCheck(item)}
+                    className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-white/[0.04]"
+                  >
+                    <span className="block truncate text-sm text-white/72 hover:text-white">
+                      {item.title}
+                    </span>
+                    <span className="mt-1 block truncate text-[11px] text-white/32">
+                      Manual goal check
+                    </span>
+                  </button>
+                ))}
               </div>
             )}
           </section>
 
-
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Modes')}
+              onClick={() => toggleGroup('Intelligent Utility')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Modes
+                Intelligent Utility
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups.Modes ? '▾' : '▸'}
+                {openGroups['Intelligent Utility'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups.Modes && (
+            {openGroups['Intelligent Utility'] && (
               <div className="mt-3 space-y-2">
-
                 <button
                   type="button"
                   onClick={() => {
                     setShowSidebar?.(false)
 
                     if (currentTier !== 'brilliant') {
-                      onPromptSelect({
-                        label: 'Conversation Mode',
-                        text: `Conversation Mode is where GEORGE works with you in real time.
-
-Brilliant gives you live guidance.
-Pro turns GEORGE into a full execution system:
-- scripts
-- cues
-- objection handling
-- campaign memory
-- performance tracking
-
-Upgrade to continue.`,
-                        context: 'conversation_mode_info'
-                      })
+                      window.location.href = '/top-up?intent=conversation'
                       return
                     }
 
                     onOpenLiveGate?.()
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-white/72 transition hover:bg-white/[0.04] hover:text-white"
+                  className="w-full rounded-xl border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.07] px-3 py-2.5 text-left transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/[0.12]"
                 >
-                  <span className="text-[#7C8CFF]">⚡</span>
-                  <span>Conversation Assistant</span>
+                  <span className="flex items-center gap-2 text-sm font-medium text-white/88">
+                    <span className="text-[#7C8CFF]">◉</span>
+                    GEORGE LIVE
+                  </span>
+                  <span className="mt-1 block text-[11px] leading-4 text-white/42">
+                    Real-time cues, timing, and response shaping.
+                  </span>
                 </button>
-
               </div>
             )}
-
           </section>
 
           <section>
@@ -502,146 +478,132 @@ Upgrade to continue.`,
           </section>
         </div>
       </div>
-    
-{currentGoalCheck && (
-  <div
-    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
-    onClick={() => setActiveGoalCheck(null)}
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-sm rounded-2xl bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
-    >
-      <div className="mb-4 text-lg text-white font-semibold">
-        {currentGoalCheck.title}
-      </div>
 
-      <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
-        {(!(currentGoalCheck?.todos?.length)) ? (
-          <p className="text-xs text-white/40">No to-dos yet.</p>
-        ) : (
-          (currentGoalCheck?.todos || []).map((todo) => (
-            <div
-              key={todo.id}
-              className="rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.04]"
-            >
+      {currentGoalCheck && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setActiveGoalCheck(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-black p-6 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
+          >
+            <div className="mb-4 text-lg text-white font-semibold">
+              {currentGoalCheck.title}
+            </div>
+
+            <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
+              {(!(currentGoalCheck?.todos?.length)) ? (
+                <p className="text-xs text-white/40">No to-dos yet.</p>
+              ) : (
+                (currentGoalCheck?.todos || []).map((todo) => (
+                  <div
+                    key={todo.id}
+                    className="rounded-lg border border-white/8 bg-white/[0.025] px-3 py-2 text-sm transition hover:bg-white/[0.04]"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
+                      className="flex w-full items-start gap-2 text-left"
+                    >
+                      <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
+                      <span className="min-w-0">
+                        <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
+                          {todo.text}
+                        </span>
+                        {todo.done && todo.completionNote && (
+                          <span className="mt-1 block text-[11px] leading-4 text-white/35">
+                            Completion: {todo.completionNote}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+
+                    <div className="mt-2 flex gap-2 pl-6">
+                      <button
+                        type="button"
+                        onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
+                        className="text-[11px] text-white/40 transition hover:text-white"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
+                        className="text-[11px] text-red-400/70 transition hover:text-red-300"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="space-y-2.5">
               <button
-                type="button"
-                onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
-                className="flex w-full items-start gap-2 text-left"
+                onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
+                className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
               >
-                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
-                <span className="min-w-0">
-                  <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
-                    {todo.text}
-                  </span>
-                  {todo.done && todo.completionNote && (
-                    <span className="mt-1 block text-[11px] leading-4 text-white/35">
-                      Completion: {todo.completionNote}
-                    </span>
-                  )}
-                </span>
+                + Add To-Do
               </button>
 
-              <div className="mt-2 flex gap-2 pl-6">
-                <button
-                  type="button"
-                  onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-white/40 transition hover:text-white"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-red-400/70 transition hover:text-red-300"
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  setActiveGoalCheck(null)
+                  setShowSidebar?.(false)
+                  const todos = currentGoalCheck.todos || []
+                  const done = todos
+                    .filter(t => t.done)
+                    .map(t => `${t.text}${t.completionNote ? ` — Completion: ${t.completionNote}` : ''}`)
+                  const open = todos.filter(t => !t.done).map(t => t.text)
+
+                  onPromptSelect({
+                    label: currentGoalCheck.title,
+                    text: `GOAL CHECK\n\nGoal: ${currentGoalCheck.title}\n\nCompleted:\n${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}\n\nOpen:\n${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}\n\nRule: Do not let me cheat myself. If a completed item looks vague, weak, unproven, or contradicted by the open items, challenge it directly and tell me what would count as real completion.\n\nWhat is the strongest next move based on this?`,
+                    context: 'goal_check_structured',
+                  })
+                }}
+                className="w-full rounded-lg bg-white text-black px-4 py-2 text-sm"
+              >
+                Review with GEORGE
+              </button>
+
+              <button
+                onClick={() => {
+                  const next = window.prompt('Rename Goal Check', currentGoalCheck.title)
+                  if (!next?.trim()) return
+
+                  const updated = goalChecks.map((g) =>
+                    g.id === currentGoalCheck.id
+                      ? { ...g, title: next.trim(), updatedAt: Date.now() }
+                      : g
+                  )
+
+                  setGoalChecks(updated)
+                  localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+                  setActiveGoalCheck(null)
+                }}
+                className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
+              >
+                Rename
+              </button>
+
+              <button
+                onClick={() => {
+                  const updated = goalChecks.filter((g) => g.id !== currentGoalCheck.id)
+                  setGoalChecks(updated)
+                  localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
+                  setActiveGoalCheck(null)
+                }}
+                className="w-full rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400"
+              >
+                Delete
+              </button>
             </div>
-          ))
-        )}
-      </div>
-
-      <div className="space-y-2.5">
-        <button
-          onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
-        >
-          + Add To-Do
-        </button>
-
-        <button
-          onClick={() => {
-            setActiveGoalCheck(null)
-            setShowSidebar?.(false)
-            const todos = currentGoalCheck.todos || []
-const done = todos
-  .filter(t => t.done)
-  .map(t => `${t.text}${t.completionNote ? ` — Completion: ${t.completionNote}` : ''}`)
-const open = todos.filter(t => !t.done).map(t => t.text)
-
-onPromptSelect({
-  label: currentGoalCheck.title,
-  text: `GOAL CHECK
-
-Goal: ${currentGoalCheck.title}
-
-Completed:
-${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}
-
-Open:
-${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}
-
-Rule: Do not let me cheat myself. If a completed item looks vague, weak, unproven, or contradicted by the open items, challenge it directly and tell me what would count as real completion.
-
-What is the strongest next move based on this?`,
-  context: 'goal_check_structured',
-})
-          }}
-          className="w-full rounded-lg bg-white text-black px-4 py-2 text-sm"
-        >
-          Review with GEORGE
-        </button>
-
-        <button
-          onClick={() => {
-            const next = window.prompt('Rename Goal Check', currentGoalCheck.title)
-            if (!next?.trim()) return
-
-            const updated = goalChecks.map((g) =>
-              g.id === currentGoalCheck.id
-                ? { ...g, title: next.trim(), updatedAt: Date.now() }
-                : g
-            )
-
-            setGoalChecks(updated)
-            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
-            setActiveGoalCheck(null)
-          }}
-          className="w-full rounded-lg px-4 py-2 text-sm text-white/80"
-        >
-          Rename
-        </button>
-
-        <button
-          onClick={() => {
-            const updated = goalChecks.filter((g) => g.id !== currentGoalCheck.id)
-            setGoalChecks(updated)
-            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
-            setActiveGoalCheck(null)
-          }}
-          className="w-full rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400"
-        >
-          Delete
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
-
-</aside>
+          </div>
+        </div>
+      )}
+    </aside>
   )
 }
