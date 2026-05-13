@@ -20,7 +20,7 @@ export default function RoadmapPage() {
   return (
     <PageShell title="" eyebrow="" backToGeorge withSidebar={false}>
       <div className="max-w-6xl space-y-8">
-        <section className="overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
+        <section className="overflow-hidden rounded-[1.05rem] border border-white/[0.045] bg-black shadow-none">
           <div className="relative overflow-hidden">
             <img
               src="/roadmap/earbuds-clean.png"
@@ -43,7 +43,7 @@ export default function RoadmapPage() {
                     GEORGE helps you find the next move in normal life — and tighten up when the moment turns live.
                   </p>
 
-                  <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm leading-7 text-white/90">
+                  <div className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm leading-7 text-white/90">
                     Normal GEORGE helps you think. LIVE GEORGE helps you perform. Same system — sharper when the stakes rise.
                   </div>
                 </div>
@@ -82,7 +82,7 @@ export default function RoadmapPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white/[0.08] bg-[#11131A]/72 p-6 shadow-[0_14px_36px_rgba(0,0,0,0.18)] backdrop-blur md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 shadow-none backdrop-blur md:p-8">
           <div className="space-y-6">
             <div className="max-w-3xl space-y-3">              <h2 className="text-2xl font-semibold tracking-tight text-white">
                 Choose the level of pressure GEORGE should carry with you.
@@ -93,7 +93,7 @@ export default function RoadmapPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-4">
-              <div className="rounded-2xl border border-white/[0.08] bg-black/25 p-5 space-y-4">
+              <div className="rounded-[1rem] border border-white/[0.045] bg-black/25 p-5 space-y-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Smart</p>
                   <p className="text-xs uppercase tracking-[0.18em] text-white/45">Start here</p>
@@ -105,7 +105,7 @@ export default function RoadmapPage() {
                   <li>• Start moving again</li>
                 </ul>              </div>
 
-              <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-5 space-y-4">
+              <div className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] p-5 space-y-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Intelligent</p>
                   <p className="text-xs uppercase tracking-[0.18em] text-[#D7DDFF]">Best value</p>
@@ -117,7 +117,7 @@ export default function RoadmapPage() {
                   <li>• Turn intent into progress</li>
                 </ul>              </div>
 
-              <div className="rounded-2xl border border-white/[0.05] bg-white/[0.022] p-5 space-y-4 shadow-[0_0_16px_rgba(124,140,255,0.045)]">
+              <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.022] p-5 space-y-4 shadow-[0_0_16px_rgba(124,140,255,0.045)]">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Brilliant</p>
                   <p className="text-xs uppercase tracking-[0.18em] text-white/55">Flagship</p>
@@ -129,7 +129,7 @@ export default function RoadmapPage() {
                   <li>• Handle the moment with control</li>
                   <li>• Recover faster when the room shifts</li>
                 </ul>              </div>
-              <div className="rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 space-y-4 shadow-[0_0_30px_rgba(34,197,94,0.07)]">
+              <div className="rounded-[1rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 space-y-4 shadow-[0_0_30px_rgba(34,197,94,0.07)]">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-white">Professional</p>
                   <p className="text-xs uppercase tracking-[0.18em] text-white/65">Performance tier</p>

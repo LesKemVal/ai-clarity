@@ -11,7 +11,7 @@ export default function ConversationPage() {
     >
       <div className="space-y-8">
 
-        <section className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/8 p-5 md:p-5">
           <div className="space-y-4">
             <p className="text-2xl font-semibold text-white">
               Stay composed while the moment is happening.
@@ -41,7 +41,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Conversation Assistance
           </h2>
@@ -67,7 +67,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[#22c55e]/30 bg-[#22c55e]/10 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Pro Conversation Partner
           </h2>
@@ -93,7 +93,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Change GEORGE Mid-Conversation
           </h2>
@@ -107,7 +107,7 @@ export default function ConversationPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">
             Return Fast
           </h2>

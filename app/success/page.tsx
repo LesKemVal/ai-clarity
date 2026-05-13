@@ -11,7 +11,7 @@ export default function SuccessPage() {
       withSidebar={false}
     >
       <div className="max-w-3xl space-y-8">
-        <section className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
               You’re in.

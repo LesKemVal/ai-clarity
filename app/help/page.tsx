@@ -11,7 +11,7 @@ export default function HelpPage() {
     >
       <div className="space-y-7">
 
-        <section className="rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.06] p-6 md:p-8">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-5 md:p-5">
           <p className="text-sm leading-7 text-white">
             GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
           </p>
@@ -20,7 +20,7 @@ export default function HelpPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <p className="text-xl font-semibold tracking-[-0.03em] text-white">
             GEORGE is built for clarity, execution, and continuity.
           </p>
@@ -29,7 +29,7 @@ export default function HelpPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">The Operating Model</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Direction — identify what actually matters.</li>
@@ -41,7 +41,7 @@ export default function HelpPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">How to Start</h2>
           <p className="leading-7 text-neutral-300">
             Give GEORGE the real situation, not a perfect prompt.
@@ -54,7 +54,7 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.06] p-6 md:p-8">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">LIVE Mode</h2>
 
           <div className="space-y-5">
@@ -81,7 +81,7 @@ export default function HelpPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">Use the Controls as Next Moves</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Keep this — save something worth returning to.</li>
@@ -93,14 +93,14 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">Continuity</h2>
           <p className="leading-7 text-neutral-400">
             Continuity lets GEORGE restore your tier, remember the active direction, and reduce repeated setup. Anonymous use is available for simple direction. Subscriber continuity is for restored access, stronger runtime context, and LIVE support.
           </p>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">Tiers</h2>
           <ul className="list-disc space-y-2 pl-5 text-neutral-400">
             <li>Smart — clarity and directional reasoning.</li>
@@ -110,7 +110,7 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <p className="text-lg font-medium leading-8 text-white">
             The simple rule: use normal GEORGE when you need direction. Use continuity when you want GEORGE to remember, restore, and support the situation as it develops.
           </p>

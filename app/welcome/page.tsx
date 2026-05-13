@@ -108,7 +108,7 @@ export default function WelcomePage() {
           ← Back to GEORGE
         </button>
 
-        <div className="space-y-6 rounded-[1.35rem] border border-white/[0.05] bg-white/[0.018] p-6 shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
+        <div className="space-y-6 rounded-[1.05rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-[0.28em] text-[#7C8CFF]">
               Make GEORGE yours
@@ -126,37 +126,37 @@ export default function WelcomePage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="What should GEORGE call you?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
               value={mission}
               onChange={(e) => setMission(e.target.value)}
               placeholder="What are you trying to build, fix, fund, or change?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
               placeholder="What matters most right now?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
               value={weeklyTime}
               onChange={(e) => setWeeklyTime(e.target.value)}
               placeholder="How much time can you really give this weekly?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
               value={learningStyle}
               onChange={(e) => setLearningStyle(e.target.value)}
               placeholder="How do you learn best?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
             <input
               value={tone}
               onChange={(e) => setTone(e.target.value)}
               placeholder="How should GEORGE speak to you?"
-              className="rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
           </div>
 
@@ -165,10 +165,10 @@ export default function WelcomePage() {
             onChange={(e) => setFriction(e.target.value)}
             rows={4}
             placeholder="What usually gets in your way?"
-            className="w-full rounded-2xl border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
+            className="w-full rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
           />
 
-          <div className="rounded-2xl border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.055] p-4">
+          <div className="rounded-[1rem] border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.055] p-4">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/80">
               GEORGE asks next
             </p>

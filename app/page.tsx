@@ -13,7 +13,7 @@ export default function RootPage() {
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,7,10,0.72)_0%,rgba(6,7,10,0.90)_52%,rgba(6,7,10,0.98)_100%)]" />
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/10 blur-[120px]" />
+        <div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/[0.055] blur-[120px]" />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-[760px] flex-col items-center px-6 text-center">

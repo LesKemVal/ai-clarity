@@ -172,7 +172,7 @@ export default function TopUpPage() {
   return (
     <PageShell backToGeorge withSidebar={false}>
       <div className="space-y-8">
-        <section className="rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6 md:p-8">
+        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <div className="max-w-5xl space-y-6">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
               BRANESx
@@ -186,7 +186,7 @@ export default function TopUpPage() {
               {subcopy}
             </p>
 
-            <div className="rounded-2xl border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-4 py-3 text-sm text-white/90">
+            <div className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm text-white/90">
               These are not feature buckets. They are levels of runtime continuity, pressure support, and operational presence.
             </div>
 
@@ -195,7 +195,7 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={redeemFounderCode}
-                className="rounded-full border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/10 hover:text-white"
+                className="rounded-full border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/[0.055] hover:text-white"
               >
                 Enter Founder Code
               </button>
@@ -206,7 +206,7 @@ export default function TopUpPage() {
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
-              <div className="rounded-[1.2rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
+              <div className="rounded-[1.2rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/[0.055] p-5 shadow-none">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
                   <span className="rounded-full border border-white/[0.05] bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
@@ -225,7 +225,7 @@ export default function TopUpPage() {
               <div className="rounded-[1.2rem] border border-white/15 bg-white/[0.022] p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Intelligent</p>
-                  <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
+                  <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
                     Operational tier
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
-                  className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
+                  className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
                 >
                   Enter Intelligent
                 </button>
@@ -268,7 +268,7 @@ export default function TopUpPage() {
                 </button>
               </div>
 
-              <div className="rounded-[1.2rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-[0_14px_36px_rgba(0,0,0,0.18)]">
+              <div className="rounded-[1.2rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-none">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Brilliant Day</p>
                   <span className="rounded-full border border-white/[0.05] bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
@@ -297,7 +297,7 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="feedback" className="scroll-mt-24 rounded-2xl border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div id="feedback" className="scroll-mt-24 rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white">Comments and suggestions</p>
               <p className="text-sm leading-7 text-neutral-300">
@@ -307,7 +307,7 @@ export default function TopUpPage() {
               <select
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
-                className="w-full rounded-2xl border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none"
+                className="w-full rounded-[1rem] border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none"
               >
                 <option value="suggestion">Suggestion</option>
                 <option value="bug">Bug</option>
@@ -320,7 +320,7 @@ export default function TopUpPage() {
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={6}
                 placeholder="What should change?"
-                className="w-full rounded-2xl border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                className="w-full rounded-[1rem] border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
               />
 
               <button
