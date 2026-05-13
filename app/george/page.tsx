@@ -4351,7 +4351,7 @@ return (
                     onClick={() => setShowSidebar(true)}
                     onTouchStart={() => setShowSidebar(true)}
                     onPointerDown={() => setShowSidebar(true)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.045] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.045] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(124,140,255,0.14)] pointer-events-auto"
                     aria-label="Open menu"
                   >
                     <span className="flex flex-col items-center justify-center gap-[3px]">
@@ -4517,11 +4517,11 @@ return (
       className={`space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`relative whitespace-pre-wrap text-[15.5px] md:text-[16.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.72]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
+        className={`relative whitespace-pre-wrap text-[15.5px] md:text-[15.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.5]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[82%] text-right rounded-[1.25rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/5 px-3.5 py-2.5 shadow-none'
-              : 'max-w-[82%] text-right rounded-[1.25rem] border border-white/[0.045] bg-white/[0.02] px-3.5 py-2.5 shadow-none')
+              ? 'max-w-[82%] text-right rounded-[0.95rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/5 px-3.5 py-2.5 shadow-none'
+              : 'max-w-[82%] text-right rounded-[0.95rem] border border-white/[0.045] bg-white/[0.02] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         } ${
           !expandedMessages[i] && (m.content || '').length > 420
@@ -5233,7 +5233,7 @@ ${simplifyTarget}`
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
           setShowScrollHint(false)
         }}
-        className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7C8CFF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(124,140,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C8CFF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(124,140,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -5307,7 +5307,7 @@ ${simplifyTarget}`
           setShowRecentFolders(prev => !prev)
           setActiveMemoryFolder(null)
         }}
-        className={`group relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-300 ${
+        className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-300 ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
             ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/10 text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(124,140,255,0.16)]'
             : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
@@ -5470,7 +5470,7 @@ if (liveMode) {
           setShowPromptMenu((prev) => !prev)
           setShowConversationMenu(false)
         }}
-        className="relative flex h-8 w-8 items-center justify-center text-white/85 transition hover:text-white"
+        className="relative flex h-7 w-7 items-center justify-center text-white/85 transition hover:text-white"
         aria-label="Make a better move"
       >
         <span className="text-[34px] leading-none">+</span>
@@ -5894,7 +5894,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#7C8CFF]/50 hover:text-white"
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#7C8CFF]/50 hover:text-white"
           >
             ×
           </button>
@@ -6472,8 +6472,8 @@ Choose one:
                 )
               })()}
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[112px] bg-[#0B0D12]" />
-              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[72px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
+              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
+              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
 
               
 
@@ -6492,8 +6492,8 @@ Choose one:
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/88 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/96 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="relative flex-1 rounded-[1.25rem] border border-white/[0.045] bg-[#171B26]/58 shadow-[0_12px_40px_rgba(0,0,0,0.24)] backdrop-blur-xl">
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+                    <div className="relative flex-1 rounded-[0.95rem] border border-white/[0.045] bg-[#141821]/52 shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-xl">
 
                       <input
                         ref={fileInputRef}
@@ -6615,8 +6615,8 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                         placeholder="Ask GEORGE"
                         rows={1}
                         onInput={autoResizeTextarea}
-                        style={{ WebkitUserSelect: 'text', minHeight: '44px', maxHeight: '180px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1.6rem] border-0 bg-transparent pl-4 pr-[92px] py-3.5 text-[16.5px] leading-[1.72] font-normal tracking-[0em] text-white/90 outline-none placeholder:text-white/22 focus:ring-0"
+                        style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
+                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-3.5 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-white/90 outline-none placeholder:text-white/22 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -6651,14 +6651,14 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className={`flex h-8 w-8 items-center justify-center rounded-full transition ${
+                              className={`flex h-7 w-7 items-center justify-center rounded-full transition ${
                                   currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT
                                     ? 'text-amber-300'
                                     : 'text-white/52 hover:text-white/82'
                                 } disabled:cursor-not-allowed disabled:opacity-40`}
                               aria-label="Voice"
                             >
-                              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/>
                                 <path d="M19 10a7 7 0 0 1-14 0"/>
                                 <path d="M12 17v4"/>
@@ -6674,10 +6674,10 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                             console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-[#7C8CFF]/22 bg-[#7C8CFF]/10 text-[#C7D0FF] transition hover:bg-[#7C8CFF]/16 hover:text-white"
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[#7C8CFF]/22 bg-[#7C8CFF]/10 text-[#C7D0FF] transition hover:bg-[#7C8CFF]/16 hover:text-white"
                           aria-label="Send"
                         >
-                          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 19V5"/>
                             <path d="m5 12 7-7 7 7"/>
                           </svg>
@@ -6686,14 +6686,14 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                     </div>
                   </div>
 
-                <div className="mt-1.5 min-h-[1rem] px-2 text-xs text-neutral-500">
+                <div className="mt-1 min-h-[0.7rem] px-2 text-xs text-neutral-500">
                   {voiceError ? (
                     <span className="block w-full text-center text-neutral-500">{voiceError}</span>
                   ) : currentTier === 'smart' ? (
-                    <span className="text-neutral-500">Voice expands with Intelligent and Brilliant.</span>
+                    <span className="text-neutral-500"></span>
                   ) : (
                     <span className={isListening ? 'text-[#AEB6FF]/82' : ''}>
-                      {isListening ? 'VOICE ACTIVE' : ''}
+                      {isListening ? 'LIVE' : ''}
                     </span>
                   )}
                 </div>
