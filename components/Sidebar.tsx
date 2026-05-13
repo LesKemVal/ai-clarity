@@ -315,7 +315,7 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-[0.8rem] bg-[#7C8CFF]/8 px-3 py-2 text-left text-[13px] text-white/90 transition hover:bg-[#7C8CFF]/15 hover:text-white"
+              className="block w-full rounded-[0.95rem] border border-[#7C8CFF]/12 bg-[#7C8CFF]/[0.06] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-[#7C8CFF]/12 hover:text-white"
             >
               New Thread
             </button>

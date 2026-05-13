@@ -2422,6 +2422,13 @@ requestAnimationFrame(() => {
     const prompt = params.get('prompt')
     const context = params.get('context')
     const label = params.get('label')
+    const liveParam = params.get('live')
+
+    if (liveParam === '1' || liveParam === 'segue') {
+      setLiveMode(false)
+      setShowLiveSegue(true)
+      window.history.replaceState({}, '', window.location.pathname)
+    }
 
     if (shared) {
       setInput(shared)
@@ -5605,7 +5612,7 @@ if (liveMode) {
 
 {showLiveSegue && typeof document !== 'undefined' && createPortal(
   <>
-    <div className="fixed inset-0 z-[240] flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
+    <main className="fixed inset-0 z-[240] relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
       <img
         src="/landing/city02.png"
         alt=""
@@ -5629,12 +5636,22 @@ if (liveMode) {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[760px] flex-col items-center px-6 text-center">
         <img
-          src="/bxx34.png"
+          src="/bxnew20.png"
           alt="BRANESx"
-          className="mb-6 h-10 w-auto object-contain opacity-90 md:h-12"
+          className="mb-6 h-8 w-auto object-contain opacity-75"
         />
 
-        <h2 className="text-[28px] font-semibold tracking-[-0.045em] text-white md:text-[40px]">
+        <div className="mb-2 text-[10px] font-medium tracking-[0.24em] text-white/34">
+          INTELLIGENT UTILITY
+        </div>
+
+        <h1 className="text-[30px] font-semibold tracking-[-0.05em] text-white md:text-[52px]">
+          GEORGE
+        </h1>
+
+        <div className="mt-10 h-px w-full max-w-[460px] bg-white/[0.06]" />
+
+        <h2 className="mt-10 text-[28px] font-semibold tracking-[-0.045em] text-white md:text-[40px]">
           GEORGE LIVE
         </h2>
 
@@ -5695,7 +5712,7 @@ if (liveMode) {
           Not now
         </button>
       </div>
-    </div>
+    </main>
   </>,
   document.body
 )}
