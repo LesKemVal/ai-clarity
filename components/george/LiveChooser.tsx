@@ -2,81 +2,130 @@
 
 type LiveChooserProps = {
   open: boolean
+  hasAccess?: boolean
   onClose: () => void
   onStartLiveConversation: () => void
   onResumeLiveConversation: () => void
-  onStartCampaign: () => void
-  onResumeCampaign: () => void
+  onUpgrade?: () => void
+  onEnterCode?: () => void
 }
 
 export default function LiveChooser({
   open,
+  hasAccess = false,
   onClose,
   onStartLiveConversation,
   onResumeLiveConversation,
-  onStartCampaign,
-  onResumeCampaign,
+  onUpgrade,
+  onEnterCode,
 }: LiveChooserProps) {
   if (!open) return null
 
   return (
-    <div className="fixed bottom-[168px] left-1/2 z-[95] w-[calc(100%-32px)] max-w-[520px] -translate-x-1/2 pointer-events-none">
-      <div className="pointer-events-auto rounded-[1.15rem] border border-white/[0.08] bg-black/92 p-2 shadow-[0_18px_46px_rgba(0,0,0,0.46)] backdrop-blur-xl">
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-[0.95rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.055] p-2">
-            <div className="mb-2 px-1">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#AEB6FF]">LIVE</p>
-              <p className="mt-1 text-[11px] leading-snug text-white/46">Immediate conversation help.</p>
-            </div>
+    <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/72 px-4 backdrop-blur-[10px]">
 
-            <button
-              type="button"
-              onClick={onStartLiveConversation}
-              className="mb-1 w-full rounded-[0.8rem] border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-left text-[12px] font-medium text-white/78 transition hover:border-[#7C8CFF]/35 hover:bg-[#7C8CFF]/10 hover:text-white"
-            >
-              Start Conversation
-            </button>
+      <div className="relative w-full max-w-[720px] overflow-hidden rounded-[1.2rem] border border-white/[0.05] bg-[#06070A]">
 
-            <button
-              type="button"
-              onClick={onResumeLiveConversation}
-              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/50 transition hover:bg-white/[0.05] hover:text-white/78"
-            >
-              Resume Conversation
-            </button>
+        <img
+          src="/landing/city02.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.18]"
+        />
+
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,7,10,0.72)_0%,rgba(6,7,10,0.92)_100%)]" />
+
+        <div className="relative z-10 flex flex-col items-center px-6 py-10 text-center">
+
+          <img
+            src="/bxx34.png"
+            alt="BRANESx"
+            className="mb-5 h-8 w-auto object-contain opacity-70"
+          />
+
+          <div className="mb-2 text-[10px] tracking-[0.22em] text-white/30">
+            OPERATIONAL FLUENCY
           </div>
 
-          <div className="rounded-[0.95rem] border border-white/[0.08] bg-white/[0.025] p-2">
-            <div className="mb-2 px-1">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-white/68">PRO</p>
-              <p className="mt-1 text-[11px] leading-snug text-white/42">Structured campaign workflow.</p>
-            </div>
+          <h2 className="text-[28px] font-semibold tracking-[-0.045em] text-white md:text-[40px]">
+            GEORGE LIVE
+          </h2>
 
-            <button
-              type="button"
-              onClick={onStartCampaign}
-              className="mb-1 w-full rounded-[0.8rem] border border-white/[0.08] bg-white/[0.035] px-3 py-2 text-left text-[12px] font-medium text-white/72 transition hover:border-[#7C8CFF]/30 hover:bg-white/[0.06] hover:text-white"
-            >
-              Start New Campaign
-            </button>
+          <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-white/62">
+            Take advantage of advanced runtime logic and take GEORGE LIVE anywhere.
+          </p>
 
-            <button
-              type="button"
-              onClick={onResumeCampaign}
-              className="w-full rounded-[0.8rem] px-3 py-2 text-left text-[12px] font-medium text-white/48 transition hover:bg-white/[0.05] hover:text-white/76"
-            >
-              Resume Campaign
-            </button>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] tracking-[0.14em] text-white/40 md:text-[12px]">
+            <span>INTERVIEWS</span>
+            <span>•</span>
+            <span>BOARDROOMS</span>
+            <span>•</span>
+            <span>CLASSROOMS</span>
+            <span>•</span>
+            <span>SALES</span>
+            <span>•</span>
+            <span>NEGOTIATIONS</span>
+            <span>•</span>
+            <span>APPOINTMENTS</span>
+            <span>•</span>
+            <span>EVERYDAY CONVERSATION</span>
           </div>
+
+          <p className="mt-6 max-w-[620px] text-[14px] leading-7 text-white/48">
+            Upload your résumé. Prepare for the room. Adapt in real time.
+            The more context GEORGE has, the sharper the assistance becomes.
+          </p>
+
+          {hasAccess ? (
+            <div className="mt-8 flex w-full max-w-[440px] flex-col gap-3">
+
+              <button
+                type="button"
+                onClick={onStartLiveConversation}
+                className="rounded-[1rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+              >
+                New LIVE Session
+              </button>
+
+              <button
+                type="button"
+                onClick={onResumeLiveConversation}
+                className="rounded-[1rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+              >
+                Resume LIVE
+              </button>
+
+            </div>
+          ) : (
+            <div className="mt-8 flex w-full max-w-[440px] flex-col gap-3">
+
+              <button
+                type="button"
+                onClick={onUpgrade}
+                className="rounded-[1rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+              >
+                Upgrade — From $10
+              </button>
+
+              <button
+                type="button"
+                onClick={onEnterCode}
+                className="rounded-[1rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+              >
+                Enter Access Code
+              </button>
+
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-6 text-[11px] tracking-[0.18em] text-white/34 transition hover:text-white/62"
+          >
+            CLOSE
+          </button>
+
         </div>
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-2 w-full rounded-[0.8rem] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/36 transition hover:bg-white/[0.022] hover:text-white/64"
-        >
-          CLOSE
-        </button>
       </div>
     </div>
   )
