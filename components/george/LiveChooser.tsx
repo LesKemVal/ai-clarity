@@ -73,7 +73,7 @@ export default function LiveChooser({
         <button
           type="button"
           onClick={onClose}
-          className="mt-2 w-full rounded-[0.8rem] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/36 transition hover:bg-white/[0.04] hover:text-white/64"
+          className="mt-2 w-full rounded-[0.8rem] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/36 transition hover:bg-white/[0.022] hover:text-white/64"
         >
           CLOSE
         </button>

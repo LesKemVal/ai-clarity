@@ -51,8 +51,8 @@ function ChoiceCard({
       onClick={onClick}
       className={`w-full rounded-[1.4rem] border p-4 text-left transition ${
         active
-          ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/10 shadow-[0_0_24px_rgba(124,140,255,0.12)]'
-          : 'border-white/10 bg-white/[0.03] hover:border-white/20'
+          ? 'border-[#7C8CFF]/60 bg-[#7C8CFF]/10 shadow-[0_0_14px_rgba(124,140,255,0.08)]'
+          : 'border-white/10 bg-white/[0.018] hover:border-white/20'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -83,7 +83,7 @@ export default function BrilliantPage() {
   return (
     <PageShell title="Brilliant" eyebrow="Conversation Engine" backToGeorge withSidebar={false}>
       <div className="mx-auto max-w-6xl space-y-8">
-        <section className="rounded-[2rem] border border-neutral-800 bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
+        <section className="rounded-[1.35rem] border border-neutral-800 bg-black shadow-[0_18px_60px_rgba(0,0,0,0.6)]">
           <div className="grid gap-8 px-6 py-10 md:px-8 md:py-12 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="space-y-5">
               <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
@@ -114,33 +114,33 @@ export default function BrilliantPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
+            <div className="rounded-[1.35rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_0_40px_rgba(124,140,255,0.08)]">
               <div className="space-y-4">
                 <p className="text-sm font-medium text-white">Live session summary</p>
 
                 <div className="space-y-3 text-sm">
-                  <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/30 px-4 py-3">
                     <p className="text-white">Wake</p>
                     <p className="mt-1 text-neutral-300">
                       {wakeOptions.find((o) => o.id === wake)?.label}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/30 px-4 py-3">
                     <p className="text-white">Mode</p>
                     <p className="mt-1 text-neutral-300">
                       {modeOptions.find((o) => o.id === mode)?.label}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/30 px-4 py-3">
                     <p className="text-white">Response</p>
                     <p className="mt-1 text-neutral-300">
                       {responseOptions.find((o) => o.id === response)?.label}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div className="rounded-2xl border border-white/[0.05] bg-black/30 px-4 py-3">
                     <p className="text-white">Human assist</p>
                     <p className="mt-1 text-neutral-300">
                       {humanAssistOptions.find((o) => o.id === assist)?.label}
@@ -160,7 +160,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Wake trigger</p>
               <div className="grid gap-3">
@@ -177,7 +177,7 @@ export default function BrilliantPage() {
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Mode trigger</p>
               <div className="grid gap-3">
@@ -196,7 +196,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Response trigger</p>
               <div className="grid gap-3">
@@ -213,7 +213,7 @@ export default function BrilliantPage() {
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Human assist</p>
               <div className="grid gap-3">
@@ -232,7 +232,7 @@ export default function BrilliantPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Phrases</p>
 
@@ -242,7 +242,7 @@ export default function BrilliantPage() {
                   value={triggerPhrase}
                   onChange={(e) => setTriggerPhrase(e.target.value)}
                   placeholder="George"
-                  className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                  className="w-full rounded-2xl border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
                 />
               </div>
 
@@ -252,21 +252,21 @@ export default function BrilliantPage() {
                   value={modePhrase}
                   onChange={(e) => setModePhrase(e.target.value)}
                   placeholder="negotiation"
-                  className="w-full rounded-2xl border border-white/10 bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                  className="w-full rounded-2xl border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
                 />
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-7 text-neutral-300">
+              <div className="rounded-2xl border border-white/[0.05] bg-white/[0.018] px-4 py-3 text-sm leading-7 text-neutral-300">
                 Example: double tap earbud, then whisper <span className="text-white">“{modePhrase || 'negotiation'}”</span>.
               </div>
             </div>
           </div>
 
-          <div className="rounded-[1.8rem] border border-neutral-800 bg-[#11131A]/72 p-6">
+          <div className="rounded-[1.2rem] border border-neutral-800 bg-[#11131A]/72 p-6">
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.22em] text-[#7C8CFF]">Privacy</p>
 
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <label className="flex items-center justify-between rounded-2xl border border-white/[0.05] bg-white/[0.018] px-4 py-3">
                 <span className="text-sm text-white">Save summaries only</span>
                 <input
                   type="checkbox"
@@ -276,7 +276,7 @@ export default function BrilliantPage() {
                 />
               </label>
 
-              <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <label className="flex items-center justify-between rounded-2xl border border-white/[0.05] bg-white/[0.018] px-4 py-3">
                 <span className="text-sm text-white">Save coaching notes only</span>
                 <input
                   type="checkbox"
@@ -286,13 +286,13 @@ export default function BrilliantPage() {
                 />
               </label>
 
-              <div className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm leading-7 text-neutral-300">
+              <div className="rounded-2xl border border-white/[0.05] bg-black/30 px-4 py-3 text-sm leading-7 text-neutral-300">
                 GEORGE stays available but dormant until you wake it. The user owns the floor.
               </div>
 
               <button
                 type="button"
-                className="w-full rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+                className="w-full rounded-full border border-white/[0.05] px-5 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
               >
                 Delete session now
               </button>

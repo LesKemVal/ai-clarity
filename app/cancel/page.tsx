@@ -11,7 +11,7 @@ export default function CancelPage() {
       withSidebar={false}
     >
       <div className="max-w-3xl space-y-8">
-        <section className="rounded-3xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
               No problem.
