@@ -500,17 +500,17 @@ const georgeAmbientPulseStyles = `
   }
 }
 
-.pulse-dot-1,
-.pulse-dot-2,
-.pulse-dot-3,
-.pulse-dot-4 {
+.,
+.,
+.,
+. {
   animation: terminalDot 0.82s ease-in-out infinite;
   box-shadow: 0 0 8px rgba(174, 182, 255, 0.22);
 }
 
-.pulse-dot-2 { animation-delay: 90ms; opacity: 0.72; }
-.pulse-dot-3 { animation-delay: 180ms; opacity: 0.52; }
-.pulse-dot-4 { animation-delay: 270ms; opacity: 0.36; }
+. { animation-delay: 90ms; opacity: 0.72; }
+. { animation-delay: 180ms; opacity: 0.52; }
+. { animation-delay: 270ms; opacity: 0.36; }
 `
 
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
@@ -4183,9 +4183,9 @@ setPendingAssistantMessage({
     </div>
 
     <div className="mt-4 flex items-center gap-[7px]">
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 pulse-dot-2" />
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 pulse-dot-3" />
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 " />
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 " />
+      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 " />
     </div>
 
   </div>
@@ -4386,10 +4386,10 @@ return (
                       </span>
                       {!showMobileHero && (
                         <div className="hidden xl:flex items-center gap-1.5">
-                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-1" />
-                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-2" />
-                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-3" />
-                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-4" />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
+                          <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
                         </div>
                       )}
                     </div>
@@ -4403,7 +4403,7 @@ return (
                       aria-label="Send George"
                       title="Send George"
                     >
-                      <span className="tracking-[0.18em] uppercase">SEND <span className="text-[#7C8CFF]">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase"><span className="text-[#7C8CFF]">G.</span></span>
                     </button>
                   </div>
                 </div>
@@ -4415,7 +4415,7 @@ return (
                   aria-label="Send George"
                   title="Send George"
                 >
-                      <span className="tracking-[0.18em] uppercase">SEND <span className="text-[#7C8CFF]">G.</span></span>
+                      <span className="tracking-[0.18em] uppercase"><span className="text-[#7C8CFF]">G.</span></span>
                     </button>
               </div>
             </header>
@@ -4424,9 +4424,9 @@ return (
 
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
-    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-1" />
-    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-2" />
-    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] pulse-dot-3" />
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
+    <span className="h-1 w-1 rounded-full bg-[#7C8CFF] " />
   </div>
 )}
 <div
@@ -4453,13 +4453,13 @@ return (
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="flex min-h-[128px] flex-col items-center justify-start px-4 pt-5 md:hidden">
+    <div className="flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-white/42">
         GEORGE
       </div>
 
       <div className="mt-2 text-center text-[12px] font-[300] tracking-[0.28em] text-white/22">
-        Direction. Execution. Continuity.
+        Operational fluency.
       </div>
 
       <ContinuityCapsule
@@ -4481,10 +4481,10 @@ return (
         }}
       />
 
-      <div className="mt-4 flex items-center justify-center gap-[7px] px-5 py-1">
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 pulse-dot-1" />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 pulse-dot-2" />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 pulse-dot-3" />
+      <div className="hidden">
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 " />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 " />
+        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 " />
       </div>
     </div>
   )}
@@ -6482,9 +6482,9 @@ Choose one:
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[10px] text-white/24 tracking-[0.16em]">
       <span className="inline-flex items-center gap-[5px]">
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 pulse-dot-1" />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 pulse-dot-2" />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 pulse-dot-3" />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 " />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 " />
+        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 " />
       </span>
     </div>
   </div>
