@@ -6553,7 +6553,11 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
 
                               const clipped = fileText.length > 12000 ? fileText.slice(0, 12000) + '\n\n[Text clipped for length.]' : fileText
                               setPendingImage(null)
-                              setInput(`I uploaded text file: ${file.name}. Help me understand and use it.\n\n${clipped}`)
+                              setInput(`I uploaded text file: ${file.name}.
+
+Tell me what this is, what matters most, and how I should use it.
+
+${clipped}`)
                               setToastMessage(`${file.name} loaded into GEORGE.`)
                               setShowToast(true)
                               textareaRef.current?.focus()
@@ -6578,7 +6582,9 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                             return
                           }
 
-                          const starter = `I uploaded file: ${file.name}. Help me understand and use this file.`
+                          const starter = `I uploaded file: ${file.name}.
+
+Tell me what this is, what matters most, and how GEORGE can help me use it effectively.`
                           setPendingImage(null)
                           setInput(starter)
                           setToastMessage(`${file.name} attached to composer.`)
