@@ -90,8 +90,8 @@ export default function WelcomePage() {
   if (tier === 'smart') return null
 
   return (
-    <main className="min-h-screen bg-black px-6 py-10 text-white">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <main className="relative min-h-screen overflow-hidden bg-[#06070A] px-6 py-10 text-white">
+      <div className="pointer-events-none absolute inset-0"><div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/[0.055] blur-[120px]" /></div><div className="relative z-10 mx-auto max-w-4xl space-y-6">
         <button
           onClick={() => (window.location.href = '/george')}
           className="text-sm text-white/70 transition hover:text-white"
@@ -99,26 +99,26 @@ export default function WelcomePage() {
           ← Back to GEORGE
         </button>
 
-        <div className="space-y-6 rounded-[1.05rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.35)]">
+        <div className="space-y-7 rounded-[1.35rem] border border-white/[0.045] bg-white/[0.018] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)] md:p-7">
           <img
             src="/bxnew20.png"
             alt="BRANESx"
             className="h-8 w-auto object-contain opacity-80 md:h-10"
           />
 
-          <div className="space-y-2">
+          <div className="space-y-2 border-b border-white/[0.05] pb-6">
             <p className="text-xs uppercase tracking-[0.28em] text-[#7C8CFF]">
               Make GEORGE yours
             </p>
             <h1 className="text-4xl font-semibold tracking-tight">
-              Build a GEORGE that understands your motion.
+              Initialize GEORGE around your direction.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
-              Give GEORGE real signal now, so guidance becomes sharper, faster, and more useful over time.
+              Give GEORGE enough signal to support your objective now. The system can keep refining context as you use it.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-3"><p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Core signal</p><div className="grid gap-3 md:grid-cols-2">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -145,13 +145,11 @@ export default function WelcomePage() {
               className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
 
-          </div>
+          </div></div>
 
-
-
-          <div className="rounded-[1rem] border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.055] p-4">
+          <div className="rounded-[1.15rem] border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.045] p-4 shadow-[0_0_32px_rgba(124,140,255,0.06)]">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/80">
-              GEORGE asks next
+              Adaptive signal
             </p>
             <p className="mt-2 text-sm leading-6 text-white/78">
               {adaptiveQuestion}
@@ -160,23 +158,23 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer this so GEORGE can support you more precisely."
+              placeholder="Answer in your own words. GEORGE can refine support over time."
               className="mt-3 w-full rounded-xl border border-white/[0.05] bg-black/35 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
             />
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={save}
               disabled={!valid}
-              className="rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-40"
+              className="rounded-[1.15rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:translate-y-[-1px] hover:bg-[#F3F5F7] disabled:opacity-40"
             >
               Make GEORGE Mine
             </button>
 
             <button
               onClick={() => window.open('/roadmap','_blank','noopener,noreferrer')}
-              className="rounded-full border border-white/[0.05] px-6 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+              className="rounded-[1.15rem] border border-white/[0.06] bg-white/[0.018] px-6 py-3.5 text-sm font-medium text-white/64 transition hover:border-[#7C8CFF]/20 hover:text-white"
             >
               Why Users Upgrade
             </button>
