@@ -7141,6 +7141,9 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
           currentTier === 'intelligent' ||
           currentTier === 'brilliant'
         }
+        hasLiveSession={
+          !!getActiveSessionForMode('live')
+        }
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
           setShowLiveChooser(false)
