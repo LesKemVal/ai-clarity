@@ -397,23 +397,13 @@ return (
             {openGroups['Intelligent Utility'] && (
               <div className="mt-3 space-y-2">
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowSidebar?.(false)
-
-                    if (currentTier !== 'brilliant') {
-                      window.location.href = '/top-up?intent=conversation'
-                      return
-                    }
-
-                    onOpenLiveGate?.()
-                  }}
+                <a
+                  href="/george/live"
                   className="flex w-full items-center gap-2 rounded-[0.8rem] px-2 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.022] hover:text-white"
                 >
                   <span className="text-[#7C8CFF]">⚡</span>
                   <span>GEORGE LIVE</span>
-                </button>
+                </a>
 
               </div>
             )}

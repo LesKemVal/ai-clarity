@@ -3,5 +3,5 @@
 import GeorgePage from '../page'
 
 export default function GeorgeLivePage() {
-  return <GeorgePage />
+  return <GeorgePage forceLive />
 }
