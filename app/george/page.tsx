@@ -1057,17 +1057,8 @@ const [isListening, setIsListening] = useState(false)
   const [showLiveSegue, setShowLiveSegue] = useState(false)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const liveParam = new URLSearchParams(window.location.search).get('live')
-    const openLiveSegue = window.localStorage.getItem('george_open_live_segue') === '1'
-
-    if (liveParam === '1' || liveParam === 'segue' || openLiveSegue) {
-      window.localStorage.removeItem('george_open_live_segue')
-      setLiveMode(false)
-      setShowLiveSegue(true)
-      window.history.replaceState({}, '', window.location.pathname)
-    }
+    // LIVE route ownership now belongs exclusively to /george/live
+    // Keep disabled to prevent modal/state hydration conflicts.
   }, [])
 
   const [liveSegueIndex, setLiveSegueIndex] = useState(0)
@@ -4120,12 +4111,7 @@ setPendingAssistantMessage({
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
   const showMobileHero = !showConversation && messages.length <= 1
   const enterLiveConversation = () => {
-    setShowLiveQuickMenu(false)
-    setShowCampaignMenu(false)
-    setShowRecentFolders(false)
-    setShowLiveEntryChoice(false)
-    setLiveSegueIndex(Math.floor(Math.random() * LIVE_SEGUES.length))
-    setShowLiveSegue(true)
+    window.location.href = '/george/live'
   }
 
   const startNewLiveConversation = () => {
@@ -4229,7 +4215,8 @@ return (
         <Sidebar
           currentTier={currentTier}
             onOpenLiveGate={() => {
-              setShowLiveSegue(true)
+              setShowSidebar(false)
+              window.location.href = '/george/live'
             }}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
@@ -5782,7 +5769,7 @@ if (liveMode) {
                 type="button"
                 onClick={() => {
                   setShowLiveEntryChoice(false)
-                  setLiveMode(true)
+                  window.location.href = '/george/live'
                 }}
                 className="rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-[#11131A] shadow-[0_22px_70px_rgba(255,255,255,0.12)] transition hover:translate-y-[-1px] hover:bg-[#F5F1E8]"
               >
