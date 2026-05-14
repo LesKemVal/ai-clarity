@@ -432,9 +432,6 @@ return (
                 <a target="_blank" rel="noopener noreferrer" href="/help" className={linkClass('/help')}>
                   Help
                 </a>
-                <a target="_blank" rel="noopener noreferrer" href="/roadmap" className={linkClass('/roadmap')}>
-                  Roadmap
-                </a>
               </div>
             )}
           </section>

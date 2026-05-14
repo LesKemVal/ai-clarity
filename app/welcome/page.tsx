@@ -172,12 +172,6 @@ export default function WelcomePage() {
               Make GEORGE Mine
             </button>
 
-            <button
-              onClick={() => window.open('/roadmap','_blank','noopener,noreferrer')}
-              className="rounded-[1.15rem] border border-white/[0.06] bg-white/[0.018] px-6 py-3.5 text-sm font-medium text-white/64 transition hover:border-[#7C8CFF]/20 hover:text-white"
-            >
-              Why Users Upgrade
-            </button>
           </div>
         </div>
       </div>
