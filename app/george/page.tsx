@@ -4229,7 +4229,7 @@ return (
         <Sidebar
           currentTier={currentTier}
             onOpenLiveGate={() => {
-              enterLiveConversation()
+              setShowLiveSegue(true)
             }}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
