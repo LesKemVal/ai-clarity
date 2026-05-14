@@ -6774,6 +6774,18 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     </span>
                   )}
                 </div>
+
+                {!liveMode && (
+                  <div className="pointer-events-none mt-2 flex justify-end px-2">
+                    <div className="text-[11px] tracking-[0.16em] text-white/26">
+                      {currentTier === 'smart'
+                        ? 'BE INTELLIGENT'
+                        : currentTier === 'intelligent'
+                          ? 'BE BRILLIANT'
+                          : 'STAY BRILLIANT'}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
