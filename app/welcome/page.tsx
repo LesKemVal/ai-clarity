@@ -45,7 +45,7 @@ export default function WelcomePage() {
     }
 
     if (/interview|job|career|hiring|resume|work/.test(text)) {
-      return 'Where do you usually lose ground: preparation, confidence, wording, follow-up, or negotiating value?'
+      return 'What would improve the outcome most right now: preparation, sharper wording, stronger positioning, follow-through, or negotiation?'
     }
 
     if (/conversation|meeting|negotiat|doctor|appointment|sales call|call|live|boss|manager/.test(text)) {
@@ -111,7 +111,7 @@ export default function WelcomePage() {
               Make GEORGE yours
             </p>
             <h1 className="text-4xl font-semibold tracking-tight">
-              Initialize GEORGE around your direction.
+              Shape GEORGE around your direction.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
               Give GEORGE enough signal to support your objective now. The system can keep refining context as you use it.
@@ -141,7 +141,7 @@ export default function WelcomePage() {
             <input
               value={learningStyle}
               onChange={(e) => setLearningStyle(e.target.value)}
-              placeholder="How do you absorb or retain information best?"
+              placeholder="How should GEORGE communicate, teach, or work with you?"
               className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
             />
 
@@ -158,7 +158,7 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer in your own words. GEORGE can refine support over time."
+              placeholder="Answer naturally. GEORGE will adapt over time."
               className="mt-3 w-full rounded-xl border border-white/[0.05] bg-black/35 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
             />
           </div>
