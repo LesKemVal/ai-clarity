@@ -130,8 +130,8 @@ export default function GeorgeLiveEntryPage() {
           Prepare the room.
         </h1>
 
-        <p className="mt-4 max-w-[560px] text-[14px] leading-6 text-white/52 md:text-[16px]">
-          Give GEORGE the minimum useful context. In the room, it should speak less and only when the moment calls for it.
+        <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/52 md:text-[16px]">
+          Give GEORGE the useful context before you enter. LIVE follows the conversation in real time and can provide repeatable lines, short cues, or silence when restraint is stronger.
         </p>
 
         <div className="mt-8 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.045] bg-white/[0.012] p-5 text-left">
@@ -176,7 +176,7 @@ export default function GeorgeLiveEntryPage() {
           </div>
 
           <p className="mt-4 text-[13px] leading-6 text-white/42">
-            Use one earbud if possible. Speak normally. GEORGE should hold silence unless a cue, posture shift, or exact line is useful.
+            Use one earbud if possible. Speak normally. GEORGE can give you exact words to repeat, posture cues, or a pause when silence protects the moment.
           </p>
 
           <div className="mt-5 border-t border-white/[0.045] pt-5">
