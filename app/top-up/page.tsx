@@ -171,17 +171,17 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="space-y-6">
-        <section className="relative overflow-hidden rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-6">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-[132px] overflow-hidden bg-[linear-gradient(135deg,rgba(174,182,255,0.09),rgba(16,69,91,0.10)_42%,transparent_72%)] md:h-[156px]">
-            <div className="absolute -right-[18%] -top-[118px] h-[210px] w-[78%] rotate-[-7deg] rounded-[999px] border-t border-[#B9E8FF]/28 bg-[#6BD9EA]/[0.10] blur-[0.2px]" />
-            <div className="absolute -right-[10%] -top-[94px] h-[190px] w-[72%] rotate-[-7deg] rounded-[999px] border-t border-[#AEB6FF]/24 bg-[#2C82A4]/[0.12]" />
-            <div className="absolute -right-[2%] -top-[74px] h-[160px] w-[62%] rotate-[-7deg] rounded-[999px] border-t border-[#D7DDFF]/18 bg-[#173B5A]/[0.18]" />
-            <div className="absolute right-[8%] top-[20px] h-[5px] w-[28%] rotate-[-7deg] rounded-full bg-[#9CCD3F]/70 shadow-[0_0_22px_rgba(156,205,63,0.18)]" />
-            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-[#0B0D12]/78" />
-          </div>
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[340px] overflow-hidden bg-[linear-gradient(180deg,rgba(12,34,56,0.36),rgba(11,13,18,0.08)_58%,transparent)] md:h-[380px]">
+        <div className="absolute -right-[14%] top-[22px] h-[210px] w-[86%] rotate-[-8deg] rounded-[999px] border-t border-[#B9E8FF]/22 bg-[#6BD9EA]/[0.07] blur-[0.2px]" />
+        <div className="absolute -right-[7%] top-[48px] h-[190px] w-[78%] rotate-[-8deg] rounded-[999px] border-t border-[#AEB6FF]/18 bg-[#2C82A4]/[0.10]" />
+        <div className="absolute right-[4%] top-[74px] h-[160px] w-[64%] rotate-[-8deg] rounded-[999px] border-t border-[#D7DDFF]/12 bg-[#173B5A]/[0.15]" />
+        <div className="absolute right-[8%] top-[128px] h-[5px] w-[30%] rotate-[-8deg] rounded-full bg-[#9CCD3F]/68 shadow-[0_0_22px_rgba(156,205,63,0.16)]" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[#0B0D12]" />
+      </div>
 
-          <div className="relative z-10 max-w-5xl space-y-5 pt-14 md:pt-16">
+      <div className="relative z-10 space-y-6">
+        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.008] p-5 backdrop-blur-[1px] md:p-6">
+          <div className="max-w-5xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]/70">
               BRANESx
             </p>
