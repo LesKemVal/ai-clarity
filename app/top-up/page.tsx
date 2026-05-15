@@ -171,16 +171,16 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[340px] overflow-hidden bg-[linear-gradient(180deg,rgba(12,34,56,0.36),rgba(11,13,18,0.08)_58%,transparent)] md:h-[380px]">
-        <div className="absolute -right-[14%] top-[22px] h-[210px] w-[86%] rotate-[-8deg] rounded-[999px] border-t border-[#B9E8FF]/22 bg-[#6BD9EA]/[0.07] blur-[0.2px]" />
-        <div className="absolute -right-[7%] top-[48px] h-[190px] w-[78%] rotate-[-8deg] rounded-[999px] border-t border-[#AEB6FF]/18 bg-[#2C82A4]/[0.10]" />
-        <div className="absolute right-[4%] top-[74px] h-[160px] w-[64%] rotate-[-8deg] rounded-[999px] border-t border-[#D7DDFF]/12 bg-[#173B5A]/[0.15]" />
-        <div className="absolute right-[8%] top-[128px] h-[5px] w-[30%] rotate-[-8deg] rounded-full bg-[#9CCD3F]/68 shadow-[0_0_22px_rgba(156,205,63,0.16)]" />
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-[#0B0D12]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(11,29,48,0.30),rgba(11,13,18,0.14)_54%,transparent)] md:h-[360px]">
+        <div className="absolute -right-[28%] top-[-92px] h-[330px] w-[126%] rotate-[-8deg] rounded-[999px] border-t border-[#AEB6FF]/10 bg-[#162B46]/[0.20]" />
+        <div className="absolute -right-[20%] top-[-48px] h-[286px] w-[112%] rotate-[-8deg] rounded-[999px] border-t border-[#6FAFE0]/12 bg-[#103E5B]/[0.16]" />
+        <div className="absolute -right-[10%] top-[4px] h-[230px] w-[96%] rotate-[-8deg] rounded-[999px] border-t border-[#A9E4F2]/10 bg-[#0D5B6C]/[0.10]" />
+        <div className="absolute -right-[4%] top-[84px] h-[1px] w-[76%] rotate-[-8deg] bg-gradient-to-r from-transparent via-[#AEB6FF]/18 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent via-[#0B0D12]/72 to-[#0B0D12]" />
       </div>
 
       <div className="relative z-10 space-y-6">
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.008] p-5 backdrop-blur-[1px] md:p-6">
+        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.006] p-5 backdrop-blur-[0.5px] md:p-6">
           <div className="max-w-5xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]/70">
               BRANESx
