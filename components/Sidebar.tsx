@@ -332,7 +332,7 @@ return (
                 LIVE
               </a>
               <a href="/welcome" className={linkClass('/welcome')}>
-                Configure
+                User Signal
               </a>
               <a href="/help" className={linkClass('/help')}>
                 Support
