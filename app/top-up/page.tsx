@@ -171,12 +171,12 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(11,29,48,0.30),rgba(11,13,18,0.14)_54%,transparent)] md:h-[360px]">
-        <div className="absolute -right-[28%] top-[-92px] h-[330px] w-[126%] rotate-[-8deg] rounded-[999px] border-t border-[#AEB6FF]/10 bg-[#162B46]/[0.20]" />
-        <div className="absolute -right-[20%] top-[-48px] h-[286px] w-[112%] rotate-[-8deg] rounded-[999px] border-t border-[#6FAFE0]/12 bg-[#103E5B]/[0.16]" />
-        <div className="absolute -right-[10%] top-[4px] h-[230px] w-[96%] rotate-[-8deg] rounded-[999px] border-t border-[#A9E4F2]/10 bg-[#0D5B6C]/[0.10]" />
-        <div className="absolute -right-[4%] top-[84px] h-[1px] w-[76%] rotate-[-8deg] bg-gradient-to-r from-transparent via-[#AEB6FF]/18 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent via-[#0B0D12]/72 to-[#0B0D12]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(8,23,39,0.34),rgba(11,13,18,0.14)_58%,transparent)] md:h-[360px]">
+        <div className="absolute -left-[34%] -top-[248px] h-[520px] w-[178%] rounded-[50%] border-b-[72px] border-[#172A43]/55" />
+        <div className="absolute -left-[26%] -top-[208px] h-[470px] w-[164%] rounded-[50%] border-b-[54px] border-[#163B5A]/36" />
+        <div className="absolute -left-[20%] -top-[174px] h-[420px] w-[150%] rounded-[50%] border-b-[30px] border-[#0F5D70]/22" />
+        <div className="absolute -left-[16%] -top-[138px] h-[374px] w-[140%] rounded-[50%] border-b border-[#AEB6FF]/12" />
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#0B0D12]/76 to-[#0B0D12]" />
       </div>
 
       <div className="relative z-10 space-y-6">
