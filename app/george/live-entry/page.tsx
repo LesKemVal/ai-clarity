@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getActiveSessionForMode } from '@/lib/george/session/store'
 
 const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
   Interview: {
@@ -59,11 +60,25 @@ const LIVE_CONTEXTS = [
 export default function GeorgeLiveEntryPage() {
   const [selectedRoom, setSelectedRoom] = useState('')
   const [objective, setObjective] = useState('')
+  const [hasLiveSession, setHasLiveSession] = useState(false)
+  const [currentTier, setCurrentTier] = useState('smart')
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
     label: '{activePrompt.label}',
     placeholder: 'What should GEORGE understand before entering the room?'
   }
+
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const tier = window.localStorage.getItem('george_tier') || 'smart'
+    setCurrentTier(tier)
+
+    const activeLive = getActiveSessionForMode('live')
+    setHasLiveSession(!!activeLive)
+  }, [])
+
 
   const prepareLive = () => {
     if (typeof window === 'undefined') return
@@ -151,20 +166,53 @@ export default function GeorgeLiveEntryPage() {
         </div>
 
         <div className="mt-7 grid w-full max-w-[420px] gap-3">
-          <button
-            type="button"
-            onClick={prepareLive}
-            className="flex items-center justify-center rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
-          >
-            Enter LIVE
-          </button>
 
-          <Link
-            href="/george/live"
-            className="flex items-center justify-center rounded-[1.15rem] border border-white/[0.06] bg-white/[0.018] px-6 py-4 text-[14px] font-medium text-white/52 transition hover:border-white/[0.12] hover:text-white"
-          >
-            Skip — I need help now
-          </Link>
+          {(currentTier === 'intelligent' || currentTier === 'brilliant') ? (
+            <>
+              {hasLiveSession && (
+                <Link
+                  href="/george/live"
+                  className="flex items-center justify-center rounded-[1.15rem] border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.06] px-6 py-4 text-[14px] font-medium text-white transition hover:border-[#7C8CFF]/34 hover:bg-[#7C8CFF]/[0.11]"
+                >
+                  Resume LIVE
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={prepareLive}
+                className="flex items-center justify-center rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+              >
+                Enter LIVE
+              </button>
+
+              <Link
+                href="/george/live"
+                className="flex items-center justify-center rounded-[1.15rem] border border-white/[0.06] bg-white/[0.018] px-6 py-4 text-[14px] font-medium text-white/52 transition hover:border-white/[0.12] hover:text-white"
+              >
+                Skip — I need help now
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/top-up"
+                className="flex items-center justify-center rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+              >
+                Unlock LIVE
+              </Link>
+
+              <div className="rounded-[1.15rem] border border-white/[0.06] bg-white/[0.018] px-5 py-4 text-left">
+                <div className="text-[13px] font-medium text-white">
+                  LIVE requires Intelligent or Brilliant.
+                </div>
+
+                <div className="mt-1 text-[13px] leading-6 text-white/46">
+                  Real-time conversational support, adaptive response shaping, and operational assistance during live interaction.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </main>
