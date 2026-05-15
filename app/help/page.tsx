@@ -55,29 +55,45 @@ export default function HelpPage() {
         </section>
 
         <section className="rounded-[1rem] border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-5 md:p-5">
-          <h2 className="mb-4 text-xl font-semibold text-white">LIVE Mode</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">How to Use LIVE</h2>
 
           <div className="space-y-5">
+
             <div>
-              <p className="font-medium text-white">Carry GEORGE into the room.</p>
+              <p className="font-medium text-white">Use one earbud if possible.</p>
               <p className="mt-2 leading-7 text-neutral-400">
-                LIVE is for interviews, negotiations, boardrooms, presentations, difficult conversations, and pressure moments where words and timing matter.
+                LIVE works best when GEORGE can quietly support timing, pacing, hesitation, pressure, and next responses without competing with the room.
               </p>
             </div>
 
             <div>
-              <p className="font-medium text-white">Get short cues and repeatable lines.</p>
+              <p className="font-medium text-white">Use short requests.</p>
               <p className="mt-2 leading-7 text-neutral-400">
-                GEORGE can help you frame what to say next, recover when the room shifts, and stay composed without turning the moment into a lecture.
+                “line”, “shorter”, “pause”, or “more direct” are usually enough. LIVE is designed for fast adjustment during real conversations.
               </p>
             </div>
 
             <div>
-              <p className="font-medium text-white">Use continuity when the situation already has context.</p>
+              <p className="font-medium text-white">Show GEORGE what you are seeing.</p>
               <p className="mt-2 leading-7 text-neutral-400">
-                If you have been using GEORGE to prepare for a business, interview, negotiation, relationship issue, or personal objective, LIVE can help you carry that context into the conversation.
+                You can upload documents, screenshots, photos, or a résumé before or during LIVE. GEORGE can reference them in real time during the conversation.
               </p>
             </div>
+
+            <div>
+              <p className="font-medium text-white">GEORGE may intentionally stay quiet.</p>
+              <p className="mt-2 leading-7 text-neutral-400">
+                Sometimes the strongest move is silence, restraint, or a shorter response. LIVE adapts to pressure, pacing, interruption risk, and conversational openings automatically.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-white">Use the message controls after responses.</p>
+              <p className="mt-2 leading-7 text-neutral-400">
+                LIVE controls adapt to the situation. Depending on the room, GEORGE may emphasize Pause, Line, Shorter, or Style adjustments.
+              </p>
+            </div>
+
           </div>
         </section>
 
