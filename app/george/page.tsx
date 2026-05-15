@@ -2057,6 +2057,34 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   }, [isThinking, bridgeThinking])
 
   const scrollHostRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const handleArrowScroll = (event: globalThis.KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+
+      const active = document.activeElement
+      const isComposer = active === textareaRef.current
+      const isEditing =
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        (active instanceof HTMLElement && active.isContentEditable)
+
+      if (isEditing && (!isComposer || input.trim())) return
+
+      const scrollHost = scrollHostRef.current
+      if (!scrollHost) return
+
+      event.preventDefault()
+      scrollHost.scrollBy({
+        top: event.key === 'ArrowDown' ? 120 : -120,
+        behavior: 'smooth',
+      })
+    }
+
+    window.addEventListener('keydown', handleArrowScroll)
+    return () => window.removeEventListener('keydown', handleArrowScroll)
+  }, [input])
   const userPinnedBottomRef = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -6287,7 +6315,7 @@ Choose one:
 <div className={`
 
 ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="relative flex-1 rounded-[0.95rem] border border-white/[0.045] bg-[#141821]/52 shadow-[0_8px_24px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+                    <div className="relative flex-1 rounded-[0.85rem] border border-white/[0.045] bg-[#11141B]/72 shadow-[0_8px_22px_rgba(0,0,0,0.16)] backdrop-blur-xl">
 
                       <input
                         ref={fileInputRef}
@@ -6529,39 +6557,34 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 </div>
 
                 {!liveMode && !input.trim() && !pendingImage && (
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-2">
-                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                  <div className="mt-3 overflow-x-auto px-1 pb-1">
+                    <div className="flex min-w-max items-center gap-4 text-[12px] text-white/36">
+                      <button
+                        type="button"
+                        onClick={() => setInput('Help me build a business strategy.')}
+                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
+                      >
+                        <span className="text-[#AEB6FF]/58">⬢</span>
+                        <span>Build a business</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => setInput('Help me interpret this document and explain what matters most.')}
-                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
+                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
                       >
-                        📄 Interpret documents
+                        <span className="text-[#AEB6FF]/58">□</span>
+                        <span>Interpret a doc</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setInput('Help me create an image.')}
-                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
+                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
                       >
-                        ◌ Create images
+                        <span className="text-[#AEB6FF]/58">◌</span>
+                        <span>Create an image</span>
                       </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setInput('Help me build a business strategy.')}
-                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
-                      >
-                        ⬢ Build a business
-                      </button>
-                    </div>
-
-                    <div className="pointer-events-none text-[11px] tracking-[0.16em] text-white/26">
-                      {currentTier === 'smart'
-                        ? 'BE INTELLIGENT'
-                        : currentTier === 'intelligent'
-                          ? 'BE BRILLIANT'
-                          : 'STAY BRILLIANT'}
                     </div>
                   </div>
                 )}
