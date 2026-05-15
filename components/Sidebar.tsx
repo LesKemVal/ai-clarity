@@ -334,6 +334,7 @@ return (
             </button>
           </section>
 
+          {!liveMode && (
           <section>
             <button
               type="button"
@@ -380,6 +381,7 @@ return (
               </div>
             )}
           </section>
+          )}
 
 
           <section>
@@ -468,6 +470,7 @@ return (
             </div>
           </section>
 
+          {!liveMode && (
           <section className="border-t border-white/[0.04] pt-4">
             <button
               type="button"
@@ -499,6 +502,34 @@ return (
               </div>
             )}
           </section>
+          )}
+
+          {liveMode && (
+            <section className="border-t border-white/[0.04] pt-4">
+              <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
+                LIVE
+              </div>
+
+              <div className="mt-3 space-y-1.5">
+                {[
+                  'Upload Context',
+                  'Control Words',
+                  'Shorter',
+                  'Exact Line',
+                  'Pause',
+                  'Exit LIVE',
+                ].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/58 transition hover:bg-white/[0.018] hover:text-white"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     
