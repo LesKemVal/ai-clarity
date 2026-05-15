@@ -4468,7 +4468,23 @@ return (
                       aria-label="Send George"
                       title="Send George"
                     >
-                      <span className="tracking-[0.18em] uppercase"><span className="text-[#AEB6FF]">G.</span></span>
+                      <div className="flex items-center gap-2">
+                        <span className="tracking-[0.18em] uppercase text-white/92">
+                          G.
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.9"
+                          className="h-[14px] w-[14px] text-white/54"
+                        >
+                          <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
+                          <path d="M12 3v12" />
+                          <path d="M8 7l4-4 4 4" />
+                        </svg>
+                      </div>
                     </button>
                   </div>
                 </div>
@@ -4480,7 +4496,23 @@ return (
                   aria-label="Send George"
                   title="Send George"
                 >
-                      <span className="tracking-[0.18em] uppercase"><span className="text-[#AEB6FF]">G.</span></span>
+                      <div className="flex items-center gap-2">
+                        <span className="tracking-[0.18em] uppercase text-white/92">
+                          G.
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.9"
+                          className="h-[14px] w-[14px] text-white/54"
+                        >
+                          <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
+                          <path d="M12 3v12" />
+                          <path d="M8 7l4-4 4 4" />
+                        </svg>
+                      </div>
                     </button>
               </div>
             </header>
