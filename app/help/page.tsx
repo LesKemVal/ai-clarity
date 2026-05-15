@@ -25,7 +25,7 @@ export default function HelpPage() {
             GEORGE is a continuity and execution layer.
           </p>
           <p className="mt-3 leading-7 text-white/44">
-            Use normal GEORGE to think through the situation. Use LIVE when timing, wording, posture, or silence matters in the room.
+            Use GEORGE to think through the situation. Use LIVE when timing, wording, posture, or silence matters in the room.
           </p>
         </section>
 
@@ -115,7 +115,7 @@ export default function HelpPage() {
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <p className="text-[17px] font-medium leading-8 text-white/86">
-            Normal GEORGE is for direction. LIVE is for pressure. Continuity is how the system remembers what matters.
+            GEORGE is for direction. LIVE is for pressure. Continuity is how the system remembers what matters.
           </p>
         </section>
 

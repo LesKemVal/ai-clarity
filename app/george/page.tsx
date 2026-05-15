@@ -1836,12 +1836,12 @@ setPreLiveMessages(null)
           mode: liveMode ? 'live' : 'normal',
           title: sessionLabel,
           messages: messagesRef.current,
-          summary: liveMode ? 'LIVE Conversation saved before starting a new session.' : 'Normal GEORGE session saved before starting a new session.',
+          summary: liveMode ? 'LIVE Conversation saved before starting a new session.' : 'GEORGE session saved before starting a new session.',
           userGoal: activePromptLabel || 'Not set',
           lastKnownState: 'Saved after user interaction.',
           suggestedRestart: liveMode
             ? 'Resume this LIVE Conversation naturally.'
-            : 'Resume this Normal GEORGE session from the clearest next step.',
+            : 'Resume this GEORGE session from the clearest next step.',
         })
       } catch {}
     }
@@ -4298,12 +4298,12 @@ return (
               if (messagesRef.current.length > 1) {
                 saveSessionToV2({
                   mode: 'normal',
-                  title: activePromptLabel || 'Normal GEORGE Session',
+                  title: activePromptLabel || 'GEORGE Session',
                   messages: messagesRef.current,
-                  summary: 'Normal GEORGE session checkpoint.',
+                  summary: 'GEORGE session checkpoint.',
                   userGoal: activePromptLabel || 'Not set',
-                  lastKnownState: 'Saved before starting a new Normal session.',
-                  suggestedRestart: 'Resume this Normal GEORGE session and continue from the clearest next step.',
+                  lastKnownState: 'Saved before starting a new GEORGE session.',
+                  suggestedRestart: 'Resume this GEORGE session and continue from the clearest next step.',
                 })
               }
             } catch {}
