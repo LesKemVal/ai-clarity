@@ -4769,35 +4769,48 @@ I am listening now. Speak naturally. I will respond ${
       </button>
     </div>
 
-    <button
-      type="button"
-      onClick={() => {
-        void handleSend(`Make this response shorter. Return only the shorter version.\n\n${m.content}`)
-      }}
-      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/52 transition hover:bg-white/[0.035] hover:text-white"
-    >
-      Shorter
-    </button>
+    {(() => {
+      const shouldEmphasizePause =
+        /pressure|objection|opportunity|detected|rushing/i.test(adaptiveCueLabel || '') ||
+        /pause|slow|hold|stop explaining/i.test(m.content || '')
 
-    <button
-      type="button"
-      onClick={() => {
-        void handleSend(`Turn this into one exact speakable line. No cue. No backup.\n\n${m.content}`)
-      }}
-      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/52 transition hover:bg-white/[0.035] hover:text-white"
-    >
-      Line
-    </button>
+      const shouldEmphasizeLine =
+        /say:|exact|line|respond/i.test(m.content || '') ||
+        resolvedOutputStyle === 'repeatable_lines'
 
-    <button
-      type="button"
-      onClick={() => {
-        void handleSend('Pause. Hold. Do not give another line unless asked.')
-      }}
-      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/42 transition hover:bg-white/[0.035] hover:text-white"
-    >
-      Pause
-    </button>
+      const controls = shouldEmphasizePause
+        ? ['Pause', 'Line', 'Shorter']
+        : shouldEmphasizeLine
+          ? ['Line', 'Shorter', 'Pause']
+          : ['Shorter', 'Line', 'Pause']
+
+      return controls.map((control) => (
+        <button
+          key={control}
+          type="button"
+          onClick={() => {
+            if (control === 'Shorter') {
+              void handleSend(`Make this response shorter. Return only the shorter version.\n\n${m.content}`)
+              return
+            }
+
+            if (control === 'Line') {
+              void handleSend(`Turn this into one exact speakable line. No cue. No backup.\n\n${m.content}`)
+              return
+            }
+
+            void handleSend('Pause. Hold. Do not give another line unless asked.')
+          }}
+          className={`rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 transition hover:bg-white/[0.035] hover:text-white ${
+            control === 'Pause' && shouldEmphasizePause
+              ? 'text-white/72'
+              : 'text-white/52'
+          }`}
+        >
+          {control}
+        </button>
+      ))
+    })()}
 
   </div>
 )}
