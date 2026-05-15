@@ -754,7 +754,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const resolvedLivePosture =
-    activeCampaign?.assistMode === 'negotiation'
+    conversationMode === 'live_debate' || activePromptContext === 'live_debate'
+      ? 'debate'
+      : activeCampaign?.assistMode === 'negotiation'
       ? 'negotiation'
       : activeCampaign?.assistMode === 'objection_handling'
         ? 'response'
@@ -774,7 +776,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
   const resolvedOutputStyle =
     activeCampaign?.outputStyle ||
-    (resolvedLivePosture === 'negotiation'
+    (resolvedLivePosture === 'debate'
+      ? 'repeatable_lines'
+      : resolvedLivePosture === 'negotiation'
       ? 'say_ask_boundary_close'
       : resolvedLivePosture === 'response'
         ? 'repeatable_lines'
@@ -1233,8 +1237,15 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         liveSetup = null
       }
 
-      const roomLine = liveSetup?.room
-        ? `${liveSetup.room} active.`
+      const setupRoom = liveSetup?.room || ''
+
+      if (setupRoom === 'Debate') {
+        setConversationMode('live_debate')
+        setActivePromptContext('live_debate')
+      }
+
+      const roomLine = setupRoom
+        ? `${setupRoom} active.`
         : 'LIVE active.'
 
       const objectiveLine = liveSetup?.objective?.trim()
@@ -1248,11 +1259,15 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
       const signal =
         OPERATIONAL_SIGNALS[Math.floor(Math.random() * OPERATIONAL_SIGNALS.length)]
 
+      const roomCalibrationLine = setupRoom === 'Debate'
+        ? 'Debate posture active. I’ll watch contradiction, proof demands, framing pressure, and interruptions.'
+        : 'Room calibrated.'
+
       const liveIntro: Message = {
         role: 'assistant',
         content: `${roomLine}
 
-Room calibrated.
+${roomCalibrationLine}
 GEORGE is listening.
 
 ${signal}${objectiveLine ? `
@@ -4036,7 +4051,9 @@ Use:
 Word:
 Say:
 Cue:
-Need:`
+Need:
+
+${resolvedLivePosture === 'debate' ? 'Debate posture: detect contradictions, protect the frame, answer proof demands, handle interruptions, and keep lines short and sharp.' : ''}`
             : `I don’t have enough of the room yet.
 
 Tell me who you're speaking to, what this is about, or what outcome you want.`
