@@ -25,19 +25,33 @@ export default function RootPage() {
           Operational intelligence for real conversations, decisions, and execution.
         </p>
 
-        <div className="mt-8 grid w-full max-w-[520px] gap-3 rounded-[1.35rem] border border-white/[0.055] bg-white/[0.018] p-4 text-left">
+        <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.35rem] border border-white/[0.055] bg-white/[0.018] p-4 text-left">
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/38">
-            <span>MODES</span>
+            <span>GEORGE TYPES</span>
             <span className="text-[#AEB6FF]/72">READY</span>
           </div>
 
-          <div className="grid gap-3 text-[13px] leading-6 text-white/58">
-            <p>
-              <span className="text-white/80">Normal GEORGE</span> helps you think, decide, build, prepare, and move.
-            </p>
-            <p>
-              <span className="text-white/80">GEORGE LIVE</span> helps with timing, pressure, wording, and the next useful line while the moment is happening.
-            </p>
+          <div className="grid gap-4 text-[13px] leading-6 text-white/58">
+            <div className="rounded-[0.9rem] bg-black/18 p-4">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-white/34">GEORGE</p>
+              <p className="mt-2 text-white/60">Helps you think, decide, build, prepare, and move.</p>
+            </div>
+
+            <div className="rounded-[0.9rem] bg-black/18 p-4">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#AEB6FF]/62">GEORGE LIVE</p>
+              <p className="mt-2 text-white/60">Helps with timing, pressure, wording, and the next useful line while the moment is happening.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 w-full max-w-[560px] overflow-hidden rounded-[1.2rem] bg-[linear-gradient(115deg,rgba(12,23,39,0.88),rgba(22,55,76,0.42),rgba(6,7,10,0.88))] p-4 text-left">
+          <div className="relative min-h-[132px] overflow-hidden rounded-[0.95rem] bg-black/16 p-4">
+            <div className="relative z-10 max-w-[260px]">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/68">LIVE MODE</p>
+              <p className="mt-3 text-[20px] font-semibold tracking-[-0.035em] text-white/90">Timing. Pressure. The next useful line.</p>
+            </div>
+            <img src="/earbud400.png" alt="GEORGE LIVE earbud" className="absolute bottom-[-34px] right-[-24px] h-[170px] w-auto object-contain opacity-78" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(174,182,255,0.12),transparent_26%)]" />
           </div>
         </div>
 
