@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
 import Brand from '@/components/Brand'
 
@@ -20,83 +20,12 @@ export default function PageShell({
   withSidebar = true,
 }: PageShellProps) {
   const [showSidebar, setShowSidebar] = useState(false)
-  const [subscriberEmail, setSubscriberEmail] = useState('')
-  const [subscriberTier, setSubscriberTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 
   useEffect(() => {
     try {
-      const email = window.localStorage.getItem('george_email')?.trim().toLowerCase() || ''
-      const savedTier = window.localStorage.getItem('george_tier')
-      const tier = savedTier === 'intelligent' || savedTier === 'brilliant' ? savedTier : 'smart'
-
-      setSubscriberEmail(email)
-      setSubscriberTier(tier)
+      window.localStorage.getItem('george_tier')
     } catch {}
   }, [])
-
-  const isSubscriber = useMemo(() => Boolean(subscriberEmail.trim()), [subscriberEmail])
-
-  const forgetThisDevice = () => {
-    try {
-      window.localStorage.removeItem('george_email')
-      window.localStorage.removeItem('george_tier')
-      window.localStorage.removeItem('GEORGE_SESSIONS_V2')
-      window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
-      window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
-      window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
-      window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
-      window.location.reload()
-    } catch {}
-  }
-
-  const IdentitySurface = () => (
-    isSubscriber ? (
-      <div className="flex items-center gap-2 rounded-full border border-white/[0.045] bg-white/[0.045] px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-        <div className="relative flex h-2.5 w-2.5 items-center justify-center">
-          <span className={`absolute inline-flex h-full w-full rounded-full ${
-            subscriberTier === 'brilliant'
-              ? 'animate-ping bg-emerald-400/45'
-              : 'animate-ping bg-[#AEB6FF]/40'
-          }`} />
-
-          <span className={`relative h-2 w-2 rounded-full ${
-            subscriberTier === 'brilliant'
-              ? 'bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]'
-              : 'bg-[#AEB6FF] shadow-[0_0_10px_rgba(174,182,255,0.9)]'
-          }`} />
-        </div>
-
-        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/52">
-          {subscriberTier}
-        </span>
-
-        <button
-          type="button"
-          onClick={forgetThisDevice}
-          className="text-[10px] uppercase tracking-[0.16em] text-red-300/45 transition hover:text-red-200"
-        >
-          Reset
-        </button>
-      </div>
-    ) : (
-      <div className="flex max-w-[235px] items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5">
-        <div className="flex min-w-0 flex-col leading-tight">
-          <span className="text-[10px] uppercase tracking-[0.18em] text-white/30">
-            Anonymous
-          </span>
-          <span className="truncate text-[11px] text-white/46">
-            LIVE requires continuity
-          </span>
-        </div>
-        <a
-          href="/top-up"
-          className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-[#AEB6FF]/72 transition hover:text-white"
-        >
-          Continue
-        </a>
-      </div>
-    )
-  )
 
   const goToGeorge = (prompt?: PromptItem) => {
     if (!prompt) {
@@ -181,112 +110,63 @@ export default function PageShell({
         )}
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-7 md:px-6 md:pt-10 xl:px-8">
-            <div className="mb-6 md:mb-8">
-              <div className="flex items-start gap-2 md:gap-3">
-                {withSidebar && (
-                  <button
-                    type="button"
-                    onClick={() => setShowSidebar(true)}
-                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.018] text-white/85 transition hover:border-[#AEB6FF]/30 hover:bg-[#AEB6FF]/8 xl:hidden"
-                    aria-label="Open menu"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-5 w-5 fill-none stroke-current"
-                      strokeWidth="2"
-                      strokeLinecap="round"
+          <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-4 md:px-6 md:pt-6 xl:px-8">
+            <div className="mb-5 border-b border-white/[0.035] pb-3 md:mb-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  {withSidebar && (
+                    <button
+                      type="button"
+                      onClick={() => setShowSidebar(true)}
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] border border-white/[0.045] bg-white/[0.014] text-white/62 transition hover:border-[#AEB6FF]/16 hover:bg-white/[0.02] hover:text-white/80 xl:hidden"
+                      aria-label="Open menu"
                     >
-                      <path d="M4 7h16M4 12h16M4 17h16" />
-                    </svg>
-                  </button>
-                )}
-
-                <div className="min-w-0 flex-1">
-                  {/* MOBILE */}
-                  <div className="flex items-center justify-between gap-2 md:hidden">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <Brand compact subtitle={eyebrow || 'GEORGE'} />
-
-                      {backToGeorge && (
-                      <button
-                        type="button"
-                        onClick={handleBack}
-                        className="ml-1 group inline-flex items-center gap-1 text-sm text-neutral-500 transition duration-200 hover:text-[#AEB6FF]"
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4 fill-none stroke-current"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                       >
-                        <span className="text-base leading-none group-hover:-translate-x-0.5 transition">
-                          ←
-                        </span>
-                        <span className="group-hover:translate-x-0.5 transition">
-                          Back
-                        </span>
-                      </button>
-                    )}
-                    </div>
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                      </svg>
+                    </button>
+                  )}
 
-                    <div className="flex items-center gap-2">
-                      <IdentitySurface />
+                  <Brand compact subtitle={eyebrow || 'GEORGE'} />
 
-                      <button
-                        type="button"
-                        onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF] transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16 hover:text-white"
-                        aria-label="Share G."
-                        title="Share G."
-                      >
-                        Share G.
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* DESKTOP */}
-                  <div className="hidden items-center justify-between gap-4 md:flex">
-                    <div className="flex items-center gap-2">
-                      <Brand subtitle={eyebrow || 'GEORGE'} showCore={false} />
-
-                      {backToGeorge && (
-                      <button
-                        type="button"
-                        onClick={handleBack}
-                        className="ml-1 group inline-flex items-center gap-1.5 text-sm text-neutral-500 transition duration-200 hover:text-[#AEB6FF]"
-                      >
-                        <span className="text-lg leading-none group-hover:-translate-x-0.5 transition">
-                          ←
-                        </span>
-                        <span className="group-hover:translate-x-0.5 transition">
-                          Back
-                        </span>
-                      </button>
-                    )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <IdentitySurface />
-
-                      <button
-                        type="button"
-                        onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF] transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16 hover:text-white"
-                        aria-label="Share G."
-                        title="Share G."
-                      >
-                        Share G.
-                      </button>
-                    </div>
-                  </div>
+                  {backToGeorge && (
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      className="ml-1 inline-flex items-center gap-1 text-[12px] uppercase tracking-[0.14em] text-white/34 transition hover:text-white/64"
+                    >
+                      <span>←</span>
+                      <span>GEORGE</span>
+                    </button>
+                  )}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleInstallGeorge}
+                  className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-[#AEB6FF]/16 bg-white/[0.012] px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF]/70 transition hover:border-[#AEB6FF]/24 hover:bg-[#AEB6FF]/[0.035] hover:text-white"
+                  aria-label="Share G."
+                  title="Share G."
+                >
+                  Share G.
+                </button>
               </div>
             </div>
 
             {(eyebrow || title) && (
-              <div className="mb-8 space-y-2">
+              <div className="mb-6 space-y-1.5 md:mb-7">
                 {eyebrow && (
-                  <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/30">
                     {eyebrow}
                   </p>
                 )}
                 {title && (
-                  <h1 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
+                  <h1 className="max-w-4xl text-[34px] font-semibold tracking-[-0.05em] text-white/92 md:text-[48px] lg:text-[56px]">
                     {title}
                   </h1>
                 )}
@@ -295,7 +175,7 @@ export default function PageShell({
 
             <div className="space-y-5">{children}</div>
 
-            <footer className="mt-10 border-t border-white/[0.05] pt-5">
+            <footer className="mt-10 border-t border-white/[0.04] pt-5">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <p className="text-xs leading-6 text-neutral-500">
                   BRANESx / GEORGE is operated by R. Block Share Holdings, LLC.
