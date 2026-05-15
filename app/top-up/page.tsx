@@ -171,19 +171,19 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(8,23,39,0.28),rgba(11,13,18,0.12)_58%,transparent)] md:h-[360px]">
-        <div className="mx-auto h-full w-full max-w-[1320px] overflow-hidden px-4 md:px-6 xl:px-8">
-          <div className="relative ml-auto h-[185px] w-[72%] min-w-[720px] translate-x-[5%] pt-7 opacity-80 md:h-[210px]">
-            <div className="absolute inset-0 rounded-[1.4rem] bg-[linear-gradient(105deg,rgba(13,31,54,0.08),rgba(35,82,111,0.18)_48%,rgba(9,15,25,0.10))] blur-[0.2px]" />
-            <div className="absolute left-[7%] top-[44px] h-px w-[78%] bg-gradient-to-r from-transparent via-[#9BB8CF]/18 to-transparent" />
-            <div className="absolute left-[16%] top-[82px] h-px w-[66%] bg-gradient-to-r from-transparent via-[#AEB6FF]/12 to-transparent" />
-            <div className="absolute left-[27%] top-[122px] h-px w-[52%] bg-gradient-to-r from-transparent via-[#7EC9DA]/12 to-transparent" />
-            <div className="absolute left-[18%] top-[58px] h-2 w-2 rounded-[0.25rem] bg-[#AEB6FF]/12" />
-            <div className="absolute left-[43%] top-[74px] h-2.5 w-2.5 rounded-[0.3rem] bg-[#8FB6C9]/12" />
-            <div className="absolute left-[62%] top-[48px] h-3 w-3 rounded-[0.35rem] bg-[#7EC9DA]/10" />
-            <div className="absolute left-[78%] top-[100px] h-2 w-2 rounded-[0.25rem] bg-[#AEB6FF]/10" />
-            <div className="absolute right-[6%] top-[26px] h-24 w-24 rounded-full border border-[#8FB6C9]/8" />
-            <div className="absolute right-[10%] top-[50px] h-16 w-16 rounded-full border border-[#AEB6FF]/7" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(8,23,39,0.24),rgba(11,13,18,0.12)_58%,transparent)] md:h-[360px]">
+        <div className="mx-auto h-full w-full max-w-[1320px] px-4 md:px-6 xl:px-8">
+          <div className="relative -ml-2 h-[198px] w-[calc(100%+16px)] overflow-hidden rounded-[1.35rem] bg-[linear-gradient(105deg,rgba(10,18,31,0.22),rgba(29,75,102,0.18)_44%,rgba(7,10,17,0.18))] opacity-85 md:-ml-4 md:h-[224px] md:w-[calc(100%+32px)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_42%,rgba(174,182,255,0.06),transparent_19%),radial-gradient(circle_at_74%_38%,rgba(126,201,218,0.06),transparent_18%)]" />
+            <div className="absolute left-[6%] top-[58px] h-px w-[84%] bg-gradient-to-r from-transparent via-[#9BB8CF]/16 to-transparent" />
+            <div className="absolute left-[12%] top-[98px] h-px w-[72%] bg-gradient-to-r from-transparent via-[#AEB6FF]/11 to-transparent" />
+            <div className="absolute left-[24%] top-[136px] h-px w-[56%] bg-gradient-to-r from-transparent via-[#7EC9DA]/10 to-transparent" />
+            <div className="absolute left-[18%] top-[74px] h-2 w-2 rounded-[0.25rem] bg-[#AEB6FF]/10" />
+            <div className="absolute left-[42%] top-[90px] h-2.5 w-2.5 rounded-[0.3rem] bg-[#8FB6C9]/10" />
+            <div className="absolute left-[63%] top-[64px] h-3 w-3 rounded-[0.35rem] bg-[#7EC9DA]/8" />
+            <div className="absolute left-[80%] top-[116px] h-2 w-2 rounded-[0.25rem] bg-[#AEB6FF]/8" />
+            <div className="absolute right-[5%] top-[32px] h-24 w-24 rounded-full border border-[#8FB6C9]/7" />
+            <div className="absolute right-[9%] top-[56px] h-16 w-16 rounded-full border border-[#AEB6FF]/6" />
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#0B0D12]/76 to-[#0B0D12]" />
