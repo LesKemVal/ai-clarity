@@ -5593,11 +5593,19 @@ if (liveMode) {
 {showEarbudOverlay && (
   <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
-      <img
-        src="/earbud400.png"
-        alt=""
-        className="h-[112px] w-auto opacity-70 blur-[0.35px] drop-shadow-[0_0_12px_rgba(124,140,255,0.10)]"
-      />
+      <div className="relative h-[122px] w-[122px]">
+        <img
+          src="/earbudlive500.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-contain opacity-45 blur-[1.2px]"
+        />
+        <img
+          src="/earbudlive500.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-contain opacity-82 drop-shadow-[0_0_18px_rgba(124,140,255,0.18)] [clip-path:circle(35%_at_50%_50%)]"
+        />
+        <div className="absolute inset-0 rounded-full border border-[#7C8CFF]/10 bg-[#7C8CFF]/[0.025] blur-[0.2px]" />
+      </div>
 
       <div className="rounded-[1rem] border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         Use one earbud if possible.
