@@ -4222,6 +4222,7 @@ return (
 
         <Sidebar
           currentTier={currentTier}
+          liveMode={liveMode}
             onOpenLiveGate={() => {
               setShowSidebar(false)
               window.location.href = '/george/live-entry'
