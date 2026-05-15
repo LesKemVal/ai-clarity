@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --bx-ink: #05060A;
+  --bx-panel: #0B0D12;
+  --bx-surface: rgba(255,255,255,0.014);
+  --bx-surface-strong: rgba(255,255,255,0.026);
+  --bx-border: rgba(255,255,255,0.052);
+  --bx-border-strong: rgba(174,182,255,0.18);
+  --bx-signal: #AEB6FF;
 }
 
 @theme inline {
@@ -43,6 +50,40 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+button,
+a[role="button"],
+input[type="button"],
+input[type="submit"] {
+  border-radius: 0.72rem;
+  letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  touch-action: manipulation;
+}
+
+button:not(:disabled),
+a[role="button"] {
+  transition-property: background-color, border-color, color, opacity, transform, box-shadow;
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+
+button:not(:disabled):active,
+a[role="button"]:active {
+  transform: translateY(0.5px) scale(0.992);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 1px solid rgba(174, 182, 255, 0.38);
+  outline-offset: 2px;
 }
 
 img,
@@ -113,31 +154,31 @@ textarea {
 
 /* GEORGE subtle glow system */
 .glow-soft {
-  box-shadow: 0 0 0px rgba(124, 140, 255, 0);
+  box-shadow: 0 0 0px rgba(174, 182, 255, 0);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .glow-soft:hover {
-  box-shadow: 0 0 12px rgba(124, 140, 255, 0.18);
+  box-shadow: 0 0 10px rgba(174, 182, 255, 0.12);
 }
 
 .glow-focus:focus,
 .glow-focus:focus-visible {
-  box-shadow: 0 0 14px rgba(124, 140, 255, 0.22);
+  box-shadow: 0 0 12px rgba(174, 182, 255, 0.16);
   outline: none;
 }
 
 .glow-press:active {
-  transform: scale(0.98);
+  transform: scale(0.992);
 }
 
 
 @keyframes glowTwice {
-  0% { box-shadow: 0 0 0 rgba(124, 140, 255, 0); color: inherit; }
-  18% { box-shadow: 0 0 14px rgba(124, 140, 255, 0.28); color: #7C8CFF; }
-  36% { box-shadow: 0 0 0 rgba(124, 140, 255, 0); color: inherit; }
-  62% { box-shadow: 0 0 14px rgba(124, 140, 255, 0.28); color: #7C8CFF; }
-  100% { box-shadow: 0 0 0 rgba(124, 140, 255, 0); color: inherit; }
+  0% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
+  18% { box-shadow: 0 0 12px rgba(174, 182, 255, 0.20); color: #AEB6FF; }
+  36% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
+  62% { box-shadow: 0 0 12px rgba(174, 182, 255, 0.20); color: #AEB6FF; }
+  100% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
 }
 
 @keyframes alertDotTwice {
@@ -158,8 +199,8 @@ textarea {
 
 
 .button-selected {
-  background-color: rgba(124, 140, 255, 0.12);
-  color: #7C8CFF;
+  background-color: rgba(174, 182, 255, 0.075);
+  color: #AEB6FF;
 }
 
 .button-press {
@@ -167,11 +208,11 @@ textarea {
 }
 
 .button-press:active {
-  transform: scale(0.98);
+  transform: scale(0.992);
 }
 
 .button-row-selected {
-  color: #7C8CFF;
+  color: #AEB6FF;
 }
 
 @keyframes branesPulseFlow {
@@ -212,5 +253,34 @@ textarea {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes menuLiftUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes georgePulse {
+  0%, 100% { opacity: .46; transform: scale(1); }
+  50% { opacity: .9; transform: scale(1.12); }
+}
+
+.animate-george-pulse {
+  animation: georgePulse 1.8s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  button,
+  a[role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    border-radius: 0.68rem;
   }
 }
