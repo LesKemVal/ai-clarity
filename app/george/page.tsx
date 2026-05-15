@@ -4778,11 +4778,17 @@ I am listening now. Speak naturally. I will respond ${
         /say:|exact|line|respond/i.test(m.content || '') ||
         resolvedOutputStyle === 'repeatable_lines'
 
-      const controls = shouldEmphasizePause
-        ? ['Pause', 'Line', 'Shorter']
-        : shouldEmphasizeLine
-          ? ['Line', 'Shorter', 'Pause']
-          : ['Shorter', 'Line', 'Pause']
+      const shouldSuppressControls =
+        /listening|hold|do not speak|let them finish|silence/i.test(m.content || '') &&
+        !/say:|line|respond/i.test(m.content || '')
+
+      const controls = shouldSuppressControls
+        ? ['Pause']
+        : shouldEmphasizePause
+          ? ['Pause', 'Line']
+          : shouldEmphasizeLine
+            ? ['Line', 'Shorter']
+            : ['Shorter', 'Line', 'Pause']
 
       return controls.map((control) => (
         <button
