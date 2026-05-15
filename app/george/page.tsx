@@ -6775,9 +6775,35 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   )}
                 </div>
 
-                {!liveMode && (
-                  <div className="pointer-events-none mt-2 flex justify-end px-2">
-                    <div className="text-[11px] tracking-[0.16em] text-white/26">
+                {!liveMode && !input.trim() && !pendingImage && (
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-2">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => setInput('Help me interpret this document and explain what matters most.')}
+                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
+                      >
+                        📄 Interpret documents
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setInput('Help me create an image.')}
+                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
+                      >
+                        ◌ Create images
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setInput('Help me build a business strategy.')}
+                        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-3 py-1.5 text-white/46 transition hover:border-white/[0.12] hover:text-white"
+                      >
+                        ⬢ Build a business
+                      </button>
+                    </div>
+
+                    <div className="pointer-events-none text-[11px] tracking-[0.16em] text-white/26">
                       {currentTier === 'smart'
                         ? 'BE INTELLIGENT'
                         : currentTier === 'intelligent'
