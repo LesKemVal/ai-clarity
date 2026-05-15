@@ -4560,18 +4560,18 @@ return (
         <div className="absolute inset-x-0 top-[82px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
         <div className="absolute inset-x-0 top-[174px] h-px bg-gradient-to-r from-transparent via-[#AEB6FF]/5 to-transparent" />
 
-        <div className="absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-b from-transparent via-[#04060A]/58 to-[#04060A]" />
+        <div className="absolute inset-x-0 bottom-0 h-[74px] bg-gradient-to-b from-transparent via-[#04060A]/36 to-[#04060A]" />
 
         <img
           src="/earbud400.png"
           alt="GEORGE LIVE"
-          className="absolute right-[18px] bottom-[-82px] h-[305px] w-auto object-contain opacity-[0.88] blur-[0.2px]"
+          className="absolute right-[64px] bottom-[-28px] h-[238px] w-auto rotate-[10deg] object-contain opacity-[0.92] blur-[0.1px]"
         />
 
         <img
           src="/earbud400.png"
           alt=""
-          className="absolute right-[318px] top-[36px] h-[118px] w-auto -rotate-[18deg] object-contain opacity-[0.20]"
+          className="absolute right-[350px] top-[48px] h-[96px] w-auto -rotate-[18deg] object-contain opacity-[0.26]"
         />
 
         <div className="relative z-10 max-w-[520px]">
