@@ -171,11 +171,15 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(8,23,39,0.34),rgba(11,13,18,0.14)_58%,transparent)] md:h-[360px]">
-        <div className="absolute -left-[34%] -top-[248px] h-[520px] w-[178%] rounded-[50%] border-b-[72px] border-[#172A43]/55" />
-        <div className="absolute -left-[26%] -top-[208px] h-[470px] w-[164%] rounded-[50%] border-b-[54px] border-[#163B5A]/36" />
-        <div className="absolute -left-[20%] -top-[174px] h-[420px] w-[150%] rounded-[50%] border-b-[30px] border-[#0F5D70]/22" />
-        <div className="absolute -left-[16%] -top-[138px] h-[374px] w-[140%] rounded-[50%] border-b border-[#AEB6FF]/12" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[320px] overflow-hidden bg-[linear-gradient(180deg,rgba(8,23,39,0.28),rgba(11,13,18,0.12)_58%,transparent)] md:h-[360px]">
+        <div className="mx-auto h-full w-full max-w-[1320px] overflow-hidden px-4 md:px-6 xl:px-8">
+          <div className="relative ml-auto h-[190px] w-[76%] min-w-[760px] translate-x-[8%] pt-5 md:h-[220px] md:w-[72%]">
+            <div className="absolute left-[3%] top-[52px] h-[78px] w-[112%] skew-x-[-14deg] rounded-[999px] bg-[linear-gradient(105deg,rgba(13,31,54,0.02),rgba(26,71,104,0.34)_42%,rgba(17,34,56,0.15)_78%)]" />
+            <div className="absolute left-[10%] top-[76px] h-[42px] w-[105%] skew-x-[-14deg] rounded-[999px] bg-[linear-gradient(105deg,rgba(12,43,65,0.04),rgba(18,82,112,0.25)_46%,rgba(11,20,34,0.10)_82%)]" />
+            <div className="absolute left-[17%] top-[102px] h-[18px] w-[94%] skew-x-[-14deg] rounded-[999px] bg-[linear-gradient(105deg,transparent,rgba(112,201,218,0.16)_52%,rgba(174,182,255,0.06)_82%,transparent)]" />
+            <div className="absolute left-[22%] top-[130px] h-px w-[82%] skew-x-[-14deg] bg-gradient-to-r from-transparent via-[#AEB6FF]/12 to-transparent" />
+          </div>
+        </div>
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#0B0D12]/76 to-[#0B0D12]" />
       </div>
 
