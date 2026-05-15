@@ -4586,43 +4586,36 @@ return (
     </div>
   )}
   {liveMode && (
-    <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.2rem] bg-[linear-gradient(135deg,#04070B_0%,#07111B_52%,#030508_100%)]">
-      <div className="relative min-h-[250px] overflow-hidden rounded-[1.2rem] px-10 py-9">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_58%,rgba(42,108,170,0.24),transparent_24%),radial-gradient(circle_at_84%_34%,rgba(174,182,255,0.045),transparent_18%)]" />
-
+    <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
+      <div className="relative grid min-h-[255px] grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] overflow-hidden rounded-[1.35rem] px-10 py-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_62%,rgba(42,108,170,0.28),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_38%)]" />
         <div className="absolute inset-x-0 top-[92px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/10 to-transparent" />
-        <div className="absolute inset-x-0 top-[184px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
+        <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
 
-        <div className="absolute inset-x-0 bottom-0 h-[58px] bg-gradient-to-b from-transparent to-[#030508]" />
-
-        <img
-          src="/earbud400.png"
-          alt="GEORGE LIVE"
-          className="absolute right-[-12px] bottom-[30px] h-[112px] w-auto rotate-[10deg] object-contain opacity-[0.96]"
-        />
-
-        <img
-          src="/earbud400.png"
-          alt=""
-          className="absolute right-[132px] top-[42px] h-[48px] w-auto -rotate-[18deg] object-contain opacity-[0.38]"
-        />
-
-        <div className="absolute right-[8px] bottom-[18px] h-[34px] w-[120px] rounded-full bg-[#2F6FFF]/14 blur-[28px]" />
-
-        <div className="relative z-10 max-w-[540px]">
-          <p className="text-[11px] uppercase tracking-[0.34em] text-[#AEB6FF]/72">
+        <div className="relative z-10 min-w-0">
+          <p className="text-[11px] uppercase tracking-[0.34em] text-[#AEB6FF]/78">
             LIVE MODE
           </p>
 
-          <h1 className="mt-5 text-[52px] font-semibold leading-[0.94] tracking-[-0.065em] text-white">
+          <h1 className="mt-6 max-w-[620px] text-[54px] font-semibold leading-[0.94] tracking-[-0.07em] text-white">
             Timing. Pressure.
             <br />
             The next useful line.
           </h1>
 
-          <p className="mt-7 max-w-[520px] text-[16px] leading-7 text-white/42">
+          <p className="mt-8 text-[16px] leading-7 text-white/42">
             Listen in real time. Get the next useful line when it matters.
           </p>
+        </div>
+
+        <div className="relative z-0">
+          <div className="absolute right-[32px] bottom-[18px] h-[58px] w-[190px] rounded-full bg-[#2F6FFF]/18 blur-[38px]" />
+
+          <img
+            src="/earbud400.png"
+            alt="GEORGE LIVE"
+            className="absolute right-[28px] top-[38px] h-[162px] w-auto rotate-[12deg] object-contain opacity-[0.98]"
+          />
         </div>
       </div>
     </div>
@@ -6676,7 +6669,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           <div className="w-full max-w-sm rounded-[1.65rem] border border-[#AEB6FF]/28 bg-[#11131A]/90  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#AEB6FF] mb-2">Runtime</p>
 
-            {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
+            {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, debate, speech, study, or everyday pressure.</p>}
             {walkthroughStep === 2 && <p className="text-white text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
             {walkthroughStep === 3 && <p className="text-white text-sm leading-7">Mic button lets GEORGE listen while you stay in motion.</p>}
             {walkthroughStep === 4 && <p className="text-white text-sm leading-7">LIVE cues give fast lines, warnings, and framing in real time.</p>}
