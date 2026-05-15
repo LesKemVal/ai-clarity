@@ -1210,18 +1210,32 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         return
       }
 
+      let liveSetup: { room?: string; objective?: string; createdAt?: number } | null = null
+
+      try {
+        const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
+        liveSetup = rawLiveSetup ? JSON.parse(rawLiveSetup) : null
+        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+      } catch {
+        liveSetup = null
+      }
+
+      const roomLine = liveSetup?.room
+        ? `${liveSetup.room} mode active.`
+        : 'LIVE mode active.'
+
+      const objectiveLine = liveSetup?.objective?.trim()
+        ? `Objective: ${liveSetup.objective.trim()}`
+        : ''
+
       const liveIntro: Message = {
         role: 'assistant',
-        content: `Use one earbud if you can.
+        content: `${roomLine}
 
+Room calibrated.
+GEORGE is listening.${objectiveLine ? `
 
-You don’t have to tell me everything right now.
- 
-I’ll read the room and support your position with live cues, repeatable lines, or next responses as things unfold.
-
-Speak naturally.
-
-You got this.`
+${objectiveLine}` : ''}`
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()

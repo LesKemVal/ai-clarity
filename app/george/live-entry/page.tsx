@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
 
 const LIVE_CONTEXTS = [
   'Interview',
@@ -12,6 +15,24 @@ const LIVE_CONTEXTS = [
 ]
 
 export default function GeorgeLiveEntryPage() {
+  const [selectedRoom, setSelectedRoom] = useState('')
+  const [objective, setObjective] = useState('')
+
+  const prepareLive = () => {
+    if (typeof window === 'undefined') return
+
+    localStorage.setItem(
+      'GEORGE_LIVE_SETUP',
+      JSON.stringify({
+        room: selectedRoom,
+        objective,
+        createdAt: Date.now(),
+      })
+    )
+
+    window.location.href = '/george/live'
+  }
+
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,140,255,0.08),transparent_34%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
@@ -29,7 +50,7 @@ export default function GeorgeLiveEntryPage() {
         </div>
 
         <h1 className="text-[34px] font-semibold tracking-[-0.055em] text-white md:text-[56px]">
-          GEORGE LIVE
+          Set up your conversation.
         </h1>
 
         <p className="mt-5 max-w-[680px] text-[15px] leading-7 text-white/62 md:text-[17px]">
@@ -38,20 +59,43 @@ export default function GeorgeLiveEntryPage() {
 
         <div className="mt-8 w-full max-w-[640px] rounded-[1.35rem] border border-white/[0.055] bg-white/[0.018] p-5 text-left">
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/38">
-            <span>SELECT A ROOM</span>
+            <span>ROOM TYPE</span>
             <span className="text-[#AEB6FF]/72">OPTIONAL</span>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {LIVE_CONTEXTS.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className="rounded-full border border-white/[0.06] bg-black/30 px-3 py-2 text-[13px] text-white/58 transition hover:border-[#7C8CFF]/22 hover:bg-[#7C8CFF]/[0.05] hover:text-white"
-              >
-                {item}
-              </button>
-            ))}
+            {LIVE_CONTEXTS.map((item) => {
+              const active = selectedRoom === item
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setSelectedRoom(item)}
+                  className={`rounded-full border px-3 py-2 text-[13px] transition ${
+                    active
+                      ? 'border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.08] text-white'
+                      : 'border-white/[0.06] bg-black/30 text-white/58 hover:border-[#7C8CFF]/22 hover:bg-[#7C8CFF]/[0.05] hover:text-white'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="mt-5">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
+              WHAT MATTERS MOST?
+            </div>
+
+            <textarea
+              value={objective}
+              onChange={(e) => setObjective(e.target.value)}
+              placeholder="What should GEORGE understand before entering the room?"
+              rows={3}
+              className="w-full resize-none rounded-[1rem] border border-white/[0.06] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/82 outline-none placeholder:text-white/24"
+            />
           </div>
 
           <p className="mt-5 text-[13px] leading-6 text-white/46">
@@ -60,12 +104,13 @@ export default function GeorgeLiveEntryPage() {
         </div>
 
         <div className="mt-7 grid w-full max-w-[420px] gap-3">
-          <Link
-            href="/george/live"
+          <button
+            type="button"
+            onClick={prepareLive}
             className="flex items-center justify-center rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
           >
             Enter LIVE
-          </Link>
+          </button>
 
           <Link
             href="/george/live"
