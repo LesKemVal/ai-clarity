@@ -329,7 +329,7 @@ return (
 
             <div className="mt-3 space-y-1">
               <a href="/george/live-entry" className={linkClass('/george/live-entry')}>
-                <span className="mr-2 text-[#AEB6FF]/78">⚡</span>LIVE
+                LIVE
               </a>
               <a href="/welcome" className={linkClass('/welcome')}>
                 Configure
