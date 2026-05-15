@@ -4669,7 +4669,7 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'down'
-                ? 'text-red-200'
+                ? 'text-red-100/82'
                 : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs down"
@@ -4971,7 +4971,7 @@ router.push('/george')
                   setToastMessage('Back to GEORGE')
                   setShowToast(true)
                 }}
-                className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-200 transition hover:border-red-300/45 hover:bg-red-500/15"
+                className="rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-red-100/82 transition hover:border-red-300/45 hover:bg-red-500/15"
               >
                 Exit
               </button>
@@ -4995,7 +4995,7 @@ router.push('/george')
       setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
             >
               <span className="h-1 w-1 rounded-full bg-[#7C8CFF]" />
               
@@ -5015,7 +5015,7 @@ router.push('/george')
                   }
                 } catch {}
               }}
-              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
+              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-[#7C8CFF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
             >
               Send
             </button>
@@ -5048,7 +5048,7 @@ ${simplifyTarget}`
                 setConversationSignal('Simplifying…')
                 void handleSend(prompt, { hidden: true })
               }}
-              className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-white/[0.022] hover:text-white/92"
+              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#7C8CFF]/45 hover:bg-white/[0.022] hover:text-white/92"
             >
               Simplify
             </button>
@@ -5127,7 +5127,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -5305,7 +5305,7 @@ ${simplifyTarget}`
           setShowRecentFolders(prev => !prev)
           setActiveMemoryFolder(null)
         }}
-        className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-300 ${
+        className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ease-out ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
             ? 'border-[#7C8CFF]/35 bg-[#7C8CFF]/[0.055] text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(124,140,255,0.16)]'
             : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
@@ -5357,7 +5357,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5488,7 +5488,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10 animate-[menuLift_140ms_ease-out]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(124,140,255,0.10)] backdrop-blur-xl animate-[menuLift_140ms_ease-out]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5564,7 +5564,7 @@ if (liveMode) {
                   setRerouteSignal(0)
                   void handleSend(reroutePrompt.text)
                 }}
-                className="block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-200"
+                className="block w-full py-1 text-left text-sm text-red-300 transition hover:text-red-100/82"
               >
                 {reroutePrompt.label}
               </button>
@@ -5623,7 +5623,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_30px_90px_rgba(0,0,0,0.72)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#7C8CFF]/24 bg-black/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF]">
           STRUCTURED LIVE
         </div>
@@ -5698,7 +5698,7 @@ if (liveMode) {
               window.localStorage.removeItem('george_active_campaign_session_id')
               exitLiveMode()
             }}
-            className="w-full rounded-xl border border-red-400/12 bg-red-400/[0.045] px-4 py-3 text-left text-sm font-medium text-red-100/82 transition hover:bg-red-500/14"
+            className="w-full rounded-xl border border-red-400/12 bg-red-400/[0.045] px-4 py-3 text-left text-sm font-medium text-red-100/82 transition hover:bg-red-400/[0.045]"
           >
             Exit without saving
           </button>
@@ -5911,7 +5911,7 @@ Choose one:
                       setToastMessage('Session deleted.')
                       setShowToast(true)
                     }}
-                    className="rounded-full bg-red-500/14 px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-red-200 transition hover:bg-red-500/24"
+                    className="rounded-full bg-red-400/[0.045] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-red-100/82 transition hover:bg-red-400/[0.08]"
                   >
                     CONFIRM
                   </button>
@@ -6028,7 +6028,7 @@ Choose one:
 )}
 
 {liveMode && (showLiveQuickMenu || showLiveToolsMenu) && (
-                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/56" />
+                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/30" />
               )}
 
 {liveMode && (() => {
@@ -6037,7 +6037,7 @@ Choose one:
 
                 return (
                 <div
-                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-300 ${
+                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-150 ease-out ${
                     isNegotiationStyle
                       ? 'border-[#7C8CFF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
                       : isResponseStyle
@@ -6320,7 +6320,7 @@ Choose one:
                         onClick={() => {
                           requestExitLiveMode()
                         }}
-                        className="shrink-0 rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-200/85 transition hover:bg-red-500/14 hover:text-red-100/82"
+                        className="shrink-0 rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/82 transition hover:bg-red-400/[0.045] hover:text-red-100/82"
                       >
                         EXIT
                       </button>
@@ -6637,7 +6637,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 ring-1 ring-[#7C8CFF]/10 p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
@@ -6677,7 +6677,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 ring-1 ring-[#7C8CFF]/10/95 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -7018,8 +7018,8 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 )}
 
       {showCampaignUpgradeGate && (
-        <div className="fixed inset-x-0 bottom-[96px] transition-all duration-300 z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-[#7C8CFF]/30 bg-[linear-gradient(180deg,rgba(23,23,28,0.98),rgba(5,5,8,0.98))] px-5 py-4 shadow-[0_26px_80px_rgba(0,0,0,0.72),0_0_36px_rgba(124,140,255,0.14)] backdrop-blur-xl ring-1 ring-[#7C8CFF]/10">
+        <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#7C8CFF] mb-2">Structured LIVE</p>
@@ -7029,7 +7029,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-[#7C8CFF]/14 bg-black/35 px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.022] hover:text-white/92"
+                className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.022] hover:text-white/92"
               >
                 Close
               </button>
@@ -7050,7 +7050,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-[1rem] max-w-full border transition hover:scale-[1.01] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(124,140,255,0.08)] transition hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
+              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-[#7C8CFF]/45 bg-[#7C8CFF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(124,140,255,0.08)] hover:border-[#7C8CFF]/80 hover:bg-[#7C8CFF]/22"
             >
               Upgrade to continue this campaign
             </button>
