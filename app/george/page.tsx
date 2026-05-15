@@ -4559,9 +4559,23 @@ return (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_58%,rgba(42,108,170,0.24),transparent_24%),radial-gradient(circle_at_84%_34%,rgba(174,182,255,0.045),transparent_18%)]" />
 
         <div className="absolute inset-x-0 top-[92px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/10 to-transparent" />
-        <div className="absolute inset-x-0 top-[184px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/07 to-transparent" />
+        <div className="absolute inset-x-0 top-[184px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 h-[58px] bg-gradient-to-b from-transparent to-[#030508]" />
+
+        <img
+          src="/earbud400.png"
+          alt="GEORGE LIVE"
+          className="absolute right-[-12px] bottom-[30px] h-[112px] w-auto rotate-[10deg] object-contain opacity-[0.96]"
+        />
+
+        <img
+          src="/earbud400.png"
+          alt=""
+          className="absolute right-[132px] top-[42px] h-[48px] w-auto -rotate-[18deg] object-contain opacity-[0.38]"
+        />
+
+        <div className="absolute right-[8px] bottom-[18px] h-[34px] w-[120px] rounded-full bg-[#2F6FFF]/14 blur-[28px]" />
 
         <div className="relative z-10 max-w-[540px]">
           <p className="text-[11px] uppercase tracking-[0.34em] text-[#AEB6FF]/72">
