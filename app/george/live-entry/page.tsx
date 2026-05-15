@@ -9,6 +9,7 @@ const ROOM_CONTROLS: Record<string, string[]> = {
   Meeting: ['summarize', 'push back', 'pause', 'next question'],
   Boardroom: ['position', 'proof', 'slow down', 'next move'],
   Negotiation: ['line', 'hold firm', 'counter', 'pause'],
+  Debate: ['rebuttal', 'proof', 'frame', 'pause'],
   'Sales Call': ['line', 'objection', 'close', 'shorter'],
   'Doctor Appointment': ['slow down', 'clarify', 'question', 'repeat'],
   Presentation: ['pace', 'stronger', 'simplify', 'close'],
@@ -41,6 +42,11 @@ const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
     placeholder: 'Trust, objection, urgency, qualification, or closing pressure.'
   },
 
+  Debate: {
+    label: 'WHAT POSITION MUST HOLD?',
+    placeholder: 'Claim, opponent pressure, likely contradictions, proof demands, or the frame you cannot lose.'
+  },
+
   'Doctor Appointment': {
     label: 'WHAT CANNOT BE MISSED?',
     placeholder: 'Symptoms, timeline, concerns, questions, pressure, or what needs repeating.'
@@ -63,6 +69,7 @@ const LIVE_CONTEXTS = [
   'Boardroom',
   'Negotiation',
   'Sales Call',
+  'Debate',
   'Doctor Appointment',
   'Presentation',
   'Everyday Conversation',
