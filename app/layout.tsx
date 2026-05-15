@@ -16,6 +16,14 @@ export const metadata: Metadata = {
   },
   description: 'Build it. Change it. Tear it down responsibly. Get all the way there with GEORGE.',
   applicationName: 'GEORGE',
+  icons: {
+    icon: [
+      { url: '/logo900.png', type: 'image/png' },
+      { url: '/bxnew20.png', type: 'image/png' },
+    ],
+    shortcut: '/logo900.png',
+    apple: '/logo900.png',
+  },
   appleWebApp: {
     title: 'GEORGE',
     capable: true,
@@ -41,7 +49,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#7C8CFF',
+  themeColor: '#0B0D12',
 }
 
 export default function RootLayout({
