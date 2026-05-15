@@ -4554,38 +4554,41 @@ return (
     </div>
   )}
   {liveMode && (
-    <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.2rem] bg-[linear-gradient(115deg,rgba(12,23,39,0.88),rgba(22,55,76,0.42),rgba(6,7,10,0.88))] p-4">
-      <div className="relative min-h-[220px] overflow-hidden rounded-[1rem] bg-black/22 px-8 py-7">
+    <div className="pointer-events-none mx-auto mb-4 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] bg-[linear-gradient(135deg,rgba(5,7,11,0.98),rgba(8,18,29,0.94)_44%,rgba(4,6,10,0.98))]">
+      <div className="relative min-h-[230px] overflow-hidden rounded-[1.35rem] px-8 py-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_46%,rgba(46,98,140,0.18),transparent_25%),radial-gradient(circle_at_82%_28%,rgba(174,182,255,0.055),transparent_18%)]" />
+        <div className="absolute inset-x-0 top-[82px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
+        <div className="absolute inset-x-0 top-[174px] h-px bg-gradient-to-r from-transparent via-[#AEB6FF]/5 to-transparent" />
 
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,13,18,0.82),rgba(11,13,18,0.18),rgba(11,13,18,0.82))]" />
-
-        <div className="relative z-10 max-w-[480px]">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-[#AEB6FF]/70">
-            LIVE MODE
-          </p>
-
-          <h1 className="mt-5 text-[42px] font-semibold leading-[1.02] tracking-[-0.055em] text-white">
-            Timing. Pressure.
-            <br />
-            The next useful line.
-          </h1>
-
-          <p className="mt-5 max-w-[420px] text-[15px] leading-7 text-white/48">
-            Listen in real time. Get the next useful line when it matters.
-          </p>
-        </div>
+        <div className="absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-b from-transparent via-[#04060A]/58 to-[#04060A]" />
 
         <img
           src="/earbud400.png"
           alt="GEORGE LIVE"
-          className="absolute right-[-18px] top-[-10px] h-[260px] w-auto rotate-[8deg] object-contain opacity-[0.92]"
+          className="absolute right-[18px] bottom-[-82px] h-[305px] w-auto object-contain opacity-[0.88] blur-[0.2px]"
         />
 
         <img
           src="/earbud400.png"
           alt=""
-          className="absolute right-[240px] top-[-90px] h-[140px] w-auto -rotate-[18deg] object-contain opacity-[0.56]"
+          className="absolute right-[318px] top-[36px] h-[118px] w-auto -rotate-[18deg] object-contain opacity-[0.20]"
         />
+
+        <div className="relative z-10 max-w-[520px]">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]/62">
+            LIVE MODE
+          </p>
+
+          <h1 className="mt-5 max-w-[560px] text-[46px] font-semibold leading-[0.98] tracking-[-0.058em] text-white/96">
+            Timing. Pressure.
+            <br />
+            The next useful line.
+          </h1>
+
+          <p className="mt-6 max-w-[430px] text-[15px] leading-7 text-white/42">
+            Listen in real time. Get the next useful line when it matters.
+          </p>
+        </div>
       </div>
     </div>
   )}
