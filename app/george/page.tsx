@@ -12,6 +12,14 @@ import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession } from '@/lib/george/session/store'
 
+const OPERATIONAL_SIGNALS = [
+  'Signal: Show GEORGE documents, screenshots, or photos during LIVE. GEORGE can reference them in real time.',
+  'Signal: Say “shorter” if you want compressed responses.',
+  'Signal: Say “line” if you want exact wording.',
+  'Signal: Say “pause” if you want GEORGE to hold.',
+  'Signal: LIVE works best with one earbud.',
+]
+
 type Message = {
   role: 'assistant' | 'user' | 'system'
   content: string
@@ -1225,12 +1233,17 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         ? `Control words: ${liveSetup.controlWords.trim()}`
         : ''
 
+      const signal =
+        OPERATIONAL_SIGNALS[Math.floor(Math.random() * OPERATIONAL_SIGNALS.length)]
+
       const liveIntro: Message = {
         role: 'assistant',
         content: `${roomLine}
 
 Room calibrated.
-GEORGE is listening.${objectiveLine ? `
+GEORGE is listening.
+
+${signal}${objectiveLine ? `
 
 ${objectiveLine}` : ''}${controlLine ? `
 
