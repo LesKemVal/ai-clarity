@@ -4469,9 +4469,6 @@ return (
                       title="Send George"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="tracking-[0.18em] uppercase text-white/92">
-                          G.
-                        </span>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
@@ -4484,6 +4481,10 @@ return (
                           <path d="M12 3v12" />
                           <path d="M8 7l4-4 4 4" />
                         </svg>
+
+                        <span className="tracking-[0.16em] uppercase text-white/78">
+                          Share G
+                        </span>
                       </div>
                     </button>
                   </div>
@@ -4497,9 +4498,6 @@ return (
                   title="Send George"
                 >
                       <div className="flex items-center gap-2">
-                        <span className="tracking-[0.18em] uppercase text-white/92">
-                          G.
-                        </span>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
@@ -4512,6 +4510,10 @@ return (
                           <path d="M12 3v12" />
                           <path d="M8 7l4-4 4 4" />
                         </svg>
+
+                        <span className="tracking-[0.16em] uppercase text-white/78">
+                          Share G
+                        </span>
                       </div>
                     </button>
               </div>
