@@ -247,7 +247,7 @@ export default function TopUpPage() {
                     Continuity
                   </span>
                 </div>
-                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$9.99</div>
+                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88"><span className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$10</span></div>
                 <ul className="space-y-2 text-sm leading-6 text-white/48">
                   <li>Expanded continuity</li>
                   <li>Stronger execution support</li>
