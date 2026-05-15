@@ -6698,6 +6698,25 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         </div>
                       )}
 
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute left-2.5 top-1/2 z-[2] flex -translate-y-1/2 items-center justify-center rounded-full text-white/34 transition hover:text-white/78"
+                        aria-label="Upload file"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-4.5 w-4.5 fill-none stroke-current"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 16V4"/>
+                          <path d="M7 9l5-5 5 5"/>
+                          <path d="M5 20h14"/>
+                        </svg>
+                      </button>
+
                       <textarea
                         ref={textareaRef}
                         value={input}
@@ -6707,7 +6726,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-3.5 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-white/90 outline-none placeholder:text-white/22 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-11 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-white/90 outline-none placeholder:text-white/22 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
