@@ -46,6 +46,7 @@ type SidebarProps = {
   onToggleScripture?: () => void
   onOpenLiveGate?: () => void
   currentTier?: 'smart' | 'intelligent' | 'brilliant'
+  liveMode?: boolean
 }
 
 export default function Sidebar({
@@ -59,6 +60,7 @@ export default function Sidebar({
   onToggleScripture = () => {},
   onOpenLiveGate = () => {},
   currentTier = 'smart',
+  liveMode = false,
 }: SidebarProps) {
   const pathname = usePathname()
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
