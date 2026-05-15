@@ -272,8 +272,8 @@ export default function Sidebar({
   }
 
   const linkClass = (path: string) =>
-    `block text-[13px] transition ${
-      pathname === path ? 'text-[#AEB6FF]/86' : 'text-white/48 hover:text-white/68'
+    `block rounded-[0.5rem] px-3 py-1.5 text-[13px] transition ${
+      pathname === path ? 'bg-white/[0.018] text-[#AEB6FF]/86' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -320,17 +320,27 @@ return (
             >
               GEORGE
             </button>
+          </section>
 
-            <button
-              type="button"
-              onClick={() => {
-                setShowSidebar?.(false)
-                window.location.href = '/welcome'
-              }}
-              className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/46 transition duration-150 hover:bg-white/[0.014] hover:text-white/66"
-            >
-              Configure
-            </button>
+          <section>
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
+              Pages
+            </div>
+
+            <div className="mt-3 space-y-1">
+              <a href="/george/live-entry" className={linkClass('/george/live-entry')}>
+                <span className="mr-2 text-[#AEB6FF]/78">⚡</span>LIVE
+              </a>
+              <a href="/welcome" className={linkClass('/welcome')}>
+                Configure
+              </a>
+              <a href="/help" className={linkClass('/help')}>
+                Support
+              </a>
+              <a href="/top-up" className={linkClass('/top-up')}>
+                Access
+              </a>
+            </div>
           </section>
 
           {!liveMode && (
@@ -381,43 +391,6 @@ return (
             )}
           </section>
           )}
-
-
-          <section className="pt-1">
-            <a
-              href="/george/live-entry"
-              className="flex w-full items-center gap-2 rounded-[0.55rem] border border-transparent px-2.5 py-2 text-[13px] text-white/62 transition hover:border-white/[0.035] hover:bg-white/[0.01] hover:text-white/78"
-            >
-              <span className="text-[#AEB6FF]/82">⚡</span>
-              <span>LIVE</span>
-            </a>
-          </section>
-
-          <section>
-            <button
-              type="button"
-              onClick={() => toggleGroup('Access')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/34">
-                Access
-              </span>
-              <span className="text-[11px] text-white/26">
-                {openGroups.Access ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {openGroups.Access && (
-              <div className="mt-4 space-y-2.5">
-                <a target="_blank" rel="noopener noreferrer" href="/top-up" className={linkClass('/top-up')}>
-                  Access
-                </a>
-                <a target="_blank" rel="noopener noreferrer" href="/help" className={linkClass('/help')}>
-                  Support
-                </a>
-              </div>
-            )}
-          </section>
 
           <section className="border-t border-white/[0.035] pt-3">
             <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[13px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
