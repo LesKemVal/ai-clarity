@@ -257,10 +257,10 @@ export default function Sidebar({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    'Intelligent Utility': true,
-    Account: true,
-    'Focus': false,
-    Sessions: false,
+    'Utility': true,
+    Access: true,
+    'Progress': false,
+    Continuity: false,
   })
 
   const toggleGroup = (title: string) => {
@@ -317,7 +317,7 @@ return (
               }}
               className="block w-full rounded-[0.95rem] border border-[#7C8CFF]/12 bg-[#7C8CFF]/[0.06] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-[#7C8CFF]/12 hover:text-white"
             >
-              New Session
+              GEORGE
             </button>
 
             <button
@@ -328,32 +328,32 @@ return (
               }}
               className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
-              Personalize GEORGE
+              Calibrate GEORGE
             </button>
           </section>
 
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Focus')}
+              onClick={() => toggleGroup('Progress')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
                 Focus
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups['Focus'] ? '▾' : '▸'}
+                {openGroups['Progress'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups['Focus'] && (
+            {openGroups['Progress'] && (
               <div className="mt-4 space-y-2">
                 <button
                   type="button"
                   onClick={createGoalCheck}
                   className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.035] hover:text-white"
                 >
-                  + New Focus
+                  + New Objective
                 </button>
 
                 {goalChecks.length === 0 ? (
@@ -370,7 +370,7 @@ return (
                         {item.title}
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-white/32">
-                        Tracked focus
+                        Progress item
                       </span>
                     </button>
                   ))
@@ -383,26 +383,26 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Intelligent Utility')}
+              onClick={() => toggleGroup('Utility')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
                 Modes
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups['Intelligent Utility'] ? '▾' : '▸'}
+                {openGroups['Utility'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups['Intelligent Utility'] && (
+            {openGroups['Utility'] && (
               <div className="mt-3 space-y-2">
 
                 <a
-                  href="/george/live"
+                  href="/george/live-entry"
                   className="flex w-full items-center gap-2 rounded-[0.8rem] px-2 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.022] hover:text-white"
                 >
                   <span className="text-[#7C8CFF]">⚡</span>
-                  <span>GEORGE LIVE</span>
+                  <span>LIVE</span>
                 </a>
 
               </div>
@@ -413,24 +413,24 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Account')}
+              onClick={() => toggleGroup('Access')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Account
+                Access
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups.Account ? '▾' : '▸'}
+                {openGroups.Access ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups.Account && (
+            {openGroups.Access && (
               <div className="mt-4 space-y-2.5">
                 <a target="_blank" rel="noopener noreferrer" href="/top-up" className={linkClass('/top-up')}>
-                  Upgrade
+                  Access
                 </a>
                 <a target="_blank" rel="noopener noreferrer" href="/help" className={linkClass('/help')}>
-                  Help
+                  Support
                 </a>
               </div>
             )}
@@ -443,20 +443,44 @@ return (
           </section>
 
           <section className="border-t border-white/[0.04] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
+              Public Utility
+            </div>
+
+            <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
+              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/34 transition hover:text-white/72">
+                988 Lifeline
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/34 transition hover:text-white/72">
+                StopBullying.gov
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/34 transition hover:text-white/72">
+                RAINN
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/34 transition hover:text-white/72">
+                Legal Aid
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/34 transition hover:text-white/72">
+                BrokerCheck
+              </a>
+            </div>
+          </section>
+
+          <section className="border-t border-white/[0.04] pt-4">
             <button
               type="button"
-              onClick={() => toggleGroup('Sessions')}
+              onClick={() => toggleGroup('Continuity')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/30">
                 Continuity
               </span>
               <span className="text-[11px] text-white/24">
-                {openGroups.Sessions ? '▾' : '▸'}
+                {openGroups.Continuity ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups.Sessions && normalSessions.length > 0 && (
+            {openGroups.Continuity && normalSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
                   <button
