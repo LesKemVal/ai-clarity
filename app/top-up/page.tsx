@@ -174,7 +174,7 @@ export default function TopUpPage() {
       <div className="space-y-8">
         <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
           <div className="max-w-5xl space-y-6">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#7C8CFF]">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]">
               BRANESx
             </p>
 
@@ -186,7 +186,7 @@ export default function TopUpPage() {
               {subcopy}
             </p>
 
-            <div className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm text-white/90">
+            <div className="rounded-[1rem] border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-4 py-3 text-sm text-white/90">
               Different levels of continuity and LIVE support.
             </div>
 
@@ -195,7 +195,7 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={redeemFounderCode}
-                className="rounded-full border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#7C8CFF]/40 hover:bg-[#7C8CFF]/[0.055] hover:text-white"
+                className="rounded-full border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#AEB6FF]/40 hover:bg-[#AEB6FF]/[0.055] hover:text-white"
               >
                 Enter Founder Code
               </button>
@@ -206,7 +206,7 @@ export default function TopUpPage() {
             </div>
 
             <div className="grid gap-4 pt-2 lg:grid-cols-3">
-              <div className="rounded-[1.2rem] border border-[#7C8CFF]/40 bg-[#7C8CFF]/[0.055] p-5 shadow-none">
+              <div className="rounded-[1.2rem] border border-[#AEB6FF]/40 bg-[#AEB6FF]/[0.055] p-5 shadow-none">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Smart</p>
                   <span className="rounded-full border border-white/[0.05] bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
@@ -225,7 +225,7 @@ export default function TopUpPage() {
               <div className="rounded-[1.2rem] border border-white/15 bg-white/[0.022] p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white">Intelligent</p>
-                  <span className="rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
+                  <span className="rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
                     Operational tier
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
-                  className="mt-5 w-full rounded-full border border-[#7C8CFF]/35 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16"
+                  className="mt-5 w-full rounded-full border border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16"
                 >
                   Enter Intelligent
                 </button>
@@ -262,7 +262,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant_day')}
-                  className="mt-5 w-full rounded-full bg-[#7C8CFF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                  className="mt-5 w-full rounded-full bg-[#AEB6FF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
                   Enter Brilliant LIVE
                 </button>
@@ -326,7 +326,7 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={submitFeedback}
-                className="w-full rounded-full border border-white/[0.05] px-5 py-3 text-sm font-medium text-white transition hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+                className="w-full rounded-full border border-white/[0.05] px-5 py-3 text-sm font-medium text-white transition hover:border-[#AEB6FF] hover:text-[#AEB6FF]"
               >
                 Save feedback
               </button>

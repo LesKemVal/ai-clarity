@@ -273,7 +273,7 @@ export default function Sidebar({
 
   const linkClass = (path: string) =>
     `block text-[13px] transition ${
-      pathname === path ? 'text-[#7C8CFF]' : 'text-white/52 hover:text-[#7C8CFF]'
+      pathname === path ? 'text-[#AEB6FF]' : 'text-white/52 hover:text-[#AEB6FF]'
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -316,7 +316,7 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-[0.95rem] border border-[#7C8CFF]/12 bg-[#7C8CFF]/[0.06] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-[#7C8CFF]/12 hover:text-white"
+              className="block w-full rounded-[0.65rem] border border-[#AEB6FF]/12 bg-white/[0.028] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-white/[0.045] hover:text-white"
             >
               GEORGE
             </button>
@@ -327,7 +327,7 @@ return (
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
+              className="block w-full rounded-[0.65rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
               Refine GEORGE
             </button>
@@ -353,7 +353,7 @@ return (
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.035] hover:text-white"
+                  className="block w-full rounded-[0.65rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.018] hover:text-white"
                 >
                   + New Direction
                 </button>
@@ -366,7 +366,7 @@ return (
                       key={item.id}
                       type="button"
                       onClick={() => openGoalCheck(item)}
-                      className="block w-full rounded-[0.8rem] px-3 py-2 text-left transition hover:bg-white/[0.022]"
+                      className="block w-full rounded-[0.65rem] px-3 py-2 text-left transition hover:bg-white/[0.022]"
                     >
                       <span className="block truncate text-[13px] text-white/72 hover:text-white">
                         {item.title}
@@ -383,34 +383,14 @@ return (
           )}
 
 
-          <section>
-            <button
-              type="button"
-              onClick={() => toggleGroup('Runtime')}
-              className="flex w-full items-center justify-between text-left"
+          <section className="pt-1">
+            <a
+              href="/george/live-entry"
+              className="flex w-full items-center gap-2 rounded-[0.65rem] border border-transparent px-2.5 py-2 text-[13px] text-white/66 transition hover:border-white/[0.04] hover:bg-white/[0.012] hover:text-white"
             >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Modes
-              </span>
-              <span className="text-[11px] text-white/32">
-                {openGroups['Runtime'] ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {openGroups['Runtime'] && (
-              <div className="mt-3 space-y-2">
-
-                <a
-                  href="/george/live-entry"
-                  className="flex w-full items-center gap-2 rounded-[0.8rem] px-2 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.022] hover:text-white"
-                >
-                  <span className="text-[#7C8CFF]">⚡</span>
-                  <span>LIVE</span>
-                </a>
-
-              </div>
-            )}
-
+              <span className="text-[#AEB6FF]">⚡</span>
+              <span>LIVE</span>
+            </a>
           </section>
 
           <section>
@@ -440,7 +420,7 @@ return (
           </section>
 
           <section className="border-t border-white/[0.04] pt-3">
-            <a href="/legal/toa" className="block rounded-[0.8rem] px-3 py-2 text-[13px] text-white/38 transition hover:bg-white/[0.022] hover:text-white">
+            <a href="/legal/toa" className="block rounded-[0.65rem] px-3 py-2 text-[13px] text-white/38 transition hover:bg-white/[0.022] hover:text-white">
               Terms
             </a>
           </section>
@@ -525,7 +505,7 @@ return (
           (currentGoalCheck?.todos || []).map((todo) => (
             <div
               key={todo.id}
-              className="rounded-[0.8rem] border border-white/8 bg-white/[0.025] px-3 py-2 text-[13px] transition hover:bg-white/[0.022]"
+              className="rounded-[0.65rem] border border-white/8 bg-white/[0.025] px-3 py-2 text-[13px] transition hover:bg-white/[0.022]"
             >
               <button
                 type="button"
@@ -569,7 +549,7 @@ return (
       <div className="space-y-2.5">
         <button
           onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-[0.8rem] px-4 py-2 text-[13px] text-white/80"
+          className="w-full rounded-[0.65rem] px-4 py-2 text-[13px] text-white/80"
         >
           + Add Item
         </button>
@@ -602,7 +582,7 @@ What is the strongest next move based on this?`,
   context: 'goal_check_structured',
 })
           }}
-          className="w-full rounded-[0.8rem] bg-white text-black px-4 py-2 text-[13px]"
+          className="w-full rounded-[0.65rem] bg-white text-black px-4 py-2 text-[13px]"
         >
           Review with GEORGE
         </button>
@@ -622,7 +602,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-[0.8rem] px-4 py-2 text-[13px] text-white/80"
+          className="w-full rounded-[0.65rem] px-4 py-2 text-[13px] text-white/80"
         >
           Rename
         </button>
@@ -634,7 +614,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-[0.8rem] border border-red-500/30 px-4 py-2 text-[13px] text-red-400"
+          className="w-full rounded-[0.65rem] border border-red-500/30 px-4 py-2 text-[13px] text-red-400"
         >
           Delete
         </button>
