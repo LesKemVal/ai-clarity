@@ -145,7 +145,7 @@ export default function Sidebar({
 
   
   const addTodo = (goal: GoalCheckItem) => {
-    const text = window.prompt('New Item')
+    const text = window.prompt('New Step')
     if (!text?.trim()) return
 
     const updated = goalChecks.map((g) =>
@@ -172,7 +172,7 @@ export default function Sidebar({
     let completionNote = targetTodo.completionNote || ''
 
     if (!targetTodo.done) {
-      const proof = window.prompt('What changed?')
+      const proof = window.prompt('What changed operationally?')
       const cleanProof = proof?.trim()
 
       if (!cleanProof || cleanProof.length < 4) {
@@ -317,7 +317,7 @@ return (
               }}
               className="block w-full rounded-[0.95rem] border border-[#7C8CFF]/12 bg-[#7C8CFF]/[0.06] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-[#7C8CFF]/12 hover:text-white"
             >
-              New Thread
+              New Session
             </button>
 
             <button
@@ -328,7 +328,7 @@ return (
               }}
               className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
-              Make GEORGE Yours
+              Personalize GEORGE
             </button>
           </section>
 
@@ -370,7 +370,7 @@ return (
                         {item.title}
                       </span>
                       <span className="mt-1 block truncate text-[11px] text-white/32">
-                        Operational review
+                        Tracked focus
                       </span>
                     </button>
                   ))
