@@ -3,6 +3,48 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
+  Interview: {
+    label: 'WHAT ARE THEY MOST LIKELY EVALUATING?',
+    placeholder: 'Role, pressure points, what you want to communicate, or what concerns you most.'
+  },
+
+  Meeting: {
+    label: 'WHAT NEEDS TO HAPPEN IN THIS ROOM?',
+    placeholder: 'Decision, alignment, clarity, positioning, or communication concerns.'
+  },
+
+  Boardroom: {
+    label: 'WHAT POSITION OR DECISION MATTERS MOST?',
+    placeholder: 'What outcome matters most, who controls the room, or what pressure exists.'
+  },
+
+  Negotiation: {
+    label: 'WHAT OUTCOME MATTERS MOST?',
+    placeholder: 'Leverage, risks, non-negotiables, pressure points, or desired posture.'
+  },
+
+  'Sales Call': {
+    label: 'WHAT NEEDS TO MOVE FORWARD?',
+    placeholder: 'Trust, objection handling, positioning, urgency, or closing pressure.'
+  },
+
+  'Doctor Appointment': {
+    label: 'WHAT NEEDS TO BE UNDERSTOOD CLEARLY?',
+    placeholder: 'Symptoms, concerns, questions, pressure, or what you do not want missed.'
+  },
+
+  Presentation: {
+    label: 'WHAT MUST LAND WITH THE ROOM?',
+    placeholder: 'Message clarity, authority, pacing, confidence, or audience concerns.'
+  },
+
+  'Everyday Conversation': {
+    label: 'WHAT SHOULD GEORGE UNDERSTAND?',
+    placeholder: 'Context, pressure, sensitivity, relationship dynamics, or communication concerns.'
+  }
+}
+
 const LIVE_CONTEXTS = [
   'Interview',
   'Meeting',
@@ -17,6 +59,11 @@ const LIVE_CONTEXTS = [
 export default function GeorgeLiveEntryPage() {
   const [selectedRoom, setSelectedRoom] = useState('')
   const [objective, setObjective] = useState('')
+
+  const activePrompt = ROOM_PROMPTS[selectedRoom] || {
+    label: '{activePrompt.label}',
+    placeholder: 'What should GEORGE understand before entering the room?'
+  }
 
   const prepareLive = () => {
     if (typeof window === 'undefined') return
@@ -86,13 +133,13 @@ export default function GeorgeLiveEntryPage() {
 
           <div className="mt-5">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
-              WHAT MATTERS MOST?
+              {activePrompt.label}
             </div>
 
             <textarea
               value={objective}
               onChange={(e) => setObjective(e.target.value)}
-              placeholder="What should GEORGE understand before entering the room?"
+              placeholder={activePrompt.placeholder}
               rows={3}
               className="w-full resize-none rounded-[1rem] border border-white/[0.06] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/82 outline-none placeholder:text-white/24"
             />
