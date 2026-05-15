@@ -4714,184 +4714,40 @@ I am listening now. Speak naturally. I will respond ${
       {m.role === 'assistant' && (
         <div className="relative space-y-1.5">
 
-          {false && (isLatestAssistant && liveMode) && (
-  <div className="flex items-center justify-end gap-1 mt-2 text-[11px] text-white/55">
-
-    <button onClick={() => saveMemory(m, i)}>
-      Quick Save
-    </button>
-
-    <button onClick={() => {
-      setShowPromptMenu(false)
-      setShowRecentFolders(false)
-      setActiveSaveIndex((prev) => (prev === i ? null : i))
-    }}>
-      Save to Folder
-    </button>
-
-    <div className="relative">
-      {rewordPopupIndex === i && (
-        <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
-            rewordPopupUpward ? 'bottom-[40px]' : 'top-[34px]'
-          }`}
-        >
-          <div className="flex items-center justify-between px-2 py-1 border-b border-[#7C8CFF]/10">
-            <span className="text-[10px] tracking-[0.12em] text-white/62">REWORD</span>
-            <button
-              onClick={() => setRewordPopupIndex(null)}
-              className="text-white/30 hover:text-white transition text-[12px]"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="p-1.5">
-            {(['Reword','Rescript','Shorter','Stronger'] as const).map((action) => (
-              <button
-                key={action}
-                onClick={() => {
-                  const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-                  const mode = resolvedLivePosture || 'manual'
-                  const prompt = `Rewrite the line below for a live call.
-
-Goal: ${goal}
-Mode: ${mode}
-Original line:
-${m.content}
-
-Return only:
-Say:
-Backup:
-Cue:`
-
-                  setRewordPopupIndex(null)
-                  void handleSend(prompt)
-                }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.022] hover:text-white/92"
-              >
-                {action}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={(event) => {
-          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-          const roomAbove = rect.top
-          const roomBelow = window.innerHeight - rect.bottom
-          setRewordPopupUpward(roomAbove > 180 || roomAbove > roomBelow)
-          setRewordPopupIndex((prev) => (prev === i ? null : i))
-        }}
-      >
-        Reword
-      </button>
-    </div>
-
-    <button onClick={() => {
-      const goal = activeCampaign?.currentGoal || activeCampaign?.desiredOutcome || 'the active conversation goal'
-      const mode = resolvedLivePosture || 'manual'
-      const style = resolvedOutputStyle
-      const delivery = resolvedDeliveryMode
-      const closingDirective = forceClose
-  ? "\n\n[DIRECTIVE: Stay in close. Continue pushing for a decision. Do not drift.]"
-  : ""
-
-const prompt = `GEORGE, give me the next live cue.${closingDirective}
-
-
-Goal: ${goal}
-Mode: ${mode}
-Output style: ${style}
-Tone: ${resolvedAssistTone}
-Delivery: ${delivery}
-
-Use the active campaign context, constraints, and what is happening now.
-
-Rules:
-- If delivery is text: return structured Say / Backup / Cue.
-- If delivery is audio: give a speakable line with a delivery instruction, not emotional performance.
-- If delivery is repeat: give one short repeatable line.
-- Do not explain.
-
-Return only:
-Say:
-Backup:
-Cue:`
-
-      void handleSend(prompt)
-    }}>
-      Cue
-    </button>
-
-    <button
-      type="button"
-      onClick={() => {
-        void handleSend(`SCREENER / GATEKEEPER → DECISION MAKER.
-
-You are GEORGE.
-
-User is either:
-1) speaking to a gatekeeper
-2) or has reached the decision maker
-
-Your job:
-- identify who you're speaking to immediately
-- if gatekeeper → get past them clean
-- if decision maker → switch tone instantly and begin control
-- do NOT pitch prematurely
-- stay tight and directive
-- move toward a close or next step
-
-Rules:
-- detect role (gatekeeper vs decision maker)
-- adapt language accordingly
-- once decision maker is confirmed → shift to closing posture
-
-Return ONLY:
-
-Say:
-Backup:
-Cue:`)
-      }}
-      className="ml-2 rounded-lg px-2 py-1 text-[11px] text-white/70 transition hover:bg-white/[0.022] hover:text-white/92"
-      title="Screener"
-    >
-      🎯
-    </button>
+          {isLatestAssistant && liveMode && (
+  <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-white/50">
 
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-44 rounded-[1.15rem] border border-[#7C8CFF]/28 bg-[#11131A]/88 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl ring-1 ring-white/[0.04] animate-[menuLift_140ms_ease-out] ${
-            tonePopupUpward ? 'bottom-[40px]' : 'top-[34px]'
+          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[menuLift_140ms_ease-out] ${
+            tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
-          <div className="flex items-center justify-between px-2 py-1 border-b border-[#7C8CFF]/10">
-            <span className="text-[10px] tracking-[0.12em] text-white/62">TONE</span>
-            <button
-              onClick={() => setTonePopupIndex(null)}
-              className="text-white/30 hover:text-white transition text-[12px]"
-            >
-              ✕
-            </button>
+          <div className="border-b border-white/[0.05] px-3 py-2 text-[10px] tracking-[0.16em] text-white/36">
+            STYLE
           </div>
 
           <div className="p-1.5">
-            {(['calm','direct','assertive','firm','warm','neutral'] as const).map((tone) => (
+            {([
+              'assertive',
+              'respectful',
+              'concise',
+              'direct',
+              'warm',
+              'firm'
+            ] as const).map((tone) => (
               <button
                 key={tone}
                 onClick={() => {
-                  setAssistTone(tone)
+                  setAssistTone(tone as any)
                   setTonePopupIndex(null)
-                  setToastMessage(`Tone: ${tone}`)
+                  setToastMessage(`Style: ${tone}`)
                   setShowToast(true)
                 }}
                 className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/70 transition hover:bg-white/[0.022] hover:text-white/92"
               >
-                {tone}
+                More {tone}
               </button>
             ))}
           </div>
@@ -4899,6 +4755,7 @@ Cue:`)
       )}
 
       <button
+        type="button"
         onClick={(event) => {
           const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
           const roomAbove = rect.top
@@ -4906,13 +4763,45 @@ Cue:`)
           setTonePopupUpward(roomAbove > 180 || roomAbove > roomBelow)
           setTonePopupIndex((prev) => (prev === i ? null : i))
         }}
+        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/52 transition hover:bg-white/[0.035] hover:text-white"
       >
-        Tone
+        Style · {resolvedAssistTone}
       </button>
     </div>
 
+    <button
+      type="button"
+      onClick={() => {
+        void handleSend(`Make this response shorter. Return only the shorter version.\n\n${m.content}`)
+      }}
+      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/52 transition hover:bg-white/[0.035] hover:text-white"
+    >
+      Shorter
+    </button>
+
+    <button
+      type="button"
+      onClick={() => {
+        void handleSend(`Turn this into one exact speakable line. No cue. No backup.\n\n${m.content}`)
+      }}
+      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/52 transition hover:bg-white/[0.035] hover:text-white"
+    >
+      Line
+    </button>
+
+    <button
+      type="button"
+      onClick={() => {
+        void handleSend('Pause. Hold. Do not give another line unless asked.')
+      }}
+      className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-white/42 transition hover:bg-white/[0.035] hover:text-white"
+    >
+      Pause
+    </button>
+
   </div>
 )}
+
 
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
