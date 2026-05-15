@@ -1153,7 +1153,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       body: 'LIVE cues help you slow down, redirect, recover control, or sharpen the next sentence before momentum slips.'
     },
     {
-      title: 'This is not normal chat mode.',
+      title: 'LIVE changes runtime behavior.',
       body: 'LIVE is optimized for timing and response delivery while conversations are actually happening.'
     }
   ]
@@ -1222,8 +1222,8 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
       }
 
       const roomLine = liveSetup?.room
-        ? `${liveSetup.room} mode active.`
-        : 'LIVE mode active.'
+        ? `${liveSetup.room} active.`
+        : 'LIVE active.'
 
       const objectiveLine = liveSetup?.objective?.trim()
         ? `Objective: ${liveSetup.objective.trim()}`
@@ -5611,7 +5611,7 @@ if (liveMode) {
         </div>
 
         <div className="mt-2 text-[12px] leading-5 text-white/62">
-          GEORGE will return you to normal mode and preserve the session through V2 continuity.
+          Return to GEORGE.
         </div>
 
         <div className="mt-5 flex flex-col gap-2.5">
@@ -6574,7 +6574,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-[1.65rem] border border-[#7C8CFF]/28 bg-[#11131A]/90  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Conversation Engine</p>
+            <p className="text-sm uppercase tracking-[0.18em] text-[#7C8CFF] mb-2">Runtime</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, speech, study, or everyday pressure.</p>}
             {walkthroughStep === 2 && <p className="text-white text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
