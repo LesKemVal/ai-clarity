@@ -259,9 +259,8 @@ export default function Sidebar({
   }
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    'Utility': true,
+    Runtime: true,
     Access: true,
-    'Progress': false,
     Continuity: false,
   })
 
@@ -330,7 +329,7 @@ return (
               }}
               className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
             >
-              Calibrate GEORGE
+              Refine GEORGE
             </button>
           </section>
 
@@ -342,7 +341,7 @@ return (
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
-                Focus
+                Objectives
               </span>
               <span className="text-[11px] text-white/32">
                 {openGroups['Progress'] ? '▾' : '▸'}
@@ -356,7 +355,7 @@ return (
                   onClick={createGoalCheck}
                   className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.035] hover:text-white"
                 >
-                  + New Objective
+                  + New Direction
                 </button>
 
                 {goalChecks.length === 0 ? (
@@ -387,18 +386,18 @@ return (
           <section>
             <button
               type="button"
-              onClick={() => toggleGroup('Utility')}
+              onClick={() => toggleGroup('Runtime')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
                 Modes
               </span>
               <span className="text-[11px] text-white/32">
-                {openGroups['Utility'] ? '▾' : '▸'}
+                {openGroups['Runtime'] ? '▾' : '▸'}
               </span>
             </button>
 
-            {openGroups['Utility'] && (
+            {openGroups['Runtime'] && (
               <div className="mt-3 space-y-2">
 
                 <a
@@ -502,33 +501,6 @@ return (
               </div>
             )}
           </section>
-          )}
-
-          {liveMode && (
-            <section className="border-t border-white/[0.04] pt-4">
-              <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
-                LIVE
-              </div>
-
-              <div className="mt-3 space-y-1.5">
-                {[
-                  'Upload Context',
-                  'Control Words',
-                  'Shorter',
-                  'Exact Line',
-                  'Pause',
-                  'Exit LIVE',
-                ].map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className="block w-full rounded-[0.8rem] px-3 py-2 text-left text-[13px] text-white/58 transition hover:bg-white/[0.018] hover:text-white"
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </section>
           )}
         </div>
       </div>
