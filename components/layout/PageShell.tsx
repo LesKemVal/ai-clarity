@@ -56,13 +56,13 @@ export default function PageShell({
           <span className={`absolute inline-flex h-full w-full rounded-full ${
             subscriberTier === 'brilliant'
               ? 'animate-ping bg-emerald-400/45'
-              : 'animate-ping bg-[#7C8CFF]/40'
+              : 'animate-ping bg-[#AEB6FF]/40'
           }`} />
 
           <span className={`relative h-2 w-2 rounded-full ${
             subscriberTier === 'brilliant'
               ? 'bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.9)]'
-              : 'bg-[#7C8CFF] shadow-[0_0_10px_rgba(124,140,255,0.9)]'
+              : 'bg-[#AEB6FF] shadow-[0_0_10px_rgba(174,182,255,0.9)]'
           }`} />
         </div>
 
@@ -181,14 +181,14 @@ export default function PageShell({
         )}
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
-          <div className="mx-auto w-full max-w-6xl px-4 pb-12 pt-8 md:px-6 md:pt-12 xl:px-10">
-            <div className="mb-8 md:mb-10">
+          <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-7 md:px-6 md:pt-10 xl:px-8">
+            <div className="mb-6 md:mb-8">
               <div className="flex items-start gap-2 md:gap-3">
                 {withSidebar && (
                   <button
                     type="button"
                     onClick={() => setShowSidebar(true)}
-                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.018] text-white/85 transition hover:border-[#7C8CFF]/30 hover:bg-[#7C8CFF]/8 xl:hidden"
+                    className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.018] text-white/85 transition hover:border-[#AEB6FF]/30 hover:bg-[#AEB6FF]/8 xl:hidden"
                     aria-label="Open menu"
                   >
                     <svg
@@ -212,7 +212,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleBack}
-                        className="ml-1 group inline-flex items-center gap-1 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF]"
+                        className="ml-1 group inline-flex items-center gap-1 text-sm text-neutral-500 transition duration-200 hover:text-[#AEB6FF]"
                       >
                         <span className="text-base leading-none group-hover:-translate-x-0.5 transition">
                           ←
@@ -230,7 +230,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF] transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16 hover:text-white"
                         aria-label="Share G."
                         title="Share G."
                       >
@@ -248,7 +248,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleBack}
-                        className="ml-1 group inline-flex items-center gap-1.5 text-sm text-neutral-500 transition duration-200 hover:text-[#7C8CFF]"
+                        className="ml-1 group inline-flex items-center gap-1.5 text-sm text-neutral-500 transition duration-200 hover:text-[#AEB6FF]"
                       >
                         <span className="text-lg leading-none group-hover:-translate-x-0.5 transition">
                           ←
@@ -266,7 +266,7 @@ export default function PageShell({
                       <button
                         type="button"
                         onClick={handleInstallGeorge}
-                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#d7dcff] transition hover:border-[#7C8CFF]/60 hover:bg-[#7C8CFF]/16 hover:text-white"
+                        className="inline-flex h-9 items-center justify-center rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF] transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16 hover:text-white"
                         aria-label="Share G."
                         title="Share G."
                       >
@@ -293,9 +293,9 @@ export default function PageShell({
               </div>
             )}
 
-            <div className="space-y-6">{children}</div>
+            <div className="space-y-5">{children}</div>
 
-            <footer className="mt-14 border-t border-white/8 pt-6">
+            <footer className="mt-10 border-t border-white/[0.05] pt-5">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <p className="text-xs leading-6 text-neutral-500">
                   BRANESx / GEORGE is operated by R. Block Share Holdings, LLC.

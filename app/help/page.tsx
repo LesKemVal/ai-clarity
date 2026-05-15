@@ -11,7 +11,7 @@ export default function HelpPage() {
     >
       <div className="space-y-7">
 
-        <section className="rounded-[1rem] border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-5 md:p-5">
+        <section className="rounded-[1rem] border border-[#AEB6FF]/25 bg-[#AEB6FF]/[0.045] p-5 md:p-5">
           <p className="text-sm leading-7 text-white">
             GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
           </p>
@@ -54,7 +54,7 @@ export default function HelpPage() {
           </ul>
         </section>
 
-        <section className="rounded-[1rem] border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.045] p-5 md:p-5">
+        <section className="rounded-[1rem] border border-[#AEB6FF]/25 bg-[#AEB6FF]/[0.045] p-5 md:p-5">
           <h2 className="mb-4 text-xl font-semibold text-white">How to Use LIVE</h2>
 
           <div className="space-y-5">

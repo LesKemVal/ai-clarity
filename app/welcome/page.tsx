@@ -91,7 +91,7 @@ export default function WelcomePage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#06070A] px-6 py-10 text-white">
-      <div className="pointer-events-none absolute inset-0"><div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/[0.055] blur-[120px]" /></div><div className="relative z-10 mx-auto max-w-4xl space-y-6">
+      <div className="pointer-events-none absolute inset-0"><div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#AEB6FF]/[0.055] blur-[120px]" /></div><div className="relative z-10 mx-auto max-w-4xl space-y-6">
         <button
           onClick={() => (window.location.href = '/george')}
           className="text-sm text-white/70 transition hover:text-white"
@@ -107,7 +107,7 @@ export default function WelcomePage() {
           />
 
           <div className="space-y-2 border-b border-white/[0.05] pb-6">
-            <p className="text-xs uppercase tracking-[0.28em] text-[#7C8CFF]">
+            <p className="text-xs uppercase tracking-[0.28em] text-[#AEB6FF]">
               Make GEORGE yours
             </p>
             <h1 className="text-4xl font-semibold tracking-tight">
@@ -147,7 +147,7 @@ export default function WelcomePage() {
 
           </div></div>
 
-          <div className="rounded-[1.15rem] border border-[#7C8CFF]/14 bg-[#7C8CFF]/[0.045] p-4 shadow-[0_0_32px_rgba(124,140,255,0.06)]">
+          <div className="rounded-[1.15rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.045] p-4 shadow-[0_0_32px_rgba(174,182,255,0.06)]">
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/80">
               Adaptive signal
             </p>
