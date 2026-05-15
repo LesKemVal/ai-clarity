@@ -8,7 +8,7 @@ export default function ContactPage() {
       <div className="max-w-3xl space-y-6">
         <section className="rounded-[1rem] bg-white/[0.018] p-5 md:p-5">
           <p className="text-sm leading-7 text-neutral-400">
-            Reach out if you need support, have a question, or want to talk about GEORGE.
+            Support and operational contact.
           </p>
         </section>
 
@@ -20,7 +20,7 @@ export default function ContactPage() {
 
           <div className="rounded-[1rem] bg-white/[0.018] p-5">
             <p className="text-sm font-medium text-white">Response</p>
-            <p className="mt-2 text-sm text-neutral-400">We’ll get back to you as quickly as we can.</p>
+            <p className="mt-2 text-sm text-neutral-400">Response times vary.</p>
           </div>
         </section>
       </div>

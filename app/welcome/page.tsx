@@ -114,7 +114,7 @@ export default function WelcomePage() {
               Shape GEORGE around your direction.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
-              Give GEORGE enough signal to support your objective now. The system can keep refining context as you use it.
+              Give GEORGE enough signal to support your direction.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer naturally. GEORGE will adapt over time."
+              placeholder="Answer naturally."
               className="mt-3 w-full rounded-xl border border-white/[0.05] bg-black/35 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
             />
           </div>

@@ -73,12 +73,12 @@ export default function TopUpPage() {
       return 'Choose GEORGE / GEORGette, personalize voice, and shape how your assistant supports your direction, continuity, and execution.'
     }
     if (intent === 'conversation') {
-      return 'Conversation Assistance includes Brilliant access with live guidance, cues, exact lines, timing help, and pressure support when words matter.'
+      return 'LIVE support during pressure conversations.'
     }
     if (intent === 'pro') {
-      return 'Brilliant Day includes Brilliant access and is built for callers, reps, fundraisers, appointment setters, and firms that need live scripts, guardrails, and campaign discipline.'
+      return 'LIVE runtime for high-pressure communication.'
     }
-    return 'GEORGE scales from clarity → operational continuity → real-time LIVE support. The deeper the tier, the longer GEORGE stays with you under pressure.'
+    return 'Choose how much continuity GEORGE keeps.'
   }, [intent])
 
   function submitFeedback() {
@@ -187,7 +187,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] px-4 py-3 text-sm text-white/90">
-              These are not feature buckets. They are levels of runtime continuity, pressure support, and operational presence.
+              Different levels of continuity and LIVE support.
             </div>
 
 
