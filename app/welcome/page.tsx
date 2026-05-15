@@ -37,30 +37,30 @@ export default function WelcomePage() {
     const text = `${mission} ${priority}`.toLowerCase()
 
     if (!mission && !priority) {
-      return 'What are you trying to become, build, fix, or handle right now?'
+      return 'What are we trying to move forward right now — something to become, build, fix, fund, protect, or decide?'
     }
 
     if (/business|startup|company|sell|sales|income|money|fund|revenue/.test(text)) {
-      return 'What does this need to do first: create fast income, prove demand, or become long-term ownership?'
+      return 'Should I help you optimize first for fast income, proof of demand, ownership, funding readiness, or long-term leverage?'
     }
 
     if (/interview|job|career|hiring|resume|work/.test(text)) {
-      return 'What would improve the outcome most right now: preparation, sharper wording, stronger positioning, follow-through, or negotiation?'
+      return 'Should I help most with preparation, sharper wording, stronger positioning, follow-through, or negotiation?'
     }
 
     if (/conversation|meeting|negotiat|doctor|appointment|sales call|call|live|boss|manager/.test(text)) {
-      return 'In live conversations, do you need GEORGE to help more with what to say, when to pause, or what question to ask next?'
+      return 'When pressure rises, should I prioritize exact lines, short cues, questions to ask, posture, or silence?'
     }
 
     if (/learn|study|test|exam|license|school|training|skill/.test(text)) {
-      return 'Do you learn better through repetition, conversation, pressure, structure, visuals, or direct execution?'
+      return 'Do you learn best through repetition, conversation, pressure, structure, visuals, examples, or direct execution?'
     }
 
     if (/credit|debt|bill|approval|car|house|loan/.test(text)) {
-      return 'What matters most right now: faster approval, lower monthly pressure, cleaner credit profile, or avoiding a bad deal?'
+      return 'Should I help you protect approval odds, lower monthly pressure, clean up the profile, or avoid a bad deal?'
     }
 
-    return 'What should GEORGE understand about how you operate, decide, or communicate?'
+    return 'What should I understand about how you decide, communicate, slow down, push forward, or lose momentum?'
   }, [mission, priority])
 
   useEffect(() => {
@@ -90,66 +90,87 @@ export default function WelcomePage() {
   if (tier === 'smart') return null
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#06070A] px-6 py-10 text-white">
-      <div className="pointer-events-none absolute inset-0"><div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#AEB6FF]/[0.055] blur-[120px]" /></div><div className="relative z-10 mx-auto max-w-4xl space-y-6">
+    <main className="relative min-h-screen overflow-hidden bg-[#05060A] px-6 py-10 text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-[-260px] h-[440px] w-[440px] -translate-x-1/2 rounded-full bg-[#AEB6FF]/[0.045] blur-[130px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-4xl space-y-6">
         <button
           onClick={() => (window.location.href = '/george')}
-          className="text-sm text-white/70 transition hover:text-white"
+          className="text-sm text-white/48 transition hover:text-white/72"
         >
           ← Back to GEORGE
         </button>
 
-        <div className="space-y-7 rounded-[1.35rem] border border-white/[0.045] bg-white/[0.018] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)] md:p-7">
+        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.46)] md:p-7">
           <img
             src="/bxnew20.png"
             alt="BRANESx"
-            className="h-8 w-auto object-contain opacity-80 md:h-10"
+            className="h-7 w-auto object-contain opacity-76 md:h-8"
           />
 
-          <div className="space-y-2 border-b border-white/[0.05] pb-6">
-            <p className="text-xs uppercase tracking-[0.28em] text-[#AEB6FF]">
-              Make GEORGE yours
+          <div className="space-y-3 border-b border-white/[0.045] pb-6">
+            <p className="text-xs uppercase tracking-[0.28em] text-[#AEB6FF]/68">
+              User Signal
             </p>
-            <h1 className="text-4xl font-semibold tracking-tight">
-              Shape GEORGE around your direction.
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
+              Help me serve you better.
             </h1>
-            <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
-              Give GEORGE enough signal to support your direction.
+            <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
+              This is not room setup. This is your operating signal — what GEORGE should remember about your goals, constraints, communication, and decision style.
             </p>
           </div>
 
-          <div className="space-y-3"><p className="text-[10px] uppercase tracking-[0.22em] text-white/34">Core signal</p><div className="grid gap-3 md:grid-cols-2">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="What should GEORGE call you?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
-            <input
-              value={mission}
-              onChange={(e) => setMission(e.target.value)}
-              placeholder="What are you trying to build, fix, fund, or change?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
-            <input
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              placeholder="What matters most right now?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="space-y-3">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Core signal</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="What should I call you?"
+                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                />
+                <input
+                  value={mission}
+                  onChange={(e) => setMission(e.target.value)}
+                  placeholder="What are we trying to build, fix, fund, or change?"
+                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                />
+                <input
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                  placeholder="What matters most right now?"
+                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                />
 
-            <input
-              value={learningStyle}
-              onChange={(e) => setLearningStyle(e.target.value)}
-              placeholder="How should GEORGE communicate, teach, or work with you?"
-              className="rounded-[1rem] border border-white/[0.05] bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/30"
-            />
+                <input
+                  value={learningStyle}
+                  onChange={(e) => setLearningStyle(e.target.value)}
+                  placeholder="How should I communicate or work with you?"
+                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                />
+              </div>
+            </div>
 
-          </div></div>
+            <div className="rounded-[0.9rem] border border-white/[0.045] bg-black/20 p-4">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">
+                Connected systems
+              </p>
+              <p className="mt-3 text-sm leading-6 text-white/48">
+                Later, GEORGE should connect to tools that help you act: code repositories, calendars, files, email, documents, CRM, broker workflows, or other work systems.
+              </p>
+              <p className="mt-3 text-xs leading-5 text-[#AEB6FF]/58">
+                Direction: connect only when useful, permissioned, and tied to a real task.
+              </p>
+            </div>
+          </div>
 
-          <div className="rounded-[1.15rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.045] p-4 shadow-[0_0_32px_rgba(174,182,255,0.06)]">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/80">
-              Adaptive signal
+          <div className="rounded-[0.95rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.028] p-4 shadow-[0_0_32px_rgba(174,182,255,0.045)]">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/72">
+              GEORGE asks
             </p>
             <p className="mt-2 text-sm leading-6 text-white/78">
               {adaptiveQuestion}
@@ -158,20 +179,23 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer naturally."
-              className="mt-3 w-full rounded-xl border border-white/[0.05] bg-black/35 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30"
+              placeholder="Answer naturally. I’ll use this to shape future guidance."
+              className="mt-3 w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
             />
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
               onClick={save}
               disabled={!valid}
-              className="rounded-[1.15rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:translate-y-[-1px] hover:bg-[#F3F5F7] disabled:opacity-40"
+              className="rounded-[0.9rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
             >
-              Make GEORGE Mine
+              Save User Signal
             </button>
 
+            <p className="text-xs leading-5 text-white/32">
+              You can update this later from the sidebar when your goals, pressure, or working style changes.
+            </p>
           </div>
         </div>
       </div>
