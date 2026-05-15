@@ -449,6 +449,21 @@ ${reminderRule}
 - Adapt guidance to the stakes, pace, and power dynamics.
 - Prefer practical next words and next moves.
 `,
+    live_debate: `
+- Treat this as live debate posture.
+- Prioritize concise rebuttals, framing control, contradiction detection, proof-demand handling, and interruption control.
+- Keep responses short enough to use under pressure.
+- Prefer one sharp line over explanation.
+- If the other party contradicts themselves, surface the contradiction cleanly.
+- If the other party demands proof, give the user one grounded proof line or one clarifying demand.
+- If the other party interrupts, give the user a calm control line.
+- Preserve composure. Do not escalate emotionally.
+- Preferred structure:
+Say:
+Backup:
+Cue:
+- Do not give debate theory unless asked.
+`,
   }
 
   return `${commonRules}\n${contextRules[promptContext] ?? ''}`.trim()
