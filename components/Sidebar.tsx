@@ -273,7 +273,7 @@ export default function Sidebar({
 
   const linkClass = (path: string) =>
     `block text-[13px] transition ${
-      pathname === path ? 'text-[#AEB6FF]' : 'text-white/52 hover:text-[#AEB6FF]'
+      pathname === path ? 'text-[#AEB6FF]/86' : 'text-white/48 hover:text-white/68'
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -282,24 +282,24 @@ export default function Sidebar({
 
 return (
     <aside
-      className={`fixed left-0 top-0 z-[120] flex h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.045] bg-[#08080B]/88 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[120] flex h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
-      <div className="border-b border-white/[0.04] px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
-        <div className="relative flex items-center justify-between opacity-92">
+      <div className="border-b border-white/[0.035] px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
+        <div className="relative flex items-center justify-between opacity-90">
           <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
               src="/bxnew20.png"
               alt="BRANESx"
-              className="h-[12px] w-[68px] object-contain opacity-82"
+              className="h-[12px] w-[68px] object-contain opacity-78"
             />
           </div>
 
           <button
             type="button"
             onClick={() => setShowSidebar?.(false)}
-            className="text-white/40 transition hover:text-white"
+            className="text-white/34 transition hover:text-white/62"
             aria-label="Close sidebar"
           >
             ×
@@ -316,7 +316,7 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-[0.65rem] border border-[#AEB6FF]/12 bg-white/[0.028] px-3 py-2.5 text-left text-[13px] text-white/88 transition hover:bg-white/[0.045] hover:text-white"
+              className="block w-full rounded-[0.55rem] border border-[#AEB6FF]/10 bg-white/[0.02] px-3 py-2.5 text-left text-[13px] text-white/82 transition hover:bg-white/[0.032] hover:text-white/90"
             >
               GEORGE
             </button>
@@ -327,9 +327,9 @@ return (
                 setShowSidebar?.(false)
                 window.location.href = '/welcome'
               }}
-              className="block w-full rounded-[0.65rem] px-3 py-2 text-left text-[13px] text-white/52 transition duration-150 hover:bg-white/[0.018] hover:text-white"
+              className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/46 transition duration-150 hover:bg-white/[0.014] hover:text-white/66"
             >
-              Refine GEORGE
+              Configure
             </button>
           </section>
 
@@ -340,10 +340,10 @@ return (
               onClick={() => toggleGroup('Progress')}
               className="flex w-full items-center justify-between text-left"
             >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-white/34">
                 Objectives
               </span>
-              <span className="text-[11px] text-white/32">
+              <span className="text-[11px] text-white/26">
                 {openGroups['Progress'] ? '▾' : '▸'}
               </span>
             </button>
@@ -353,9 +353,9 @@ return (
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-[0.65rem] px-3 py-2 text-left text-[13px] text-white/72 transition hover:border-white/20 hover:bg-white/[0.018] hover:text-white"
+                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
                 >
-                  + New Direction
+                  + New Objective
                 </button>
 
                 {goalChecks.length === 0 ? (
@@ -366,13 +366,13 @@ return (
                       key={item.id}
                       type="button"
                       onClick={() => openGoalCheck(item)}
-                      className="block w-full rounded-[0.65rem] px-3 py-2 text-left transition hover:bg-white/[0.022]"
+                      className="block w-full rounded-[0.55rem] px-3 py-2 text-left transition hover:bg-white/[0.018]"
                     >
-                      <span className="block truncate text-[13px] text-white/72 hover:text-white">
+                      <span className="block truncate text-[13px] text-white/64 hover:text-white/78">
                         {item.title}
                       </span>
-                      <span className="mt-1 block truncate text-[11px] text-white/32">
-                        Progress item
+                      <span className="mt-1 block truncate text-[11px] text-white/28">
+                        Objective
                       </span>
                     </button>
                   ))
@@ -386,9 +386,9 @@ return (
           <section className="pt-1">
             <a
               href="/george/live-entry"
-              className="flex w-full items-center gap-2 rounded-[0.65rem] border border-transparent px-2.5 py-2 text-[13px] text-white/66 transition hover:border-white/[0.04] hover:bg-white/[0.012] hover:text-white"
+              className="flex w-full items-center gap-2 rounded-[0.55rem] border border-transparent px-2.5 py-2 text-[13px] text-white/62 transition hover:border-white/[0.035] hover:bg-white/[0.01] hover:text-white/78"
             >
-              <span className="text-[#AEB6FF]">⚡</span>
+              <span className="text-[#AEB6FF]/82">⚡</span>
               <span>LIVE</span>
             </a>
           </section>
@@ -399,10 +399,10 @@ return (
               onClick={() => toggleGroup('Access')}
               className="flex w-full items-center justify-between text-left"
             >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/38">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-white/34">
                 Access
               </span>
-              <span className="text-[11px] text-white/32">
+              <span className="text-[11px] text-white/26">
                 {openGroups.Access ? '▾' : '▸'}
               </span>
             </button>
@@ -419,47 +419,47 @@ return (
             )}
           </section>
 
-          <section className="border-t border-white/[0.04] pt-3">
-            <a href="/legal/toa" className="block rounded-[0.65rem] px-3 py-2 text-[13px] text-white/38 transition hover:bg-white/[0.022] hover:text-white">
+          <section className="border-t border-white/[0.035] pt-3">
+            <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[13px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
               Terms
             </a>
           </section>
 
-          <section className="border-t border-white/[0.04] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
               Public Utility
             </div>
 
             <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
-              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/34 transition hover:text-white/72">
+              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/30 transition hover:text-white/56">
                 988 Lifeline
               </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/34 transition hover:text-white/72">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/30 transition hover:text-white/56">
                 StopBullying.gov
               </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/34 transition hover:text-white/72">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/30 transition hover:text-white/56">
                 RAINN
               </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/34 transition hover:text-white/72">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/30 transition hover:text-white/56">
                 Legal Aid
               </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/34 transition hover:text-white/72">
+              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/30 transition hover:text-white/56">
                 BrokerCheck
               </a>
             </div>
           </section>
 
           {!liveMode && (
-          <section className="border-t border-white/[0.04] pt-4">
+          <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
               onClick={() => toggleGroup('Continuity')}
               className="flex w-full items-center justify-between text-left"
             >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/30">
+              <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
                 Continuity
               </span>
-              <span className="text-[11px] text-white/24">
+              <span className="text-[11px] text-white/20">
                 {openGroups.Continuity ? '▾' : '▸'}
               </span>
             </button>
@@ -471,9 +471,9 @@ return (
                     key={session.id}
                     type="button"
                     onClick={() => openNormalSession(session)}
-                    className="block w-full rounded-md px-2 py-1.5 text-left transition hover:bg-white/[0.018]"
+                    className="block w-full rounded-[0.45rem] px-2 py-1.5 text-left transition hover:bg-white/[0.014]"
                   >
-                    <span className="block truncate text-[13px] text-white/54 hover:text-white/80">
+                    <span className="block truncate text-[13px] text-white/48 hover:text-white/68">
                       {getSessionTitle(session)}
                     </span>
                   </button>
@@ -487,39 +487,39 @@ return (
     
 {currentGoalCheck && (
   <div
-    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/72 backdrop-blur-[2px]"
     onClick={() => setActiveGoalCheck(null)}
   >
     <div
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-sm rounded-[1rem] bg-black p-5 shadow-[0_30px_120px_rgba(0,0,0,0.8)]"
+      className="w-full max-w-sm rounded-[0.9rem] border border-white/[0.055] bg-[#07080B] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.72)]"
     >
-      <div className="mb-4 text-lg text-white font-semibold">
+      <div className="mb-4 text-[16px] font-semibold text-white/88">
         {currentGoalCheck.title}
       </div>
 
       <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
         {(!(currentGoalCheck?.todos?.length)) ? (
-          <p className="text-xs text-white/40">No to-dos yet.</p>
+          <p className="text-xs text-white/34">No steps yet.</p>
         ) : (
           (currentGoalCheck?.todos || []).map((todo) => (
             <div
               key={todo.id}
-              className="rounded-[0.65rem] border border-white/8 bg-white/[0.025] px-3 py-2 text-[13px] transition hover:bg-white/[0.022]"
+              className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-2 text-[13px] transition hover:bg-white/[0.02]"
             >
               <button
                 type="button"
                 onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
                 className="flex w-full items-start gap-2 text-left"
               >
-                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${todo.done ? 'bg-white' : 'border-white/30'}`} />
+                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-[0.25rem] border ${todo.done ? 'border-white/70 bg-white/80' : 'border-white/24'}`} />
                 <span className="min-w-0">
-                  <span className={todo.done ? 'block line-through text-white/40' : 'block text-white'}>
+                  <span className={todo.done ? 'block line-through text-white/34' : 'block text-white/82'}>
                     {todo.text}
                   </span>
                   {todo.done && todo.completionNote && (
-                    <span className="mt-1 block text-[11px] leading-4 text-white/35">
-                      Completion: {todo.completionNote}
+                    <span className="mt-1 block text-[11px] leading-4 text-white/32">
+                      Proof: {todo.completionNote}
                     </span>
                   )}
                 </span>
@@ -529,14 +529,14 @@ return (
                 <button
                   type="button"
                   onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-white/40 transition hover:text-white"
+                  className="text-[11px] text-white/36 transition hover:text-white/62"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
                   onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-red-400/70 transition hover:text-red-300"
+                  className="text-[11px] text-red-300/54 transition hover:text-red-200/72"
                 >
                   Delete
                 </button>
@@ -549,9 +549,9 @@ return (
       <div className="space-y-2.5">
         <button
           onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-[0.65rem] px-4 py-2 text-[13px] text-white/80"
+          className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/66 transition hover:bg-white/[0.014] hover:text-white/82"
         >
-          + Add Item
+          + Add Step
         </button>
 
         <button
@@ -582,7 +582,7 @@ What is the strongest next move based on this?`,
   context: 'goal_check_structured',
 })
           }}
-          className="w-full rounded-[0.65rem] bg-white text-black px-4 py-2 text-[13px]"
+          className="w-full rounded-[0.55rem] bg-white px-4 py-2 text-[13px] text-black transition hover:bg-white/88"
         >
           Review with GEORGE
         </button>
@@ -602,7 +602,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-[0.65rem] px-4 py-2 text-[13px] text-white/80"
+          className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
         >
           Rename
         </button>
@@ -614,7 +614,7 @@ What is the strongest next move based on this?`,
             localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
             setActiveGoalCheck(null)
           }}
-          className="w-full rounded-[0.65rem] border border-red-500/30 px-4 py-2 text-[13px] text-red-400"
+          className="w-full rounded-[0.55rem] border border-red-300/18 px-4 py-2 text-[13px] text-red-300/60 transition hover:border-red-300/26 hover:text-red-200/74"
         >
           Delete
         </button>
