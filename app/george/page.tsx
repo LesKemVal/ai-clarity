@@ -6666,14 +6666,13 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         <span>Interpret a doc</span>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => setInput('Help me create an image.')}
+                      <a
+                        href="/images"
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
                         <span className="text-[#AEB6FF]/58">◌</span>
-                        <span>Create an image</span>
-                      </button>
+                        <span>Create Images</span>
+                      </a>
                     </div>
                   </div>
                 )}
