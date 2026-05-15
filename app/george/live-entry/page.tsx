@@ -4,6 +4,17 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 
+const ROOM_CONTROLS: Record<string, string[]> = {
+  Interview: ['line', 'shorter', 'pause', 'answer clean'],
+  Meeting: ['summarize', 'push back', 'pause', 'next question'],
+  Boardroom: ['position', 'proof', 'slow down', 'next move'],
+  Negotiation: ['line', 'hold firm', 'counter', 'pause'],
+  'Sales Call': ['line', 'objection', 'close', 'shorter'],
+  'Doctor Appointment': ['slow down', 'clarify', 'question', 'repeat'],
+  Presentation: ['pace', 'stronger', 'simplify', 'close'],
+  'Everyday Conversation': ['line', 'pause', 'shorter', 'help me respond'],
+}
+
 const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
   Interview: {
     label: 'WHAT ARE THEY MOST LIKELY EVALUATING?',
@@ -60,13 +71,16 @@ const LIVE_CONTEXTS = [
 export default function GeorgeLiveEntryPage() {
   const [selectedRoom, setSelectedRoom] = useState('')
   const [objective, setObjective] = useState('')
+  const [controlWords, setControlWords] = useState('')
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
-    label: '{activePrompt.label}',
+    label: 'WHAT MATTERS MOST?',
     placeholder: 'What should GEORGE understand before entering the room?'
   }
+
+  const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
 
 
   useEffect(() => {
@@ -88,6 +102,7 @@ export default function GeorgeLiveEntryPage() {
       JSON.stringify({
         room: selectedRoom,
         objective,
+        controlWords,
         createdAt: Date.now(),
       })
     )
@@ -163,6 +178,45 @@ export default function GeorgeLiveEntryPage() {
           <p className="mt-5 text-[13px] leading-6 text-white/46">
             Use one earbud if possible. Speak naturally. GEORGE will follow the room and assist when useful.
           </p>
+
+          <div className="mt-5 border-t border-white/[0.05] pt-5">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
+              CONTROL WORDS
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {suggestedControls.map((word) => (
+                <button
+                  key={word}
+                  type="button"
+                  onClick={() => {
+                    const parts = controlWords
+                      .split(',')
+                      .map((item) => item.trim())
+                      .filter(Boolean)
+
+                    if (!parts.includes(word)) {
+                      setControlWords([...parts, word].join(', '))
+                    }
+                  }}
+                  className="rounded-full border border-white/[0.06] bg-black/25 px-3 py-1.5 text-[12px] text-white/50 transition hover:border-[#7C8CFF]/22 hover:bg-[#7C8CFF]/[0.045] hover:text-white"
+                >
+                  {word}
+                </button>
+              ))}
+            </div>
+
+            <input
+              value={controlWords}
+              onChange={(e) => setControlWords(e.target.value)}
+              placeholder="Words or phrases you can say to control GEORGE in the room"
+              className="mt-3 w-full rounded-[1rem] border border-white/[0.06] bg-black/20 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/24"
+            />
+
+            <p className="mt-2 text-[12px] leading-5 text-white/34">
+              Example: say “line” for exact words, “pause” to hold, or “shorter” to compress the response.
+            </p>
+          </div>
         </div>
 
         <div className="mt-7 grid w-full max-w-[420px] gap-3">

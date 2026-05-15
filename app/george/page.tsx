@@ -1203,7 +1203,7 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         return
       }
 
-      let liveSetup: { room?: string; objective?: string; createdAt?: number } | null = null
+      let liveSetup: { room?: string; objective?: string; controlWords?: string; createdAt?: number } | null = null
 
       try {
         const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
@@ -1221,6 +1221,10 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         ? `Objective: ${liveSetup.objective.trim()}`
         : ''
 
+      const controlLine = liveSetup?.controlWords?.trim()
+        ? `Control words: ${liveSetup.controlWords.trim()}`
+        : ''
+
       const liveIntro: Message = {
         role: 'assistant',
         content: `${roomLine}
@@ -1228,7 +1232,9 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
 Room calibrated.
 GEORGE is listening.${objectiveLine ? `
 
-${objectiveLine}` : ''}`
+${objectiveLine}` : ''}${controlLine ? `
+
+${controlLine}` : ''}`
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()
