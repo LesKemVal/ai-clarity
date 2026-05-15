@@ -18,15 +18,15 @@ export default function TopUpPage() {
 
   const headline = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'Make GEORGE yours.'
+      return 'Configure GEORGE.'
     }
     if (intent === 'conversation') {
-      return 'Activate Conversation Assistance.'
+      return 'Activate LIVE support.'
     }
     if (intent === 'pro') {
-      return 'Continue into Brilliant Day.'
+      return 'Open Brilliant Day.'
     }
-    return 'Choose how deeply GEORGE stays with you.'
+    return 'Access and continuity.'
   }, [intent])
 
   async function playVoiceSample(voice: string, label: string) {
@@ -70,15 +70,15 @@ export default function TopUpPage() {
 
   const subcopy = useMemo(() => {
     if (intent === 'make-george-yours') {
-      return 'Choose GEORGE / GEORGette, personalize voice, and shape how your assistant supports your direction, continuity, and execution.'
+      return 'Set identity, voice, and continuity behavior without changing the core system.'
     }
     if (intent === 'conversation') {
-      return 'LIVE support during pressure conversations.'
+      return 'Runtime support for rooms where timing, wording, and pressure matter.'
     }
     if (intent === 'pro') {
-      return 'LIVE runtime for high-pressure communication.'
+      return 'Temporary LIVE runtime elevation for high-pressure communication.'
     }
-    return 'Choose how much continuity GEORGE keeps.'
+    return 'Choose the level of restoration, execution support, and LIVE runtime access you need.'
   }, [intent])
 
   function submitFeedback() {
@@ -171,23 +171,23 @@ export default function TopUpPage() {
 
   return (
     <PageShell backToGeorge withSidebar={false}>
-      <div className="space-y-8">
-        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
-          <div className="max-w-5xl space-y-6">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]">
+      <div className="space-y-6">
+        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-6">
+          <div className="max-w-5xl space-y-5">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-[#AEB6FF]/70">
               BRANESx
             </p>
 
-            <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
+            <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white md:text-5xl">
               {headline}
             </h1>
 
-            <p className="max-w-3xl text-sm leading-7 text-neutral-300 md:text-base">
+            <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
               {subcopy}
             </p>
 
-            <div className="rounded-[1rem] border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-4 py-3 text-sm text-white/90">
-              Different levels of continuity and LIVE support.
+            <div className="rounded-[0.8rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.025] px-4 py-3 text-sm text-white/70">
+              Access changes what GEORGE can restore, remember, and support in real time.
             </div>
 
 
@@ -195,99 +195,99 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={redeemFounderCode}
-                className="rounded-full border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#AEB6FF]/40 hover:bg-[#AEB6FF]/[0.055] hover:text-white"
+                className="rounded-[0.7rem] border border-white/[0.055] bg-white/[0.012] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/58 transition hover:border-[#AEB6FF]/18 hover:bg-white/[0.018] hover:text-white/74"
               >
-                Enter Founder Code
+                Founder Code
               </button>
 
-              <span className="text-[11px] tracking-[0.08em] text-white/35">
-                Founder access restores runtime entitlements instantly.
+              <span className="text-[11px] tracking-[0.08em] text-white/30">
+                Founder access restores local runtime entitlement.
               </span>
             </div>
 
-            <div className="grid gap-4 pt-2 lg:grid-cols-3">
-              <div className="rounded-[1.2rem] border border-[#AEB6FF]/40 bg-[#AEB6FF]/[0.055] p-5 shadow-none">
+            <div className="grid gap-3 pt-2 lg:grid-cols-4">
+              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.012] p-5 shadow-none">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Smart</p>
-                  <span className="rounded-full border border-white/[0.05] bg-white/[0.06] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    Free
+                  <p className="text-base font-semibold text-white/88">Smart</p>
+                  <span className="rounded-[0.6rem] border border-white/[0.045] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/48">
+                    Base
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$0</div>
-                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Clarify what matters</li>
-                  <li>• Reduce drift and confusion</li>
-                  <li>• Lightweight operational guidance</li>
-                  <li>• Immediate anonymous access</li>
+                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$0</div>
+                <ul className="space-y-2 text-sm leading-6 text-white/46">
+                  <li>Clarify what matters</li>
+                  <li>Reduce drift and confusion</li>
+                  <li>Light operational guidance</li>
+                  <li>Anonymous access</li>
                 </ul>
               </div>
 
-              <div className="rounded-[1.2rem] border border-white/15 bg-white/[0.022] p-5">
+              <div className="rounded-[0.9rem] border border-[#AEB6FF]/16 bg-[#AEB6FF]/[0.025] p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Intelligent</p>
-                  <span className="rounded-full border border-[#AEB6FF]/30 bg-[#AEB6FF]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
-                    Operational tier
+                  <p className="text-base font-semibold text-white/88">Intelligent</p>
+                  <span className="rounded-[0.6rem] border border-[#AEB6FF]/16 bg-white/[0.012] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]/58">
+                    Continuity
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$9.99</div>
-                <ul className="space-y-2 text-sm leading-6 text-neutral-300">
-                  <li>• Expanded continuity and persistence</li>
-                  <li>• Stronger execution support</li>
-                  <li>• Better pressure handling</li>
-                  <li>• Expanded runtime access</li>
+                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$9.99</div>
+                <ul className="space-y-2 text-sm leading-6 text-white/48">
+                  <li>Expanded continuity</li>
+                  <li>Stronger execution support</li>
+                  <li>Better pressure handling</li>
+                  <li>More runtime access</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
-                  className="mt-5 w-full rounded-full border border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#AEB6FF]/60 hover:bg-[#AEB6FF]/16"
+                  className="mt-5 w-full rounded-[0.7rem] border border-[#AEB6FF]/18 bg-white/[0.012] px-4 py-3 text-sm font-semibold text-white/76 transition hover:border-[#AEB6FF]/28 hover:bg-[#AEB6FF]/[0.035]"
                 >
-                  Enter Intelligent
+                  Select Intelligent
                 </button>
               </div>
 
-              <div className="rounded-[1.2rem] border border-white/[0.05] bg-[#171B26]/46 p-5">
+              <div className="rounded-[0.9rem] border border-[#AEB6FF]/18 bg-[#10131B]/46 p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Brilliant</p>
-                  <span className="rounded-full border border-white/[0.05] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
-                    LIVE runtime
+                  <p className="text-base font-semibold text-white/90">Brilliant</p>
+                  <span className="rounded-[0.6rem] border border-white/[0.05] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
+                    LIVE
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$25</div>
-                <ul className="space-y-2 text-sm leading-6 text-neutral-400">
-                  <li>• Real-time LIVE assistance</li>
-                  <li>• Timing and pressure awareness</li>
-                  <li>• Conversational pacing + response shaping</li>
-                  <li>• Strongest continuity and runtime presence</li>
+                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/90">$25</div>
+                <ul className="space-y-2 text-sm leading-6 text-white/50">
+                  <li>Real-time LIVE support</li>
+                  <li>Timing and pressure awareness</li>
+                  <li>Repeatable lines and cues</li>
+                  <li>Strongest continuity</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant_day')}
-                  className="mt-5 w-full rounded-full bg-[#AEB6FF] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                  className="mt-5 w-full rounded-[0.7rem] border border-[#AEB6FF]/22 bg-[#AEB6FF]/[0.07] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#AEB6FF]/34 hover:bg-[#AEB6FF]/[0.095]"
                 >
-                  Enter Brilliant LIVE
+                  Select Brilliant
                 </button>
               </div>
 
-              <div className="rounded-[1.2rem] border border-[#22c55e]/30 bg-[#22c55e]/10 p-5 shadow-none">
+              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.012] p-5 shadow-none">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white">Brilliant Day</p>
-                  <span className="rounded-full border border-white/[0.05] bg-white/[0.05] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80">
-                    Temporary runtime elevation
+                  <p className="text-base font-semibold text-white/88">Brilliant Day</p>
+                  <span className="rounded-[0.6rem] border border-white/[0.045] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/46">
+                    Temporary
                   </span>
                 </div>
-                <div className="mb-3 text-3xl font-semibold tracking-tight text-white">$5 Day Pass</div>
-                <ul className="space-y-2 text-sm leading-6 text-neutral-100">
-                  <li>• Temporary Brilliant access</li>
-                  <li>• Interviews and negotiations</li>
-                  <li>• Sales calls and difficult conversations</li>
-                  <li>• LIVE support when the moment matters</li>
+                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$5</div>
+                <ul className="space-y-2 text-sm leading-6 text-white/46">
+                  <li>Temporary Brilliant access</li>
+                  <li>Interviews and negotiations</li>
+                  <li>Calls and difficult rooms</li>
+                  <li>LIVE when the moment matters</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
-                  className="mt-5 w-full rounded-full border border-[#22c55e]/45 bg-[#22c55e]/14 px-4 py-3 text-sm font-semibold text-white transition hover:border-[#22c55e]/70 hover:bg-[#22c55e]/20"
+                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/74 transition hover:border-[#AEB6FF]/22 hover:bg-white/[0.026] hover:text-white/86"
                 >
-                  Activate Brilliant Day
+                  Select Day Access
                 </button>
               </div>
             </div>
@@ -297,17 +297,17 @@ export default function TopUpPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="feedback" className="scroll-mt-24 rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
+          <div id="feedback" className="scroll-mt-24 rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5">
             <div className="space-y-4">
-              <p className="text-sm font-medium text-white">Comments and suggestions</p>
-              <p className="text-sm leading-7 text-neutral-300">
-                Tell us what feels confusing, useful, missing, or worth improving.
+              <p className="text-sm font-medium text-white/84">Feedback</p>
+              <p className="text-sm leading-7 text-white/44">
+                Note what feels confusing, useful, missing, or worth tightening.
               </p>
 
               <select
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
-                className="w-full rounded-[1rem] border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none"
+                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#10131B]/58 px-4 py-3 text-white outline-none"
               >
                 <option value="suggestion">Suggestion</option>
                 <option value="bug">Bug</option>
@@ -320,13 +320,13 @@ export default function TopUpPage() {
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={6}
                 placeholder="What should change?"
-                className="w-full rounded-[1rem] border border-white/[0.05] bg-[#171B26]/58 px-4 py-3 text-white outline-none placeholder:text-white/30"
+                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#10131B]/58 px-4 py-3 text-white outline-none placeholder:text-white/28"
               />
 
               <button
                 type="button"
                 onClick={submitFeedback}
-                className="w-full rounded-full border border-white/[0.05] px-5 py-3 text-sm font-medium text-white transition hover:border-[#AEB6FF] hover:text-[#AEB6FF]"
+                className="w-full rounded-[0.7rem] border border-white/[0.055] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-[#AEB6FF]/22 hover:text-white/86"
               >
                 Save feedback
               </button>
