@@ -667,16 +667,28 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
 
     setMessages((prev) => {
+      if (prev.length === 0) {
+        const next = [{ role: 'assistant' as const, content: greeting }]
+        messagesRef.current = next
+        return next
+      }
 
       if (
         prev.length === 1 &&
         prev[0]?.role === 'assistant' &&
         prev[0]?.content.includes("Tell me what matters today?")
       ) {
-        return [{ role: 'assistant', content: greeting }]
+        const next = [{ role: 'assistant' as const, content: greeting }]
+        messagesRef.current = next
+        return next
       }
+
       return prev
     })
+
+    if (messagesRef.current.length === 0) {
+      messagesRef.current = [{ role: 'assistant', content: greeting }]
+    }
 
     if (
       messagesRef.current.length === 1 &&
@@ -6557,12 +6569,12 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 </div>
 
                 {!liveMode && !input.trim() && !pendingImage && (
-                  <div className="mt-3 overflow-x-auto px-1 pb-1">
-                    <div className="flex min-w-max items-center gap-4 text-[12px] text-white/36">
+                  <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
+                    <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-white/38">
                       <button
                         type="button"
                         onClick={() => setInput('Help me build a business strategy.')}
-                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
+                        className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
                         <span className="text-[#AEB6FF]/58">⬢</span>
                         <span>Build a business</span>
@@ -6571,7 +6583,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => setInput('Help me interpret this document and explain what matters most.')}
-                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
+                        className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
                         <span className="text-[#AEB6FF]/58">□</span>
                         <span>Interpret a doc</span>
@@ -6580,7 +6592,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => setInput('Help me create an image.')}
-                        className="inline-flex items-center gap-2 whitespace-nowrap transition hover:text-white/72"
+                        className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
                         <span className="text-[#AEB6FF]/58">◌</span>
                         <span>Create an image</span>
