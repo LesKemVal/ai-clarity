@@ -4496,7 +4496,7 @@ return (
   {liveMode && (
     <div className="pointer-events-none flex justify-center pt-1 pb-0 overflow-visible">
       <img
-        src="/earbud400.png"
+        src="/earbudlive500.png"
         alt=""
         className="h-[76px] w-auto max-w-[78vw] object-contain opacity-72 drop-shadow-[0_0_18px_rgba(124,140,255,0.12)]"
       />
@@ -5596,13 +5596,13 @@ if (liveMode) {
       <img
         src="/earbud400.png"
         alt=""
-        className="h-[84px] w-auto opacity-55 drop-shadow-[0_0_10px_rgba(124,140,255,0.08)]"
+        className="h-[112px] w-auto opacity-70 blur-[0.35px] drop-shadow-[0_0_12px_rgba(124,140,255,0.10)]"
       />
 
       <div className="rounded-[1rem] border border-[#7C8CFF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
-        Use one earbud if you can.
+        Use one earbud if possible.
         <br />
-        GEORGE is listening live.
+        GEORGE is listening.
       </div>
     </div>
   </div>
