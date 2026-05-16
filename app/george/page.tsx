@@ -361,9 +361,9 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
-  const firstTimeGreeting = `Continue current direction\nor switch projects?` 
+  const firstTimeGreeting = `Whatever you want to become, build, or understand — ask GEORGE.` 
 
-  const earlyUserGreeting = `What are we solving today?` 
+  const earlyUserGreeting = `Continue current direction\nor switch projects?` 
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
