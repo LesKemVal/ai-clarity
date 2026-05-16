@@ -982,7 +982,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       body: 'LIVE is designed for movement. Interviews, negotiation, conflict, uncertainty, pressure, sales, and difficult conversations.'
     },
     {
-      title: 'GEORGE watches the room.',
+      title: 'GEORGE tracks the room.',
       body: 'LIVE cues help you slow down, redirect, recover control, or sharpen the next sentence before momentum slips.'
     },
     {
@@ -1570,7 +1570,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   }
 
   const messagesRef = useRef<Message[]>([
-    { role: 'assistant', content: 'Hello, build something worth at least 10 or 100 X the cost of Brilliant tier.. and I know we’ll be fine.' },
+    { role: 'assistant', content: 'Bring the situation. I’ll help narrow what matters and what to do next.' },
   ])
 
   const enterLiveMode = () => {
