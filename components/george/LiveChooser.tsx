@@ -90,7 +90,7 @@ export default function LiveChooser({
           {typed}
         </div>
 
-        <div className={`mt-7 flex w-full max-w-[420px] flex-col gap-2.5 transition duration-500 ${showActions ? 'opacity-100 translate-y-0' : 'pointer-events-none opacity-0 translate-y-2'}`}>
+        <div className={`mt-7 flex w-full max-w-[420px] flex-col gap-2.5 transition duration-300 ${showActions ? 'opacity-100 translate-y-0' : 'pointer-events-none opacity-0 translate-y-2'}`}>
           {hasAccess ? (
             <>
               <button
