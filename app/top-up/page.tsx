@@ -181,9 +181,9 @@ export default function TopUpPage() {
             <div className="absolute left-[18%] top-[74px] h-2 w-2 rounded-[0.25rem] bg-white/[0.045]" />
             <div className="absolute left-[42%] top-[90px] h-2.5 w-2.5 rounded-[0.3rem] bg-[#8FB6C9]/10" />
             <div className="absolute left-[63%] top-[64px] h-3 w-3 rounded-[0.35rem] bg-[#7EC9DA]/8" />
-            <div className="absolute left-[80%] top-[116px] h-2 w-2 rounded-[0.25rem] bg-[#AEB6FF]/8" />
+            <div className="absolute left-[80%] top-[116px] h-2 w-2 rounded-[0.25rem] bg-white/[0.035]" />
             <div className="absolute right-[5%] top-[32px] h-24 w-24 rounded-full border border-[#8FB6C9]/7" />
-            <div className="absolute right-[9%] top-[56px] h-16 w-16 rounded-full border border-[#AEB6FF]/6" />
+            <div className="absolute right-[9%] top-[56px] h-16 w-16 rounded-full border border-white/[0.035]" />
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent via-[#0B0D12]/76 to-[#0B0D12]" />
@@ -213,7 +213,7 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={redeemFounderCode}
-                className="rounded-[0.7rem] border border-white/[0.055] bg-white/[0.012] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/58 transition hover:border-[#AEB6FF]/18 hover:bg-white/[0.018] hover:text-white/74"
+                className="rounded-[0.7rem] border border-white/[0.055] bg-white/[0.012] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/58 transition hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/76"
               >
                 Founder Code
               </button>
@@ -243,7 +243,7 @@ export default function TopUpPage() {
               <div className="rounded-[0.9rem] border border-white/[0.05] bg-white/[0.012] p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-base font-semibold text-white/88">Intelligent</p>
-                  <span className="rounded-[0.6rem] border border-[#AEB6FF]/16 bg-white/[0.012] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]/58">
+                  <span className="rounded-[0.6rem] border border-white/[0.05] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
                     Continuity
                   </span>
                 </div>
@@ -257,7 +257,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-[#AEB6FF]/18 bg-white/[0.012] px-4 py-3 text-sm font-semibold text-white/76 transition hover:border-[#AEB6FF]/28 hover:bg-[#AEB6FF]/[0.035]"
+                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.065] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/76 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                 >
                   Select Intelligent
                 </button>
@@ -280,7 +280,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant_day')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-[#AEB6FF]/22 bg-white/[0.045] px-4 py-3 text-sm font-semibold text-white transition hover:border-[#AEB6FF]/34 hover:bg-white/[0.08]"
+                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.085] bg-white/[0.045] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/[0.14] hover:bg-white/[0.08]"
                 >
                   Select Brilliant
                 </button>
@@ -303,7 +303,7 @@ export default function TopUpPage() {
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/74 transition hover:border-[#AEB6FF]/22 hover:bg-white/[0.026] hover:text-white/86"
+                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/74 transition hover:border-white/[0.12] hover:bg-white/[0.032] hover:text-white/88"
                 >
                   Select Day Access
                 </button>
@@ -344,7 +344,7 @@ export default function TopUpPage() {
               <button
                 type="button"
                 onClick={submitFeedback}
-                className="w-full rounded-[0.7rem] border border-white/[0.055] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-[#AEB6FF]/22 hover:text-white/86"
+                className="w-full rounded-[0.7rem] border border-white/[0.055] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/[0.12] hover:bg-white/[0.022] hover:text-white/86"
               >
                 Save feedback
               </button>
