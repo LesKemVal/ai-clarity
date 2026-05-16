@@ -4587,7 +4587,7 @@ return (
         <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
 
         <div className="relative z-10 min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.34em] text-white/72/78">
+          <p className="text-[11px] uppercase tracking-[0.34em] text-white/72">
             LIVE MODE
           </p>
 
@@ -4752,7 +4752,7 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'up'
-                ? 'text-white/72/82'
+                ? 'text-white/82'
                 : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs up"
@@ -5085,7 +5085,7 @@ ${simplifyTarget}`
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'up'
-                  ? 'text-white/72/82'
+                  ? 'text-white/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-up`]
@@ -5118,7 +5118,7 @@ ${simplifyTarget}`
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'down'
-                  ? 'text-white/72/82'
+                  ? 'text-white/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-down`]
@@ -5177,7 +5177,7 @@ ${simplifyTarget}`
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[11px] font-medium leading-4 text-white/86 transition hover:border-[#AEB6FF]/50 hover:bg-[#AEB6FF]/14"
+                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[11px] font-medium leading-4 text-white/86 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                 >
                   Save to {getDefaultFolder()}
                 </button>
@@ -5327,7 +5327,7 @@ ${simplifyTarget}`
         }}
         className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ease-out ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] text-white/72/82 shadow-[0_0_8px_rgba(174,182,255,0.16)]'
+            ? 'border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] text-white/82 shadow-[0_0_8px_rgba(174,182,255,0.16)]'
             : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
         }`}
         aria-label="Open memory folders"
@@ -6526,7 +6526,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   ) : currentTier === 'smart' ? (
                     <span className="text-neutral-500"></span>
                   ) : (
-                    <span className={isListening ? 'text-white/72/82' : ''}>
+                    <span className={isListening ? 'text-white/82' : ''}>
                       {isListening ? 'LIVE' : ''}
                     </span>
                   )}
@@ -6540,7 +6540,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         onClick={() => setInput('Help me build a business strategy.')}
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-white/72/58">⬢</span>
+                        <span className="text-white/58">⬢</span>
                         <span>Build a business</span>
                       </button>
 
@@ -6549,7 +6549,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         onClick={() => setInput('Help me interpret this document and explain what matters most.')}
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-white/72/58">□</span>
+                        <span className="text-white/58">□</span>
                         <span>Interpret a doc</span>
                       </button>
 
@@ -6557,7 +6557,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         href="/images"
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-white/72/58">◌</span>
+                        <span className="text-white/58">◌</span>
                         <span>Create Images</span>
                       </a>
                     </div>
