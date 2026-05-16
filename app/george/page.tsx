@@ -6191,7 +6191,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="Ask GEORGE"
+                        placeholder="Bring the situation. GEORGE will narrow the next move."
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
