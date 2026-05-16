@@ -69,7 +69,7 @@ export default function TosPage() {
 
         </section>
 
-        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] p-5 md:p-5">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-white/[0.055] p-5 md:p-5">
           <p className="text-white font-medium">
             Final position
           </p>

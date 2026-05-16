@@ -12,7 +12,7 @@ export default function BackButton({
   return (
     <button
       onClick={() => router.back()}
-      className="inline-flex items-center gap-2 text-sm text-neutral-400 transition hover:text-[#7C8CFF]"
+      className="inline-flex items-center gap-2 text-sm text-neutral-400 transition hover:text-white"
     >
       ← {label}
     </button>

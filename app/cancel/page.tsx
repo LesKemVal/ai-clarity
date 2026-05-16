@@ -27,7 +27,7 @@ export default function CancelPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/george')}
-            className="rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-medium text-black transition button-press hover:opacity-90"
+            className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition button-press hover:opacity-90"
           >
             Return to GEORGE
           </button>
@@ -35,7 +35,7 @@ export default function CancelPage() {
           <button
             type="button"
             onClick={() => (window.open('/top-up','_blank','noopener,noreferrer'))}
-            className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+            className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-white/[0.18] hover:text-white"
           >
             Back to continuity options
           </button>
