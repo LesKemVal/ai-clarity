@@ -15,7 +15,7 @@ export default function ImagesPage() {
     const cleanPrompt = prompt.trim()
 
     if (!cleanPrompt) {
-      setError('Describe what you want to create.')
+      setError('Describe the visual direction.')
       return
     }
 
@@ -63,7 +63,7 @@ export default function ImagesPage() {
           </Link>
 
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">
-            Bx Utility
+            Bx Visual Runtime
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export default function ImagesPage() {
                 <img src={image} alt="Generated visual" className="h-full w-full object-contain" />
               ) : (
                 <div className="px-8 text-center text-[13px] leading-6 text-white/34">
-                  Generated images will appear here.
+                  Visual output appears here.
                 </div>
               )}
             </div>
@@ -130,7 +130,7 @@ export default function ImagesPage() {
                 download="bx-image.png"
                 className="mt-3 block touch-manipulation rounded-[0.75rem] border border-white/[0.055] px-4 py-2.5 text-center text-[13px] text-white/56 transition hover:bg-white/[0.018] hover:text-white/78"
               >
-                Download image
+                Export visual
               </a>
             )}
           </div>
