@@ -4587,7 +4587,7 @@ return (
         <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
 
         <div className="relative z-10 min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.34em] text-[#AEB6FF]/78">
+          <p className="text-[11px] uppercase tracking-[0.34em] text-white/72/78">
             LIVE MODE
           </p>
 
@@ -4752,7 +4752,7 @@ I am listening now. Speak naturally. I will respond ${
             }}
             className={`relative flex items-center justify-center transition duration-150 ${
               feedback[i] === 'up'
-                ? 'text-[#AEB6FF]/82'
+                ? 'text-white/72/82'
                 : 'text-white/50 hover:text-white/80'
             }`}
             aria-label="Thumbs up"
@@ -4812,7 +4812,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[menuLift_140ms_ease-out] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -4921,7 +4921,7 @@ I am listening now. Speak naturally. I will respond ${
                 <span className="h-1 w-4 rounded-full bg-[#AEB6FF] " />
                 <span className="h-1 w-4 rounded-full bg-[#AEB6FF] " />
               </div>
-              <span className="text-xs text-[#AEB6FF]">
+              <span className="text-xs text-white/72">
                 This requires deeper support.
               </span>
             </div>
@@ -5015,7 +5015,7 @@ router.push('/george')
       setActiveSaveIndex((prev) => (prev === i ? null : i))
                 setActiveMemoryFolder(null)
               }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:bg-white/[0.022] hover:text-white/92"
             >
               <span className="h-1 w-1 rounded-full bg-[#AEB6FF]" />
               
@@ -5035,7 +5035,7 @@ router.push('/george')
                   }
                 } catch {}
               }}
-              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/[0.055] hover:bg-white/[0.022] hover:text-white/92"
+              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:bg-white/[0.022] hover:text-white/92"
             >
               Send
             </button>
@@ -5085,7 +5085,7 @@ ${simplifyTarget}`
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'up'
-                  ? 'text-[#AEB6FF]/82'
+                  ? 'text-white/72/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-up`]
@@ -5118,7 +5118,7 @@ ${simplifyTarget}`
               }}
               className={`relative flex items-center justify-center transition duration-150 ${
                 feedback[i] === 'down'
-                  ? 'text-[#AEB6FF]/82'
+                  ? 'text-white/72/82'
                   : 'text-white/50 hover:text-white/80'
               } ${
                 feedbackPulse[`${i}-down`]
@@ -5147,7 +5147,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-[#AEB6FF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(174,182,255,0.10)] backdrop-blur-xl animate-[menuLift_140ms_ease-out] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
@@ -5177,7 +5177,7 @@ ${simplifyTarget}`
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-lg border border-[#AEB6FF]/20 bg-[#AEB6FF]/8 px-2.5 py-2 text-[11px] font-medium leading-4 text-white/86 transition hover:border-[#AEB6FF]/50 hover:bg-[#AEB6FF]/14"
+                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[11px] font-medium leading-4 text-white/86 transition hover:border-[#AEB6FF]/50 hover:bg-[#AEB6FF]/14"
                 >
                   Save to {getDefaultFolder()}
                 </button>
@@ -5229,7 +5229,7 @@ ${simplifyTarget}`
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="w-full rounded-xl border border-white/[0.05] px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/[0.055]"
+                      className="w-full rounded-xl border border-white/[0.05] px-2.5 py-1.5 text-[11px] leading-4 text-white transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                     >
                       Save
                     </button>
@@ -5327,7 +5327,7 @@ ${simplifyTarget}`
         }}
         className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ease-out ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] text-[#AEB6FF]/82 shadow-[0_0_8px_rgba(174,182,255,0.16)]'
+            ? 'border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] text-white/72/82 shadow-[0_0_8px_rgba(174,182,255,0.16)]'
             : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
         }`}
         aria-label="Open memory folders"
@@ -5362,7 +5362,7 @@ if (liveMode) {
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
-              ? 'border border-[#AEB6FF]/40 bg-[#AEB6FF]/20 text-[#AEB6FF]'
+              ? 'border border-[#AEB6FF]/40 bg-[#AEB6FF]/20 text-white/72'
               : 'text-white/80 hover:text-white'
           }`}
         >
@@ -5377,7 +5377,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-[#AEB6FF]/28 bg-[#11131A]/90 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42),0_0_18px_rgba(174,182,255,0.10)] backdrop-blur-xl transition-all duration-200 ease-out animate-[menuLift_140ms_ease-out]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5508,7 +5508,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-[#AEB6FF]/28 bg-[#11131A]/90 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.50),0_0_18px_rgba(174,182,255,0.10)] backdrop-blur-xl animate-[menuLift_140ms_ease-out]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5601,7 +5601,7 @@ if (liveMode) {
                   setShowPromptMenu(false)
                   void handleSend(prompt.text, { source: 'sidebar_prompt' })
                 }}
-                className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#AEB6FF]"
+                className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-white/72"
               >
                 {prompt.label}
               </button>
@@ -5612,7 +5612,7 @@ if (liveMode) {
 
 {showEarbudOverlay && (
   <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
-    <div className="flex flex-col items-center gap-3 px-6 text-center animate-[menuLift_700ms_ease-out]">
+    <div className="flex flex-col items-center gap-3 px-6 text-center animate-[pickerTwistUp_220ms_cubic-bezier(0.22,1,0.36,1)]">
       <div className="relative h-[122px] w-[122px]">
         <img
           src="/earbudlive500.png"
@@ -5651,8 +5651,8 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-[#AEB6FF]/24 bg-black/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
-        <div className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-white/72">
           STRUCTURED LIVE
         </div>
 
@@ -5694,7 +5694,7 @@ if (liveMode) {
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
       <div className="w-full max-w-[420px] rounded-[1.6rem] border border-white/[0.07] bg-[#0B0D12]/92 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.42)] backdrop-blur-xl transition-all duration-150 ease-out">
-        <div className="mb-2 text-[11px] tracking-[0.22em] text-[#AEB6FF]">
+        <div className="mb-2 text-[11px] tracking-[0.22em] text-white/72">
           LEAVE LIVE
         </div>
 
@@ -5776,7 +5776,7 @@ if (liveMode) {
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
-            <div className="text-[11px] tracking-[0.18em] text-[#AEB6FF]">
+            <div className="text-[11px] tracking-[0.18em] text-white/72">
               {sessionPickerMode === 'campaign' ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
             </div>
             <div className="mt-1 text-[11px] text-white/45">
@@ -6526,7 +6526,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   ) : currentTier === 'smart' ? (
                     <span className="text-neutral-500"></span>
                   ) : (
-                    <span className={isListening ? 'text-[#AEB6FF]/82' : ''}>
+                    <span className={isListening ? 'text-white/72/82' : ''}>
                       {isListening ? 'LIVE' : ''}
                     </span>
                   )}
@@ -6540,7 +6540,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         onClick={() => setInput('Help me build a business strategy.')}
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-[#AEB6FF]/58">⬢</span>
+                        <span className="text-white/72/58">⬢</span>
                         <span>Build a business</span>
                       </button>
 
@@ -6549,7 +6549,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         onClick={() => setInput('Help me interpret this document and explain what matters most.')}
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-[#AEB6FF]/58">□</span>
+                        <span className="text-white/72/58">□</span>
                         <span>Interpret a doc</span>
                       </button>
 
@@ -6557,7 +6557,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         href="/images"
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
                       >
-                        <span className="text-[#AEB6FF]/58">◌</span>
+                        <span className="text-white/72/58">◌</span>
                         <span>Create Images</span>
                       </a>
                     </div>
@@ -6571,8 +6571,8 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.65rem] border border-[#AEB6FF]/28 bg-[#11131A]/90  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#AEB6FF] mb-2">Runtime</p>
+          <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+            <p className="text-sm uppercase tracking-[0.18em] text-white/72 mb-2">Runtime</p>
 
             {walkthroughStep === 1 && <p className="text-white text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, debate, speech, study, or everyday pressure.</p>}
             {walkthroughStep === 2 && <p className="text-white text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
@@ -6611,7 +6611,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-[#AEB6FF]/28 bg-[#11131A]/90 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -6939,7 +6939,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             <button
               type="button"
               onClick={() => window.open('/top-up','_blank')}
-              className="text-xs text-[#AEB6FF] transition hover:opacity-80"
+              className="text-xs text-white/72 transition hover:opacity-80"
             >
               See full options
             </button>
@@ -6956,7 +6956,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF] mb-2">Structured LIVE</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/72 mb-2">Structured LIVE</p>
                 <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a structured LIVE session.</p>
                 <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE continuity is being prepared.</p>
               </div>
