@@ -363,6 +363,10 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
 
   const firstTimeGreeting = `Whatever you want to become, build, or understand — ask GEORGE.` 
 
+  // Normal GEORGE opens with continuity posture.
+  // Scope: non-LIVE normal sessions only.
+  // This is behavioral orientation, not session restoration.
+  // Saved conversations, LIVE Conversations, and room prep continuation remain handled by pickers.
   const earlyUserGreeting = `Continue current direction\nor switch projects?` 
 
   const greetingPool = [
