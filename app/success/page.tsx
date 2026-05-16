@@ -11,7 +11,7 @@ export default function SuccessPage() {
       withSidebar={false}
     >
       <div className="max-w-3xl space-y-8">
-        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-[#7C8CFF]/[0.055] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
+        <section className="rounded-[1rem] border border-[#7C8CFF]/30 bg-white/[0.055] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.45)] backdrop-blur md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
               You’re in.
@@ -31,7 +31,7 @@ export default function SuccessPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/george')}
-            className="rounded-full bg-[#7C8CFF] px-6 py-3 text-sm font-medium text-black transition button-press hover:opacity-90"
+            className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition button-press hover:opacity-90"
           >
             Continue with GEORGE
           </button>
@@ -39,7 +39,7 @@ export default function SuccessPage() {
           <button
             type="button"
             onClick={() => (window.location.href = '/george?intent=make-george-yours')}
-            className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-[#7C8CFF] hover:text-[#7C8CFF]"
+            className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-white/[0.18] hover:text-white"
           >
             Make GEORGE Yours
           </button>

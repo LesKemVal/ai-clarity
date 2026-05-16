@@ -21,7 +21,7 @@ export default function MobileHeader({
         <button
           type="button"
           onClick={onMenuClick}
-          className="flex h-9 w-9 items-center justify-center text-[#7C8CFF]"
+          className="flex h-9 w-9 items-center justify-center text-white/72"
           aria-label="Open menu"
         >
           <span className="flex flex-col gap-[3px]">
