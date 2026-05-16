@@ -611,7 +611,7 @@ const liveConversationStateRef = useRef({
   pressureCount: 0,
   lastCue: '',
   outcomeState: 'neutral',
-  activeGoal: 'clarity'
+  activeDirection: 'clarity'
 })
 
 const [contextTurnCount, setContextTurnCount] = useState(0)
@@ -1763,7 +1763,7 @@ ${productOrService}
 Target Audience:
 ${targetAudience}
 
-Goal:
+Direction:
 ${campaignGoal}
 
 Constraints:
@@ -3458,8 +3458,8 @@ if (responseTimerRef.current) {
       // ⚡ proactive conversational guidance
       if (liveMode && liveTranscript) {
         const state = liveConversationStateRef.current
-        if (!state.activeGoal) {
-          state.activeGoal = activeCampaign?.desiredOutcome || 'clarity'
+        if (!state.activeDirection) {
+          state.activeDirection = activeCampaign?.desiredOutcome || 'clarity'
         }
 
         const vocalState = detectVocalState(liveTranscript)
@@ -3467,9 +3467,9 @@ if (responseTimerRef.current) {
 
         const lower = liveTranscript.toLowerCase()
 
-        if (/close|sell|buy|sign/.test(lower)) state.activeGoal = 'close'
-        if (/understand|clarify|explain/.test(lower)) state.activeGoal = 'clarity'
-        if (/diagnose|symptom|pain|doctor/.test(lower)) state.activeGoal = 'diagnosis'
+        if (/close|sell|buy|sign/.test(lower)) state.activeDirection = 'close'
+        if (/understand|clarify|explain/.test(lower)) state.activeDirection = 'clarity'
+        if (/diagnose|symptom|pain|doctor/.test(lower)) state.activeDirection = 'diagnosis'
 
 
         const now = Date.now()
@@ -5524,7 +5524,7 @@ if (liveMode) {
               {sessionPickerMode === 'campaign' ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
             </div>
             <div className="mt-1 text-[11px] text-white/45">
-              {sessionPickerMode === 'campaign' ? 'Structured LIVE sessions.' : 'Recent LIVE conversations.'}
+              {sessionPickerMode === 'campaign' ? 'Saved LIVE sessions.' : 'Recent LIVE conversations.'}
             </div>
           </div>
           <button
@@ -5557,7 +5557,7 @@ if (liveMode) {
             if (!sessions.length) {
               return (
                 <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-2 text-[12px] text-white/65">
-                  {sessionPickerMode === 'campaign' ? 'No saved campaigns yet.' : 'No saved conversations yet.'}
+                  {sessionPickerMode === 'campaign' ? 'No saved LIVE sessions yet.' : 'No saved conversations yet.'}
                 </div>
               )
             }
@@ -5613,19 +5613,17 @@ if (liveMode) {
                     role: 'assistant',
                     content: `Welcome back.
 
-Goal:
+Direction:
 ${goal}
 
-Current state:
+Current position:
 ${state}
 
 Next move:
 ${restart}
 
 
-1. Continue from here.
-2. Tell me what changed.
-3. Start fresh.`
+Continue from here, tell me what changed, or start fresh.`
                   }
 
                   const restored = Array.isArray(session.messages)
@@ -5656,16 +5654,16 @@ ${restart}
                       ? 'bg-white/[0.045] text-white/72'
                       : 'bg-white/[0.022] text-white/52'
                   }`}>
-                    {sessionPickerMode === 'campaign' ? '⚡ Structured' : '◉ LIVE'}
+                    ◉ LIVE
                   </span>
                 </div>
 
                 <div className="mt-1.5 line-clamp-1 text-[11px] text-white/55">
-                  Goal: {session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'}
+                  Direction: {session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'}
                 </div>
 
                 <div className="mt-0.5 line-clamp-1 text-[11px] text-white/38">
-                  Last state: {session.lastKnownState || session.summary || 'No state captured yet'}
+                  Last position: {session.lastKnownState || session.summary || 'No state captured yet'}
                 </div>
 
                 <div className="mt-1.5 text-[10px] text-neutral-500">
