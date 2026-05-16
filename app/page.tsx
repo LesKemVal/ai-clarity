@@ -26,7 +26,7 @@ export default function RootPage() {
         <img
           src="/bxnew20.png"
           alt="BRANESx"
-          className="mb-7 h-7 w-auto object-contain opacity-78"
+          className="mb-8 h-5 w-auto object-contain opacity-64"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.28em] text-white/34">
