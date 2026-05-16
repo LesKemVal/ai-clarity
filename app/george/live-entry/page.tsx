@@ -119,7 +119,7 @@ export default function GeorgeLiveEntryPage() {
 
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(174,182,255,0.045),transparent_32%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.025),transparent_32%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-5 text-center">
@@ -144,7 +144,7 @@ export default function GeorgeLiveEntryPage() {
         <div className="mt-8 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.045] bg-white/[0.012] p-5 text-left">
           <div className="flex items-center justify-between border-b border-white/[0.045] pb-3 text-[11px] tracking-[0.18em] text-white/34">
             <span>ROOM</span>
-            <span className="text-[#AEB6FF]/58">OPTIONAL</span>
+            <span className="text-white/34">OPTIONAL</span>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -158,8 +158,8 @@ export default function GeorgeLiveEntryPage() {
                   onClick={() => setSelectedRoom(item)}
                   className={`rounded-[0.8rem] border px-3 py-2 text-[13px] transition ${
                     active
-                      ? 'border-[#AEB6FF]/24 bg-[#AEB6FF]/[0.055] text-white'
-                      : 'border-white/[0.052] bg-black/20 text-white/52 hover:border-[#AEB6FF]/16 hover:bg-white/[0.018] hover:text-white/78'
+                      ? 'border-white/[0.12] bg-white/[0.045] text-white'
+                      : 'border-white/[0.052] bg-black/20 text-white/52 hover:border-white/[0.09] hover:bg-white/[0.018] hover:text-white/78'
                   }`}
                 >
                   {item}
@@ -178,7 +178,7 @@ export default function GeorgeLiveEntryPage() {
               onChange={(e) => setObjective(e.target.value)}
               placeholder={activePrompt.placeholder}
               rows={3}
-              className="w-full resize-none rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/80 outline-none placeholder:text-white/22"
+              className="w-full resize-none rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/80 outline-none placeholder:text-white/22 focus:border-white/[0.10]"
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function GeorgeLiveEntryPage() {
                       setControlWords([...parts, word].join(', '))
                     }
                   }}
-                  className="rounded-[0.75rem] border border-white/[0.052] bg-black/20 px-3 py-1.5 text-[12px] text-white/48 transition hover:border-[#AEB6FF]/16 hover:bg-white/[0.018] hover:text-white/76"
+                  className="rounded-[0.75rem] border border-white/[0.052] bg-black/20 px-3 py-1.5 text-[12px] text-white/48 transition hover:border-white/[0.09] hover:bg-white/[0.018] hover:text-white/76"
                 >
                   {word}
                 </button>
@@ -217,7 +217,7 @@ export default function GeorgeLiveEntryPage() {
               value={controlWords}
               onChange={(e) => setControlWords(e.target.value)}
               placeholder="Words you can say to adjust GEORGE without breaking the room"
-              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[13px] text-white/80 outline-none placeholder:text-white/22"
+              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[13px] text-white/80 outline-none placeholder:text-white/22 focus:border-white/[0.10]"
             />
 
             <p className="mt-2 text-[12px] leading-5 text-white/30">
@@ -233,7 +233,7 @@ export default function GeorgeLiveEntryPage() {
               {hasLiveSession && (
                 <Link
                   href="/george/live"
-                  className="flex items-center justify-center rounded-[0.95rem] border border-[#AEB6FF]/18 bg-[#AEB6FF]/[0.045] px-6 py-4 text-[14px] font-medium text-white transition hover:border-[#AEB6FF]/26 hover:bg-[#AEB6FF]/[0.07]"
+                  className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.018] px-6 py-4 text-[14px] font-medium text-white/72 transition hover:border-white/[0.10] hover:bg-white/[0.035] hover:text-white"
                 >
                   Resume runtime
                 </Link>
