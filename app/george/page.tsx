@@ -6706,11 +6706,13 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
           setShowLiveChooser(false)
-          startNewLiveConversation()
+          window.location.href = '/george/live-entry'
         }}
         onResumeLiveConversation={() => {
           setShowLiveChooser(false)
-          resumeLiveConversation()
+          setSessionPickerClosing(false)
+          setSessionPickerMode('live')
+          setShowSessionPicker(true)
         }}
         onPrepRoom={() => {
           setShowLiveChooser(false)
