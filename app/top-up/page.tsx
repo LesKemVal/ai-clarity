@@ -78,7 +78,7 @@ export default function TopUpPage() {
     if (intent === 'pro') {
       return 'Temporary LIVE runtime elevation for high-pressure communication.'
     }
-    return 'Choose the level of restoration, execution support, and LIVE runtime access you need.'
+    return 'Choose the level of continuity, operational support, and LIVE access that fits how you work.'
   }, [intent])
 
   function submitFeedback() {
@@ -219,7 +219,7 @@ export default function TopUpPage() {
               </button>
 
               <span className="text-[11px] tracking-[0.08em] text-white/30">
-                Founder access restores local runtime entitlement.
+                Founder access restores local continuity access.
               </span>
             </div>
 
@@ -235,7 +235,7 @@ export default function TopUpPage() {
                 <ul className="space-y-2 text-sm leading-6 text-white/46">
                   <li>Clarify what matters</li>
                   <li>Reduce drift and confusion</li>
-                  <li>Light operational guidance</li>
+                  <li>Everyday operational support</li>
                   <li>Anonymous access</li>
                 </ul>
               </div>
@@ -249,17 +249,17 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$10</div>
                 <ul className="space-y-2 text-sm leading-6 text-white/48">
-                  <li>Expanded continuity</li>
+                  <li>Deeper continuity memory</li>
                   <li>Stronger execution support</li>
                   <li>Better pressure handling</li>
-                  <li>More runtime access</li>
+                  <li>More adaptive support</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('intelligent')}
                   className="mt-5 w-full rounded-[0.7rem] border border-white/[0.065] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/76 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
                 >
-                  Select Intelligent
+                  Activate Intelligent
                 </button>
               </div>
 
@@ -272,17 +272,17 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-2xl font-semibold tracking-tight text-white/90">$25</div>
                 <ul className="space-y-2 text-sm leading-6 text-white/50">
-                  <li>Real-time LIVE support</li>
+                  <li>LIVE conversational support</li>
                   <li>Timing and pressure awareness</li>
                   <li>Repeatable lines and cues</li>
-                  <li>Strongest continuity</li>
+                  <li>Deepest continuity support</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout('brilliant_day')}
                   className="mt-5 w-full rounded-[0.7rem] border border-white/[0.085] bg-white/[0.045] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/[0.14] hover:bg-white/[0.08]"
                 >
-                  Select Brilliant
+                  Activate Brilliant
                 </button>
               </div>
 
@@ -295,7 +295,7 @@ export default function TopUpPage() {
                 </div>
                 <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$5</div>
                 <ul className="space-y-2 text-sm leading-6 text-white/46">
-                  <li>Temporary Brilliant access</li>
+                  <li>Temporary LIVE elevation</li>
                   <li>Interviews and negotiations</li>
                   <li>Calls and difficult rooms</li>
                   <li>LIVE when the moment matters</li>
@@ -305,7 +305,7 @@ export default function TopUpPage() {
                   onClick={() => startCheckout('brilliant')}
                   className="mt-5 w-full rounded-[0.7rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/74 transition hover:border-white/[0.12] hover:bg-white/[0.032] hover:text-white/88"
                 >
-                  Select Day Access
+                  Activate Day Access
                 </button>
               </div>
             </div>
