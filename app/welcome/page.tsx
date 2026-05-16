@@ -113,10 +113,10 @@ export default function WelcomePage() {
 
           <div className="space-y-3 border-b border-white/[0.045] pb-6">
             <p className="text-xs uppercase tracking-[0.28em] text-white/42">
-              User Signal
+              Continuity Signal
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
-              Help me serve you better.
+              Establish continuity.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
               This is not room setup. This is your operating signal — what GEORGE should remember about your goals, constraints, communication, and decision style.
@@ -157,7 +157,7 @@ export default function WelcomePage() {
 
             <div className="rounded-[0.9rem] border border-white/[0.045] bg-black/20 p-4">
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">
-                Connected systems
+                Connected Runtime
               </p>
               <p className="mt-3 text-sm leading-6 text-white/48">
                 Later, GEORGE should connect to tools that help you act: code repositories, calendars, files, email, documents, CRM, broker workflows, or other work systems.
@@ -179,7 +179,7 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer naturally. I’ll use this to shape future guidance."
+              placeholder="Answer directly. GEORGE uses this to preserve continuity, decision context, and useful momentum."
               className="mt-3 w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
             />
           </div>
@@ -190,7 +190,7 @@ export default function WelcomePage() {
               disabled={!valid}
               className="rounded-[0.9rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
             >
-              Save User Signal
+              Save Continuity Signal
             </button>
 
             <p className="text-xs leading-5 text-white/32">
