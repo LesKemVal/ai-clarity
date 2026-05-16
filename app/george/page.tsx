@@ -4238,9 +4238,9 @@ setPendingAssistantMessage({
     </div>
 
     <div className="mt-4 flex items-center gap-[7px]">
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 " />
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 " />
-      <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 " />
+      <span className="h-[4px] w-[4px] rounded-full bg-white/70 " />
+      <span className="h-[4px] w-[4px] rounded-full bg-white/48 " />
+      <span className="h-[4px] w-[4px] rounded-full bg-white/30 " />
     </div>
 
   </div>
@@ -4443,10 +4443,10 @@ return (
                       </span>
                       {!showMobileHero && (
                         <div className="hidden xl:flex items-center gap-1.5">
-                          <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
-                          <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
-                          <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
-                          <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
+                          <span className="h-1 w-1 rounded-full bg-white " />
+                          <span className="h-1 w-1 rounded-full bg-white " />
+                          <span className="h-1 w-1 rounded-full bg-white " />
+                          <span className="h-1 w-1 rounded-full bg-white " />
                         </div>
                       )}
                     </div>
@@ -4515,9 +4515,9 @@ return (
 
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
-    <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
-    <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
-    <span className="h-1 w-1 rounded-full bg-[#AEB6FF] " />
+    <span className="h-1 w-1 rounded-full bg-white " />
+    <span className="h-1 w-1 rounded-full bg-white " />
+    <span className="h-1 w-1 rounded-full bg-white " />
   </div>
 )}
 <div
@@ -4573,9 +4573,9 @@ return (
       />
 
       <div className="hidden">
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/70 " />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/48 " />
-        <span className="h-[4px] w-[4px] rounded-full bg-[#AEB6FF]/30 " />
+        <span className="h-[4px] w-[4px] rounded-full bg-white/70 " />
+        <span className="h-[4px] w-[4px] rounded-full bg-white/48 " />
+        <span className="h-[4px] w-[4px] rounded-full bg-white/30 " />
       </div>
     </div>
   )}
@@ -4637,7 +4637,7 @@ return (
         className={`relative whitespace-pre-wrap text-[15.5px] md:text-[15.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.5]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[82%] text-right rounded-[0.95rem] border border-[#AEB6FF]/18 bg-[#AEB6FF]/5 px-3.5 py-2.5 shadow-none'
+              ? 'max-w-[82%] text-right rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-3.5 py-2.5 shadow-none'
               : 'max-w-[82%] text-right rounded-[0.95rem] border border-white/[0.045] bg-white/[0.02] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         } ${
@@ -4733,7 +4733,7 @@ I am listening now. Speak naturally. I will respond ${
                 setMessages(nextMessages)
                 messagesRef.current = nextMessages
               }}
-              className="rounded-full border border-[#AEB6FF]/25 bg-[#AEB6FF]/[0.055] px-5 py-4 text-xs text-white transition hover:border-[#AEB6FF]/50 hover:bg-[#AEB6FF]/15"
+              className="rounded-full border border-white/[0.07] bg-white/[0.026] px-5 py-4 text-xs text-white/82 transition hover:border-white/[0.14] hover:bg-white/[0.045]"
             >
               {label}
             </button>
@@ -4917,9 +4917,9 @@ I am listening now. Speak naturally. I will respond ${
           {m.constrained && (
             <div className="mt-2 flex items-center gap-1.5">
               <div className="flex items-center gap-1.5 pl-1">
-                <span className="h-1 w-4 rounded-full bg-[#AEB6FF] " />
-                <span className="h-1 w-4 rounded-full bg-[#AEB6FF] " />
-                <span className="h-1 w-4 rounded-full bg-[#AEB6FF] " />
+                <span className="h-1 w-4 rounded-full bg-white " />
+                <span className="h-1 w-4 rounded-full bg-white " />
+                <span className="h-1 w-4 rounded-full bg-white " />
               </div>
               <span className="text-xs text-white/72">
                 This requires deeper support.
@@ -4945,8 +4945,8 @@ I am listening now. Speak naturally. I will respond ${
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
                   !voiceOn
-                    ? 'border-[#AEB6FF]/85 bg-[#AEB6FF]/25 text-white shadow-[0_0_18px_rgba(174,182,255,0.22)]'
-                    : 'border-[#AEB6FF]/20 bg-[#AEB6FF]/8 text-white/65 hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/14 hover:text-white'
+                    ? 'border-white/[0.16] bg-white/[0.05] text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)]'
+                    : 'border-white/[0.07] bg-white/[0.02] text-white/65 hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white'
                 }`}
               >
                 Text Assist
@@ -4964,8 +4964,8 @@ I am listening now. Speak naturally. I will respond ${
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
                   voiceOn
-                    ? 'border-[#AEB6FF]/85 bg-[#AEB6FF]/25 text-white shadow-[0_0_18px_rgba(174,182,255,0.22)]'
-                    : 'border-[#AEB6FF]/20 bg-[#AEB6FF]/8 text-white/65 hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/14 hover:text-white'
+                    ? 'border-white/[0.16] bg-white/[0.05] text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)]'
+                    : 'border-white/[0.07] bg-white/[0.02] text-white/65 hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white'
                 }`}
               >
                 Audio Assist
@@ -5017,7 +5017,7 @@ router.push('/george')
               }}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:bg-white/[0.022] hover:text-white/92"
             >
-              <span className="h-1 w-1 rounded-full bg-[#AEB6FF]" />
+              <span className="h-1 w-1 rounded-full bg-white" />
               
             </button>
 
@@ -5068,7 +5068,7 @@ ${simplifyTarget}`
                 setConversationSignal('Simplifying…')
                 void handleSend(prompt, { hidden: true })
               }}
-              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-[#AEB6FF]/45 hover:bg-white/[0.022] hover:text-white/92"
+              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white"
             >
               Simplify
             </button>
@@ -5247,7 +5247,7 @@ ${simplifyTarget}`
 {showScrollHint && (
   <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center opacity-70 transition hover:opacity-100`}>
 
-    <div className="absolute h-10 w-10 rounded-full border border-[#AEB6FF]/12 bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34),0_0_14px_rgba(174,182,255,0.08)] backdrop-blur-md" />
+    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34)] backdrop-blur-md" />
 
     <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
@@ -5258,7 +5258,7 @@ ${simplifyTarget}`
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
           setShowScrollHint(false)
         }}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#AEB6FF]/72 text-black shadow-[0_10px_24px_rgba(0,0,0,0.28),0_0_16px_rgba(174,182,255,0.18)] transition hover:bg-[#8D9BFF]/88 hover:scale-[1.03]"
+        className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_24px_rgba(0,0,0,0.24)] transition hover:bg-white/90 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -5327,7 +5327,7 @@ ${simplifyTarget}`
         }}
         className={`group relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-150 ease-out ${
           liveMode || activePromptContext?.includes('conversation') || activePromptContext?.includes('professional') || activePromptContext?.includes('brilliant_live')
-            ? 'border-[#AEB6FF]/35 bg-[#AEB6FF]/[0.055] text-white/82 shadow-[0_0_8px_rgba(174,182,255,0.16)]'
+            ? 'border-white/[0.12] bg-white/[0.04] text-white/82 shadow-[0_10px_22px_rgba(0,0,0,0.22)]'
             : 'border-white/10 bg-white/[0.015] text-white/70 hover:border-white/20 hover:bg-white/[0.022] hover:text-white/92'
         }`}
         aria-label="Open memory folders"
@@ -5362,7 +5362,7 @@ if (liveMode) {
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
-              ? 'border border-[#AEB6FF]/40 bg-[#AEB6FF]/20 text-white/72'
+              ? 'border border-white/[0.12] bg-white/[0.045] text-white/76'
               : 'text-white/80 hover:text-white'
           }`}
         >
@@ -5455,8 +5455,8 @@ if (liveMode) {
                         }}
                         className={`block w-full rounded-xl border px-4 py-1.5 text-left text-xs transition ${
                           isLatest
-                            ? 'border-[#AEB6FF]/40 bg-[#AEB6FF]/[0.055] text-white'
-                            : 'border-white/[0.06] bg-black/28 text-neutral-300 hover:border-[#AEB6FF]/35 hover:text-white'
+                            ? 'border-white/[0.12] bg-white/[0.04] text-white'
+                            : 'border-white/[0.06] bg-black/28 text-neutral-300 hover:border-white/[0.12] hover:text-white'
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between gap-1.5">
@@ -5495,7 +5495,7 @@ if (liveMode) {
         <span
           className={`absolute right-2 top-1 h-1 w-1 rounded-full ${
             reroutePrompt || suggestedPrompts !== tieredStarterPrompts && suggestedPrompts.length > 0
-              ? 'bg-[#AEB6FF]'
+              ? 'bg-white'
               : 'bg-white/85'
           } ${
             suggestedSignal || rerouteSignal
@@ -5624,10 +5624,10 @@ if (liveMode) {
           alt=""
           className="absolute inset-0 h-full w-full object-contain opacity-82 drop-shadow-[0_0_18px_rgba(174,182,255,0.18)] [clip-path:circle(35%_at_50%_50%)]"
         />
-        <div className="absolute inset-0 rounded-full border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.025] blur-[0.2px]" />
+        <div className="absolute inset-0 rounded-full border border-[#AEB6FF]/10 bg-white/[0.025] blur-[0.2px]" />
       </div>
 
-      <div className="rounded-[1rem] border border-[#AEB6FF]/18 bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
+      <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         Use one earbud if possible.
         <br />
         GEORGE is listening.
@@ -5909,7 +5909,7 @@ Choose one:
 
                   <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[0.14em] ${
                     sessionPickerMode === 'campaign'
-                      ? 'bg-[#AEB6FF]/14 text-[#C8CEFF]'
+                      ? 'bg-white/[0.045] text-white/72'
                       : 'bg-white/[0.022] text-white/52'
                   }`}>
                     {sessionPickerMode === 'campaign' ? '⚡ Structured' : '◉ LIVE'}
@@ -6067,10 +6067,10 @@ Choose one:
                 <div
                   className={`fixed bottom-[76px] md:bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-150 ease-out ${
                     isNegotiationStyle
-                      ? 'border-[#AEB6FF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
+                      ? 'border-white/[0.07] bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
                       : isResponseStyle
                         ? 'border-white/10 bg-[rgba(10,10,12,0.78)] shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
-                        : 'border-[#AEB6FF]/10 bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
+                        : 'border-white/[0.06] bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
                   }`}
                 >
                   <div className="flex min-w-0 w-full flex-wrap items-center gap-x-2 gap-y-1.5 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none] md:flex-nowrap">
@@ -6123,7 +6123,7 @@ Choose one:
                             />
 
                             <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
-                              <div className="overflow-hidden rounded-[1.05rem] border border-[#AEB6FF]/20 bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
+                              <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
                                   <div className="text-[11px] tracking-[0.32em] text-white/58">
@@ -6281,9 +6281,9 @@ Choose one:
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[10px] text-white/24 tracking-[0.16em]">
       <span className="inline-flex items-center gap-[5px]">
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/62 " />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/44 " />
-        <span className="h-[3px] w-[3px] rounded-full bg-[#AEB6FF]/28 " />
+        <span className="h-[3px] w-[3px] rounded-full bg-white/62 " />
+        <span className="h-[3px] w-[3px] rounded-full bg-white/44 " />
+        <span className="h-[3px] w-[3px] rounded-full bg-white/28 " />
       </span>
     </div>
   </div>
@@ -6508,7 +6508,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           onClick={() => {
                             handleSend()
                           }}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[#AEB6FF]/22 bg-[#AEB6FF]/[0.055] text-[#C7D0FF] transition hover:bg-[#AEB6FF]/16 hover:text-white"
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.025] text-white/72 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
                           aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -6584,7 +6584,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 <button
                   type="button"
                   onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-[1rem] max-w-full bg-[#AEB6FF] px-5 py-4 text-sm font-medium text-black"
+                  className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
                 >
                   Next
                 </button>
@@ -6595,7 +6595,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     window.localStorage.setItem("george_walkthrough_seen","1")
                     setShowWalkthrough(false)
                   }}
-                  className="w-full rounded-[1rem] max-w-full bg-[#AEB6FF] px-5 py-4 text-sm font-medium text-black"
+                  className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
                 >
                   End
                 </button>
@@ -6640,7 +6640,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       onClick={() => setVoiceType(voice.value)}
                       className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
-                          ? 'border-[#AEB6FF]/60 bg-[#AEB6FF]/15 text-white'
+                          ? 'border-[#AEB6FF]/60 bg-white/15 text-white'
                           : 'border-white/[0.06] bg-black/28 text-neutral-500 hover:text-white'
                       }`}
                     >
@@ -6658,7 +6658,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-[#AEB6FF]/50"
+                  className="w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-white/[0.14]"
                 />
               </div>
 
@@ -6679,7 +6679,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   setToastMessage('GEORGE is yours now.')
                   setShowToast(true)
                 }}
-                className="w-full rounded-[1rem] max-w-full bg-[#AEB6FF] px-5 py-4 text-sm font-medium text-black transition hover:opacity-55"
+                className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black transition hover:opacity-55"
               >
                 Save
               </button>
@@ -6727,7 +6727,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 text-center">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#C7D0FF]/78">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-white/58">
             GEORGE Continuity
           </p>
 
@@ -6817,7 +6817,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   setShowToast(true)
                 }
               }}
-              className="mt-3 w-full rounded-full border border-[#AEB6FF]/20 bg-[#AEB6FF]/[0.045] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#C7D0FF] transition hover:bg-[#AEB6FF]/[0.12] hover:text-white"
+              className="mt-3 w-full rounded-full border border-[#AEB6FF]/20 bg-white/[0.045] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
             >
               Send continuity link
             </button>
@@ -6864,7 +6864,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 </div>
               </div>
 
-              <div className="text-[11px] font-medium text-[#C7D0FF]">
+              <div className="text-[11px] font-medium text-white/70">
                 $9.99
               </div>
             </div>
@@ -6901,7 +6901,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/24 bg-[#AEB6FF]/8 px-4 py-3 text-left transition hover:border-[#AEB6FF]/45 hover:bg-[#AEB6FF]/12"
+            className="block w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/24 bg-white/8 px-4 py-3 text-left transition hover:border-[#AEB6FF]/45 hover:bg-white/12"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -6911,7 +6911,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 </div>
               </div>
 
-              <div className="text-[11px] font-medium text-[#C7D0FF]">
+              <div className="text-[11px] font-medium text-white/70">
                 $25
               </div>
             </div>
@@ -6984,7 +6984,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-[#AEB6FF]/45 bg-[#AEB6FF]/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(174,182,255,0.08)] hover:border-[#AEB6FF]/80 hover:bg-[#AEB6FF]/22"
+              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-[#AEB6FF]/45 bg-white/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(174,182,255,0.08)] hover:border-[#AEB6FF]/80 hover:bg-white/22"
             >
               Upgrade to continue this campaign
             </button>
