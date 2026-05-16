@@ -89,7 +89,6 @@ export default function GeorgeLiveEntryPage() {
 
   const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
 
-
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -99,7 +98,6 @@ export default function GeorgeLiveEntryPage() {
     const activeLive = getActiveSessionForMode('live')
     setHasLiveSession(!!activeLive)
   }, [])
-
 
   const prepareLive = () => {
     if (typeof window === 'undefined') return
@@ -119,8 +117,8 @@ export default function GeorgeLiveEntryPage() {
 
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.025),transparent_32%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(196,210,255,0.045),transparent_30%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-5 text-center">
         <img
@@ -129,7 +127,7 @@ export default function GeorgeLiveEntryPage() {
           className="mb-7 h-6 w-auto object-contain opacity-74"
         />
 
-        <div className="mb-3 text-[10px] font-medium tracking-[0.3em] text-white/30">
+        <div className="mb-3 text-[10px] font-medium tracking-[0.3em] text-white/34">
           LIVE RUNTIME
         </div>
 
@@ -137,14 +135,14 @@ export default function GeorgeLiveEntryPage() {
           Prepare the room.
         </h1>
 
-        <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/52 md:text-[16px]">
+        <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
           Give GEORGE the useful context before you enter. LIVE follows the conversation in real time and can provide repeatable lines, short cues, or silence when restraint is stronger.
         </p>
 
-        <div className="mt-8 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.045] bg-white/[0.012] p-5 text-left">
-          <div className="flex items-center justify-between border-b border-white/[0.045] pb-3 text-[11px] tracking-[0.18em] text-white/34">
+        <div className="mt-8 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
+          <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/34">
             <span>ROOM</span>
-            <span className="text-white/34">OPTIONAL</span>
+            <span className="text-white/38">OPTIONAL</span>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -156,10 +154,10 @@ export default function GeorgeLiveEntryPage() {
                   key={item}
                   type="button"
                   onClick={() => setSelectedRoom(item)}
-                  className={`rounded-[0.8rem] border px-3 py-2 text-[13px] transition ${
+                  className={`rounded-[0.8rem] border px-3 py-2 text-[13px] transition-all duration-150 ${
                     active
-                      ? 'border-white/[0.12] bg-white/[0.045] text-white'
-                      : 'border-white/[0.052] bg-black/20 text-white/52 hover:border-white/[0.09] hover:bg-white/[0.018] hover:text-white/78'
+                      ? 'border-white/[0.14] bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.038))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+                      : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
                   }`}
                 >
                   {item}
@@ -169,7 +167,7 @@ export default function GeorgeLiveEntryPage() {
           </div>
 
           <div className="mt-5">
-            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/32">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
               {activePrompt.label}
             </div>
 
@@ -178,16 +176,16 @@ export default function GeorgeLiveEntryPage() {
               onChange={(e) => setObjective(e.target.value)}
               placeholder={activePrompt.placeholder}
               rows={3}
-              className="w-full resize-none rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/80 outline-none placeholder:text-white/22 focus:border-white/[0.10]"
+              className="w-full resize-none rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[14px] leading-6 text-white/82 outline-none placeholder:text-white/22 transition focus:border-white/[0.12] focus:bg-white/[0.018]"
             />
           </div>
 
-          <p className="mt-4 text-[13px] leading-6 text-white/42">
+          <p className="mt-4 text-[13px] leading-6 text-white/44">
             Use one earbud if possible. Speak normally. GEORGE can give you exact words to repeat, posture cues, or a pause when silence protects the moment.
           </p>
 
-          <div className="mt-5 border-t border-white/[0.045] pt-5">
-            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/32">
+          <div className="mt-5 border-t border-white/[0.05] pt-5">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
               CONTROL WORDS
             </div>
 
@@ -206,7 +204,7 @@ export default function GeorgeLiveEntryPage() {
                       setControlWords([...parts, word].join(', '))
                     }
                   }}
-                  className="rounded-[0.75rem] border border-white/[0.052] bg-black/20 px-3 py-1.5 text-[12px] text-white/48 transition hover:border-white/[0.09] hover:bg-white/[0.018] hover:text-white/76"
+                  className="rounded-[0.75rem] border border-white/[0.055] bg-black/20 px-3 py-1.5 text-[12px] text-white/50 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.022] hover:text-white/78"
                 >
                   {word}
                 </button>
@@ -217,10 +215,10 @@ export default function GeorgeLiveEntryPage() {
               value={controlWords}
               onChange={(e) => setControlWords(e.target.value)}
               placeholder="Words you can say to adjust GEORGE without breaking the room"
-              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.052] bg-black/20 px-4 py-3 text-[13px] text-white/80 outline-none placeholder:text-white/22 focus:border-white/[0.10]"
+              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/22 transition focus:border-white/[0.12] focus:bg-white/[0.018]"
             />
 
-            <p className="mt-2 text-[12px] leading-5 text-white/30">
+            <p className="mt-2 text-[12px] leading-5 text-white/32">
               Example: “line” for exact words, “pause” to hold, “shorter” to compress.
             </p>
           </div>
@@ -233,7 +231,7 @@ export default function GeorgeLiveEntryPage() {
               {hasLiveSession && (
                 <Link
                   href="/george/live"
-                  className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.018] px-6 py-4 text-[14px] font-medium text-white/72 transition hover:border-white/[0.10] hover:bg-white/[0.035] hover:text-white"
+                  className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.065] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.018))] px-6 py-4 text-[14px] font-medium text-white/74 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
                 >
                   Resume runtime
                 </Link>
@@ -249,7 +247,7 @@ export default function GeorgeLiveEntryPage() {
 
               <Link
                 href="/george/live"
-                className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.055] bg-white/[0.012] px-6 py-4 text-[14px] font-medium text-white/48 transition hover:border-white/[0.09] hover:text-white/72"
+                className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.012] px-6 py-4 text-[14px] font-medium text-white/50 transition-all duration-150 hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/74"
               >
                 Start without setup
               </Link>
