@@ -5308,7 +5308,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto rounded-full border border-[#AEB6FF]/16 bg-[#11131A]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#C7D0FF]/84 shadow-[0_0_18px_rgba(174,182,255,0.08)] transition hover:border-[#AEB6FF]/28 hover:bg-white/[0.035] hover:text-white"
+                  className="pointer-events-auto rounded-full border border-white/[0.075] bg-[#0B0D12]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-white/76 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white"
                 >
                   ◉ LIVE
                 </button>
@@ -5667,7 +5667,7 @@ if (liveMode) {
         <button
           type="button"
           onClick={() => setShowProLiveComingSoon(false)}
-          className="mt-5 w-full rounded-xl border border-[#AEB6FF]/24 bg-[#AEB6FF]/[0.055] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#AEB6FF]/16"
+          className="mt-5 w-full rounded-xl border border-white/[0.075] bg-white/[0.025] px-4 py-3 text-sm font-medium text-white/82 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
         >
           Continue
         </button>
@@ -6404,7 +6404,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#AEB6FF]/18 bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -6854,7 +6854,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-[1rem] max-w-full border border-white/[0.045] bg-white/[0.02] px-4 py-3 text-left transition hover:border-[#AEB6FF]/24 hover:bg-white/[0.05]"
+            className="block w-full rounded-[1rem] max-w-full border border-white/[0.055] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.12] hover:bg-white/[0.04]"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -6922,7 +6922,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           <button
             type="button"
             onClick={redeemFounderCode}
-            className="w-full rounded-full border border-white/[0.045] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#AEB6FF]/35 hover:bg-white/[0.035] hover:text-white"
+            className="w-full rounded-full border border-white/[0.06] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
           >
             Enter Founder Code
           </button>
