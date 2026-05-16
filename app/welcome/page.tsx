@@ -119,7 +119,7 @@ export default function WelcomePage() {
               Establish continuity.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
-              This is not room setup. This is your operating signal — what GEORGE should remember about your goals, constraints, communication, and decision style.
+              GEORGE uses this to understand what matters, how you operate, and how to stay useful as pressure, goals, and context change.
             </p>
           </div>
 
@@ -157,13 +157,13 @@ export default function WelcomePage() {
 
             <div className="rounded-[0.9rem] border border-white/[0.045] bg-black/20 p-4">
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">
-                Connected Runtime
+                Connected Systems
               </p>
               <p className="mt-3 text-sm leading-6 text-white/48">
-                Later, GEORGE should connect to tools that help you act: code repositories, calendars, files, email, documents, CRM, broker workflows, or other work systems.
+                GEORGE can later connect to calendars, repositories, files, email, documents, or other systems when continuity and real work require it.
               </p>
               <p className="mt-3 text-xs leading-5 text-white/38">
-                Direction: connect only when useful, permissioned, and tied to a real task.
+                Connections should remain selective, permissioned, and operationally useful.
               </p>
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function WelcomePage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer directly. GEORGE uses this to preserve continuity, decision context, and useful momentum."
+              placeholder="Answer directly. GEORGE uses this to preserve continuity and adapt intelligently over time."
               className="mt-3 w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
             />
           </div>
@@ -194,7 +194,7 @@ export default function WelcomePage() {
             </button>
 
             <p className="text-xs leading-5 text-white/32">
-              Update this anytime as your goals, pressure, or direction changes.
+              As your situation changes, GEORGE should adapt with it.
             </p>
           </div>
         </div>
