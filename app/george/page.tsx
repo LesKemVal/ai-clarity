@@ -6476,29 +6476,19 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           </p>
 
           <p className="mt-3 text-sm font-medium text-white">
-            Restore continuity and LIVE runtime
+            Restore GEORGE access
           </p>
 
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Restore how GEORGE recognizes you, your tier, and your LIVE continuity.
+            Restore your access, preferences, and LIVE support.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-[1rem] border border-white/[0.045] bg-black/28 px-4 py-3">
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Continuity identity
+              Recognized access
             </label>
-            <ContinuityCapsule
-              email={subscriberEmail}
-              label="Recognized as"
-              onClear={() => {
-                setSubscriberEmail('')
-                window.localStorage.removeItem('george_email')
-                window.localStorage.removeItem('george_verified_continuity')
-              }}
-            />
-
             <ContinuityCapsule
               email={subscriberEmail}
               label="Recognized as"
@@ -6525,7 +6515,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               className="mt-2 w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-700"
             />
             <p className="mt-2 text-[11px] leading-5 text-neutral-500">
-              Your continuity link restores your tier and LIVE access on this device.
+              Your access link restores GEORGE recognition and LIVE access on this device.
             </p>
 
             <button
@@ -6554,7 +6544,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     return
                   }
 
-                  setToastMessage('Continuity link sent.')
+                  setToastMessage('Access link sent.')
                   setShowToast(true)
                 } catch {
                   setToastMessage('Unable to send continuity link.')
@@ -6563,7 +6553,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               }}
               className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
             >
-              Send continuity link
+              Send access link
             </button>
           </div>
 
@@ -6604,7 +6594,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               <div>
                 <div className="text-sm font-medium text-white">Intelligent</div>
                 <div className="mt-1 text-xs leading-5 text-neutral-500">
-                  Subscriber continuity and stronger execution support.
+                  Stronger memory, execution support, and adaptive guidance.
                 </div>
               </div>
 
@@ -6651,7 +6641,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               <div>
                 <div className="text-sm font-medium text-white">Brilliant</div>
                 <div className="mt-1 text-xs leading-5 text-neutral-300">
-                  LIVE conversational assistance and restored LIVE continuity.
+                  Deep LIVE conversational support and stronger restoration.
                 </div>
               </div>
 
@@ -6702,7 +6692,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-white/72 mb-2">Structured LIVE</p>
                 <p className="mt-0.5 text-[14px] font-semibold text-white mt-1 mb-2">This is a structured LIVE session.</p>
-                <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE continuity is being prepared.</p>
+                <p className="mt-1 text-[11px] leading-5 text-neutral-500">Structured LIVE support is being prepared.</p>
               </div>
               <button
                 type="button"
