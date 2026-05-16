@@ -79,6 +79,7 @@ export default function GeorgeLiveEntryPage() {
   const [selectedRoom, setSelectedRoom] = useState('')
   const [objective, setObjective] = useState('')
   const [controlWords, setControlWords] = useState('')
+  const [selectedLanguage, setSelectedLanguage] = useState('English')
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
 
@@ -106,6 +107,7 @@ export default function GeorgeLiveEntryPage() {
       'GEORGE_LIVE_SETUP',
       JSON.stringify({
         room: selectedRoom,
+        language: selectedLanguage,
         objective,
         controlWords,
         createdAt: Date.now(),
@@ -164,6 +166,33 @@ export default function GeorgeLiveEntryPage() {
                 </button>
               )
             })}
+          </div>
+
+          <div className="mt-5">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
+              LANGUAGE
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {['English', 'Español', 'Français', 'العربية', '中文', '日本語'].map((language) => {
+                const active = selectedLanguage === language
+
+                return (
+                  <button
+                    key={language}
+                    type="button"
+                    onClick={() => setSelectedLanguage(language)}
+                    className={`rounded-[0.75rem] border px-3 py-1.5 text-[12px] transition-all duration-150 ${
+                      active
+                        ? 'border-white/[0.14] bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.038))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
+                    }`}
+                  >
+                    {language}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           <div className="mt-5">
