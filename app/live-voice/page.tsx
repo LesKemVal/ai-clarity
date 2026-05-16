@@ -832,10 +832,10 @@ function isForceIntervention(text: string) {
     <main className="min-h-screen bg-black px-5 py-8 text-white">
       <div className="mx-auto flex max-w-3xl flex-col gap-5">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-white/35">BRANESx / GEORGE</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">LIVE Voice Sandbox</h1>
+          <p className="text-xs uppercase tracking-[0.35em] text-white/35">BRANESx / GEORGE · INTERNAL</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight">LIVE Runtime Diagnostic</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
-            This page tests mic capture, transcript interpretation, GEORGE&apos;s LIVE governor, and optional earbud playback without touching normal GEORGE chat.
+            Internal diagnostic surface for mic capture, transcript interpretation, LIVE governor behavior, and earbud playback. This is not the user-facing LIVE experience.
           </p>
         </div>
 
