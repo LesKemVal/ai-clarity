@@ -4581,7 +4581,7 @@ return (
   )}
   {liveMode && (
     <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
-      <div className="relative grid min-h-[255px] grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] overflow-hidden rounded-[1.35rem] px-10 py-10">
+      <div className="relative grid min-h-[255px] grid-cols-1 overflow-hidden rounded-[1.35rem] px-6 py-8 sm:px-8 sm:py-9 md:grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] md:px-10 md:py-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_62%,rgba(42,108,170,0.28),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_38%)]" />
         <div className="absolute inset-x-0 top-[92px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/10 to-transparent" />
         <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
@@ -4591,13 +4591,13 @@ return (
             LIVE MODE
           </p>
 
-          <h1 className="mt-6 max-w-[620px] text-[54px] font-semibold leading-[0.94] tracking-[-0.07em] text-white">
+          <h1 className="mt-6 max-w-[360px] text-[44px] font-semibold leading-[0.94] tracking-[-0.07em] text-white sm:max-w-[520px] sm:text-[54px] md:max-w-[620px]">
             Timing. Pressure.
             <br />
             The next useful line.
           </h1>
 
-          <p className="mt-8 text-[16px] leading-7 text-white/42">
+          <p className="mt-7 max-w-[250px] text-[15px] leading-7 text-white/42 sm:max-w-[360px] sm:text-[16px] md:mt-8">
             Listen in real time. Get the next useful line when it matters.
           </p>
         </div>
@@ -4608,7 +4608,7 @@ return (
           <img
             src="/earbud400.png"
             alt="GEORGE LIVE"
-            className="absolute right-[28px] top-[38px] h-[162px] w-auto rotate-[12deg] object-contain opacity-[0.98]"
+            className="absolute right-[12px] top-[88px] h-[124px] w-auto rotate-[12deg] object-contain opacity-[0.82] sm:right-[22px] sm:top-[56px] sm:h-[148px] md:right-[28px] md:top-[38px] md:h-[162px] md:opacity-[0.98]"
           />
         </div>
       </div>
