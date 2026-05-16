@@ -72,7 +72,7 @@ export default function RootPage() {
         </div>
 
         <p className="mt-5 text-[12px] leading-5 text-white/32">
-          Smart starts free. LIVE access begins with Brilliant.
+          GEORGE starts free. LIVE Conversation begins with Intelligent.
         </p>
       </div>
     </main>
