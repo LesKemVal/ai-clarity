@@ -5150,7 +5150,7 @@ ${simplifyTarget}`
               className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DDFF]">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-white/48">
                   Save
                 </div>
 
@@ -5163,7 +5163,7 @@ ${simplifyTarget}`
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="flex-1 rounded-lg border border-[#AEB6FF]/18 bg-[#AEB6FF]/8 px-2 py-1.5 text-[10px] font-medium text-white/76 transition hover:border-[#AEB6FF]/40 hover:bg-[#AEB6FF]/14 hover:text-white"
+                      className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.018] px-2 py-1.5 text-[10px] font-medium text-white/76 transition hover:border-white/[0.14] hover:bg-white/[0.04] hover:text-white"
                     >
                       {folder}
                     </button>
@@ -5196,8 +5196,8 @@ ${simplifyTarget}`
                           }}
                           className={`max-w-full break-words rounded-full border px-2 py-1 text-[10px] leading-4 transition ${
                             activeMemoryFolder === folder
-                              ? 'border-[#AEB6FF]/50 bg-[#AEB6FF]/[0.055] text-white'
-                              : 'border-white/10 text-neutral-300 hover:border-[#AEB6FF]/35 hover:text-white'
+                              ? 'border-white/[0.14] bg-white/[0.045] text-white'
+                              : 'border-white/[0.08] text-neutral-300 hover:border-white/[0.12] hover:text-white'
                           }`}
                         >
                           {folder}
@@ -5208,7 +5208,7 @@ ${simplifyTarget}`
                 )}
 
                 {activeMemoryFolder && getLatestSavedMemoryByFolder(activeMemoryFolder) && (
-                  <div className="rounded-xl border border-[#AEB6FF]/14 bg-black/35 p-1.5 text-[10px] leading-4 text-neutral-500 break-words">
+                  <div className="rounded-xl border border-white/[0.06] bg-black/28 p-1.5 text-[10px] leading-4 text-neutral-500 break-words">
                     {getLatestSavedMemoryByFolder(activeMemoryFolder)}
                   </div>
                 )}
@@ -5220,7 +5220,7 @@ ${simplifyTarget}`
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="New folder"
-                      className="w-full rounded-xl border border-[#AEB6FF]/14 bg-black/30 px-2.5 py-1.5 text-[11px] leading-4 text-white outline-none placeholder:text-neutral-500"
+                      className="w-full rounded-xl border border-white/[0.06] bg-black/24 px-2.5 py-1.5 text-[11px] leading-4 text-white outline-none placeholder:text-neutral-500"
                     />
                     <button
                       type="button"
@@ -5456,7 +5456,7 @@ if (liveMode) {
                         className={`block w-full rounded-xl border px-4 py-1.5 text-left text-xs transition ${
                           isLatest
                             ? 'border-[#AEB6FF]/40 bg-[#AEB6FF]/[0.055] text-white'
-                            : 'border-[#AEB6FF]/14 bg-black/35 text-neutral-300 hover:border-[#AEB6FF]/35 hover:text-white'
+                            : 'border-white/[0.06] bg-black/28 text-neutral-300 hover:border-[#AEB6FF]/35 hover:text-white'
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between gap-1.5">
@@ -6641,7 +6641,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
                           ? 'border-[#AEB6FF]/60 bg-[#AEB6FF]/15 text-white'
-                          : 'border-[#AEB6FF]/14 bg-black/35 text-neutral-500 hover:text-white'
+                          : 'border-white/[0.06] bg-black/28 text-neutral-500 hover:text-white'
                       }`}
                     >
                       {voice.label}
