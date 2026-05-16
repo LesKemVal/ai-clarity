@@ -92,7 +92,7 @@ export default function WelcomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#05060A] px-6 py-10 text-white">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-260px] h-[440px] w-[440px] -translate-x-1/2 rounded-full bg-[#AEB6FF]/[0.045] blur-[130px]" />
+        <div className="absolute left-1/2 top-[-260px] h-[440px] w-[440px] -translate-x-1/2 rounded-full bg-white/[0.025] blur-[130px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
       </div>
 
@@ -112,7 +112,7 @@ export default function WelcomePage() {
           />
 
           <div className="space-y-3 border-b border-white/[0.045] pb-6">
-            <p className="text-xs uppercase tracking-[0.28em] text-[#AEB6FF]/68">
+            <p className="text-xs uppercase tracking-[0.28em] text-white/42">
               User Signal
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
@@ -162,14 +162,14 @@ export default function WelcomePage() {
               <p className="mt-3 text-sm leading-6 text-white/48">
                 Later, GEORGE should connect to tools that help you act: code repositories, calendars, files, email, documents, CRM, broker workflows, or other work systems.
               </p>
-              <p className="mt-3 text-xs leading-5 text-[#AEB6FF]/58">
+              <p className="mt-3 text-xs leading-5 text-white/38">
                 Direction: connect only when useful, permissioned, and tied to a real task.
               </p>
             </div>
           </div>
 
-          <div className="rounded-[0.95rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.028] p-4 shadow-[0_0_32px_rgba(174,182,255,0.045)]">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-[#AEB6FF]/72">
+          <div className="rounded-[0.95rem] border border-white/[0.045] bg-black/24 p-4">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/42">
               GEORGE asks
             </p>
             <p className="mt-2 text-sm leading-6 text-white/78">
