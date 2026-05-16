@@ -3913,7 +3913,11 @@ setPendingAssistantMessage({
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
   const showMobileHero = !showConversation && messages.length <= 1
   const enterLiveConversation = () => {
-    window.location.href = '/george/live-entry'
+    if (liveMode) return
+
+    setShowLiveChooser(true)
+    setShowLiveQuickMenu(false)
+    setShowLiveToolsMenu(false)
   }
 
   const startNewLiveConversation = () => {
@@ -5801,224 +5805,8 @@ Continue from here, tell me what changed, or start fresh.`
                 <div className="pointer-events-none fixed inset-0 z-[71] bg-black/30" />
               )}
 
-{liveMode && (() => {
-                const isNegotiationStyle = resolvedLivePosture === 'negotiation'
-                const isResponseStyle = resolvedLivePosture === 'response'
-
-                return (
-                <div
-                  className={`fixed bottom-[76px] md:bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-150 ease-out ${
-                    isNegotiationStyle
-                      ? 'border-white/[0.07] bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
-                      : isResponseStyle
-                        ? 'border-white/10 bg-[rgba(10,10,12,0.78)] shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
-                        : 'border-white/[0.06] bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
-                  }`}
-                >
-                  <div className="flex min-w-0 w-full flex-wrap items-center gap-x-2 gap-y-1.5 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none] md:flex-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (liveMode) {
-                          setSessionPickerClosing(false)
-                          setSessionPickerMode('live')
-                          setShowSessionPicker(true)
-                          return
-                        }
-
-                        setShowLiveChooser(true)
-                        setShowLiveToolsMenu(false)
-                      }}
-                      className="shrink-0 rounded-full bg-white/[0.045] px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:bg-white/[0.08] hover:text-white"
-                      aria-label="Open LIVE chooser"
-                    >
-                      ◉ LIVE
-                    </button>
-
-                    <div className="relative shrink-0">
-                      
-                    </div>
-
-                    <span
-                      title={voiceOn ? 'Audio guidance active' : 'Audio guidance off'}
-                      className={`mx-1 shrink-0 h-2 w-2 rounded-full transition ${
-                        voiceOn
-                          ? 'bg-white/72 shadow-[0_0_6px_rgba(255,255,255,0.12)]'
-                          : 'bg-white/32'
-                      }`}
-                    />
-
-                    {(isThinking || isSpeaking) && (
-                      <span className="shrink-0 text-[10px] text-white/24 tracking-[0.16em]">
-                        {isThinking ? `GEORGE${'.'.repeat(thinkingDots)}` : 'VOICE'}
-                      </span>
-                    )}
-
-                    {adaptiveCueLabel && (
-                      <span className="shrink-0 rounded-full bg-amber-400/10 px-2.5 py-1 text-[10px] font-medium tracking-[0.12em] text-amber-100">
-                        {adaptiveCueLabel}
-                      </span>
-                    )}
 
 
-                    <div className="relative shrink-0">
-                        {showLiveToolsMenu && (
-                          <>
-                            <button
-                              type="button"
-                              aria-label="Close LIVE tools"
-                              onClick={() => setShowLiveToolsMenu(false)}
-                              className="fixed inset-0 z-[91] cursor-default bg-transparent"
-                            />
-
-                            <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
-                              <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
-
-                                <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                  <div className="text-[11px] tracking-[0.32em] text-white/58">
-                                    TOOLS
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setShowLiveToolsMenu(false)}
-                                    className="text-white/72 transition hover:text-white"
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
-
-                                <div className="px-4 pb-4">
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      activateResponsePosture()
-                                      setShowLiveToolsMenu(false)
-                                    }}
-                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
-                                  >
-                                    <div className="pt-[1px] text-white/58">✎</div>
-                                    <div>
-                                      <div className="text-[15px] text-white/92">Reword</div>
-                                      <div className="mt-0.5 text-[12px] text-white/38">
-                                        Rewrite this for impact
-                                      </div>
-                                    </div>
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setShowLiveQuickMenu(true)
-                                      setShowLiveToolsMenu(false)
-                                    }}
-                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
-                                  >
-                                    <div className="pt-[1px] text-white/58">⚡</div>
-                                    <div>
-                                      <div className="text-[15px] text-white/92">Cue</div>
-                                      <div className="mt-0.5 text-[12px] text-white/38">
-                                        Get the next live cue
-                                      </div>
-                                    </div>
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={activateNegotiationPosture}
-                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
-                                  >
-                                    <div className="pt-[1px] text-white/58">◎</div>
-                                    <div>
-                                      <div className="text-[15px] text-white/92">Screener</div>
-                                      <div className="mt-0.5 text-[12px] text-white/38">
-                                        Handle gatekeepers
-                                      </div>
-                                    </div>
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setAssistTone('firm')
-                                      setShowLiveToolsMenu(false)
-                                    }}
-                                    className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
-                                  >
-                                    <div className="pt-[1px] text-white/58">≋</div>
-                                    <div>
-                                      <div className="text-[15px] text-white/92">Tone</div>
-                                      <div className="mt-0.5 text-[12px] text-white/38">
-                                        Adjust tone & style
-                                      </div>
-                                    </div>
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setActiveSaveIndex(messages.length - 1)
-                                      setShowLiveToolsMenu(false)
-                                    }}
-                                    className="flex w-full items-start gap-3 px-2 pt-3 pb-1 text-left transition hover:bg-white/[0.018]"
-                                  >
-                                    <div className="pt-[1px] text-white/58">⌑</div>
-                                    <div>
-                                      <div className="text-[15px] text-white/92">Save</div>
-                                      <div className="mt-0.5 text-[12px] text-white/38">
-                                        Save to memory or folder
-                                      </div>
-                                    </div>
-                                  </button>
-
-                                </div>
-                              </div>
-                            </div>
-                          </>
-                        )}
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowLiveToolsMenu((prev) => !prev)
-                            setShowLiveQuickMenu(false)
-                          }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.16em] text-white/42 transition hover:bg-white/[0.05] hover:text-white/82"
-                        >
-                          Tools
-                        </button>
-                      </div>
-
-                    <div className="ml-auto flex shrink-0 items-center gap-1.5 pl-1.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSessionPickerClosing(false)
-                          setSessionPickerMode('live')
-                          setShowSessionPicker(true)
-                        }}
-                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/82"
-                        aria-label="Open LIVE conversation memory"
-                        title="Resume conversation continuity"
-                      >
-                        Resume
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          requestExitLiveMode()
-                        }}
-                        className="shrink-0 rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/82 transition hover:bg-red-400/[0.045] hover:text-red-100/82"
-                      >
-                        EXIT
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                )
-              })()}
 
               <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
               <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
@@ -6040,7 +5828,147 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+                    {liveMode && (
+                      <div className="mb-1.5 flex w-full items-center justify-between gap-2 px-1">
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSessionPickerClosing(false)
+                              setSessionPickerMode('live')
+                              setShowSessionPicker(true)
+                            }}
+                            className="rounded-full border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[10px] font-medium tracking-[0.16em] text-white/52 transition hover:border-white/[0.10] hover:bg-white/[0.035] hover:text-white/82"
+                            aria-label="Open LIVE conversation memory"
+                          >
+                            Resume
+                          </button>
+
+                          <div className="relative">
+                            {showLiveToolsMenu && (
+                              <>
+                                <button
+                                  type="button"
+                                  aria-label="Close LIVE tools"
+                                  onClick={() => setShowLiveToolsMenu(false)}
+                                  className="fixed inset-0 z-[91] cursor-default bg-transparent"
+                                />
+
+                                <div className="absolute bottom-full left-0 z-[95] mb-2 w-[240px]">
+                                  <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
+                                    <div className="flex items-center justify-between px-5 pt-4 pb-2">
+                                      <div className="text-[11px] tracking-[0.32em] text-white/58">TOOLS</div>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowLiveToolsMenu(false)}
+                                        className="text-white/72 transition hover:text-white"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+
+                                    <div className="px-4 pb-4">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          activateResponsePosture()
+                                          setShowLiveToolsMenu(false)
+                                        }}
+                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                      >
+                                        <div className="pt-[1px] text-white/58">✎</div>
+                                        <div>
+                                          <div className="text-[15px] text-white/92">Reword</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Rewrite this for impact</div>
+                                        </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setShowLiveQuickMenu(true)
+                                          setShowLiveToolsMenu(false)
+                                        }}
+                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                      >
+                                        <div className="pt-[1px] text-white/58">⚡</div>
+                                        <div>
+                                          <div className="text-[15px] text-white/92">Cue</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Get the next live cue</div>
+                                        </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={activateNegotiationPosture}
+                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                      >
+                                        <div className="pt-[1px] text-white/58">◎</div>
+                                        <div>
+                                          <div className="text-[15px] text-white/92">Screener</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Handle gatekeepers</div>
+                                        </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setAssistTone('firm')
+                                          setShowLiveToolsMenu(false)
+                                        }}
+                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                      >
+                                        <div className="pt-[1px] text-white/58">≋</div>
+                                        <div>
+                                          <div className="text-[15px] text-white/92">Tone</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Adjust tone & style</div>
+                                        </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setActiveSaveIndex(messages.length - 1)
+                                          setShowLiveToolsMenu(false)
+                                        }}
+                                        className="flex w-full items-start gap-3 px-2 pt-3 pb-1 text-left transition hover:bg-white/[0.018]"
+                                      >
+                                        <div className="pt-[1px] text-white/58">⌑</div>
+                                        <div>
+                                          <div className="text-[15px] text-white/92">Save</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Save to memory or folder</div>
+                                        </div>
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowLiveToolsMenu((prev) => !prev)
+                                setShowLiveQuickMenu(false)
+                              }}
+                              className="rounded-full border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[10px] font-medium tracking-[0.16em] text-white/52 transition hover:border-white/[0.10] hover:bg-white/[0.035] hover:text-white/82"
+                            >
+                              Tools
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={requestExitLiveMode}
+                          className="rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/82 transition hover:bg-red-400/[0.045]"
+                        >
+                          EXIT
+                        </button>
+                      </div>
+                    )}
+
                     <div className="relative flex-1 rounded-[0.85rem] border border-white/[0.045] bg-[#11141B]/72 shadow-[0_8px_22px_rgba(0,0,0,0.16)] backdrop-blur-xl">
 
                       <input
