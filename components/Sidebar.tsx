@@ -331,6 +331,9 @@ return (
               <a href="/george/live-entry" className={linkClass('/george/live-entry')}>
                 LIVE
               </a>
+              <a href="/images" className={linkClass('/images')}>
+                Create Images
+              </a>
               <a href="/welcome" className={linkClass('/welcome')}>
                 User Signal
               </a>
