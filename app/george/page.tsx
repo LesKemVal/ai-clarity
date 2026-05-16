@@ -3118,14 +3118,6 @@ const handleSend = useCallback(
       }
     ) => {
       let text = (overrideText ?? input).trim()
-      console.log('[GEORGE handleSend]', {
-        overrideText,
-        input,
-        text,
-        isThinking,
-        activePromptContext,
-        activePromptLabel,
-      })
 
       const domain = detectDomain(text)
 
@@ -3414,13 +3406,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
   return curated
 })
-
-      
-
-      console.log('[GEORGE setMessages user]', {
-        updatedMessagesLength: updatedMessages.length,
-        lastUserMessage: updatedMessages[updatedMessages.length - 1]?.content,
-      })
       setMessages(updatedMessages)
 
       const steer = getSteering({
@@ -3448,11 +3433,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       try {
         if (firstResponseOverride) {
-          console.log('[GEORGE firstResponseOverride hit]', {
-            firstResponseOverride,
-            activePromptContext,
-            activePromptLabel,
-          })
           stopBridgeSpeech()
         const assistantMessage: Message = {
             role: 'assistant',
@@ -3464,11 +3444,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
           setMessages((prev) => {
             const next = [...prev, assistantMessage]
-            console.log('[GEORGE setMessages assistant override]', {
-              prevLength: prev.length,
-              nextLength: next.length,
-              assistantPreview: assistantMessage.content.slice(0, 80),
-            })
             messagesRef.current = next
             return next
           })
@@ -6618,7 +6593,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         <button
                           type="button"
                           onClick={() => {
-                            console.log('[GEORGE arrow click]', { input, isThinking, activePromptContext })
                             handleSend()
                           }}
                           className="flex h-7 w-7 items-center justify-center rounded-full border border-[#AEB6FF]/22 bg-[#AEB6FF]/[0.055] text-[#C7D0FF] transition hover:bg-[#AEB6FF]/16 hover:text-white"
