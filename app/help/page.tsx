@@ -22,15 +22,15 @@ export default function HelpPage() {
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <p className="text-[20px] font-semibold tracking-[-0.035em] text-white/92">
-            GEORGE is a continuity and execution layer.
+            GEORGE helps you think clearly, move deliberately, and respond better under pressure.
           </p>
           <p className="mt-3 leading-7 text-white/44">
-            Use GEORGE to work through the situation. Use LIVE when timing, wording, posture, or silence matters in the room.
+            Use GEORGE to work through the situation. Use LIVE when timing, wording, or pressure starts to matter.
           </p>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Operating Model</h2>
+          <h2 className="mb-4 text-[18px] font-semibold text-white/88">How GEORGE works</h2>
           <div className="grid gap-2 text-sm leading-6 text-white/46">
             <p><span className="text-white/76">Direction</span> — identify what actually matters.</p>
             <p><span className="text-white/76">Action</span> — choose the next useful move.</p>
@@ -99,23 +99,23 @@ export default function HelpPage() {
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <h2 className="mb-4 text-[18px] font-semibold text-white/88">Continuity</h2>
           <p className="leading-7 text-white/44">
-            Continuity restores tier, active direction, and working context. Anonymous use remains available for simple direction. Subscriber continuity is for stronger restoration and LIVE support.
+            Continuity helps GEORGE retain useful direction, context, and working history over time.
           </p>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <h2 className="mb-4 text-[18px] font-semibold text-white/88">Access</h2>
           <div className="grid gap-2 text-sm leading-6 text-white/46">
-            <p><span className="text-white/76">Smart</span> — direction and reasoning.</p>
+            <p><span className="text-white/76">Smart</span> — everyday direction and reasoning.</p>
             <p><span className="text-white/76">Intelligent</span> — stronger continuity and execution support.</p>
-            <p><span className="text-white/76">Brilliant</span> — LIVE and strongest runtime continuity.</p>
+            <p><span className="text-white/76">Brilliant</span> — deepest LIVE support and strongest continuity.</p>
             <p><span className="text-white/76">Brilliant Day</span> — temporary LIVE runtime elevation.</p>
           </div>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <p className="text-[17px] font-medium leading-8 text-white/86">
-            GEORGE is for direction. LIVE is for pressure. Continuity is how the system remembers what matters.
+            GEORGE helps you move clearly. LIVE helps when pressure enters the room.
           </p>
         </section>
 
