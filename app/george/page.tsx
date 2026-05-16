@@ -6065,7 +6065,7 @@ Choose one:
 
                 return (
                 <div
-                  className={`fixed bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-150 ease-out ${
+                  className={`fixed bottom-[76px] md:bottom-[72px] left-0 right-0 z-[72] mx-auto flex w-full max-w-[900px] px-2 md:w-[calc(100%-24px)] items-center overflow-visible rounded-[1.15rem] border px-2.5 py-1 backdrop-blur-xl transition-all duration-150 ease-out ${
                     isNegotiationStyle
                       ? 'border-[#AEB6FF]/16 bg-[rgba(8,10,18,0.82)] shadow-[0_-16px_42px_rgba(0,0,0,0.44)]'
                       : isResponseStyle
@@ -6073,7 +6073,7 @@ Choose one:
                         : 'border-[#AEB6FF]/10 bg-black/74 shadow-[0_-14px_38px_rgba(0,0,0,0.38)]'
                   }`}
                 >
-                  <div className="flex min-w-0 w-full items-center gap-2 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none]">
+                  <div className="flex min-w-0 w-full flex-wrap items-center gap-x-2 gap-y-1.5 overflow-visible py-0 text-white/76 text-[12px] [scrollbar-width:none] md:flex-nowrap">
                     <button
                       type="button"
                       onClick={() => {
@@ -6241,7 +6241,7 @@ Choose one:
                         </button>
                       </div>
 
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="ml-auto flex shrink-0 items-center gap-1.5 pl-1.5">
                       <button
                         type="button"
                         onClick={() => {
