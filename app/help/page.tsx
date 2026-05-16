@@ -6,17 +6,17 @@ export default function HelpPage() {
   return (
     <PageShell
       title="Operating GEORGE"
-      eyebrow="Support"
+      eyebrow="Manual"
       backToGeorge
     >
       <div className="space-y-5">
 
-        <section className="rounded-[0.9rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.025] p-5 md:p-5">
-          <p className="text-sm leading-7 text-white/84">
+        <section className="rounded-[0.9rem] border border-white/[0.045] bg-black/24 p-5 md:p-5">
+          <p className="text-sm leading-7 text-white/82">
             GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
           </p>
-          <p className="mt-3 text-sm leading-7 text-white/46">
-            You choose the direction. GEORGE helps narrow the next move, hold context, and respond with restraint when pressure rises.
+          <p className="mt-3 text-sm leading-7 text-white/44">
+            You choose the direction. GEORGE narrows the next move, holds useful context, and responds with restraint when pressure rises.
           </p>
         </section>
 
@@ -25,7 +25,7 @@ export default function HelpPage() {
             GEORGE is a continuity and execution layer.
           </p>
           <p className="mt-3 leading-7 text-white/44">
-            Use GEORGE to think through the situation. Use LIVE when timing, wording, posture, or silence matters in the room.
+            Use GEORGE to work through the situation. Use LIVE when timing, wording, posture, or silence matters in the room.
           </p>
         </section>
 
@@ -51,14 +51,14 @@ export default function HelpPage() {
           </div>
         </section>
 
-        <section className="rounded-[0.9rem] border border-[#AEB6FF]/14 bg-[#AEB6FF]/[0.025] p-5 md:p-5">
+        <section className="rounded-[0.9rem] border border-white/[0.045] bg-black/24 p-5 md:p-5">
           <h2 className="mb-4 text-[18px] font-semibold text-white/88">LIVE</h2>
 
           <div className="space-y-4">
             <div>
               <p className="font-medium text-white/82">One earbud if possible.</p>
               <p className="mt-2 leading-7 text-white/44">
-                LIVE should support timing, pacing, pressure, and next responses without competing with the room.
+                LIVE supports timing, pacing, pressure, and next responses without competing with the room.
               </p>
             </div>
 
