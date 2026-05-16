@@ -88,7 +88,9 @@ export default function PageShell({
 
   return (
     <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[220px] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_70%)] opacity-55" />
+
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {withSidebar && showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
@@ -111,14 +113,14 @@ export default function PageShell({
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
           <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-4 md:px-6 md:pt-6 xl:px-8">
-            <div className="mb-5 border-b border-white/[0.035] pb-3 md:mb-6">
+            <div className="mb-5 border-b border-white/[0.04] pb-3 md:mb-6">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
                   {withSidebar && (
                     <button
                       type="button"
                       onClick={() => setShowSidebar(true)}
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] border border-white/[0.045] bg-white/[0.014] text-white/62 transition hover:border-[#AEB6FF]/16 hover:bg-white/[0.02] hover:text-white/80 xl:hidden"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.014] text-white/60 transition hover:border-white/[0.12] hover:bg-white/[0.024] hover:text-white/82 xl:hidden"
                       aria-label="Open menu"
                     >
                       <svg
@@ -149,7 +151,7 @@ export default function PageShell({
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.6rem] border border-[#AEB6FF]/16 bg-white/[0.012] px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#D9DEFF]/70 transition hover:border-[#AEB6FF]/24 hover:bg-[#AEB6FF]/[0.035] hover:text-white"
+                  className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.65rem] border border-white/[0.06] bg-white/[0.014] px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/[0.12] hover:bg-white/[0.03] hover:text-white/82"
                   aria-label="Share G."
                   title="Share G."
                 >
