@@ -33,7 +33,7 @@ export default function RootPage() {
           INTELLIGENT UTILITY
         </div>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
-          Think clearly. Decide faster. Use GEORGE before the moment — and GEORGE LIVE while the moment is happening.
+          Build businesses. Untangle problems. Prepare for pressure. Sharpen communication. Think clearly under load. Ask GEORGE.
         </p>
 
         <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.35rem] border border-white/[0.032] bg-black/[0.16] p-4 text-left backdrop-blur-[0.5px]">
