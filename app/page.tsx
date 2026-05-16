@@ -50,7 +50,7 @@ export default function RootPage() {
 
             <div className="rounded-[0.9rem] bg-black/18 p-5">
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">GEORGE LIVE</p>
-              <p className="mt-3 text-[16px] leading-7 text-white/58">Real-time support for conversations, pressure, wording, and what to say next.</p>
+              <p className="mt-3 text-[16px] leading-7 text-white/58">Put GEORGE in your ear and walk into interviews, negotiations, meetings, difficult calls, presentations, appointments, or any room where words and timing matter.</p>
             </div>
           </div>
         </div>
