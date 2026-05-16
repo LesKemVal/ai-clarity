@@ -36,19 +36,19 @@ export default function RootPage() {
           Build businesses. Untangle problems. Prepare for pressure. Sharpen communication. Think clearly under load.
         </p>
 
-        <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.35rem] border border-white/[0.032] bg-black/[0.16] p-4 text-left backdrop-blur-[0.5px]">
+        <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.25rem] border border-white/[0.024] bg-black/[0.10] p-4 text-left">
           <div className="flex items-center justify-between border-b border-white/[0.032] pb-3 text-[11px] tracking-[0.18em] text-white/34">
             <span>RUNTIME MODES</span>
             <span className="text-white/38">ACTIVE</span>
           </div>
 
           <div className="grid gap-4 text-[13px] leading-6 text-white/58">
-            <div className="rounded-[0.9rem] bg-black/18 p-5">
+            <div className="rounded-[0.85rem] border border-white/[0.025] bg-black/[0.12] p-5">
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/32">GEORGE</p>
               <p className="mt-3 text-[16px] leading-7 text-white/58">Plan, write, compare, prepare, and move from uncertainty to the next useful action. Ask GEORGE.</p>
             </div>
 
-            <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.012] p-5">
+            <div className="rounded-[0.85rem] border border-white/[0.055] bg-white/[0.014] p-5">
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/52">GEORGE LIVE</p>
               <p className="mt-3 text-[16px] leading-7 text-white/66">Put GEORGE in your ear and walk into interviews, negotiations, debates, meetings, difficult calls, presentations, or any room where words and timing matter.</p>
             </div>
