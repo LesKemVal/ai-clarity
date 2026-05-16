@@ -190,11 +190,11 @@ export default function WelcomePage() {
               disabled={!valid}
               className="rounded-[0.9rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
             >
-              Save Continuity Signal
+              Establish Continuity
             </button>
 
             <p className="text-xs leading-5 text-white/32">
-              You can update this later from the sidebar when your goals, pressure, or working style changes.
+              Update this anytime as your goals, pressure, or direction changes.
             </p>
           </div>
         </div>
