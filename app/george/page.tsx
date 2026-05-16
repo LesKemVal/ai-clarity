@@ -6686,6 +6686,10 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setShowLiveChooser(false)
           resumeLiveConversation()
         }}
+        onPrepRoom={() => {
+          setShowLiveChooser(false)
+          window.location.href = '/george/live-entry'
+        }}
         onUpgrade={() => {
           setShowLiveChooser(false)
           router.push('/top-up')

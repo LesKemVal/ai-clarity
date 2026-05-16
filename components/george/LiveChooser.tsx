@@ -11,6 +11,7 @@ type LiveChooserProps = {
   onResumeLiveConversation: () => void
   onUpgrade?: () => void
   onEnterCode?: () => void
+  onPrepRoom?: () => void
 }
 
 const lineOne = 'Take advantage of advanced runtime logic, real-time conversational awareness, and live response shaping — and take GEORGE LIVE anywhere.'
@@ -26,6 +27,7 @@ export default function LiveChooser({
   onResumeLiveConversation,
   onUpgrade,
   onEnterCode,
+  onPrepRoom,
 }: LiveChooserProps) {
   const [typed, setTyped] = useState('')
   const [showActions, setShowActions] = useState(false)
@@ -98,7 +100,15 @@ export default function LiveChooser({
                 onClick={onStartLiveConversation}
                 className="rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
               >
-                New LIVE Session
+                Start LIVE
+              </button>
+
+              <button
+                type="button"
+                onClick={onPrepRoom}
+                className="rounded-[1.15rem] border border-white/[0.075] bg-white/[0.025] px-6 py-4 text-[15px] font-semibold text-white/76 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
+              >
+                Prep Room
               </button>
 
               {hasLiveSession && (
