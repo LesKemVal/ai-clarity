@@ -5308,7 +5308,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto rounded-full border border-[#AEB6FF]/16 bg-[#11131A]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#C7D0FF]/84 shadow-[0_0_18px_rgba(174,182,255,0.08)] transition hover:border-[#AEB6FF]/28 hover:bg-[#AEB6FF]/[0.055] hover:text-white"
+                  className="pointer-events-auto rounded-full border border-[#AEB6FF]/16 bg-[#11131A]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#C7D0FF]/84 shadow-[0_0_18px_rgba(174,182,255,0.08)] transition hover:border-[#AEB6FF]/28 hover:bg-white/[0.035] hover:text-white"
                 >
                   ◉ LIVE
                 </button>
@@ -5766,13 +5766,13 @@ if (liveMode) {
           }, 170)
         }
       }}
-      className={`fixed inset-0 z-[200] bg-black/20 backdrop-blur-[6px] backdrop-saturate-150 transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[200] bg-black/42 backdrop-blur-[4px] transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
     />
 
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-[#AEB6FF]/20' : 'border-[#AEB6FF]/28'} bg-[#11131A]/90 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.55),0_0_18px_rgba(174,182,255,0.10)] backdrop-blur-xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5793,7 +5793,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-[#AEB6FF]/50 hover:text-white"
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-white/[0.14] hover:text-white"
           >
             ×
           </button>
@@ -5821,7 +5821,7 @@ if (liveMode) {
             return sessions.slice(0, 12).map((session) => (
               <div
                 key={session.id}
-                className="group relative overflow-hidden rounded-[1rem] border border-transparent bg-black/20 transition hover:bg-[#AEB6FF]/[0.055]"
+                className="group relative overflow-hidden rounded-[1rem] border border-transparent bg-black/20 transition hover:bg-white/[0.035]"
               >
                 <button
                   onClick={() => {
@@ -6123,7 +6123,7 @@ Choose one:
                             />
 
                             <div className="absolute bottom-full left-[-8px] z-[95] mb-1.5 w-[240px]">
-                              <div className="overflow-hidden rounded-[1.05rem] border border-[#AEB6FF]/20 bg-[#11131A]/90 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
+                              <div className="overflow-hidden rounded-[1.05rem] border border-[#AEB6FF]/20 bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
                                   <div className="text-[11px] tracking-[0.32em] text-white/58">
@@ -6404,7 +6404,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#AEB6FF]/18 bg-[#11131A]/90 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-[#AEB6FF]/18 bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.55)] backdrop-blur-xl">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -6922,7 +6922,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           <button
             type="button"
             onClick={redeemFounderCode}
-            className="w-full rounded-full border border-white/[0.045] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#AEB6FF]/35 hover:bg-[#AEB6FF]/[0.055] hover:text-white"
+            className="w-full rounded-full border border-white/[0.045] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[#AEB6FF]/35 hover:bg-white/[0.035] hover:text-white"
           >
             Enter Founder Code
           </button>
