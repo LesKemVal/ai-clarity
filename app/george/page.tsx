@@ -5499,7 +5499,7 @@ if (liveMode) {
               : 'bg-white/85'
           } ${
             suggestedSignal || rerouteSignal
-              ? 'ring-1 ring-[#AEB6FF]/45 shadow-[0_0_6px_#AEB6FF,0_0_12px_#AEB6FF] '
+              ? 'ring-1 ring-white/[0.18] shadow-[0_0_8px_rgba(255,255,255,0.14)] '
               : ''
           }`}
         />
@@ -5624,7 +5624,7 @@ if (liveMode) {
           alt=""
           className="absolute inset-0 h-full w-full object-contain opacity-82 drop-shadow-[0_0_18px_rgba(174,182,255,0.18)] [clip-path:circle(35%_at_50%_50%)]"
         />
-        <div className="absolute inset-0 rounded-full border border-[#AEB6FF]/10 bg-white/[0.025] blur-[0.2px]" />
+        <div className="absolute inset-0 rounded-full border border-white/[0.06] bg-white/[0.025] blur-[0.2px]" />
       </div>
 
       <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
@@ -6640,7 +6640,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       onClick={() => setVoiceType(voice.value)}
                       className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
                         voiceType === voice.value
-                          ? 'border-[#AEB6FF]/60 bg-white/15 text-white'
+                          ? 'border-white/[0.16] bg-white/[0.055] text-white'
                           : 'border-white/[0.06] bg-black/28 text-neutral-500 hover:text-white'
                       }`}
                     >
@@ -6658,7 +6658,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
                   placeholder="GEORGE"
-                  className="w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/16 bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-white/[0.14]"
+                  className="w-full rounded-[1rem] max-w-full border border-white/[0.07] bg-black/40 px-5 py-4 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-white/[0.14]"
                 />
               </div>
 
@@ -6817,7 +6817,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   setShowToast(true)
                 }
               }}
-              className="mt-3 w-full rounded-full border border-[#AEB6FF]/20 bg-white/[0.045] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
+              className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-white/70 transition hover:bg-white/[0.12] hover:text-white"
             >
               Send continuity link
             </button>
@@ -6901,7 +6901,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowToast(true)
               }
             }}
-            className="block w-full rounded-[1rem] max-w-full border border-[#AEB6FF]/24 bg-white/8 px-4 py-3 text-left transition hover:border-[#AEB6FF]/45 hover:bg-white/12"
+            className="block w-full rounded-[1rem] max-w-full border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-left transition hover:border-white/[0.14] hover:bg-white/[0.05]"
           >
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -6984,7 +6984,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-[#AEB6FF]/45 bg-white/16 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(174,182,255,0.08)] hover:border-[#AEB6FF]/80 hover:bg-white/22"
+              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-white/[0.14] bg-white/[0.055] px-5 py-4 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
             >
               Upgrade to continue this campaign
             </button>
