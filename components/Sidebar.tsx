@@ -273,7 +273,7 @@ export default function Sidebar({
 
   const linkClass = (path: string) =>
     `block rounded-[0.5rem] px-3 py-1.5 text-[13px] transition ${
-      pathname === path ? 'bg-white/[0.018] text-[#AEB6FF]/86' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'
+      pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -316,7 +316,7 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-[0.55rem] border border-[#AEB6FF]/10 bg-white/[0.02] px-3 py-2.5 text-left text-[13px] text-white/82 transition hover:bg-white/[0.032] hover:text-white/90"
+              className="block w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2.5 text-left text-[13px] text-white/82 transition hover:bg-white/[0.032] hover:text-white/90"
             >
               GEORGE
             </button>
