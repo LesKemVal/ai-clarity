@@ -6291,7 +6291,7 @@ Choose one:
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex items-center w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[0.85rem] border border-white/[0.045] bg-[#11141B]/72 shadow-[0_8px_22px_rgba(0,0,0,0.16)] backdrop-blur-xl">
 
                       <input
@@ -6638,7 +6638,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       key={voice.value}
                       type="button"
                       onClick={() => setVoiceType(voice.value)}
-                      className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm transition ${
+                      className={`rounded-[1rem] border transition hover:scale-[1.01] px-5 py-4 text-sm ${
                         voiceType === voice.value
                           ? 'border-white/[0.16] bg-white/[0.055] text-white'
                           : 'border-white/[0.06] bg-black/28 text-neutral-500 hover:text-white'
@@ -6984,7 +6984,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 hover:-translate-y-[1px] border-white/[0.14] bg-white/[0.055] px-5 py-4 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
+              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 border-white/[0.14] bg-white/[0.055] px-5 py-4 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
             >
               Upgrade to continue this campaign
             </button>
