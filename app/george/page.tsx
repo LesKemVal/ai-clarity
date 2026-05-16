@@ -6714,10 +6714,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setSessionPickerMode('live')
           setShowSessionPicker(true)
         }}
-        onPrepRoom={() => {
-          setShowLiveChooser(false)
-          window.location.href = '/george/live-entry'
-        }}
         onUpgrade={() => {
           setShowLiveChooser(false)
           router.push('/top-up')
