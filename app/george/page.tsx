@@ -6080,7 +6080,7 @@ Choose one:
                         setShowLiveChooser(true)
                         setShowLiveToolsMenu(false)
                       }}
-                      className="shrink-0 rounded-full bg-[#AEB6FF]/[0.055] px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#AEB6FF]/82 transition hover:bg-[#AEB6FF]/18"
+                      className="shrink-0 rounded-full bg-white/[0.045] px-2.5 py-1 text-[11px] font-semibold tracking-[0.18em] text-white/72 transition hover:bg-white/[0.08] hover:text-white"
                       aria-label="Open LIVE chooser"
                     >
                       ◉ LIVE
@@ -6094,8 +6094,8 @@ Choose one:
                       title={voiceOn ? 'Audio guidance active' : 'Audio guidance off'}
                       className={`mx-1 shrink-0 h-2 w-2 rounded-full transition ${
                         voiceOn
-                          ? 'bg-[#AEB6FF]/72 shadow-[0_0_8px_rgba(174,182,255,0.28)]'
-                          : 'bg-[#AEB6FF]/55'
+                          ? 'bg-white/72 shadow-[0_0_6px_rgba(255,255,255,0.12)]'
+                          : 'bg-white/32'
                       }`}
                     />
 
@@ -6126,7 +6126,7 @@ Choose one:
                               <div className="overflow-hidden rounded-[1.05rem] border border-[#AEB6FF]/20 bg-[#11131A]/90 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
 
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                  <div className="text-[11px] tracking-[0.32em] text-[#8E96FF]">
+                                  <div className="text-[11px] tracking-[0.32em] text-white/58">
                                     TOOLS
                                   </div>
 
@@ -6149,7 +6149,7 @@ Choose one:
                                     }}
                                     className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
                                   >
-                                    <div className="pt-[1px] text-[#8E96FF]">✎</div>
+                                    <div className="pt-[1px] text-white/58">✎</div>
                                     <div>
                                       <div className="text-[15px] text-white/92">Reword</div>
                                       <div className="mt-0.5 text-[12px] text-white/38">
@@ -6166,7 +6166,7 @@ Choose one:
                                     }}
                                     className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
                                   >
-                                    <div className="pt-[1px] text-[#8E96FF]">⚡</div>
+                                    <div className="pt-[1px] text-white/58">⚡</div>
                                     <div>
                                       <div className="text-[15px] text-white/92">Cue</div>
                                       <div className="mt-0.5 text-[12px] text-white/38">
@@ -6180,7 +6180,7 @@ Choose one:
                                     onClick={activateNegotiationPosture}
                                     className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
                                   >
-                                    <div className="pt-[1px] text-[#8E96FF]">◎</div>
+                                    <div className="pt-[1px] text-white/58">◎</div>
                                     <div>
                                       <div className="text-[15px] text-white/92">Screener</div>
                                       <div className="mt-0.5 text-[12px] text-white/38">
@@ -6197,7 +6197,7 @@ Choose one:
                                     }}
                                     className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
                                   >
-                                    <div className="pt-[1px] text-[#8E96FF]">≋</div>
+                                    <div className="pt-[1px] text-white/58">≋</div>
                                     <div>
                                       <div className="text-[15px] text-white/92">Tone</div>
                                       <div className="mt-0.5 text-[12px] text-white/38">
@@ -6214,7 +6214,7 @@ Choose one:
                                     }}
                                     className="flex w-full items-start gap-3 px-2 pt-3 pb-1 text-left transition hover:bg-white/[0.018]"
                                   >
-                                    <div className="pt-[1px] text-[#8E96FF]">⌑</div>
+                                    <div className="pt-[1px] text-white/58">⌑</div>
                                     <div>
                                       <div className="text-[15px] text-white/92">Save</div>
                                       <div className="mt-0.5 text-[12px] text-white/38">
@@ -6235,7 +6235,7 @@ Choose one:
                             setShowLiveToolsMenu((prev) => !prev)
                             setShowLiveQuickMenu(false)
                           }}
-                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.16em] text-white/42 transition hover:bg-[#AEB6FF]/[0.055] hover:text-[#AEB6FF]/82"
+                          className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium tracking-[0.16em] text-white/42 transition hover:bg-white/[0.05] hover:text-white/82"
                         >
                           Tools
                         </button>
@@ -6249,7 +6249,7 @@ Choose one:
                           setSessionPickerMode('live')
                           setShowSessionPicker(true)
                         }}
-                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-white/32 transition hover:bg-[#AEB6FF]/[0.055] hover:text-[#AEB6FF]/82"
+                        className="shrink-0 rounded-full px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/82"
                         aria-label="Open LIVE conversation memory"
                         title="Resume conversation continuity"
                       >
