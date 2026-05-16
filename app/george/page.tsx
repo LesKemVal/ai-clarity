@@ -5397,7 +5397,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
       <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-white/72">
-          STRUCTURED LIVE
+          LIVE STRUCTURE
         </div>
 
         <div className="mt-2 text-[16px] font-semibold text-white">
@@ -5472,7 +5472,7 @@ if (liveMode) {
             }}
             className="w-full rounded-xl border border-red-400/12 bg-red-400/[0.045] px-4 py-3 text-left text-sm font-medium text-red-100/82 transition hover:bg-red-400/[0.045]"
           >
-            Exit without saving
+            Leave without saving
           </button>
 
           <button
@@ -5524,7 +5524,7 @@ if (liveMode) {
               {sessionPickerMode === 'campaign' ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
             </div>
             <div className="mt-1 text-[11px] text-white/45">
-              {sessionPickerMode === 'campaign' ? 'Structured LIVE continuity memory.' : 'Immediate LIVE Conversation memory.'}
+              {sessionPickerMode === 'campaign' ? 'Structured LIVE sessions.' : 'Recent LIVE conversations.'}
             </div>
           </div>
           <button
@@ -5616,13 +5616,13 @@ if (liveMode) {
 Goal:
 ${goal}
 
-Last known state:
+Current state:
 ${state}
 
-Recommended next move:
+Next move:
 ${restart}
 
-Choose one:
+
 1. Continue from here.
 2. Tell me what changed.
 3. Start fresh.`
