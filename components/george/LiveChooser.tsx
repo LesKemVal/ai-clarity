@@ -61,13 +61,13 @@ export default function LiveChooser({
       <img
         src="/landing/city02.png"
         alt=""
-        className="absolute inset-0 h-full w-full object-cover opacity-[0.26]"
+        className="absolute inset-0 h-full w-full object-cover opacity-[0.24]"
       />
 
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,7,10,0.72)_0%,rgba(6,7,10,0.90)_52%,rgba(6,7,10,0.98)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,7,10,0.74)_0%,rgba(6,7,10,0.90)_52%,rgba(6,7,10,0.98)_100%)]" />
 
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#7C8CFF]/[0.055] blur-[120px]" />
+        <div className="absolute left-1/2 top-[-220px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[120px]" />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-[760px] flex-col items-center px-6 text-center">
@@ -105,7 +105,7 @@ export default function LiveChooser({
                 <button
                   type="button"
                   onClick={onResumeLiveConversation}
-                  className="rounded-[1.15rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+                  className="rounded-[1.15rem] border border-white/[0.075] bg-white/[0.025] px-6 py-4 text-[15px] font-semibold text-white/76 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
                 >
                   Resume LIVE
                 </button>
@@ -124,7 +124,7 @@ export default function LiveChooser({
               <button
                 type="button"
                 onClick={onEnterCode}
-                className="rounded-[1.15rem] border border-[#7C8CFF]/18 bg-[#7C8CFF]/[0.08] px-6 py-4 text-[15px] font-semibold text-[#D7DDFF] transition hover:bg-[#7C8CFF]/[0.14] hover:text-white"
+                className="rounded-[1.15rem] border border-white/[0.075] bg-white/[0.025] px-6 py-4 text-[15px] font-semibold text-white/76 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
               >
                 Enter Access Code
               </button>
