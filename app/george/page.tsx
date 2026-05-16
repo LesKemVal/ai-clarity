@@ -567,7 +567,9 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
   const [showCampaignMenu, setShowCampaignMenu] = useState(false)
-  const [language, setLanguage] = useState<'EN' | 'ES'>('EN')
+  const [language, setLanguage] = useState('English')
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+  const languageOptions = ['English', 'Español', 'Français', 'العربية', '中文', '日本語']
 
   const activeCampaign = campaigns.find((campaign) => campaign.id === activeCampaignId) || null
   const resolvedLivePosture =
@@ -671,6 +673,15 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   useEffect(() => {
     setSuggestedPrompts(tieredStarterPrompts)
   }, [tieredStarterPrompts])
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const savedLanguage = window.localStorage.getItem('george_language')
+    if (savedLanguage) {
+      setLanguage(savedLanguage)
+    }
+  }, [])
+
   useEffect(() => {
     if (typeof window === 'undefined') return
 
@@ -4166,18 +4177,44 @@ return (
                     </span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
-                    }}
-                    className="flex h-8 items-center gap-1 rounded-full border border-white/[0.04] bg-white/[0.015] px-2 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:text-white/75"
-                    aria-label="Change language"
-                  >
-                    <span>{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
-                    <span>{language}</span>
-                  </button>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowLanguageMenu((prev) => !prev)
+                      }}
+                      className="flex h-8 items-center gap-1 rounded-full border border-white/[0.04] bg-white/[0.015] px-2 text-[10px] font-medium tracking-[0.14em] text-white/45 transition hover:text-white/75"
+                      aria-label="Change language"
+                    >
+                      <span>🌐</span>
+                      <span>{language}</span>
+                    </button>
+
+                    {showLanguageMenu && (
+                      <div className="absolute left-0 top-full z-[120] mt-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                        {languageOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setLanguage(option)
+                              window.localStorage.setItem('george_language', option)
+                              setShowLanguageMenu(false)
+                            }}
+                            className={`w-full rounded-[0.65rem] px-3 py-2 text-left text-[12px] transition ${
+                              language === option
+                                ? 'bg-white/[0.055] text-white'
+                                : 'text-white/52 hover:bg-white/[0.025] hover:text-white/82'
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -5039,18 +5076,7 @@ ${simplifyTarget}`
                     Help
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setLanguage(prev => prev === 'EN' ? 'ES' : 'EN')
-                    }}
-                    className="rounded-full border border-white/[0.04] bg-white/[0.018] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white/42 transition hover:bg-white/[0.022] hover:text-white/72"
-                    aria-label="Change language"
-                  >
-                    <span className="mr-1">{language === 'EN' ? '🇺🇸' : '🇪🇸'}</span>
-                    {language}
-                  </button>
+
                 </div>
 
                 <button
