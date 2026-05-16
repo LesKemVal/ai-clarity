@@ -5819,6 +5819,13 @@ Continue from here, tell me what changed, or start fresh.`
                     <button
                       type="button"
                       onClick={() => {
+                        if (liveMode) {
+                          setSessionPickerClosing(false)
+                          setSessionPickerMode('live')
+                          setShowSessionPicker(true)
+                          return
+                        }
+
                         setShowLiveChooser(true)
                         setShowLiveToolsMenu(false)
                       }}
