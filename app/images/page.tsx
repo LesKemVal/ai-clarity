@@ -70,15 +70,15 @@ export default function ImagesPage() {
         <section className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
           <div>
             <div className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/28">
-              Create Images
+              VISUAL GENERATION
             </div>
 
             <h1 className="text-[34px] font-semibold tracking-[-0.055em] text-white md:text-[52px]">
-              Generate a visual.
+              Generate visual direction.
             </h1>
 
             <p className="mt-4 max-w-[520px] text-[14px] leading-6 text-white/48">
-              Describe the image plainly. Use this for concepts, ads, product visuals, scenes, references, and early creative direction.
+              Use GEORGE to generate concepts, visual references, campaign ideas, product direction, scenes, interfaces, and operational creative work.
             </p>
 
             <div className="mt-7 rounded-[1rem] border border-white/[0.055] bg-white/[0.015] p-4">
@@ -92,7 +92,7 @@ export default function ImagesPage() {
 
               <div className="mt-4 flex items-center justify-between gap-3">
                 <p className="text-[12px] leading-5 text-white/30">
-                  Keep prompts specific. GEORGE will create one square image.
+                  Specific prompts produce stronger visual direction.
                 </p>
 
                 <button
@@ -101,7 +101,7 @@ export default function ImagesPage() {
                   disabled={loading}
                   className="touch-manipulation shrink-0 rounded-[0.8rem] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#07080B] transition hover:bg-white/88 disabled:cursor-not-allowed disabled:opacity-45"
                 >
-                  {loading ? 'Creating…' : 'Create'}
+                  {loading ? 'Creating…' : 'Generate'}
                 </button>
               </div>
 
@@ -119,7 +119,7 @@ export default function ImagesPage() {
                 <img src={image} alt="Generated visual" className="h-full w-full object-contain" />
               ) : (
                 <div className="px-8 text-center text-[13px] leading-6 text-white/34">
-                  Created images will appear here.
+                  Generated images will appear here.
                 </div>
               )}
             </div>
