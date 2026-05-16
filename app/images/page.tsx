@@ -10,6 +10,8 @@ export default function ImagesPage() {
   const [loading, setLoading] = useState(false)
 
   const createImage = async () => {
+    if (loading) return
+
     const cleanPrompt = prompt.trim()
 
     if (!cleanPrompt) {
@@ -53,7 +55,7 @@ export default function ImagesPage() {
   }
 
   return (
-    <main className="min-h-[100dvh] bg-[#06070A] px-5 py-8 text-white">
+    <main className="min-h-[100dvh] overflow-x-hidden overscroll-none bg-[#06070A] px-4 py-6 text-white sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
         <div className="mb-8 flex items-center justify-between border-b border-white/[0.055] pb-4">
           <Link href="/george" className="text-[13px] text-white/44 transition hover:text-white/70">
@@ -85,7 +87,7 @@ export default function ImagesPage() {
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={7}
                 placeholder="Example: A restrained monochrome poster for an operational intelligence product, premium black background, subtle prescription-mark influence, institutional, minimal, useful."
-                className="w-full resize-none rounded-[0.85rem] border border-white/[0.055] bg-black/30 px-4 py-3 text-[14px] leading-6 text-white/82 outline-none placeholder:text-white/24"
+                className="w-full resize-none rounded-[0.85rem] border border-white/[0.055] bg-black/30 px-4 py-3 text-[16px] leading-6 text-white/82 outline-none placeholder:text-white/24 sm:text-[14px]"
               />
 
               <div className="mt-4 flex items-center justify-between gap-3">
@@ -97,7 +99,7 @@ export default function ImagesPage() {
                   type="button"
                   onClick={createImage}
                   disabled={loading}
-                  className="shrink-0 rounded-[0.8rem] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#07080B] transition hover:bg-white/88 disabled:cursor-not-allowed disabled:opacity-45"
+                  className="touch-manipulation shrink-0 rounded-[0.8rem] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#07080B] transition hover:bg-white/88 disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   {loading ? 'Creating…' : 'Create'}
                 </button>
@@ -126,7 +128,7 @@ export default function ImagesPage() {
               <a
                 href={image}
                 download="bx-image.png"
-                className="mt-3 block rounded-[0.75rem] border border-white/[0.055] px-4 py-2.5 text-center text-[13px] text-white/56 transition hover:bg-white/[0.018] hover:text-white/78"
+                className="mt-3 block touch-manipulation rounded-[0.75rem] border border-white/[0.055] px-4 py-2.5 text-center text-[13px] text-white/56 transition hover:bg-white/[0.018] hover:text-white/78"
               >
                 Download image
               </a>
