@@ -80,6 +80,7 @@ export default function GeorgeLiveEntryPage() {
   const [objective, setObjective] = useState('')
   const [controlWords, setControlWords] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('English')
+  const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
 
@@ -95,6 +96,11 @@ export default function GeorgeLiveEntryPage() {
 
     const tier = window.localStorage.getItem('george_tier') || 'smart'
     setCurrentTier(tier)
+
+    const liveLanguage = window.localStorage.getItem('george_live_language')
+    if (liveLanguage) {
+      setSelectedLanguage(liveLanguage)
+    }
 
     const activeLive = getActiveSessionForMode('live')
     setHasLiveSession(!!activeLive)
@@ -181,11 +187,15 @@ export default function GeorgeLiveEntryPage() {
                   <button
                     key={language}
                     type="button"
-                    onClick={() => setSelectedLanguage(language)}
+                    onClick={() => {
+                      setSelectedLanguage(language)
+                      window.localStorage.setItem('george_live_language', language)
+                      setShowLanguageScopePrompt(true)
+                    }}
                     className={`rounded-[0.75rem] border px-3 py-1.5 text-[12px] transition-all duration-150 ${
                       active
-                        ? 'border-white/[0.14] bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.038))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
-                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
+                        ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-[#D7DCFF] shadow-[0_0_18px_rgba(170,180,255,0.10),inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-[#AAB4FF]/24 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80'
                     }`}
                   >
                     {language}
@@ -252,6 +262,39 @@ export default function GeorgeLiveEntryPage() {
             </p>
           </div>
         </div>
+
+        {showLanguageScopePrompt && (
+          <div className="mt-4 rounded-[0.95rem] border border-[#AAB4FF]/18 bg-[#AAB4FF]/[0.045] px-4 py-3 text-left">
+            <div className="text-[12px] font-medium text-[#D7DCFF]">
+              Use {selectedLanguage} only for LIVE?
+            </div>
+
+            <div className="mt-1 text-[11px] leading-5 text-white/42">
+              GEORGE will use this language for LIVE setup and cues. You can also apply it across the site.
+            </div>
+
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowLanguageScopePrompt(false)}
+                className="rounded-full border border-white/[0.06] bg-black/20 px-3 py-1.5 text-[11px] text-white/58 transition hover:border-white/[0.12] hover:text-white/82"
+              >
+                LIVE only
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.localStorage.setItem('george_language', selectedLanguage)
+                  setShowLanguageScopePrompt(false)
+                }}
+                className="rounded-full border border-[#AAB4FF]/25 bg-[#AAB4FF]/10 px-3 py-1.5 text-[11px] text-[#D7DCFF] transition hover:bg-[#AAB4FF]/15"
+              >
+                Apply sitewide
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-7 grid w-full max-w-[400px] gap-3">
 
