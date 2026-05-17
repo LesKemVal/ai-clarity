@@ -290,7 +290,7 @@ return (
         <div className="relative flex items-center justify-between opacity-90">
           <div className="flex items-center gap-2.5 translate-y-[4px]">
             <img
-              src="/bxnew20.png"
+              src="/logofav.png"
               alt="BRANESx"
               className="h-[12px] w-[68px] object-contain opacity-78"
             />
@@ -328,9 +328,16 @@ return (
             </div>
 
             <div className="mt-3 space-y-1">
-              <a href="/george/live-entry" className={linkClass('/george/live-entry')}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSidebar?.(false)
+                  onOpenLiveGate()
+                }}
+                className={linkClass('/george/live-entry')}
+              >
                 LIVE
-              </a>
+              </button>
               <a href="/images" className={linkClass('/images')}>
                 Create Images
               </a>

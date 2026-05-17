@@ -137,7 +137,7 @@ export default function GeorgeLiveEntryPage() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-5 text-center">
         <img
-          src="/bxnew20.png"
+          src="/logofav.png"
           alt="BRANESx"
           className="mb-7 h-6 w-auto object-contain opacity-74"
         />

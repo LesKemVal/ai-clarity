@@ -12,7 +12,7 @@ export default function Brand({
   return (
     <div className="flex items-center gap-2 overflow-hidden">
       <img
-        src="/bxnew20.png"
+        src="/logofav.png"
         alt="BRANESx"
         className={
           compact
