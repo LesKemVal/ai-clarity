@@ -28,8 +28,8 @@ const ROOM_RUNTIME_ESTIMATES: Record<
 > = {
   Interview: {
     average: '~28¢',
-    statement: 'Highly competent forward movement before pressure compounds.',
-    support: ['sharper answers', 'pacing guidance', 'pressure management'],
+    statement: 'For pennies, buy sharper answers, steadier pacing, and better pressure control before the room gets expensive.',
+    support: ['sharper answers · ~32¢', 'pacing guidance · ~41¢', 'pressure management · ~49¢'],
   },
 
   Meeting: {
@@ -300,7 +300,7 @@ export default function GeorgeLiveEntryPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
-                      Estimated LIVE Runtime Support
+                      Operational Capacity
                     </div>
 
                     <div className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-white/92">
@@ -309,7 +309,7 @@ export default function GeorgeLiveEntryPage() {
                   </div>
 
                   <div className="rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/38">
-                    Contextual estimate
+                    Adjusts by room
                   </div>
                 </div>
 
@@ -321,7 +321,7 @@ export default function GeorgeLiveEntryPage() {
                   {runtimeEstimate.support.map((item) => (
                     <div
                       key={item}
-                      className="rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-3 py-2 text-[12px] text-white/50"
+                      className="rounded-[0.7rem] border border-[#AAB4FF]/[0.08] bg-black/18 px-3 py-2 text-[12px] text-white/58 transition hover:border-[#AAB4FF]/[0.18] hover:bg-[#AAB4FF]/[0.045] hover:text-white/82"
                     >
                       {item}
                     </div>
