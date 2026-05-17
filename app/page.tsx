@@ -26,7 +26,7 @@ export default function RootPage() {
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-8 h-36 w-36 rounded-[2.1rem] object-contain opacity-95"
+          className="mb-8 h-40 w-40 rounded-[2.35rem] object-contain opacity-95"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.28em] text-white/34">

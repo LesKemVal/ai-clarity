@@ -1951,11 +1951,9 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
 
       if (isEditing && (!isComposer || input.trim())) return
 
-      const scrollHost = scrollHostRef.current
-      if (!scrollHost) return
-
       event.preventDefault()
-      scrollHost.scrollBy({
+
+      window.scrollBy({
         top: event.key === 'ArrowDown' ? 120 : -120,
         behavior: 'smooth',
       })
