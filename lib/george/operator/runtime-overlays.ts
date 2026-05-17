@@ -6,6 +6,15 @@ export type GeorgeRuntimeOverlayId =
 
 export type GeorgeRuntimeOverlayTier = 'intelligent' | 'brilliant'
 
+export type GeorgeLocationSignal = {
+  city?: string
+  region?: string
+  country?: string
+  latitude?: number
+  longitude?: number
+  source?: 'user_provided' | 'browser_permission' | 'profile' | 'unknown'
+}
+
 export type GeorgeRuntimeOverlay = {
   id: GeorgeRuntimeOverlayId
   code: string
@@ -28,6 +37,7 @@ export type GeorgeRuntimeOverlay = {
   }
   runtimePriorities: string[]
   likelyUsers: string[]
+  localOpportunityModel: string[]
   outreachFrame: string
   pressureModel: string[]
   userSignalPrompts: string[]
@@ -80,6 +90,15 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
       'creators',
       'people preparing for interviews or difficult conversations',
     ],
+    localOpportunityModel: [
+      'job centers and workforce offices',
+      'community colleges and training programs',
+      'truck stops, CDL schools, and logistics communities',
+      'churches and neighborhood organizations',
+      'libraries and community resource centers',
+      'small businesses with customer-facing workers',
+      'local creator, speaker, and entrepreneur groups',
+    ],
     outreachFrame:
       'GEORGE helps people think, speak, prepare, and move better when real life requires it.',
     pressureModel: [
@@ -89,6 +108,7 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
       'Operator may have unique access through location, work, trust, or community.',
     ],
     userSignalPrompts: [
+      'What city, workplace, school, or community can you realistically reach first?',
       'Who do you already know that faces pressure in conversations, work, school, or decisions?',
       'Where can you demonstrate GEORGE in less than two minutes?',
       'What group trusts you enough to actually try something you recommend?',
@@ -125,10 +145,19 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
     },
     runtimePriorities: ['interview readiness', 'public speaking', 'study clarity', 'peer adoption', 'visible usefulness'],
     likelyUsers: ['students', 'internship seekers', 'debate clubs', 'student creators', 'public speakers', 'campus organizations'],
+    localOpportunityModel: [
+      'campus career centers',
+      'community college student groups',
+      'debate and public speaking groups',
+      'internship and job-prep programs',
+      'student creator communities',
+      'libraries and tutoring centers',
+    ],
     outreachFrame:
       'GEORGE helps students prepare, speak clearly, and handle pressure in moments that affect opportunity.',
     pressureModel: ['Students resist boring tools.', 'The first use must feel immediately useful.', 'Social proof matters.'],
     userSignalPrompts: [
+      'Which campus or training program can you actually reach?',
       'Which campus group would understand GEORGE fastest?',
       'What pressure moment do students around you face most often?',
       'Can you demo GEORGE before an interview, presentation, or debate?',
@@ -164,10 +193,19 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
     },
     runtimePriorities: ['plain usefulness', 'low friction', 'workplace pressure', 'communication help', 'mobile install'],
     likelyUsers: ['drivers', 'warehouse workers', 'contractors', 'service workers', 'field operators', 'small crews'],
+    localOpportunityModel: [
+      'truck stops and CDL schools',
+      'warehouses and logistics hubs',
+      'contractor and service-worker networks',
+      'union halls and workforce programs',
+      'small crews and local operators',
+      'adult education and licensing programs',
+    ],
     outreachFrame:
       'GEORGE helps people handle decisions, conversations, and pressure without making technology the center of attention.',
     pressureModel: ['Users may distrust hype.', 'Short practical demonstrations matter.', 'Mobile install must be simple.'],
     userSignalPrompts: [
+      'What kind of workers or operators are near you?',
       'Where do people around you need help thinking or speaking under pressure?',
       'Can you show GEORGE solving one practical problem in under two minutes?',
       'What words would make GEORGE sound useful instead of techy to this group?',
@@ -204,10 +242,19 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
     },
     runtimePriorities: ['workflow fit', 'continuity value', 'team usefulness', 'risk reduction', 'deployment readiness'],
     likelyUsers: ['founders', 'sales teams', 'managers', 'trainers', 'nonprofits', 'workforce programs', 'professional services'],
+    localOpportunityModel: [
+      'small business associations',
+      'nonprofits and workforce organizations',
+      'professional service firms',
+      'sales teams and training groups',
+      'founder and entrepreneur communities',
+      'city, civic, and community organizations',
+    ],
     outreachFrame:
       'GEORGE is an operational intelligence layer that helps people prepare, communicate, decide, and continue work with more consistency.',
     pressureModel: ['Organizations need proof.', 'Avoid broad claims.', 'One strong workflow beats a platform pitch.'],
     userSignalPrompts: [
+      'What organization near you already has communication pressure or training needs?',
       'What organization already trusts you enough to hear this clearly?',
       'Where does communication failure cost time, money, or opportunity?',
       'What workflow can GEORGE improve immediately?',
@@ -218,4 +265,22 @@ export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
 export function resolveRuntimeOverlay(code?: string | null) {
   if (!code) return null
   return GEORGE_RUNTIME_OVERLAYS[code.trim().toUpperCase()] || null
+}
+
+export function buildGeographicOpportunityPrompt(
+  overlay: GeorgeRuntimeOverlay,
+  location?: GeorgeLocationSignal | null
+) {
+  const place = [location?.city, location?.region, location?.country].filter(Boolean).join(', ')
+  const locationLine = place
+    ? `Known user location/context: ${place}.`
+    : 'Location is unknown. Ask the user for their city, region, workplace, school, or reachable community before assuming local opportunities.'
+
+  return [
+    locationLine,
+    `Overlay objective: ${overlay.objective}`,
+    `Operational goal: ${overlay.operationalGoal}`,
+    `Local opportunity model: ${overlay.localOpportunityModel.join('; ')}.`,
+    'Use geography only to identify realistic adoption opportunities the user can actually reach. Do not stereotype the user or the community. Ask for confirmation when local context is uncertain.',
+  ].join('\n')
 }
