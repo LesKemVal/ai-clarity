@@ -13,6 +13,7 @@ import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, 
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession } from '@/lib/george/session/store'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
+import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 
 const OPERATIONAL_SIGNALS = [
   'Signal: Show GEORGE documents, screenshots, or photos during LIVE. GEORGE can reference them in real time.',
@@ -991,7 +992,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const redeemAccessCode = () => {
     const normalized = accessCode.trim().toUpperCase()
 
-    const tier = ACCESS_CODES[normalized]
+    const runtimeOverlay = applyRuntimeOverlayFromCode(normalized)
+    const tier = runtimeOverlay?.tier || ACCESS_CODES[normalized]
 
     if (!tier) {
       setAccessCodeError('Invalid access code.')
@@ -1004,6 +1006,12 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       localStorage.setItem('george_tier', tier)
     }
 
+    setToastMessage(
+      runtimeOverlay
+        ? `${runtimeOverlay.overlay.title} loaded.`
+        : `${tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access loaded.`
+    )
+    setShowToast(true)
     setAccessCode('')
     setAccessCodeError('')
     setShowAccessCodeEntry(false)
