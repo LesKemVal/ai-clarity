@@ -16,12 +16,52 @@ import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/pro
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 
 const OPERATIONAL_SIGNALS = [
-  'Signal: Show GEORGE documents, screenshots, or photos during LIVE. GEORGE can reference them in real time.',
-  'Signal: Say “shorter” if you want compressed responses.',
-  'Signal: Say “line” if you want exact wording.',
-  'Signal: Say “pause” if you want GEORGE to hold.',
-  'Signal: LIVE works best with one earbud.',
+  'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
+  'Say “shorter” if you want compressed responses.',
+  'Say “line” if you want exact wording.',
+  'Say “pause” if you want GEORGE to hold.',
+  'LIVE works best with one earbud.',
 ]
+
+function getLiveRoomSignal(room: string) {
+  if (room === 'Interview') {
+    return 'Interview context loaded. GEORGE will watch proof, pacing, pressure, and answer clarity.'
+  }
+
+  if (room === 'Meeting') {
+    return 'Meeting context loaded. GEORGE will watch alignment, timing, decision pressure, and next useful moves.'
+  }
+
+  if (room === 'Boardroom') {
+    return 'Boardroom context loaded. GEORGE will watch authority, proof pressure, framing, and executive clarity.'
+  }
+
+  if (room === 'Negotiation') {
+    return 'Negotiation context loaded. GEORGE will watch leverage, timing, pressure, concessions, and control.'
+  }
+
+  if (room === 'Sales Call') {
+    return 'Sales context loaded. GEORGE will watch trust, objection pressure, timing, and closing movement.'
+  }
+
+  if (room === 'Debate') {
+    return 'Debate context loaded. GEORGE will watch contradiction, proof demands, interruptions, and framing control.'
+  }
+
+  if (room === 'Doctor Appointment') {
+    return 'Appointment context loaded. GEORGE will watch clarity, symptoms, questions, and what cannot be missed.'
+  }
+
+  if (room === 'Presentation') {
+    return 'Presentation context loaded. GEORGE will watch pacing, audience pressure, message clarity, and the close.'
+  }
+
+  if (room === 'Everyday Conversation') {
+    return 'Conversation context loaded. GEORGE will watch tone, timing, pressure, and the next useful line.'
+  }
+
+  return 'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.'
+}
 
 type Message = {
   role: 'assistant' | 'user' | 'system'
@@ -1119,8 +1159,7 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         ? `Control words: ${liveSetup.controlWords.trim()}`
         : ''
 
-      const signal =
-        OPERATIONAL_SIGNALS[Math.floor(Math.random() * OPERATIONAL_SIGNALS.length)]
+      const signal = getLiveRoomSignal(setupRoom)
 
       const roomCalibrationLine = setupRoom === 'Debate'
         ? 'Debate posture active. I’ll watch contradiction, proof demands, framing pressure, and interruptions.'
