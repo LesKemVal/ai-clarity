@@ -4405,7 +4405,7 @@ return (
           </h1>
 
           <p className="mt-7 max-w-[250px] text-[15px] leading-7 text-white/42 sm:max-w-[360px] sm:text-[16px] md:mt-8">
-            Listen in real time. Get the next useful line when it matters.
+            Keep GEORGE in the room with you.
           </p>
         </div>
 
@@ -4444,7 +4444,7 @@ return (
         className={`relative whitespace-pre-wrap text-[15.5px] md:text-[15.5px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.5]'} landscape:leading-8 tracking-[0em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-white/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[82%] text-right rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-3.5 py-2.5 shadow-none'
+              ? 'max-w-[82%] text-right rounded-[0.95rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
               : 'max-w-[82%] text-right rounded-[0.95rem] border border-white/[0.045] bg-white/[0.02] px-3.5 py-2.5 shadow-none')
  : 'max-w-full text-left'
         } ${
@@ -5883,7 +5883,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#0F1117]/78 px-2 py-1 shadow-none' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     {liveMode && (
                       <div className="mb-1.5 flex w-full items-center justify-between gap-2 px-1">
                         <div className="flex items-center gap-1.5">
@@ -6024,7 +6024,7 @@ ${(showConversation || liveMode) ? 'fixed bottom-[6px]' : 'fixed top-[57%] md:to
                       </div>
                     )}
 
-                    <div className="relative flex-1 rounded-[0.85rem] border border-white/[0.045] bg-[#11141B]/72 shadow-[0_8px_22px_rgba(0,0,0,0.16)] backdrop-blur-xl">
+                    <div className="relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] backdrop-blur-xl">
 
                       <input
                         ref={fileInputRef}
