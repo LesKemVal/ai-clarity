@@ -292,7 +292,7 @@ return (
             <img
               src="/logofav.png"
               alt="BRANESx"
-              className="h-[12px] w-[68px] object-contain opacity-78"
+              className="h-7 w-7 rounded-[0.45rem] object-contain opacity-88"
             />
           </div>
 
