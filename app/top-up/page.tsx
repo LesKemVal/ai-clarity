@@ -3,12 +3,88 @@
 import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
 
+type TierId = 'smart' | 'intelligent' | 'brilliant' | 'brilliant_day'
+
+type TierCard = {
+  id: TierId
+  name: string
+  price: string
+  tone: string
+  promise: string
+  label: string
+  details: string[]
+  action?: string
+  checkout?: 'intelligent' | 'brilliant' | 'brilliant_day'
+}
+
+const tiers: TierCard[] = [
+  {
+    id: 'smart',
+    name: 'Smart',
+    price: '$0',
+    tone: 'Base',
+    promise: 'Everyday direction when you need the next move.',
+    label: 'Explain Smart',
+    details: [
+      'Clarify what matters without overloading the answer.',
+      'Reduce drift when goals, problems, or decisions feel scattered.',
+      'Use GEORGE without payment while the core habit forms.',
+    ],
+  },
+  {
+    id: 'intelligent',
+    name: 'Intelligent',
+    price: '$10',
+    tone: 'Continuity',
+    promise: 'Stronger memory, follow-through, and execution support.',
+    label: 'Explain Intelligent',
+    details: [
+      'Better continuity when a goal or situation changes over time.',
+      'More useful support for planning, decisions, documents, and momentum.',
+      'A stronger operating layer before LIVE becomes necessary.',
+    ],
+    action: 'Activate Intelligent',
+    checkout: 'intelligent',
+  },
+  {
+    id: 'brilliant',
+    name: 'Brilliant',
+    price: '$25',
+    tone: 'LIVE',
+    promise: 'When LIVE support carries the moment.',
+    label: 'Explain Brilliant',
+    details: [
+      'LIVE conversational support when timing, wording, silence, and pressure matter.',
+      'Repeatable lines, cues, posture guidance, and room-aware help.',
+      'Deepest continuity for conversations and work that should not reset.',
+    ],
+    action: 'Activate Brilliant',
+    checkout: 'brilliant',
+  },
+  {
+    id: 'brilliant_day',
+    name: 'Brilliant Day',
+    price: '$5',
+    tone: 'Temporary',
+    promise: 'Use LIVE for the room in front of you today.',
+    label: 'Explain Day Access',
+    details: [
+      'Temporary Brilliant access for interviews, negotiations, calls, meetings, or difficult rooms.',
+      'Useful when one conversation may affect the next opportunity.',
+      'Designed for the moment without changing your longer-term tier.',
+    ],
+    action: 'Activate Day Access',
+    checkout: 'brilliant_day',
+  },
+]
+
 export default function TopUpPage() {
   const [intent, setIntent] = useState<string | null>(null)
   const [feedbackType, setFeedbackType] = useState('suggestion')
   const [feedback, setFeedback] = useState('')
   const [message, setMessage] = useState('')
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
+  const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -73,10 +149,10 @@ export default function TopUpPage() {
       return 'Set identity, voice, and continuity behavior without changing the core system.'
     }
     if (intent === 'conversation') {
-      return 'Runtime support for rooms where timing, wording, and pressure matter.'
+      return 'Support for rooms where timing, wording, and pressure matter.'
     }
     if (intent === 'pro') {
-      return 'Temporary LIVE runtime elevation for high-pressure communication.'
+      return 'Temporary LIVE support for high-pressure communication.'
     }
     return 'Choose the level of continuity, operational support, and LIVE access that fits how you work.'
   }, [intent])
@@ -124,11 +200,6 @@ export default function TopUpPage() {
     }
   }
 
-  function jumpTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-
   async function redeemFounderCode() {
     const code = window.prompt('Enter founder access code')
 
@@ -136,11 +207,8 @@ export default function TopUpPage() {
 
     const normalized = code.trim().toUpperCase()
 
-    const intelligentFounder =
-      /^INTEL-FOUNDER-\d{3}$/.test(normalized)
-
-    const brilliantFounder =
-      normalized === 'BRILLIANT-FOUNDER'
+    const intelligentFounder = /^INTEL-FOUNDER-\d{3}$/.test(normalized)
+    const brilliantFounder = normalized === 'BRILLIANT-FOUNDER'
 
     if (intelligentFounder) {
       localStorage.setItem('george_tier', 'intelligent')
@@ -190,10 +258,10 @@ export default function TopUpPage() {
       </div>
 
       <div className="relative z-10 space-y-6">
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.006] p-5 backdrop-blur-[0.5px] md:p-6">
+        <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 backdrop-blur-[0.5px] md:p-6">
           <div className="max-w-5xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">
-              BRANESx
+              ACCESS LEVELS
             </p>
 
             <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white md:text-5xl">
@@ -204,16 +272,15 @@ export default function TopUpPage() {
               {subcopy}
             </p>
 
-            <div className="rounded-[0.8rem] border border-white/[0.045] bg-black/24 px-4 py-3 text-sm text-white/70">
-              Access changes what GEORGE can restore, remember, and support in real time.
+            <div className="rounded-[0.8rem] border border-white/[0.028] bg-black/20 px-4 py-3 text-sm text-white/64">
+              Pay for the level of recall, support, and LIVE access you actually need.
             </div>
-
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
                 type="button"
                 onClick={redeemFounderCode}
-                className="rounded-[0.7rem] border border-white/[0.055] bg-white/[0.012] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/58 transition hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/76"
+                className="rounded-[0.7rem] border border-white/[0.045] bg-white/[0.010] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-white/58 transition hover:border-white/[0.09] hover:bg-white/[0.022] hover:text-white/76"
               >
                 Founder Code
               </button>
@@ -224,98 +291,85 @@ export default function TopUpPage() {
             </div>
 
             <div className="grid gap-3 pt-2 lg:grid-cols-4">
-              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.012] p-5 shadow-none">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white/88">Smart</p>
-                  <span className="rounded-[0.6rem] border border-white/[0.045] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/48">
-                    Base
-                  </span>
-                </div>
-                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$0</div>
-                <ul className="space-y-2 text-sm leading-6 text-white/46">
-                  <li>Clarify what matters</li>
-                  <li>Reduce drift and confusion</li>
-                  <li>Everyday operational support</li>
-                  <li>Anonymous access</li>
-                </ul>
-              </div>
+              {tiers.map((tier) => {
+                const expanded = expandedTier === tier.id
+                const featured = tier.id === 'brilliant'
 
-              <div className="rounded-[0.9rem] border border-white/[0.05] bg-white/[0.012] p-5">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white/88">Intelligent</p>
-                  <span className="rounded-[0.6rem] border border-white/[0.05] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
-                    Continuity
-                  </span>
-                </div>
-                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$10</div>
-                <ul className="space-y-2 text-sm leading-6 text-white/48">
-                  <li>Deeper continuity memory</li>
-                  <li>Stronger execution support</li>
-                  <li>Better pressure handling</li>
-                  <li>More adaptive support</li>
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('intelligent')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.065] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/76 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-white"
-                >
-                  Activate Intelligent
-                </button>
-              </div>
+                return (
+                  <div
+                    key={tier.id}
+                    className={`rounded-[0.9rem] border bg-white/[0.010] p-4 transition-all duration-200 ${
+                      featured
+                        ? 'border-[#AAB4FF]/16 shadow-[0_0_28px_rgba(170,180,255,0.045)]'
+                        : 'border-white/[0.028]'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-base font-semibold text-white/88">{tier.name}</p>
+                        <div className="mt-2 text-2xl font-semibold tracking-tight text-white/88">{tier.price}</div>
+                      </div>
 
-              <div className="rounded-[0.9rem] border border-white/[0.06] bg-white/[0.016] p-5">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white/90">Brilliant</p>
-                  <span className="rounded-[0.6rem] border border-white/[0.05] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
-                    LIVE
-                  </span>
-                </div>
-                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/90">$25</div>
-                <ul className="space-y-2 text-sm leading-6 text-white/50">
-                  <li>LIVE conversational support</li>
-                  <li>Timing and pressure awareness</li>
-                  <li>Repeatable lines and cues</li>
-                  <li>Deepest continuity support</li>
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('brilliant_day')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.085] bg-white/[0.045] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/[0.14] hover:bg-white/[0.08]"
-                >
-                  Activate Brilliant
-                </button>
-              </div>
+                      <span className="rounded-[0.55rem] border border-white/[0.035] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/44">
+                        {tier.tone}
+                      </span>
+                    </div>
 
-              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.012] p-5 shadow-none">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-base font-semibold text-white/88">Brilliant Day</p>
-                  <span className="rounded-[0.6rem] border border-white/[0.045] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/46">
-                    Temporary
-                  </span>
-                </div>
-                <div className="mb-3 text-2xl font-semibold tracking-tight text-white/88">$5</div>
-                <ul className="space-y-2 text-sm leading-6 text-white/46">
-                  <li>Temporary LIVE elevation</li>
-                  <li>Interviews and negotiations</li>
-                  <li>Calls and difficult rooms</li>
-                  <li>LIVE when the moment matters</li>
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('brilliant')}
-                  className="mt-5 w-full rounded-[0.7rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-sm font-semibold text-white/74 transition hover:border-white/[0.12] hover:bg-white/[0.032] hover:text-white/88"
-                >
-                  Activate Day Access
-                </button>
-              </div>
+                    <p className="mt-4 min-h-[44px] text-sm leading-6 text-white/48">
+                      {tier.promise}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => setExpandedTier(expanded ? null : tier.id)}
+                      className="mt-4 flex w-full items-center justify-between rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-3 py-2.5 text-left text-[12px] font-medium text-white/58 transition hover:border-white/[0.08] hover:bg-white/[0.022] hover:text-white/80"
+                    >
+                      <span>{tier.label}</span>
+                      <span className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>⌄</span>
+                    </button>
+
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${
+                        expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <ul className="mt-3 space-y-2 border-t border-white/[0.035] pt-3 text-sm leading-6 text-white/46">
+                          {tier.details.map((detail) => (
+                            <li key={detail}>{detail}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {tier.action && tier.checkout && (
+                      <button
+                        type="button"
+                        onClick={() => startCheckout(tier.checkout)}
+                        className={`mt-4 w-full rounded-[0.7rem] border px-4 py-3 text-sm font-semibold transition ${
+                          featured
+                            ? 'border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.075] text-[#D7DCFF] hover:bg-[#AAB4FF]/[0.11]'
+                            : 'border-white/[0.055] bg-white/[0.014] text-white/72 hover:border-white/[0.10] hover:bg-white/[0.03] hover:text-white/88'
+                        }`}
+                      >
+                        {tier.action}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
-
-            
           </div>
         </section>
 
+        {message && (
+          <div className="rounded-[0.8rem] border border-[#AAB4FF]/16 bg-[#AAB4FF]/[0.045] px-4 py-3 text-sm text-[#D7DCFF]">
+            {message}
+          </div>
+        )}
+
         <section className="grid gap-4 lg:grid-cols-2">
-          <div id="feedback" className="scroll-mt-24 rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5">
+          <div id="feedback" className="scroll-mt-24 rounded-[0.9rem] border border-white/[0.028] bg-white/[0.010] p-5">
             <div className="space-y-4">
               <p className="text-sm font-medium text-white/84">Feedback</p>
               <p className="text-sm leading-7 text-white/44">
@@ -325,7 +379,7 @@ export default function TopUpPage() {
               <select
                 value={feedbackType}
                 onChange={(e) => setFeedbackType(e.target.value)}
-                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#10131B]/58 px-4 py-3 text-white outline-none"
+                className="w-full rounded-[0.85rem] border border-white/[0.04] bg-[#10131B]/58 px-4 py-3 text-white outline-none"
               >
                 <option value="suggestion">Suggestion</option>
                 <option value="bug">Bug</option>
@@ -338,13 +392,13 @@ export default function TopUpPage() {
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={6}
                 placeholder="What should change?"
-                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#10131B]/58 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                className="w-full rounded-[0.85rem] border border-white/[0.04] bg-[#10131B]/58 px-4 py-3 text-white outline-none placeholder:text-white/28"
               />
 
               <button
                 type="button"
                 onClick={submitFeedback}
-                className="w-full rounded-[0.7rem] border border-white/[0.055] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/[0.12] hover:bg-white/[0.022] hover:text-white/86"
+                className="w-full rounded-[0.7rem] border border-white/[0.045] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/86"
               >
                 Save feedback
               </button>
