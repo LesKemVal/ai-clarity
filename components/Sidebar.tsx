@@ -341,7 +341,7 @@ return (
               <a href="/images" className={linkClass('/images')}>
                 Create Images
               </a>
-              <a href="/welcome" className={linkClass('/welcome')}>
+              <a href="/signal" className={linkClass('/signal')}>
                 User Signal
               </a>
               <a href="/help" className={linkClass('/help')}>
