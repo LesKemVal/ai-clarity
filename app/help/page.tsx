@@ -1,128 +1,164 @@
 'use client'
 
-import PageShell from '@/components/layout/PageShell'
+import { useState } from 'react'
+
+type HelpSection =
+  | 'george'
+  | 'live'
+  | 'continuity'
+  | 'memory'
+  | 'images'
+  | 'voice'
+  | 'signal'
+  | null
 
 export default function HelpPage() {
+  const [open, setOpen] = useState<HelpSection>(null)
+
+  const toggle = (section: HelpSection) => {
+    setOpen(open === section ? null : section)
+  }
+
   return (
-    <PageShell
-      title="Operating GEORGE"
-      eyebrow="Manual"
-      backToGeorge
-    >
-      <div className="space-y-5">
-
-        <section className="rounded-[0.9rem] border border-white/[0.045] bg-black/24 p-5 md:p-5">
-          <p className="text-sm leading-7 text-white/82">
-            GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
-          </p>
-          <p className="mt-3 text-sm leading-7 text-white/44">
-            You choose the direction. GEORGE keeps the signal, narrows the move, and stays useful when the room changes.
-          </p>
-        </section>
-
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <p className="text-[20px] font-semibold tracking-[-0.035em] text-white/92">
-            Less drift. Better next moves. Stronger words when they count.
-          </p>
-          <p className="mt-3 leading-7 text-white/44">
-            Use GEORGE to decide, prepare, respond, and keep momentum. Use LIVE when the conversation itself is the work.
-          </p>
-        </section>
-
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Operating model</h2>
-          <div className="grid gap-2 text-sm leading-6 text-white/46">
-            <p><span className="text-white/76">Direction</span> — identify what actually matters.</p>
-            <p><span className="text-white/76">Action</span> — choose the next useful move.</p>
-            <p><span className="text-white/76">Signal</span> — learn from what happens next.</p>
+    <main className="min-h-[100dvh] bg-[#06070A] px-5 py-10 text-white">
+      <div className="mx-auto max-w-[720px]">
+        <div className="mb-10">
+          <div className="text-[10px] uppercase tracking-[0.28em] text-white/34">
+            OPERATIONAL HELP
           </div>
-          <p className="mt-4 text-sm leading-6 text-white/50">
-            Bring the objective. GEORGE turns it into movement.
+
+          <h1 className="mt-3 text-[34px] font-semibold tracking-[-0.05em] text-white/92">
+            GEORGE works like a utility.
+          </h1>
+
+          <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-white/58">
+            Use what you need. Ignore what you do not. GEORGE is designed to
+            help people think, prepare, communicate, and move more effectively
+            in real situations.
           </p>
-        </section>
+        </div>
 
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Start with the real situation</h2>
-          <div className="grid gap-2 text-sm leading-6 text-white/46">
-            <p>“I need to make a decision.”</p>
-            <p>“I need to say this the right way.”</p>
-            <p>“I need a plan I can actually follow.”</p>
-            <p>“I’m stuck. Find the next move.”</p>
-          </div>
-        </section>
+        <div className="space-y-3">
+          <UtilityCard
+            open={open === 'george'}
+            onClick={() => toggle('george')}
+            label="GEORGE"
+            title="Normal GEORGE"
+            body="Use GEORGE to think through problems, build plans, interpret documents, prepare for decisions, sharpen ideas, or continue momentum when direction matters."
+          />
 
-        <section className="rounded-[0.9rem] border border-white/[0.045] bg-black/24 p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">LIVE</h2>
+          <UtilityCard
+            open={open === 'live'}
+            onClick={() => toggle('live')}
+            label="LIVE"
+            title="LIVE Conversation"
+            body="LIVE helps during conversations where timing, pressure, and communication matter. Interviews, meetings, negotiations, conflict, presentations, calls, and difficult moments."
+            accent
+          />
 
-          <div className="space-y-4">
-            <div>
-              <p className="font-medium text-white/82">One earbud if possible.</p>
-              <p className="mt-2 leading-7 text-white/44">
-                LIVE supports timing, pacing, pressure, and next responses without competing with the room.
-              </p>
-              <p className="mt-3 text-[15px] italic tracking-[-0.01em] text-white/72">
-                When the conversation itself is the work.
-              </p>
-            </div>
+          <UtilityCard
+            open={open === 'continuity'}
+            onClick={() => toggle('continuity')}
+            label="CONTINUITY"
+            title="Continuity"
+            body="GEORGE can restore sessions, context, goals, and ongoing work so conversations continue naturally instead of restarting from zero."
+          />
 
-            <div>
-              <p className="font-medium text-white/82">Steer without exposing the system.</p>
-              <p className="mt-2 leading-7 text-white/44">
-                Natural phrases like “hmm”, “let me think”, or “right” can steer LIVE without disrupting the conversation.
-              </p>
-            </div>
+          <UtilityCard
+            open={open === 'memory'}
+            onClick={() => toggle('memory')}
+            label="MEMORY"
+            title="Memory & Sessions"
+            body="Sessions help GEORGE continue useful work over time. Important conversations, goals, and operational context can persist across usage."
+          />
 
-            <div>
-              <p className="font-medium text-white/82">Show GEORGE what matters.</p>
-              <p className="mt-2 leading-7 text-white/44">
-                Upload documents, screenshots, photos, or a résumé before or during LIVE so GEORGE can reference the context in real time.
-              </p>
-            </div>
+          <UtilityCard
+            open={open === 'images'}
+            onClick={() => toggle('images')}
+            label="IMAGES"
+            title="Images & Documents"
+            body="You can show GEORGE screenshots, photos, and documents to add context, interpret information, or support LIVE situations."
+          />
 
-            <div>
-              <p className="font-medium text-white/82">Silence can be the move.</p>
-              <p className="mt-2 leading-7 text-white/44">
-                LIVE may hold, compress, cue posture, or give one exact line depending on pressure and timing.
-              </p>
-            </div>
-          </div>
-        </section>
+          <UtilityCard
+            open={open === 'voice'}
+            onClick={() => toggle('voice')}
+            label="VOICE"
+            title="Voice"
+            body="Voice and earbud support are designed for real-world usage where hands-free assistance, timing, and low-friction interaction matter."
+          />
 
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Controls</h2>
-          <div className="grid gap-2 text-sm leading-6 text-white/46">
-            <p><span className="text-white/76">Keep this</span> — save what is worth returning to.</p>
-            <p><span className="text-white/76">Share</span> — move useful guidance outside GEORGE.</p>
-            <p><span className="text-white/76">Related</span> — surface nearby context.</p>
-            <p><span className="text-white/76">Simplify</span> — reduce the answer to what matters most.</p>
-            <p><span className="text-white/76">Reword</span> — reshape a line for the moment.</p>
-          </div>
-        </section>
-
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Continuity</h2>
-          <p className="leading-7 text-white/44">
-            Continuity keeps useful direction, context, and working history available when the work changes shape.
-          </p>
-        </section>
-
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Access</h2>
-          <div className="grid gap-2 text-sm leading-6 text-white/46">
-            <p><span className="text-white/76">Smart</span> — everyday direction and reasoning.</p>
-            <p><span className="text-white/76">Intelligent</span> — stronger continuity and execution support.</p>
-            <p><span className="text-white/76">Brilliant</span> — deepest LIVE support and strongest continuity.</p>
-            <p><span className="text-white/76">Brilliant Day</span> — temporary Brilliant access.</p>
-          </div>
-        </section>
-
-        <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <p className="text-[17px] font-medium leading-8 text-white/86">
-            Bring the situation. GEORGE keeps the next move in view.
-          </p>
-        </section>
-
+          <UtilityCard
+            open={open === 'signal'}
+            onClick={() => toggle('signal')}
+            label="SIGNAL"
+            title="Signal"
+            body="Signal helps GEORGE interpret what matters most in the room: pressure, timing, leverage, hesitation, confusion, urgency, and momentum."
+          />
+        </div>
       </div>
-    </PageShell>
+    </main>
+  )
+}
+
+function UtilityCard({
+  open,
+  onClick,
+  label,
+  title,
+  body,
+  accent = false,
+}: {
+  open: boolean
+  onClick: () => void
+  label: string
+  title: string
+  body: string
+  accent?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full rounded-[1.1rem] border px-5 py-4 text-left transition-all duration-300 ${
+        accent
+          ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.035]'
+          : 'border-white/[0.05] bg-black/[0.18]'
+      }`}
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-white/34">
+            {label}
+          </div>
+
+          <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">
+            {title}
+          </div>
+        </div>
+
+        <div
+          className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] text-[18px] text-white/42 transition ${
+            open ? 'rotate-45 bg-white/[0.06] text-white/84' : ''
+          }`}
+        >
+          +
+        </div>
+      </div>
+
+      <div
+        className={`grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          open
+            ? 'mt-4 grid-rows-[1fr] opacity-100'
+            : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <p className="text-[14px] leading-6 text-white/58">
+            {body}
+          </p>
+        </div>
+      </div>
+    </button>
   )
 }
