@@ -25,7 +25,7 @@ export default function HelpPage() {
             Less drift. Better next moves. Stronger words when they count.
           </p>
           <p className="mt-3 leading-7 text-white/44">
-            Use GEORGE to decide, prepare, respond, and keep momentum. Use LIVE when the conversation itself becomes the work.
+            Use GEORGE to decide, prepare, respond, and keep momentum. Use LIVE when the conversation itself is the work.
           </p>
         </section>
 
@@ -60,12 +60,15 @@ export default function HelpPage() {
               <p className="mt-2 leading-7 text-white/44">
                 LIVE supports timing, pacing, pressure, and next responses without competing with the room.
               </p>
+              <p className="mt-3 text-[15px] italic tracking-[-0.01em] text-white/72">
+                When the conversation itself is the work.
+              </p>
             </div>
 
             <div>
               <p className="font-medium text-white/82">Steer without exposing the system.</p>
               <p className="mt-2 leading-7 text-white/44">
-                Natural phrases like “hmm”, “let me think”, or “right” can guide LIVE toward a line, cue, pause, or shorter response.
+                Natural phrases like “hmm”, “let me think”, or “right” can steer LIVE without disrupting the conversation.
               </p>
             </div>
 
