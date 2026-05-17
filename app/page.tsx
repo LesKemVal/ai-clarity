@@ -10,7 +10,7 @@ export default function RootPage() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,12,16,0.38),rgba(8,10,14,0.24)_36%,rgba(6,7,10,0.52)_70%,rgba(6,7,10,0.92)_100%)]" />
         <div className="absolute left-1/2 top-[-90px] h-[92%] w-[1180px] -translate-x-1/2 overflow-hidden rounded-[1.8rem] bg-[linear-gradient(105deg,rgba(10,12,16,0.30),rgba(18,20,26,0.12)_44%,rgba(7,10,17,0.26))] opacity-76">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_32%,rgba(174,182,255,0.045),transparent_24%),radial-gradient(circle_at_74%_30%,rgba(126,160,190,0.035),transparent_18%),radial-gradient(circle_at_38%_66%,rgba(20,48,76,0.12),transparent_28%)]" />
-          <div className="absolute left-[6%] top-[148px] h-px w-[84%] bg-gradient-to-r from-transparent via-[#9BB8CF]/16 to-transparent" />
+          <div className="absolute left-[6%] top-[182px] h-px w-[84%] bg-gradient-to-r from-transparent via-[#9BB8CF]/10 to-transparent" />
           <div className="absolute left-[12%] top-[248px] h-px w-[72%] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
           <div className="absolute left-[20%] top-[378px] h-px w-[64%] bg-gradient-to-r from-transparent via-[#7EC9DA]/10 to-transparent" />
           <div className="absolute left-[28%] top-[520px] h-px w-[48%] bg-gradient-to-r from-transparent via-[#9BB8CF]/8 to-transparent" />
@@ -26,34 +26,34 @@ export default function RootPage() {
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-8 h-5 w-auto object-contain opacity-64"
+          className="mb-8 h-36 w-36 rounded-[2.1rem] object-contain opacity-95"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.28em] text-white/34">
           OPERATIONAL INTELLIGENCE
         </div>
         <h1 className="max-w-[640px] text-[34px] font-semibold leading-[1.05] tracking-[-0.055em] text-white/94 md:text-[52px]">
-          Move from uncertainty to the next useful action.
+          Bring the situation. Get the next move.
         </h1>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
-          Build businesses. Untangle problems. Prepare for pressure. Sharpen communication. Think clearly under load.
+          Use GEORGE to plan, decide, prepare, respond, and keep momentum when the next step matters.
         </p>
 
         <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.25rem] border border-white/[0.024] bg-black/[0.10] p-4 text-left">
           <div className="flex items-center justify-between border-b border-white/[0.032] pb-3 text-[11px] tracking-[0.18em] text-white/34">
-            <span>HOW GEORGE HELPS</span>
-            <span className="text-white/38">DIRECTION → ACTION → SIGNAL</span>
+            <span>UTILITY</span>
+            <span className="text-white/38">ASK → MOVE → CONTINUE</span>
           </div>
 
           <div className="grid gap-4 text-[13px] leading-6 text-white/58">
             <div className="rounded-[0.85rem] border border-white/[0.025] bg-black/[0.12] p-5">
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/32">GEORGE</p>
-              <p className="mt-3 text-[16px] leading-7 text-white/58">Bring the situation. GEORGE identifies what matters, narrows the next move, and keeps useful context as the work changes.</p>
+              <p className="mt-3 text-[16px] leading-7 text-white/58">Turn a goal, problem, document, idea, or decision into a useful next step.</p>
             </div>
 
             <div className="rounded-[0.85rem] border border-white/[0.055] bg-white/[0.014] p-5">
               <p className="text-[11px] uppercase tracking-[0.2em] text-white/52">GEORGE LIVE</p>
-              <p className="mt-3 text-[16px] leading-7 text-white/66">Use LIVE when words, timing, posture, or silence matter — interviews, negotiations, meetings, difficult calls, presentations, or any pressure room.</p>
+              <p className="mt-3 text-[16px] leading-7 text-white/66">Use LIVE when the room matters: interviews, negotiations, calls, meetings, conflict, presentations, or moments where words and timing count.</p>
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function RootPage() {
             href="/george/live-entry"
             className="flex items-center justify-center rounded-[1.15rem] border border-white/[0.055] bg-white/[0.018] px-6 py-4 text-[15px] font-semibold text-white/82 transition hover:border-white/[0.09] hover:bg-white/[0.032] hover:text-white"
           >
-            Enter GEORGE LIVE
+            Prepare LIVE
           </Link>
         </div>
 
