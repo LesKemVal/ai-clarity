@@ -6251,54 +6251,12 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 </div>
 
                 
-                {!liveMode && (
-                  <div className="pointer-events-auto fixed bottom-[74px] left-0 right-0 z-[82] mx-auto flex w-full max-w-[900px] justify-center px-3">
-                    <div className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-[#0B0D12]/96 px-2 py-1 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
-                      {[
-                        'Reframe',
-                        'Simplify',
-                        'Related',
-                        'Next Move',
-                        'Tone',
-                        'Save',
-                      ].map((tool) => (
-                        <button
-                          key={tool}
-                          type="button"
-                          className="rounded-full px-3 py-1.5 text-[11px] text-white/54 transition hover:bg-white/[0.05] hover:text-white/88"
-                        >
-                          {tool}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
 
-                {!liveMode && (
-                  <div className="pointer-events-auto fixed bottom-[74px] left-0 right-0 z-[82] mx-auto flex w-full max-w-[900px] justify-center px-3">
-                    <div className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-[#0B0D12]/96 px-2 py-1 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
-                      {[
-                        'Reframe',
-                        'Simplify',
-                        'Related',
-                        'Next Move',
-                        'Tone',
-                        'Save',
-                      ].map((tool) => (
-                        <button
-                          key={tool}
-                          type="button"
-                          className="rounded-full px-3 py-1.5 text-[11px] text-white/54 transition hover:bg-white/[0.05] hover:text-white/88"
-                        >
-                          {tool}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
-{!liveMode && !input.trim() && !pendingImage && (
+
+
+{!liveMode && !showConversation && !input.trim() && !pendingImage && (
                   <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
                     <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-white/38">
                       <button
