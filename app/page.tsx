@@ -51,26 +51,27 @@ export default function RootPage() {
               <p className="mt-3 text-[16px] leading-7 text-white/58">Turn a goal, problem, document, idea, or decision into a useful next step.</p>
             </div>
 
-            <div className="rounded-[0.85rem] border border-white/[0.055] bg-white/[0.014] p-5">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/52">GEORGE LIVE</p>
+            <div className="rounded-[0.85rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.018] p-5 shadow-[inset_0_1px_0_rgba(143,182,201,0.035)]">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8D4E6]/58">GEORGE LIVE</p>
               <p className="mt-3 text-[16px] leading-7 text-white/66">Use LIVE when the room matters: interviews, negotiations, calls, meetings, conflict, presentations, or moments where words and timing count.</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-7 grid w-full max-w-[420px] gap-3">
+        <div className="mt-7 grid w-full max-w-[440px] gap-3 sm:grid-cols-2">
           <Link
             href="/george"
-            className="flex items-center justify-center rounded-[1.15rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+            className="group flex items-center justify-center rounded-[1.1rem] border border-white/[0.08] bg-white/[0.92] px-6 py-4 text-[14px] font-semibold text-[#0B0D12] shadow-[0_18px_44px_rgba(0,0,0,0.22)] transition hover:bg-white"
           >
             Enter GEORGE
           </Link>
 
           <Link
             href="/george/live-entry"
-            className="flex items-center justify-center rounded-[1.15rem] border border-white/[0.055] bg-white/[0.018] px-6 py-4 text-[15px] font-semibold text-white/82 transition hover:border-white/[0.09] hover:bg-white/[0.032] hover:text-white"
+            className="group relative flex items-center justify-center overflow-hidden rounded-[1.1rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(143,182,201,0.105),rgba(8,17,29,0.72))] px-6 py-4 text-[14px] font-semibold text-[#E6F3FA]/88 shadow-[0_18px_44px_rgba(4,10,18,0.24),inset_0_1px_0_rgba(143,182,201,0.08)] transition hover:border-[#8FB6C9]/[0.28] hover:text-white"
           >
-            Prepare LIVE
+            <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.16),transparent_42%)] opacity-70 transition group-hover:opacity-100" />
+            <span className="relative">Enter LIVE</span>
           </Link>
         </div>
 
