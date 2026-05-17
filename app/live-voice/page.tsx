@@ -1,5 +1,6 @@
 'use client'
 
+import { formatDelivery } from '@/lib/george/live-voice/runtime/format-delivery'
 import { useEffect, useRef, useState } from 'react'
 import { georgeAudioQueue } from '@/lib/george/live-voice/runtime/queue'
 import { georgeTurnManager } from '@/lib/george/live-voice/runtime/turn-manager'
@@ -273,8 +274,9 @@ function isForceIntervention(text: string) {
   async function speak(text: string) {
     const deliveryProfile = DELIVERY_PROFILES[deliveryProfileId]
     const deliverable = getAdaptiveDeliverable(text)
+    const formattedDelivery = formatDelivery(deliverable)
 
-    if (!deliverable.trim()) {
+    if (!formattedDelivery.spokenText.trim()) {
       if (latency.totalMs > 2400) {
         pushLog('Latency too high. Using visual cues only.')
       } else {
@@ -289,6 +291,19 @@ function isForceIntervention(text: string) {
 
     const ttsStart = Date.now()
 
+    if (formattedDelivery.pauseMs > 0) {
+      pushLog(`GEORGE holding ${formattedDelivery.pauseMs}ms before speaking.`)
+      await new Promise((resolve) => window.setTimeout(resolve, formattedDelivery.pauseMs))
+    }
+
+    if (formattedDelivery.chuckle) {
+      pushLog('Delivery cue: small chuckle before speaking.')
+    }
+
+    if (formattedDelivery.lowerTone) {
+      pushLog('Delivery cue: lower tone.')
+    }
+
     if (georgeTurnManager.shouldInterruptGeorge()) {
       pushLog('Speech interrupted by room activity.')
       return
@@ -299,7 +314,7 @@ function isForceIntervention(text: string) {
     const res = await fetch('/api/george/live/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: deliverable }),
+      body: JSON.stringify({ text: formattedDelivery.spokenText }),
     })
 
     if (!res.ok) {
@@ -307,7 +322,7 @@ function isForceIntervention(text: string) {
 
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel()
-        const utterance = new SpeechSynthesisUtterance(deliverable)
+        const utterance = new SpeechSynthesisUtterance(formattedDelivery.spokenText)
         utterance.rate = 1
         utterance.pitch = 1
         utterance.volume = deliveryProfile.volume
