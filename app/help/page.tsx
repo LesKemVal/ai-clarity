@@ -16,28 +16,28 @@ export default function HelpPage() {
             GEORGE operates within principles that respect the Holy Bible (KJV) and will not contradict it.
           </p>
           <p className="mt-3 text-sm leading-7 text-white/44">
-            You choose the direction. GEORGE narrows the next move, holds useful context, and responds with restraint when pressure rises.
+            You choose the direction. GEORGE keeps the signal, narrows the move, and stays useful when the room changes.
           </p>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <p className="text-[20px] font-semibold tracking-[-0.035em] text-white/92">
-            GEORGE helps you think clearly, move deliberately, and respond better under pressure.
+            Less drift. Better next moves. Stronger words when they count.
           </p>
           <p className="mt-3 leading-7 text-white/44">
-            Use GEORGE to work through the situation. Use LIVE when timing, wording, or pressure starts to matter.
+            Use GEORGE to decide, prepare, respond, and keep momentum. Use LIVE when the conversation itself becomes the work.
           </p>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
-          <h2 className="mb-4 text-[18px] font-semibold text-white/88">How GEORGE works</h2>
+          <h2 className="mb-4 text-[18px] font-semibold text-white/88">Operating model</h2>
           <div className="grid gap-2 text-sm leading-6 text-white/46">
             <p><span className="text-white/76">Direction</span> — identify what actually matters.</p>
             <p><span className="text-white/76">Action</span> — choose the next useful move.</p>
             <p><span className="text-white/76">Signal</span> — learn from what happens next.</p>
           </div>
           <p className="mt-4 text-sm leading-6 text-white/50">
-            Bring the objective. GEORGE narrows the path.
+            Bring the objective. GEORGE turns it into movement.
           </p>
         </section>
 
@@ -63,9 +63,9 @@ export default function HelpPage() {
             </div>
 
             <div>
-              <p className="font-medium text-white/82">Short controls are enough.</p>
+              <p className="font-medium text-white/82">Steer without exposing the system.</p>
               <p className="mt-2 leading-7 text-white/44">
-                “line”, “shorter”, “pause”, or “more direct” can adjust GEORGE without breaking the moment.
+                Natural phrases like “hmm”, “let me think”, or “right” can guide LIVE toward a line, cue, pause, or shorter response.
               </p>
             </div>
 
@@ -99,7 +99,7 @@ export default function HelpPage() {
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <h2 className="mb-4 text-[18px] font-semibold text-white/88">Continuity</h2>
           <p className="leading-7 text-white/44">
-            Continuity helps GEORGE retain useful direction, context, and working history over time.
+            Continuity keeps useful direction, context, and working history available when the work changes shape.
           </p>
         </section>
 
@@ -109,13 +109,13 @@ export default function HelpPage() {
             <p><span className="text-white/76">Smart</span> — everyday direction and reasoning.</p>
             <p><span className="text-white/76">Intelligent</span> — stronger continuity and execution support.</p>
             <p><span className="text-white/76">Brilliant</span> — deepest LIVE support and strongest continuity.</p>
-            <p><span className="text-white/76">Brilliant Day</span> — temporary LIVE runtime elevation.</p>
+            <p><span className="text-white/76">Brilliant Day</span> — temporary Brilliant access.</p>
           </div>
         </section>
 
         <section className="rounded-[0.9rem] border border-white/[0.04] bg-white/[0.012] p-5 md:p-5">
           <p className="text-[17px] font-medium leading-8 text-white/86">
-            GEORGE helps you move clearly. LIVE helps when pressure enters the room.
+            Bring the situation. GEORGE keeps the next move in view.
           </p>
         </section>
 
