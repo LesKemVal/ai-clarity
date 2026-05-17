@@ -205,7 +205,7 @@ export default function GeorgeLiveEntryPage() {
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-7 h-24 w-24 rounded-[1.6rem] object-contain opacity-94"
+          className="mb-3 h-[118px] w-[200px] object-contain opacity-95"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.3em] text-white/34">
