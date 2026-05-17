@@ -80,6 +80,7 @@ export default function GeorgeLiveEntryPage() {
   const [objective, setObjective] = useState('')
   const [controlWords, setControlWords] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('English')
+  const [speechCadence, setSpeechCadence] = useState('Balanced')
   const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
@@ -102,6 +103,11 @@ export default function GeorgeLiveEntryPage() {
       setSelectedLanguage(liveLanguage)
     }
 
+    const savedCadence = window.localStorage.getItem('george_live_cadence')
+    if (savedCadence) {
+      setSpeechCadence(savedCadence)
+    }
+
     const activeLive = getActiveSessionForMode('live')
     setHasLiveSession(!!activeLive)
   }, [])
@@ -114,6 +120,7 @@ export default function GeorgeLiveEntryPage() {
       JSON.stringify({
         room: selectedRoom,
         language: selectedLanguage,
+        cadence: speechCadence,
         objective,
         controlWords,
         createdAt: Date.now(),
@@ -144,10 +151,10 @@ export default function GeorgeLiveEntryPage() {
         </h1>
 
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
-          Give GEORGE the useful context before you enter. LIVE follows the conversation in real time and can provide repeatable lines, short cues, or silence when restraint is stronger.
+          Set the room, language, and natural steering phrases before LIVE starts.
         </p>
 
-        <div className="mt-8 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
+        <div className="mt-7 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/34">
             <span>ROOM</span>
             <span className="text-white/38">OPTIONAL</span>
@@ -219,16 +226,69 @@ export default function GeorgeLiveEntryPage() {
             />
           </div>
 
-          <p className="mt-4 text-[13px] leading-6 text-white/44">
-            Use one earbud if possible. Speak normally. GEORGE can give you exact words to repeat, posture cues, or a pause when silence protects the moment.
-          </p>
-
           <div className="mt-5 border-t border-white/[0.05] pt-5">
-            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
-              CONTROL WORDS
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] tracking-[0.18em] text-white/34">
+                  SPEECH CADENCE
+                </div>
+                <p className="mt-1 text-[12px] leading-5 text-white/36">
+                  Bias how GEORGE speaks in your ear. GEORGE can still adjust if the room changes.
+                </p>
+              </div>
+
+              <div className="text-[10px] uppercase tracking-[0.16em] text-[#AAB4FF]/62">
+                LIVE only
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {[
+                { label: 'Measured', note: 'slower' },
+                { label: 'Balanced', note: 'clear' },
+                { label: 'Sharp', note: 'faster' },
+              ].map((mode) => {
+                const active = speechCadence === mode.label
+
+                return (
+                  <button
+                    key={mode.label}
+                    type="button"
+                    onClick={() => {
+                      setSpeechCadence(mode.label)
+                      window.localStorage.setItem('george_live_cadence', mode.label)
+                    }}
+                    className={`rounded-[0.8rem] border px-3 py-2 text-left transition-all duration-150 ${
+                      active
+                        ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-[#D7DCFF] shadow-[0_0_18px_rgba(170,180,255,0.10),inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-[#AAB4FF]/24 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80'
+                    }`}
+                  >
+                    <span className="block text-[12px] font-medium">{mode.label}</span>
+                    <span className="mt-0.5 block text-[10px] text-white/34">{mode.note}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-white/[0.05] pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] tracking-[0.18em] text-white/34">
+                  STEERING PHRASES
+                </div>
+                <p className="mt-1 text-[12px] leading-5 text-white/36">
+                  Natural phrases you can reuse in the room without exposing GEORGE.
+                </p>
+              </div>
+
+              <div className="text-[10px] uppercase tracking-[0.16em] text-[#AAB4FF]/62">
+                LIVE only
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
               {suggestedControls.map((word) => (
                 <button
                   key={word}
@@ -243,7 +303,7 @@ export default function GeorgeLiveEntryPage() {
                       setControlWords([...parts, word].join(', '))
                     }
                   }}
-                  className="rounded-[0.75rem] border border-white/[0.055] bg-black/20 px-3 py-1.5 text-[12px] text-white/50 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.022] hover:text-white/78"
+                  className="rounded-[0.75rem] border border-white/[0.055] bg-black/20 px-3 py-1.5 text-[12px] text-white/50 transition-all duration-150 hover:border-[#AAB4FF]/24 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80"
                 >
                   {word}
                 </button>
@@ -253,12 +313,12 @@ export default function GeorgeLiveEntryPage() {
             <input
               value={controlWords}
               onChange={(e) => setControlWords(e.target.value)}
-              placeholder="Words you can say to adjust GEORGE without breaking the room"
-              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/22 transition focus:border-white/[0.12] focus:bg-white/[0.018]"
+              placeholder="Add phrases you naturally say, separated by commas"
+              className="mt-3 w-full rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/22 transition focus:border-[#AAB4FF]/24 focus:bg-white/[0.018]"
             />
 
             <p className="mt-2 text-[12px] leading-5 text-white/32">
-              Example: “line” for exact words, “pause” to hold, “shorter” to compress.
+              “hmm” is strongest: reusable, natural, and almost invisible.
             </p>
           </div>
         </div>
@@ -296,7 +356,7 @@ export default function GeorgeLiveEntryPage() {
           </div>
         )}
 
-        <div className="mt-7 grid w-full max-w-[400px] gap-3">
+        <div className="mt-5 grid w-full max-w-[400px] gap-3">
 
           {(currentTier === 'intelligent' || currentTier === 'brilliant') ? (
             <>
