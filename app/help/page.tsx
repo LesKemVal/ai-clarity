@@ -49,9 +49,9 @@ const HELP_ITEMS: Array<{
     id: 'signal',
     index: '04',
     label: 'WHAT GEORGE NOTICES',
-    title: 'Pressure, timing, and changes.'
+    title: 'Pressure, timing, and changes.',
     body: 'GEORGE watches for pressure, hesitation, confusion, timing, and changes in the room so support stays useful and practical.',
-    utility: 'Notice what matters.'
+    utility: 'Notice what matters.',
   },
   {
     id: 'context',
