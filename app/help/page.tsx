@@ -48,10 +48,10 @@ const HELP_ITEMS: Array<{
   {
     id: 'signal',
     index: '04',
-    label: 'SIGNAL',
-    title: 'What matters in the room.',
-    body: 'Signal helps GEORGE track pressure, hesitation, timing, leverage, confusion, and momentum so guidance stays useful instead of generic.',
-    utility: 'Read what changes.',
+    label: 'WHAT GEORGE NOTICES',
+    title: 'Pressure, timing, and changes.'
+    body: 'GEORGE watches for pressure, hesitation, confusion, timing, and changes in the room so support stays useful and practical.',
+    utility: 'Notice what matters.'
   },
   {
     id: 'context',
@@ -82,7 +82,7 @@ export default function HelpPage() {
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="mb-5 h-12 w-12 rounded-[0.9rem] object-contain opacity-92"
+            className="mb-6 h-20 w-20 rounded-[1.25rem] object-contain opacity-95"
           />
 
           <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
@@ -108,7 +108,7 @@ export default function HelpPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setOpen(selected ? null : item.id)}
-                  className={`min-h-[82px] rounded-[0.82rem] border px-3 py-3 text-left transition-all duration-200 ${
+                  className={`min-h-[96px] rounded-[0.9rem] border px-4 py-4 text-left transition-all duration-200 ${
                     selected
                       ? item.accent
                         ? 'border-[#8FB6C9]/[0.24] bg-[#8FB6C9]/[0.060] text-[#E0EDF4] shadow-[0_14px_36px_rgba(4,10,18,0.28)]'
@@ -117,11 +117,11 @@ export default function HelpPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] tracking-[0.18em] text-current/42">{item.index}</span>
-                    <span className="text-[12px] text-current/35">{selected ? '—' : '+'}</span>
+                    <span className="text-[11px] tracking-[0.16em] text-current/58">{item.index}</span>
+                    <span className="text-[12px] text-current/52">{selected ? '—' : '+'}</span>
                   </div>
 
-                  <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-current/58">
+                  <div className="mt-3 text-[12px] uppercase tracking-[0.14em] text-current/72">
                     {item.label}
                   </div>
                 </button>
