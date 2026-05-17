@@ -6240,7 +6240,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="Bring the situation. GEORGE will narrow the next move."
+                        placeholder="Ask GEORGE"
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
@@ -6295,17 +6295,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     </div>
                   </div>
 
-                <div className="mt-1 min-h-[0.7rem] px-2 text-xs text-neutral-500">
-                  {voiceError ? (
-                    <span className="block w-full text-center text-neutral-500">{voiceError}</span>
-                  ) : currentTier === 'smart' ? (
-                    <span className="text-neutral-500"></span>
-                  ) : (
-                    <span className={isListening ? 'text-white/82' : ''}>
-                      {isListening ? 'LIVE' : ''}
-                    </span>
-                  )}
-                </div>
+
 
                 
 
@@ -6316,24 +6306,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 {!liveMode && !showConversation && !input.trim() && !pendingImage && (
                   <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
                     <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-white/38">
-                      <button
-                        type="button"
-                        onClick={() => setInput('Help me build a business strategy.')}
-                        className="inline-flex items-center gap-2 transition hover:text-white/72"
-                      >
-                        <span className="text-white/58">⬢</span>
-                        <span>Build a business</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setInput('Help me interpret this document and explain what matters most.')}
-                        className="inline-flex items-center gap-2 transition hover:text-white/72"
-                      >
-                        <span className="text-white/58">□</span>
-                        <span>Interpret a doc</span>
-                      </button>
-
                       <a
                         href="/images"
                         className="inline-flex items-center gap-2 transition hover:text-white/72"
