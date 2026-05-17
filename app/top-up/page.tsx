@@ -86,6 +86,31 @@ export default function TopUpPage() {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
 
+  const currentUsageGuidance = useMemo(() => {
+    if (intent === 'conversation' || intent === 'pro') {
+      return {
+        tone: 'LIVE leaning',
+        message:
+          'Brilliant becomes strongest when LIVE support becomes part of your regular workflow.',
+      }
+    }
+
+    if (intent === 'make-george-yours') {
+      return {
+        tone: 'Continuity fit',
+        message:
+          'Intelligent already covers most continuity and execution workflows comfortably.',
+      }
+    }
+
+    return {
+      tone: 'Current fit',
+      message:
+        'Your current usage still fits comfortably within Intelligent unless LIVE becomes routine.',
+    }
+  }, [intent])
+
+
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
@@ -274,6 +299,16 @@ export default function TopUpPage() {
 
             <div className="rounded-[0.8rem] border border-white/[0.028] bg-black/20 px-4 py-3 text-sm text-white/64">
               Pay for the level of recall, support, and LIVE access you actually need.
+            </div>
+
+            <div className="rounded-[0.8rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.045),rgba(255,255,255,0.012))] px-4 py-3">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#C9D0FF]/46">
+                {currentUsageGuidance.tone}
+              </div>
+
+              <p className="mt-2 text-sm leading-6 text-white/62">
+                {currentUsageGuidance.message}
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
