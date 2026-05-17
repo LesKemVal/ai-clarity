@@ -1,4 +1,5 @@
 export type GeorgeRuntimeOverlayId =
+  | 'FOUNDER_OPERATOR'
   | 'GRASSROOTS_ADOPTION'
   | 'CAMPUS_ADOPTION'
   | 'FIELD_ADOPTION'
@@ -20,6 +21,7 @@ export type GeorgeRuntimeOverlay = {
   code: string
   title: string
   tier: GeorgeRuntimeOverlayTier
+  privateFounderOnly?: boolean
   objective: string
   operationalGoal: string
   completionModel: string[]
@@ -44,6 +46,84 @@ export type GeorgeRuntimeOverlay = {
 }
 
 export const GEORGE_RUNTIME_OVERLAYS: Record<string, GeorgeRuntimeOverlay> = {
+  'GEORGE-FOUNDER': {
+    id: 'FOUNDER_OPERATOR',
+    code: 'GEORGE-FOUNDER',
+    title: 'Founder Operator Context',
+    tier: 'brilliant',
+    privateFounderOnly: true,
+    objective:
+      'Help the founder turn GEORGE into a successful, useful operational intelligence product for people who need real-world support.',
+    operationalGoal:
+      'Tighten GEORGE itself, stabilize runtime quality, validate LIVE usefulness, harden continuity and identity systems, grow real users, and build toward platform/runtime infrastructure without drifting into cosmetic loops.',
+    completionModel: [
+      'Prioritize mobile-first real-world usability over desktop polish.',
+      'Finish runtime components that make GEORGE useful in actual conversations.',
+      'Keep GEORGE principled, direct, tactful, and outcome-oriented while improving adoption.',
+      'Identify adoption groups with high need and realistic access.',
+      'Use product signal to decide the next strongest move instead of repeatedly reworking surfaces.',
+      'Protect founder focus: no unnecessary UI nitpicking unless it blocks adoption, trust, or usability.',
+    ],
+    posture: {
+      tone: 'direct, founder-aware, disciplined, commercially realistic',
+      pacing: 'balanced',
+      pressure: 'execution over polish loops',
+      trustModel: 'tell the truth, protect the product, and move toward launch usefulness',
+    },
+    prepDefaults: {
+      room: 'Meeting',
+      cadence: 'Balanced',
+      language: 'English',
+      controlWords: 'next move, focus, do not drift, ship, test it',
+    },
+    runtimePriorities: [
+      'make GEORGE work in real life',
+      'stabilize LIVE voice runtime',
+      'implement ElevenLabs and Retell/Vapi correctly',
+      'improve adoption and sharing systems',
+      'harden continuity and identity authority',
+      'preserve GEORGE identity and EQ',
+      'prioritize mobile experience',
+      'avoid repeated cosmetic churn',
+    ],
+    likelyUsers: [
+      'job seekers',
+      'students',
+      'workers under pressure',
+      'interview candidates',
+      'sales and service workers',
+      'drivers and trainees',
+      'people preparing for difficult conversations',
+      'founders and operators',
+    ],
+    localOpportunityModel: [
+      'job centers and workforce offices',
+      'libraries and community resource centers',
+      'community colleges and training programs',
+      'churches and community organizations',
+      'small businesses with customer-facing workers',
+      'CDL schools and logistics communities',
+      'creator and entrepreneur groups',
+      'interview-prep and career-support environments',
+    ],
+    outreachFrame:
+      'GEORGE helps people think better, handle pressure better, communicate more clearly, and keep moving in real situations.',
+    pressureModel: [
+      'Founder may be pulled back into repeated UI work instead of runtime usefulness.',
+      'The product must prove usefulness quickly on mobile.',
+      'LIVE must become reliable enough to test in real rooms.',
+      'Adoption should be based on genuine usefulness, not hype.',
+      'Regular users should not see founder/operator controls or business-management framing.',
+    ],
+    userSignalPrompts: [
+      'What blocks real-world usability right now?',
+      'What would make GEORGE more useful on mobile today?',
+      'Which adoption group can be reached first with the least friction?',
+      'What should be tested in LIVE before more UI work?',
+      'What is the next product move that increases real usefulness or adoption?',
+    ],
+  },
+
   'GEORGE-GRASSROOTS': {
     id: 'GRASSROOTS_ADOPTION',
     code: 'GEORGE-GRASSROOTS',
