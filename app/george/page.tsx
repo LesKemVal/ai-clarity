@@ -6072,9 +6072,8 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                               Tools
                             </button>
                           </div>
-                        </div>
 
-                        <button
+                          <button
                           type="button"
                           onClick={requestExitLiveMode}
                           className="rounded-full bg-red-500/8 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/82 transition hover:bg-red-400/[0.045]"
