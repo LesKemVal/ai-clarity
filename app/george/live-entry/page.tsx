@@ -241,7 +241,7 @@ export default function GeorgeLiveEntryPage() {
         </h1>
 
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
-          Answer a few questions and strengthen LIVE support before the room starts.
+          Answer a few questions and strengthen LIVE support before you enter the room.
         </p>
 
         {runtimeMotionContext && (
