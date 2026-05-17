@@ -283,7 +283,7 @@ export default function TopUpPage() {
       </div>
 
       <div className="relative z-10 space-y-6">
-        <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 backdrop-blur-[0.5px] md:p-6">
+        <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 md:p-6">
           <div className="max-w-5xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">
               ACCESS LEVELS

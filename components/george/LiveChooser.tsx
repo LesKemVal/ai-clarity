@@ -34,13 +34,13 @@ export default function LiveChooser({
             onClose()
           }
         }}
-        className="fixed inset-0 z-[200] bg-black/42 backdrop-blur-[4px] transition-opacity duration-150"
+        className="fixed inset-0 z-[200] bg-black/42 transition-opacity duration-150"
       />
 
       <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
         <div
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-[360px] rounded-[1.05rem] border border-white/[0.075] bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-200 ease-out"
+          className="relative w-full max-w-[360px] rounded-[1.05rem] border border-white/[0.075] bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)] transition-all duration-200 ease-out"
         >
           <div className="mb-2 flex items-center justify-between">
             <div className="pr-12">
