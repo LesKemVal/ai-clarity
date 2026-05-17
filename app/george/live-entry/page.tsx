@@ -5,15 +5,15 @@ import { useEffect, useState } from 'react'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 
 const ROOM_CONTROLS: Record<string, string[]> = {
-  Interview: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  Meeting: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  Boardroom: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  Negotiation: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  Debate: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  'Sales Call': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  'Doctor Appointment': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  Presentation: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
-  'Everyday Conversation': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Interview: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Meeting: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Boardroom: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Negotiation: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Debate: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  'Sales Call': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  'Doctor Appointment': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Presentation: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  'Everyday Conversation': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
 }
 
 
@@ -221,7 +221,7 @@ export default function GeorgeLiveEntryPage() {
         </h1>
 
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
-          Set the room, language, and natural steering phrases before LIVE starts.
+          Answer a few questions and strengthen LIVE support before the room starts.
         </p>
 
         <div className="mt-7 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
@@ -427,12 +427,12 @@ export default function GeorgeLiveEntryPage() {
             <input
               value={controlWords}
               onChange={(e) => setControlWords(e.target.value)}
-              placeholder="Add phrases you naturally say, separated by commas"
+              placeholder="Add natural phrases GEORGE should listen for during LIVE"
               className="mt-3 w-full rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/22 transition focus:border-[#AAB4FF]/24 focus:bg-white/[0.018]"
             />
 
             <p className="mt-2 text-[12px] leading-5 text-white/32">
-              “hmm” is strongest: reusable, natural, and almost invisible.
+              “OK” stops current GEORGE behavior. Your next phrase becomes the new direction.
             </p>
           </div>
         </div>
