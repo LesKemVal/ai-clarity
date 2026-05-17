@@ -288,11 +288,11 @@ return (
     >
       <div className="border-b border-white/[0.035] px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
         <div className="relative flex items-center justify-between opacity-90">
-          <div className="flex items-center gap-2.5 translate-y-[4px]">
+          <div className="flex items-center gap-2.5 translate-y-[2px]">
             <img
               src="/logofav.png"
               alt="BRANESx"
-              className="h-7 w-7 rounded-[0.45rem] object-contain opacity-88"
+              className="h-[60px] w-[60px] rounded-[1.1rem] object-contain opacity-94"
             />
           </div>
 

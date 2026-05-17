@@ -139,12 +139,16 @@ export default function GeorgeLiveEntryPage() {
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-7 h-6 w-auto object-contain opacity-74"
+          className="mb-7 h-24 w-24 rounded-[1.6rem] object-contain opacity-94"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.3em] text-white/34">
           LIVE RUNTIME
         </div>
+
+        <p className="mb-6 text-[16px] italic tracking-[-0.015em] text-white/70">
+          Because often, the conversation is the work.
+        </p>
 
         <h1 className="text-[32px] font-semibold tracking-[-0.052em] text-white md:text-[52px]">
           Prepare the room.

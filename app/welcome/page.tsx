@@ -108,7 +108,7 @@ export default function WelcomePage() {
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="h-7 w-auto object-contain opacity-76 md:h-8"
+            className="h-24 w-24 rounded-[1.6rem] object-contain opacity-94 md:h-28 md:w-28"
           />
 
           <div className="space-y-3 border-b border-white/[0.045] pb-6">
