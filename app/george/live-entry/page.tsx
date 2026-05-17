@@ -5,15 +5,15 @@ import { useEffect, useState } from 'react'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 
 const ROOM_CONTROLS: Record<string, string[]> = {
-  Interview: ['line', 'shorter', 'pause', 'answer clean'],
-  Meeting: ['summarize', 'push back', 'pause', 'next question'],
-  Boardroom: ['position', 'proof', 'slow down', 'next move'],
-  Negotiation: ['line', 'hold firm', 'counter', 'pause'],
-  Debate: ['rebuttal', 'proof', 'frame', 'pause'],
-  'Sales Call': ['line', 'objection', 'close', 'shorter'],
-  'Doctor Appointment': ['slow down', 'clarify', 'question', 'repeat'],
-  Presentation: ['pace', 'stronger', 'simplify', 'close'],
-  'Everyday Conversation': ['line', 'pause', 'shorter', 'help me respond'],
+  Interview: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Meeting: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Boardroom: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Negotiation: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Debate: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  'Sales Call': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  'Doctor Appointment': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  Presentation: ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
+  'Everyday Conversation': ['hmm', 'hmm, let me think', 'hmm, right', 'hmm, I see'],
 }
 
 

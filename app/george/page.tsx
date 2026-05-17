@@ -5601,7 +5601,14 @@ if (liveMode) {
             try {
               sessions = (sessionPickerMode === 'campaign'
                 ? getCampaignSessions()
-                : getSessionsForMode('live')).filter(hasMeaningfulUserMessage)
+                : getSessionsForMode('live'))
+                  .filter(hasMeaningfulUserMessage)
+                  .sort((a, b) => {
+                    const activeId = getActiveSessionIdForMode(sessionPickerMode)
+                    if (a.id === activeId) return -1
+                    if (b.id === activeId) return 1
+                    return b.updatedAt - a.updatedAt
+                  })
             } catch {
               sessions = []
             }
