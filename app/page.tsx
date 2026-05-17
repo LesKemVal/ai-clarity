@@ -1,6 +1,15 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
+
+type CapabilityMode = 'george' | 'live' | null
 
 export default function RootPage() {
+  const [openCapability, setOpenCapability] = useState<CapabilityMode>(null)
+  const georgeOpen = openCapability === 'george'
+  const liveOpen = openCapability === 'live'
+
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#0A0C10_0%,#06070A_46%,#050609_100%)]" />
@@ -22,40 +31,97 @@ export default function RootPage() {
         <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-b from-transparent via-[#06070A]/58 to-[#06070A]" />
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-6 text-center">
+      <div className="relative z-10 mx-auto flex w-full max-w-[720px] flex-col items-center px-4 text-center sm:px-6">
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-8 h-40 w-40 rounded-[2.35rem] object-contain opacity-95"
+          className="mb-7 h-36 w-36 rounded-[2.1rem] object-contain opacity-95 sm:h-40 sm:w-40"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.28em] text-white/34">
           OPERATIONAL INTELLIGENCE
         </div>
-        <h1 className="max-w-[640px] text-[34px] font-semibold leading-[1.05] tracking-[-0.055em] text-white/94 md:text-[52px]">
+        <h1 className="max-w-[640px] text-[33px] font-semibold leading-[1.05] tracking-[-0.055em] text-white/94 md:text-[52px]">
           Bring the situation. Get the next move.
         </h1>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
           Use GEORGE to plan, decide, prepare, respond, and keep momentum when the next step matters.
         </p>
 
-        <div className="mt-8 grid w-full max-w-[560px] gap-4 rounded-[1.25rem] border border-white/[0.024] bg-black/[0.10] p-4 text-left">
-          <div className="flex items-center justify-between border-b border-white/[0.032] pb-3 text-[11px] tracking-[0.18em] text-white/34">
-            <span>UTILITY</span>
-            <span className="text-white/38">ASK → MOVE → CONTINUE</span>
-          </div>
+        <div className="mt-8 grid w-full max-w-[520px] gap-3 text-left">
+          <button
+            type="button"
+            onClick={() => setOpenCapability(georgeOpen ? null : 'george')}
+            className={`group w-full rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
+              georgeOpen
+                ? 'border-white/[0.12] bg-white/[0.055] shadow-[0_22px_54px_rgba(0,0,0,0.30)]'
+                : 'border-white/[0.055] bg-black/[0.18] hover:border-white/[0.10] hover:bg-white/[0.028]'
+            }`}
+            aria-expanded={georgeOpen}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.24em] text-white/34">GEORGE</div>
+                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Normal GEORGE</div>
+              </div>
 
-          <div className="grid gap-4 text-[13px] leading-6 text-white/58">
-            <div className="rounded-[0.85rem] border border-white/[0.025] bg-black/[0.12] p-5">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-white/32">GEORGE</p>
-              <p className="mt-3 text-[16px] leading-7 text-white/58">Turn a goal, problem, document, idea, or decision into a useful next step.</p>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] text-[18px] text-white/42 transition ${georgeOpen ? 'rotate-45 bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
+                +
+              </div>
             </div>
 
-            <div className="rounded-[0.85rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.018] p-5 shadow-[inset_0_1px_0_rgba(143,182,201,0.035)]">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-[#B8D4E6]/58">GEORGE LIVE</p>
-              <p className="mt-3 text-[16px] leading-7 text-white/66">Use LIVE when the room matters: interviews, negotiations, calls, meetings, conflict, presentations, or moments where words and timing count.</p>
+            <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${georgeOpen ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+              <div className="overflow-hidden">
+                <p className="text-[14px] leading-6 text-white/58">
+                  Turn a goal, problem, document, idea, or decision into direction and a useful next step.
+                </p>
+
+                <div className="mt-4 grid gap-2 text-[12px] text-white/44">
+                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">Build, decide, plan, learn, prepare.</div>
+                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">Use documents, screenshots, ideas, or pressure.</div>
+                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">GEORGE keeps moving toward the outcome.</div>
+                </div>
+              </div>
             </div>
-          </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setOpenCapability(liveOpen ? null : 'live')}
+            className={`group relative w-full overflow-hidden rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
+              liveOpen
+                ? 'border-[#8FB6C9]/[0.28] bg-[linear-gradient(180deg,rgba(143,182,201,0.10),rgba(8,17,29,0.72))] shadow-[0_24px_60px_rgba(4,10,18,0.42),inset_0_1px_0_rgba(143,182,201,0.08)]'
+                : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.22] hover:bg-[#8FB6C9]/[0.045]'
+            }`}
+            aria-expanded={liveOpen}
+          >
+            <span className={`pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.18),transparent_44%)] transition ${liveOpen ? 'opacity-90' : 'opacity-30'}`} />
+
+            <div className="relative flex items-center justify-between gap-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.24em] text-[#B8D4E6]/58">LIVE GEORGE</div>
+                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-[#E6F3FA]/90">Real-time support</div>
+              </div>
+
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#8FB6C9]/[0.14] text-[18px] text-[#B8D4E6]/56 transition ${liveOpen ? 'rotate-45 bg-[#8FB6C9]/[0.08] text-white' : 'group-hover:text-white/84'}`}>
+                +
+              </div>
+            </div>
+
+            <div className={`relative grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${liveOpen ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+              <div className="overflow-hidden">
+                <p className="text-[14px] leading-6 text-white/66">
+                  Use LIVE when the room matters: interviews, negotiations, calls, meetings, conflict, presentations, or any moment where timing and words count.
+                </p>
+
+                <div className="mt-4 grid gap-2 text-[12px] text-white/48">
+                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Timing. Pressure. The next useful line.</div>
+                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Use one earbud. Let GEORGE track the room.</div>
+                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Prepare the room first, or enter quickly.</div>
+                </div>
+              </div>
+            </div>
+          </button>
         </div>
 
         <div className="mt-7 grid w-full max-w-[440px] gap-3 sm:grid-cols-2">
