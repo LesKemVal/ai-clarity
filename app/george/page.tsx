@@ -680,6 +680,30 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
     if (savedLanguage) {
       setLanguage(savedLanguage)
     }
+
+    const savedCadence = window.localStorage.getItem('george_live_cadence')
+    if (savedCadence) {
+      setLiveCadence(savedCadence)
+    }
+
+    try {
+      const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
+
+      if (rawLiveSetup) {
+        const parsed = JSON.parse(rawLiveSetup)
+
+        if (parsed?.controlWords) {
+          const firstPhrase = parsed.controlWords
+            .split(',')
+            .map((v: string) => v.trim())
+            .filter(Boolean)[0]
+
+          if (firstPhrase) {
+            setLiveSteeringPhrase(firstPhrase)
+          }
+        }
+      }
+    } catch {}
   }, [])
 
   useEffect(() => {
@@ -919,6 +943,8 @@ const [isListening, setIsListening] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [showLiveChooser, setShowLiveChooser] = useState(false)
+  const [liveCadence, setLiveCadence] = useState('Balanced')
+  const [liveSteeringPhrase, setLiveSteeringPhrase] = useState('hmm')
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
