@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
+import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 
 const ROOM_CONTROLS: Record<string, string[]> = {
   Interview: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
@@ -148,6 +149,7 @@ export default function GeorgeLiveEntryPage() {
   const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
+  const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
     label: 'WHAT SHOULD GEORGE TRACK?',
@@ -163,6 +165,24 @@ export default function GeorgeLiveEntryPage() {
 
     const tier = window.localStorage.getItem('george_tier') || 'smart'
     setCurrentTier(tier)
+
+    const motionContext = getActiveRuntimeMotionContext()
+    if (motionContext) {
+      setRuntimeMotionContext(motionContext)
+    }
+
+    try {
+      const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
+      const liveSetup = rawLiveSetup ? JSON.parse(rawLiveSetup) : null
+
+      if (liveSetup?.runtimeOverlay) {
+        if (liveSetup.room) setSelectedRoom(liveSetup.room)
+        if (liveSetup.objective) setObjective(liveSetup.objective)
+        if (liveSetup.controlWords) setControlWords(liveSetup.controlWords)
+        if (liveSetup.language) setSelectedLanguage(liveSetup.language)
+        if (liveSetup.cadence) setSpeechCadence(liveSetup.cadence)
+      }
+    } catch {}
 
     const liveLanguage = window.localStorage.getItem('george_live_language')
     if (liveLanguage) {
@@ -223,6 +243,22 @@ export default function GeorgeLiveEntryPage() {
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
           Answer a few questions and strengthen LIVE support before the room starts.
         </p>
+
+        {runtimeMotionContext && (
+          <div className="mt-5 w-full max-w-[620px] rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.035] px-5 py-4 text-left shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[#C9D0FF]/48">
+              Loaded Context
+            </div>
+
+            <div className="mt-2 text-[15px] font-medium text-white/86">
+              {runtimeMotionContext.title}
+            </div>
+
+            <p className="mt-2 text-[13px] leading-6 text-white/52">
+              {runtimeMotionContext.operationalGoal}
+            </p>
+          </div>
+        )}
 
         <div className="mt-7 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/34">
