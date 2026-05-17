@@ -146,8 +146,8 @@ export default function GeorgeLiveEntryPage() {
           LIVE RUNTIME
         </div>
 
-        <p className="mb-6 text-[16px] italic tracking-[-0.015em] text-white/70">
-          Because often, the conversation is the work.
+        <p className="mb-6 text-[16px] tracking-[-0.015em] text-white/70">
+          Because often, the conversation <span className="font-semibold text-white/86">is</span> the work.
         </p>
 
         <h1 className="text-[32px] font-semibold tracking-[-0.052em] text-white md:text-[52px]">
