@@ -92,12 +92,11 @@ function saveSessionToV2(params: {
       ? (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
       : ''
 
-  if (!subscriberEmail) return
-
   const now = Date.now()
+  const sessionId = params.id || `session_${now}`
 
   upsertSession({
-    id: params.id || `session_${now}`,
+    id: sessionId,
     type: 'session',
     mode: params.mode,
     title: params.title,
@@ -115,10 +114,13 @@ function saveSessionToV2(params: {
           : params.mode === 'live'
             ? 'live_conversation'
             : 'normal',
-      subscriberEmail,
+      ...(subscriberEmail ? { subscriberEmail } : { localOnly: true }),
       ...params.metadata,
     },
   })
+
+  setActiveSessionIdForMode(params.mode, sessionId)
+  setActiveMode(params.mode)
 }
 
 
@@ -919,7 +921,7 @@ const [isListening, setIsListening] = useState(false)
 
   const getSubscriberSessionMetadata = useCallback(() => {
     const email = subscriberEmail.trim().toLowerCase()
-    return email ? { subscriberEmail: email } : null
+    return email ? { subscriberEmail: email } : { localOnly: true }
   }, [subscriberEmail])
 
   const [birthdayMD, setBirthdayMD] = useState('')
@@ -1061,9 +1063,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       }
 
       let existingLive =
-        subscriberEmail.trim()
+        getActiveSessionForMode('live') ||
+        (subscriberEmail.trim()
           ? getLatestSubscriberSession(subscriberEmail, 'live')
-          : null
+          : null)
 
 if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
         skipNextTypewriterRef.current = true
@@ -1151,9 +1154,10 @@ ${controlLine}` : ''}`
     // /george always boots into normal GEORGE.
     setActiveMode('normal')
     const activeSession =
-      subscriberEmail.trim()
+      getActiveSessionForMode('normal') ||
+      (subscriberEmail.trim()
         ? getLatestSubscriberSession(subscriberEmail, 'normal')
-        : null
+        : null)
 
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
@@ -4042,7 +4046,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-white/[0.045] backdrop-blur-[20px] backdrop-saturate-85 backdrop-brightness-110 xl:hidden"
+            className="fixed inset-0 z-[40] bg-white/[0.045]  xl:hidden"
           />
         )}
 
@@ -4181,7 +4185,7 @@ return (
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82 backdrop-blur-xl px-4 py-1.5 transition duration-200 ${"z-50"}`}>
+            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-2 xl:hidden">
                   <button
@@ -4214,7 +4218,7 @@ return (
                     </button>
 
                     {showLanguageMenu && (
-                      <div className="absolute left-0 top-full z-[120] mt-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                      <div className="absolute left-0 top-full z-[120] mt-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)] ">
                         {languageOptions.map((option) => (
                           <button
                             key={option}
@@ -4619,7 +4623,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-white/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -4805,7 +4809,7 @@ router.push('/george')
             </div>
           )}
 
-          {!isWelcomeAssistant &&
+          {false && !isWelcomeAssistant &&
             !liveMode && (
           <div className="flex items-center gap-2 flex-nowrap overflow-x-auto divide-x divide-white/10 text-[11px] text-neutral-500">
             {!isWelcomeAssistant && (
@@ -4954,7 +4958,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/48">
@@ -5054,7 +5058,7 @@ ${simplifyTarget}`
 {showScrollHint && (
   <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center opacity-70 transition hover:opacity-100`}>
 
-    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/30 shadow-[0_14px_34px_rgba(0,0,0,0.34)] backdrop-blur-md" />
+    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/58 shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
 
     <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
@@ -5173,7 +5177,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/25">
@@ -5304,7 +5308,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5423,7 +5427,7 @@ if (liveMode) {
         <div className="absolute inset-0 rounded-full border border-white/[0.06] bg-white/[0.025] blur-[0.2px]" />
       </div>
 
-      <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] backdrop-blur-xl">
+      <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-white/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] ">
         Use one earbud if possible.
         <br />
         GEORGE is listening.
@@ -5443,11 +5447,11 @@ if (liveMode) {
       type="button"
       aria-label="Close structured LIVE notice"
       onClick={() => setShowProLiveComingSoon(false)}
-      className="fixed inset-0 z-[240] bg-black/60 backdrop-blur-[10px]"
+      className="fixed inset-0 z-[240] bg-black/78 "
     />
 
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)]  ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-white/72">
           LIVE STRUCTURE
         </div>
@@ -5485,11 +5489,11 @@ if (liveMode) {
           setShowExitPopup(false)
         }
       }}
-      className="fixed inset-0 z-[220] bg-black/46 backdrop-blur-[6px] transition-opacity duration-150"
+      className="fixed inset-0 z-[220] bg-black/74  transition-opacity duration-150"
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className="w-full max-w-[420px] rounded-[1.35rem] border border-white/[0.075] bg-[#0B0D12]/94 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-150 ease-out">
+      <div className="w-full max-w-[420px] rounded-[1.35rem] border border-white/[0.075] bg-[#0B0D12]/94 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-150 ease-out">
         <div className="mb-2 text-[11px] tracking-[0.22em] text-white/72">
           LEAVE LIVE
         </div>
@@ -5562,13 +5566,13 @@ if (liveMode) {
           }, 170)
         }
       }}
-      className={`fixed inset-0 z-[200] bg-black/42 backdrop-blur-[4px] transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[200] bg-black/72  transition-opacity duration-150 ${sessionPickerClosing ? 'opacity-0' : 'opacity-100'}`}
     />
 
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5589,7 +5593,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white/70 transition hover:border-white/[0.14] hover:text-white"
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/82 text-white/70 transition hover:border-white/[0.14] hover:text-white"
           >
             ×
           </button>
@@ -5774,7 +5778,7 @@ Continue from here, tell me what changed, or start fresh.`
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/82 px-5 py-4 backdrop-blur-xl">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/82 px-5 py-4 ">
 
     <div className="text-[11px] text-white/60 mb-2">
       What happened here?
@@ -5857,7 +5861,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {liveMode && (showLiveQuickMenu || showLiveToolsMenu) && (
-                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/30" />
+                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/58" />
               )}
 
 
@@ -5883,7 +5887,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto backdrop-blur-xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     {liveMode && (
                       <div className="mb-1.5 flex w-full items-center justify-between gap-2 px-1">
                         <div className="flex items-center gap-1.5">
@@ -5911,9 +5915,9 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                 />
 
                                 <div className="absolute bottom-full left-0 z-[95] mb-2 w-[240px]">
-                                  <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] backdrop-blur-xl">
+                                  <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] ">
                                     <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                      <div className="text-[11px] tracking-[0.32em] text-white/58">TOOLS</div>
+                                      <div className="text-[10px] tracking-[0.34em] text-[#8FB6C9]/72">RUNTIME</div>
                                       <button
                                         type="button"
                                         onClick={() => setShowLiveToolsMenu(false)}
@@ -5949,8 +5953,8 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                       >
                                         <div className="pt-[1px] text-white/58">⚡</div>
                                         <div>
-                                          <div className="text-[15px] text-white/92">Cue</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Get the next live cue</div>
+                                          <div className="text-[15px] text-white/92">Continue</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Continue the direction naturally</div>
                                         </div>
                                       </button>
 
@@ -5961,8 +5965,8 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                       >
                                         <div className="pt-[1px] text-white/58">◎</div>
                                         <div>
-                                          <div className="text-[15px] text-white/92">Screener</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Handle gatekeepers</div>
+                                          <div className="text-[15px] text-white/92">Screen</div>
+                                          <div className="mt-0.5 text-[12px] text-white/38">Handle pressure or gatekeeping</div>
                                         </div>
                                       </button>
 
@@ -6024,7 +6028,7 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                       </div>
                     )}
 
-                    <div className="relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] backdrop-blur-xl">
+                    <div className="relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
 
                       <input
                         ref={fileInputRef}
@@ -6136,7 +6140,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -6246,7 +6250,55 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   )}
                 </div>
 
-                {!liveMode && !input.trim() && !pendingImage && (
+                
+                {!liveMode && (
+                  <div className="pointer-events-auto fixed bottom-[74px] left-0 right-0 z-[82] mx-auto flex w-full max-w-[900px] justify-center px-3">
+                    <div className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-[#0B0D12]/96 px-2 py-1 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
+                      {[
+                        'Reframe',
+                        'Simplify',
+                        'Related',
+                        'Next Move',
+                        'Tone',
+                        'Save',
+                      ].map((tool) => (
+                        <button
+                          key={tool}
+                          type="button"
+                          className="rounded-full px-3 py-1.5 text-[11px] text-white/54 transition hover:bg-white/[0.05] hover:text-white/88"
+                        >
+                          {tool}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+
+                {!liveMode && (
+                  <div className="pointer-events-auto fixed bottom-[74px] left-0 right-0 z-[82] mx-auto flex w-full max-w-[900px] justify-center px-3">
+                    <div className="flex items-center gap-1 rounded-full border border-white/[0.06] bg-[#0B0D12]/96 px-2 py-1 shadow-[0_12px_34px_rgba(0,0,0,0.42)]">
+                      {[
+                        'Reframe',
+                        'Simplify',
+                        'Related',
+                        'Next Move',
+                        'Tone',
+                        'Save',
+                      ].map((tool) => (
+                        <button
+                          key={tool}
+                          type="button"
+                          className="rounded-full px-3 py-1.5 text-[11px] text-white/54 transition hover:bg-white/[0.05] hover:text-white/88"
+                        >
+                          {tool}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+{!liveMode && !input.trim() && !pendingImage && (
                   <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
                     <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-white/38">
                       <button
@@ -6284,7 +6336,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       
       {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4 ">
+        <div className="fixed inset-0 z-[95] bg-black/82  flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-white/72 mb-2">Runtime</p>
 
@@ -6321,7 +6373,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 {showPersonalizeModal && (
         <div
-          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/60 px-4 pb-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/78 px-4 pb-4 "
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
@@ -6433,7 +6485,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/60 backdrop-blur-[16px]" />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/78 " />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
@@ -6657,7 +6709,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_20px_56px_rgba(0,0,0,0.42)] backdrop-blur-xl ">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_20px_56px_rgba(0,0,0,0.42)]  ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-white/72 mb-2">Structured LIVE</p>
@@ -6698,7 +6750,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showToast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[80] flex justify-center px-4">
-          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-white shadow-[0_18px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-white shadow-[0_18px_40px_rgba(0,0,0,0.45)] ">
             {toastMessage}
           </div>
         </div>
