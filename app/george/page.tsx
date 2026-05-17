@@ -1173,11 +1173,8 @@ ${controlLine}` : ''}`
     bumpVisitCount()
 
     const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
-    const subscriberMetadata = getSubscriberSessionMetadata()
-    if (subscriberMetadata) {
-      createSession('normal', firstMessage, 'Untitled session', subscriberMetadata)
-      normalSessionWriteReadyRef.current = true
-    }
+
+    normalSessionWriteReadyRef.current = true
     setMessages(firstMessage)
     messagesRef.current = firstMessage
   }, [profileName, currentTier, liveMode, conversationMode, activePromptContext, forceLive])
@@ -4046,7 +4043,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-white/[0.045]  xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/72 xl:hidden"
           />
         )}
 
