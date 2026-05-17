@@ -893,9 +893,7 @@ function detectLiveInterruption(interim: string) {
 }
 
 const [isListening, setIsListening] = useState(false)
-  const [smartMicUses, setSmartMicUses] = useState(0)
-  const SMART_MIC_LIMIT = 3
-  const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
+    const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [thinkingDots, setThinkingDots] = useState(1)
@@ -6192,34 +6190,16 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                               onClick={() => {
                                 if (!voiceSupported || isThinking) return
 
-                                if (currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT) {
-                                  setMessages((prev) => [
-                                    ...prev,
-                                    {
-                                      role: 'assistant',
-                                      content: 'Upgrade to continue — your upgrade helps put GEORGE into the hands of people who need this companion most.'
-                                    }
-                                  ])
-                                  return
-                                }
-
                                 setInteractionMode('speech')
                                 if (isListening) {
                                   stopListening()
                                   setInterimTranscript('')
                                 } else {
-                                  if (currentTier === 'smart') {
-                                    setSmartMicUses((prev) => prev + 1)
-                                  }
                                   startListening()
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className={`flex h-7 w-7 items-center justify-center rounded-full transition ${
-                                  currentTier === 'smart' && smartMicUses >= SMART_MIC_LIMIT
-                                    ? 'text-amber-300'
-                                    : 'text-white/52 hover:text-white/82'
-                                } disabled:cursor-not-allowed disabled:opacity-40`}
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-white/52 transition hover:text-white/82 disabled:cursor-not-allowed disabled:opacity-40"
                               aria-label="Voice"
                             >
                               <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
