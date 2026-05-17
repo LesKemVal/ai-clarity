@@ -5914,33 +5914,38 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                   className="fixed inset-0 z-[91] cursor-default bg-transparent"
                                 />
 
-                                <div className="absolute bottom-full left-0 z-[95] mb-2 w-[240px]">
-                                  <div className="overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[#0B0D12]/92 shadow-[0_16px_44px_rgba(0,0,0,0.56)] ">
-                                    <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                      <div className="text-[10px] tracking-[0.34em] text-[#8FB6C9]/72">RUNTIME</div>
+                                <div className="absolute bottom-full left-0 z-[95] mb-2 w-[220px]">
+                                  <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.08] bg-[#08111D]/96 shadow-[0_18px_52px_rgba(0,0,0,0.62)]">
+                                    <div className="flex items-center justify-between border-b border-white/[0.04] px-4 py-3">
+                                      <div className="text-[10px] tracking-[0.28em] text-[#B8D4E6]/58">
+                                        LIVE
+                                      </div>
+
                                       <button
                                         type="button"
                                         onClick={() => setShowLiveToolsMenu(false)}
-                                        className="text-white/72 transition hover:text-white"
+                                        className="text-white/42 transition hover:text-white/82"
                                       >
                                         ✕
                                       </button>
                                     </div>
 
-                                    <div className="px-4 pb-4">
+                                    <div className="p-2">
                                       <button
                                         type="button"
                                         onClick={() => {
                                           activateResponsePosture()
                                           setShowLiveToolsMenu(false)
                                         }}
-                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                        className="flex w-full items-center justify-between rounded-[0.8rem] px-3 py-2.5 text-left transition hover:bg-white/[0.035]"
                                       >
-                                        <div className="pt-[1px] text-white/58">✎</div>
-                                        <div>
-                                          <div className="text-[15px] text-white/92">Reword</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Rewrite this for impact</div>
-                                        </div>
+                                        <span className="text-[13px] text-white/84">
+                                          Reword
+                                        </span>
+
+                                        <span className="text-[11px] text-white/28">
+                                          ↺
+                                        </span>
                                       </button>
 
                                       <button
@@ -5949,25 +5954,29 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                           setShowLiveQuickMenu(true)
                                           setShowLiveToolsMenu(false)
                                         }}
-                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                        className="mt-1 flex w-full items-center justify-between rounded-[0.8rem] px-3 py-2.5 text-left transition hover:bg-white/[0.035]"
                                       >
-                                        <div className="pt-[1px] text-white/58">⚡</div>
-                                        <div>
-                                          <div className="text-[15px] text-white/92">Continue</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Continue the direction naturally</div>
-                                        </div>
+                                        <span className="text-[13px] text-white/84">
+                                          Continue
+                                        </span>
+
+                                        <span className="text-[11px] text-white/28">
+                                          →
+                                        </span>
                                       </button>
 
                                       <button
                                         type="button"
                                         onClick={activateNegotiationPosture}
-                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                        className="mt-1 flex w-full items-center justify-between rounded-[0.8rem] px-3 py-2.5 text-left transition hover:bg-white/[0.035]"
                                       >
-                                        <div className="pt-[1px] text-white/58">◎</div>
-                                        <div>
-                                          <div className="text-[15px] text-white/92">Screen</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Handle pressure or gatekeeping</div>
-                                        </div>
+                                        <span className="text-[13px] text-white/84">
+                                          Screen
+                                        </span>
+
+                                        <span className="text-[11px] text-white/28">
+                                          ◎
+                                        </span>
                                       </button>
 
                                       <button
@@ -5976,13 +5985,15 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                           setAssistTone('firm')
                                           setShowLiveToolsMenu(false)
                                         }}
-                                        className="flex w-full items-start gap-3 border-b border-white/6 px-2 py-3 text-left transition hover:bg-white/[0.018]"
+                                        className="mt-1 flex w-full items-center justify-between rounded-[0.8rem] px-3 py-2.5 text-left transition hover:bg-white/[0.035]"
                                       >
-                                        <div className="pt-[1px] text-white/58">≋</div>
-                                        <div>
-                                          <div className="text-[15px] text-white/92">Tone</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Adjust tone & style</div>
-                                        </div>
+                                        <span className="text-[13px] text-white/84">
+                                          Tone
+                                        </span>
+
+                                        <span className="text-[11px] text-white/28">
+                                          ≋
+                                        </span>
                                       </button>
 
                                       <button
@@ -5991,13 +6002,15 @@ ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bott
                                           setActiveSaveIndex(messages.length - 1)
                                           setShowLiveToolsMenu(false)
                                         }}
-                                        className="flex w-full items-start gap-3 px-2 pt-3 pb-1 text-left transition hover:bg-white/[0.018]"
+                                        className="mt-1 flex w-full items-center justify-between rounded-[0.8rem] px-3 py-2.5 text-left transition hover:bg-white/[0.035]"
                                       >
-                                        <div className="pt-[1px] text-white/58">⌑</div>
-                                        <div>
-                                          <div className="text-[15px] text-white/92">Save</div>
-                                          <div className="mt-0.5 text-[12px] text-white/38">Save to memory or folder</div>
-                                        </div>
+                                        <span className="text-[13px] text-white/84">
+                                          Save
+                                        </span>
+
+                                        <span className="text-[11px] text-white/28">
+                                          ⌑
+                                        </span>
                                       </button>
                                     </div>
                                   </div>
