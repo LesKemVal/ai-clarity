@@ -345,7 +345,10 @@ export default function TopUpPage() {
                     {tier.action && tier.checkout && (
                       <button
                         type="button"
-                        onClick={() => startCheckout(tier.checkout)}
+                        onClick={() => {
+                          if (!tier.checkout) return
+                          startCheckout(tier.checkout)
+                        }}
                         className={`mt-4 w-full rounded-[0.7rem] border px-4 py-3 text-sm font-semibold transition ${
                           featured
                             ? 'border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.075] text-[#D7DCFF] hover:bg-[#AAB4FF]/[0.11]'

@@ -16,6 +16,70 @@ const ROOM_CONTROLS: Record<string, string[]> = {
   'Everyday Conversation': ['line', 'pause', 'shorter', 'help me respond'],
 }
 
+
+const ROOM_RUNTIME_ESTIMATES: Record<
+  string,
+  {
+    average: string
+    statement: string
+    support: string[]
+  }
+> = {
+  Interview: {
+    average: '~28¢',
+    statement: 'Highly competent forward movement before pressure compounds.',
+    support: ['sharper answers', 'pacing guidance', 'pressure management'],
+  },
+
+  Meeting: {
+    average: '~34¢',
+    statement: 'Useful alignment before the room drifts.',
+    support: ['decision framing', 'clearer positioning', 'better timing'],
+  },
+
+  Boardroom: {
+    average: '~83¢',
+    statement: 'Operational support when executive pressure carries weight.',
+    support: ['proof pressure support', 'executive communication', 'posture calibration'],
+  },
+
+  Negotiation: {
+    average: '~64¢',
+    statement: 'Worth it when leverage, timing, and framing matter.',
+    support: ['stronger framing', 'pressure handling', 'timing cues'],
+  },
+
+  Debate: {
+    average: '~46¢',
+    statement: 'Useful when clarity and pressure resistance matter.',
+    support: ['rebuttal shaping', 'proof framing', 'composure support'],
+  },
+
+  'Sales Call': {
+    average: '~36¢',
+    statement: 'Small runtime cost. Meaningful movement if the room opens.',
+    support: ['objection handling', 'closing posture', 'trust calibration'],
+  },
+
+  'Doctor Appointment': {
+    average: '~41¢',
+    statement: 'Worth it when something important cannot be missed.',
+    support: ['clarification support', 'question refinement', 'memory reinforcement'],
+  },
+
+  Presentation: {
+    average: '~39¢',
+    statement: 'Forward movement through stronger delivery and pacing.',
+    support: ['pacing support', 'message refinement', 'closing strength'],
+  },
+
+  'Everyday Conversation': {
+    average: '~18¢',
+    statement: 'Light operational support for everyday communication.',
+    support: ['next responses', 'conversation flow', 'clearer wording'],
+  },
+}
+
 const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
   Interview: {
     label: 'WHAT WILL THEY BE LISTENING FOR?',
@@ -89,6 +153,8 @@ export default function GeorgeLiveEntryPage() {
     label: 'WHAT SHOULD GEORGE TRACK?',
     placeholder: 'Outcome, pressure, timing, risk, or what matters most in the room.'
   }
+
+  const runtimeEstimate = ROOM_RUNTIME_ESTIMATES[selectedRoom]
 
   const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
 
@@ -183,6 +249,50 @@ export default function GeorgeLiveEntryPage() {
                 </button>
               )
             })}
+
+          </div>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-out ${
+              runtimeEstimate
+                ? 'mt-5 max-h-[240px] translate-y-0 opacity-100'
+                : 'max-h-0 -translate-y-2 opacity-0'
+            }`}
+          >
+            {runtimeEstimate && (
+              <div className="rounded-[0.9rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.05),rgba(255,255,255,0.012))] px-4 py-4 shadow-[0_0_24px_rgba(170,180,255,0.04)]">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
+                      Estimated LIVE Runtime Support
+                    </div>
+
+                    <div className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-white/92">
+                      {runtimeEstimate.average}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/38">
+                    Contextual estimate
+                  </div>
+                </div>
+
+                <p className="mt-3 text-[14px] leading-6 text-white/62">
+                  {runtimeEstimate.statement}
+                </p>
+
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {runtimeEstimate.support.map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-3 py-2 text-[12px] text-white/50"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-5">
