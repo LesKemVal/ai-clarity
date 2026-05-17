@@ -82,7 +82,7 @@ export default function HelpPage() {
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="mb-6 h-20 w-20 rounded-[1.25rem] object-contain opacity-95"
+            className="mb-7 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
           />
 
           <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
