@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+// Temporary-token route is retained for later production hardening.
 export async function GET() {
   try {
     const apiKey = process.env.DEEPGRAM_API_KEY
@@ -24,8 +25,13 @@ export async function GET() {
     })
 
     if (!res.ok) {
+      const detail = await res.text().catch(() => '')
       return NextResponse.json(
-        { error: 'Failed to create temporary Deepgram token' },
+        {
+          error: 'Failed to create temporary Deepgram token',
+          status: res.status,
+          detail,
+        },
         { status: 500 }
       )
     }
