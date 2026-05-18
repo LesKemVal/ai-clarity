@@ -6089,7 +6089,33 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {liveMode && (
-  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-end px-4 xl:pl-[280px]">
+  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-between gap-2 px-4 xl:pl-[280px]">
+    <button
+      type="button"
+      onClick={() => {
+        if (currentTier === 'smart') {
+          setToastMessage('Voice replies unlock above Smart.')
+          setShowToast(true)
+          return
+        }
+
+        const nextVoice = !voiceOn
+        hasUserInteractedRef.current = true
+        setVoiceOn(nextVoice)
+        setInteractionMode(nextVoice ? 'speech' : 'text')
+        window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+        setToastMessage(nextVoice ? 'LIVE voice on — send a test line.' : 'LIVE voice off')
+        setShowToast(true)
+      }}
+      className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition ${
+        voiceOn
+          ? 'border-[#8FB6C9]/35 bg-[#8FB6C9]/12 text-[#D7F1FF]/90 hover:bg-[#8FB6C9]/18'
+          : 'border-white/12 bg-white/[0.035] text-[#D7DBE4]/62 hover:border-white/22 hover:bg-white/[0.055] hover:text-[#D7DBE4]'
+      }`}
+    >
+      VOICE {voiceOn ? 'ON' : 'OFF'}
+    </button>
+
     <button
       type="button"
       onClick={requestExitLiveMode}
