@@ -18,7 +18,7 @@ export async function GET() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        scopes: ['usage:write'],
+        scopes: ['listen'],
         ttl: 60,
       }),
     })
