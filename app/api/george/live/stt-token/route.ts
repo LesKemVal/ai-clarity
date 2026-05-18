@@ -19,7 +19,7 @@ export async function GET() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        scopes: ['asr:write'],
+        scopes: ['usage:write'],
         ttl: 60,
       }),
     })
