@@ -749,8 +749,9 @@ function isForceIntervention(text: string) {
         }
       }
 
-      socket.onerror = () => {
-        setError('Deepgram socket error.')
+      socket.onerror = (event) => {
+        console.error('Deepgram socket error event:', event)
+        setError('Deepgram socket error. Check browser console for websocket details.')
         pushLog('Deepgram socket error.')
       }
 
