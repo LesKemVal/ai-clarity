@@ -54,8 +54,11 @@ export default function PageShell({
     if (isiPhone) {
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
+                      title: 'GEORGE by BRANESx',
+                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
+                      
           title: 'GEORGE by BRANESx',
-          text: 'Want to get something done? GEORGE is your guide.',
+          text: 'Bring the situation. Get the next move.',
           url,
         }).catch(() => {})
         return
@@ -77,7 +80,10 @@ export default function PageShell({
     }
 
     if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE by BRANESx', text: 'Want to get something done? GEORGE is your guide.', url }).catch(() => {})
+      navigator.share({
+                      title: 'GEORGE by BRANESx',
+                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
+                       title: 'GEORGE by BRANESx', text: 'Bring the situation. Get the next move.', url }).catch(() => {})
       return
     }
 
