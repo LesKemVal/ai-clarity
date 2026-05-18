@@ -175,7 +175,7 @@ export default function RootPage() {
                 href="/george/live-entry"
                 className="rounded-[0.9rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.075] px-4 py-3 text-center text-[13px] font-semibold text-[#E6F3FA] transition hover:bg-[#8FB6C9]/[0.11]"
               >
-                Start LIVE
+                Prepare the Room
               </Link>
 
               <button
