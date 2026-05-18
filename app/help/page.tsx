@@ -33,7 +33,7 @@ const HELP_ITEMS: Array<{
     index: '02',
     label: 'LIVE',
     title: 'Timing under pressure.',
-    body: 'Use LIVE when the conversation is the work: interviews, negotiations, calls, meetings, presentations, conflict, or moments where words matter.',
+    body: 'Use Bx for interviews, negotiations, calls, meetings, presentations, conflict, or moments where words matter.',
     utility: 'Timing. Pressure. Execution.',
     accent: true,
   },
