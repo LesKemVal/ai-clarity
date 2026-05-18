@@ -43,7 +43,7 @@ export default function RootPage() {
           OPERATIONAL INTELLIGENCE
         </div>
         <h1 className="max-w-[640px] text-[33px] font-semibold leading-[1.05] tracking-[-0.055em] text-white/94 md:text-[52px]">
-          Bring the situation. Get the next move.
+          LIVE Conversation assistance
         </h1>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
           Use GEORGE to plan, decide, prepare, respond, and keep momentum when the next step matters.
