@@ -6834,6 +6834,18 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
           setShowLiveChooser(false)
+
+          window.localStorage.setItem('george_fresh_live_entry', '1')
+          window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+          window.localStorage.removeItem('george_live_control_words')
+          window.localStorage.removeItem('george_live_runtime_support')
+          window.localStorage.removeItem('george_live_estimated_cents')
+          window.localStorage.removeItem('george_active_live_session_id')
+          window.localStorage.removeItem('george_active_campaign_session_id')
+          window.localStorage.removeItem('george_active_campaign')
+          window.localStorage.removeItem('george_active_context')
+          window.localStorage.removeItem('george_active_label')
+
           window.location.href = '/george/live-entry'
         }}
         onResumeLiveConversation={() => {

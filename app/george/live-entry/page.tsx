@@ -284,6 +284,15 @@ export default function GeorgeLiveEntryPage() {
     const tier = window.localStorage.getItem('george_tier') || 'smart'
     setCurrentTier(tier)
 
+    const freshLiveEntry = window.localStorage.getItem('george_fresh_live_entry') === '1'
+    if (freshLiveEntry) {
+      window.localStorage.removeItem('george_fresh_live_entry')
+      window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+      window.localStorage.removeItem('george_live_control_words')
+      window.localStorage.removeItem('george_live_runtime_support')
+      window.localStorage.removeItem('george_live_estimated_cents')
+    }
+
     const motionContext = getActiveRuntimeMotionContext()
     if (motionContext) {
       setRuntimeMotionContext(motionContext)
@@ -314,25 +323,27 @@ export default function GeorgeLiveEntryPage() {
       setSpeechCadence(savedCadence)
     }
 
-    const savedDelivery = window.localStorage.getItem('george_live_assist_mode')
-    if (savedDelivery === 'lines' || savedDelivery === 'cues') {
-      setLiveAssistMode(savedDelivery)
-    }
-
-    const savedControlWords = window.localStorage.getItem('george_live_control_words')
-    if (savedControlWords) {
-      setControlWords(savedControlWords)
-    }
-
-    try {
-      const savedRuntimeSupport = JSON.parse(window.localStorage.getItem('george_live_runtime_support') || 'null')
-      if (Array.isArray(savedRuntimeSupport?.selectedCapabilityIds)) {
-        setSelectedCapabilityIds(savedRuntimeSupport.selectedCapabilityIds)
+    if (!freshLiveEntry) {
+      const savedDelivery = window.localStorage.getItem('george_live_assist_mode')
+      if (savedDelivery === 'lines' || savedDelivery === 'cues') {
+        setLiveAssistMode(savedDelivery)
       }
-      if (typeof savedRuntimeSupport?.selectedCapacityCents === 'number') {
-        setSelectedCapacityCents(savedRuntimeSupport.selectedCapacityCents)
+
+      const savedControlWords = window.localStorage.getItem('george_live_control_words')
+      if (savedControlWords) {
+        setControlWords(savedControlWords)
       }
-    } catch {}
+
+      try {
+        const savedRuntimeSupport = JSON.parse(window.localStorage.getItem('george_live_runtime_support') || 'null')
+        if (Array.isArray(savedRuntimeSupport?.selectedCapabilityIds)) {
+          setSelectedCapabilityIds(savedRuntimeSupport.selectedCapabilityIds)
+        }
+        if (typeof savedRuntimeSupport?.selectedCapacityCents === 'number') {
+          setSelectedCapacityCents(savedRuntimeSupport.selectedCapacityCents)
+        }
+      } catch {}
+    }
 
     const activeLive = getActiveSessionForMode('live')
     setHasLiveSession(!!activeLive)
