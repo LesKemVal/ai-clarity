@@ -4840,7 +4840,7 @@ router.push('/george')
             </div>
           )}
 
-          {false && !isWelcomeAssistant &&
+          {!liveMode && !isWelcomeAssistant &&
             !liveMode && (
           <div className="flex items-center gap-2 flex-nowrap overflow-x-auto divide-x divide-white/10 text-[11px] text-neutral-500">
             {!isWelcomeAssistant && (
