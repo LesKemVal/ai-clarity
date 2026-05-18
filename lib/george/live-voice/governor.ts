@@ -42,6 +42,35 @@ function shouldRescueUser(input: {
   return pressureHigh || interruptionHigh || intentWeakOrAmbiguous
 }
 
+function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInput) {
+  const memory = input.runtimeMemory
+  if (!memory) return packet
+
+  let runtimeForce: 'light' | 'balanced' | 'strong' = 'balanced'
+
+  if ((memory.acceptedCarryCount || 0) >= 3) {
+    runtimeForce = 'strong'
+  }
+
+  if ((memory.overrideCount || 0) >= 3) {
+    runtimeForce = 'light'
+  }
+
+  if (runtimeForce === 'strong' && packet.liveAssistMode === 'cues' && packet.cue) {
+    packet.cue = `${packet.cue} Keep moving.`.trim()
+  }
+
+  if (runtimeForce === 'light') {
+    packet.confidence = Math.min(packet.confidence, 0.74)
+  }
+
+  return {
+    ...packet,
+    runtimeForce,
+    runtimeMemoryApplied: true,
+  }
+}
+
 function applySpeakerIntentAuthority(
   packet: LiveVoicePacket,
   transcript: string
@@ -188,6 +217,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       packet.status = `${packet.status} Audio mode: cue-only.`.trim()
     }
   }
+
+  packet = applyRuntimeMemory(packet, input)
 
   if (TEACHER_LANGUAGE.test(packet.volley)) {
     packet.volley = 'Say it plainly.'
