@@ -290,19 +290,14 @@ export default function GeorgeLiveEntryPage() {
     }
 
     try {
-      const rawLiveSetup =
-        window.localStorage.getItem('GEORGE_LIVE_SETUP') ||
-        window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP')
+      const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
       const liveSetup = rawLiveSetup ? JSON.parse(rawLiveSetup) : null
 
-      if (liveSetup?.runtimeOverlay || liveSetup?.room || liveSetup?.objective || liveSetup?.controlWords) {
-        if (liveSetup.room) setSelectedRoom(liveSetup.room)
-        if (liveSetup.objective) setObjective(liveSetup.objective)
-        if (liveSetup.controlWords) setControlWords(liveSetup.controlWords)
+      // Start New LIVE must not inherit old room/objective/cost from GEORGE_LAST_LIVE_SETUP.
+      // If the user skips prep, GEORGE enters listening mode and infers context from the room.
+      if (liveSetup?.runtimeOverlay) {
         if (liveSetup.language) setSelectedLanguage(liveSetup.language)
         if (liveSetup.cadence) setSpeechCadence(liveSetup.cadence)
-        if (typeof liveSetup.selectedCapacityCents === 'number') setSelectedCapacityCents(liveSetup.selectedCapacityCents)
-        if (Array.isArray(liveSetup.selectedCapabilityIds)) setSelectedCapabilityIds(liveSetup.selectedCapabilityIds)
         if (liveSetup.liveAssistMode === 'lines' || liveSetup.liveAssistMode === 'cues') {
           setLiveAssistMode(liveSetup.liveAssistMode)
         }

@@ -100,7 +100,10 @@ export type RoomAnalysis = {
 }
 
 const AUTHORITY_PATTERNS =
-  /(\bid\b|identification|license|registration|insurance|officer|step out|compliance|policy|security)/i
+  /(identification|license|registration|show me your id|officer|step out|compliance requirement|security policy)/i
+
+const WEAK_AUTHORITY_WORDS =
+  /(\bid\b|insurance|policy|security)/i
 
 const PRESSURE_PATTERNS =
   /(why did you|explain|problem|issue|concern|late|deadline|raise|performance|fired|warning)/i
@@ -112,12 +115,17 @@ export function analyzeRoom(shadowMap: string): RoomAnalysis {
   const text = shadowMap.toLowerCase()
 
   const authority = AUTHORITY_PATTERNS.test(text)
+  const weakAuthority = WEAK_AUTHORITY_WORDS.test(text)
   const pressure = PRESSURE_PATTERNS.test(text)
   const interruption = INTERRUPTION_PATTERNS.test(text)
 
+  // Do not infer room context from a single nickname, joke, greeting, or weak keyword.
+  // Example: “what’s up doc?” is not medical context.
+  const authorityConfirmed = authority || (weakAuthority && (pressure || interruption))
+
   let pressureLevel: RoomPressure = 'low'
 
-  if (authority) {
+  if (authorityConfirmed) {
     pressureLevel = 'authority'
   } else if (pressure && interruption) {
     pressureLevel = 'high'
@@ -130,7 +138,7 @@ export function analyzeRoom(shadowMap: string): RoomAnalysis {
     interruptionRisk: interruption ? 0.82 : pressure ? 0.56 : 0.2,
     emotionalTemperature: pressure ? 0.72 : 0.34,
     likelySpeakerControl: interruption ? 'other_party' : 'balanced',
-    summary: authority
+    summary: authorityConfirmed
       ? 'Authority pressure detected.'
       : pressure
         ? 'Pressure rising in room.'

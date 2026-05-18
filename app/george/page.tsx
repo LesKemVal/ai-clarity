@@ -1195,7 +1195,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       const steeringLine = liveSetup?.controlWords?.trim()
         ? `Steering active: ${liveSetup.controlWords.trim()}`
-        : 'Steering active: say “shorter,” “line,” or “pause” to adjust GEORGE without breaking the room.'
+        : ''
 
       const capacityLine =
         typeof liveSetup?.estimatedCents === 'number'
@@ -1211,13 +1211,14 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       const liveIntro: Message = {
         role: 'assistant',
-        content: `LIVE ready.
+        content: setupRoom
+          ? `LIVE ready.
 
 Room changed? Update GEORGE instantly.
 
-Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.${setupRoom ? `
+Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.
 
-Room: ${setupRoom}` : ''}${objectiveLine ? `
+Room: ${setupRoom}${objectiveLine ? `
 
 ${objectiveLine}` : ''}${steeringLine ? `
 
@@ -1226,6 +1227,13 @@ ${steeringLine}` : ''}${supportLine ? `
 ${supportLine}` : ''}${capacityLine ? `
 
 ${capacityLine}` : ''}`
+          : `LIVE ready.
+
+No room selected. GEORGE will listen first, infer context from the room, and confirm only when there is enough signal.
+
+Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.${steeringLine ? `
+
+${steeringLine}` : ''}`
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()
@@ -4008,6 +4016,14 @@ Keep responses:
 - natural
 
 Return ONLY ONE operational deliverable.
+
+If no room was selected or context is unclear:
+- do not interrogate the user
+- do not assume context from a single word, name, joke, greeting, or slang phrase
+- “what’s up doc” does not mean medical context
+- listen first
+- if enough signal appears, ask one short confirmation such as “Interview?” or “Doctor context?”
+- otherwise give a neutral listening cue or a minimal next move
 
 If assist mode is:
 - cues → return one short cue only
