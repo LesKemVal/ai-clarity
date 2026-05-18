@@ -19,6 +19,11 @@ export type LiveVoicePacket = {
   responseCompression?: string
   deliveryStyle?: string
   intervention?: string
+  speakerIntent?: string
+  speakerIntentConfidence?: number
+  speakerIntentReason?: string
+  speakerIntentShouldSpeak?: boolean
+  speakerIntentShouldHold?: boolean
 }
 
 export type LiveVoiceGovernorInput = {
