@@ -4864,7 +4864,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -4992,7 +4992,7 @@ I am listening now. Speak naturally. I will respond ${
                   setVoiceOn(false)
                   setInteractionMode('text')
                   window.localStorage.setItem('george_voice', 'off')
-                  setToastMessage('Text guidance active')
+                  setToastMessage('Text Guidance Active')
                   setShowToast(true)
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
@@ -5011,7 +5011,7 @@ I am listening now. Speak naturally. I will respond ${
                   setInteractionMode('speech')
                   window.localStorage.setItem('george_voice', 'on')
                   setTimeout(() => startListening(), 120)
-                  setToastMessage('Audio guidance active')
+                  setToastMessage('Earbud Mode Active')
                   setShowToast(true)
                 }}
                 className={`rounded-full border px-3 py-1.5 font-semibold tracking-[0.08em] transition ${
@@ -5202,7 +5202,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
@@ -5302,7 +5302,7 @@ ${simplifyTarget}`
 {showScrollHint && (
   <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center opacity-70 transition hover:opacity-100`}>
 
-    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/58 shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
+    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/68 backdrop-blur-[10px] shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
 
     <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
@@ -5421,7 +5421,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/25">
@@ -5552,7 +5552,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.15rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -5584,7 +5584,7 @@ if (liveMode) {
                 setVoiceOn(nextVoice)
                 setInteractionMode(nextVoice ? 'speech' : 'text')
                 window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-                setToastMessage(nextVoice ? 'Voice on — send a test line.' : 'Voice off')
+                setToastMessage(nextVoice ? 'Voice Active' : 'Voice Standby')
                 setShowToast(true)
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#D7DBE4]"
@@ -5673,7 +5673,7 @@ if (liveMode) {
       </div>
 
       <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-[#D7DBE4]/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] ">
-        Use one earbud if possible.
+        LIVE Audio Active.
         <br />
         GEORGE is listening.
       </div>
@@ -5692,11 +5692,11 @@ if (liveMode) {
       type="button"
       aria-label="Close structured LIVE notice"
       onClick={() => setShowProLiveComingSoon(false)}
-      className="fixed inset-0 z-[240] bg-black/78 "
+      className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
     />
 
     <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_20px_56px_rgba(0,0,0,0.42)]  ">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72">
           LIVE STRUCTURE
         </div>
@@ -5738,7 +5738,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className="w-full max-w-[420px] rounded-[1.35rem] border border-white/[0.075] bg-[#0B0D12]/94 p-4 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-150 ease-out">
+      <div className="w-full max-w-[420px] rounded-[1.35rem] border border-white/[0.075] bg-[#0B0D12]/94 p-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-150 ease-out">
         <div className="mb-2 text-[11px] tracking-[0.22em] text-[#D7DBE4]/72">
           LEAVE LIVE
         </div>
@@ -5817,7 +5817,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_18px_48px_rgba(0,0,0,0.38)]  transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.2rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -5838,7 +5838,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/82 text-[#D7DBE4]/70 transition hover:border-white/[0.09] hover:text-[#D7DBE4]"
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/72 backdrop-blur-[10px] text-[#D7DBE4]/70 transition hover:border-white/[0.09] hover:text-[#D7DBE4]"
           >
             ×
           </button>
@@ -6023,7 +6023,7 @@ Continue from here, tell me what changed, or start fresh.`
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/82 px-5 py-4 ">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/72 backdrop-blur-[10px] px-5 py-4 ">
 
     <div className="text-[11px] text-[#D7DBE4]/60 mb-2">
       What happened here?
@@ -6106,7 +6106,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {liveMode && (showLiveQuickMenu || showLiveToolsMenu) && (
-                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/58" />
+                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 backdrop-blur-[10px]" />
               )}
 
 
@@ -6143,7 +6143,7 @@ Continue from here, tell me what changed, or start fresh.`
         setVoiceOn(nextVoice)
         setInteractionMode(nextVoice ? 'speech' : 'text')
         window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-        setToastMessage(nextVoice ? 'LIVE voice on — send a test line.' : 'LIVE voice off')
+        setToastMessage(nextVoice ? 'LIVE Audio Active' : 'LIVE Audio Standby')
         setShowToast(true)
       }}
       className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition ${
@@ -6406,7 +6406,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       
       {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/82  flex items-center justify-center px-4 ">
+        <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
 
@@ -6443,7 +6443,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 {showPersonalizeModal && (
         <div
-          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/78 px-4 pb-4 "
+          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 backdrop-blur-[10px]px-4 pb-4 "
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
@@ -6555,7 +6555,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/78 " />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/68 backdrop-blur-[10px]" />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
@@ -6779,7 +6779,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_20px_56px_rgba(0,0,0,0.42)]  ">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72 mb-2">Structured LIVE</p>
@@ -6810,7 +6810,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setShowCampaignUpgradeGate(false)
                 setShowUpgradeModal(true)
               }}
-              className="mt-4 w-full rounded-[1.15rem] max-w-full border transition duration-150 border-white/[0.09] bg-white/[0.032] px-5 py-4 text-sm font-semibold text-[#D7DBE4] shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
+              className="mt-4 w-full rounded-[1.2rem] max-w-full border transition duration-150 border-white/[0.09] bg-white/[0.032] px-5 py-4 text-sm font-semibold text-[#D7DBE4] shadow-[0_12px_28px_rgba(0,0,0,0.24)] hover:border-white/[0.18] hover:bg-white/[0.075]"
             >
               Upgrade to continue this campaign
             </button>
