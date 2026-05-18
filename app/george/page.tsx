@@ -1314,6 +1314,44 @@ const detectTriggerIntent = (text: string) => {
 }
 
 
+
+async function canGovernorInjectLiveCue(transcript: string) {
+  if (!transcript.trim()) return false
+
+  try {
+    const res = await fetch('/api/george/live/govern', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transcript,
+        mode: 'voice_live',
+        audio: true,
+        shadowMap: liveContextBufferRef.current.join('\n'),
+        lastFiveSeconds: transcript,
+      }),
+    })
+
+    const packet = await res.json().catch(() => null)
+    return Boolean(packet?.shouldSpeak)
+  } catch {
+    return false
+  }
+}
+
+async function injectGovernedLiveCue(transcript: string, content: string) {
+  const allowed = await canGovernorInjectLiveCue(transcript)
+  if (!allowed) return false
+
+  setPendingAssistantMessage(null)
+  setPendingAssistantMessage({
+    role: 'assistant',
+    content,
+  })
+
+  return true
+}
+
+
 const georgeProfile = detectConversationProfile(input, interimTranscript)
 
   const liveGuidance = buildLiveGuidance({
@@ -3611,15 +3649,12 @@ if (responseTimerRef.current) {
           const isInterrupt =
             /conceding|reset your position/.test(proactiveCue)
 
-          const fire = () => {
+          const fire = async () => {
+            const injected = await injectGovernedLiveCue(liveTranscript, finalProactiveCue)
+            if (!injected) return
+
             lastCueTsRef.current = Date.now()
             state.lastCue = finalProactiveCue
-            setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-              role: 'assistant',
-              content: finalProactiveCue
-            })
           }
 
           if (isInterrupt) {
@@ -3720,14 +3755,11 @@ setPendingAssistantMessage({
             const personProfile = detectConversationPersonProfile(input, liveTranscript)
           const profileLabel = `${personProfile.role} — ${personProfile.posture}`
 
-setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-              role: 'assistant',
-              content: 'Pause. Control the next sentence.'
+void injectGovernedLiveCue(liveTranscript, 'Pause. Control the next sentence.').then((injected) => {
+              if (!injected) return
+              setConversationSignal('LIVE urgent')
+              setAdaptiveCueLabel('Pressure detected')
             })
-            setConversationSignal('LIVE urgent')
-            setAdaptiveCueLabel('Pressure detected')
             return
           }
           stopListening()
@@ -3737,11 +3769,9 @@ setPendingAssistantMessage({
           const shouldShowProfileLabel = personProfile.confidence >= 0.55 && personProfile.role !== 'unknown'
           const liveLineOutput = shouldShowProfileLabel ? profileLabel + "\\n" + lineText : lineText
 
-          setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-            role: 'assistant',
-            content: intent === "line"
+          void injectGovernedLiveCue(
+            liveTranscript,
+            intent === "line"
               ? profileLabel + "\n" + lineText
               : intent === "reword"
               ? "Say: “Let me put that another way…”"
@@ -3750,7 +3780,7 @@ setPendingAssistantMessage({
               : intent === "word"
               ? "Word: [clear single word]"
               : "Focus. Control the next sentence."
-          })
+          )
           return
         }
         const lower = liveTranscript.toLowerCase()
@@ -3878,14 +3908,11 @@ responseTimerRef.current = setTimeout(() => {
 
   if (liveMode && strongSignal) {
     stopListening()
-    setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-      role: 'assistant',
-      content: 'Say: “Let me make this simple…”'
+    void injectGovernedLiveCue(livePrompt, 'Say: “Let me make this simple…”').then((injected) => {
+      if (!injected) return
+      setConversationSignal('LIVE strong signal')
+      setAdaptiveCueLabel('Strong opportunity detected')
     })
-    setConversationSignal('LIVE strong signal')
-    setAdaptiveCueLabel('Strong opportunity detected')
     return
   }
 
@@ -3902,19 +3929,12 @@ setPendingAssistantMessage({
     stopListening()
 
     if (score >= 5) {
-      setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-        role: 'assistant',
-        content: 'Pause. Take control of the next sentence.\n\nSay: “Let me clarify the main point.”'
-      })
+      void injectGovernedLiveCue(
+        text,
+        'Pause. Take control of the next sentence.\n\nSay: “Let me clarify the main point.”'
+      )
     } else {
-      setPendingAssistantMessage(null);
-setPendingAssistantMessage(null);
-setPendingAssistantMessage({
-        role: 'assistant',
-        content: 'Cue: Slow down. Ask one clean question.'
-      })
+      void injectGovernedLiveCue(text, 'Cue: Slow down. Ask one clean question.')
     }
 
     liveInterventionRef.current = interventionNow
