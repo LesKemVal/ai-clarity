@@ -4870,8 +4870,9 @@ router.push('/george')
                   if (navigator.share) {
                     await navigator.share({
                       title: 'GEORGE by BRANESx',
-                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
-                       title: 'GEORGE by BRANESx', text: `Bring the situation. Get the next move.\n\n${shareText}`, url: window.location.origin + '/george' })
+                      text: `Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.\n\n${shareText}`,
+                      url: window.location.origin + '/george',
+                    })
                   } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(shareText)
                     setToastMessage('Copied')
