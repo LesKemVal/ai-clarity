@@ -2,6 +2,7 @@ import type { LiveSpeakerRole, LiveVoiceGovernorInput, LiveVoicePacket } from '.
 import { analyzeRoom, inferLiveSpeaker } from './runtime/room-analyzer'
 import { detectConversationSignals } from './runtime/conversation-signals'
 import { selectLiveResponsePolicy } from './runtime/response-policy'
+import { classifyLiveSpeakerIntent } from './runtime/speaker-intent'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -33,6 +34,11 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       ? 'george_instruction'
       : speakerInference.speaker
 
+  const speakerIntent = classifyLiveSpeakerIntent({
+    transcript,
+    knownUserSpeaking: speakerInference.speaker === 'user',
+  })
+
   const lastFiveSeconds = String(input.lastFiveSeconds || transcript).trim()
   const hasShadow = shadowMap.length > 0 || lastFiveSeconds.length > 0
   const room = analyzeRoom(`${shadowMap}\n${lastFiveSeconds}\n${transcript}`)
@@ -48,6 +54,11 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     shadowUsed: hasShadow,
     roomPressure: room.pressure,
     interruptionRisk: room.interruptionRisk,
+    speakerIntent: speakerIntent.intent,
+    speakerIntentConfidence: speakerIntent.confidence,
+    speakerIntentReason: speakerIntent.reason,
+    speakerIntentShouldSpeak: speakerIntent.shouldSpeak,
+    speakerIntentShouldHold: speakerIntent.shouldHold,
   }
 
   if (!transcript) {
@@ -59,6 +70,11 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
       status: 'No live signal.',
       confidence: 0,
       shadowUsed: false,
+      speakerIntent: speakerIntent.intent,
+      speakerIntentConfidence: speakerIntent.confidence,
+      speakerIntentReason: speakerIntent.reason,
+      speakerIntentShouldSpeak: speakerIntent.shouldSpeak,
+      speakerIntentShouldHold: speakerIntent.shouldHold,
     }
   }
 
@@ -81,6 +97,11 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     responseCompression: policy.compression,
     deliveryStyle: policy.deliveryStyle,
     intervention: policy.intervention,
+    speakerIntent: speakerIntent.intent,
+    speakerIntentConfidence: speakerIntent.confidence,
+    speakerIntentReason: speakerIntent.reason,
+    speakerIntentShouldSpeak: speakerIntent.shouldSpeak,
+    speakerIntentShouldHold: speakerIntent.shouldHold,
   }
 
   packet.volley = cleanLine(packet.volley, input.audio ? 7 : 12)
