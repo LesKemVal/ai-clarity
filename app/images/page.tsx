@@ -58,14 +58,19 @@ export default function ImagesPage() {
     <main className="min-h-[100dvh] overflow-x-hidden overscroll-none bg-[#06070A] px-4 py-6 text-white sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
         <div className="mb-8 flex items-center justify-between border-b border-white/[0.055] pb-4">
-          <Link href="/george" className="flex items-center gap-3 text-[13px] text-white/44 transition hover:text-white/70">
+          <Link
+            href="/george"
+            className="flex items-center gap-3 text-[13px] text-white/44 transition hover:text-white/70"
+          >
             <img
               src="/logofav.png"
               alt="BRANESx"
-              className="h-[42px] w-[42px] rounded-[0.9rem] object-contain opacity-92"
+              className="h-[58px] w-[58px] rounded-[1.1rem] object-contain opacity-95"
             />
 
-            <span>GEORGE</span>
+            <span className="text-[14px] tracking-[0.18em] text-white/72">
+              GEORGE
+            </span>
           </Link>
 
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">
