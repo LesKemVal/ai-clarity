@@ -420,9 +420,17 @@ function isForceIntervention(text: string) {
         setRunning(true)
         void requestWakeLock()
 
-        const recorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm',
-        })
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/webm')
+            ? 'audio/webm'
+            : ''
+
+        pushLog(`Recorder MIME: ${mimeType || 'browser default'}`)
+
+        const recorder = mimeType
+          ? new MediaRecorder(stream, { mimeType })
+          : new MediaRecorder(stream)
 
         recorderRef.current = recorder
 
