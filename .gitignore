@@ -10,3 +10,8 @@ backups
 # Local subscriber/continuity test data
 data/subscribers.json
 data/continuity-tokens.json
+
+# Local backups
+*.bak
+*.backup
+.env.local.backup
