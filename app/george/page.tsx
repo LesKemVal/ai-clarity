@@ -321,6 +321,11 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
   }
 
   const liveUserText = String(opts.userText || '').toLowerCase()
+  const storedAssistMode =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('george_live_assist_mode')
+      : null
+
   let say = normalizeLine(sayMatch?.[1] || fallbackLine, opts.audio ? 10 : 18)
 
   if (/raise|compensation|pay/.test(liveUserText) && /sir|discuss|talk|raise|compensation|pay/.test(liveUserText)) {
@@ -342,17 +347,19 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
   }
 
   const wantsCue =
+  storedAssistMode === 'cues' ||
   /cue|pause|slow down|listen|hold|wait/i.test(liveUserText)
 
 const wantsLine =
+  storedAssistMode === 'lines' ||
   /what should i say|how do i say|give me a line|line|say/i.test(liveUserText)
-
-if (wantsCue) {
-  return cue || say || ''
-}
 
 if (wantsLine) {
   return say || cue || ''
+}
+
+if (wantsCue) {
+  return cue || say || ''
 }
 
 return say || cue || ''
@@ -3029,6 +3036,20 @@ const handleSend = useCallback(
     ) => {
       let text = (overrideText ?? input).trim()
 
+      const liveRuntimeSetup = (() => {
+        if (typeof window === 'undefined' || !liveMode) return null
+
+        try {
+          const raw =
+            window.localStorage.getItem('GEORGE_LIVE_SETUP') ||
+            window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP')
+
+          return raw ? JSON.parse(raw) : null
+        } catch {
+          return null
+        }
+      })()
+
       const domain = detectDomain(text)
 
       const memoryDomain =
@@ -3284,9 +3305,35 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         }
       }
 
+      const liveRuntimePrefix =
+        liveMode && liveRuntimeSetup
+          ? `LIVE RUNTIME SETUP — internal only.
+
+Room: ${liveRuntimeSetup.room || 'not specified'}
+Objective: ${liveRuntimeSetup.objective || 'not specified'}
+Language: ${liveRuntimeSetup.language || 'English'}
+Cadence: ${liveRuntimeSetup.cadence || 'Balanced'}
+Assist mode: ${liveRuntimeSetup.liveAssistMode || 'cues'}
+Steering phrases: ${liveRuntimeSetup.controlWords || 'none'}
+Estimated runtime cost: ${liveRuntimeSetup.estimatedCents ? `${liveRuntimeSetup.estimatedCents} cents` : 'not estimated'}
+
+Runtime support selected:
+${Array.isArray(liveRuntimeSetup.runtimeSupport?.selectedCapabilities)
+  ? liveRuntimeSetup.runtimeSupport.selectedCapabilities.map((item: any) => `- ${item.label}: ${item.description}`).join('\n')
+  : 'none'}
+
+Runtime behavior bias:
+${Array.isArray(liveRuntimeSetup.runtimeSupport?.runtimeBias)
+  ? JSON.stringify(liveRuntimeSetup.runtimeSupport.runtimeBias)
+  : 'none'}
+
+Use this setup to shape LIVE behavior. Keep commands, labels, pricing, and debug signals internal. Visible output must remain one operational deliverable: either one cue or one repeatable line.`
+          : ''
+
       const updatedMessages = [
         ...messagesRef.current,
         ...(domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
+        ...(liveRuntimePrefix ? [{ role: 'system', content: liveRuntimePrefix, source: 'system_override' } as Message] : []),
         ...(userMessage ? [userMessage] : [])
       ]
       const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text)
