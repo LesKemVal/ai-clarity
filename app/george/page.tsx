@@ -3971,11 +3971,24 @@ Keep responses:
 - usable out loud
 - natural
 
-Use:
+Return ONLY ONE operational deliverable.
+
+If assist mode is:
+- cues → return one short cue only
+- lines → return one short repeatable line only
+
+Never output labels like:
 Word:
 Say:
 Cue:
 Need:
+Style:
+Pause:
+Backup:
+
+Never explain your reasoning.
+Never format as sections.
+Never return multiple options.
 
 ${resolvedLivePosture === 'debate' ? 'Debate posture: detect contradictions, protect the frame, answer proof demands, handle interruptions, and keep lines short and sharp.' : ''}`
             : `I don’t have enough of the room yet.
