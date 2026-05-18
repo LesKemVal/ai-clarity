@@ -5541,10 +5541,11 @@ if (liveMode) {
                   return
                 }
                 const nextVoice = !voiceOn
+                hasUserInteractedRef.current = true
                 setVoiceOn(nextVoice)
                 setInteractionMode(nextVoice ? 'speech' : 'text')
                 window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-                setToastMessage(nextVoice ? 'Voice on' : 'Voice off')
+                setToastMessage(nextVoice ? 'Voice on — send a test line.' : 'Voice off')
                 setShowToast(true)
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#D7DBE4]"
