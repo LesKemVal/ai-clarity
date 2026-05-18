@@ -4169,6 +4169,11 @@ return (
             setShowToast(true)
           }}
           onNewSession={() => {
+            if (forceLive || liveMode) {
+              requestExitLiveMode()
+              return
+            }
+
             try {
               if (messagesRef.current.length > 1) {
                 saveSessionToV2({
