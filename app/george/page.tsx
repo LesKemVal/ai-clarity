@@ -5987,6 +5987,18 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
+{liveMode && (
+  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-end px-4 xl:pl-[280px]">
+    <button
+      type="button"
+      onClick={requestExitLiveMode}
+      className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/85 shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition hover:border-red-300/35 hover:bg-red-500/16 hover:text-red-50"
+    >
+      EXIT LIVE
+    </button>
+  </div>
+)}
+
 <div className={`
 
 ${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
