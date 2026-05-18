@@ -13,6 +13,10 @@ export async function POST(req: Request) {
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
+      runtimeMemory:
+        body?.runtimeMemory && typeof body.runtimeMemory === 'object'
+          ? body.runtimeMemory
+          : undefined,
     })
 
     return NextResponse.json(packet)
