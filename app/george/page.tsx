@@ -4550,15 +4550,19 @@ return (
         <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
 
         <div className="relative z-10 min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.34em] text-[#D7DBE4]/72">
-            LIVE MODE
+          <p className="text-[11px] uppercase tracking-[0.30em] text-[#D7DBE4]/52">
+            LIVE
           </p>
 
-          <h1 className="mt-6 max-w-[360px] text-[44px] font-semibold leading-[0.94] tracking-[-0.07em] text-[#D7DBE4] sm:max-w-[520px] sm:text-[54px] md:max-w-[620px]">
-            Timing. Pressure.
+          <h1 className="mt-5 max-w-[540px] text-[34px] font-semibold leading-[1.02] tracking-[-0.06em] text-[#D7DBE4] sm:text-[44px] md:text-[50px]">
+            Room changed?
             <br />
-            Execution.
+            Update GEORGE instantly.
           </h1>
+
+          <p className="mt-5 max-w-[560px] text-[14px] leading-7 text-[#D7DBE4]/42">
+            Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.
+          </p>
 
         </div>
 
@@ -4568,7 +4572,7 @@ return (
           <img
             src="/earbud400.png"
             alt="GEORGE LIVE"
-            className="absolute right-[12px] top-[88px] h-[124px] w-auto rotate-[12deg] object-contain opacity-[0.82] sm:right-[22px] sm:top-[56px] sm:h-[148px] md:right-[28px] md:top-[38px] md:h-[162px] md:opacity-[0.98]"
+            className="absolute right-[8px] top-[104px] h-[108px] w-auto rotate-[12deg] object-contain opacity-[0.82] sm:right-[22px] sm:top-[56px] sm:h-[148px] md:right-[28px] md:top-[38px] md:h-[138px] md:opacity-[0.98]"
           />
         </div>
       </div>
