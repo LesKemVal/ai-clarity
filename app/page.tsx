@@ -178,12 +178,21 @@ export default function RootPage() {
                 Start LIVE
               </Link>
 
-              <Link
-                href="/george/live"
+              <button
+                type="button"
+                onClick={() => {
+                  const hasLive =
+                    typeof window !== 'undefined' &&
+                    window.localStorage.getItem('GEORGE_LIVE_SETUP')
+
+                  window.location.href = hasLive
+                    ? '/george/live'
+                    : '/george/live-entry'
+                }}
                 className="rounded-[0.9rem] border border-white/[0.06] bg-black/24 px-4 py-3 text-center text-[13px] font-medium text-white/68 transition hover:border-white/[0.10] hover:text-white/84"
               >
                 Resume LIVE
-              </Link>
+              </button>
             </div>
           </div>
         </div>
