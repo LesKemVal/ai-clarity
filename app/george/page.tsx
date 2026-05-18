@@ -458,7 +458,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
+          text: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.\n\nUse it for interviews, difficult conversations, decisions, meetings, negotiations, and real-world follow-through.',
           url,
         }).catch(() => {
           setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
