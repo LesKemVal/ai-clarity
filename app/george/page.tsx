@@ -647,6 +647,13 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         : 'short_cues')
 
   const liveContextBufferRef = useRef<string[]>([])
+  const liveRuntimeMemoryRef = useRef({
+    acceptedCarryCount: 0,
+    overrideCount: 0,
+    hesitationCount: 0,
+    preferredForce: 'balanced' as 'light' | 'balanced' | 'strong',
+    toneCorrection: 'neutral' as 'softer' | 'firmer' | 'neutral',
+  })
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
 const lastCueTsRef = useRef<number>(0)
@@ -1332,6 +1339,7 @@ async function canGovernorInjectLiveCue(transcript: string) {
           typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
             ? 'lines'
             : 'cues',
+        runtimeMemory: liveRuntimeMemoryRef.current,
       }),
     })
 
@@ -1344,7 +1352,24 @@ async function canGovernorInjectLiveCue(transcript: string) {
 
 async function injectGovernedLiveCue(transcript: string, content: string) {
   const allowed = await canGovernorInjectLiveCue(transcript)
+  const memory = liveRuntimeMemoryRef.current
+  const lower = transcript.toLowerCase()
+
+  if (/^(ok|okay|got it|i got it|i've got it|ive got it)$/.test(lower.trim())) {
+    memory.overrideCount += 1
+    memory.preferredForce = memory.overrideCount >= 3 ? 'light' : memory.preferredForce
+  }
+
+  if (/hmm|maybe|i guess|i don’t know|i don't know|i dont know/.test(lower)) {
+    memory.hesitationCount += 1
+  }
+
   if (!allowed) return false
+
+  memory.acceptedCarryCount += 1
+  if (memory.acceptedCarryCount >= 3 && memory.overrideCount < 2) {
+    memory.preferredForce = 'strong'
+  }
 
   setPendingAssistantMessage(null)
   setPendingAssistantMessage({
