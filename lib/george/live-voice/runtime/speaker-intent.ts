@@ -1,0 +1,172 @@
+export type LiveSpeakerIntent =
+  | 'addressed_to_george'
+  | 'addressed_to_room'
+  | 'steering_signal'
+  | 'room_speaker'
+  | 'ambiguous'
+
+export type LiveSpeakerIntentInput = {
+  transcript: string
+  knownUserSpeaking?: boolean
+  previousIntent?: LiveSpeakerIntent | null
+  activeRoom?: string | null
+  objective?: string | null
+}
+
+export type LiveSpeakerIntentResult = {
+  intent: LiveSpeakerIntent
+  confidence: number
+  shouldSpeak: boolean
+  shouldHold: boolean
+  shouldRemember: boolean
+  reason: string
+}
+
+const GEORGE_ADDRESS_PATTERNS = [
+  /^george[,.\s]/i,
+  /\bhey george\b/i,
+  /\bok george\b/i,
+  /\bgeorge what\b/i,
+  /\bgeorge help\b/i,
+  /\bhelp me respond\b/i,
+  /\bgive me (a )?(line|response|answer)\b/i,
+  /\bwhat (do|should) i say\b/i,
+  /\bwhat now\b/i,
+  /\bcoach me\b/i,
+]
+
+const STEERING_PATTERNS = [
+  /^hmm+$/i,
+  /^right$/i,
+  /^ok(ay)?$/i,
+  /^one second$/i,
+  /^give me a second$/i,
+  /^let me think$/i,
+  /^shorter$/i,
+  /^pause$/i,
+  /^hold$/i,
+  /^slow down$/i,
+  /^say that simpler$/i,
+]
+
+const ROOM_RESPONSE_PATTERNS = [
+  /\bthank you for (asking|having me|the time)\b/i,
+  /\bmy experience\b/i,
+  /\bwhat i would say is\b/i,
+  /\bfrom my perspective\b/i,
+  /\bi think we should\b/i,
+  /\bthe reason is\b/i,
+  /\bto answer your question\b/i,
+]
+
+const ROOM_SPEAKER_PATTERNS = [
+  /\bdo you have\b/i,
+  /\btell me about\b/i,
+  /\bwhy should we\b/i,
+  /\bwhat makes you\b/i,
+  /\bcan you explain\b/i,
+  /\bwhere do you see\b/i,
+  /\bwhat are your\b/i,
+  /\bhow would you\b/i,
+]
+
+function normalizeTranscript(transcript: string) {
+  return transcript.trim().replace(/\s+/g, ' ')
+}
+
+function matchesAny(text: string, patterns: RegExp[]) {
+  return patterns.some((pattern) => pattern.test(text))
+}
+
+export function classifyLiveSpeakerIntent(input: LiveSpeakerIntentInput): LiveSpeakerIntentResult {
+  const transcript = normalizeTranscript(input.transcript)
+
+  if (!transcript) {
+    return {
+      intent: 'ambiguous',
+      confidence: 0,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: false,
+      reason: 'No transcript content.',
+    }
+  }
+
+  const lower = transcript.toLowerCase()
+  const wordCount = lower.split(' ').filter(Boolean).length
+
+  if (matchesAny(lower, GEORGE_ADDRESS_PATTERNS)) {
+    return {
+      intent: 'addressed_to_george',
+      confidence: 0.92,
+      shouldSpeak: true,
+      shouldHold: false,
+      shouldRemember: true,
+      reason: 'Direct GEORGE address or explicit request for help.',
+    }
+  }
+
+  if (matchesAny(lower, STEERING_PATTERNS)) {
+    return {
+      intent: 'steering_signal',
+      confidence: wordCount <= 4 ? 0.82 : 0.66,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'Short steering phrase. Hold by default unless runtime context asks for a cue.',
+    }
+  }
+
+  if (!input.knownUserSpeaking && matchesAny(lower, ROOM_SPEAKER_PATTERNS)) {
+    return {
+      intent: 'room_speaker',
+      confidence: 0.74,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'Likely other party speaking or asking the user a question.',
+    }
+  }
+
+  if (input.knownUserSpeaking && matchesAny(lower, ROOM_RESPONSE_PATTERNS)) {
+    return {
+      intent: 'addressed_to_room',
+      confidence: 0.74,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'Likely user speaking to the room, not GEORGE.',
+    }
+  }
+
+  if (input.knownUserSpeaking && wordCount >= 7) {
+    return {
+      intent: 'addressed_to_room',
+      confidence: 0.58,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'Longer user utterance without GEORGE address is likely room-directed speech.',
+    }
+  }
+
+  if (!input.knownUserSpeaking && wordCount >= 5) {
+    return {
+      intent: 'room_speaker',
+      confidence: 0.54,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'Likely room audio without a direct GEORGE request.',
+    }
+  }
+
+  return {
+    intent: 'ambiguous',
+    confidence: 0.42,
+    shouldSpeak: false,
+    shouldHold: true,
+    shouldRemember: true,
+    reason: 'Insufficient signal. Preserve context and avoid unnecessary interruption.',
+  }
+}
