@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import LiveSteeringGuide from '@/components/george/LiveSteeringGuide'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 
@@ -129,6 +128,42 @@ const ROOM_RUNTIME_ESTIMATES: Record<
   },
 }
 
+const LIVE_CAPACITY_OPTIONS = [
+  {
+    id: 'sharper_answers',
+    label: 'Sharper answers',
+    cents: 4,
+    description: 'Cleaner proof, fewer wandering responses.',
+    runtimeBias: {
+      answerCompression: 'high',
+      hedgeReduction: true,
+      proofMode: 'stronger',
+    },
+  },
+  {
+    id: 'pacing_guidance',
+    label: 'Pacing guidance',
+    cents: 8,
+    description: 'Slow down before pressure compounds.',
+    runtimeBias: {
+      silenceWindows: 'active',
+      cadenceAdjustment: 'adaptive',
+      interruptionThreshold: 'higher',
+    },
+  },
+  {
+    id: 'pressure_management',
+    label: 'Pressure management',
+    cents: 17,
+    description: 'Hold composure under challenge.',
+    runtimeBias: {
+      pressureDetection: 'high',
+      resistanceForecasting: true,
+      composureCues: 'active',
+    },
+  },
+]
+
 const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
   Interview: {
     label: 'WHAT WILL THEY BE LISTENING FOR?',
@@ -206,6 +241,8 @@ export default function GeorgeLiveEntryPage() {
   const [currentTier, setCurrentTier] = useState('smart')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
   const [selectedCapacityCents, setSelectedCapacityCents] = useState<number | null>(null)
+  const [selectedCapabilityIds, setSelectedCapabilityIds] = useState<string[]>([])
+  const [steeringSaved, setSteeringSaved] = useState(false)
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
     label: 'WHAT SHOULD GEORGE TRACK?',
@@ -213,9 +250,33 @@ export default function GeorgeLiveEntryPage() {
   }
 
   const runtimeEstimate = ROOM_RUNTIME_ESTIMATES[selectedRoom]
-  const estimatedCents = selectedCapacityCents ?? runtimeEstimate?.baseCents ?? null
+  const selectedCapabilities = LIVE_CAPACITY_OPTIONS.filter((item) => selectedCapabilityIds.includes(item.id))
+  const capacityCents = selectedCapabilities.reduce((sum, item) => sum + item.cents, 0)
+  const baseRuntimeCents = selectedCapacityCents ?? runtimeEstimate?.baseCents ?? null
+  const estimatedCents = baseRuntimeCents === null ? null : baseRuntimeCents + capacityCents
 
   const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
+
+  const toggleCapability = (id: string) => {
+    setSelectedCapabilityIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
+  }
+
+  const persistSteeringPhrases = (value = controlWords) => {
+    if (typeof window === 'undefined') return
+
+    const normalized = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(', ')
+
+    setControlWords(normalized)
+    window.localStorage.setItem('george_live_control_words', normalized)
+    setSteeringSaved(true)
+    window.setTimeout(() => setSteeringSaved(false), 1200)
+  }
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -240,6 +301,8 @@ export default function GeorgeLiveEntryPage() {
         if (liveSetup.controlWords) setControlWords(liveSetup.controlWords)
         if (liveSetup.language) setSelectedLanguage(liveSetup.language)
         if (liveSetup.cadence) setSpeechCadence(liveSetup.cadence)
+        if (typeof liveSetup.selectedCapacityCents === 'number') setSelectedCapacityCents(liveSetup.selectedCapacityCents)
+        if (Array.isArray(liveSetup.selectedCapabilityIds)) setSelectedCapabilityIds(liveSetup.selectedCapabilityIds)
         if (liveSetup.liveAssistMode === 'lines' || liveSetup.liveAssistMode === 'cues') {
           setLiveAssistMode(liveSetup.liveAssistMode)
         }
@@ -261,12 +324,37 @@ export default function GeorgeLiveEntryPage() {
       setLiveAssistMode(savedDelivery)
     }
 
+    const savedControlWords = window.localStorage.getItem('george_live_control_words')
+    if (savedControlWords) {
+      setControlWords(savedControlWords)
+    }
+
+    try {
+      const savedRuntimeSupport = JSON.parse(window.localStorage.getItem('george_live_runtime_support') || 'null')
+      if (Array.isArray(savedRuntimeSupport?.selectedCapabilityIds)) {
+        setSelectedCapabilityIds(savedRuntimeSupport.selectedCapabilityIds)
+      }
+      if (typeof savedRuntimeSupport?.selectedCapacityCents === 'number') {
+        setSelectedCapacityCents(savedRuntimeSupport.selectedCapacityCents)
+      }
+    } catch {}
+
     const activeLive = getActiveSessionForMode('live')
     setHasLiveSession(!!activeLive)
   }, [])
 
   const prepareLive = () => {
     if (typeof window === 'undefined') return
+
+    const runtimeSupport = {
+      selectedCapacityCents,
+      selectedCapabilityIds,
+      selectedCapabilities,
+      baseRuntimeCents,
+      capacityCents,
+      estimatedCents,
+      runtimeBias: selectedCapabilities.map((item) => item.runtimeBias),
+    }
 
     const liveSetup = {
       room: selectedRoom,
@@ -275,12 +363,18 @@ export default function GeorgeLiveEntryPage() {
       objective,
       controlWords,
       liveAssistMode,
+      runtimeSupport,
+      selectedCapacityCents,
+      selectedCapabilityIds,
+      estimatedCents,
       createdAt: Date.now(),
     }
 
     localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
     localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
     localStorage.setItem('george_live_assist_mode', liveAssistMode)
+    localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
+    localStorage.setItem('george_live_estimated_cents', String(estimatedCents ?? ''))
 
     window.location.href = '/george/live'
   }
@@ -360,65 +454,91 @@ export default function GeorgeLiveEntryPage() {
 
           </div>
 
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-out ${
-              runtimeEstimate
-                ? 'mt-5 max-h-[240px] translate-y-0 opacity-100'
-                : 'max-h-0 -translate-y-2 opacity-0'
-            }`}
-          >
-            {runtimeEstimate && (
-              <div className="rounded-[0.9rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.05),rgba(255,255,255,0.012))] px-4 py-4 shadow-[0_0_24px_rgba(170,180,255,0.04)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
-                      Estimated Conversation Cost
-                    </div>
-
-                    <div className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-white/92">
-                      ~{estimatedCents}¢
-                    </div>
+          {runtimeEstimate && (
+            <div className="mt-5 rounded-[0.95rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.045),rgba(255,255,255,0.010))] p-4 shadow-[0_0_24px_rgba(170,180,255,0.035)]">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
+                    Runtime estimate
                   </div>
 
-                  <div className="rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/38">
-                    Adjusts by room + support
+                  <div className="mt-2 text-[30px] font-semibold tracking-[-0.045em] text-white/92">
+                    ~{estimatedCents}¢
                   </div>
                 </div>
 
-                <p className="mt-3 text-[14px] leading-6 text-white/62">
-                  {runtimeEstimate.statement}
-                </p>
+                <div className="rounded-full border border-[#AAB4FF]/12 bg-black/24 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[#C9D0FF]/52">
+                  Room + capacity
+                </div>
+              </div>
 
-                <p className="mt-2 text-[12px] leading-5 text-white/40">
-                  This is the estimated cost of the conversation, interview, appointment, call, or room — not a subscription price.
-                </p>
+              <p className="mt-3 text-[13px] leading-6 text-white/48">
+                This is not a subscription price. It is a visible runtime estimate for how much support GEORGE is carrying in this room.
+              </p>
 
-                <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  {runtimeEstimate.support.map((item) => {
-                    const active = estimatedCents === item.cents
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {runtimeEstimate.support.map((item) => {
+                  const active = selectedCapacityCents === item.cents || (!selectedCapacityCents && item.cents === runtimeEstimate.baseCents)
+
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => setSelectedCapacityCents(item.cents)}
+                      className={`rounded-[0.75rem] border px-3 py-2 text-left text-[12px] transition ${
+                        active
+                          ? 'border-[#AAB4FF]/30 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.07)]'
+                          : 'border-white/[0.055] bg-black/20 text-white/52 hover:border-[#AAB4FF]/18 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80'
+                      }`}
+                    >
+                      <span className="block font-medium">{item.label}</span>
+                      <span className="mt-1 block text-[11px] text-white/36">~{item.cents}¢ base</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="mt-4 border-t border-white/[0.05] pt-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/34">
+                    Add capacity
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.16em] text-[#AAB4FF]/52">
+                    Real runtime bias
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  {LIVE_CAPACITY_OPTIONS.map((item) => {
+                    const active = selectedCapabilityIds.includes(item.id)
 
                     return (
                       <button
-                        key={item.label}
+                        key={item.id}
                         type="button"
-                        onClick={() => setSelectedCapacityCents(item.cents)}
-                        className={`rounded-[0.7rem] border px-3 py-2 text-left text-[12px] transition ${
+                        onClick={() => toggleCapability(item.id)}
+                        className={`rounded-[0.85rem] border px-4 py-3 text-left transition ${
                           active
-                            ? 'border-[#AAB4FF]/[0.28] bg-[#AAB4FF]/[0.09] text-white shadow-[0_0_18px_rgba(170,180,255,0.07)]'
-                            : 'border-[#AAB4FF]/[0.08] bg-black/18 text-white/58 hover:border-[#AAB4FF]/[0.18] hover:bg-[#AAB4FF]/[0.045] hover:text-white/82'
+                            ? 'border-[#AAB4FF]/30 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.07)]'
+                            : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-[#AAB4FF]/18 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80'
                         }`}
                       >
-                        <span className="block">{item.label}</span>
-                        <span className="mt-1 block text-[11px] text-white/38">~{item.cents}¢ estimated</span>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-[13px] font-semibold">{item.label}</div>
+                            <div className="mt-1 text-[12px] leading-5 text-white/40">{item.description}</div>
+                          </div>
+                          <div className="shrink-0 text-[12px] font-semibold text-[#C9D0FF]/82">
+                            +{item.cents}¢
+                          </div>
+                        </div>
                       </button>
                     )
                   })}
                 </div>
               </div>
-            )}
-          </div>
-
-          <LiveSteeringGuide room={selectedRoom} />
+            </div>
+          )}
 
           <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
@@ -582,7 +702,11 @@ export default function GeorgeLiveEntryPage() {
                       .filter(Boolean)
 
                     if (!parts.includes(word)) {
-                      setControlWords([...parts, word].join(', '))
+                      const next = [...parts, word].join(', ')
+                      setControlWords(next)
+                      window.localStorage.setItem('george_live_control_words', next)
+                      setSteeringSaved(true)
+                      window.setTimeout(() => setSteeringSaved(false), 1200)
                     }
                   }}
                   className="rounded-[0.75rem] border border-white/[0.055] bg-black/20 px-3 py-1.5 text-[12px] text-white/50 transition-all duration-150 hover:border-[#AAB4FF]/24 hover:bg-[#AAB4FF]/[0.045] hover:text-white/80"
@@ -595,12 +719,19 @@ export default function GeorgeLiveEntryPage() {
             <input
               value={controlWords}
               onChange={(e) => setControlWords(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  persistSteeringPhrases()
+                }
+              }}
+              onBlur={() => persistSteeringPhrases()}
               placeholder="Add natural phrases GEORGE should listen for during LIVE"
               className="mt-3 w-full rounded-[0.9rem] border border-white/[0.055] bg-black/22 px-4 py-3 text-[13px] text-white/82 outline-none placeholder:text-white/22 transition focus:border-[#AAB4FF]/24 focus:bg-white/[0.018]"
             />
 
             <p className="mt-2 text-[12px] leading-5 text-white/32">
-              “OK” stops current GEORGE behavior. Your next phrase becomes the new direction.
+              {steeringSaved ? 'Saved for LIVE.' : 'Press Enter to save. “OK” resets GEORGE behavior and lets your next phrase become the new direction.'}
             </p>
           </div>
         </div>
