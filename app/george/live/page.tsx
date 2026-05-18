@@ -1,7 +1,5 @@
-'use client'
-
-import GeorgePage from '../page'
+import GeorgeLiveShell from './GeorgeLiveShell'
 
 export default function GeorgeLivePage() {
-  return <GeorgePage forceLive />
+  return <GeorgeLiveShell />
 }
