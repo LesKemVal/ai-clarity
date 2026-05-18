@@ -128,7 +128,7 @@ export default function RootPage() {
         <div className="mt-7 grid w-full max-w-[440px] gap-3 sm:grid-cols-2">
           <Link
             href="/george"
-            className="group flex items-center justify-center rounded-[1.1rem] border border-[#DCE1E7]/[0.18] bg-[#0D1117] px-6 py-4 text-[14px] font-semibold text-[#DCE1E7] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-white/[0.18] hover:bg-[#11151A] hover:text-white"
+            className="group flex items-center justify-center rounded-[1.1rem] border border-[#F8FAFC]/[0.46] bg-[#020304] px-6 py-4 text-[14px] font-semibold text-[#F8FAFC] shadow-[0_0_0_1px_rgba(248,250,252,0.10),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#F8FAFC]/[0.68] hover:bg-[#050607] hover:text-white"
           >
             Enter GEORGE
           </Link>
@@ -136,7 +136,7 @@ export default function RootPage() {
           <button
             type="button"
             onClick={() => setShowLiveStart(true)}
-            className="group relative flex items-center justify-center overflow-hidden rounded-[1.1rem] border border-[#8FB6C9]/[0.16] bg-[#101722] px-6 py-4 text-[14px] font-semibold text-[#D7E6EE] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-[#8FB6C9]/[0.24] hover:bg-[#121B27]"
+            className="group relative flex items-center justify-center overflow-hidden rounded-[1.1rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[14px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
           >
             <span>Enter LIVE</span>
           </button>
