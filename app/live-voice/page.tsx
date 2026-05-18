@@ -755,9 +755,12 @@ function isForceIntervention(text: string) {
         pushLog('Deepgram socket error.')
       }
 
-      socket.onclose = () => {
+      socket.onclose = (event) => {
         setRunning(false)
-        pushLog('Deepgram socket closed.')
+        const reason = `Deepgram socket closed: code ${event.code}${event.reason ? ` — ${event.reason}` : ''}`
+        console.warn(reason, event)
+        setError(reason)
+        pushLog(reason)
       }
     } catch (err) {
       setError('Mic start failed. Check browser mic permission.')
