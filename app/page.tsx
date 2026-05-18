@@ -46,7 +46,7 @@ export default function RootPage() {
           LIVE Conversation assistance
         </h1>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
-          Use GEORGE to plan, decide, prepare, respond, and keep momentum when the next step matters.
+          Use GEORGE to plan, decide, prepare, respond, and keep momentum when timing, pressure, and words matter most.
         </p>
 
         <div className="mt-8 grid w-full max-w-[520px] gap-3 text-left">
