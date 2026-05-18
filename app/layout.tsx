@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'GEORGE by BRANESx',
-    description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.'
+    description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.',
     siteName: 'BRANESx',
     url: 'https://www.branesx.com/george',
     type: 'website',
