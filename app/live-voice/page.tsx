@@ -420,7 +420,8 @@ function isForceIntervention(text: string) {
       streamRef.current = stream
 
       const socket = new WebSocket(
-        `wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250&token=${encodeURIComponent(tokenData.token)}`
+        'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
+        ['token', tokenData.token]
       )
 
       socketRef.current = socket
