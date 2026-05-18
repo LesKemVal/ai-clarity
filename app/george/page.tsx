@@ -4169,6 +4169,8 @@ return (
             setShowToast(true)
           }}
           onNewSession={() => {
+            // Route boundary: /george/live must not render normal GEORGE in place.
+            // Leaving LIVE must go through the save/stay/exit flow first.
             if (forceLive || liveMode) {
               requestExitLiveMode()
               return
