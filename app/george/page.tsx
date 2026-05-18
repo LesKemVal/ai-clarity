@@ -1141,16 +1141,35 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       const startNewLiveRequested = window.localStorage.getItem('george_start_new_live') === '1'
       if (startNewLiveRequested) {
         window.localStorage.removeItem('george_start_new_live')
+
+        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+        window.localStorage.removeItem('george_active_live_session_id')
+        window.localStorage.removeItem('george_active_campaign_session_id')
+        window.localStorage.removeItem('george_active_campaign')
+        window.localStorage.removeItem('george_active_context')
+        window.localStorage.removeItem('george_active_label')
+
         setActiveCampaignId(null)
+        setMessages([])
+        messagesRef.current = []
       }
 
       let existingLive =
-        getActiveSessionForMode('live') ||
-        (subscriberEmail.trim()
-          ? getLatestSubscriberSession(subscriberEmail, 'live')
-          : null)
+        !startNewLiveRequested
+          ? (
+              getActiveSessionForMode('live') ||
+              (subscriberEmail.trim()
+                ? getLatestSubscriberSession(subscriberEmail, 'live')
+                : null)
+            )
+          : null
 
-if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(existingLive.messages) && existingLive.messages.length > 0) {
+if (
+  !startNewLiveRequested &&
+  existingLive?.mode === 'live' &&
+  Array.isArray(existingLive.messages) &&
+  existingLive.messages.length > 0
+) {
         skipNextTypewriterRef.current = true
         restoredMessagesSignatureRef.current = getMessagesSignature(existingLive.messages)
         setMessages(existingLive.messages)
