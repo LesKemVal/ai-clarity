@@ -172,10 +172,12 @@ export default function GeorgeLiveEntryPage() {
     }
 
     try {
-      const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
+      const rawLiveSetup =
+        window.localStorage.getItem('GEORGE_LIVE_SETUP') ||
+        window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP')
       const liveSetup = rawLiveSetup ? JSON.parse(rawLiveSetup) : null
 
-      if (liveSetup?.runtimeOverlay) {
+      if (liveSetup?.runtimeOverlay || liveSetup?.room || liveSetup?.objective || liveSetup?.controlWords) {
         if (liveSetup.room) setSelectedRoom(liveSetup.room)
         if (liveSetup.objective) setObjective(liveSetup.objective)
         if (liveSetup.controlWords) setControlWords(liveSetup.controlWords)
@@ -201,17 +203,17 @@ export default function GeorgeLiveEntryPage() {
   const prepareLive = () => {
     if (typeof window === 'undefined') return
 
-    localStorage.setItem(
-      'GEORGE_LIVE_SETUP',
-      JSON.stringify({
-        room: selectedRoom,
-        language: selectedLanguage,
-        cadence: speechCadence,
-        objective,
-        controlWords,
-        createdAt: Date.now(),
-      })
-    )
+    const liveSetup = {
+      room: selectedRoom,
+      language: selectedLanguage,
+      cadence: speechCadence,
+      objective,
+      controlWords,
+      createdAt: Date.now(),
+    }
+
+    localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
+    localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
 
     window.location.href = '/george/live'
   }
