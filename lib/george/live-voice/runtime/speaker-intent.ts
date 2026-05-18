@@ -2,6 +2,7 @@ export type LiveSpeakerIntent =
   | 'addressed_to_george'
   | 'addressed_to_room'
   | 'steering_signal'
+  | 'assisted_continuation'
   | 'confirmation_signal'
   | 'correction_signal'
   | 'room_speaker'
@@ -37,6 +38,15 @@ const GEORGE_ADDRESS_PATTERNS = [
   /\bcoach me\b/i,
 ]
 
+const ASSISTED_CONTINUATION_PATTERNS = [
+  /^hmm+[,\.\s]+\S+/i,
+  /^ok(?:ay)?[,\.\s]+\S+/i,
+  /^right[,\.\s]+\S+/i,
+  /^maybe\s+(we|i|this|that)\b/i,
+  /^i\s+(don’t|don't|dont)\s+know\b/i,
+  /^i\s+guess\b/i,
+]
+
 const CONFIRMATION_PATTERNS = [
   /^m+\s*h+mm+$/i,
   /^mm+\s*hmm+$/i,
@@ -59,17 +69,11 @@ const STEERING_PATTERNS = [
   /^hmm+$/i,
   /^right$/i,
   /^ok(ay)?$/i,
-  /^one second$/i,
-  /^give me a second$/i,
-  /^let me think$/i,
   /^shorter$/i,
   /^more$/i,
   /^now$/i,
   /^soft$/i,
   /^firm$/i,
-  /^pause$/i,
-  /^hold$/i,
-  /^slow down$/i,
   /^say that simpler$/i,
 ]
 
@@ -127,6 +131,17 @@ export function classifyLiveSpeakerIntent(input: LiveSpeakerIntentInput): LiveSp
       shouldHold: false,
       shouldRemember: true,
       reason: 'Direct GEORGE address or explicit request for help.',
+    }
+  }
+
+  if (matchesAny(lower, ASSISTED_CONTINUATION_PATTERNS)) {
+    return {
+      intent: 'assisted_continuation',
+      confidence: wordCount <= 8 ? 0.78 : 0.66,
+      shouldSpeak: true,
+      shouldHold: false,
+      shouldRemember: true,
+      reason: 'Natural cadence continuation. User is carrying the floor and may need GEORGE to shape the next words toward the objective.',
     }
   }
 
