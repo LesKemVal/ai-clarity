@@ -136,10 +136,9 @@ export default function RootPage() {
           <button
             type="button"
             onClick={() => setShowLiveStart(true)}
-            className="group relative flex items-center justify-center overflow-hidden rounded-[1.1rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(143,182,201,0.105),rgba(8,17,29,0.72))] px-6 py-4 text-[14px] font-semibold text-[#E6F3FA]/88 shadow-[0_18px_44px_rgba(4,10,18,0.24),inset_0_1px_0_rgba(143,182,201,0.08)] transition hover:border-[#8FB6C9]/[0.28] hover:text-white"
+            className="group relative flex items-center justify-center overflow-hidden rounded-[1.1rem] border border-[#8FB6C9]/[0.16] bg-[#101722] px-6 py-4 text-[14px] font-semibold text-[#D7E6EE] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-[#8FB6C9]/[0.24] hover:bg-[#121B27]"
           >
-            <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.16),transparent_42%)] opacity-70 transition group-hover:opacity-100" />
-            <span className="relative">Enter LIVE</span>
+            <span>Enter LIVE</span>
           </button>
         </div>
 
@@ -149,7 +148,7 @@ export default function RootPage() {
       </div>
 
       {showLiveStart && (
-        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/76 px-4 pb-5 sm:items-center sm:pb-0">
+        <div className="fixed inset-0 z-[90] flex items-end justify-center bg-black/78 px-4 pb-5 sm:items-center sm:pb-0">
           <button
             type="button"
             aria-label="Close LIVE start"
@@ -157,7 +156,7 @@ export default function RootPage() {
             className="absolute inset-0 cursor-default"
           />
 
-          <div className="relative w-full max-w-[390px] rounded-[1.35rem] border border-[#8FB6C9]/[0.10] bg-[#07101B]/96 p-4 text-left shadow-[0_26px_70px_rgba(0,0,0,0.58)]">
+          <div className="relative w-full max-w-[390px] rounded-[1.15rem] border border-[#8FB6C9]/[0.10] bg-[#080D14]/[0.98] p-4 text-left shadow-[0_26px_70px_rgba(0,0,0,0.58)]">
             <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/60">
               LIVE GEORGE
             </div>
@@ -167,7 +166,7 @@ export default function RootPage() {
             </div>
 
             <p className="mt-2 text-[13px] leading-6 text-[#9FA9B5]">
-              Prepare the room first, or return to LIVE if you already started.
+              Prepare the room, or continue the LIVE Conversation already in motion.
             </p>
 
             <div className="mt-5 grid gap-2">
@@ -175,7 +174,7 @@ export default function RootPage() {
                 href="/george/live-entry"
                 className="rounded-[0.9rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.075] px-4 py-3 text-center text-[13px] font-semibold text-[#E6F3FA] transition hover:bg-[#8FB6C9]/[0.11]"
               >
-                Prepare the Room
+                Prepare Room
               </Link>
 
               <button
@@ -191,7 +190,7 @@ export default function RootPage() {
                 }}
                 className="rounded-[0.9rem] border border-white/[0.06] bg-black/24 px-4 py-3 text-center text-[13px] font-medium text-white/68 transition hover:border-white/[0.10] hover:text-white/84"
               >
-                Resume LIVE
+                Resume LIVE Conversation
               </button>
             </div>
           </div>

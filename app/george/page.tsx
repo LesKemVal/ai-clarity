@@ -4436,12 +4436,9 @@ return (
           <h1 className="mt-6 max-w-[360px] text-[44px] font-semibold leading-[0.94] tracking-[-0.07em] text-[#D7DBE4] sm:max-w-[520px] sm:text-[54px] md:max-w-[620px]">
             Timing. Pressure.
             <br />
-            The next useful line.
+            Execution.
           </h1>
 
-          <p className="mt-7 max-w-[250px] text-[15px] leading-7 text-[#D7DBE4]/42 sm:max-w-[360px] sm:text-[16px] md:mt-8">
-            Keep GEORGE in the room with you.
-          </p>
         </div>
 
         <div className="relative z-0">
