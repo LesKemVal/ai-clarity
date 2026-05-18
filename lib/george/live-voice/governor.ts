@@ -57,7 +57,9 @@ function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInp
   }
 
   if (runtimeForce === 'strong' && packet.liveAssistMode === 'cues' && packet.cue) {
-    packet.cue = `${packet.cue} Keep moving.`.trim()
+    packet.cue = packet.cue
+      ? `${packet.cue.replace(/[.\s]*$/, '')}. Keep moving.`
+      : 'Keep moving.'
   }
 
   if (runtimeForce === 'light') {

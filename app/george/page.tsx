@@ -1360,6 +1360,14 @@ async function injectGovernedLiveCue(transcript: string, content: string) {
     memory.preferredForce = memory.overrideCount >= 3 ? 'light' : memory.preferredForce
   }
 
+  if (
+    /^(ok|okay|hold|pause|wait|stop)$/.test(lower.trim()) &&
+    !allowed
+  ) {
+    memory.overrideCount += 1
+    memory.preferredForce = memory.overrideCount >= 3 ? 'light' : memory.preferredForce
+  }
+
   if (/hmm|maybe|i guess|i don’t know|i don't know|i dont know/.test(lower)) {
     memory.hesitationCount += 1
   }
