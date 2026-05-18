@@ -2695,17 +2695,19 @@ requestAnimationFrame(() => {
       return null
     }
 
-    const res = await fetch('/api/tts', {
+    const res = await fetch(liveMode ? '/api/george/live/tts' : '/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-            mode: liveMode
-              ? 'conversation'
-              : activeCampaign
-              ? 'campaign'
-              : 'normal',
-        forceClose,
- input: text, speed: voiceSpeed, tier: currentTier, voice: voiceType }),
+      body: liveMode
+        ? JSON.stringify({ text })
+        : JSON.stringify({
+            mode: activeCampaign ? 'campaign' : 'normal',
+            forceClose,
+            input: text,
+            speed: voiceSpeed,
+            tier: currentTier,
+            voice: voiceType,
+          }),
     })
 
     if (!res.ok) {
