@@ -15,6 +15,7 @@ const ROOM_CONTROLS: Record<string, string[]> = {
   'Sales Call': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
   'Doctor Appointment': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
   Presentation: ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
+  Influencer: ['hmm', 'right', 'ok', 'let me reset that', 'let’s keep it simple'],
   'Everyday Conversation': ['hmm', 'right', 'ok', 'let me think', 'why don’t we'],
 }
 
@@ -22,63 +23,109 @@ const ROOM_CONTROLS: Record<string, string[]> = {
 const ROOM_RUNTIME_ESTIMATES: Record<
   string,
   {
-    average: string
+    baseCents: number
     statement: string
-    support: string[]
+    support: Array<{ label: string; cents: number }>
   }
 > = {
   Interview: {
-    average: '~28¢',
-    statement: 'For pennies, buy sharper answers, steadier pacing, and better pressure control before the room gets expensive.',
-    support: ['sharper answers · ~32¢', 'pacing guidance · ~41¢', 'pressure management · ~49¢'],
+    baseCents: 18,
+    statement: 'Estimated cost for a typical LIVE interview. Still pennies, but visible so the user understands what the conversation is spending.',
+    support: [
+      { label: 'light interview support', cents: 18 },
+      { label: 'active answer shaping', cents: 24 },
+      { label: 'high-pressure interview', cents: 31 },
+    ],
   },
 
   Meeting: {
-    average: '~34¢',
-    statement: 'Useful alignment before the room drifts.',
-    support: ['decision framing', 'clearer positioning', 'better timing'],
+    baseCents: 22,
+    statement: 'Estimated cost for a typical LIVE meeting where GEORGE tracks timing, clarity, and decisions.',
+    support: [
+      { label: 'light alignment', cents: 22 },
+      { label: 'decision support', cents: 29 },
+      { label: 'pressure meeting', cents: 37 },
+    ],
   },
 
   Boardroom: {
-    average: '~83¢',
-    statement: 'Operational support when executive pressure carries weight.',
-    support: ['proof pressure support', 'executive communication', 'posture calibration'],
+    baseCents: 48,
+    statement: 'Estimated cost for a higher-pressure executive conversation with heavier runtime support.',
+    support: [
+      { label: 'executive cues', cents: 48 },
+      { label: 'proof pressure', cents: 64 },
+      { label: 'high-stakes room', cents: 79 },
+    ],
   },
 
   Negotiation: {
-    average: '~64¢',
-    statement: 'Worth it when leverage, timing, and framing matter.',
-    support: ['stronger framing', 'pressure handling', 'timing cues'],
+    baseCents: 36,
+    statement: 'Estimated cost for a LIVE negotiation where leverage, timing, and framing matter.',
+    support: [
+      { label: 'timing cues', cents: 36 },
+      { label: 'pressure handling', cents: 49 },
+      { label: 'strong carry', cents: 62 },
+    ],
   },
 
   Debate: {
-    average: '~46¢',
-    statement: 'Useful when clarity and pressure resistance matter.',
-    support: ['rebuttal shaping', 'proof framing', 'composure support'],
+    baseCents: 32,
+    statement: 'Estimated cost for a pressure conversation where GEORGE helps protect the frame.',
+    support: [
+      { label: 'clarity cues', cents: 32 },
+      { label: 'rebuttal shaping', cents: 44 },
+      { label: 'proof pressure', cents: 56 },
+    ],
   },
 
   'Sales Call': {
-    average: '~36¢',
-    statement: 'Small runtime cost. Meaningful movement if the room opens.',
-    support: ['objection handling', 'closing posture', 'trust calibration'],
+    baseCents: 24,
+    statement: 'Estimated cost for a LIVE sales call with pacing, objection, and trust support.',
+    support: [
+      { label: 'light call cues', cents: 24 },
+      { label: 'objection support', cents: 33 },
+      { label: 'closing pressure', cents: 42 },
+    ],
   },
 
   'Doctor Appointment': {
-    average: '~41¢',
-    statement: 'Worth it when something important cannot be missed.',
-    support: ['clarification support', 'question refinement', 'memory reinforcement'],
+    baseCents: 27,
+    statement: 'Estimated cost for a LIVE appointment where clarity and recall matter.',
+    support: [
+      { label: 'question support', cents: 27 },
+      { label: 'clarification help', cents: 35 },
+      { label: 'high-detail visit', cents: 44 },
+    ],
   },
 
   Presentation: {
-    average: '~39¢',
-    statement: 'Forward movement through stronger delivery and pacing.',
-    support: ['pacing support', 'message refinement', 'closing strength'],
+    baseCents: 25,
+    statement: 'Estimated cost for LIVE presentation support around pacing, message, and closing strength.',
+    support: [
+      { label: 'pacing support', cents: 25 },
+      { label: 'message refinement', cents: 34 },
+      { label: 'strong close', cents: 43 },
+    ],
+  },
+
+  Influencer: {
+    baseCents: 21,
+    statement: 'Estimated cost for LIVE creator support when the audience, guest, brand, or comments can shift the room quickly.',
+    support: [
+      { label: 'audience cues', cents: 21 },
+      { label: 'brand-safe response', cents: 29 },
+      { label: 'live pressure recovery', cents: 39 },
+    ],
   },
 
   'Everyday Conversation': {
-    average: '~18¢',
-    statement: 'Light operational support for everyday communication.',
-    support: ['next responses', 'conversation flow', 'clearer wording'],
+    baseCents: 12,
+    statement: 'Estimated cost for a lighter LIVE conversation where GEORGE helps keep the exchange clear.',
+    support: [
+      { label: 'light cues', cents: 12 },
+      { label: 'next responses', cents: 18 },
+      { label: 'sensitive conversation', cents: 26 },
+    ],
   },
 }
 
@@ -123,6 +170,11 @@ const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
     placeholder: 'Message, audience pressure, pacing, proof, or the strongest close.'
   },
 
+  Influencer: {
+    label: 'WHAT SHOULD GEORGE PROTECT?',
+    placeholder: 'Audience pressure, guest, brand tone, comments, controversy, or the response style you need.'
+  },
+
   'Everyday Conversation': {
     label: 'WHAT SHOULD GEORGE TRACK?',
     placeholder: 'Context, pressure, sensitivity, relationship dynamics, or desired outcome.'
@@ -138,6 +190,7 @@ const LIVE_CONTEXTS = [
   'Debate',
   'Doctor Appointment',
   'Presentation',
+  'Influencer',
   'Everyday Conversation',
 ]
 
@@ -152,6 +205,7 @@ export default function GeorgeLiveEntryPage() {
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
+  const [selectedCapacityCents, setSelectedCapacityCents] = useState<number | null>(null)
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
     label: 'WHAT SHOULD GEORGE TRACK?',
@@ -159,6 +213,7 @@ export default function GeorgeLiveEntryPage() {
   }
 
   const runtimeEstimate = ROOM_RUNTIME_ESTIMATES[selectedRoom]
+  const estimatedCents = selectedCapacityCents ?? runtimeEstimate?.baseCents ?? null
 
   const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
 
@@ -288,7 +343,10 @@ export default function GeorgeLiveEntryPage() {
                 <button
                   key={item}
                   type="button"
-                  onClick={() => setSelectedRoom(item)}
+                  onClick={() => {
+                    setSelectedRoom(item)
+                    setSelectedCapacityCents(null)
+                  }}
                   className={`rounded-[0.8rem] border px-3 py-2 text-[13px] transition-all duration-150 ${
                     active
                       ? 'border-white/[0.14] bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.038))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
@@ -314,16 +372,16 @@ export default function GeorgeLiveEntryPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
-                      Operational Capacity
+                      Estimated Conversation Cost
                     </div>
 
                     <div className="mt-2 text-[28px] font-semibold tracking-[-0.04em] text-white/92">
-                      {runtimeEstimate.average}
+                      ~{estimatedCents}¢
                     </div>
                   </div>
 
                   <div className="rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/38">
-                    Adjusts by room
+                    Adjusts by room + support
                   </div>
                 </div>
 
@@ -331,15 +389,30 @@ export default function GeorgeLiveEntryPage() {
                   {runtimeEstimate.statement}
                 </p>
 
+                <p className="mt-2 text-[12px] leading-5 text-white/40">
+                  This is the estimated cost of the conversation, interview, appointment, call, or room — not a subscription price.
+                </p>
+
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  {runtimeEstimate.support.map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[0.7rem] border border-[#AAB4FF]/[0.08] bg-black/18 px-3 py-2 text-[12px] text-white/58 transition hover:border-[#AAB4FF]/[0.18] hover:bg-[#AAB4FF]/[0.045] hover:text-white/82"
-                    >
-                      {item}
-                    </div>
-                  ))}
+                  {runtimeEstimate.support.map((item) => {
+                    const active = estimatedCents === item.cents
+
+                    return (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => setSelectedCapacityCents(item.cents)}
+                        className={`rounded-[0.7rem] border px-3 py-2 text-left text-[12px] transition ${
+                          active
+                            ? 'border-[#AAB4FF]/[0.28] bg-[#AAB4FF]/[0.09] text-white shadow-[0_0_18px_rgba(170,180,255,0.07)]'
+                            : 'border-[#AAB4FF]/[0.08] bg-black/18 text-white/58 hover:border-[#AAB4FF]/[0.18] hover:bg-[#AAB4FF]/[0.045] hover:text-white/82'
+                        }`}
+                      >
+                        <span className="block">{item.label}</span>
+                        <span className="mt-1 block text-[11px] text-white/38">~{item.cents}¢ estimated</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -574,14 +647,14 @@ export default function GeorgeLiveEntryPage() {
                   href="/george/live"
                   className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.065] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.018))] px-6 py-4 text-[14px] font-medium text-white/74 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
                 >
-                  Resume runtime
+                  Resume Conversation
                 </Link>
               )}
 
               <button
                 type="button"
                 onClick={prepareLive}
-                className="flex items-center justify-center rounded-[0.95rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
+                className="flex items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
               >
                 Enter LIVE
               </button>
@@ -590,7 +663,7 @@ export default function GeorgeLiveEntryPage() {
                 href="/george/live"
                 className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.012] px-6 py-4 text-[14px] font-medium text-white/50 transition-all duration-150 hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/74"
               >
-                Start without setup
+                Enter without setup
               </Link>
             </>
           ) : (
