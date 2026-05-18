@@ -2,6 +2,8 @@ export type LiveSpeakerIntent =
   | 'addressed_to_george'
   | 'addressed_to_room'
   | 'steering_signal'
+  | 'confirmation_signal'
+  | 'correction_signal'
   | 'room_speaker'
   | 'ambiguous'
 
@@ -35,6 +37,24 @@ const GEORGE_ADDRESS_PATTERNS = [
   /\bcoach me\b/i,
 ]
 
+const CONFIRMATION_PATTERNS = [
+  /^m+\s*h+mm+$/i,
+  /^mm+\s*hmm+$/i,
+  /^uh\s*huh$/i,
+  /^yes$/i,
+  /^yeah$/i,
+  /^that’s right$/i,
+  /^thats right$/i,
+]
+
+const CORRECTION_PATTERNS = [
+  /^actually\b/i,
+  /^not that\b/i,
+  /^not quite\b/i,
+  /^different angle\b/i,
+  /^different frame\b/i,
+]
+
 const STEERING_PATTERNS = [
   /^hmm+$/i,
   /^right$/i,
@@ -43,6 +63,10 @@ const STEERING_PATTERNS = [
   /^give me a second$/i,
   /^let me think$/i,
   /^shorter$/i,
+  /^more$/i,
+  /^now$/i,
+  /^soft$/i,
+  /^firm$/i,
   /^pause$/i,
   /^hold$/i,
   /^slow down$/i,
@@ -103,6 +127,28 @@ export function classifyLiveSpeakerIntent(input: LiveSpeakerIntentInput): LiveSp
       shouldHold: false,
       shouldRemember: true,
       reason: 'Direct GEORGE address or explicit request for help.',
+    }
+  }
+
+  if (matchesAny(lower, CONFIRMATION_PATTERNS)) {
+    return {
+      intent: 'confirmation_signal',
+      confidence: 0.86,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'User confirmed GEORGE is tracking the room correctly.',
+    }
+  }
+
+  if (matchesAny(lower, CORRECTION_PATTERNS)) {
+    return {
+      intent: 'correction_signal',
+      confidence: 0.84,
+      shouldSpeak: false,
+      shouldHold: true,
+      shouldRemember: true,
+      reason: 'User corrected GEORGE posture, frame, or room interpretation.',
     }
   }
 
