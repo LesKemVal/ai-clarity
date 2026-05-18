@@ -406,11 +406,22 @@ function isForceIntervention(text: string) {
     setLatency(georgeLatencyMetrics.get())
 
     try {
+      const tokenRes = await fetch('/api/george/live/stt-token')
+
+      if (!tokenRes.ok) {
+        const detail = await tokenRes.json().catch(() => null)
+        setError(detail?.detail || detail?.error || 'Failed to obtain temporary Deepgram token.')
+        return
+      }
+
+      const tokenData = await tokenRes.json()
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
       const socket = new WebSocket(
-        'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250'
+        'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
+        ['token', tokenData.token]
       )
 
       socketRef.current = socket
