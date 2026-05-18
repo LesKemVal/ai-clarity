@@ -370,6 +370,13 @@ export default function GeorgeLiveEntryPage() {
       createdAt: Date.now(),
     }
 
+    localStorage.setItem('george_start_new_live', '1')
+    localStorage.removeItem('george_active_live_session_id')
+    localStorage.removeItem('george_active_campaign_session_id')
+    localStorage.removeItem('george_active_campaign')
+    localStorage.removeItem('george_active_context')
+    localStorage.removeItem('george_active_label')
+
     localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
     localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
     localStorage.setItem('george_live_assist_mode', liveAssistMode)

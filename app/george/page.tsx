@@ -1142,7 +1142,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       if (startNewLiveRequested) {
         window.localStorage.removeItem('george_start_new_live')
 
-        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
         window.localStorage.removeItem('george_active_live_session_id')
         window.localStorage.removeItem('george_active_campaign_session_id')
         window.localStorage.removeItem('george_active_campaign')
