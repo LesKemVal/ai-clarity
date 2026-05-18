@@ -457,8 +457,11 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     if (isiPhone) {
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
+                      title: 'GEORGE by BRANESx',
+                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
+                      
           title: 'GEORGE by BRANESx',
-          text: 'Want to get something done? GEORGE is your guide.',
+          text: 'Bring the situation. Get the next move.',
           url,
         }).catch(() => {
           setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
@@ -4868,7 +4871,10 @@ router.push('/george')
                 const shareText = m.content
                 try {
                   if (navigator.share) {
-                    await navigator.share({ title: 'GEORGE by BRANESx', text: `Want to get something done? GEORGE is your guide.\n\n${shareText}`, url: window.location.origin + '/george' })
+                    await navigator.share({
+                      title: 'GEORGE by BRANESx',
+                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
+                       title: 'GEORGE by BRANESx', text: `Bring the situation. Get the next move.\n\n${shareText}`, url: window.location.origin + '/george' })
                   } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(shareText)
                     setToastMessage('Copied')
