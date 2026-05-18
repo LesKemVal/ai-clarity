@@ -12,7 +12,7 @@ export default function RootPage() {
   const liveOpen = openCapability === 'live'
 
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
+    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-[#DCE1E7]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#0A0C10_0%,#06070A_46%,#050609_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.045]" />
 
@@ -55,7 +55,7 @@ export default function RootPage() {
             onClick={() => setOpenCapability(georgeOpen ? null : 'george')}
             className={`group w-full rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
               georgeOpen
-                ? 'border-white/[0.12] bg-white/[0.055] shadow-[0_22px_54px_rgba(0,0,0,0.30)]'
+                ? 'border-[#DCE1E7]/[0.18] bg-white/[0.055] shadow-[0_22px_54px_rgba(0,0,0,0.30)]'
                 : 'border-white/[0.055] bg-black/[0.18] hover:border-white/[0.10] hover:bg-white/[0.028]'
             }`}
             aria-expanded={georgeOpen}
@@ -92,7 +92,7 @@ export default function RootPage() {
             className={`group relative w-full overflow-hidden rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
               liveOpen
                 ? 'border-[#8FB6C9]/[0.28] bg-[linear-gradient(180deg,rgba(143,182,201,0.10),rgba(8,17,29,0.72))] shadow-[0_24px_60px_rgba(4,10,18,0.42),inset_0_1px_0_rgba(143,182,201,0.08)]'
-                : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.22] hover:bg-[#8FB6C9]/[0.045]'
+                : 'border-[#DCE1E7]/[0.14] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.22] hover:bg-[#8FB6C9]/[0.045]'
             }`}
             aria-expanded={liveOpen}
           >
@@ -128,7 +128,7 @@ export default function RootPage() {
         <div className="mt-7 grid w-full max-w-[440px] gap-3 sm:grid-cols-2">
           <Link
             href="/george"
-            className="group flex items-center justify-center rounded-[1.1rem] border border-white/[0.12] bg-[#0D1117] px-6 py-4 text-[14px] font-semibold text-[#D8DEE7] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-white/[0.18] hover:bg-[#11151A] hover:text-white"
+            className="group flex items-center justify-center rounded-[1.1rem] border border-[#DCE1E7]/[0.18] bg-[#0D1117] px-6 py-4 text-[14px] font-semibold text-[#DCE1E7] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-white/[0.18] hover:bg-[#11151A] hover:text-white"
           >
             Enter GEORGE
           </Link>
