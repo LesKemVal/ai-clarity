@@ -1,5 +1,5 @@
-import GeorgeLiveShell from './GeorgeLiveShell'
+import { redirect } from 'next/navigation'
 
 export default function GeorgeLivePage() {
-  return <GeorgeLiveShell />
+  redirect('/live-voice')
 }
