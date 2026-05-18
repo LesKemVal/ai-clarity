@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import LiveSteeringGuide from '@/components/george/LiveSteeringGuide'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 
@@ -332,6 +333,8 @@ export default function GeorgeLiveEntryPage() {
               </div>
             )}
           </div>
+
+          <LiveSteeringGuide room={selectedRoom} />
 
           <div className="mt-5">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
