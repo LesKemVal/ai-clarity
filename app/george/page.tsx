@@ -342,27 +342,37 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
 
   const cue = normalizeLine(cueMatch?.[1] || (/\bid\b|identification|license|registration/i.test(liveUserText) ? 'Hands visible. Move slowly.' : 'Slow down. Let him answer.'), opts.audio ? 8 : 10)
 
+  const stripOperationalLabels = (value: string) =>
+    String(value || '')
+      .replace(/^\s*(Word|Say|Cue|Need|Style|Pause|Backup):\s*/i, '')
+      .replace(/\[pause\]/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+  say = stripOperationalLabels(say)
+  const cleanCue = stripOperationalLabels(cue)
+
   if (opts.audio) {
-    return say || cue
+    return say || cleanCue
   }
 
   const wantsCue =
-  storedAssistMode === 'cues' ||
-  /cue|pause|slow down|listen|hold|wait/i.test(liveUserText)
+    storedAssistMode === 'cues' ||
+    /cue|pause|slow down|listen|hold|wait/i.test(liveUserText)
 
-const wantsLine =
-  storedAssistMode === 'lines' ||
-  /what should i say|how do i say|give me a line|line|say/i.test(liveUserText)
+  const wantsLine =
+    storedAssistMode === 'lines' ||
+    /what should i say|how do i say|give me a line|line|say/i.test(liveUserText)
 
-if (wantsLine) {
-  return say || cue || ''
-}
+  if (wantsLine) {
+    return say || cleanCue || ''
+  }
 
-if (wantsCue) {
-  return cue || say || ''
-}
+  if (wantsCue) {
+    return cleanCue || say || ''
+  }
 
-return say || cue || ''
+  return say || cleanCue || ''
 }
 
 
