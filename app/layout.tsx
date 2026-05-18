@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: 'GEORGE by BRANESx',
     template: '%s | GEORGE',
   },
-  description: 'Build it. Change it. Tear it down responsibly. Get all the way there with GEORGE.',
+  description: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.',
   applicationName: 'GEORGE',
   icons: {
     icon: [{ url: '/logofav.png', type: 'image/png' }],
@@ -28,15 +28,24 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'GEORGE by BRANESx',
-    description: 'Want to get something done? GEORGE is your guide.',
+    description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.'
     siteName: 'BRANESx',
     url: 'https://www.branesx.com/george',
     type: 'website',
+    images: [
+      {
+        url: '/logofav.png',
+        width: 900,
+        height: 900,
+        alt: 'GEORGE by BRANESx',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
     title: 'GEORGE by BRANESx',
-    description: 'Want to get something done? GEORGE is your guide.',
+    description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.',
+    images: ['/logofav.png'],
   },
 }
 
