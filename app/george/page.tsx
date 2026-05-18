@@ -341,11 +341,21 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
     return say || cue
   }
 
-  return [
-    say ? `Say:\n${say}` : '',
-    backup ? `\nBackup:\n${backup}` : '',
-    cue ? `\nCue:\n${cue}` : '',
-  ].filter(Boolean).join('\n').trim()
+  const wantsCue =
+  /cue|pause|slow down|listen|hold|wait/i.test(liveUserText)
+
+const wantsLine =
+  /what should i say|how do i say|give me a line|line|say/i.test(liveUserText)
+
+if (wantsCue) {
+  return cue || say || ''
+}
+
+if (wantsLine) {
+  return say || cue || ''
+}
+
+return say || cue || ''
 }
 
 
