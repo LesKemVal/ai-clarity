@@ -1164,7 +1164,17 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         return
       }
 
-      let liveSetup: { room?: string; objective?: string; controlWords?: string; createdAt?: number } | null = null
+      let liveSetup: {
+        room?: string
+        objective?: string
+        controlWords?: string
+        liveAssistMode?: 'cues' | 'lines'
+        estimatedCents?: number
+        runtimeSupport?: {
+          selectedCapabilities?: Array<{ label?: string; description?: string }>
+        }
+        createdAt?: number
+      } | null = null
 
       try {
         const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
@@ -1181,36 +1191,43 @@ if (!startNewLiveRequested && existingLive?.mode === 'live' && Array.isArray(exi
         setActivePromptContext('live_debate')
       }
 
-      const roomLine = setupRoom
-        ? `${setupRoom} active.`
-        : 'LIVE active.'
-
       const objectiveLine = liveSetup?.objective?.trim()
-        ? `Objective: ${liveSetup.objective.trim()}`
+        ? `Objective loaded: ${liveSetup.objective.trim()}`
         : ''
 
-      const controlLine = liveSetup?.controlWords?.trim()
-        ? `Control words: ${liveSetup.controlWords.trim()}`
+      const steeringLine = liveSetup?.controlWords?.trim()
+        ? `Steering active: ${liveSetup.controlWords.trim()}`
+        : 'Steering active: say “shorter,” “line,” or “pause” to adjust GEORGE without breaking the room.'
+
+      const capacityLine =
+        typeof liveSetup?.estimatedCents === 'number'
+          ? `Runtime estimate: ~${liveSetup.estimatedCents}¢`
+          : ''
+
+      const supportLine = Array.isArray(liveSetup?.runtimeSupport?.selectedCapabilities) && liveSetup.runtimeSupport.selectedCapabilities.length > 0
+        ? `Support loaded: ${liveSetup.runtimeSupport.selectedCapabilities
+            .map((item) => item.label)
+            .filter(Boolean)
+            .join(', ')}`
         : ''
-
-      const signal = getLiveRoomSignal(setupRoom)
-
-      const roomCalibrationLine = setupRoom === 'Debate'
-        ? 'Debate posture active. I’ll watch contradiction, proof demands, framing pressure, and interruptions.'
-        : 'Room calibrated.'
 
       const liveIntro: Message = {
         role: 'assistant',
-        content: `${roomLine}
+        content: `LIVE ready.
 
-${roomCalibrationLine}
-GEORGE is listening.
+Room changed? Update GEORGE instantly.
 
-${signal}${objectiveLine ? `
+Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.${setupRoom ? `
 
-${objectiveLine}` : ''}${controlLine ? `
+Room: ${setupRoom}` : ''}${objectiveLine ? `
 
-${controlLine}` : ''}`
+${objectiveLine}` : ''}${steeringLine ? `
+
+${steeringLine}` : ''}${supportLine ? `
+
+${supportLine}` : ''}${capacityLine ? `
+
+${capacityLine}` : ''}`
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()
@@ -3337,7 +3354,16 @@ ${Array.isArray(liveRuntimeSetup.runtimeSupport?.runtimeBias)
   ? JSON.stringify(liveRuntimeSetup.runtimeSupport.runtimeBias)
   : 'none'}
 
-Use this setup to shape LIVE behavior. Keep commands, labels, pricing, and debug signals internal. Visible output must remain one operational deliverable: either one cue or one repeatable line.`
+Use this setup to shape LIVE behavior.
+
+Steering doctrine:
+- The user has agency and may see room context GEORGE cannot see.
+- Steering phrases are human runtime overrides, not normal conversation content.
+- Treat steering phrases as both signal and possible sentence-starter.
+- If the user says “hmm,” “right,” “one second,” “let me think,” “OK,” “shorter,” “line,” or “pause,” infer the adjustment and continue from that social opening when useful.
+- If the user does nothing, GEORGE should keep carrying the user's objective toward the strongest positive outcome.
+- Keep commands, labels, pricing, and debug signals internal.
+- Visible output must remain one operational deliverable: either one cue or one repeatable line.`
           : ''
 
       const updatedMessages = [
