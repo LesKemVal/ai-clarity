@@ -36,6 +36,9 @@ type LivePacket = {
   shadowUsed?: boolean
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   interruptionRisk?: number
+  liveAssistMode?: 'cues' | 'lines'
+  runtimeForce?: 'light' | 'balanced' | 'strong'
+  runtimeMemoryApplied?: boolean
 }
 
 export default function LiveVoicePage() {
@@ -67,6 +70,13 @@ function isForceIntervention(text: string) {
   const processingQueueRef = useRef(false)
   const wakeLockRef = useRef<any>(null)
   const lastGovernAtRef = useRef(0)
+  const liveRuntimeMemoryRef = useRef({
+    acceptedCarryCount: 0,
+    overrideCount: 0,
+    hesitationCount: 0,
+    preferredForce: 'balanced' as 'light' | 'balanced' | 'strong',
+    toneCorrection: 'neutral' as 'softer' | 'firmer' | 'neutral',
+  })
 
 
   function getAdaptiveDeliverable(text: string) {
@@ -245,6 +255,11 @@ function isForceIntervention(text: string) {
         audio,
         shadowMap,
         lastFiveSeconds: clean,
+        liveAssistMode:
+          typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
+            ? 'lines'
+            : 'cues',
+        runtimeMemory: liveRuntimeMemoryRef.current,
       }),
     })
 
@@ -264,8 +279,8 @@ function isForceIntervention(text: string) {
 
     setPacket(nextPacket)
 
-    if (nextPacket?.shouldSpeak && nextPacket?.volley) {
-      pushLog(`GEORGE: ${nextPacket.volley}`)
+    if (nextPacket?.shouldSpeak && (nextPacket?.volley || nextPacket?.cue)) {
+      pushLog(`GEORGE: ${nextPacket.volley || nextPacket.cue}`)
     }
 
     return nextPacket as LivePacket
@@ -679,8 +694,27 @@ function isForceIntervention(text: string) {
             ) &&
             georgeSilenceDetector.isSilenceWindow()
           ) {
+            const approvedPacket = orchestrated.packet as LivePacket
+            const approvedSpeech =
+              approvedPacket.liveAssistMode === 'lines'
+                ? approvedPacket.volley
+                : approvedPacket.cue
+
+            if (!approvedSpeech?.trim()) {
+              pushLog('No approved LIVE audio channel to speak.')
+              return
+            }
+
+            liveRuntimeMemoryRef.current.acceptedCarryCount += 1
+            if (
+              liveRuntimeMemoryRef.current.acceptedCarryCount >= 3 &&
+              liveRuntimeMemoryRef.current.overrideCount < 2
+            ) {
+              liveRuntimeMemoryRef.current.preferredForce = 'strong'
+            }
+
             georgeAudioQueue.enqueue(
-              orchestrated.queueText,
+              approvedSpeech,
               forcedIntervention
                 ? 40
                 : (
