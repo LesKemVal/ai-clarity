@@ -128,7 +128,7 @@ export default function RootPage() {
         <div className="mt-7 grid w-full max-w-[440px] gap-3 sm:grid-cols-2">
           <Link
             href="/george"
-            className="group flex items-center justify-center rounded-[1.1rem] border border-white/[0.08] bg-white/[0.92] px-6 py-4 text-[14px] font-semibold text-[#0B0D12] shadow-[0_18px_44px_rgba(0,0,0,0.22)] transition hover:bg-white"
+            className="group flex items-center justify-center rounded-[1.1rem] border border-white/[0.12] bg-[#0D1117] px-6 py-4 text-[14px] font-semibold text-[#D8DEE7] shadow-[0_10px_26px_rgba(0,0,0,0.18)] transition hover:border-white/[0.18] hover:bg-[#11151A] hover:text-white"
           >
             Enter GEORGE
           </Link>
