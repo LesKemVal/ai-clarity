@@ -78,9 +78,9 @@ export default function RootPage() {
                 </p>
 
                 <div className="mt-4 grid gap-2 text-[12px] text-white/44">
-                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">Build, decide, plan, learn, prepare.</div>
-                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">Use documents, screenshots, ideas, or pressure.</div>
-                  <div className="rounded-[0.75rem] border border-white/[0.035] bg-black/20 px-3 py-2">GEORGE keeps moving toward the outcome.</div>
+                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">Build, decide, plan, learn, prepare.</div>
+                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">Use documents, screenshots, ideas, or pressure.</div>
+                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">GEORGE keeps moving toward the outcome.</div>
                 </div>
               </div>
             </div>
