@@ -309,10 +309,13 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
       .find((line) =>
         line &&
         !/^(Say|Backup|Cue|Do|Ask|Boundary):/i.test(line) &&
+        !/^pause\.?\s*hold\.?/i.test(line) &&
+        !/^holding/i.test(line) &&
+        !/do not give another line unless asked/i.test(line) &&
         !/GEORGE|clarity, direction|execution system|You are GEORGE|not a chatbot|not a therapist/i.test(line)
       )
 
-    return firstUsable || 'Stay calm. Let them answer.'
+    return firstUsable || 'What outcome do you want help with right now?'
   })()
 
   let backup = normalizeLine(backupMatch?.[1] || '', opts.audio ? 10 : 16)
@@ -340,7 +343,7 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
     }
   }
 
-  const cue = normalizeLine(cueMatch?.[1] || (/\bid\b|identification|license|registration/i.test(liveUserText) ? 'Hands visible. Move slowly.' : 'Slow down. Let him answer.'), opts.audio ? 8 : 10)
+  const cue = normalizeLine(cueMatch?.[1] || (/\bid\b|identification|license|registration/i.test(liveUserText) ? 'Hands visible. Move slowly.' : 'Give one clean next move.'), opts.audio ? 8 : 10)
 
   const stripOperationalLabels = (value: string) =>
     String(value || '')
@@ -358,7 +361,8 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
 
   const wantsCue =
     storedAssistMode === 'cues' ||
-    /cue|pause|slow down|listen|hold|wait/i.test(liveUserText)
+    /cue|slow down|listen/i.test(liveUserText) ||
+    /\b(pause|hold|wait)\b/i.test(liveUserText)
 
   const wantsLine =
     storedAssistMode === 'lines' ||
@@ -1153,34 +1157,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         messagesRef.current = []
       }
 
-      let existingLive =
-        !startNewLiveRequested
-          ? (
-              getActiveSessionForMode('live') ||
-              (subscriberEmail.trim()
-                ? getLatestSubscriberSession(subscriberEmail, 'live')
-                : null)
-            )
-          : null
-
-if (
-  !startNewLiveRequested &&
-  existingLive?.mode === 'live' &&
-  Array.isArray(existingLive.messages) &&
-  existingLive.messages.length > 0
-) {
-        skipNextTypewriterRef.current = true
-        restoredMessagesSignatureRef.current = getMessagesSignature(existingLive.messages)
-        setMessages(existingLive.messages)
-        messagesRef.current = existingLive.messages
-        liveSessionWriteReadyRef.current = true
-        setVoiceOn(true)
-        setInteractionMode('speech')
-        setShowEarbudOverlay(true)
-        window.setTimeout(() => setShowEarbudOverlay(false), 5200)
-        setTimeout(() => startListening(), 120)
-        return
-      }
+      // LIVE auto-restore is disabled for now.
+      // A new LIVE route must boot cleanly and must not reattach stale "hold/resume" room state.
+      // Resume will return later only after it is scoped to verified LIVE sessions.
+      const existingLive = null
 
       let liveSetup: {
         room?: string
