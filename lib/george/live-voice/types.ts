@@ -4,6 +4,14 @@ export type LiveSpeakerRole =
   | 'george_instruction'
   | 'unclear'
 
+export type LiveRuntimeMemory = {
+  preferredForce?: 'light' | 'balanced' | 'strong'
+  toneCorrection?: 'softer' | 'firmer' | 'neutral'
+  acceptedCarryCount?: number
+  overrideCount?: number
+  hesitationCount?: number
+}
+
 export type LiveVoicePacket = {
   speaker: LiveSpeakerRole
   shouldSpeak: boolean
@@ -25,6 +33,8 @@ export type LiveVoicePacket = {
   speakerIntentShouldSpeak?: boolean
   speakerIntentShouldHold?: boolean
   liveAssistMode?: 'cues' | 'lines'
+  runtimeForce?: 'light' | 'balanced' | 'strong'
+  runtimeMemoryApplied?: boolean
 }
 
 export type LiveVoiceGovernorInput = {
@@ -35,4 +45,5 @@ export type LiveVoiceGovernorInput = {
   shadowMap?: string
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'
+  runtimeMemory?: LiveRuntimeMemory
 }
