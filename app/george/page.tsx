@@ -312,10 +312,15 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
         !/^pause\.?\s*hold\.?/i.test(line) &&
         !/^holding/i.test(line) &&
         !/do not give another line unless asked/i.test(line) &&
+        !/what outcome|outcome matters|trying to accomplish|move forward right now|what matters most/i.test(line) &&
         !/GEORGE|clarity, direction|execution system|You are GEORGE|not a chatbot|not a therapist/i.test(line)
       )
 
-    return firstUsable || 'What outcome do you want help with right now?'
+    if (/^hi\b|^hello\b|^hey\b/i.test(firstUsable || '')) {
+      return 'I’m listening.'
+    }
+
+    return firstUsable || 'I’m listening.'
   })()
 
   let backup = normalizeLine(backupMatch?.[1] || '', opts.audio ? 10 : 16)
@@ -3341,48 +3346,58 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
       }
 
       const liveRuntimePrefix =
-        liveMode && liveRuntimeSetup
+        liveMode
           ? `LIVE RUNTIME SETUP — internal only.
 
-Room: ${liveRuntimeSetup.room || 'not specified'}
-Objective: ${liveRuntimeSetup.objective || 'not specified'}
-Language: ${liveRuntimeSetup.language || 'English'}
-Cadence: ${liveRuntimeSetup.cadence || 'Balanced'}
-Assist mode: ${liveRuntimeSetup.liveAssistMode || 'cues'}
-Steering phrases: ${liveRuntimeSetup.controlWords || 'none'}
-Estimated runtime cost: ${liveRuntimeSetup.estimatedCents ? `${liveRuntimeSetup.estimatedCents} cents` : 'not estimated'}
+Room: ${liveRuntimeSetup?.room || 'not specified'}
+Objective: ${liveRuntimeSetup?.objective || 'not specified'}
+Language: ${liveRuntimeSetup?.language || 'English'}
+Cadence: ${liveRuntimeSetup?.cadence || 'Balanced'}
+Assist mode: ${liveRuntimeSetup?.liveAssistMode || 'cues'}
+Steering phrases: ${liveRuntimeSetup?.controlWords || 'none'}
+Estimated runtime cost: ${liveRuntimeSetup?.estimatedCents ? `${liveRuntimeSetup.estimatedCents} cents` : 'not estimated'}
 
 Runtime support selected:
-${Array.isArray(liveRuntimeSetup.runtimeSupport?.selectedCapabilities)
+${Array.isArray(liveRuntimeSetup?.runtimeSupport?.selectedCapabilities)
   ? liveRuntimeSetup.runtimeSupport.selectedCapabilities.map((item: any) => `- ${item.label}: ${item.description}`).join('\n')
   : 'none'}
 
 Runtime behavior bias:
-${Array.isArray(liveRuntimeSetup.runtimeSupport?.runtimeBias)
+${Array.isArray(liveRuntimeSetup?.runtimeSupport?.runtimeBias)
   ? JSON.stringify(liveRuntimeSetup.runtimeSupport.runtimeBias)
   : 'none'}
 
-Use this setup to shape LIVE behavior.
+LIVE separation doctrine:
+- This is LIVE, not normal GEORGE.
+- Do not use normal GEORGE planning language.
+- Do not ask broad onboarding questions like “what outcome matters most?” unless the user explicitly asks for planning.
+- If no room was selected or context is unclear, GEORGE should listen first.
+- For greetings like “hello,” “hey,” or “what’s up,” respond minimally: “I’m listening.” or “Keep going.”
+- Do not assume context from a single word, name, nickname, joke, greeting, or slang phrase.
+- “what’s up doc?” does not mean medical context.
+- When clues accumulate, ask one short confirmation only: “Interview?” “Doctor context?” “Negotiation?”
+- Once context is confirmed or highly likely, adapt silently and give one operational cue or line.
 
 Steering doctrine:
 - The user has agency and may see room context GEORGE cannot see.
 - Steering phrases are human runtime overrides, not normal conversation content.
 - Treat steering phrases as both signal and possible sentence-starter.
 - If the user says “hmm,” “right,” “one second,” “let me think,” “OK,” “shorter,” “line,” or “pause,” infer the adjustment and continue from that social opening when useful.
-- If the user does nothing, GEORGE should keep carrying the user's objective toward the strongest positive outcome.
 - Keep commands, labels, pricing, and debug signals internal.
 - Visible output must remain one operational deliverable: either one cue or one repeatable line.`
           : ''
 
       const updatedMessages = [
         ...messagesRef.current,
-        ...(domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
+        ...(!liveMode && domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
         ...(liveRuntimePrefix ? [{ role: 'system', content: liveRuntimePrefix, source: 'system_override' } as Message] : []),
         ...(userMessage ? [userMessage] : [])
       ]
-      const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text)
 
-      setSuggestedPrompts((prev) => {
+      if (!liveMode) {
+        const nextSuggestedPrompts = getSuggestedPromptsFromMessages(updatedMessages, text)
+
+        setSuggestedPrompts((prev) => {
   const incoming = nextSuggestedPrompts || []
 
   // MERGE EXISTING + NEW
@@ -3407,20 +3422,23 @@ Steering doctrine:
 
   return curated
 })
+      }
       setMessages(updatedMessages)
 
-      const steer = getSteering({
-        userText: text,
-        tier: currentTier,
-        conversationMode,
-      })
-      setSteeringHint(steer)
+      if (!liveMode) {
+        const steer = getSteering({
+          userText: text,
+          tier: currentTier,
+          conversationMode,
+        })
+        setSteeringHint(steer)
 
-      const goal = getGoalState({
-        userText: text,
-        tier: currentTier,
-      })
-      setGoalState(goal)
+        const goal = getGoalState({
+          userText: text,
+          tier: currentTier,
+        })
+        setGoalState(goal)
+      }
 
       messagesRef.current = updatedMessages
       setInput('')
@@ -3461,10 +3479,12 @@ Steering doctrine:
         }
 
         const campaignContextActive =
-          liveMode ||
-          activePromptContext?.includes('conversation') ||
-          activePromptContext?.includes('professional') ||
-          activePromptContext?.includes('brilliant_live')
+          !liveMode &&
+          (
+            activePromptContext?.includes('conversation') ||
+            activePromptContext?.includes('professional') ||
+            activePromptContext?.includes('brilliant_live')
+          )
 
         const res = await fetch('/api/chat', {
           method: 'POST',
