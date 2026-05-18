@@ -26,7 +26,7 @@ wss.on('connection', (client) => {
   console.log('Client connected to GEORGE LIVE proxy')
 
   const deepgram = new WebSocket(
-    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
+    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250&encoding=webm&sample_rate=48000',
     {
       headers: {
         Authorization: `Token ${DEEPGRAM_API_KEY}`,
@@ -39,8 +39,17 @@ wss.on('connection', (client) => {
   })
 
   deepgram.on('message', (data) => {
+    const text = data.toString()
+    try {
+      const parsed = JSON.parse(text)
+      const transcript = parsed?.channel?.alternatives?.[0]?.transcript
+      if (transcript) {
+        console.log('Transcript:', transcript)
+      }
+    } catch {}
+
     if (client.readyState === WebSocket.OPEN) {
-      client.send(data.toString())
+      client.send(text)
     }
   })
 
@@ -62,6 +71,8 @@ wss.on('connection', (client) => {
   })
 
   client.on('message', (data) => {
+    console.log('Audio chunk:', data.length || data.size || 'unknown')
+
     if (deepgram.readyState === WebSocket.OPEN) {
       deepgram.send(data)
     }
