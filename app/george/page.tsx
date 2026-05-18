@@ -4864,7 +4864,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -5202,7 +5202,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
@@ -5552,7 +5552,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_18px_48px_rgba(0,0,0,0.42)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -6152,7 +6152,10 @@ Continue from here, tell me what changed, or start fresh.`
           : 'border-white/12 bg-white/[0.035] text-[#D7DBE4]/62 hover:border-white/22 hover:bg-white/[0.055] hover:text-[#D7DBE4]'
       }`}
     >
-      VOICE {voiceOn ? 'ON' : 'OFF'}
+      <span className="inline-flex items-center gap-1.5">
+        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/28'}`} />
+        {voiceOn ? 'AUDIO ACTIVE' : 'AUDIO STANDBY'}
+      </span>
     </button>
 
     <button
@@ -6443,7 +6446,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 {showPersonalizeModal && (
         <div
-          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 backdrop-blur-[10px]px-4 pb-4 "
+          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 px-4 backdrop-blur-[10px] pb-4 "
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
@@ -6559,7 +6562,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.045] bg-[#11131A]/92 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.54)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.045] bg-[#11131A]/92 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 text-center">
@@ -6820,7 +6823,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showToast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[80] flex justify-center px-4">
-          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-[#D7DBE4] shadow-[0_18px_40px_rgba(0,0,0,0.45)] ">
+          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-[#D7DBE4] shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl">
             {toastMessage}
           </div>
         </div>
