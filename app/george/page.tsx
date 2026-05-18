@@ -4158,8 +4158,8 @@ responseTimerRef.current = setTimeout(() => {
 
     recognition.onend = () => {
       // LIVE no longer uses browser SpeechRecognition restart loops.
-    // Deepgram runtime owns LIVE listening authority.
-    if (!liveMode && voiceOn && !isThinking) {
+      // Deepgram runtime owns LIVE listening authority.
+      if (!liveMode && voiceOn && !isThinking) {
         setTimeout(() => {
           startListening()
         }, 250)
