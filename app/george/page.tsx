@@ -457,11 +457,8 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     if (isiPhone) {
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
-                      title: 'GEORGE by BRANESx',
-                      text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
-                      
           title: 'GEORGE by BRANESx',
-          text: 'Bring the situation. Get the next move.',
+          text: 'Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.',
           url,
         }).catch(() => {
           setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
