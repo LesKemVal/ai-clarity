@@ -26,7 +26,7 @@ wss.on('connection', (client) => {
   console.log('Client connected to GEORGE LIVE proxy')
 
   const deepgram = new WebSocket(
-    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250&encoding=opus&container=webm&sample_rate=48000',
+    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
     {
       headers: {
         Authorization: `Token ${DEEPGRAM_API_KEY}`,
@@ -34,8 +34,16 @@ wss.on('connection', (client) => {
     }
   )
 
+  let keepAlive = null
+
   deepgram.on('open', () => {
     client.send(JSON.stringify({ type: 'proxy_open' }))
+
+    keepAlive = setInterval(() => {
+      if (deepgram.readyState === WebSocket.OPEN) {
+        deepgram.send(JSON.stringify({ type: 'KeepAlive' }))
+      }
+    }, 5000)
   })
 
   deepgram.on('message', (data) => {
@@ -61,6 +69,8 @@ wss.on('connection', (client) => {
   })
 
   deepgram.on('close', (code, reason) => {
+    if (keepAlive) clearInterval(keepAlive)
+
     const message = reason?.toString?.() || ''
     console.log('Deepgram closed:', code, message)
 
@@ -79,6 +89,8 @@ wss.on('connection', (client) => {
   })
 
   client.on('close', () => {
+    if (keepAlive) clearInterval(keepAlive)
+
     if (
       deepgram.readyState === WebSocket.OPEN ||
       deepgram.readyState === WebSocket.CONNECTING
