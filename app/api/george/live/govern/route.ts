@@ -12,6 +12,7 @@ export async function POST(req: Request) {
       contextHint: typeof body?.contextHint === 'string' ? body.contextHint : '',
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+      liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
     })
 
     return NextResponse.json(packet)
