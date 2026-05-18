@@ -147,6 +147,7 @@ export default function GeorgeLiveEntryPage() {
   const [controlWords, setControlWords] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('English')
   const [speechCadence, setSpeechCadence] = useState('Balanced')
+  const [liveAssistMode, setLiveAssistMode] = useState<'cues' | 'lines'>('cues')
   const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
@@ -184,6 +185,9 @@ export default function GeorgeLiveEntryPage() {
         if (liveSetup.controlWords) setControlWords(liveSetup.controlWords)
         if (liveSetup.language) setSelectedLanguage(liveSetup.language)
         if (liveSetup.cadence) setSpeechCadence(liveSetup.cadence)
+        if (liveSetup.liveAssistMode === 'lines' || liveSetup.liveAssistMode === 'cues') {
+          setLiveAssistMode(liveSetup.liveAssistMode)
+        }
       }
     } catch {}
 
@@ -195,6 +199,11 @@ export default function GeorgeLiveEntryPage() {
     const savedCadence = window.localStorage.getItem('george_live_cadence')
     if (savedCadence) {
       setSpeechCadence(savedCadence)
+    }
+
+    const savedDelivery = window.localStorage.getItem('george_live_assist_mode')
+    if (savedDelivery === 'lines' || savedDelivery === 'cues') {
+      setLiveAssistMode(savedDelivery)
     }
 
     const activeLive = getActiveSessionForMode('live')
@@ -210,11 +219,13 @@ export default function GeorgeLiveEntryPage() {
       cadence: speechCadence,
       objective,
       controlWords,
+      liveAssistMode,
       createdAt: Date.now(),
     }
 
     localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
     localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
+    localStorage.setItem('george_live_assist_mode', liveAssistMode)
 
     window.location.href = '/george/live'
   }
@@ -335,6 +346,49 @@ export default function GeorgeLiveEntryPage() {
           </div>
 
           <LiveSteeringGuide room={selectedRoom} />
+
+          <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
+              LIVE OUTPUT
+            </div>
+
+            <p className="mb-3 text-[13px] leading-6 text-white/54">
+              Choose how GEORGE assists in LIVE. GEORGE keeps this setting until you change it.
+            </p>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                { id: 'cues', title: 'Cues', body: 'Short directional support.' },
+                { id: 'lines', title: 'Repeatable lines', body: 'Exact words to say.' },
+              ].map((item) => {
+                const active = liveAssistMode === item.id
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      const next = item.id as 'cues' | 'lines'
+                      setLiveAssistMode(next)
+                      window.localStorage.setItem('george_live_assist_mode', next)
+                    }}
+                    className={`rounded-[0.8rem] border px-3 py-3 text-left transition-all duration-150 ${
+                      active
+                        ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.08),inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
+                    }`}
+                  >
+                    <div className="text-[13px] font-semibold">{item.title}</div>
+                    <div className="mt-1 text-[12px] leading-5 text-white/46">{item.body}</div>
+                  </button>
+                )
+              })}
+            </div>
+
+            <p className="mt-3 text-[12px] leading-5 text-white/40">
+              Use natural sounds like “hmm…” or “ok…” to give GEORGE room to help shape the next move.
+            </p>
+          </div>
 
           <div className="mt-5">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">

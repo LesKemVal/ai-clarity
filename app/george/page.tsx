@@ -1328,6 +1328,10 @@ async function canGovernorInjectLiveCue(transcript: string) {
         audio: true,
         shadowMap: liveContextBufferRef.current.join('\n'),
         lastFiveSeconds: transcript,
+        liveAssistMode:
+          typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
+            ? 'lines'
+            : 'cues',
       }),
     })
 

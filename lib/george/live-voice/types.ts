@@ -24,6 +24,7 @@ export type LiveVoicePacket = {
   speakerIntentReason?: string
   speakerIntentShouldSpeak?: boolean
   speakerIntentShouldHold?: boolean
+  liveAssistMode?: 'cues' | 'lines'
 }
 
 export type LiveVoiceGovernorInput = {
@@ -33,4 +34,5 @@ export type LiveVoiceGovernorInput = {
   contextHint?: string
   shadowMap?: string
   lastFiveSeconds?: string
+  liveAssistMode?: 'cues' | 'lines'
 }

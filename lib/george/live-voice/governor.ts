@@ -173,6 +173,21 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
 
   packet.volley = cleanLine(packet.volley, input.audio ? 7 : 12)
   packet.cue = cleanLine(packet.cue, input.audio ? 7 : 10)
+  packet.liveAssistMode = input.liveAssistMode || 'cues'
+
+  if (packet.speakerIntent === 'assisted_continuation' && !packet.cue) {
+    packet.cue = input.audio ? 'Finish clean. Goal first.' : 'Continue cleanly toward the goal.'
+  }
+
+  if (input.audio && packet.speakerIntent !== 'addressed_to_george') {
+    if (packet.liveAssistMode === 'lines') {
+      packet.cue = ''
+      packet.status = `${packet.status} Audio mode: repeatable-line only.`.trim()
+    } else {
+      packet.volley = ''
+      packet.status = `${packet.status} Audio mode: cue-only.`.trim()
+    }
+  }
 
   if (TEACHER_LANGUAGE.test(packet.volley)) {
     packet.volley = 'Say it plainly.'
