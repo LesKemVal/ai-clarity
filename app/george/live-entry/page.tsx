@@ -389,7 +389,7 @@ export default function GeorgeLiveEntryPage() {
     localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
     localStorage.setItem('george_live_estimated_cents', String(estimatedCents ?? ''))
 
-    window.location.href = '/george/live'
+    window.location.href = '/live-voice'
   }
 
   return (
@@ -788,7 +788,7 @@ export default function GeorgeLiveEntryPage() {
             <>
               {hasLiveSession && (
                 <Link
-                  href="/george/live"
+                  href="/live-voice"
                   className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.065] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.018))] px-6 py-4 text-[14px] font-medium text-white/74 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
                 >
                   Resume Conversation
@@ -804,7 +804,7 @@ export default function GeorgeLiveEntryPage() {
               </button>
 
               <Link
-                href="/george/live"
+                href="/live-voice"
                 className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.012] px-6 py-4 text-[14px] font-medium text-white/50 transition-all duration-150 hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/74"
               >
                 Enter without setup
