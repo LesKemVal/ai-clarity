@@ -2616,6 +2616,10 @@ requestAnimationFrame(() => {
   }, [])
 
   const startListening = useCallback(() => {
+    if (liveMode) {
+      return
+    }
+
     if (!recognitionRef.current || isIOS) {
       setVoiceError('Voice input is not available on this device yet.')
       return
@@ -4153,7 +4157,9 @@ responseTimerRef.current = setTimeout(() => {
     }
 
     recognition.onend = () => {
-      if (liveMode && voiceOn && !isThinking) {
+      // LIVE no longer uses browser SpeechRecognition restart loops.
+    // Deepgram runtime owns LIVE listening authority.
+    if (!liveMode && voiceOn && !isThinking) {
         setTimeout(() => {
           startListening()
         }, 250)
