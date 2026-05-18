@@ -6768,9 +6768,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           currentTier === 'intelligent' ||
           currentTier === 'brilliant'
         }
-        hasLiveSession={
-          !!getActiveSessionForMode('live')
-        }
+        hasLiveSession={false}
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
           setShowLiveChooser(false)
