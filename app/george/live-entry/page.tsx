@@ -312,6 +312,7 @@ export default function GeorgeLiveEntryPage() {
   const [selectedCapacityCents, setSelectedCapacityCents] = useState<number | null>(null)
   const [selectedCapabilityIds, setSelectedCapabilityIds] = useState<string[]>([])
   const [steeringSaved, setSteeringSaved] = useState(false)
+  const [showPurviewOptions, setShowPurviewOptions] = useState(false)
 
   const activePrompt = ROOM_PROMPTS[selectedRoom] || {
     label: 'WHAT SHOULD GEORGE TRACK?',
@@ -639,52 +640,68 @@ export default function GeorgeLiveEntryPage() {
           )}
 
           <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
-            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
-              PURVIEW
-            </div>
-
-            <p className="mb-3 text-[13px] leading-6 text-white/54">
-              Choose the discipline you are speaking from. GEORGE shapes cues and repeatable lines from that purview inside the room.
-            </p>
-
-            <div className="grid gap-2 sm:grid-cols-2">
-              {LIVE_PURVIEWS.map((item) => {
-                const active = selectedPurview === item.id
-
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setSelectedPurview(item.id)}
-                    className={`rounded-[0.8rem] border px-3 py-3 text-left transition-all duration-150 ${
-                      active
-                        ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.08),inset_0_1px_0_rgba(255,255,255,0.08)]'
-                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
-                    }`}
-                  >
-                    <div className="text-[13px] font-semibold">{item.label}</div>
-                    <div className="mt-1 text-[12px] leading-5 text-white/46">{item.body}</div>
-                    <div className="mt-2 text-[11px] leading-5 text-white/32">Cue: {item.cue}</div>
-                    <div className="mt-1 text-[11px] leading-5 text-white/32">Line: {item.line}</div>
-                  </button>
-                )
-              })}
-            </div>
-
-            {selectedPurview === 'custom' && (
-              <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-black/24 px-4 py-3">
-                <label className="block text-[10px] uppercase tracking-[0.18em] text-white/34">
-                  Specific discipline
-                </label>
-                <input
-                  value={customPurview}
-                  onChange={(event) => setCustomPurview(event.target.value)}
-                  placeholder="Example: CDL operator dealing with dispatch"
-                  className="mt-2 w-full bg-transparent text-[14px] text-white/82 outline-none placeholder:text-white/24"
-                />
-                <p className="mt-2 text-[12px] leading-5 text-white/38">
-                  GEORGE will use this as the operating lens for cues, vocabulary, assumptions, and repeatable lines.
+            <button
+              type="button"
+              onClick={() => setShowPurviewOptions((value) => !value)}
+              className="flex w-full items-center justify-between gap-3 text-left"
+            >
+              <div>
+                <div className="text-[11px] tracking-[0.18em] text-white/34">
+                  PURVIEW
+                </div>
+                <p className="mt-1 text-[13px] leading-5 text-white/50">
+                  Speak from a discipline. GEORGE uses the right wording, terms, and phrasing so you sound familiar with that field.
                 </p>
+              </div>
+
+              <div className="shrink-0 text-[12px] text-white/34">
+                {showPurviewOptions ? 'Close' : (LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}
+              </div>
+            </button>
+
+            {showPurviewOptions && (
+              <div className="mt-4">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {LIVE_PURVIEWS.map((item) => {
+                    const active = selectedPurview === item.id
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPurview(item.id)
+                          if (item.id !== 'custom') setShowPurviewOptions(false)
+                        }}
+                        className={`rounded-[0.8rem] border px-3 py-2.5 text-left transition-all duration-150 ${
+                          active
+                            ? 'border-[#AAB4FF]/30 bg-[#AAB4FF]/10 text-white'
+                            : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
+                        }`}
+                      >
+                        <div className="text-[13px] font-semibold">{item.label}</div>
+                        <div className="mt-1 text-[12px] leading-5 text-white/42">{item.body}</div>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {selectedPurview === 'custom' && (
+                  <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-black/24 px-4 py-3">
+                    <label className="block text-[10px] uppercase tracking-[0.18em] text-white/34">
+                      Specific discipline
+                    </label>
+                    <input
+                      value={customPurview}
+                      onChange={(event) => setCustomPurview(event.target.value)}
+                      placeholder="Example: blockchain analyst, CDL operator, HVAC technician"
+                      className="mt-2 w-full bg-transparent text-[14px] text-white/82 outline-none placeholder:text-white/24"
+                    />
+                    <p className="mt-2 text-[12px] leading-5 text-white/38">
+                      GEORGE will use this as the operating lens for vocabulary and response wording.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
