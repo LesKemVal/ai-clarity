@@ -420,27 +420,32 @@ function isForceIntervention(text: string) {
         setRunning(true)
         void requestWakeLock()
 
-        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : MediaRecorder.isTypeSupported('audio/webm')
-            ? 'audio/webm'
-            : ''
+        const audioContext = new AudioContext({ sampleRate: 16000 })
+        const source = audioContext.createMediaStreamSource(stream)
+        const processor = audioContext.createScriptProcessor(4096, 1, 1)
 
-        pushLog(`Recorder MIME: ${mimeType || 'browser default'}`)
+        source.connect(processor)
+        processor.connect(audioContext.destination)
 
-        const recorder = mimeType
-          ? new MediaRecorder(stream, { mimeType })
-          : new MediaRecorder(stream)
+        pushLog('PCM capture active: linear16 @ 16kHz')
 
-        recorderRef.current = recorder
+        processor.onaudioprocess = (event) => {
+          if (socket.readyState !== WebSocket.OPEN) return
 
-        recorder.ondataavailable = (event) => {
-          if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-            socket.send(event.data)
+          const input = event.inputBuffer.getChannelData(0)
+          const pcm = new Int16Array(input.length)
+
+          for (let i = 0; i < input.length; i += 1) {
+            const sample = Math.max(-1, Math.min(1, input[i]))
+            pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff
           }
+
+          socket.send(pcm.buffer)
         }
 
-        recorder.start(250)
+        ;(window as any).__georgeLiveAudioContext = audioContext
+        ;(window as any).__georgeLiveProcessor = processor
+        ;(window as any).__georgeLiveSource = source
       }
 
       socket.onmessage = async (message) => {
