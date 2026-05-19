@@ -4496,10 +4496,10 @@ return (
                 <button
                   type="button"
                   onClick={() => setShowSidebar(true)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-[0.75rem] transition hover:bg-white/[0.025] xl:hidden"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-[0.85rem] transition hover:bg-white/[0.025] xl:hidden"
                   aria-label="Open GEORGE sidebar"
                 >
-                  <img src="/logofav.png" alt="GEORGE" className="h-7 w-7 object-contain opacity-95" />
+                  <img src="/logofav.png" alt="GEORGE" className="h-8 w-8 object-contain opacity-95" />
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -5345,7 +5345,7 @@ ${simplifyTarget}`
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none leading-none`}>
                 <div className="pointer-events-auto flex items-center gap-5">
                   <button
                     type="button"
@@ -5404,7 +5404,7 @@ ${simplifyTarget}`
                         setShowUpgradeModal(true)
                       }
                     }}
-                    className="relative inline-flex h-5 w-[270px] max-w-[58vw] items-center overflow-hidden text-left text-[11px] font-medium tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    className="relative inline-flex h-5 w-[270px] max-w-[58vw] items-center self-center overflow-hidden text-left text-[11px] font-medium leading-none tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
                   >
                     <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalPrimary_4.8s_ease-in-out_infinite]">
                       <span className="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -5453,7 +5453,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto translate-x-2 text-[11px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF] md:translate-x-0" 
+                  className="pointer-events-auto translate-x-2 self-center text-[11px] font-semibold leading-none tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF] md:translate-x-0" 
                 >
                   ◉ LIVE
                 </button>
