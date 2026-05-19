@@ -1217,26 +1217,24 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       const liveIntro: Message = {
         role: 'assistant',
         content: setupRoom
-          ? `LIVE ready.
+          ? `I am LIVE and present.
 
-Room changed? Update GEORGE instantly.
+You chose ${setupRoom} mode. I will support you accordingly.
 
-Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.
+If the room shifts, tell me what changed or use a trigger word.
 
-Room: ${setupRoom}${objectiveLine ? `
+${objectiveLine ? `${objectiveLine}
 
-${objectiveLine}` : ''}${steeringLine ? `
+` : ''}${steeringLine ? `${steeringLine}
 
-${steeringLine}` : ''}${supportLine ? `
+` : ''}${supportLine ? `${supportLine}
 
-${supportLine}` : ''}${capacityLine ? `
+` : ''}${capacityLine ? `${capacityLine}` : ''}`.trim()
+          : `I am LIVE and present.
 
-${capacityLine}` : ''}`
-          : `LIVE ready.
+No room was selected. I will listen first, read the room, and support you accordingly.
 
-No room selected. GEORGE will listen first, infer context from the room, and confirm only when there is enough signal.
-
-Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.${steeringLine ? `
+Use a trigger word if you need a line, cue, pause, reword, or shorter response.${steeringLine ? `
 
 ${steeringLine}` : ''}`
       }

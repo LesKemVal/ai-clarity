@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import GeorgePage from '../page'
 
 export default function GeorgeLivePage() {
-  redirect('/live-voice')
+  return <GeorgePage forceLive />
 }
