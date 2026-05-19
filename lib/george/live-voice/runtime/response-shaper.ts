@@ -187,14 +187,14 @@ class GeorgeResponseShaper {
 
     if ((input.fatigueScore || 0) > 0.72) {
       volley = this.shorten(volley, 5)
-      cue = this.prependCue(cue, 'Less is more.')
+      cue = this.prependCue(cue, 'Preserve human syntax. Reduce only what weakens the point.')
       reasons.push('fatigue compression')
     }
 
     if (signals.has('weak_confidence')) {
       volley = this.removeWeakConfidence(volley)
       volley = this.shorten(volley, 6)
-      cue = this.prependCue(cue, 'Sound certain. No filler.')
+      cue = this.prependCue(cue, 'Sound clear. Keep useful bridge language.')
       reasons.push('weak confidence tightening')
     }
 
@@ -211,7 +211,7 @@ class GeorgeResponseShaper {
 
     if (input.responseCompression === 'high') {
       volley = this.shorten(volley, 5)
-      cue = this.prependCue(cue, 'Keep it tight.')
+      cue = this.prependCue(cue, 'Match the room. Compress only if timing requires it.')
       reasons.push('policy high compression')
     }
 

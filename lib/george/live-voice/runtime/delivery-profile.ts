@@ -17,7 +17,7 @@ export const DELIVERY_PROFILES: Record<DeliveryProfileId, DeliveryProfile> = {
   whisperer: {
     id: 'whisperer',
     label: 'Tactical Whisperer',
-    maxWords: 7,
+    maxWords: 14,
     volume: 0.42,
     shouldWhisper: true,
     silenceBias: 0.72,
@@ -25,7 +25,7 @@ export const DELIVERY_PROFILES: Record<DeliveryProfileId, DeliveryProfile> = {
   peer: {
     id: 'peer',
     label: 'Calm Peer',
-    maxWords: 12,
+    maxWords: 22,
     volume: 0.62,
     shouldWhisper: false,
     silenceBias: 0.45,
@@ -33,7 +33,7 @@ export const DELIVERY_PROFILES: Record<DeliveryProfileId, DeliveryProfile> = {
   authority: {
     id: 'authority',
     label: 'Firm Authority',
-    maxWords: 9,
+    maxWords: 18,
     volume: 0.55,
     shouldWhisper: false,
     silenceBias: 0.52,
@@ -51,11 +51,18 @@ export const DELIVERY_PROFILES: Record<DeliveryProfileId, DeliveryProfile> = {
 export function compressForDelivery(text: string, profile: DeliveryProfile) {
   if (profile.maxWords <= 0) return ''
 
-  const words = text
-    .replace(/\s+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
+  const clean = text.replace(/\s+/g, ' ').trim()
+  const words = clean.split(/\s+/).filter(Boolean)
+
+  if (words.length <= profile.maxWords) return clean
+
+  const sentenceBoundary = clean.match(/^(.+?[.!?])\s+/)
+  if (sentenceBoundary) {
+    const sentenceWords = sentenceBoundary[1].split(/\s+/).filter(Boolean)
+    if (sentenceWords.length <= profile.maxWords + 4) {
+      return sentenceBoundary[1]
+    }
+  }
 
   return words.slice(0, profile.maxWords).join(' ')
 }

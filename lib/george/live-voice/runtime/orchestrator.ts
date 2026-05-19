@@ -254,14 +254,21 @@ export function orchestrateLiveTurn(
     activeObjective
   )
 
-  const runtimeWordLimit =
-    velocityState.velocity === 'spiking'
-      ? Math.min(runtimeConfig.maxSpokenWords, 5)
-      : runtimeConfig.maxSpokenWords
+  const roomNeedsCompression =
+    velocityState.velocity === 'spiking' ||
+    normalizedRoomPressure === 'authority' ||
+    Number(normalizedInterruptionRisk || 0) > 0.78 ||
+    forecastBias === 'hold'
+
+  const runtimeWordLimit = roomNeedsCompression
+    ? Math.max(8, Math.min(runtimeConfig.maxSpokenWords, loadDecision.maxWords))
+    : runtimeConfig.maxSpokenWords
 
   nextPacket.volley = georgeLoadManager.compress(
     nextPacket.volley,
-    Math.min(loadDecision.maxWords, runtimeWordLimit)
+    runtimeConfig.preserveBridgeLanguage
+      ? runtimeWordLimit
+      : Math.min(loadDecision.maxWords, runtimeWordLimit)
   )
 
   nextPacket.cue = `${postureDecision.cuePrefix} ${recoveryState.repair} ${nextPacket.cue || ''}`.trim()
