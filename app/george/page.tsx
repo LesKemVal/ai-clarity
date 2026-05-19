@@ -4496,10 +4496,10 @@ return (
                 <button
                   type="button"
                   onClick={() => setShowSidebar(true)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-[0.85rem] transition hover:bg-white/[0.025] xl:hidden"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden"
                   aria-label="Open GEORGE sidebar"
                 >
-                  <img src="/logofav.png" alt="GEORGE" className="h-8 w-8 object-contain opacity-95" />
+                  <img src="/logofav.png" alt="GEORGE" className="h-10 w-10 object-contain opacity-95" />
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
