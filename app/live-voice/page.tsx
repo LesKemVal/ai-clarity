@@ -87,6 +87,7 @@ function isForceIntervention(text: string) {
   const reconnectEligibleRef = useRef(false)
   const reconnectEligibleUntilRef = useRef(0)
   const lastDisconnectReasonRef = useRef('')
+  const liveSessionIdRef = useRef(0)
   const lastGovernAtRef = useRef(0)
   const liveRuntimeMemoryRef = useRef({
     acceptedCarryCount: 0,
@@ -429,6 +430,7 @@ function isForceIntervention(text: string) {
       reconnectEligibleUntilRef.current = 0
     }
     setLiveLifecycle('tearing_down')
+    liveSessionIdRef.current += 1
     georgeCancelEngine.bump()
     georgeAudioQueue.clear()
     processingQueueRef.current = false
@@ -518,6 +520,8 @@ function isForceIntervention(text: string) {
         process.env.NEXT_PUBLIC_LIVE_PROXY_WS || 'ws://localhost:8787/live'
       )
 
+      const sessionId = liveSessionIdRef.current + 1
+      liveSessionIdRef.current = sessionId
       socketRef.current = socket
 
       socket.onopen = () => {
@@ -557,6 +561,11 @@ function isForceIntervention(text: string) {
       }
 
       socket.onmessage = async (message) => {
+        if (sessionId !== liveSessionIdRef.current || socket !== socketRef.current) {
+          pushLog('Ignored stale LIVE socket message.')
+          return
+        }
+
         let data: any = null
 
         try {
@@ -567,6 +576,11 @@ function isForceIntervention(text: string) {
         }
 
         const messageReceivedAt = Date.now()
+
+        if (sessionId !== liveSessionIdRef.current || socket !== socketRef.current) {
+          pushLog('Ignored stale LIVE proxy payload.')
+          return
+        }
 
         if (data?.type === 'proxy_open') {
           pushLog('LIVE proxy acknowledged stream.')
@@ -1174,6 +1188,7 @@ function isForceIntervention(text: string) {
             <p>Intentional Stop: {String(intentionalStopRef.current)}</p>
             <p>Reconnect Eligible: {String(isReconnectStillValid())}</p>
             <p>Disconnect: {lastDisconnectReasonRef.current || '—'}</p>
+            <p>Session: {liveSessionIdRef.current}</p>
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
             <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
