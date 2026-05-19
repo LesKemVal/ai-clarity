@@ -279,7 +279,7 @@ export default function Sidebar({
 return (
   <>
     {!showSidebar && (
-      <div className="hidden xl:block">
+      <div className="block xl:hidden">
         <nav className="fixed left-0 top-0 z-[110] flex h-screen w-[44px] flex-col items-center gap-7 bg-transparent px-1 py-5 xl:hidden">
           <button
             type="button"
