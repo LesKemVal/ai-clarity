@@ -5401,13 +5401,13 @@ ${simplifyTarget}`
                     }}
                     className="relative inline-flex h-5 w-[270px] max-w-[58vw] items-center overflow-hidden text-left text-[11px] font-medium tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
                   >
-                    <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalPrimary_5.8s_ease-in-out_infinite]">
+                    <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalPrimary_4.8s_ease-in-out_infinite]">
                       <span className="h-4 w-4 shrink-0" />
                       <span className="whitespace-nowrap">{tierPrimarySignal}</span>
                     </span>
 
                     {hasLiveGeorgeAccess && (
-                      <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalSecondary_5.8s_ease-in-out_infinite]">
+                      <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalSecondary_4.8s_ease-in-out_infinite]">
                         <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                           <svg
                             viewBox="0 0 24 24"
@@ -6220,12 +6220,15 @@ Continue from here, tell me what changed, or start fresh.`
 
 <style jsx global>{`
   @keyframes tierSignalPrimary {
-    0%, 44% { opacity: 1; transform: translateY(0); }
-    50%, 100% { opacity: 0; transform: translateY(-9px); }
+    0%, 47% { opacity: 1; transform: translateY(0); }
+    51%, 100% { opacity: 0; transform: translateY(-8px); }
   }
 
   @keyframes tierSignalSecondary {
-    0%, 44% { opacity: 0; transform: translateY(9px); }
+    0%, 47% { opacity: 0; transform: translateY(8px); }
+    51%, 96% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-8px); }
+  }
     50%, 94% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-9px); }
   }
