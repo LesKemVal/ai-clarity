@@ -78,6 +78,7 @@ function isForceIntervention(text: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const lastGovernedRef = useRef('')
   const processingQueueRef = useRef(false)
+  const speakingRef = useRef(false)
   const wakeLockRef = useRef<any>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
@@ -157,12 +158,17 @@ function isForceIntervention(text: string) {
 
 
   function stopGeorgeAudio(reason = 'Playback interrupted.') {
-    if (!audioRef.current) return
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+    }
 
-    audioRef.current.pause()
-    audioRef.current.currentTime = 0
-    audioRef.current.src = ''
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current.src = ''
+    }
 
+    speakingRef.current = false
     georgeTurnManager.markIdle()
     void georgeDeliverySessionManager.interrupt(reason)
 
@@ -314,6 +320,13 @@ function isForceIntervention(text: string) {
   }
 
   async function speak(text: string) {
+    if (speakingRef.current) {
+      pushLog('Dropped overlapping LIVE speech request.')
+      return
+    }
+
+    speakingRef.current = true
+
     const deliverySessionId = liveSessionIdRef.current
     const deliveryGeneration = georgeCancelEngine.current()
     const deliveryProfile = DELIVERY_PROFILES[deliveryProfileId]
@@ -326,6 +339,7 @@ function isForceIntervention(text: string) {
       } else {
         pushLog('Silent profile suppressed speech.')
       }
+      speakingRef.current = false
       return
     }
 
@@ -340,6 +354,7 @@ function isForceIntervention(text: string) {
       await new Promise((resolve) => window.setTimeout(resolve, formattedDelivery.pauseMs))
 
       if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+        speakingRef.current = false
         pushLog('Dropped stale LIVE delivery after hold.')
         return
       }
@@ -357,6 +372,7 @@ function isForceIntervention(text: string) {
       !isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) ||
       georgeTurnManager.shouldInterruptGeorge()
     ) {
+      speakingRef.current = false
       pushLog('Speech interrupted by room activity.')
       return
     }
@@ -370,6 +386,7 @@ function isForceIntervention(text: string) {
     })
 
     if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+      speakingRef.current = false
       georgeTurnManager.markIdle()
       pushLog('Dropped stale LIVE TTS response.')
       return
@@ -387,9 +404,19 @@ function isForceIntervention(text: string) {
         utterance.rate = 1
         utterance.pitch = 1
         utterance.volume = deliveryProfile.volume
+        utterance.onend = () => {
+          speakingRef.current = false
+          georgeTurnManager.markIdle()
+        }
+        utterance.onerror = () => {
+          speakingRef.current = false
+          georgeTurnManager.markIdle()
+        }
         window.speechSynthesis.speak(utterance)
+        return
       }
 
+      speakingRef.current = false
       georgeTurnManager.markIdle()
       return
     }
@@ -397,6 +424,7 @@ function isForceIntervention(text: string) {
     const blob = await res.blob()
 
     if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+      speakingRef.current = false
       georgeTurnManager.markIdle()
       pushLog('Dropped stale LIVE audio blob.')
       return
@@ -429,6 +457,7 @@ function isForceIntervention(text: string) {
       georgeTurnManager.shouldInterruptGeorge()
     ) {
       releaseAudioUrl()
+      speakingRef.current = false
       georgeTurnManager.markIdle()
       pushLog('Playback invalidated before audio start.')
       return
@@ -447,6 +476,7 @@ function isForceIntervention(text: string) {
       ) {
         stopGeorgeAudio('LIVE playback interrupted by room activity.')
         releaseAudioUrl()
+        speakingRef.current = false
         window.clearInterval(interruptionPoll)
       }
     }, 120)
@@ -454,6 +484,7 @@ function isForceIntervention(text: string) {
     audioRef.current.onended = () => {
       window.clearInterval(interruptionPoll)
       releaseAudioUrl()
+      speakingRef.current = false
       georgeTurnManager.markIdle()
     }
   }
@@ -481,6 +512,7 @@ function isForceIntervention(text: string) {
     georgeCancelEngine.bump()
     georgeAudioQueue.clear()
     processingQueueRef.current = false
+    speakingRef.current = false
     stopGeorgeAudio('LIVE session teardown interrupted playback.')
 
     recorderRef.current?.stop()
