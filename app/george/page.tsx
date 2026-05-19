@@ -5402,7 +5402,22 @@ ${simplifyTarget}`
                     className="relative inline-flex h-5 w-[270px] max-w-[58vw] items-center overflow-hidden text-left text-[11px] font-medium tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
                   >
                     <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalPrimary_4.8s_ease-in-out_infinite]">
-                      <span className="h-4 w-4 shrink-0" />
+                      <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                        {currentTier !== 'smart' && (
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="h-3.5 w-3.5 text-[#F2B36D] drop-shadow-[0_0_8px_rgba(242,179,109,0.20)]"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 22c3.7 0 6.5-2.6 6.5-6.2 0-2.2-1.1-4.2-2.8-5.5.1 1.4-.5 2.4-1.4 3.1.1-3.4-1.7-6.1-4.5-8.4.3 2.9-.9 4.7-2.3 6.2-1.1 1.2-2 2.5-2 4.5C5.5 19.4 8.3 22 12 22Z" />
+                          </svg>
+                        )}
+                      </span>
                       <span className="whitespace-nowrap">{tierPrimarySignal}</span>
                     </span>
 
@@ -6220,12 +6235,15 @@ Continue from here, tell me what changed, or start fresh.`
 
 <style jsx global>{`
   @keyframes tierSignalPrimary {
-    0%, 47% { opacity: 1; transform: translateY(0); }
-    51%, 100% { opacity: 0; transform: translateY(-8px); }
+    0%, 40% { opacity: 1; transform: translateY(0); }
+    48%, 100% { opacity: 1; transform: translateY(-22px); }
   }
 
   @keyframes tierSignalSecondary {
-    0%, 47% { opacity: 0; transform: translateY(8px); }
+    0%, 40% { opacity: 1; transform: translateY(22px); }
+    48%, 88% { opacity: 1; transform: translateY(0); }
+    96%, 100% { opacity: 1; transform: translateY(-22px); }
+  }
     51%, 96% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-8px); }
   }
