@@ -4340,7 +4340,7 @@ useEffect(() => {
 return (
     <>
       <style>{georgeAmbientPulseStyles}</style>
-      <main className="app-shell pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
+      <main className="app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
@@ -5346,14 +5346,14 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none leading-none`}>
-                <div className="pointer-events-auto flex items-center gap-5">
+                <div className="pointer-events-auto flex h-5 items-center gap-5 leading-none">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveHelpTopic('live')
                       setShowHelpModal(true)
                     }}
-                    className="text-[11px] font-medium tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
+                    className="inline-flex h-5 items-center text-[11px] font-medium leading-none tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
                   >
                     Help
                   </button>
@@ -5365,7 +5365,7 @@ ${simplifyTarget}`
                         e.stopPropagation()
                         setShowLanguageMenu((prev) => !prev)
                       }}
-                      className="text-[11px] font-medium tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
+                      className="inline-flex h-5 items-center text-[11px] font-medium leading-none tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
                     >
                       {language}
                     </button>
@@ -5453,7 +5453,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto translate-x-2 self-center text-[11px] font-semibold leading-none tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF] md:translate-x-0" 
+                  className="pointer-events-auto inline-flex h-5 translate-x-2 items-center self-center text-[11px] font-semibold leading-none tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF] md:translate-x-0" 
                 >
                   ◉ LIVE
                 </button>

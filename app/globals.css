@@ -297,3 +297,22 @@ textarea {
     border-radius: 0.68rem;
   }
 }
+
+
+@supports (-webkit-touch-callout: none) {
+  .george-mobile-root {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+}
+
+@media (pointer: coarse) {
+  .george-mobile-root {
+    font-family: Roboto, Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .george-mobile-root {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+}
