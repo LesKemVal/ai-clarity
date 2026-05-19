@@ -308,63 +308,63 @@ const LIVE_PURVIEWS = [
   {
     id: 'cdl_operator',
     label: 'CDL operator',
-    body: 'Transportation, safety, timing, dispatch, compliance.',
+    body: 'Transportation, dispatch, safety, compliance.',
     cue: 'Keep it practical, safety-aware, and route/time specific.',
     line: 'Frame it around safety, schedule, compliance, and what is actually workable.',
   },
   {
     id: 'software_engineer',
     label: 'Software engineer',
-    body: 'Systems, implementation, bugs, architecture, tradeoffs.',
+    body: 'Systems, implementation, architecture, tradeoffs.',
     cue: 'Use precise technical language and avoid vague claims.',
     line: 'Frame it around constraints, tradeoffs, implementation, reliability, and scope.',
   },
   {
     id: 'systems_architect',
     label: 'Systems architect',
-    body: 'Architecture, scale, dependencies, reliability, risk.',
+    body: 'Architecture, scale, dependencies, risk.',
     cue: 'Speak from system impact, not isolated tasks.',
     line: 'Tie the point to architecture, integration risk, scalability, and downstream effects.',
   },
   {
     id: 'registered_nurse',
     label: 'Registered nurse',
-    body: 'Patient care, symptoms, charting, protocol, escalation.',
+    body: 'Patient care, protocol, escalation, documentation.',
     cue: 'Keep it clinically clear, careful, and specific.',
     line: 'Clarify symptoms, timeline, risk, and what needs escalation or documentation.',
   },
   {
     id: 'electrician',
     label: 'Electrician',
-    body: 'Load, code, safety, circuits, installation, inspection.',
+    body: 'Code, safety, load, installation.',
     cue: 'Use field-safe language and code-aware framing.',
     line: 'Frame it around safety, load, code requirements, inspection, and practical execution.',
   },
   {
     id: 'hvac_technician',
     label: 'HVAC technician',
-    body: 'Diagnostics, airflow, refrigerant, equipment, service calls.',
+    body: 'Diagnostics, airflow, equipment, service.',
     cue: 'Stay diagnostic, practical, and customer-clear.',
     line: 'Explain the issue through symptoms, equipment behavior, likely cause, and next service step.',
   },
   {
     id: 'project_manager',
     label: 'Project manager',
-    body: 'Scope, timeline, blockers, ownership, dependencies.',
+    body: 'Scope, timeline, blockers, ownership.',
     cue: 'Keep the room aligned around next action.',
     line: 'Clarify owner, deadline, blocker, dependency, and decision needed.',
   },
   {
     id: 'founder_operator',
     label: 'Founder / operator',
-    body: 'Execution, risk, product, customers, capital, leverage.',
+    body: 'Execution, leverage, risk, decisions.',
     cue: 'Speak from ownership, tradeoffs, and decisive next moves.',
     line: 'Frame it around the business outcome, constraint, risk, and next executable move.',
   },
   {
     id: 'custom',
     label: 'Custom discipline',
-    body: 'Tell GEORGE the discipline you want to speak from.',
+    body: 'Define your own discipline.',
     cue: 'Use the user-defined discipline as the operating lens.',
     line: 'Shape language from the discipline the user names.',
   },
@@ -807,17 +807,30 @@ export default function GeorgeLiveEntryPage() {
                   PURVIEW
                 </div>
                 <p className="mt-1 text-[13px] leading-5 text-white/50">
-                  Speak from a discipline. GEORGE uses the right wording, terms, and phrasing so you sound familiar with that field.
+                  Speak from a discipline. GEORGE uses familiar wording, terms, pacing, and phrasing for that field.
                 </p>
               </div>
 
               <div className="shrink-0 text-[12px] text-white/34">
-                {showPurviewOptions ? 'Close' : (LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}
+                {showPurviewOptions ? 'Close' : `${(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label} · See more`}
               </div>
             </button>
 
             {showPurviewOptions && (
               <div className="mt-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/30">
+                    Choose discipline
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPurviewOptions(false)}
+                    className="text-[12px] text-[#AAB4FF]/70 transition hover:text-[#D7DCFF]"
+                  >
+                    Hide
+                  </button>
+                </div>
+
                 <div className="grid gap-2 sm:grid-cols-2">
                   {LIVE_PURVIEWS.map((item) => {
                     const active = selectedPurview === item.id
