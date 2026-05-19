@@ -164,34 +164,69 @@ const LIVE_CAPACITY_OPTIONS = [
   },
 ]
 
-const LIVE_POSTURES = [
+const LIVE_PURVIEWS = [
   {
-    id: 'clear_operator',
-    label: 'Clear operator',
-    body: 'Plain, direct, controlled.',
-    cue: 'Keep responses clean and useful.',
-    line: 'Say it plainly, then ask for the next step.',
+    id: 'cdl_operator',
+    label: 'CDL operator',
+    body: 'Transportation, safety, timing, dispatch, compliance.',
+    cue: 'Keep it practical, safety-aware, and route/time specific.',
+    line: 'Frame it around safety, schedule, compliance, and what is actually workable.',
   },
   {
-    id: 'technical_professional',
-    label: 'Technical professional',
-    body: 'Precise, structured, discipline-aware.',
-    cue: 'Use correct terms and avoid vague claims.',
-    line: 'Frame it around scope, tradeoffs, reliability, and implementation.',
+    id: 'software_engineer',
+    label: 'Software engineer',
+    body: 'Systems, implementation, bugs, architecture, tradeoffs.',
+    cue: 'Use precise technical language and avoid vague claims.',
+    line: 'Frame it around constraints, tradeoffs, implementation, reliability, and scope.',
   },
   {
-    id: 'executive_calm',
-    label: 'Executive calm',
-    body: 'Brief, decisive, outcome-oriented.',
-    cue: 'Lead with risk, priority, and next move.',
-    line: 'Keep it short: decision, reason, next action.',
+    id: 'systems_architect',
+    label: 'Systems architect',
+    body: 'Architecture, scale, dependencies, reliability, risk.',
+    cue: 'Speak from system impact, not isolated tasks.',
+    line: 'Tie the point to architecture, integration risk, scalability, and downstream effects.',
   },
   {
-    id: 'warm_advocate',
-    label: 'Warm advocate',
-    body: 'Respectful, human, firm.',
-    cue: 'Protect clarity without sounding cold.',
-    line: 'Ask for clarity, then restate what matters.',
+    id: 'registered_nurse',
+    label: 'Registered nurse',
+    body: 'Patient care, symptoms, charting, protocol, escalation.',
+    cue: 'Keep it clinically clear, careful, and specific.',
+    line: 'Clarify symptoms, timeline, risk, and what needs escalation or documentation.',
+  },
+  {
+    id: 'electrician',
+    label: 'Electrician',
+    body: 'Load, code, safety, circuits, installation, inspection.',
+    cue: 'Use field-safe language and code-aware framing.',
+    line: 'Frame it around safety, load, code requirements, inspection, and practical execution.',
+  },
+  {
+    id: 'hvac_technician',
+    label: 'HVAC technician',
+    body: 'Diagnostics, airflow, refrigerant, equipment, service calls.',
+    cue: 'Stay diagnostic, practical, and customer-clear.',
+    line: 'Explain the issue through symptoms, equipment behavior, likely cause, and next service step.',
+  },
+  {
+    id: 'project_manager',
+    label: 'Project manager',
+    body: 'Scope, timeline, blockers, ownership, dependencies.',
+    cue: 'Keep the room aligned around next action.',
+    line: 'Clarify owner, deadline, blocker, dependency, and decision needed.',
+  },
+  {
+    id: 'founder_operator',
+    label: 'Founder / operator',
+    body: 'Execution, risk, product, customers, capital, leverage.',
+    cue: 'Speak from ownership, tradeoffs, and decisive next moves.',
+    line: 'Frame it around the business outcome, constraint, risk, and next executable move.',
+  },
+  {
+    id: 'custom',
+    label: 'Custom discipline',
+    body: 'Tell GEORGE the discipline you want to speak from.',
+    cue: 'Use the user-defined discipline as the operating lens.',
+    line: 'Shape language from the discipline the user names.',
   },
 ]
 
@@ -213,7 +248,7 @@ const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
 
   Negotiation: {
     label: 'WHAT MUST HOLD?',
-    placeholder: 'Leverage, limits, fallback, pressure points, or desired posture.'
+    placeholder: 'Leverage, limits, fallback, pressure points, or desired purview.'
   },
 
   'Sales Call': {
@@ -267,7 +302,8 @@ export default function GeorgeLiveEntryPage() {
   const [selectedLanguage, setSelectedLanguage] = useState('English')
   const [speechCadence, setSpeechCadence] = useState('Balanced')
   const [liveAssistMode, setLiveAssistMode] = useState<'cues' | 'lines'>('cues')
-  const [selectedPosture, setSelectedPosture] = useState('clear_operator')
+  const [selectedPurview, setSelectedPurview] = useState('cdl_operator')
+  const [customPurview, setCustomPurview] = useState('')
   const [showRoomSummary, setShowRoomSummary] = useState(false)
   const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
@@ -385,7 +421,10 @@ export default function GeorgeLiveEntryPage() {
   const prepareLive = (skipPrep = false) => {
     if (typeof window === 'undefined') return
 
-    const activePosture = LIVE_POSTURES.find((item) => item.id === selectedPosture) || LIVE_POSTURES[0]
+    const activePurview = LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]
+    const finalPurview = selectedPurview === 'custom' && customPurview.trim()
+      ? { ...activePurview, label: customPurview.trim(), body: `User-defined discipline: ${customPurview.trim()}` }
+      : activePurview
 
     const runtimeSupport = {
       selectedCapacityCents,
@@ -395,7 +434,7 @@ export default function GeorgeLiveEntryPage() {
       capacityCents,
       estimatedCents,
       runtimeBias: selectedCapabilities.map((item) => item.runtimeBias),
-      posture: activePosture,
+      purview: finalPurview,
     }
 
     const liveSetup = {
@@ -405,7 +444,7 @@ export default function GeorgeLiveEntryPage() {
       objective,
       controlWords,
       liveAssistMode,
-      posture: activePosture,
+      purview: finalPurview,
       skipPrep,
       runtimeSupport,
       selectedCapacityCents,
@@ -601,22 +640,22 @@ export default function GeorgeLiveEntryPage() {
 
           <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
-              USER POSTURE
+              PURVIEW
             </div>
 
             <p className="mb-3 text-[13px] leading-6 text-white/54">
-              Choose how you want to sound. GEORGE will shape cues and repeatable lines from this posture across any room.
+              Choose the discipline you are speaking from. GEORGE shapes cues and repeatable lines from that purview inside the room.
             </p>
 
             <div className="grid gap-2 sm:grid-cols-2">
-              {LIVE_POSTURES.map((item) => {
-                const active = selectedPosture === item.id
+              {LIVE_PURVIEWS.map((item) => {
+                const active = selectedPurview === item.id
 
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setSelectedPosture(item.id)}
+                    onClick={() => setSelectedPurview(item.id)}
                     className={`rounded-[0.8rem] border px-3 py-3 text-left transition-all duration-150 ${
                       active
                         ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.08),inset_0_1px_0_rgba(255,255,255,0.08)]'
@@ -631,6 +670,23 @@ export default function GeorgeLiveEntryPage() {
                 )
               })}
             </div>
+
+            {selectedPurview === 'custom' && (
+              <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-black/24 px-4 py-3">
+                <label className="block text-[10px] uppercase tracking-[0.18em] text-white/34">
+                  Specific discipline
+                </label>
+                <input
+                  value={customPurview}
+                  onChange={(event) => setCustomPurview(event.target.value)}
+                  placeholder="Example: CDL operator dealing with dispatch"
+                  className="mt-2 w-full bg-transparent text-[14px] text-white/82 outline-none placeholder:text-white/24"
+                />
+                <p className="mt-2 text-[12px] leading-5 text-white/38">
+                  GEORGE will use this as the operating lens for cues, vocabulary, assumptions, and repeatable lines.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
@@ -879,7 +935,7 @@ export default function GeorgeLiveEntryPage() {
 
               <div className="mt-3 space-y-2 text-[13px] leading-6 text-white/62">
                 <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
-                <div><span className="text-white/34">Posture:</span> {(LIVE_POSTURES.find((item) => item.id === selectedPosture) || LIVE_POSTURES[0]).label}</div>
+                <div><span className="text-white/34">Purview:</span> {(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}</div>
                 <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
                 <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
                 {estimatedCents !== null && (
