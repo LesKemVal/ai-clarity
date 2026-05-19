@@ -26,7 +26,7 @@ wss.on('connection', (client) => {
   console.log('Client connected to GEORGE LIVE proxy')
 
   const deepgram = new WebSocket(
-    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250',
+    'wss://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&interim_results=true&endpointing=250&encoding=webm',
     {
       headers: {
         Authorization: `Token ${DEEPGRAM_API_KEY}`,
