@@ -128,6 +128,17 @@ const ROOM_RUNTIME_ESTIMATES: Record<
   },
 }
 
+type LiveDeliveryOverlay = {
+  cadenceProfile: 'measured' | 'precise' | 'field-direct' | 'clinical' | 'executive'
+  compressionBias: number
+  declarativeStrength: number
+  silenceTolerance: 'low' | 'medium' | 'high'
+  interruptionTiming: 'quick' | 'measured' | 'delayed'
+  qualificationStyle: 'plain' | 'technical' | 'clinical' | 'operational' | 'strategic'
+  linguisticDensity: 'low' | 'medium' | 'high'
+  deliveryNotes: string[]
+}
+
 const LIVE_CAPACITY_OPTIONS = [
   {
     id: 'sharper_answers',
@@ -163,6 +174,135 @@ const LIVE_CAPACITY_OPTIONS = [
     },
   },
 ]
+
+const LIVE_DELIVERY_OVERLAYS: Record<string, LiveDeliveryOverlay> = {
+  cdl_operator: {
+    cadenceProfile: 'field-direct',
+    compressionBias: 0.82,
+    declarativeStrength: 0.78,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'quick',
+    qualificationStyle: 'operational',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use practical route, timing, safety, dispatch, and compliance language.',
+      'Keep lines grounded and operational.',
+      'Avoid corporate abstraction unless the room requires it.',
+    ],
+  },
+  software_engineer: {
+    cadenceProfile: 'precise',
+    compressionBias: 0.72,
+    declarativeStrength: 0.74,
+    silenceTolerance: 'high',
+    interruptionTiming: 'measured',
+    qualificationStyle: 'technical',
+    linguisticDensity: 'high',
+    deliveryNotes: [
+      'Use constraints, implementation, tradeoffs, reliability, and scope language.',
+      'Qualify uncertainty without sounding unsure.',
+      'Favor precise claims over broad confidence.',
+    ],
+  },
+  systems_architect: {
+    cadenceProfile: 'precise',
+    compressionBias: 0.68,
+    declarativeStrength: 0.8,
+    silenceTolerance: 'high',
+    interruptionTiming: 'delayed',
+    qualificationStyle: 'technical',
+    linguisticDensity: 'high',
+    deliveryNotes: [
+      'Frame points around architecture, dependencies, scale, and downstream risk.',
+      'Use layered reasoning and decisive summary lines.',
+      'Protect system-level context.',
+    ],
+  },
+  registered_nurse: {
+    cadenceProfile: 'clinical',
+    compressionBias: 0.7,
+    declarativeStrength: 0.72,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'measured',
+    qualificationStyle: 'clinical',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use symptoms, timeline, protocol, escalation, and documentation language.',
+      'Stay careful, specific, and calm.',
+      'Avoid overclaiming beyond known facts.',
+    ],
+  },
+  electrician: {
+    cadenceProfile: 'field-direct',
+    compressionBias: 0.8,
+    declarativeStrength: 0.8,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'quick',
+    qualificationStyle: 'operational',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use load, code, circuit, inspection, safety, and installation language.',
+      'Keep explanations field-practical.',
+      'Anchor recommendations in safety and code-aware execution.',
+    ],
+  },
+  hvac_technician: {
+    cadenceProfile: 'field-direct',
+    compressionBias: 0.78,
+    declarativeStrength: 0.76,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'quick',
+    qualificationStyle: 'operational',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use diagnostic, airflow, equipment, refrigerant, service, and symptom language.',
+      'Explain through observed behavior and next service step.',
+      'Keep lines customer-clear without losing technical footing.',
+    ],
+  },
+  project_manager: {
+    cadenceProfile: 'measured',
+    compressionBias: 0.76,
+    declarativeStrength: 0.82,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'measured',
+    qualificationStyle: 'strategic',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use scope, owner, deadline, blocker, dependency, and decision language.',
+      'Compress ambiguity into next action.',
+      'Keep the room aligned and accountable.',
+    ],
+  },
+  founder_operator: {
+    cadenceProfile: 'executive',
+    compressionBias: 0.84,
+    declarativeStrength: 0.88,
+    silenceTolerance: 'high',
+    interruptionTiming: 'measured',
+    qualificationStyle: 'strategic',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Use outcome, constraint, leverage, risk, product, customer, and capital language.',
+      'Sound decisive without becoming reckless.',
+      'Land statements with ownership and next executable move.',
+    ],
+  },
+  custom: {
+    cadenceProfile: 'measured',
+    compressionBias: 0.74,
+    declarativeStrength: 0.76,
+    silenceTolerance: 'medium',
+    interruptionTiming: 'measured',
+    qualificationStyle: 'plain',
+    linguisticDensity: 'medium',
+    deliveryNotes: [
+      'Infer the discipline named by the user.',
+      'Use discipline-native terminology where appropriate.',
+      'Avoid pretending expertise beyond the user-defined purview.',
+    ],
+  },
+}
 
 const LIVE_PURVIEWS = [
   {
@@ -423,9 +563,24 @@ export default function GeorgeLiveEntryPage() {
     if (typeof window === 'undefined') return
 
     const activePurview = LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]
+    const baseDeliveryOverlay = LIVE_DELIVERY_OVERLAYS[selectedPurview] || LIVE_DELIVERY_OVERLAYS.custom
     const finalPurview = selectedPurview === 'custom' && customPurview.trim()
-      ? { ...activePurview, label: customPurview.trim(), body: `User-defined discipline: ${customPurview.trim()}` }
-      : activePurview
+      ? {
+          ...activePurview,
+          label: customPurview.trim(),
+          body: `User-defined discipline: ${customPurview.trim()}`,
+          deliveryOverlay: {
+            ...baseDeliveryOverlay,
+            deliveryNotes: [
+              `Infer discipline-native wording for: ${customPurview.trim()}.`,
+              ...baseDeliveryOverlay.deliveryNotes,
+            ],
+          },
+        }
+      : {
+          ...activePurview,
+          deliveryOverlay: baseDeliveryOverlay,
+        }
 
     const runtimeSupport = {
       selectedCapacityCents,
@@ -436,6 +591,7 @@ export default function GeorgeLiveEntryPage() {
       estimatedCents,
       runtimeBias: selectedCapabilities.map((item) => item.runtimeBias),
       purview: finalPurview,
+      deliveryOverlay: finalPurview.deliveryOverlay,
     }
 
     const liveSetup = {
@@ -446,6 +602,7 @@ export default function GeorgeLiveEntryPage() {
       controlWords,
       liveAssistMode,
       purview: finalPurview,
+      deliveryOverlay: finalPurview.deliveryOverlay,
       skipPrep,
       runtimeSupport,
       selectedCapacityCents,
