@@ -46,7 +46,7 @@ class GeorgeEmotionalVelocity {
       return {
         velocity: 'spiking',
         score,
-        reason: 'Emotional speed spiking. Compress hard.',
+        reason: 'Emotional speed spiking. Stabilize cadence and reduce cognitive load.',
       }
     }
 
@@ -54,7 +54,7 @@ class GeorgeEmotionalVelocity {
       return {
         velocity: 'rising',
         score,
-        reason: 'Emotional speed rising. Reduce complexity.',
+        reason: 'Emotional speed rising. Preserve clarity and emotional regulation.',
       }
     }
 

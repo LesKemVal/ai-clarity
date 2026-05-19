@@ -133,9 +133,9 @@ class GeorgePressureMemory {
       rolePressure: { ...this.rolePressure },
       summary:
         fatigueScore > 0.72
-          ? 'Pressure memory high. Simplify and reduce output.'
+          ? 'Pressure memory high. Stabilize cadence and reduce cognitive load.'
           : fatigueScore > 0.42
-            ? 'Pressure accumulating. Keep guidance tight.'
+            ? 'Pressure accumulating. Keep guidance clean and synchronized.'
             : 'Pressure memory stable.',
     }
   }

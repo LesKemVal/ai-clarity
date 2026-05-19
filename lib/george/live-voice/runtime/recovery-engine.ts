@@ -32,7 +32,7 @@ class GeorgeRecoveryEngine {
     if (signals.has('defensive_language')) {
       return {
         state: 'defensive_spiral',
-        repair: 'Shorten. Re-center. One clean sentence.',
+        repair: 'Re-center. Make the next point clean and human.',
         reason: 'User appears trapped in explanation spiral.',
         shouldReset: true,
       }
