@@ -69,6 +69,10 @@ function isForceIntervention(text: string) {
   const lastGovernedRef = useRef('')
   const processingQueueRef = useRef(false)
   const wakeLockRef = useRef<any>(null)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
+  const audioProcessorRef = useRef<ScriptProcessorNode | null>(null)
+  const stoppingRef = useRef(false)
   const lastGovernAtRef = useRef(0)
   const liveRuntimeMemoryRef = useRef({
     acceptedCarryCount: 0,
@@ -392,7 +396,57 @@ function isForceIntervention(text: string) {
     }
   }
 
+  function teardownLiveSession(reason = 'Stopped.') {
+    stoppingRef.current = true
+    georgeCancelEngine.bump()
+    georgeAudioQueue.clear()
+    processingQueueRef.current = false
+    stopGeorgeAudio('LIVE session teardown interrupted playback.')
+
+    recorderRef.current?.stop()
+    recorderRef.current = null
+
+    try {
+      audioProcessorRef.current?.disconnect()
+      if (audioProcessorRef.current) {
+        audioProcessorRef.current.onaudioprocess = null
+      }
+    } catch {}
+    audioProcessorRef.current = null
+
+    try {
+      audioSourceRef.current?.disconnect()
+    } catch {}
+    audioSourceRef.current = null
+
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      void audioContextRef.current.close()
+    }
+    audioContextRef.current = null
+
+    if (
+      socketRef.current?.readyState === WebSocket.OPEN ||
+      socketRef.current?.readyState === WebSocket.CONNECTING
+    ) {
+      socketRef.current.close()
+    }
+    socketRef.current = null
+
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+
+    setRunning(false)
+    void releaseWakeLock()
+    pushLog(reason)
+  }
+
   async function start() {
+    if (running || socketRef.current) {
+      pushLog('LIVE session already active.')
+      return
+    }
+
+    stoppingRef.current = false
     setError('')
     setTranscript('')
     setPacket(null)
@@ -424,13 +478,17 @@ function isForceIntervention(text: string) {
         const source = audioContext.createMediaStreamSource(stream)
         const processor = audioContext.createScriptProcessor(4096, 1, 1)
 
+        audioContextRef.current = audioContext
+        audioSourceRef.current = source
+        audioProcessorRef.current = processor
+
         source.connect(processor)
         processor.connect(audioContext.destination)
 
         pushLog('PCM capture active: linear16 @ 16kHz')
 
         processor.onaudioprocess = (event) => {
-          if (socket.readyState !== WebSocket.OPEN) return
+          if (stoppingRef.current || socket !== socketRef.current || socket.readyState !== WebSocket.OPEN) return
 
           const input = event.inputBuffer.getChannelData(0)
           const pcm = new Int16Array(input.length)
@@ -443,9 +501,7 @@ function isForceIntervention(text: string) {
           socket.send(pcm.buffer)
         }
 
-        ;(window as any).__georgeLiveAudioContext = audioContext
-        ;(window as any).__georgeLiveProcessor = processor
-        ;(window as any).__georgeLiveSource = source
+
       }
 
       socket.onmessage = async (message) => {
@@ -758,11 +814,13 @@ function isForceIntervention(text: string) {
       }
 
       socket.onclose = (event) => {
-        setRunning(false)
         const reason = `Deepgram socket closed: code ${event.code}${event.reason ? ` — ${event.reason}` : ''}`
         console.warn(reason, event)
-        setError(reason)
-        pushLog(reason)
+
+        if (!stoppingRef.current) {
+          setError(reason)
+          teardownLiveSession(reason)
+        }
       }
     } catch (err) {
       setError('Mic start failed. Check browser mic permission.')
@@ -772,23 +830,12 @@ function isForceIntervention(text: string) {
   }
 
   function stop() {
-    recorderRef.current?.stop()
-    recorderRef.current = null
-
-    socketRef.current?.close()
-    socketRef.current = null
-
-    streamRef.current?.getTracks().forEach((track) => track.stop())
-    streamRef.current = null
-
-    setRunning(false)
-    releaseWakeLock()
-    pushLog('Stopped.')
+    teardownLiveSession('Stopped.')
   }
 
   useEffect(() => {
     return () => {
-      releaseWakeLock()
+      teardownLiveSession('LIVE diagnostic unmounted.')
     }
   }, [])
 
