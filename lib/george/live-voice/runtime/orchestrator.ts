@@ -1,6 +1,7 @@
 import { georgeConfidenceEngine } from './confidence-engine'
 import { compressForDelivery, DELIVERY_PROFILES, type DeliveryProfileId } from './delivery-profile'
 import { LIVE_RUNTIME_DOCTRINE } from './runtime-doctrine'
+import { selectSalvageObjective } from './salvage-objectives'
 import { georgeEmotionalVelocity } from './emotional-velocity'
 import { georgeLoadManager } from './load-manager'
 import { georgePostureEngine } from './posture-engine'
@@ -110,6 +111,15 @@ export function orchestrateLiveTurn(
     interruptionRisk: nextPacket.interruptionRisk,
   })
 
+  const salvageObjective = selectSalvageObjective({
+    text,
+    trajectory: trajectoryState.trajectory,
+    powerFrame: powerState.frame,
+    roomPressure: nextPacket.roomPressure,
+    emotionalVelocity: velocityState.velocity,
+    objectiveId: activeObjective.id,
+  })
+
   const decisionWindow = georgeDecisionWindow.evaluate({
     text,
     confidence: nextPacket.confidence,
@@ -187,7 +197,7 @@ export function orchestrateLiveTurn(
   const postureDecision = georgePostureEngine.decide({
     dominantRole: dominantRoleState.role,
     speaker: nextPacket.speaker,
-    roomPressure: normalizedRoomPressure,
+    roomPressure: nextPacket.roomPressure,
     interruptionRisk: normalizedInterruptionRisk,
     confidence: nextPacket.confidence,
     emotionalVelocity: velocityState.velocity,
@@ -247,7 +257,7 @@ export function orchestrateLiveTurn(
   const loadDecision = georgeLoadManager.decide({
     confidence: nextPacket.confidence,
     interruptionRisk: normalizedInterruptionRisk,
-    roomPressure: normalizedRoomPressure,
+    roomPressure: nextPacket.roomPressure,
     speaker: nextPacket.speaker,
     strongestRolePressure,
     forecastBias,
@@ -302,7 +312,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Forecast bias: ${forecastBias}. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Salvage objective: ${salvageObjective.label} (${salvageObjective.reason}). Forecast bias: ${forecastBias}. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -341,7 +351,7 @@ export function orchestrateLiveTurn(
   const silence = georgeSilenceIntelligence.decide({
     confidence: nextPacket.confidence,
     interruptionRisk: normalizedInterruptionRisk,
-    roomPressure: normalizedRoomPressure,
+    roomPressure: nextPacket.roomPressure,
     speaker: nextPacket.speaker,
     deliveryProfile: deliveryProfileId,
     controlOwner: controlSnapshot.owner,
@@ -359,6 +369,10 @@ export function orchestrateLiveTurn(
   const silenceSnapshot = georgeLiveRuntimeState.update({
     silence: silence.shouldHold ? 'hold' : `speak:${silence.silenceType}`,
   })
+
+  if (salvageObjective.id !== 'none') {
+    nextPacket.cue = `${salvageObjective.cue} ${nextPacket.cue || ''}`.trim()
+  }
 
   if (silence.shouldHold) {
     georgeLiveRuntimeEvents.emit('silence_required', {
