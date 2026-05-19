@@ -784,6 +784,35 @@ const showLiveGeorgeFlame = hasLiveGeorgeAccess && tierSignalPhase === 0
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    let cancelled = false
+
+    fetch('/api/session', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return
+
+        if (data?.tier === 'intelligent' || data?.tier === 'brilliant') {
+          setCurrentTier(data.tier)
+          window.localStorage.setItem('george_tier', data.tier)
+
+          if (data?.email) {
+            const restoredEmail = String(data.email).trim().toLowerCase()
+            setSubscriberEmail(restoredEmail)
+            window.localStorage.setItem('george_email', restoredEmail)
+            window.localStorage.setItem('george_verified_continuity', 'true')
+          }
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const savedLanguage = window.localStorage.getItem('george_language')
     if (savedLanguage) {
       setLanguage(savedLanguage)
@@ -6917,7 +6946,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         }}
         onUpgrade={() => {
           setShowLiveChooser(false)
-          router.push('/top-up')
+          setShowUpgradeModal(true)
         }}
         onEnterCode={() => {
           setShowLiveChooser(false)
