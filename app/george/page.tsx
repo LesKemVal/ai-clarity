@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import LiveChooser from '@/components/george/LiveChooser'
+import MobileHeader from '@/components/george/mobile/MobileHeader'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -4525,7 +4526,10 @@ return (
           <div className="flex h-[var(--george-vh,100dvh)] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <div className="xl:hidden" />
+                <MobileHeader
+                  onOpenSidebar={() => setShowSidebar(true)}
+                  onShareGeorge={handleInstallGeorge}
+                />
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
 
@@ -4572,33 +4576,6 @@ return (
                     </button>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleInstallGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72 xl:hidden"
-                  aria-label="Send George"
-                  title="Send George"
-                >
-                      <div className="flex items-center gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.9"
-                          className="h-[14px] w-[14px] text-[#D7DBE4]/54"
-                        >
-                          <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
-                          <path d="M12 3v12" />
-                          <path d="M8 7l4-4 4 4" />
-                        </svg>
-
-                        <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                          Share G
-                        </span>
-                      </div>
-                    </button>
               </div>
             </header>
 
