@@ -614,16 +614,13 @@ function isForceIntervention(text: string) {
           await prewarm(text)
         }
 
-        setTranscript((prev) => {
-          if (isFinal) return `${prev} ${text}`.trim()
-          return prev
-        })
-
         if (isFinal) {
           if (!finalTranscriptRuntime.shouldAccept(text)) {
             pushLog('Ignored duplicate final transcript.')
             return
           }
+
+          setTranscript((prev) => `${prev} ${text}`.trim())
 
           partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
