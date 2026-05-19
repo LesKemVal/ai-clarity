@@ -706,6 +706,28 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [reroutePrompt, setReroutePrompt] = useState<PromptSelection | null>(null)
   const [rerouteSignal, setRerouteSignal] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
+const [tierSignalPhase, setTierSignalPhase] = useState(0)
+
+useEffect(() => {
+  if (typeof window === 'undefined') return
+
+  const timer = window.setInterval(() => {
+    setTierSignalPhase((phase) => (phase + 1) % 2)
+  }, 3800)
+
+  return () => window.clearInterval(timer)
+}, [])
+
+const hasLiveGeorgeAccess = currentTier === 'intelligent' || currentTier === 'brilliant'
+const tierSignalText =
+  hasLiveGeorgeAccess && tierSignalPhase === 0
+    ? 'You have access to LIVE GEORGE'
+    : currentTier === 'smart'
+      ? 'Go Intelligent'
+      : currentTier === 'intelligent'
+        ? 'Go Brilliant'
+        : 'Stay Brilliant'
+const showLiveGeorgeFlame = hasLiveGeorgeAccess && tierSignalPhase === 0
   const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
     if (currentTier === 'brilliant') {
       return [
@@ -6164,6 +6186,39 @@ Continue from here, tell me what changed, or start fresh.`
       className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/85 shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition hover:border-red-300/35 hover:bg-red-500/16 hover:text-red-50"
     >
       EXIT LIVE
+    </button>
+  </div>
+)}
+
+{!liveMode && (
+  <div className={`pointer-events-auto ${(showConversation || liveMode) ? 'fixed bottom-[72px]' : 'fixed top-[calc(57%-46px)] md:top-[calc(60%-46px)] -translate-y-1/2'} left-0 right-0 z-[79] mx-auto flex w-full max-w-[900px] justify-center px-4 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+    <button
+      type="button"
+      onClick={() => {
+        if (showLiveGeorgeFlame) {
+          setShowLiveChooser(true)
+        } else {
+          setShowUpgradeModal(true)
+        }
+      }}
+      className="inline-flex items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.024] px-3.5 py-1.5 text-[11px] font-medium tracking-[0.04em] text-[#D7DBE4]/58 shadow-[0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-xl transition hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-[#D7DBE4]/82"
+    >
+      {showLiveGeorgeFlame && (
+        <svg
+          viewBox="0 0 24 24"
+          className="h-3.5 w-3.5 text-[#F2B36D] drop-shadow-[0_0_8px_rgba(242,179,109,0.28)]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 22c3.7 0 6.5-2.6 6.5-6.2 0-2.2-1.1-4.2-2.8-5.5.1 1.4-.5 2.4-1.4 3.1.1-3.4-1.7-6.1-4.5-8.4.3 2.9-.9 4.7-2.3 6.2-1.1 1.2-2 2.5-2 4.5C5.5 19.4 8.3 22 12 22Z" />
+          <path d="M12 18.8c1.4 0 2.5-1 2.5-2.4 0-1-.5-1.8-1.3-2.4-.1.9-.5 1.5-1.1 1.9-.1-1.4-.8-2.5-2-3.5.1 1.2-.4 2-.9 2.7-.4.5-.7 1-.7 1.7 0 1.2 1 2 3.5 2Z" />
+        </svg>
+      )}
+      <span>{tierSignalText}</span>
     </button>
   </div>
 )}
