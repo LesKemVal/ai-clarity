@@ -491,6 +491,30 @@ export default function GeorgeLiveEntryPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const tag = target?.tagName?.toLowerCase()
+
+      if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) return
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        window.scrollBy({ top: 120, behavior: 'smooth' })
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        window.scrollBy({ top: -120, behavior: 'smooth' })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const tier = window.localStorage.getItem('george_tier') || 'smart'
     setCurrentTier(tier)
 
@@ -628,7 +652,7 @@ export default function GeorgeLiveEntryPage() {
   }
 
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#06070A] px-5 py-8 text-white">
+    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-[#06070A] px-5 pb-28 pt-6 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(196,210,255,0.045),transparent_30%),linear-gradient(180deg,#06070A_0%,#090B10_52%,#06070A_100%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
 
@@ -655,13 +679,30 @@ export default function GeorgeLiveEntryPage() {
           Answer a few questions and pre-load context so GEORGE is sharpest.
         </p>
 
-        <button
-          type="button"
-          onClick={() => prepareLive(true)}
-          className="mt-3 text-[12px] font-medium text-white/42 underline-offset-4 transition hover:text-white/72 hover:underline"
-        >
-          Skip prep and enter LIVE
-        </button>
+        <div className="mt-3 flex items-center justify-center gap-5 text-[12px] font-medium">
+          <Link
+            href="/george"
+            className="text-white/38 underline-offset-4 transition hover:text-white/70 hover:underline"
+          >
+            Back
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setShowRoomSummary(true)}
+            className="text-white/42 underline-offset-4 transition hover:text-white/72 hover:underline"
+          >
+            Preview prep
+          </button>
+
+          <button
+            type="button"
+            onClick={() => prepareLive(true)}
+            className="text-[#AAB4FF]/62 underline-offset-4 transition hover:text-[#D7DCFF] hover:underline"
+          >
+            Skip prep
+          </button>
+        </div>
 
         {runtimeMotionContext && (
           <div className="mt-5 w-full max-w-[620px] rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.035] px-5 py-4 text-left shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
@@ -1105,51 +1146,54 @@ export default function GeorgeLiveEntryPage() {
           </div>
         )}
 
-        <div className="mt-5 w-full max-w-[520px]">
-          {!showRoomSummary ? (
-            <button
-              type="button"
-              onClick={() => setShowRoomSummary(true)}
-              className="flex w-full items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
-            >
-              Review room
-            </button>
-          ) : (
-            <div className="rounded-[1.05rem] border border-white/[0.06] bg-black/28 p-4 text-left">
+        {showRoomSummary && (
+          <div className="mt-5 w-full max-w-[520px] rounded-[1.05rem] border border-white/[0.06] bg-black/28 p-4 text-left">
+            <div className="flex items-center justify-between">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/34">
-                Room summary
+                Prep preview
               </div>
-
-              <div className="mt-3 space-y-2 text-[13px] leading-6 text-white/62">
-                <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
-                <div><span className="text-white/34">Purview:</span> {(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}</div>
-                <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
-                <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
-                {estimatedCents !== null && (
-                  <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
-                )}
-                {objective.trim() && (
-                  <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => prepareLive(false)}
-                className="mt-4 flex w-full items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
-              >
-                Continue to LIVE
-              </button>
-
               <button
                 type="button"
                 onClick={() => setShowRoomSummary(false)}
-                className="mt-3 w-full text-center text-[12px] text-white/36 transition hover:text-white/62"
+                className="text-[12px] text-white/34 transition hover:text-white/68"
               >
-                Adjust room
+                Close
               </button>
             </div>
-          )}
+
+            <div className="mt-3 space-y-2 text-[13px] leading-6 text-white/62">
+              <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
+              <div><span className="text-white/34">Purview:</span> {(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}</div>
+              <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
+              <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
+              {estimatedCents !== null && (
+                <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
+              )}
+              {objective.trim() && (
+                <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="fixed bottom-0 left-0 right-0 z-[80] border-t border-white/[0.055] bg-[#06070A]/92 px-5 py-3 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-[620px] items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => setShowRoomSummary(true)}
+              className="text-[12px] font-medium text-white/38 underline-offset-4 transition hover:text-white/70 hover:underline"
+            >
+              Preview prep
+            </button>
+
+            <button
+              type="button"
+              onClick={() => prepareLive(false)}
+              className="rounded-full border border-[#8FB6C9]/30 bg-[#8FB6C9]/10 px-4 py-2 text-[12px] font-semibold tracking-[0.08em] text-[#E6F3FA]/86 transition hover:border-[#8FB6C9]/48 hover:bg-[#8FB6C9]/16"
+            >
+              Good luck — enter LIVE
+            </button>
+          </div>
         </div>
       </div>
     </main>
