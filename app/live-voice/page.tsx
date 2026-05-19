@@ -83,6 +83,8 @@ function isForceIntervention(text: string) {
   const audioProcessorRef = useRef<ScriptProcessorNode | null>(null)
   const stoppingRef = useRef(false)
   const intentionalStopRef = useRef(false)
+  const reconnectEligibleRef = useRef(false)
+  const lastDisconnectReasonRef = useRef('')
   const lastGovernAtRef = useRef(0)
   const liveRuntimeMemoryRef = useRef({
     acceptedCarryCount: 0,
@@ -406,9 +408,19 @@ function isForceIntervention(text: string) {
     }
   }
 
+  function isReconnectEligible(code?: number) {
+    return (
+      !intentionalStopRef.current &&
+      (code === 1006 || code === 1011 || code === 1012 || code === 1013)
+    )
+  }
+
   function teardownLiveSession(reason = 'Stopped.', intentional = true, finalState: LiveLifecycleState | null = null) {
     stoppingRef.current = true
     intentionalStopRef.current = intentional
+    if (intentional) {
+      reconnectEligibleRef.current = false
+    }
     setLiveLifecycle('tearing_down')
     georgeCancelEngine.bump()
     georgeAudioQueue.clear()
@@ -461,6 +473,8 @@ function isForceIntervention(text: string) {
 
     stoppingRef.current = false
     intentionalStopRef.current = false
+    reconnectEligibleRef.current = false
+    lastDisconnectReasonRef.current = ''
     setLiveLifecycle('connecting')
     setError('')
     setTranscript('')
@@ -839,15 +853,12 @@ function isForceIntervention(text: string) {
           return
         }
 
-        if (
-          event.code === 1006 ||
-          event.code === 1011 ||
-          event.code === 1012 ||
-          event.code === 1013
-        ) {
+        if (isReconnectEligible(event.code)) {
+          reconnectEligibleRef.current = true
+          lastDisconnectReasonRef.current = reason
           setError(reason)
           teardownLiveSession(reason, false, 'interrupted')
-          pushLog('LIVE transport interrupted.')
+          pushLog('LIVE transport interrupted. Reconnect eligible.')
           return
         }
 
@@ -1101,6 +1112,8 @@ function isForceIntervention(text: string) {
             <p>Tier: {liveTier}</p>
             <p>Lifecycle: {liveLifecycle}</p>
             <p>Intentional Stop: {String(intentionalStopRef.current)}</p>
+            <p>Reconnect Eligible: {String(reconnectEligibleRef.current)}</p>
+            <p>Disconnect: {lastDisconnectReasonRef.current || '—'}</p>
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
             <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
