@@ -4491,47 +4491,7 @@ return (
           <div className="flex h-[100dvh] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <div className="flex items-center gap-2 xl:hidden">
-
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setShowLanguageMenu((prev) => !prev)
-                      }}
-                      className="flex h-8 items-center gap-1 rounded-full border border-white/[0.04] bg-white/[0.015] px-2 text-[10px] font-medium tracking-[0.14em] text-[#D7DBE4]/45 transition hover:text-[#D7DBE4]/75"
-                      aria-label="Change language"
-                    >
-                      <span>🌐</span>
-                      <span>{language}</span>
-                    </button>
-
-                    {showLanguageMenu && (
-                      <div className="absolute left-0 top-full z-[120] mt-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)] ">
-                        {languageOptions.map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setLanguage(option)
-                              window.localStorage.setItem('george_language', option)
-                              setShowLanguageMenu(false)
-                            }}
-                            className={`w-full rounded-[0.65rem] px-3 py-2 text-left text-[12px] transition ${
-                              language === option
-                                ? 'bg-white/[0.032] text-[#D7DBE4]'
-                                : 'text-[#D7DBE4]/52 hover:bg-white/[0.025] hover:text-[#D7DBE4]/82'
-                            }`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <div className="xl:hidden" />
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
 
@@ -5377,7 +5337,7 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
-                <div className="pointer-events-auto flex items-center gap-2">
+                <div className="pointer-events-auto flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -5388,6 +5348,43 @@ ${simplifyTarget}`
                   >
                     Help
                   </button>
+
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowLanguageMenu((prev) => !prev)
+                      }}
+                      className="text-[11px] font-medium tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
+                    >
+                      {language}
+                    </button>
+
+                    {showLanguageMenu && (
+                      <div className="absolute bottom-full left-0 z-[120] mb-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)]">
+                        {languageOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setLanguage(option)
+                              window.localStorage.setItem('george_language', option)
+                              setShowLanguageMenu(false)
+                            }}
+                            className={`w-full rounded-[0.65rem] px-3 py-2 text-left text-[12px] transition ${
+                              language === option
+                                ? 'bg-white/[0.032] text-[#D7DBE4]'
+                                : 'text-[#D7DBE4]/52 hover:bg-white/[0.025] hover:text-[#D7DBE4]/82'
+                            }`}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     type="button"
