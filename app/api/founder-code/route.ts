@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { setGeorgeSessionCookie } from '@/lib/security/george-session'
+import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 
 type Tier = 'intelligent' | 'brilliant'
 
@@ -22,6 +23,16 @@ function parseFounderCodes() {
 }
 
 export async function POST(req: NextRequest) {
+  const rate = checkRateLimit({
+    key: `founder-code:${getRequestIdentity(req)}`,
+    limit: 8,
+    windowMs: 15 * 60_000,
+  })
+
+  if (!rate.ok) {
+    return NextResponse.json({ error: 'Too many founder code attempts. Try again later.' }, { status: 429 })
+  }
+
   const body = await req.json().catch(() => ({}))
   const code = String(body?.code || '').trim().toUpperCase()
 
@@ -33,6 +44,10 @@ export async function POST(req: NextRequest) {
   const tier = codes[code]
 
   if (!tier) {
+    console.warn('[GEORGE][founder-code][invalid]', {
+      ip: getRequestIdentity(req),
+    })
+
     return NextResponse.json({ error: 'Invalid founder code.' }, { status: 403 })
   }
 
