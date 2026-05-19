@@ -485,61 +485,29 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   return `${timeGreeting} What do you want to do?`
 }
 
-  function handleInstallGeorge() {
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
-    const isiPhone = /iPhone|iPad|iPod/i.test(ua)
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
+  async function handleShareGeorge() {
+    const url =
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/george`
+        : '/george'
 
-    if (isiPhone) {
+    try {
       if (typeof navigator !== 'undefined' && navigator.share) {
-        navigator.share({
+        await navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.\n\nUse it for interviews, difficult conversations, decisions, meetings, negotiations, and real-world follow-through.',
+          text: 'Bring the situation. Get the next move.\n\nUse GEORGE for interviews, pressure, decisions, negotiations, difficult conversations, meetings, and real-world momentum.',
           url,
-        }).catch(() => {
-          setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
-          setShowToast(true)
         })
+
         return
       }
 
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(url).catch(() => {})
+        await navigator.clipboard.writeText(url)
+        setToastMessage('GEORGE link copied')
+        setShowToast(true)
       }
-      setToastMessage('iPhone: Send → Edit Actions → Add to Home Screen')
-      setShowToast(true)
-      return
-    }
-
-    if (typeof window !== 'undefined' && (window as any).__branesInstallPrompt) {
-      const promptEvent = (window as any).__branesInstallPrompt
-      promptEvent.prompt()
-      promptEvent.userChoice.finally(() => {
-        ;(window as any).__branesInstallPrompt = null
-      })
-      return
-    }
-
-    const isMac = /Macintosh|Mac OS X/i.test(ua)
-    const isWindows = /Windows/i.test(ua)
-
-    if (isMac) {
-      setToastMessage('Mac: Browser menu → Install App or Add to Dock')
-      setShowToast(true)
-      return
-    }
-
-    if (isWindows) {
-      setToastMessage('Desktop: Browser menu → Install App')
-      setShowToast(true)
-      return
-    }
-
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).catch(() => {})
-    }
-    setToastMessage('GEORGE link copied')
-    setShowToast(true)
+    } catch {}
   }
 
 const [messages, setMessages] = useState<Message[]>([])
@@ -4553,7 +4521,7 @@ return (
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={handleInstallGeorge}
+                      onClick={handleShareGeorge}
                       className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
                       aria-label="Send George"
                       title="Send George"
@@ -4582,7 +4550,7 @@ return (
 
                 <button
                   type="button"
-                  onClick={handleInstallGeorge}
+                  onClick={handleShareGeorge}
                   className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72 xl:hidden"
                   aria-label="Send George"
                   title="Send George"
