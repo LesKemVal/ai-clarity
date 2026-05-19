@@ -84,6 +84,7 @@ function isForceIntervention(text: string) {
   const stoppingRef = useRef(false)
   const intentionalStopRef = useRef(false)
   const reconnectEligibleRef = useRef(false)
+  const reconnectEligibleUntilRef = useRef(0)
   const lastDisconnectReasonRef = useRef('')
   const lastGovernAtRef = useRef(0)
   const liveRuntimeMemoryRef = useRef({
@@ -415,11 +416,16 @@ function isForceIntervention(text: string) {
     )
   }
 
+  function isReconnectStillValid() {
+    return reconnectEligibleRef.current && Date.now() <= reconnectEligibleUntilRef.current
+  }
+
   function teardownLiveSession(reason = 'Stopped.', intentional = true, finalState: LiveLifecycleState | null = null) {
     stoppingRef.current = true
     intentionalStopRef.current = intentional
     if (intentional) {
       reconnectEligibleRef.current = false
+      reconnectEligibleUntilRef.current = 0
     }
     setLiveLifecycle('tearing_down')
     georgeCancelEngine.bump()
@@ -474,6 +480,7 @@ function isForceIntervention(text: string) {
     stoppingRef.current = false
     intentionalStopRef.current = false
     reconnectEligibleRef.current = false
+    reconnectEligibleUntilRef.current = 0
     lastDisconnectReasonRef.current = ''
     setLiveLifecycle('connecting')
     setError('')
@@ -855,6 +862,7 @@ function isForceIntervention(text: string) {
 
         if (isReconnectEligible(event.code)) {
           reconnectEligibleRef.current = true
+          reconnectEligibleUntilRef.current = Date.now() + 8000
           lastDisconnectReasonRef.current = reason
           setError(reason)
           teardownLiveSession(reason, false, 'interrupted')
@@ -1112,7 +1120,7 @@ function isForceIntervention(text: string) {
             <p>Tier: {liveTier}</p>
             <p>Lifecycle: {liveLifecycle}</p>
             <p>Intentional Stop: {String(intentionalStopRef.current)}</p>
-            <p>Reconnect Eligible: {String(reconnectEligibleRef.current)}</p>
+            <p>Reconnect Eligible: {String(isReconnectStillValid())}</p>
             <p>Disconnect: {lastDisconnectReasonRef.current || '—'}</p>
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
