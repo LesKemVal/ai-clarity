@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { setGeorgeSessionCookie } from '@/lib/security/george-session'
 
 type Tier = 'intelligent' | 'brilliant'
 
@@ -35,8 +36,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid founder code.' }, { status: 403 })
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     ok: true,
     tier,
   })
+
+  // Founder sessions intentionally avoid exposing subscriber records.
+  setGeorgeSessionCookie(response, {
+    email: `founder:${code.toLowerCase()}`,
+    tier,
+    source: 'founder',
+  })
+
+  return response
 }
