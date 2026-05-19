@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { setGeorgeSessionCookie } from '@/lib/security/george-session'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
@@ -20,6 +21,10 @@ function parseFounderCodes() {
 
       return acc
     }, {})
+}
+
+function getFounderSessionLabel(code: string) {
+  return crypto.createHash('sha256').update(code).digest('hex').slice(0, 16)
 }
 
 export async function POST(req: NextRequest) {
@@ -56,9 +61,9 @@ export async function POST(req: NextRequest) {
     tier,
   })
 
-  // Founder sessions intentionally avoid exposing subscriber records.
+  // Founder sessions intentionally avoid exposing subscriber records or raw codes.
   setGeorgeSessionCookie(response, {
-    email: `founder:${code.toLowerCase()}`,
+    email: `founder:${getFounderSessionLabel(code)}`,
     tier,
     source: 'founder',
   })
