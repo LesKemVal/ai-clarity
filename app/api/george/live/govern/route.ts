@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server'
 import { governLiveVoice } from '@/lib/george/live-voice/governor'
+import { verifyLiveAccess } from '@/lib/subscriptions/live-access'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
+    const access = verifyLiveAccess(body?.email)
+
+    if (!access.ok) {
+      return NextResponse.json({
+        speaker: 'system',
+        shouldSpeak: false,
+        volley: '',
+        cue: '',
+        status: access.error,
+        confidence: 0,
+      }, { status: access.status })
+    }
 
     const packet = governLiveVoice({
       transcript: String(body?.transcript || ''),

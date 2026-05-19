@@ -201,6 +201,11 @@ function isForceIntervention(text: string) {
   }
 
 
+  function getVerifiedLiveEmail() {
+    if (typeof window === 'undefined') return ''
+    return (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
+  }
+
   function pushLog(line: string) {
     setLog((prev) => [`${new Date().toLocaleTimeString()} — ${line}`, ...prev].slice(0, 12))
   }
@@ -275,6 +280,7 @@ function isForceIntervention(text: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: getVerifiedLiveEmail(),
         transcript: clean,
         mode: 'voice_live',
         audio,
@@ -382,7 +388,10 @@ function isForceIntervention(text: string) {
     const res = await fetch('/api/george/live/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: formattedDelivery.spokenText }),
+      body: JSON.stringify({
+        email: getVerifiedLiveEmail(),
+        text: formattedDelivery.spokenText,
+      }),
     })
 
     if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {

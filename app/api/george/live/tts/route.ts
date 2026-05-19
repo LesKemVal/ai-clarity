@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { verifyLiveAccess } from '@/lib/subscriptions/live-access'
 
 export async function POST(req: Request) {
   try {
@@ -13,6 +14,12 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
+    const access = verifyLiveAccess(body?.email)
+
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.status })
+    }
+
     const text = String(body?.text || '').trim()
 
     if (!text) {

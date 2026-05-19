@@ -15,3 +15,7 @@ data/continuity-tokens.json
 *.bak
 *.backup
 .env.local.backup
+
+# Local secret backups
+.env*.backup
+.env*.bak

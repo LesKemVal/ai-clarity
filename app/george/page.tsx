@@ -1494,38 +1494,36 @@ const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-const redeemFounderCode = () => {
+const redeemFounderCode = async () => {
   const code = window.prompt('Enter founder access code')
 
   if (!code) return
 
-  const normalized = code.trim().toUpperCase()
+  try {
+    const response = await fetch('/api/founder-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    })
 
-  const intelligentFounder = /^INTEL-FOUNDER-\d{3}$/.test(normalized)
-  const brilliantFounder = normalized === 'BRILLIANT-FOUNDER'
+    const data = await response.json().catch(() => ({}))
 
-  if (intelligentFounder) {
-    setCurrentTier('intelligent')
-    window.localStorage.setItem('george_tier', 'intelligent')
-    window.localStorage.setItem('george_founder_code', normalized)
-    setToastMessage('Founder Intelligent access activated.')
+    if (!response.ok || (data.tier !== 'intelligent' && data.tier !== 'brilliant')) {
+      setToastMessage(data.error || 'Invalid founder code.')
+      setShowToast(true)
+      return
+    }
+
+    setCurrentTier(data.tier)
+    window.localStorage.setItem('george_tier', data.tier)
+    window.localStorage.setItem('george_founder_access', 'server-verified')
+    setToastMessage(`Founder ${data.tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access activated.`)
     setShowToast(true)
     setShowUpgradeModal(false)
-    return
-  }
-
-  if (brilliantFounder) {
-    setCurrentTier('brilliant')
-    window.localStorage.setItem('george_tier', 'brilliant')
-    window.localStorage.setItem('george_founder_code', normalized)
-    setToastMessage('Founder Brilliant access activated.')
+  } catch {
+    setToastMessage('Founder code check failed.')
     setShowToast(true)
-    setShowUpgradeModal(false)
-    return
   }
-
-  setToastMessage('Invalid founder code.')
-  setShowToast(true)
 }
 
   const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
@@ -1634,24 +1632,18 @@ const redeemFounderCode = () => {
 
     const validTier = tierParam === 'smart' || tierParam === 'intelligent' || tierParam === 'brilliant'
 
-    if (validTier) {
-      setCurrentTier(tierParam)
-      window.localStorage.setItem('george_tier', tierParam)
+    if (validTier && subStatus === 'success') {
+      setToastMessage(`${tierParam.charAt(0).toUpperCase() + tierParam.slice(1)} is being verified.`)
+      setShowToast(true)
+    }
 
-      if (subStatus === 'success') {
-        setToastMessage(`${tierParam.charAt(0).toUpperCase() + tierParam.slice(1)} is active.`)
-        setShowToast(true)
-        window.history.replaceState({}, '', window.location.pathname)
-      }
-
+    if (!cleanSavedEmail) {
+      setCurrentTier('smart')
+      window.localStorage.setItem('george_tier', 'smart')
       return
     }
 
-    if (savedTier === 'intelligent' || savedTier === 'brilliant') {
-      setCurrentTier(savedTier)
-    }
-
-    void fetch(`/api/subscription-state${cleanSavedEmail ? `?email=${encodeURIComponent(cleanSavedEmail)}` : ''}`)
+    void fetch(`/api/subscription-state?email=${encodeURIComponent(cleanSavedEmail)}`)
       .then((res) => res.json())
       .then((data) => {
         const serverTier = data?.currentTier
@@ -1673,6 +1665,10 @@ const redeemFounderCode = () => {
         if (subStatus === 'success') {
           const cleanUrl = window.location.pathname
           window.history.replaceState({}, '', cleanUrl)
+          setToastMessage(serverTier === 'intelligent' || serverTier === 'brilliant'
+            ? `${serverTier.charAt(0).toUpperCase() + serverTier.slice(1)} verified.`
+            : 'Access will restore after payment confirmation.')
+          setShowToast(true)
         }
       })
       .catch(() => {

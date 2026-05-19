@@ -230,36 +230,30 @@ export default function TopUpPage() {
 
     if (!code) return
 
-    const normalized = code.trim().toUpperCase()
+    try {
+      const response = await fetch('/api/founder-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
 
-    const intelligentFounder = /^INTEL-FOUNDER-\d{3}$/.test(normalized)
-    const brilliantFounder = normalized === 'BRILLIANT-FOUNDER'
+      const data = await response.json().catch(() => ({}))
 
-    if (intelligentFounder) {
-      localStorage.setItem('george_tier', 'intelligent')
-      localStorage.setItem('george_founder_code', normalized)
+      if (!response.ok || (data.tier !== 'intelligent' && data.tier !== 'brilliant')) {
+        setMessage(data.error || 'Invalid founder code.')
+        return
+      }
 
-      setMessage('Founder Intelligent access activated.')
+      localStorage.setItem('george_tier', data.tier)
+      localStorage.setItem('george_founder_access', 'server-verified')
+
+      setMessage(`Founder ${data.tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access activated.`)
       setTimeout(() => {
-        window.location.href = '/george?tier=intelligent'
+        window.location.href = `/george?tier=${data.tier}`
       }, 500)
-
-      return
+    } catch {
+      setMessage('Founder code check failed.')
     }
-
-    if (brilliantFounder) {
-      localStorage.setItem('george_tier', 'brilliant')
-      localStorage.setItem('george_founder_code', normalized)
-
-      setMessage('Founder Brilliant access activated.')
-      setTimeout(() => {
-        window.location.href = '/george?tier=brilliant'
-      }, 500)
-
-      return
-    }
-
-    setMessage('Invalid founder code.')
   }
 
   return (

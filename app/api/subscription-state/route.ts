@@ -1,34 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
 import { getSubscriberByEmail } from '@/lib/subscriptions/subscriber-store'
 
-const storePath = path.join(process.cwd(), 'data', 'subscription-state.json')
-
 export async function GET(req: NextRequest) {
-  const email = req.nextUrl.searchParams.get('email')
-  const subscriber = getSubscriberByEmail(email)
+  const email = req.nextUrl.searchParams.get('email')?.trim().toLowerCase()
 
-  if (subscriber) {
-    return NextResponse.json({
-      currentTier: subscriber.currentTier,
-      email: subscriber.email,
-      lastCheckoutSessionId: subscriber.lastCheckoutSessionId,
-      lastSubscriptionId: subscriber.lastSubscriptionId,
-      lastCustomerId: subscriber.stripeCustomerId,
-    })
+  if (!email) {
+    return NextResponse.json(
+      {
+        currentTier: 'smart',
+        email: null,
+        lastCheckoutSessionId: null,
+        lastSubscriptionId: null,
+        lastCustomerId: null,
+      },
+      { status: 400 }
+    )
   }
 
-  try {
-    const raw = fs.readFileSync(storePath, 'utf8')
-    return NextResponse.json(JSON.parse(raw))
-  } catch {
+  const subscriber = getSubscriberByEmail(email)
+
+  if (!subscriber) {
     return NextResponse.json({
       currentTier: 'smart',
-      email: email || null,
+      email,
       lastCheckoutSessionId: null,
       lastSubscriptionId: null,
       lastCustomerId: null,
     })
   }
+
+  return NextResponse.json({
+    currentTier: subscriber.currentTier,
+    email: subscriber.email,
+    lastCheckoutSessionId: subscriber.lastCheckoutSessionId,
+    lastSubscriptionId: subscriber.lastSubscriptionId,
+    lastCustomerId: subscriber.stripeCustomerId,
+  })
 }

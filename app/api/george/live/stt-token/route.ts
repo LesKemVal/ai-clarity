@@ -1,7 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyLiveAccess } from '@/lib/subscriptions/live-access'
 
 // Temporary-token route is retained for later production hardening.
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const access = verifyLiveAccess(req.nextUrl.searchParams.get('email'))
+
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status })
+  }
+
   try {
     const apiKey = process.env.DEEPGRAM_API_KEY
 
