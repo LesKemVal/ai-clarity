@@ -26,7 +26,7 @@ class GeorgeLoadManager {
     if (forecastBias === 'minimal') {
       return {
         state: 'overload',
-        maxWords: 5,
+        maxWords: 8,
         cadence: 'minimal',
         reason: 'Forecast bias minimal. Compress before room turns.',
       }
@@ -35,7 +35,7 @@ class GeorgeLoadManager {
     if (forecastBias === 'hold') {
       return {
         state: 'high',
-        maxWords: 6,
+        maxWords: 10,
         cadence: 'minimal',
         reason: 'Forecast bias hold. Reduce output before interruption.',
       }
@@ -44,7 +44,7 @@ class GeorgeLoadManager {
     if (forecastBias === 'proof') {
       return {
         state: 'high',
-        maxWords: 7,
+        maxWords: 14,
         cadence: 'minimal',
         reason: 'Forecast bias proof. Keep evidence tight.',
       }
@@ -53,7 +53,7 @@ class GeorgeLoadManager {
     if (forecastBias === 'support' && interruptionRisk < 0.55) {
       return {
         state: 'managed',
-        maxWords: 10,
+        maxWords: 14,
         cadence: 'normal',
         reason: 'Forecast bias support. Give useful help without crowding.',
       }
@@ -62,7 +62,7 @@ class GeorgeLoadManager {
     if (forecastBias === 'advance' && interruptionRisk < 0.6) {
       return {
         state: 'managed',
-        maxWords: 10,
+        maxWords: 14,
         cadence: 'normal',
         reason: 'Forecast bias advance. Preserve forward momentum.',
       }
@@ -71,7 +71,7 @@ class GeorgeLoadManager {
     if (role === 'authority' && rolePressure > 1.2) {
       return {
         state: 'overload',
-        maxWords: 5,
+        maxWords: 8,
         cadence: 'minimal',
         reason: 'Authority pressure persisting. Minimal cue.',
       }
@@ -80,7 +80,7 @@ class GeorgeLoadManager {
     if (role === 'skeptic' && rolePressure > 1.4) {
       return {
         state: 'high',
-        maxWords: 6,
+        maxWords: 16,
         cadence: 'minimal',
         reason: 'Skeptic pressure persisting. Proof must be compressed.',
       }
@@ -89,7 +89,7 @@ class GeorgeLoadManager {
     if (role === 'gatekeeper' && rolePressure > 1.4) {
       return {
         state: 'high',
-        maxWords: 7,
+        maxWords: 12,
         cadence: 'minimal',
         reason: 'Gatekeeper pressure persisting. Reduce friction.',
       }
@@ -98,7 +98,7 @@ class GeorgeLoadManager {
     if (role === 'ally' && rolePressure > 1.2 && interruptionRisk < 0.55) {
       return {
         state: 'managed',
-        maxWords: 10,
+        maxWords: 16,
         cadence: 'normal',
         reason: 'Ally opening detected. Use room without crowding.',
       }
@@ -107,7 +107,7 @@ class GeorgeLoadManager {
     if (input.roomPressure === 'authority') {
       return {
         state: 'high',
-        maxWords: 7,
+        maxWords: 10,
         cadence: 'minimal',
         reason: 'Authority pressure. Compress.',
       }
@@ -116,7 +116,7 @@ class GeorgeLoadManager {
     if (interruptionRisk > 0.78 || confidence < 0.42) {
       return {
         state: 'overload',
-        maxWords: 5,
+        maxWords: 8,
         cadence: 'minimal',
         reason: 'User bandwidth likely low.',
       }
@@ -125,7 +125,7 @@ class GeorgeLoadManager {
     if (input.roomPressure === 'high' || interruptionRisk > 0.58) {
       return {
         state: 'high',
-        maxWords: 7,
+        maxWords: 12,
         cadence: 'slow',
         reason: 'Pressure rising. Reduce load.',
       }
@@ -134,7 +134,7 @@ class GeorgeLoadManager {
     if (input.roomPressure === 'moderate') {
       return {
         state: 'managed',
-        maxWords: 9,
+        maxWords: 14,
         cadence: 'slow',
         reason: 'Moderate pressure. Keep it simple.',
       }
@@ -142,20 +142,33 @@ class GeorgeLoadManager {
 
     return {
       state: 'low',
-      maxWords: 12,
+      maxWords: 20,
       cadence: 'normal',
       reason: 'Load stable.',
     }
   }
 
   compress(text: string, maxWords: number) {
-    return text
-      .replace(/\s+/g, ' ')
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, maxWords)
-      .join(' ')
+    const clean = text.replace(/\s+/g, ' ').trim()
+    const words = clean.split(/\s+/).filter(Boolean)
+
+    if (words.length <= maxWords) {
+      return clean
+    }
+
+    const sentenceBoundary = clean.match(/^(.+?[.!?])\s+/)
+
+    if (sentenceBoundary) {
+      const sentenceWords = sentenceBoundary[1]
+        .split(/\s+/)
+        .filter(Boolean)
+
+      if (sentenceWords.length <= maxWords + 4) {
+        return sentenceBoundary[1]
+      }
+    }
+
+    return words.slice(0, maxWords).join(' ')
   }
 }
 

@@ -181,7 +181,7 @@ class GeorgeResponseShaper {
 
     if (input.recovery !== 'stable') {
       volley = this.removeDefensiveLanguage(volley)
-      cue = this.prependCue(cue, 'One sentence.')
+      cue = this.prependCue(cue, 'Keep the point clean.')
       reasons.push('recovery shaping')
     }
 
@@ -237,13 +237,26 @@ class GeorgeResponseShaper {
   }
 
   private shorten(text: string, maxWords: number) {
-    return text
-      .replace(/\s+/g, ' ')
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, maxWords)
-      .join(' ')
+    const clean = text.replace(/\s+/g, ' ').trim()
+    const words = clean.split(/\s+/).filter(Boolean)
+
+    if (words.length <= maxWords) {
+      return clean
+    }
+
+    const sentenceBoundary = clean.match(/^(.+?[.!?])\s+/)
+
+    if (sentenceBoundary) {
+      const sentenceWords = sentenceBoundary[1]
+        .split(/\s+/)
+        .filter(Boolean)
+
+      if (sentenceWords.length <= maxWords + 3) {
+        return sentenceBoundary[1]
+      }
+    }
+
+    return words.slice(0, maxWords).join(' ')
   }
 
   private prependCue(cue: string, prefix: string) {
