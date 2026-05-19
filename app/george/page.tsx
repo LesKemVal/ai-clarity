@@ -1843,7 +1843,7 @@ setPreLiveMessages([...messagesRef.current])
     setVoiceOn(false)
     setInteractionMode('text')
     setConversationMode(null)
-router.push('/george')
+window.location.href = '/george'
     setShowConversationMenu(false)
     setConversationMenuLane('selector')
     setShowSessionPicker(false)
@@ -1875,7 +1875,7 @@ router.push('/george')
   // 🔒 CLEAR ANY LIVE CONTEXT FLAGS
   setLiveMode(false)
   setConversationMode(null)
-router.push('/george')
+window.location.href = '/george'
   setActivePromptContext(null)
 
   setMessages(preLiveMessages)
@@ -4490,7 +4490,7 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y">
-          <div className="flex h-[var(--george-vh,100dvh)] min-h-0 w-full flex-1 flex-col overflow-hidden overscroll-none touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+          <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <button
@@ -4605,7 +4605,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
@@ -5040,7 +5040,7 @@ I am listening now. Speak naturally. I will respond ${
                   setVoiceOn(false)
                   setInteractionMode('text')
                   setConversationMode(null)
-router.push('/george')
+window.location.href = '/george'
                   setShowConversationMenu(false)
                   setConversationMenuLane('selector')
                   setActivePromptContext(null)
