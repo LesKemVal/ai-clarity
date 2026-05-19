@@ -59,6 +59,7 @@ function isForceIntervention(text: string) {
 
   const [running, setRunning] = useState(false)
   const [liveLifecycle, setLiveLifecycle] = useState<LiveLifecycleState>('idle')
+  const liveActive = liveLifecycle === 'connecting' || liveLifecycle === 'active'
   const [transcript, setTranscript] = useState('')
   const [packet, setPacket] = useState<LivePacket | null>(null)
   const [log, setLog] = useState<string[]>([])
@@ -486,7 +487,7 @@ function isForceIntervention(text: string) {
   }
 
   async function start() {
-    if (liveLifecycle === 'connecting' || liveLifecycle === 'active' || running || socketRef.current) {
+    if (liveActive || running || socketRef.current) {
       pushLog('LIVE session already active.')
       return
     }
@@ -556,8 +557,36 @@ function isForceIntervention(text: string) {
       }
 
       socket.onmessage = async (message) => {
-        const data = JSON.parse(message.data)
+        let data: any = null
+
+        try {
+          data = JSON.parse(message.data)
+        } catch {
+          pushLog('Ignored malformed LIVE proxy message.')
+          return
+        }
+
         const messageReceivedAt = Date.now()
+
+        if (data?.type === 'proxy_open') {
+          pushLog('LIVE proxy acknowledged stream.')
+          return
+        }
+
+        if (data?.type === 'proxy_error') {
+          const proxyError = data?.error || 'Unknown LIVE proxy error.'
+          setError(proxyError)
+          pushLog(`LIVE proxy error: ${proxyError}`)
+          return
+        }
+
+        if (data?.type === 'proxy_close') {
+          const proxyClose = `LIVE proxy closed: ${data?.code || 'unknown'}${data?.reason ? ` — ${data.reason}` : ''}`
+          setError(proxyClose)
+          pushLog(proxyClose)
+          return
+        }
+
         const text = data?.channel?.alternatives?.[0]?.transcript || ''
         const isFinal = Boolean(data?.is_final)
 
@@ -1045,7 +1074,7 @@ function isForceIntervention(text: string) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {!running ? (
+            {!liveActive ? (
               <>
                 <button
                   type="button"
