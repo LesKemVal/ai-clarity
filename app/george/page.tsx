@@ -707,6 +707,8 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [rerouteSignal, setRerouteSignal] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 const [tierSignalPhase, setTierSignalPhase] = useState(0)
+const [showHelpModal, setShowHelpModal] = useState(false)
+const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
 
 useEffect(() => {
   if (typeof window === 'undefined') return
@@ -5392,10 +5394,43 @@ ${simplifyTarget}`
                 <div className="pointer-events-auto flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => window.open('/help','_blank')}
-                    className="rounded-full border border-white/[0.04] bg-white/[0.018] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-[#D7DBE4]/42 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/72"
+                    onClick={() => {
+                      setActiveHelpTopic('live')
+                      setShowHelpModal(true)
+                    }}
+                    className="text-[11px] font-medium tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
                   >
                     Help
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (showLiveGeorgeFlame) {
+                        setShowLiveChooser(true)
+                      } else {
+                        setShowUpgradeModal(true)
+                      }
+                    }}
+                    className="inline-flex w-[245px] items-center gap-1.5 overflow-hidden text-left text-[11px] font-medium tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                  >
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                      {showLiveGeorgeFlame && (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-3.5 w-3.5 text-[#F2B36D] drop-shadow-[0_0_8px_rgba(242,179,109,0.20)]"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M12 22c3.7 0 6.5-2.6 6.5-6.2 0-2.2-1.1-4.2-2.8-5.5.1 1.4-.5 2.4-1.4 3.1.1-3.4-1.7-6.1-4.5-8.4.3 2.9-.9 4.7-2.3 6.2-1.1 1.2-2 2.5-2 4.5C5.5 19.4 8.3 22 12 22Z" />
+                        </svg>
+                      )}
+                    </span>
+                    <span className="whitespace-nowrap">{tierSignalText}</span>
                   </button>
 
 
@@ -5404,7 +5439,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto rounded-full border border-white/[0.075] bg-[#0B0D12]/78 px-3 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-[#D7DBE4]/76 shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-white/[0.09] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
+                  className="pointer-events-auto text-[11px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
                 >
                   ◉ LIVE
                 </button>
@@ -6177,51 +6212,6 @@ Continue from here, tell me what changed, or start fresh.`
   }
 `}</style>
 
-{!liveMode && (
-  <div className="pointer-events-auto fixed bottom-[96px] left-0 right-0 z-[91] mx-auto flex w-full max-w-[900px] items-center justify-center gap-5 px-4 xl:pl-[280px]">
-    <button
-      type="button"
-      onClick={() => setShowLiveChooser(true)}
-      className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]"
-    >
-      LIVE
-    </button>
-
-    <button
-      type="button"
-      onClick={() => {
-        if (showLiveGeorgeFlame) {
-          setShowLiveChooser(true)
-        } else {
-          setShowUpgradeModal(true)
-        }
-      }}
-      className="inline-flex w-[235px] items-center justify-start gap-1.5 overflow-hidden text-left text-[11px] font-medium tracking-[0.05em] text-[#D7DBE4]/52 transition hover:text-[#D7DBE4]/80"
-    >
-      <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-        {showLiveGeorgeFlame && (
-          <svg
-            viewBox="0 0 24 24"
-            className="h-3.5 w-3.5 text-[#F2B36D] drop-shadow-[0_0_8px_rgba(242,179,109,0.22)]"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 22c3.7 0 6.5-2.6 6.5-6.2 0-2.2-1.1-4.2-2.8-5.5.1 1.4-.5 2.4-1.4 3.1.1-3.4-1.7-6.1-4.5-8.4.3 2.9-.9 4.7-2.3 6.2-1.1 1.2-2 2.5-2 4.5C5.5 19.4 8.3 22 12 22Z" />
-            <path d="M12 18.8c1.4 0 2.5-1 2.5-2.4 0-1-.5-1.8-1.3-2.4-.1.9-.5 1.5-1.1 1.9-.1-1.4-.8-2.5-2-3.5.1 1.2-.4 2-.9 2.7-.4.5-.7 1-.7 1.7 0 1.2 1 2 3.5 2Z" />
-          </svg>
-        )}
-      </span>
-      <span key={tierSignalText} className="animate-[tierSignalRise_420ms_ease-out] whitespace-nowrap">
-        {tierSignalText}
-      </span>
-    </button>
-  </div>
-)}
-
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
   <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
     <div className="text-[10px] text-[#D7DBE4]/24 tracking-[0.16em]">
@@ -6923,6 +6913,82 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             </button>
           </div>
         </div>
+      )}
+
+      {showHelpModal && typeof document !== 'undefined' && createPortal(
+        <>
+          <button
+            type="button"
+            aria-label="Close help"
+            onClick={() => setShowHelpModal(false)}
+            className="fixed inset-0 z-[220] bg-black/62 backdrop-blur-[8px]"
+          />
+
+          <div className="fixed inset-0 z-[230] flex items-center justify-center px-4 py-6">
+            <div className="relative w-full max-w-[430px] rounded-[1.45rem] border border-white/[0.07] bg-[#0B0D12]/96 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.52)]">
+              <button
+                type="button"
+                aria-label="Close help"
+                onClick={() => setShowHelpModal(false)}
+                className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-[#11131A] text-lg text-white/78 shadow-[0_12px_30px_rgba(0,0,0,0.42)] transition hover:text-white"
+              >
+                ×
+              </button>
+
+              {!activeHelpTopic ? null : (
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">GEORGE Help</p>
+
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    {[
+                      ['live', 'LIVE'],
+                      ['continuity', 'Continuity'],
+                      ['images', 'Images'],
+                      ['signal', 'Signal'],
+                    ].map(([id, label]) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setActiveHelpTopic(id as 'live' | 'continuity' | 'images' | 'signal')}
+                        className={`rounded-xl border px-3 py-2 text-left text-[12px] transition ${
+                          activeHelpTopic === id
+                            ? 'border-white/[0.14] bg-white/[0.06] text-white'
+                            : 'border-white/[0.055] bg-black/20 text-white/52 hover:text-white/80'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 rounded-xl border border-white/[0.055] bg-black/24 p-4">
+                    <h3 className="text-[15px] font-semibold text-white/88">
+                      {activeHelpTopic === 'live' && 'LIVE GEORGE'}
+                      {activeHelpTopic === 'continuity' && 'Continuity'}
+                      {activeHelpTopic === 'images' && 'Images'}
+                      {activeHelpTopic === 'signal' && 'Signal'}
+                    </h3>
+
+                    <p className="mt-2 text-[13px] leading-6 text-white/52">
+                      {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations. Use Prep Room to set the room, purview, support level, and context before entering LIVE.'}
+                      {activeHelpTopic === 'continuity' && 'Continuity restores GEORGE recognition, tier access, and LIVE eligibility on this device through your verified access session.'}
+                      {activeHelpTopic === 'images' && 'Images lets you generate visual direction, product concepts, campaign visuals, and references from GEORGE.'}
+                      {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns over time so guidance can better serve your interest.'}
+                    </p>
+
+                    <a
+                      href="/help"
+                      className="mt-4 inline-flex text-[12px] font-medium text-[#D7DBE4]/62 underline-offset-4 transition hover:text-white hover:underline"
+                    >
+                      Open full help topics
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>,
+        document.body
       )}
 
       {showToast && (
