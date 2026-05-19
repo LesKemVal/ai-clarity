@@ -5914,6 +5914,25 @@ if (liveMode) {
             <div className="mt-1 text-[11px] text-[#D7DBE4]/45">
               {sessionPickerMode === 'campaign' ? 'Saved LIVE sessions.' : 'Recent LIVE conversations.'}
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const sessions = sessionPickerMode === 'campaign'
+                  ? getCampaignSessions()
+                  : getSessionsForMode('live')
+
+                sessions.forEach((session: any) => deleteSession(session.id))
+
+                setPendingDeleteSessionId(null)
+                setShowSessionPicker(false)
+                setToastMessage(sessionPickerMode === 'campaign' ? 'LIVE sessions cleared.' : 'LIVE conversations cleared.')
+                setShowToast(true)
+              }}
+              className="mt-2 text-[11px] text-red-100/48 transition hover:text-red-100/82"
+            >
+              Clear saved LIVE
+            </button>
           </div>
           <button
             type="button"
@@ -6066,7 +6085,7 @@ Continue from here, tell me what changed, or start fresh.`
                 </div>
               </button>
 
-              <div className="absolute right-2 top-2 hidden md:flex items-center">
+              <div className="absolute right-2 top-2 flex items-center">
                 {pendingDeleteSessionId === session.id ? (
                   <button
                     type="button"
