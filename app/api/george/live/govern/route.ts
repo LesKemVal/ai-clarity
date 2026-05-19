@@ -1,13 +1,36 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { governLiveVoice } from '@/lib/george/live-voice/governor'
-import { verifyLiveAccess } from '@/lib/subscriptions/live-access'
+import { verifyLiveAccessFromRequest } from '@/lib/subscriptions/live-access'
+import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const rate = checkRateLimit({
+      key: `live-govern:${getRequestIdentity(req)}`,
+      limit: 120,
+      windowMs: 60_000,
+    })
+
+    if (!rate.ok) {
+      return NextResponse.json({
+        speaker: 'system',
+        shouldSpeak: false,
+        volley: '',
+        cue: '',
+        status: 'LIVE governor temporarily rate limited.',
+        confidence: 0,
+      }, { status: 429 })
+    }
+
     const body = await req.json()
-    const access = verifyLiveAccess(body?.email)
+    const access = verifyLiveAccessFromRequest(req, body?.email)
 
     if (!access.ok) {
+      console.warn('[LIVE][govern][auth-failed]', {
+        status: access.status,
+        reason: access.error,
+      })
+
       return NextResponse.json({
         speaker: 'system',
         shouldSpeak: false,
