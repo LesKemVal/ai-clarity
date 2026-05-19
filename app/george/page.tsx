@@ -16,6 +16,7 @@ import { createSession, getActiveMode, getActiveSessionForMode, getActiveSession
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
+import { getGeorgeMobileFont, IOS_GEORGE_FONT } from '@/lib/george/mobile/fonts'
 
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
@@ -416,6 +417,12 @@ const georgeAmbientPulseStyles = `
 `
 
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
+const [mobileFontFamily, setMobileFontFamily] = useState(IOS_GEORGE_FONT)
+useEffect(() => {
+  if (typeof navigator === 'undefined') return
+  setMobileFontFamily(getGeorgeMobileFont(navigator.userAgent))
+}, [])
+
   const router = useRouter()
   const [input, setInput] = useState('')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
