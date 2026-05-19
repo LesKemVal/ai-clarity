@@ -689,14 +689,6 @@ export default function GeorgeLiveEntryPage() {
 
           <button
             type="button"
-            onClick={() => setShowRoomSummary(true)}
-            className="text-white/42 underline-offset-4 transition hover:text-white/72 hover:underline"
-          >
-            Preview prep
-          </button>
-
-          <button
-            type="button"
             onClick={() => prepareLive(true)}
             className="text-[#AAB4FF]/62 underline-offset-4 transition hover:text-[#D7DCFF] hover:underline"
           >
@@ -1147,31 +1139,65 @@ export default function GeorgeLiveEntryPage() {
         )}
 
         {showRoomSummary && (
-          <div className="mt-5 w-full max-w-[520px] rounded-[1.05rem] border border-white/[0.06] bg-black/28 p-4 text-left">
-            <div className="flex items-center justify-between">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/34">
-                Prep preview
-              </div>
+          <div className="fixed inset-0 z-[120] flex items-center justify-center px-5">
+            <button
+              type="button"
+              aria-label="Close prep preview"
+              onClick={() => setShowRoomSummary(false)}
+              className="absolute inset-0 bg-black/68 backdrop-blur-[10px]"
+            />
+
+            <div className="relative w-full max-w-[430px] rounded-[1.35rem] border border-white/[0.075] bg-[#0B0D12]/96 p-5 text-left shadow-[0_24px_72px_rgba(0,0,0,0.52)]">
               <button
                 type="button"
+                aria-label="Close prep preview"
                 onClick={() => setShowRoomSummary(false)}
-                className="text-[12px] text-white/34 transition hover:text-white/68"
+                className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-[#11131A] text-lg text-white/78 shadow-[0_12px_30px_rgba(0,0,0,0.42)] transition hover:text-white"
               >
-                Close
+                ×
               </button>
-            </div>
 
-            <div className="mt-3 space-y-2 text-[13px] leading-6 text-white/62">
-              <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
-              <div><span className="text-white/34">Purview:</span> {(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}</div>
-              <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
-              <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
-              {estimatedCents !== null && (
-                <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
-              )}
-              {objective.trim() && (
-                <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
-              )}
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/34">
+                Prep summary
+              </div>
+
+              <div className="mt-4 space-y-2 text-[13px] leading-6 text-white/62">
+                <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
+                <div><span className="text-white/34">Purview:</span> {(LIVE_PURVIEWS.find((item) => item.id === selectedPurview) || LIVE_PURVIEWS[0]).label}</div>
+                <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
+                <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
+                {estimatedCents !== null && (
+                  <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
+                )}
+                {objective.trim() && (
+                  <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
+                )}
+              </div>
+
+              <div className="mt-5 grid gap-2">
+                <button
+                  type="button"
+                  onClick={() => prepareLive(false)}
+                  className="w-full rounded-xl border border-[#8FB6C9]/30 bg-[#8FB6C9]/10 px-4 py-3 text-sm font-semibold text-[#E6F3FA]/88 transition hover:border-[#8FB6C9]/48 hover:bg-[#8FB6C9]/16"
+                >
+                  Enter LIVE
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowRoomSummary(false)}
+                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-sm font-medium text-white/62 transition hover:bg-white/[0.04] hover:text-white/82"
+                >
+                  Edit prep
+                </button>
+
+                <Link
+                  href="/george"
+                  className="block w-full rounded-xl px-4 py-3 text-center text-sm font-medium text-white/38 transition hover:text-white/68"
+                >
+                  Go back
+                </Link>
+              </div>
             </div>
           </div>
         )}
