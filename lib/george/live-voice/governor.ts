@@ -11,12 +11,28 @@ const USER_AGENCY_OVERRIDE =
   /^(ok|okay|got it|i got it|i've got it|ive got it|hold|pause|wait|one second|give me a second|let me think|stop)$/i
 
 function cleanLine(value: string, maxWords: number) {
-  const words = value
+  const clean = value
     .replace(/[“”]/g, '"')
     .replace(/\s+/g, ' ')
     .trim()
-    .split(/\s+/)
-    .filter(Boolean)
+
+  const words = clean.split(/\s+/).filter(Boolean)
+
+  if (words.length <= maxWords) {
+    return clean.replace(/[,:;.-]*$/, '')
+  }
+
+  const sentenceBoundary = clean.match(/^(.+?[.!?])\s+/)
+
+  if (sentenceBoundary) {
+    const sentenceWords = sentenceBoundary[1]
+      .split(/\s+/)
+      .filter(Boolean)
+
+    if (sentenceWords.length <= maxWords + 4) {
+      return sentenceBoundary[1].replace(/[,:;.-]*$/, '')
+    }
+  }
 
   return words.slice(0, maxWords).join(' ').replace(/[,:;.-]*$/, '')
 }
@@ -202,8 +218,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     speakerIntentShouldHold: speakerIntent.shouldHold,
   }
 
-  packet.volley = cleanLine(packet.volley, input.audio ? 7 : 12)
-  packet.cue = cleanLine(packet.cue, input.audio ? 7 : 10)
+  packet.volley = cleanLine(packet.volley, input.audio ? 14 : 22)
+  packet.cue = cleanLine(packet.cue, input.audio ? 12 : 18)
   packet.liveAssistMode = input.liveAssistMode || 'cues'
 
   if (packet.speakerIntent === 'assisted_continuation' && !packet.cue) {
@@ -224,7 +240,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
 
   if (TEACHER_LANGUAGE.test(packet.volley)) {
     packet.volley = 'Say it plainly.'
-    packet.cue = 'Short. Calm. Direct.'
+    packet.cue = 'Clear, calm, and human.'
     packet.status = 'Teacher language blocked.'
   }
 
