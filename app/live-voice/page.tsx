@@ -1118,7 +1118,7 @@ function isForceIntervention(text: string) {
           <p className="text-xs uppercase tracking-[0.35em] text-white/35">BRANESx / GEORGE · INTERNAL</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">LIVE Runtime Diagnostic</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
-            Internal diagnostic surface for mic capture, transcript interpretation, LIVE governor behavior, and earbud playback. This is not the user-facing LIVE experience.
+            Internal GEORGE LIVE runtime lab for mic capture, transcript interpretation, governor behavior, latency, and earbud playback. Not a user-facing product route.
           </p>
         </div>
 
