@@ -8,6 +8,7 @@ export default function ImagesPage() {
   const [image, setImage] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
 
   const createImage = async () => {
     if (loading) return
@@ -73,8 +74,23 @@ export default function ImagesPage() {
             </span>
           </Link>
 
-          <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">
-            Bx Visual Runtime
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowMenu((value) => !value)}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.018] text-[18px] text-white/58 transition hover:bg-white/[0.045] hover:text-white"
+              aria-label="Open menu"
+            >
+              ☰
+            </button>
+
+            {showMenu && (
+              <div className="absolute right-0 top-12 z-50 w-44 rounded-[1rem] border border-white/[0.07] bg-[#0B0D12]/95 p-2 text-sm shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl">
+                <Link href="/george" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">GEORGE</Link>
+                <Link href="/george/live-entry" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">LIVE</Link>
+                <Link href="/help" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">Help</Link>
+              </div>
+            )}
           </div>
         </div>
 
