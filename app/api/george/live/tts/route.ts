@@ -1,22 +1,38 @@
-import { NextResponse } from 'next/server'
-import { verifyLiveAccess } from '@/lib/subscriptions/live-access'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyLiveAccessFromRequest } from '@/lib/subscriptions/live-access'
+import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const rate = checkRateLimit({
+      key: `live-tts:${getRequestIdentity(req)}`,
+      limit: 60,
+      windowMs: 60_000,
+    })
+
+    if (!rate.ok) {
+      return NextResponse.json({ error: 'LIVE voice is temporarily rate limited.' }, { status: 429 })
+    }
+
     const apiKey = process.env.ELEVENLABS_API_KEY
     const voiceId = process.env.ELEVENLABS_VOICE_ID
 
     if (!apiKey || !voiceId) {
       return NextResponse.json(
-        { error: 'Missing ELEVENLABS_API_KEY or ELEVENLABS_VOICE_ID' },
+        { error: 'LIVE voice is not fully configured.' },
         { status: 500 }
       )
     }
 
     const body = await req.json()
-    const access = verifyLiveAccess(body?.email)
+    const access = verifyLiveAccessFromRequest(req, body?.email)
 
     if (!access.ok) {
+      console.warn('[LIVE][tts][auth-failed]', {
+        status: access.status,
+        reason: access.error,
+      })
+
       return NextResponse.json({ error: access.error }, { status: access.status })
     }
 
@@ -46,6 +62,7 @@ export async function POST(req: Request) {
     })
 
     if (!res.ok) {
+      console.warn('[LIVE][tts][provider-failed]', { status: res.status })
       return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
     }
 
