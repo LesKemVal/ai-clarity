@@ -22,6 +22,7 @@ export type LiveRuntimeEvent = {
     interruptionRisk?: number
     escalationLikelihood?: number
     silence?: string
+    effectiveness?: string
   }
 }
 

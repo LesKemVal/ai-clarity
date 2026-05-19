@@ -374,7 +374,6 @@ export function orchestrateLiveTurn(
     recovery: recoveryState.state,
   })
 
-
   const silence = georgeSilenceIntelligence.decide({
     confidence: nextPacket.confidence,
     interruptionRisk: normalizedInterruptionRisk,
@@ -409,6 +408,7 @@ export function orchestrateLiveTurn(
       intervention: nextPacket.intervention,
       interruptionRisk: normalizedInterruptionRisk,
       silence: silence.silenceType,
+      effectiveness: interventionEffectiveness,
     })
   } else {
     georgeLiveRuntimeEvents.emit('cue_ready', {
@@ -420,6 +420,7 @@ export function orchestrateLiveTurn(
       intervention: nextPacket.intervention,
       confidence: nextPacket.confidence,
       escalationLikelihood,
+      effectiveness: interventionEffectiveness,
     })
   }
 
