@@ -305,7 +305,17 @@ function isForceIntervention(text: string) {
     return nextPacket as LivePacket
   }
 
+  function isLiveDeliveryCurrent(sessionId: number, generation: number) {
+    return (
+      sessionId === liveSessionIdRef.current &&
+      !georgeCancelEngine.isExpired(generation) &&
+      !stoppingRef.current
+    )
+  }
+
   async function speak(text: string) {
+    const deliverySessionId = liveSessionIdRef.current
+    const deliveryGeneration = georgeCancelEngine.current()
     const deliveryProfile = DELIVERY_PROFILES[deliveryProfileId]
     const deliverable = getAdaptiveDeliverable(text)
     const formattedDelivery = formatDelivery(deliverable)
@@ -328,6 +338,11 @@ function isForceIntervention(text: string) {
     if (formattedDelivery.pauseMs > 0) {
       pushLog(`GEORGE holding ${formattedDelivery.pauseMs}ms before speaking.`)
       await new Promise((resolve) => window.setTimeout(resolve, formattedDelivery.pauseMs))
+
+      if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+        pushLog('Dropped stale LIVE delivery after hold.')
+        return
+      }
     }
 
     if (formattedDelivery.chuckle) {
@@ -338,7 +353,10 @@ function isForceIntervention(text: string) {
       pushLog('Delivery cue: lower tone.')
     }
 
-    if (georgeTurnManager.shouldInterruptGeorge()) {
+    if (
+      !isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) ||
+      georgeTurnManager.shouldInterruptGeorge()
+    ) {
       pushLog('Speech interrupted by room activity.')
       return
     }
@@ -351,10 +369,19 @@ function isForceIntervention(text: string) {
       body: JSON.stringify({ text: formattedDelivery.spokenText }),
     })
 
+    if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+      georgeTurnManager.markIdle()
+      pushLog('Dropped stale LIVE TTS response.')
+      return
+    }
+
     if (!res.ok) {
       pushLog('ElevenLabs unavailable. Falling back to browser voice.')
 
-      if ('speechSynthesis' in window) {
+      if (
+        isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) &&
+        'speechSynthesis' in window
+      ) {
         window.speechSynthesis.cancel()
         const utterance = new SpeechSynthesisUtterance(formattedDelivery.spokenText)
         utterance.rate = 1
@@ -369,6 +396,12 @@ function isForceIntervention(text: string) {
 
     const blob = await res.blob()
 
+    if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
+      georgeTurnManager.markIdle()
+      pushLog('Dropped stale LIVE audio blob.')
+      return
+    }
+
     setLatency((prev) =>
       georgeLatencyMetrics.update({
         ttsMs: Date.now() - ttsStart,
@@ -380,14 +413,23 @@ function isForceIntervention(text: string) {
     )
 
     const url = URL.createObjectURL(blob)
+    let audioUrlReleased = false
+    const releaseAudioUrl = () => {
+      if (audioUrlReleased) return
+      URL.revokeObjectURL(url)
+      audioUrlReleased = true
+    }
 
     if (!audioRef.current) {
       audioRef.current = new Audio()
     }
 
     if (
+      !isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) ||
       georgeTurnManager.shouldInterruptGeorge()
     ) {
+      releaseAudioUrl()
+      georgeTurnManager.markIdle()
       pushLog('Playback invalidated before audio start.')
       return
     }
@@ -399,14 +441,19 @@ function isForceIntervention(text: string) {
     })
 
     const interruptionPoll = window.setInterval(() => {
-      if (georgeTurnManager.shouldInterruptGeorge()) {
+      if (
+        !isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) ||
+        georgeTurnManager.shouldInterruptGeorge()
+      ) {
         stopGeorgeAudio('LIVE playback interrupted by room activity.')
+        releaseAudioUrl()
         window.clearInterval(interruptionPoll)
       }
     }, 120)
 
     audioRef.current.onended = () => {
       window.clearInterval(interruptionPoll)
+      releaseAudioUrl()
       georgeTurnManager.markIdle()
     }
   }
