@@ -2429,8 +2429,10 @@ requestAnimationFrame(() => {
       const insideSavePicker = savePickerRef.current?.contains(target) ?? false
       const insideFolderBrowser = folderBrowserRef.current?.contains(target) ?? false
       const insidePromptMenu = promptMenuRef.current?.contains(target) ?? false
+      const insideLanguageMenu = (target as Element | null)?.closest?.('[data-george-language-menu]') ?? false
 
-      if (!insideSavePicker && !insideFolderBrowser && !insidePromptMenu) {
+      if (!insideSavePicker && !insideFolderBrowser && !insidePromptMenu && !insideLanguageMenu) {
+        setShowLanguageMenu(false)
         setShowPromptMenu(false)
         setShowRecentFolders(false)
         setActiveMemoryFolder(null)
@@ -2451,6 +2453,8 @@ requestAnimationFrame(() => {
 
       if (event.key === 'Escape') {
         setShowPromptMenu(false)
+        setShowLanguageMenu(false)
+        setShowHelpModal(false)
       }
 
       if (typing && event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
@@ -5337,7 +5341,7 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
-                <div className="pointer-events-auto flex items-center gap-3">
+                <div className="pointer-events-auto flex items-center gap-5">
                   <button
                     type="button"
                     onClick={() => {
@@ -5349,7 +5353,7 @@ ${simplifyTarget}`
                     Help
                   </button>
 
-                  <div className="relative">
+                  <div className="relative" data-george-language-menu>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -5362,7 +5366,7 @@ ${simplifyTarget}`
                     </button>
 
                     {showLanguageMenu && (
-                      <div className="absolute bottom-full left-0 z-[120] mb-2 w-[160px] overflow-hidden rounded-[0.9rem] border border-white/[0.07] bg-[#0B0D12]/95 p-1.5 shadow-[0_18px_42px_rgba(0,0,0,0.45)]">
+                      <div className="absolute bottom-full left-0 z-[120] mb-3 w-[172px] overflow-hidden rounded-[1rem] border border-white/[0.075] bg-[#0B0D12]/96 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl">
                         {languageOptions.map((option) => (
                           <button
                             key={option}
@@ -5373,7 +5377,7 @@ ${simplifyTarget}`
                               window.localStorage.setItem('george_language', option)
                               setShowLanguageMenu(false)
                             }}
-                            className={`w-full rounded-[0.65rem] px-3 py-2 text-left text-[12px] transition ${
+                            className={`w-full rounded-[0.75rem] px-3 py-2 text-left text-[12px] transition ${
                               language === option
                                 ? 'bg-white/[0.032] text-[#D7DBE4]'
                                 : 'text-[#D7DBE4]/52 hover:bg-white/[0.025] hover:text-[#D7DBE4]/82'
