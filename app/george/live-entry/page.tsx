@@ -164,6 +164,37 @@ const LIVE_CAPACITY_OPTIONS = [
   },
 ]
 
+const LIVE_POSTURES = [
+  {
+    id: 'clear_operator',
+    label: 'Clear operator',
+    body: 'Plain, direct, controlled.',
+    cue: 'Keep responses clean and useful.',
+    line: 'Say it plainly, then ask for the next step.',
+  },
+  {
+    id: 'technical_professional',
+    label: 'Technical professional',
+    body: 'Precise, structured, discipline-aware.',
+    cue: 'Use correct terms and avoid vague claims.',
+    line: 'Frame it around scope, tradeoffs, reliability, and implementation.',
+  },
+  {
+    id: 'executive_calm',
+    label: 'Executive calm',
+    body: 'Brief, decisive, outcome-oriented.',
+    cue: 'Lead with risk, priority, and next move.',
+    line: 'Keep it short: decision, reason, next action.',
+  },
+  {
+    id: 'warm_advocate',
+    label: 'Warm advocate',
+    body: 'Respectful, human, firm.',
+    cue: 'Protect clarity without sounding cold.',
+    line: 'Ask for clarity, then restate what matters.',
+  },
+]
+
 const ROOM_PROMPTS: Record<string, { label: string; placeholder: string }> = {
   Interview: {
     label: 'WHAT WILL THEY BE LISTENING FOR?',
@@ -236,6 +267,8 @@ export default function GeorgeLiveEntryPage() {
   const [selectedLanguage, setSelectedLanguage] = useState('English')
   const [speechCadence, setSpeechCadence] = useState('Balanced')
   const [liveAssistMode, setLiveAssistMode] = useState<'cues' | 'lines'>('cues')
+  const [selectedPosture, setSelectedPosture] = useState('clear_operator')
+  const [showRoomSummary, setShowRoomSummary] = useState(false)
   const [showLanguageScopePrompt, setShowLanguageScopePrompt] = useState(false)
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [currentTier, setCurrentTier] = useState('smart')
@@ -349,8 +382,10 @@ export default function GeorgeLiveEntryPage() {
     setHasLiveSession(!!activeLive)
   }, [])
 
-  const prepareLive = () => {
+  const prepareLive = (skipPrep = false) => {
     if (typeof window === 'undefined') return
+
+    const activePosture = LIVE_POSTURES.find((item) => item.id === selectedPosture) || LIVE_POSTURES[0]
 
     const runtimeSupport = {
       selectedCapacityCents,
@@ -360,15 +395,18 @@ export default function GeorgeLiveEntryPage() {
       capacityCents,
       estimatedCents,
       runtimeBias: selectedCapabilities.map((item) => item.runtimeBias),
+      posture: activePosture,
     }
 
     const liveSetup = {
-      room: selectedRoom,
+      room: skipPrep ? 'Adaptive LIVE' : selectedRoom,
       language: selectedLanguage,
       cadence: speechCadence,
       objective,
       controlWords,
       liveAssistMode,
+      posture: activePosture,
+      skipPrep,
       runtimeSupport,
       selectedCapacityCents,
       selectedCapabilityIds,
@@ -419,6 +457,14 @@ export default function GeorgeLiveEntryPage() {
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
           Answer a few questions and pre-load context so GEORGE is sharpest.
         </p>
+
+        <button
+          type="button"
+          onClick={() => prepareLive(true)}
+          className="mt-3 text-[12px] font-medium text-white/42 underline-offset-4 transition hover:text-white/72 hover:underline"
+        >
+          Skip prep and enter LIVE
+        </button>
 
         {runtimeMotionContext && (
           <div className="mt-5 w-full max-w-[620px] rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.035] px-5 py-4 text-left shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
@@ -552,6 +598,40 @@ export default function GeorgeLiveEntryPage() {
               </div>
             </div>
           )}
+
+          <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
+            <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
+              USER POSTURE
+            </div>
+
+            <p className="mb-3 text-[13px] leading-6 text-white/54">
+              Choose how you want to sound. GEORGE will shape cues and repeatable lines from this posture across any room.
+            </p>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              {LIVE_POSTURES.map((item) => {
+                const active = selectedPosture === item.id
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setSelectedPosture(item.id)}
+                    className={`rounded-[0.8rem] border px-3 py-3 text-left transition-all duration-150 ${
+                      active
+                        ? 'border-[#AAB4FF]/35 bg-[#AAB4FF]/10 text-white shadow-[0_0_18px_rgba(170,180,255,0.08),inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'border-white/[0.055] bg-black/20 text-white/54 hover:border-white/[0.11] hover:bg-white/[0.024] hover:text-white/80'
+                    }`}
+                  >
+                    <div className="text-[13px] font-semibold">{item.label}</div>
+                    <div className="mt-1 text-[12px] leading-5 text-white/46">{item.body}</div>
+                    <div className="mt-2 text-[11px] leading-5 text-white/32">Cue: {item.cue}</div>
+                    <div className="mt-1 text-[11px] leading-5 text-white/32">Line: {item.line}</div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
 
           <div className="mt-5 rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
             <div className="mb-2 text-[11px] tracking-[0.18em] text-white/34">
@@ -782,53 +862,50 @@ export default function GeorgeLiveEntryPage() {
           </div>
         )}
 
-        <div className="mt-5 grid w-full max-w-[400px] gap-3">
+        <div className="mt-5 w-full max-w-[520px]">
+          {!showRoomSummary ? (
+            <button
+              type="button"
+              onClick={() => setShowRoomSummary(true)}
+              className="flex w-full items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
+            >
+              Review room
+            </button>
+          ) : (
+            <div className="rounded-[1.05rem] border border-white/[0.06] bg-black/28 p-4 text-left">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/34">
+                Room summary
+              </div>
 
-          {(currentTier === 'intelligent' || currentTier === 'brilliant') ? (
-            <>
-              {hasLiveSession && (
-                <Link
-                  href="/george/live"
-                  className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.065] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.018))] px-6 py-4 text-[14px] font-medium text-white/74 transition-all duration-150 hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
-                >
-                  Resume Conversation
-                </Link>
-              )}
+              <div className="mt-3 space-y-2 text-[13px] leading-6 text-white/62">
+                <div><span className="text-white/34">Room:</span> {selectedRoom || 'Adaptive LIVE'}</div>
+                <div><span className="text-white/34">Posture:</span> {(LIVE_POSTURES.find((item) => item.id === selectedPosture) || LIVE_POSTURES[0]).label}</div>
+                <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
+                <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
+                {estimatedCents !== null && (
+                  <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
+                )}
+                {objective.trim() && (
+                  <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
+                )}
+              </div>
 
               <button
                 type="button"
-                onClick={prepareLive}
-                className="flex items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
+                onClick={() => prepareLive(false)}
+                className="mt-4 flex w-full items-center justify-center rounded-[0.95rem] border border-[#8FB6C9]/[0.34] bg-[#0B1622] px-6 py-4 text-[15px] font-semibold text-[#E6F3FA] shadow-[0_0_0_1px_rgba(143,182,201,0.08),0_14px_32px_rgba(0,0,0,0.34)] transition hover:border-[#8FB6C9]/[0.48] hover:bg-[#101C2A]"
               >
-                Enter LIVE
+                Continue to LIVE
               </button>
 
-              <Link
-                href="/george/live"
-                className="flex items-center justify-center rounded-[0.95rem] border border-white/[0.06] bg-white/[0.012] px-6 py-4 text-[14px] font-medium text-white/50 transition-all duration-150 hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/74"
+              <button
+                type="button"
+                onClick={() => setShowRoomSummary(false)}
+                className="mt-3 w-full text-center text-[12px] text-white/36 transition hover:text-white/62"
               >
-                Enter without setup
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/top-up"
-                className="flex items-center justify-center rounded-[0.95rem] bg-white px-6 py-4 text-[15px] font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7]"
-              >
-                Unlock LIVE
-              </Link>
-
-              <div className="rounded-[0.95rem] border border-white/[0.055] bg-white/[0.012] px-5 py-4 text-left">
-                <div className="text-[13px] font-medium text-white/88">
-                  LIVE requires Intelligent or Brilliant.
-                </div>
-
-                <div className="mt-1 text-[13px] leading-6 text-white/42">
-                  Real-time cues, silence control, and exact wording when the room requires it.
-                </div>
-              </div>
-            </>
+                Adjust room
+              </button>
+            </div>
           )}
         </div>
       </div>
