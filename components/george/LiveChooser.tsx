@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 type LiveChooserProps = {
   open: boolean
   hasAccess?: boolean
@@ -21,7 +23,35 @@ export default function LiveChooser({
   onUpgrade,
   onEnterCode,
 }: LiveChooserProps) {
+  const [sessionAccess, setSessionAccess] = useState(false)
+  const [sessionChecked, setSessionChecked] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    let cancelled = false
+
+    fetch('/api/session', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return
+        setSessionAccess(Boolean(data?.liveAccess))
+        setSessionChecked(true)
+      })
+      .catch(() => {
+        if (cancelled) return
+        const localTier = window.localStorage.getItem('george_tier')
+        setSessionAccess(localTier === 'intelligent' || localTier === 'brilliant')
+        setSessionChecked(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [open])
+
   if (!open) return null
+
+  const effectiveHasAccess = hasAccess || sessionAccess
 
   return (
     <>
@@ -30,9 +60,7 @@ export default function LiveChooser({
         tabIndex={0}
         onClick={onClose}
         onKeyDown={(event) => {
-          if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
-            onClose()
-          }
+          if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') onClose()
         }}
         className="fixed inset-0 z-[200] bg-black/42 transition-opacity duration-150"
       />
@@ -44,16 +72,13 @@ export default function LiveChooser({
         >
           <div className="mb-2 flex items-center justify-between">
             <div className="pr-12">
-              <div className="text-[11px] tracking-[0.18em] text-white/72">
-                LIVE
-              </div>
-
+              <div className="text-[11px] tracking-[0.18em] text-white/72">LIVE</div>
               <div className="mt-1 text-[11px] text-white/45">
-                {hasAccess
-                  ? hasLiveSession
-                    ? 'Resume LIVE or prepare a new room.'
-                    : 'Prepare a room before LIVE starts.'
-                  : 'LIVE access required.'}
+                {effectiveHasAccess
+                  ? 'Start a new LIVE room or resume one.'
+                  : sessionChecked
+                    ? 'Restore account access to use LIVE.'
+                    : 'Checking LIVE access...'}
               </div>
             </div>
 
@@ -68,42 +93,24 @@ export default function LiveChooser({
           </div>
 
           <div className="space-y-2">
-            {hasAccess ? (
+            {effectiveHasAccess ? (
               <>
-                {hasLiveSession && (
-                  <button
-                    type="button"
-                    onClick={onResumeLiveConversation}
-                    className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/82 transition hover:border-white/[0.11] hover:bg-white/[0.04]"
-                  >
-                    Resume LIVE
-                  </button>
-                )}
+                <button type="button" onClick={onResumeLiveConversation} className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/82 transition hover:border-white/[0.11] hover:bg-white/[0.04]">
+                  Resume LIVE
+                </button>
 
-                <button
-                  type="button"
-                  onClick={onStartLiveConversation}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
-                >
+                <button type="button" onClick={onStartLiveConversation} className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white">
                   Start New
                 </button>
               </>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={onUpgrade}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/82 transition hover:border-white/[0.11] hover:bg-white/[0.04]"
-                >
-                  Unlock LIVE
+                <button type="button" onClick={onEnterCode || onUpgrade} className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/82 transition hover:border-white/[0.11] hover:bg-white/[0.04]">
+                  Restore Account
                 </button>
 
-                <button
-                  type="button"
-                  onClick={onEnterCode}
-                  className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white"
-                >
-                  Enter Access Code
+                <button type="button" onClick={onUpgrade} className="w-full rounded-xl border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-medium text-white/76 transition hover:border-white/[0.11] hover:bg-white/[0.04] hover:text-white">
+                  View Access Options
                 </button>
               </>
             )}
