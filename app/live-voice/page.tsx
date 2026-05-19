@@ -26,6 +26,13 @@ import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import { georgeRuntimeDecisionEngine } from '@/lib/george/live-voice/runtime/runtime-decision-engine'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
+type LiveLifecycleState =
+  | 'idle'
+  | 'connecting'
+  | 'active'
+  | 'tearing_down'
+  | 'failed'
+
 type LivePacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
   shouldSpeak: boolean
@@ -50,6 +57,7 @@ function isForceIntervention(text: string) {
 }
 
   const [running, setRunning] = useState(false)
+  const [liveLifecycle, setLiveLifecycle] = useState<LiveLifecycleState>('idle')
   const [transcript, setTranscript] = useState('')
   const [packet, setPacket] = useState<LivePacket | null>(null)
   const [log, setLog] = useState<string[]>([])
@@ -398,6 +406,7 @@ function isForceIntervention(text: string) {
 
   function teardownLiveSession(reason = 'Stopped.') {
     stoppingRef.current = true
+    setLiveLifecycle('tearing_down')
     georgeCancelEngine.bump()
     georgeAudioQueue.clear()
     processingQueueRef.current = false
@@ -436,17 +445,19 @@ function isForceIntervention(text: string) {
     streamRef.current = null
 
     setRunning(false)
+    setLiveLifecycle(reason === 'Stopped.' || reason.includes('unmounted') ? 'idle' : 'failed')
     void releaseWakeLock()
     pushLog(reason)
   }
 
   async function start() {
-    if (running || socketRef.current) {
+    if (liveLifecycle === 'connecting' || liveLifecycle === 'active' || running || socketRef.current) {
       pushLog('LIVE session already active.')
       return
     }
 
     stoppingRef.current = false
+    setLiveLifecycle('connecting')
     setError('')
     setTranscript('')
     setPacket(null)
@@ -472,6 +483,7 @@ function isForceIntervention(text: string) {
       socket.onopen = () => {
         pushLog('GEORGE LIVE proxy socket opened.')
         setRunning(true)
+        setLiveLifecycle('active')
         void requestWakeLock()
 
         const audioContext = new AudioContext({ sampleRate: 16000 })
@@ -825,7 +837,7 @@ function isForceIntervention(text: string) {
     } catch (err) {
       setError('Mic start failed. Check browser mic permission.')
       pushLog('Mic start failed.')
-      stop()
+      teardownLiveSession('Mic start failed.')
     }
   }
 
@@ -1065,6 +1077,7 @@ function isForceIntervention(text: string) {
             <p>Silence: {runtimeState.silence}</p>
             <p>Delivery: {runtimeState.deliveryProfile}</p>
             <p>Tier: {liveTier}</p>
+            <p>Lifecycle: {liveLifecycle}</p>
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
             <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
