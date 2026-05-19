@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
+import { deleteSession, safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
 
 export type PromptItem = {
   label: string
@@ -66,18 +66,19 @@ export default function Sidebar({
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
+  const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
+  const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
 
+  const loadNormalSessions = () => {
+    setNormalSessions(
+      safeReadSessions()
+        .filter((session) => session.mode === 'normal')
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .slice(0, 12)
+    )
+  }
 
   useEffect(() => {
-    const loadNormalSessions = () => {
-      setNormalSessions(
-        safeReadSessions()
-          .filter((session) => session.mode === 'normal')
-          .sort((a, b) => b.updatedAt - a.updatedAt)
-          .slice(0, 12)
-      )
-    }
-
     loadNormalSessions()
     window.addEventListener('storage', loadNormalSessions)
     return () => window.removeEventListener('storage', loadNormalSessions)
@@ -97,7 +98,6 @@ export default function Sidebar({
     return () => window.removeEventListener('storage', loadGoalChecks)
   }, [])
 
-
   const getSessionTitle = (session: GeorgeStoredSession) => {
     const firstUserMessage = session.messages?.find((message) => message.role === 'user')?.content?.trim()
     const firstAssistantMessage = session.messages?.find((message) => message.role === 'assistant')?.content?.trim()
@@ -111,15 +111,6 @@ export default function Sidebar({
     return source.replace(/\s+/g, ' ').slice(0, 42)
   }
 
-  const getSessionPreview = (session: GeorgeStoredSession) => {
-    const preview =
-      session.messages?.find((message) => message.role === 'user')?.content?.trim() ||
-      session.messages?.find((message) => message.role === 'assistant')?.content?.trim() ||
-      'Saved normal session'
-
-    return preview.replace(/\s+/g, ' ').slice(0, 64)
-  }
-
   const openNormalSession = (session: GeorgeStoredSession) => {
     setActiveSessionIdForMode('normal', session.id)
     setActiveMode('normal')
@@ -127,10 +118,16 @@ export default function Sidebar({
     window.location.href = '/george'
   }
 
+  const deleteNormalSession = (sessionId: string) => {
+    deleteSession(sessionId)
+    setSessionMenuId(null)
+    setPendingDeleteSessionId(null)
+    loadNormalSessions()
+  }
+
   const createGoalCheck = () => {
     const title = window.prompt('Name this Focus')
     const cleanTitle = title?.trim()
-
     if (!cleanTitle) return
 
     const next: GoalCheckItem = {
@@ -145,7 +142,6 @@ export default function Sidebar({
     safeWriteGoalChecks(updated)
   }
 
-  
   const addTodo = (goal: GoalCheckItem) => {
     const text = window.prompt('New Step')
     if (!text?.trim()) return
@@ -213,7 +209,6 @@ export default function Sidebar({
 
     const next = window.prompt('Edit Item', targetTodo.text)
     const cleanNext = next?.trim()
-
     if (!cleanNext) return
 
     const updated = goalChecks.map((g) =>
@@ -281,6 +276,53 @@ export default function Sidebar({
     : null
 
 return (
+  <>
+    {!showSidebar && (
+      <nav className="fixed left-0 top-0 z-[110] flex h-screen w-[58px] flex-col items-center gap-7 border-r border-white/[0.035] bg-[#050608]/92 px-2 py-5 xl:hidden">
+        <button
+          type="button"
+          onClick={() => setShowSidebar?.(true)}
+          aria-label="Open GEORGE sidebar"
+          className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] transition hover:bg-white/[0.035]"
+        >
+          <img src="/logofav.png" alt="GEORGE" className="h-8 w-8 object-contain opacity-95" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowSidebar?.(true)
+            onNewSession()
+          }}
+          aria-label="New GEORGE session"
+          className="text-white/72 transition hover:text-white"
+        >
+          ✎
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowSidebar?.(true)}
+          aria-label="Search sessions"
+          className="text-white/72 transition hover:text-white"
+        >
+          ⌕
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowSidebar?.(true)
+            setOpenGroups((prev) => ({ ...prev, Continuity: true }))
+          }}
+          aria-label="Conversation history"
+          className="text-white/72 transition hover:text-white"
+        >
+          ◯
+        </button>
+      </nav>
+    )}
+
     <aside
       className={`fixed left-0 top-0 z-[120] flex h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
@@ -450,16 +492,52 @@ return (
             {openGroups.Continuity && normalSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
-                  <button
-                    key={session.id}
-                    type="button"
-                    onClick={() => openNormalSession(session)}
-                    className="block w-full rounded-[0.45rem] px-2 py-1.5 text-left transition hover:bg-white/[0.014]"
-                  >
-                    <span className="block truncate text-[13px] text-white/48 hover:text-white/68">
-                      {getSessionTitle(session)}
-                    </span>
-                  </button>
+                  <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
+                    <button
+                      type="button"
+                      onClick={() => openNormalSession(session)}
+                      className="block w-full rounded-[0.45rem] px-2 py-1.5 pr-8 text-left transition"
+                    >
+                      <span className="block truncate text-[13px] text-white/48 group-hover:text-white/68">
+                        {getSessionTitle(session)}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        setPendingDeleteSessionId(null)
+                        setSessionMenuId(sessionMenuId === session.id ? null : session.id)
+                      }}
+                      className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/28 transition hover:bg-white/[0.035] hover:text-white/72"
+                      aria-label="Session options"
+                    >
+                      ⋯
+                    </button>
+
+                    {sessionMenuId === session.id && (
+                      <div className="absolute right-1 top-8 z-20 w-32 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
+                        {pendingDeleteSessionId === session.id ? (
+                          <button
+                            type="button"
+                            onClick={() => deleteNormalSession(session.id)}
+                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/82 transition hover:bg-red-400/[0.06]"
+                          >
+                            Confirm delete
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setPendingDeleteSessionId(session.id)}
+                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -467,146 +545,101 @@ return (
           )}
         </div>
       </div>
-    
-{currentGoalCheck && (
-  <div
-    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/76"
-    onClick={() => setActiveGoalCheck(null)}
-  >
-    <div
-      onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-sm rounded-[0.9rem] border border-white/[0.055] bg-[#07080B] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.72)]"
-    >
-      <div className="mb-4 text-[16px] font-semibold text-white/88">
-        {currentGoalCheck.title}
-      </div>
 
-      <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
-        {(!(currentGoalCheck?.todos?.length)) ? (
-          <p className="text-xs text-white/34">No steps yet.</p>
-        ) : (
-          (currentGoalCheck?.todos || []).map((todo) => (
-            <div
-              key={todo.id}
-              className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-2 text-[13px] transition hover:bg-white/[0.02]"
-            >
+      {currentGoalCheck && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/76"
+          onClick={() => setActiveGoalCheck(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-[0.9rem] border border-white/[0.055] bg-[#07080B] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.72)]"
+          >
+            <div className="mb-4 text-[16px] font-semibold text-white/88">
+              {currentGoalCheck.title}
+            </div>
+
+            <div className="mb-5 max-h-52 overflow-y-auto space-y-2">
+              {(!(currentGoalCheck?.todos?.length)) ? (
+                <p className="text-xs text-white/34">No steps yet.</p>
+              ) : (
+                (currentGoalCheck?.todos || []).map((todo) => (
+                  <div
+                    key={todo.id}
+                    className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-2 text-[13px] transition hover:bg-white/[0.02]"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
+                      className="flex w-full items-start gap-2 text-left"
+                    >
+                      <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-[0.25rem] border ${todo.done ? 'border-white/70 bg-white/80' : 'border-white/24'}`} />
+                      <span className="min-w-0">
+                        <span className={todo.done ? 'block line-through text-white/34' : 'block text-white/82'}>
+                          {todo.text}
+                        </span>
+                        {todo.done && todo.completionNote && (
+                          <span className="mt-1 block text-[11px] leading-4 text-white/32">
+                            Proof: {todo.completionNote}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+
+                    <div className="mt-2 flex gap-2 pl-6">
+                      <button
+                        type="button"
+                        onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
+                        className="text-[11px] text-white/36 transition hover:text-white/62"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
+                        className="text-[11px] text-red-300/54 transition hover:text-red-200/72"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="space-y-2.5">
               <button
-                type="button"
-                onClick={() => currentGoalCheck && toggleTodo(currentGoalCheck, todo.id)}
-                className="flex w-full items-start gap-2 text-left"
+                onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
+                className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/66 transition hover:bg-white/[0.014] hover:text-white/82"
               >
-                <span className={`mt-0.5 h-4 w-4 shrink-0 rounded-[0.25rem] border ${todo.done ? 'border-white/70 bg-white/80' : 'border-white/24'}`} />
-                <span className="min-w-0">
-                  <span className={todo.done ? 'block line-through text-white/34' : 'block text-white/82'}>
-                    {todo.text}
-                  </span>
-                  {todo.done && todo.completionNote && (
-                    <span className="mt-1 block text-[11px] leading-4 text-white/32">
-                      Proof: {todo.completionNote}
-                    </span>
-                  )}
-                </span>
+                + Add Step
               </button>
 
-              <div className="mt-2 flex gap-2 pl-6">
-                <button
-                  type="button"
-                  onClick={() => currentGoalCheck && editTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-white/36 transition hover:text-white/62"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => currentGoalCheck && deleteTodo(currentGoalCheck, todo.id)}
-                  className="text-[11px] text-red-300/54 transition hover:text-red-200/72"
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  setActiveGoalCheck(null)
+                  setShowSidebar?.(false)
+                  const todos = currentGoalCheck.todos || []
+                  const done = todos
+                    .filter(t => t.done)
+                    .map(t => `${t.text}${t.completionNote ? ` — Completion: ${t.completionNote}` : ''}`)
+                  const open = todos.filter(t => !t.done).map(t => t.text)
+
+                  onPromptSelect({
+                    label: currentGoalCheck.title,
+                    text: `GOAL CHECK\n\nGoal: ${currentGoalCheck.title}\n\nCompleted:\n${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}\n\nOpen:\n${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}`,
+                    context: 'goal_check'
+                  })
+                }}
+                className="w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-4 py-2 text-[13px] text-white/72 transition hover:bg-white/[0.032] hover:text-white/88"
+              >
+                Open with GEORGE
+              </button>
             </div>
-          ))
-        )}
-      </div>
-
-      <div className="space-y-2.5">
-        <button
-          onClick={() => currentGoalCheck && addTodo(currentGoalCheck)}
-          className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/66 transition hover:bg-white/[0.014] hover:text-white/82"
-        >
-          + Add Step
-        </button>
-
-        <button
-          onClick={() => {
-            setActiveGoalCheck(null)
-            setShowSidebar?.(false)
-            const todos = currentGoalCheck.todos || []
-const done = todos
-  .filter(t => t.done)
-  .map(t => `${t.text}${t.completionNote ? ` — Completion: ${t.completionNote}` : ''}`)
-const open = todos.filter(t => !t.done).map(t => t.text)
-
-onPromptSelect({
-  label: currentGoalCheck.title,
-  text: `GOAL CHECK
-
-Goal: ${currentGoalCheck.title}
-
-Completed:
-${done.length ? done.map(d => `- ${d}`).join('\n') : '- None'}
-
-Open:
-${open.length ? open.map(o => `- ${o}`).join('\n') : '- None'}
-
-Rule: Do not let me cheat myself. If a completed item looks vague, weak, unproven, or contradicted by the open items, challenge it directly and tell me what would count as real completion.
-
-What is the strongest next move based on this?`,
-  context: 'goal_check_structured',
-})
-          }}
-          className="w-full rounded-[0.55rem] bg-white px-4 py-2 text-[13px] text-black transition hover:bg-white/88"
-        >
-          Review with GEORGE
-        </button>
-
-        <button
-          onClick={() => {
-            const next = window.prompt('Rename Focus', currentGoalCheck.title)
-            if (!next?.trim()) return
-
-            const updated = goalChecks.map((g) =>
-              g.id === currentGoalCheck.id
-                ? { ...g, title: next.trim(), updatedAt: Date.now() }
-                : g
-            )
-
-            setGoalChecks(updated)
-            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
-            setActiveGoalCheck(null)
-          }}
-          className="w-full rounded-[0.55rem] px-4 py-2 text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
-        >
-          Rename
-        </button>
-
-        <button
-          onClick={() => {
-            const updated = goalChecks.filter((g) => g.id !== currentGoalCheck.id)
-            setGoalChecks(updated)
-            localStorage.setItem('GEORGE_GOAL_CHECKS', JSON.stringify(updated))
-            setActiveGoalCheck(null)
-          }}
-          className="w-full rounded-[0.55rem] border border-red-300/18 px-4 py-2 text-[13px] text-red-300/60 transition hover:border-red-300/26 hover:text-red-200/74"
-        >
-          Delete
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
-
-</aside>
-  )
+          </div>
+        </div>
+      )}
+    </aside>
+  </>
+)
 }
