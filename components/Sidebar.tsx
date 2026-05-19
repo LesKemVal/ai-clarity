@@ -68,6 +68,7 @@ export default function Sidebar({
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
+  const [railPanel, setRailPanel] = useState<'new' | 'search' | 'sessions' | null>(null)
 
   const loadNormalSessions = () => {
     setNormalSessions(
@@ -278,49 +279,144 @@ export default function Sidebar({
 return (
   <>
     {!showSidebar && (
-      <nav className="fixed left-0 top-0 z-[110] flex h-screen w-[58px] flex-col items-center gap-7 border-r border-white/[0.035] bg-[#050608]/92 px-2 py-5 xl:hidden">
-        <button
-          type="button"
-          onClick={() => setShowSidebar?.(true)}
-          aria-label="Open GEORGE sidebar"
-          className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] transition hover:bg-white/[0.035]"
-        >
-          <img src="/logofav.png" alt="GEORGE" className="h-8 w-8 object-contain opacity-95" />
-        </button>
+      <>
+        <nav className="fixed left-0 top-0 z-[110] flex h-screen w-[44px] flex-col items-center gap-7 bg-transparent px-1 py-5 xl:hidden">
+          <button
+            type="button"
+            onClick={() => {
+              setRailPanel(null)
+              setShowSidebar?.(true)
+            }}
+            aria-label="Open GEORGE sidebar"
+            className="flex h-10 w-10 items-center justify-center rounded-[0.75rem] transition hover:bg-white/[0.025]"
+          >
+            <img src="/logofav.png" alt="GEORGE" className="h-8 w-8 object-contain opacity-95" />
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setShowSidebar?.(true)
-            onNewSession()
-          }}
-          aria-label="New GEORGE session"
-          className="text-white/72 transition hover:text-white"
-        >
-          ✎
-        </button>
+          <button
+            type="button"
+            onClick={() => setRailPanel(railPanel === 'new' ? null : 'new')}
+            aria-label="New GEORGE session"
+            className="text-white/70 transition hover:text-white"
+          >
+            ✎
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setShowSidebar?.(true)}
-          aria-label="Search sessions"
-          className="text-white/72 transition hover:text-white"
-        >
-          ⌕
-        </button>
+          <button
+            type="button"
+            onClick={() => setRailPanel(railPanel === 'search' ? null : 'search')}
+            aria-label="Search sessions"
+            className="text-white/70 transition hover:text-white"
+          >
+            ⌕
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setShowSidebar?.(true)
-            setOpenGroups((prev) => ({ ...prev, Continuity: true }))
-          }}
-          aria-label="Conversation history"
-          className="text-white/72 transition hover:text-white"
-        >
-          ◯
-        </button>
-      </nav>
+          <button
+            type="button"
+            onClick={() => setRailPanel(railPanel === 'sessions' ? null : 'sessions')}
+            aria-label="Conversation history"
+            className="text-white/70 transition hover:text-white"
+          >
+            ◯
+          </button>
+        </nav>
+
+        {railPanel && (
+          <>
+            <button
+              type="button"
+              aria-label="Close rail panel"
+              onClick={() => setRailPanel(null)}
+              className="fixed inset-0 z-[108] bg-transparent"
+            />
+
+            <div className="fixed left-[48px] top-20 z-[111] w-[260px] rounded-[1rem] border border-white/[0.07] bg-[#07080B]/96 p-3 shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl xl:hidden">
+              {railPanel === 'new' && (
+                <div>
+                  <div className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/30">New</div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRailPanel(null)
+                      onNewSession()
+                    }}
+                    className="w-full rounded-xl px-3 py-2 text-left text-[13px] text-white/72 transition hover:bg-white/[0.035] hover:text-white"
+                  >
+                    Start new GEORGE session
+                  </button>
+                </div>
+              )}
+
+              {railPanel === 'search' && (
+                <div>
+                  <div className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/30">Search</div>
+                  <div className="rounded-xl border border-white/[0.055] bg-black/24 px-3 py-2 text-[12px] text-white/42">
+                    Session search is coming next.
+                  </div>
+                </div>
+              )}
+
+              {railPanel === 'sessions' && (
+                <div>
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-white/30">Sessions</div>
+                    <button
+                      type="button"
+                      onClick={() => setRailPanel(null)}
+                      className="text-[12px] text-white/34 transition hover:text-white/70"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  {normalSessions.length === 0 ? (
+                    <div className="rounded-xl border border-white/[0.055] bg-black/24 px-3 py-2 text-[12px] text-white/42">
+                      No saved sessions.
+                    </div>
+                  ) : (
+                    <div className="max-h-[320px] space-y-1 overflow-y-auto">
+                      {normalSessions.map((session) => (
+                        <div key={session.id} className="group relative rounded-xl hover:bg-white/[0.025]">
+                          <button
+                            type="button"
+                            onClick={() => openNormalSession(session)}
+                            className="block w-full px-3 py-2 pr-8 text-left"
+                          >
+                            <span className="block truncate text-[13px] text-white/64">
+                              {getSessionTitle(session)}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setPendingDeleteSessionId(pendingDeleteSessionId === session.id ? null : session.id)
+                            }}
+                            className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/30 transition hover:text-white/72"
+                          >
+                            ⋯
+                          </button>
+
+                          {pendingDeleteSessionId === session.id && (
+                            <button
+                              type="button"
+                              onClick={() => deleteNormalSession(session.id)}
+                              className="mb-1 ml-3 rounded-lg px-2 py-1 text-[11px] text-red-100/70 transition hover:bg-red-400/[0.06] hover:text-red-100"
+                            >
+                              Delete session
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </>
     )}
 
     <aside
