@@ -4694,7 +4694,7 @@ return (
           <img
             src="/earbud400.png"
             alt="GEORGE LIVE"
-            className="absolute right-[8px] top-[104px] h-[108px] w-auto rotate-[12deg] object-contain opacity-[0.82] sm:right-[22px] sm:top-[56px] sm:h-[148px] md:right-[28px] md:top-[38px] md:h-[138px] md:opacity-[0.98]"
+            className="absolute right-[-18px] top-[90px] h-[132px] w-auto rotate-[12deg] object-contain opacity-[0.88] sm:right-[-8px] sm:top-[48px] sm:h-[176px] md:right-[12px] md:top-[34px] md:h-[166px] md:opacity-[0.98]"
           />
         </div>
       </div>
