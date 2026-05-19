@@ -471,6 +471,20 @@ function isForceIntervention(text: string) {
     pushLog(reason)
   }
 
+  async function manualReconnect() {
+    if (!isReconnectStillValid()) {
+      pushLog('Reconnect window expired.')
+      reconnectEligibleRef.current = false
+      reconnectEligibleUntilRef.current = 0
+      setLiveLifecycle('failed')
+      return
+    }
+
+    const reconnectReason = lastDisconnectReasonRef.current || 'unknown disconnect'
+    pushLog(`Manual reconnect requested after: ${reconnectReason}`)
+    await start()
+  }
+
   async function start() {
     if (liveLifecycle === 'connecting' || liveLifecycle === 'active' || running || socketRef.current) {
       pushLog('LIVE session already active.')
@@ -1032,13 +1046,25 @@ function isForceIntervention(text: string) {
 
           <div className="flex flex-wrap gap-3">
             {!running ? (
-              <button
-                type="button"
-                onClick={start}
-                className="rounded-[1rem] bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/85"
-              >
-                Start LIVE mic
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={start}
+                  className="rounded-[1rem] bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/85"
+                >
+                  Start LIVE mic
+                </button>
+
+                {isReconnectStillValid() ? (
+                  <button
+                    type="button"
+                    onClick={manualReconnect}
+                    className="rounded-[1rem] border border-amber-300/25 bg-amber-300/[0.08] px-5 py-3 text-sm font-semibold text-amber-50 transition hover:bg-amber-300/[0.14]"
+                  >
+                    Reconnect LIVE
+                  </button>
+                ) : null}
+              </>
             ) : (
               <button
                 type="button"
