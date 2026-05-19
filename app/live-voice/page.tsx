@@ -30,6 +30,7 @@ type LiveLifecycleState =
   | 'idle'
   | 'connecting'
   | 'active'
+  | 'interrupted'
   | 'tearing_down'
   | 'failed'
 
@@ -81,6 +82,7 @@ function isForceIntervention(text: string) {
   const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
   const audioProcessorRef = useRef<ScriptProcessorNode | null>(null)
   const stoppingRef = useRef(false)
+  const intentionalStopRef = useRef(false)
   const lastGovernAtRef = useRef(0)
   const liveRuntimeMemoryRef = useRef({
     acceptedCarryCount: 0,
@@ -404,8 +406,9 @@ function isForceIntervention(text: string) {
     }
   }
 
-  function teardownLiveSession(reason = 'Stopped.') {
+  function teardownLiveSession(reason = 'Stopped.', intentional = true, finalState: LiveLifecycleState | null = null) {
     stoppingRef.current = true
+    intentionalStopRef.current = intentional
     setLiveLifecycle('tearing_down')
     georgeCancelEngine.bump()
     georgeAudioQueue.clear()
@@ -445,7 +448,7 @@ function isForceIntervention(text: string) {
     streamRef.current = null
 
     setRunning(false)
-    setLiveLifecycle(reason === 'Stopped.' || reason.includes('unmounted') ? 'idle' : 'failed')
+    setLiveLifecycle(finalState || (reason === 'Stopped.' || reason.includes('unmounted') ? 'idle' : 'failed'))
     void releaseWakeLock()
     pushLog(reason)
   }
@@ -457,6 +460,7 @@ function isForceIntervention(text: string) {
     }
 
     stoppingRef.current = false
+    intentionalStopRef.current = false
     setLiveLifecycle('connecting')
     setError('')
     setTranscript('')
@@ -827,17 +831,35 @@ function isForceIntervention(text: string) {
 
       socket.onclose = (event) => {
         const reason = `Deepgram socket closed: code ${event.code}${event.reason ? ` — ${event.reason}` : ''}`
+
         console.warn(reason, event)
+
+        if (intentionalStopRef.current) {
+          pushLog('LIVE session closed intentionally.')
+          return
+        }
+
+        if (
+          event.code === 1006 ||
+          event.code === 1011 ||
+          event.code === 1012 ||
+          event.code === 1013
+        ) {
+          setError(reason)
+          teardownLiveSession(reason, false, 'interrupted')
+          pushLog('LIVE transport interrupted.')
+          return
+        }
 
         if (!stoppingRef.current) {
           setError(reason)
-          teardownLiveSession(reason)
+          teardownLiveSession(reason, false)
         }
       }
     } catch (err) {
       setError('Mic start failed. Check browser mic permission.')
       pushLog('Mic start failed.')
-      teardownLiveSession('Mic start failed.')
+      teardownLiveSession('Mic start failed.', false)
     }
   }
 
@@ -1078,6 +1100,7 @@ function isForceIntervention(text: string) {
             <p>Delivery: {runtimeState.deliveryProfile}</p>
             <p>Tier: {liveTier}</p>
             <p>Lifecycle: {liveLifecycle}</p>
+            <p>Intentional Stop: {String(intentionalStopRef.current)}</p>
             <p>Leverage: {runtimeState.leverageState || 'stable'}</p>
             <p>Escalation: {runtimeState.escalationLikelihood ?? 0}</p>
             <p>Urgency: {runtimeState.interventionUrgency || 'low'}</p>
