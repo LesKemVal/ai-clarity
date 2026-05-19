@@ -81,7 +81,9 @@ wss.on('connection', (client) => {
   })
 
   client.on('message', (data) => {
-    console.log('Audio chunk:', data.length || data.size || 'unknown')
+    if (process.env.LIVE_PROXY_DEBUG === '1') {
+      console.log('Audio chunk:', data.length || data.size || 'unknown')
+    }
 
     if (deepgram.readyState === WebSocket.OPEN) {
       deepgram.send(data)
