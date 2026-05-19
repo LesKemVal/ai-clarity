@@ -1,5 +1,6 @@
 import { georgeConfidenceEngine } from './confidence-engine'
 import { compressForDelivery, DELIVERY_PROFILES, type DeliveryProfileId } from './delivery-profile'
+import { LIVE_RUNTIME_DOCTRINE } from './runtime-doctrine'
 import { georgeEmotionalVelocity } from './emotional-velocity'
 import { georgeLoadManager } from './load-manager'
 import { georgePostureEngine } from './posture-engine'
@@ -57,6 +58,9 @@ export type LiveOrchestratorResult = {
   }
   queueText: string
 }
+
+// Runtime doctrine imported intentionally to anchor future runtime evolution.
+void LIVE_RUNTIME_DOCTRINE
 
 export function orchestrateLiveTurn(
   input: LiveOrchestratorInput
