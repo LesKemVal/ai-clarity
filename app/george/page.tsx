@@ -4492,20 +4492,6 @@ return (
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-2 xl:hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowSidebar(true)}
-                    onTouchStart={() => setShowSidebar(true)}
-                    onPointerDown={() => setShowSidebar(true)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.045] bg-[#171B26]/72 text-[#AAB4FF] shadow-[0_0_12px_rgba(174,182,255,0.14)] pointer-events-auto"
-                    aria-label="Open menu"
-                  >
-                    <span className="flex flex-col items-center justify-center gap-[3px]">
-                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
-                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
-                      <span className="block h-[1.5px] w-4 rounded-full bg-current" />
-                    </span>
-                  </button>
 
                   <div className="relative">
                     <button
