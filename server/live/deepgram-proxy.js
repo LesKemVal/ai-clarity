@@ -106,6 +106,6 @@ wss.on('connection', (client) => {
   })
 })
 
-server.listen(PORT, () => {
-  console.log(`GEORGE LIVE proxy running on ws://localhost:${PORT}/live`)
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`GEORGE LIVE proxy running on ws://0.0.0.0:${PORT}/live`)
 })

@@ -8,8 +8,8 @@ ENV LIVE_PROXY_PORT=8787
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-COPY server/live ./server/live
+COPY deepgram-proxy.js ./deepgram-proxy.js
 
 EXPOSE 8787
 
-CMD ["node", "server/live/deepgram-proxy.js"]
+CMD ["node", "deepgram-proxy.js"]
