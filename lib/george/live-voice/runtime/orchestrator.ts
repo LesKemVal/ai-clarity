@@ -3,6 +3,7 @@ import { compressForDelivery, DELIVERY_PROFILES, type DeliveryProfileId } from '
 import { LIVE_RUNTIME_DOCTRINE } from './runtime-doctrine'
 import { selectSalvageObjective } from './salvage-objectives'
 import { assessPerceivedPositioning } from './perceived-positioning'
+import { classifyInterventionEffect } from './intervention-effectiveness'
 import { georgeEmotionalVelocity } from './emotional-velocity'
 import { georgeLoadManager } from './load-manager'
 import { georgePostureEngine } from './posture-engine'
@@ -364,6 +365,15 @@ export function orchestrateLiveTurn(
     credibilityMovement: perceivedPositioning.credibilityMovement,
     respectSignal: perceivedPositioning.respectSignal,
   })
+
+  const interventionEffectiveness = classifyInterventionEffect({
+    perception: perceivedPositioning.perception,
+    trustMovement: perceivedPositioning.trustMovement,
+    interruptionRisk: nextPacket.interruptionRisk,
+    emotionalVelocity: velocityState.velocity,
+    recovery: recoveryState.state,
+  })
+
 
   const silence = georgeSilenceIntelligence.decide({
     confidence: nextPacket.confidence,

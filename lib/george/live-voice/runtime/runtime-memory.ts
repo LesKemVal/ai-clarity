@@ -11,6 +11,7 @@ export type LiveRuntimeMemoryEntry = {
   label: string
   reason: string
   timestamp: number
+  effectiveness?: string
 }
 
 class GeorgeLiveRuntimeMemory {
