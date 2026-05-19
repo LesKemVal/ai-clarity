@@ -2,6 +2,7 @@ import { georgeConfidenceEngine } from './confidence-engine'
 import { compressForDelivery, DELIVERY_PROFILES, type DeliveryProfileId } from './delivery-profile'
 import { LIVE_RUNTIME_DOCTRINE } from './runtime-doctrine'
 import { selectSalvageObjective } from './salvage-objectives'
+import { assessPerceivedPositioning } from './perceived-positioning'
 import { georgeEmotionalVelocity } from './emotional-velocity'
 import { georgeLoadManager } from './load-manager'
 import { georgePostureEngine } from './posture-engine'
@@ -118,6 +119,17 @@ export function orchestrateLiveTurn(
     roomPressure: nextPacket.roomPressure,
     emotionalVelocity: velocityState.velocity,
     objectiveId: activeObjective.id,
+  })
+
+  const perceivedPositioning = assessPerceivedPositioning({
+    text,
+    speaker: nextPacket.speaker,
+    powerFrame: powerState.frame,
+    trajectory: trajectoryState.trajectory,
+    recovery: recoveryState.state,
+    emotionalVelocity: velocityState.velocity,
+    roomPressure: nextPacket.roomPressure,
+    interruptionRisk: nextPacket.interruptionRisk,
   })
 
   const decisionWindow = georgeDecisionWindow.evaluate({
@@ -312,7 +324,7 @@ export function orchestrateLiveTurn(
   nextPacket.volley = shapedResponse.volley
   nextPacket.cue = shapedResponse.cue
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Salvage objective: ${salvageObjective.label} (${salvageObjective.reason}). Forecast bias: ${forecastBias}. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Salvage objective: ${salvageObjective.label} (${salvageObjective.reason}). Perception: ${perceivedPositioning.perception} (${perceivedPositioning.reason}). Forecast bias: ${forecastBias}. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
@@ -346,6 +358,11 @@ export function orchestrateLiveTurn(
     forecast: partialForecast,
     forecastConfidence: partialForecastConfidence,
     forecastBias,
+    perceivedPositioning: perceivedPositioning.perception,
+    perceivedPositioningScore: perceivedPositioning.score,
+    trustMovement: perceivedPositioning.trustMovement,
+    credibilityMovement: perceivedPositioning.credibilityMovement,
+    respectSignal: perceivedPositioning.respectSignal,
   })
 
   const silence = georgeSilenceIntelligence.decide({

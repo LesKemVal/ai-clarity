@@ -29,6 +29,11 @@ export type LiveRuntimeSnapshot = {
   forecast?: string
   forecastConfidence?: number
   forecastBias?: string
+  perceivedPositioning?: string
+  perceivedPositioningScore?: number
+  trustMovement?: string
+  credibilityMovement?: string
+  respectSignal?: string
 }
 
 const EMPTY_STATE: LiveRuntimeSnapshot = {
@@ -62,6 +67,11 @@ const EMPTY_STATE: LiveRuntimeSnapshot = {
   forecast: 'none',
   forecastConfidence: 0,
   forecastBias: 'none',
+  perceivedPositioning: 'stable',
+  perceivedPositioningScore: 0.5,
+  trustMovement: 'stable',
+  credibilityMovement: 'stable',
+  respectSignal: 'stable',
 }
 
 class GeorgeLiveRuntimeState {
