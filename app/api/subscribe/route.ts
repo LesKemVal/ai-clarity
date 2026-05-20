@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
           }),
       success_url:
         tier === 'brilliant_day'
-          ? `${appUrl}/george/live?daily=success&session_id={CHECKOUT_SESSION_ID}`
+          ? `${appUrl}/top-up?daily=success&session_id={CHECKOUT_SESSION_ID}`
           : `${appUrl}/george?subscription=success&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:
         tier === 'brilliant_day'
-          ? `${appUrl}/george/live?daily=cancelled`
+          ? `${appUrl}/top-up?daily=cancelled`
           : `${appUrl}/george?subscription=cancelled&tier=${tier}`,
     })
 
