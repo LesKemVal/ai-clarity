@@ -43,6 +43,10 @@ function readStore(): SubscriberStore {
 }
 
 function writeStore(store: SubscriberStore) {
+  if (process.env.VERCEL === '1') {
+    return
+  }
+
   fs.mkdirSync(path.dirname(storePath), { recursive: true })
   fs.writeFileSync(storePath, JSON.stringify(store, null, 2))
 }
