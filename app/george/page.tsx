@@ -5335,9 +5335,8 @@ ${simplifyTarget}`
         className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_24px_rgba(0,0,0,0.24)] transition hover:bg-white/90 hover:scale-[1.03]"
         aria-label="Scroll to latest message"
       >
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 5v13" />
-          <path d="m6 12 6 6 6-6" />
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 22c3.7 0 6.5-2.6 6.5-6.2 0-2.2-1.1-4.2-2.8-5.5.1 1.4-.5 2.4-1.4 3.1.1-3.4-1.7-6.1-4.5-8.4.3 2.9-.9 4.7-2.3 6.2-1.1 1.2-2 2.5-2 4.5C5.5 19.4 8.3 22 12 22Z" />
         </svg>
       </button>
 
