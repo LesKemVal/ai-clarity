@@ -4497,7 +4497,7 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
-          <div className="flex h-[var(--george-vh,100dvh)] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+          <div className="flex min-h-[100dvh] w-full flex-1 flex-col overflow-visible px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <MobileHeader
@@ -5384,7 +5384,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto -translate-x-1 text-[15px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
+                  className="pointer-events-auto -translate-x-3 text-[15px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
                 >
                   🔥
                 </button>
