@@ -9,7 +9,7 @@ export default function MobileHeaderGate() {
   if (
     pathname === '/' ||
     pathname === '/george' ||
-    pathname === '/images' || pathname === '/top-up' ||
+    pathname === '/images' || pathname === '/top-up' || pathname === '/signal' ||
     pathname.startsWith('/george/')
   ) {
     return null
