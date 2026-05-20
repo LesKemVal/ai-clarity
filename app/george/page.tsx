@@ -565,43 +565,8 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
 
   useEffect(() => {
-    // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
-    if (liveMode || isManualLive) return
-
-    // const greeting = getInitialGreeting()
-
-
-    setMessages((prev) => {
-      if (prev.length === 0) {
-        const next: any[] = []
-        messagesRef.current = next
-        return next
-      }
-
-      if (
-        prev.length === 1 &&
-        prev[0]?.role === 'assistant' &&
-        prev[0]?.content.includes("Tell me what matters today?")
-      ) {
-        const next: any[] = []
-        messagesRef.current = next
-        return next
-      }
-
-      return prev
-    })
-
-    if (messagesRef.current.length === 0) {
-      messagesRef.current = []
-    }
-
-    if (
-      messagesRef.current.length === 1 &&
-      messagesRef.current[0]?.role === 'assistant' &&
-      messagesRef.current[0]?.content.includes("Tell me what matters today?")
-    ) {
-      messagesRef.current = []
-    }
+    // Normal GEORGE front screen intentionally starts clean.
+    // No automatic assistant greeting.
   }, [])
 
   function handleFeedback(index: number, type: 'up' | 'down') {
