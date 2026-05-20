@@ -76,13 +76,13 @@ export default function HelpPage() {
   const active = HELP_ITEMS.find((item) => item.id === open) || HELP_ITEMS[0]
 
   return (
-    <main className="min-h-[100dvh] bg-[#06070A] px-5 py-8 text-[#D7DBE4]">
-      <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[920px] flex-col justify-center">
-        <section className="mb-7 max-w-[660px]">
+    <main className="min-h-[100dvh] bg-[#06070A] px-5 pb-8 pt-3 text-[#D7DBE4]">
+      <div className="mx-auto flex w-full max-w-[920px] flex-col justify-start">
+        <section className="mb-5 max-w-[660px]">
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="mb-7 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
+            className="mb-4 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
           />
 
           <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
