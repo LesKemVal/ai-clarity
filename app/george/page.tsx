@@ -6467,7 +6467,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       
       {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[8px]  flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/78  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/78  p-5 text-center shadow-[0_18px_54px_rgba(0,0,0,0.42)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
 
             {walkthroughStep === 1 && <p className="text-[#D7DBE4] text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, debate, speech, study, or everyday pressure.</p>}
@@ -6507,7 +6507,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/78 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/78 p-5 shadow-[0_18px_54px_rgba(0,0,0,0.42)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
