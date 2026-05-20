@@ -1580,7 +1580,78 @@ const redeemFounderCode = async () => {
   }
 }
 
-  const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
+  
+const handleClearContinuity = () => {
+  setSubscriberEmail('')
+  window.localStorage.removeItem('george_email')
+  window.localStorage.removeItem('george_verified_continuity')
+}
+
+const handleContinuityRequest = async () => {
+  const email = subscriberEmail.trim().toLowerCase()
+
+  if (!email) {
+    setToastMessage('Enter your email first.')
+    setShowToast(true)
+    return
+  }
+
+  try {
+    const response = await fetch('/api/continuity/request-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      setToastMessage(data?.error || 'Unable to send continuity link.')
+      setShowToast(true)
+      return
+    }
+
+    setToastMessage('Access link sent.')
+    setShowToast(true)
+  } catch {
+    setToastMessage('Unable to send continuity link.')
+    setShowToast(true)
+  }
+}
+
+const handleTierCheckout = async (
+  tier: 'intelligent' | 'brilliant'
+) => {
+  try {
+    const response = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tier,
+        email: subscriberEmail || undefined,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (data?.url) {
+      if (data.url && data.url.startsWith('http')) {
+        window.location.href = data.url
+      } else {
+        router.replace(data.url)
+      }
+      return
+    }
+
+    setToastMessage(data?.error || 'Unable to open checkout.')
+    setShowToast(true)
+  } catch {
+    setToastMessage('Unable to open checkout.')
+    setShowToast(true)
+  }
+}
+
+const [showCampaignUpgradeGate, setShowCampaignUpgradeGate] = useState(false)
   const [upgradeCtaWord, setUpgradeCtaWord] = useState<'Intelligent' | 'Brilliant'>('Intelligent')
 
   useEffect(() => {
@@ -6621,11 +6692,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             <ContinuityCapsule
               email={subscriberEmail}
               label="Recognized as"
-              onClear={() => {
-                setSubscriberEmail('')
-                window.localStorage.removeItem('george_email')
-                window.localStorage.removeItem('george_verified_continuity')
-              }}
+              onClear={handleClearContinuity}
             />
 
             <input
@@ -6649,37 +6716,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
             <button
               type="button"
-              onClick={async () => {
-                const email = subscriberEmail.trim().toLowerCase()
-
-                if (!email) {
-                  setToastMessage('Enter your email first.')
-                  setShowToast(true)
-                  return
-                }
-
-                try {
-                  const response = await fetch('/api/continuity/request-link', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email }),
-                  })
-
-                  const data = await response.json()
-
-                  if (!response.ok) {
-                    setToastMessage(data?.error || 'Unable to send continuity link.')
-                    setShowToast(true)
-                    return
-                  }
-
-                  setToastMessage('Access link sent.')
-                  setShowToast(true)
-                } catch {
-                  setToastMessage('Unable to send continuity link.')
-                  setShowToast(true)
-                }
-              }}
+              onClick={handleContinuityRequest}
               className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#D7DBE4]/70 transition hover:bg-white/[0.12] hover:text-[#D7DBE4]"
             >
               Send access link
@@ -6688,35 +6725,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
           <button
             type="button"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/subscribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    tier: 'intelligent',
-                    email: subscriberEmail || undefined,
-                  }),
-                })
-
-                const data = await response.json()
-
-                if (data?.url) {
-                  if (data.url && data.url.startsWith('http')) {
-                    window.location.href = data.url
-                  } else {
-                    router.replace(data.url)
-                  }
-                  return
-                }
-
-                setToastMessage(data?.error || 'Unable to open checkout.')
-                setShowToast(true)
-              } catch {
-                setToastMessage('Unable to open checkout.')
-                setShowToast(true)
-              }
-            }}
+            onClick={() => handleTierCheckout('intelligent')}
             className="block w-full rounded-[1rem] max-w-full border border-white/[0.055] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.12] hover:bg-white/[0.04]"
           >
             <div className="flex items-center justify-between gap-3">
@@ -6735,35 +6744,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
           <button
             type="button"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/subscribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    tier: 'brilliant',
-                    email: subscriberEmail || undefined,
-                  }),
-                })
-
-                const data = await response.json()
-
-                if (data?.url) {
-                  if (data.url && data.url.startsWith('http')) {
-                    window.location.href = data.url
-                  } else {
-                    router.replace(data.url)
-                  }
-                  return
-                }
-
-                setToastMessage(data?.error || 'Unable to open checkout.')
-                setShowToast(true)
-              } catch {
-                setToastMessage('Unable to open checkout.')
-                setShowToast(true)
-              }
-            }}
+            onClick={() => handleTierCheckout('brilliant')}
             className="block w-full rounded-[1rem] max-w-full border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-left transition hover:border-white/[0.09] hover:bg-white/[0.05]"
           >
             <div className="flex items-center justify-between gap-3">
