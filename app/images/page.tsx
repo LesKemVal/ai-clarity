@@ -57,12 +57,19 @@ export default function ImagesPage() {
   return (
     <main className="min-h-[145dvh] overflow-x-hidden overflow-y-scroll overscroll-y-auto touch-pan-y bg-[#06070A] px-4 pb-[220px] pt-6 text-white [-webkit-overflow-scrolling:touch] sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
-        <div className="mb-8 flex items-center justify-center border-b border-white/[0.055] pb-5">
+        <div className="mb-8 flex items-center justify-start gap-4 border-b border-white/[0.055] pb-5">
+          <Link
+            href="/george"
+            className="text-[13px] font-medium uppercase tracking-[0.16em] text-white/46 transition hover:text-white/76"
+          >
+            Back
+          </Link>
+
           <Link href="/george" aria-label="Back to GEORGE">
             <img
               src="/logofav.png"
               alt="GEORGE"
-              className="h-[88px] w-[88px] rounded-[1.35rem] object-contain opacity-95"
+              className="h-[82px] w-[82px] rounded-[1.35rem] object-contain opacity-95"
             />
           </Link>
         </div>
