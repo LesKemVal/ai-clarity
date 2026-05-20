@@ -421,7 +421,12 @@ const [mobileFontFamily, setMobileFontFamily] = useState(IOS_GEORGE_FONT)
 useEffect(() => {
   if (typeof navigator === 'undefined') return
   setMobileFontFamily(getGeorgeMobileFont(navigator.userAgent))
+
+    if (/android/i.test(navigator.userAgent)) {
+      document.documentElement.classList.add('android')
+    }
 }, [])
+
 
   const router = useRouter()
   const [input, setInput] = useState('')
@@ -4497,7 +4502,7 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible">
-          <div className="flex min-h-[100dvh] w-full flex-1 flex-col overflow-visible px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+          <div className="flex h-[var(--george-vh,100dvh)] min-h-0 w-full flex-1 flex-col overflow-hidden px-4 pb-0 pt-[68px] md:h-screen md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 <MobileHeader
@@ -4596,7 +4601,7 @@ return (
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-2 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="sticky top-[64px] z-[2] flex min-h-[64px] flex-col items-center justify-start px-4 pt-1 md:hidden pointer-events-none">
+    <div className="george-hero sticky top-[64px] z-[2] flex min-h-[64px] flex-col items-center justify-start px-4 pt-1 md:hidden pointer-events-none">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
         GEORGE
       </div>
@@ -5384,7 +5389,7 @@ ${simplifyTarget}`
                 <button
                   type="button"
                   onClick={enterLiveConversation}
-                  className="pointer-events-auto -translate-x-3 text-[15px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
+                  className="pointer-events-auto -translate-x-5 text-[15px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
                 >
                   🔥
                 </button>
@@ -6160,12 +6165,6 @@ Continue from here, tell me what changed, or start fresh.`
                 <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 backdrop-blur-[10px]" />
               )}
 
-
-
-
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
-              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
-
               
 
 
@@ -6240,7 +6239,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'george-composer fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
 
                       <input
@@ -6459,19 +6458,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 
 
-{!liveMode && !showConversation && !input.trim() && !pendingImage && (
-                  <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
-                    <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-[#D7DBE4]/38">
-                      <a
-                        href="/images"
-                        className="inline-flex items-center gap-2 transition hover:text-[#D7DBE4]/72"
-                      >
-                        <span className="text-[#D7DBE4]/58">◌</span>
-                        <span>Create Images</span>
-                      </a>
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
           </div>

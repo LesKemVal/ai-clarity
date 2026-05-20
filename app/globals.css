@@ -298,3 +298,60 @@ textarea {
     border-radius: 0.68rem;
   }
 }
+
+/* ================================
+   GEORGE ANDROID VISUAL COMPRESSION
+   ================================ */
+
+html.android .app-shell {
+  background:
+    radial-gradient(circle at top, rgba(22,26,34,0.42), transparent 42%),
+    #090B10 !important;
+}
+
+/* Slightly reduce overall visual weight */
+html.android .app-shell * {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hero */
+html.android .app-shell .george-hero {
+  transform: scale(0.94);
+  transform-origin: top center;
+  opacity: 0.92;
+}
+
+/* Composer */
+html.android .app-shell .george-composer {
+  transform: scale(0.97);
+  transform-origin: bottom center;
+}
+
+/* Glass instead of dense black */
+html.android .app-shell .glass-black {
+  background: rgba(11,13,18,0.72) !important;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+/* Reduce bulky shadows */
+html.android .app-shell .soft-shadow {
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.24) !important;
+}
+
+/* Text slightly smaller on Android */
+html.android .app-shell textarea,
+html.android .app-shell input,
+html.android .app-shell button,
+html.android .app-shell p {
+  letter-spacing: -0.01em;
+}
+
+/* Slightly smaller front idle layout */
+html.android .app-shell .front-idle {
+  transform: scale(0.965);
+  transform-origin: top center;
+}
+
