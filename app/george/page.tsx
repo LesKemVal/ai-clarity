@@ -4615,7 +4615,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-12 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
     <div className="sticky top-[92px] z-[2] flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden pointer-events-none">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
@@ -5355,7 +5355,7 @@ ${simplifyTarget}`
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode || showMobileHero ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
                 <div className="pointer-events-auto flex items-center gap-5">
                   <button
                     type="button"
