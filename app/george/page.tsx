@@ -568,12 +568,12 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
     if (liveMode || isManualLive) return
 
-    const greeting = getInitialGreeting()
+    // const greeting = getInitialGreeting()
 
 
     setMessages((prev) => {
       if (prev.length === 0) {
-        const next = [{ role: 'assistant' as const, content: greeting }]
+        const next: any[] = []
         messagesRef.current = next
         return next
       }
@@ -583,7 +583,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         prev[0]?.role === 'assistant' &&
         prev[0]?.content.includes("Tell me what matters today?")
       ) {
-        const next = [{ role: 'assistant' as const, content: greeting }]
+        const next: any[] = []
         messagesRef.current = next
         return next
       }
@@ -592,7 +592,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     })
 
     if (messagesRef.current.length === 0) {
-      messagesRef.current = [{ role: 'assistant', content: greeting }]
+      messagesRef.current = []
     }
 
     if (
@@ -600,7 +600,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
       messagesRef.current[0]?.role === 'assistant' &&
       messagesRef.current[0]?.content.includes("Tell me what matters today?")
     ) {
-      messagesRef.current = [{ role: 'assistant', content: greeting }]
+      messagesRef.current = []
     }
   }, [])
 
@@ -4435,7 +4435,7 @@ return (
             const greeting = getInitialGreeting(profileName, currentTier)
             setTimeout(() => {
               setMessages([{ role: 'assistant', content: greeting }])
-              messagesRef.current = [{ role: 'assistant', content: greeting }]
+              messagesRef.current = []
             }, 1000)
             setInput('')
             setInterimTranscript('')
@@ -4615,9 +4615,9 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-[180px] md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-2 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="sticky top-[92px] z-[2] flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden pointer-events-none">
+    <div className="sticky top-[38px] z-[2] flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden pointer-events-none">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
         GEORGE
       </div>
