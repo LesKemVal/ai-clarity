@@ -9,6 +9,8 @@ import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import LiveChooser from '@/components/george/LiveChooser'
 import MobileHeader from '@/components/george/mobile/MobileHeader'
 import TierTicker from '@/components/george/mobile/TierTicker'
+import WalkthroughModal from '@/components/george/modals/WalkthroughModal'
+import HelpModal from '@/components/george/modals/HelpModal'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -6466,39 +6468,14 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       
       {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[8px]  flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/78  p-5 text-center shadow-[0_18px_54px_rgba(0,0,0,0.42)]">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
-
-            {walkthroughStep === 1 && <p className="text-[#D7DBE4] text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, debate, speech, study, or everyday pressure.</p>}
-            {walkthroughStep === 2 && <p className="text-[#D7DBE4] text-sm leading-7">Voice speed controls how fast GEORGE responds in your ear.</p>}
-            {walkthroughStep === 3 && <p className="text-[#D7DBE4] text-sm leading-7">Mic button lets GEORGE listen while you stay in motion.</p>}
-            {walkthroughStep === 4 && <p className="text-[#D7DBE4] text-sm leading-7">LIVE cues give fast lines, warnings, and framing in real time.</p>}
-
-            <div className="mt-5">
-              {walkthroughStep < 4 ? (
-                <button
-                  type="button"
-                  onClick={() => setWalkthroughStep((s) => s + 1)}
-                  className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.localStorage.setItem("george_walkthrough_seen","1")
-                    setShowWalkthrough(false)
-                  }}
-                  className="w-full rounded-[1rem] max-w-full bg-white px-5 py-4 text-sm font-medium text-black"
-                >
-                  End
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <WalkthroughModal
+          step={walkthroughStep}
+          onNext={() => setWalkthroughStep((s) => s + 1)}
+          onEnd={() => {
+            window.localStorage.setItem("george_walkthrough_seen","1")
+            setShowWalkthrough(false)
+          }}
+        />
       )}
 
 {showPersonalizeModal && (
@@ -6879,78 +6856,11 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       )}
 
       {showHelpModal && typeof document !== 'undefined' && createPortal(
-        <>
-          <button
-            type="button"
-            aria-label="Close help"
-            onClick={() => setShowHelpModal(false)}
-            className="fixed inset-0 z-[220] bg-black/62 backdrop-blur-[8px]"
-          />
-
-          <div className="fixed inset-0 z-[230] flex items-center justify-center px-4 py-6">
-            <div className="relative w-full max-w-[430px] rounded-[1.35rem] border border-white/[0.08] bg-[#0B0D12]/82 p-5 shadow-[0_18px_54px_rgba(0,0,0,0.42)]">
-              <button
-                type="button"
-                aria-label="Close help"
-                onClick={() => setShowHelpModal(false)}
-                className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-[#11131A] text-lg text-white/78 shadow-[0_12px_30px_rgba(0,0,0,0.42)] transition hover:text-white"
-              >
-                ×
-              </button>
-
-              {!activeHelpTopic ? null : (
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-white/34">GEORGE Help</p>
-
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    {[
-                      ['live', 'LIVE'],
-                      ['continuity', 'Continuity'],
-                      ['images', 'Images'],
-                      ['signal', 'Signal'],
-                    ].map(([id, label]) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => setActiveHelpTopic(id as 'live' | 'continuity' | 'images' | 'signal')}
-                        className={`rounded-xl border px-3 py-2 text-left text-[12px] transition ${
-                          activeHelpTopic === id
-                            ? 'border-white/[0.14] bg-white/[0.06] text-white'
-                            : 'border-white/[0.055] bg-black/20 text-white/52 hover:text-white/80'
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 rounded-xl border border-white/[0.055] bg-black/24 p-4">
-                    <h3 className="text-[15px] font-semibold text-white/88">
-                      {activeHelpTopic === 'live' && 'LIVE GEORGE'}
-                      {activeHelpTopic === 'continuity' && 'Continuity'}
-                      {activeHelpTopic === 'images' && 'Images'}
-                      {activeHelpTopic === 'signal' && 'Signal'}
-                    </h3>
-
-                    <p className="mt-2 text-[13px] leading-6 text-white/52">
-                      {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations. Use Prep Room to set the room, purview, support level, and context before entering LIVE.'}
-                      {activeHelpTopic === 'continuity' && 'Continuity restores GEORGE recognition, tier access, and LIVE eligibility on this device through your verified access session.'}
-                      {activeHelpTopic === 'images' && 'Images lets you generate visual direction, product concepts, campaign visuals, and references from GEORGE.'}
-                      {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns over time so guidance can better serve your interest.'}
-                    </p>
-
-                    <a
-                      href="/help"
-                      className="mt-4 inline-flex text-[12px] font-medium text-[#D7DBE4]/62 underline-offset-4 transition hover:text-white hover:underline"
-                    >
-                      Open full help topics
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </>,
+        <HelpModal
+          activeHelpTopic={activeHelpTopic}
+          onClose={() => setShowHelpModal(false)}
+          onSelectTopic={setActiveHelpTopic}
+        />,
         document.body
       )}
 

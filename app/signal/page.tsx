@@ -109,21 +109,21 @@ export default function SignalPage() {
           ← Back to GEORGE
         </button>
 
-        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.34)] md:p-7">
+        <div className="space-y-6 rounded-[1rem] border border-white/[0.05] bg-white/[0.015] p-5 shadow-[0_12px_34px_rgba(0,0,0,0.28)] md:p-6">
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="h-24 w-24 rounded-[1.6rem] object-contain opacity-94 md:h-28 md:w-28"
+            className="h-20 w-20 rounded-[1.2rem] object-contain opacity-90 md:h-24 md:w-24"
           />
 
-          <div className="space-y-3 border-b border-white/[0.045] pb-6">
+          <div className="space-y-2 border-b border-white/[0.05] pb-5">
             <p className="text-xs uppercase tracking-[0.28em] text-white/42">
-              Add Signal
+              Signal
             </p>
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
+            <h1 className="max-w-3xl text-[2.4rem] font-semibold tracking-[-0.06em] text-white md:text-[3.2rem]">
               Give GEORGE better signal.
             </h1>
-            <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
+            <p className="max-w-3xl text-sm leading-6 text-white/44 md:text-[15px]">
               Answer a few questions so GEORGE can understand what matters, ask sharper follow-ups, and stay useful as your goals, projects, pressure, and context change.
             </p>
             {hasSavedSignal && (
@@ -133,41 +133,41 @@ export default function SignalPage() {
             )}
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-3 lg:grid-cols-[1.35fr_0.65fr]">
             <div className="space-y-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Current signal</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Working signal</p>
               <div className="grid gap-3 md:grid-cols-2">
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="What should I call you?"
-                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                  placeholder="Name"
+                  className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
                 <input
                   value={mission}
                   onChange={(e) => setMission(e.target.value)}
-                  placeholder="What are we trying to build, fix, fund, or change?"
-                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                  placeholder="Primary objective"
+                  className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
                 <input
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  placeholder="What matters most right now?"
-                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                  placeholder="Current pressure"
+                  className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
 
                 <input
                   value={learningStyle}
                   onChange={(e) => setLearningStyle(e.target.value)}
-                  placeholder="How should I communicate or work with you?"
-                  className="rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-white outline-none placeholder:text-white/28"
+                  placeholder="Preferred operating style"
+                  className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
               </div>
             </div>
 
             <div className="rounded-[0.9rem] border border-white/[0.045] bg-black/20 p-4">
               <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">
-                Connected Systems
+                Continuity layer
               </p>
               <p className="mt-3 text-sm leading-6 text-white/48">
                 GEORGE can later connect to calendars, repositories, files, email, documents, or other systems when continuity and real work require it.
@@ -178,9 +178,9 @@ export default function SignalPage() {
             </div>
           </div>
 
-          <div className="rounded-[0.95rem] border border-white/[0.045] bg-black/24 p-4">
+          <div className="rounded-[0.9rem] border border-white/[0.05] bg-black/18 p-4">
             <p className="text-[10px] uppercase tracking-[0.22em] text-white/42">
-              GEORGE asks next
+              Adaptive signal
             </p>
             <p className="mt-2 text-sm leading-6 text-white/78">
               {adaptiveQuestion}
@@ -189,8 +189,8 @@ export default function SignalPage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Answer directly. GEORGE uses this to learn what matters and decide what question may help next."
-              className="mt-3 w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
+              placeholder="Add the detail GEORGE should preserve for sharper guidance."
+              className="mt-3 w-full rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/28"
             />
           </div>
 
@@ -200,11 +200,11 @@ export default function SignalPage() {
               disabled={!valid}
               className="rounded-[0.9rem] bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
             >
-              Add Signal
+              Signal
             </button>
 
             <p className="text-xs leading-5 text-white/32">
-              You can return here whenever the project, pressure, goal, or working style changes.
+              Update signal when the objective, pressure, or operating style changes.
             </p>
           </div>
         </div>

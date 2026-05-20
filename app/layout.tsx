@@ -10,6 +10,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.branesx.com'),
   title: {
     default: 'GEORGE by BRANESx',
     template: '%s | GEORGE',
