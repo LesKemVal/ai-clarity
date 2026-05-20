@@ -31,10 +31,12 @@ export default function MobileHeader({
       <button
         type="button"
         onClick={onOpenSidebar}
-        className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025]"
-        aria-label="Open GEORGE sidebar"
+        className="inline-flex h-12 w-12 flex-col items-center justify-center gap-1 rounded-[1rem] text-[#D7DBE4]/72 transition hover:bg-white/[0.025] hover:text-[#D7DBE4]"
+        aria-label="Open GEORGE menu"
       >
-        <img src="/logofav.png" alt="GEORGE" className="h-10 w-10 object-contain opacity-95" />
+        <span className="h-[2px] w-6 rounded-full bg-current" />
+        <span className="h-[2px] w-6 rounded-full bg-current" />
+        <span className="h-[2px] w-6 rounded-full bg-current" />
       </button>
 
       <button

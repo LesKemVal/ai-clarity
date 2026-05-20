@@ -5355,7 +5355,7 @@ ${simplifyTarget}`
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode || showMobileHero ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
                 <div className="pointer-events-auto flex items-center gap-5">
                   <button
                     type="button"
