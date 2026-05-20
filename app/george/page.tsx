@@ -4248,6 +4248,7 @@ responseTimerRef.current = setTimeout(() => {
 
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
   const showMobileHero = !showConversation && messages.length <= 1
+  const showSoloInputLogoBackdrop = input.trim().length > 0 && !hasVisibleThread && !liveMode
 
 useEffect(() => {
   if (!showMobileHero || liveMode) return
@@ -4552,6 +4553,19 @@ return (
               </div>
             </header>
 
+            {showSoloInputLogoBackdrop && (
+              <div className="pointer-events-none fixed inset-x-0 top-[68px] bottom-0 z-[1] flex items-center justify-center overflow-hidden md:hidden">
+                <div className="relative flex items-center justify-center">
+                  <img
+                    src="/logofav.png"
+                    alt=""
+                    aria-hidden="true"
+                    className="h-auto w-[125vw] max-w-none opacity-[0.07]"
+                  />
+                </div>
+              </div>
+            )}
+
             
 
 {!showMobileHero && (
@@ -4582,7 +4596,7 @@ return (
   }}
   className={`flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y px-3 ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-2 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && (
-    <div className="sticky top-[38px] z-[2] flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden pointer-events-none">
+    <div className="sticky top-[64px] z-[2] flex min-h-[64px] flex-col items-center justify-start px-4 pt-1 md:hidden pointer-events-none">
       <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
         GEORGE
       </div>
@@ -4640,12 +4654,6 @@ return (
 
         <div className="relative z-0">
           <div className="absolute right-[32px] bottom-[18px] h-[58px] w-[190px] rounded-full bg-[#2F6FFF]/18 blur-[38px]" />
-
-          <img
-            src="/earbud400.png"
-            alt="GEORGE LIVE"
-            className="absolute right-[-18px] top-[90px] h-[132px] w-auto rotate-[12deg] object-contain opacity-[0.88] sm:right-[-8px] sm:top-[48px] sm:h-[176px] md:right-[12px] md:top-[34px] md:h-[166px] md:opacity-[0.98]"
-          />
         </div>
       </div>
     </div>
@@ -4657,6 +4665,7 @@ return (
     </div>
   )}
   {messages
+  .filter((m, i) => !(showMobileHero && i === 0 && m.role === 'assistant'))
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -5320,7 +5329,7 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none`}>
-                <div className="pointer-events-auto flex items-center gap-5">
+                <div className="pointer-events-auto flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -5369,19 +5378,6 @@ ${simplifyTarget}`
                     )}
                   </div>
 
-                  <TierTicker
-                    currentTier={currentTier}
-                    tierPrimarySignal={tierPrimarySignal}
-                    hasLiveGeorgeAccess={hasLiveGeorgeAccess}
-                    onPress={() => {
-                      if (hasLiveGeorgeAccess) {
-                        setShowLiveChooser(true)
-                      } else {
-                        setShowUpgradeModal(true)
-                      }
-                    }}
-                  />
-
 
                 </div>
 
@@ -5390,7 +5386,7 @@ ${simplifyTarget}`
                   onClick={enterLiveConversation}
                   className="pointer-events-auto text-[11px] font-semibold tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF]" 
                 >
-                  ◉ LIVE
+                  🔥
                 </button>
 
               </div>
