@@ -15,6 +15,7 @@ import UpgradeModal from '@/components/george/modals/UpgradeModal'
 import PersonalizeModal from '@/components/george/modals/PersonalizeModal'
 import StructuredLiveNoticeModal from '@/components/george/modals/StructuredLiveNoticeModal'
 import ExitLiveModal from '@/components/george/modals/ExitLiveModal'
+import ToastNotice from '@/components/george/modals/ToastNotice'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
@@ -6600,11 +6601,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       )}
 
       {showToast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[80] flex justify-center px-4">
-          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-[#D7DBE4] shadow-[0_18px_54px_rgba(0,0,0,0.42)] backdrop-blur-xl">
-            {toastMessage}
-          </div>
-        </div>
+        <ToastNotice message={toastMessage} />
       )}
       </main>
 
