@@ -56,7 +56,7 @@ export default function ImagesPage() {
   }
 
   return (
-    <main className="min-h-[100dvh] overflow-x-hidden overscroll-none bg-[#06070A] px-4 py-6 text-white sm:px-5 sm:py-8">
+    <main className="min-h-[145dvh] overflow-x-hidden overflow-y-scroll overscroll-y-auto touch-pan-y bg-[#06070A] px-4 pb-[220px] pt-6 text-white [-webkit-overflow-scrolling:touch] sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
         <div className="mb-8 flex items-center justify-between border-b border-white/[0.055] pb-4">
           <Link
