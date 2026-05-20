@@ -63,7 +63,7 @@ export default function RootPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.24em] text-white/34">GEORGE</div>
-                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Normal GEORGE</div>
+                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Ask GEORGE</div>
               </div>
 
               <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] text-[18px] text-white/42 transition ${georgeOpen ? 'rotate-45 bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
