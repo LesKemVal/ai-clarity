@@ -61,3 +61,22 @@ This may still matter later for LIVE and Ask GEORGE because it can help users re
 Do not permanently delete the concept.
 Do not confuse purview with campaign mode.
 If restored, it should support rhetorical/operational posture without reintroducing structured campaign bleed.
+
+
+## Purview / Rhetorical Posture Clarification
+
+Purview was not campaign logic.
+
+Purview means a user can ask GEORGE to adopt the rhetorical posture, vocabulary, pacing, and operating lens of a specific person, discipline, role, or occupation.
+
+This may still matter later for LIVE and Ask GEORGE because it can help users receive guidance in the style of:
+- a negotiator
+- attorney-like reasoning
+- doctor-facing language
+- CDL/operator language
+- executive briefing posture
+- technical builder posture
+
+Do not permanently delete the concept.
+Do not confuse purview with campaign mode.
+If restored, it should support rhetorical/operational posture without reintroducing structured campaign bleed.
