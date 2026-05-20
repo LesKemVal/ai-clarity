@@ -8,7 +8,6 @@ export default function ImagesPage() {
   const [image, setImage] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
 
   const createImage = async () => {
     if (loading) return
@@ -58,40 +57,14 @@ export default function ImagesPage() {
   return (
     <main className="min-h-[145dvh] overflow-x-hidden overflow-y-scroll overscroll-y-auto touch-pan-y bg-[#06070A] px-4 pb-[220px] pt-6 text-white [-webkit-overflow-scrolling:touch] sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
-        <div className="mb-8 flex items-center justify-between border-b border-white/[0.055] pb-4">
-          <Link
-            href="/george"
-            className="flex items-center gap-3 text-[13px] text-white/44 transition hover:text-white/70"
-          >
+        <div className="mb-8 flex items-center justify-center border-b border-white/[0.055] pb-5">
+          <Link href="/george" aria-label="Back to GEORGE">
             <img
               src="/logofav.png"
-              alt="BRANESx"
-              className="h-[58px] w-[58px] rounded-[1.1rem] object-contain opacity-95"
+              alt="GEORGE"
+              className="h-[88px] w-[88px] rounded-[1.35rem] object-contain opacity-95"
             />
-
-            <span className="text-[14px] tracking-[0.18em] text-white/72">
-              GEORGE
-            </span>
           </Link>
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowMenu((value) => !value)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.018] text-[18px] text-white/58 transition hover:bg-white/[0.045] hover:text-white"
-              aria-label="Open menu"
-            >
-              ☰
-            </button>
-
-            {showMenu && (
-              <div className="absolute right-0 top-12 z-50 w-44 rounded-[1rem] border border-white/[0.07] bg-[#0B0D12]/95 p-2 text-sm shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl">
-                <Link href="/george" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">GEORGE</Link>
-                <Link href="/george/live-entry" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">LIVE</Link>
-                <Link href="/help" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">Help</Link>
-              </div>
-            )}
-          </div>
         </div>
 
         <section className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
