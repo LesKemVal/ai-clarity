@@ -79,14 +79,34 @@ export default function HelpPage() {
     <main className="min-h-[100dvh] bg-[#06070A] px-5 pb-8 pt-3 text-[#D7DBE4]">
       <div className="mx-auto flex w-full max-w-[920px] flex-col justify-start">
         <section className="mb-5 max-w-[660px]">
-          <img
-            src="/logofav.png"
-            alt="BRANESx"
-            className="mb-4 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
-          />
+          <div className="mb-4 flex items-center gap-4">
+            <img
+              src="/logofav.png"
+              alt="BRANESx"
+              className="h-32 w-32 rounded-[1.85rem] object-contain opacity-95"
+            />
 
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
-            OPERATIONAL HELP
+            <button
+              type="button"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  window.history.back()
+                  return
+                }
+
+                window.location.href = '/george'
+              }}
+              className="inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.14em] text-white/38 transition hover:text-white/72"
+            >
+              <span>←</span>
+              <span>Back</span>
+            </button>
+          </div>
+
+          <div className="mb-3 flex items-center gap-3">
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
+              OPERATIONAL HELP
+            </div>
           </div>
 
           <h1 className="mt-3 text-[31px] font-semibold tracking-[-0.05em] text-[#DADFE8] sm:text-[38px]">
