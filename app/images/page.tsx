@@ -59,6 +59,16 @@ export default function ImagesPage() {
     <main className="min-h-[145dvh] overflow-x-hidden overflow-y-scroll overscroll-y-auto touch-pan-y bg-[#06070A] px-4 pb-[220px] pt-6 text-white [-webkit-overflow-scrolling:touch] sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
         <div className="mb-8 flex items-center gap-3 border-b border-white/[0.055] pb-5">
+          <Link href="/george" aria-label="Back to GEORGE">
+            <img
+              src="/logofav.png"
+              alt="GEORGE"
+              className="h-[104px] w-[104px] object-contain opacity-95"
+            />
+          </Link>
+
+          <span className="text-white/18">→</span>
+
           <button
             type="button"
             onClick={() => {
@@ -72,16 +82,6 @@ export default function ImagesPage() {
           >
             <BackButton label="Back" />
           </button>
-
-          <span className="text-white/18">→</span>
-
-          <Link href="/george" aria-label="Back to GEORGE">
-            <img
-              src="/logofav.png"
-              alt="GEORGE"
-              className="h-[82px] w-[82px] object-contain opacity-95"
-            />
-          </Link>
         </div>
 
         <section className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
