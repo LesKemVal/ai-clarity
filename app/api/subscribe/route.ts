@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: tier === 'brilliant_day' ? 'payment' : 'subscription',
       payment_method_types: ['card'],
-      payment_method_collection: 'always',
+      ...(tier === 'brilliant_day' ? {} : { payment_method_collection: 'always' as const }),
       line_items: [
         {
           price: priceId,
