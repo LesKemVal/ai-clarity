@@ -34,7 +34,7 @@ Current direction:
 
 Do not reintroduce:
 - campaign-specific entry prompts
-- purview/discipline campaign setup
+- campaign-specific setup that creates Pro LIVE bleed
 - structured campaign resume flow
 - Pro LIVE campaign surfaces
 
@@ -42,3 +42,22 @@ Unless intentionally restarting that product track.
 
 Reason:
 The two LIVE modes are similar enough right now. Keeping campaign logic active creates confusion, UI drift, and mode bleed.
+
+
+## Purview / Rhetorical Posture Clarification
+
+Purview was not campaign logic.
+
+Purview means a user can ask GEORGE to adopt the rhetorical posture, vocabulary, pacing, and operating lens of a specific person, discipline, role, or occupation.
+
+This may still matter later for LIVE and Ask GEORGE because it can help users receive guidance in the style of:
+- a negotiator
+- attorney-like reasoning
+- doctor-facing language
+- CDL/operator language
+- executive briefing posture
+- technical builder posture
+
+Do not permanently delete the concept.
+Do not confuse purview with campaign mode.
+If restored, it should support rhetorical/operational posture without reintroducing structured campaign bleed.
