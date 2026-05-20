@@ -8,6 +8,7 @@ export default function SignalPage() {
 
   const [tier, setTier] = useState<Tier>('smart')
   const [ready, setReady] = useState(false)
+  const [hasSavedSignal, setHasSavedSignal] = useState(false)
 
   const [name, setName] = useState('')
   const [mission, setMission] = useState('')
@@ -19,10 +20,14 @@ export default function SignalPage() {
   useEffect(() => {
     setTier((localStorage.getItem('george_tier') || 'smart') as Tier)
     setName(localStorage.getItem('george_name') || '')
-    setMission(localStorage.getItem('george_user_mission') || '')
-    setPriority(localStorage.getItem('george_user_priority') || '')
-    setLearningStyle(localStorage.getItem('george_user_learning_style') || '')
-    setAdaptiveAnswer(localStorage.getItem('george_user_adaptive_answer') || '')
+    setHasSavedSignal(
+      !!(
+        localStorage.getItem('george_user_mission') ||
+        localStorage.getItem('george_user_priority') ||
+        localStorage.getItem('george_user_learning_style') ||
+        localStorage.getItem('george_user_adaptive_answer')
+      )
+    )
     setReady(true)
   }, [])
 
@@ -92,7 +97,7 @@ export default function SignalPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#05060A] px-6 py-10 text-white">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-[-260px] h-[440px] w-[440px] -translate-x-1/2 rounded-full bg-white/[0.025] blur-[130px]" />
+        <div className="absolute left-1/2 top-[-180px] h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-white/[0.018] blur-[76px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
       </div>
 
@@ -104,7 +109,7 @@ export default function SignalPage() {
           ← Back to GEORGE
         </button>
 
-        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.46)] md:p-7">
+        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.34)] md:p-7">
           <img
             src="/logofav.png"
             alt="BRANESx"
@@ -121,6 +126,11 @@ export default function SignalPage() {
             <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
               Answer a few questions so GEORGE can understand what matters, ask sharper follow-ups, and stay useful as your goals, projects, pressure, and context change.
             </p>
+            {hasSavedSignal && (
+              <p className="max-w-3xl rounded-[0.8rem] border border-white/[0.045] bg-black/20 px-4 py-3 text-xs leading-5 text-white/42">
+                GEORGE already has saved signal. Add new signal here when your goal, pressure, or working style changes.
+              </p>
+            )}
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
