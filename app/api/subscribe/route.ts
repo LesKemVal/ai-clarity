@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       cancel_url:
         tier === 'brilliant_day'
           ? `${appUrl}/top-up?daily=cancelled`
-          : `${appUrl}/george?subscription=cancelled&tier=${tier}`,
+          : `${appUrl}/top-up?subscription=cancelled&tier=${tier}`,
     } as unknown as Stripe.Checkout.SessionCreateParams)
 
     return NextResponse.json({ mode: 'redirect', url: session.url })
