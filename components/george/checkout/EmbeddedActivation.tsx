@@ -44,8 +44,8 @@ export default function EmbeddedActivation({
   }
 
   return (
-    <div className="rounded-[1rem] border border-white/[0.05] bg-[#07090F]/92 p-4 shadow-[0_18px_54px_rgba(0,0,0,0.42)]">
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <div className="mx-auto w-full max-w-[720px] rounded-[1.15rem] border border-white/[0.06] bg-[#07090F]/94 p-3 shadow-[0_18px_54px_rgba(0,0,0,0.42)] md:p-4">
+      <div className="mb-3 flex items-start justify-between gap-3 px-1 md:mb-4">
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-[#C9D0FF]/52">
             Secure activation
@@ -54,7 +54,7 @@ export default function EmbeddedActivation({
             {tierLabel}
           </p>
           <p className="mt-2 text-sm leading-6 text-white/44">
-            Activate capability inside GEORGE. Stripe handles payment security.
+            Activate inside GEORGE. Stripe handles payment security.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function EmbeddedActivation({
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-[0.9rem] bg-white">
+      <div className="max-h-[74vh] overflow-y-auto overflow-x-hidden rounded-[0.95rem] bg-white md:max-h-[78vh]">
         <EmbeddedCheckoutProvider
           stripe={stripePromise}
           options={{ clientSecret }}
