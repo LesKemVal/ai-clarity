@@ -368,17 +368,27 @@ export default function TopUpPage() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-base font-semibold text-white/88">{tier.name}</p>
-                        <div className="mt-2 text-2xl font-semibold tracking-tight text-white/88">{tier.price}</div>
+                        <p className="text-[10px] uppercase tracking-[0.18em] text-white/34">
+                          {tier.tone}
+                        </p>
+                        <p className="mt-2 text-base font-semibold text-white/88">{tier.name}</p>
                       </div>
 
-                      <span className="rounded-[0.55rem] border border-white/[0.035] bg-white/[0.014] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/44">
-                        {tier.tone}
-                      </span>
+                      <div className="rounded-[0.55rem] border border-white/[0.035] bg-white/[0.014] px-2.5 py-1 text-[12px] font-semibold text-white/58">
+                        {tier.price}
+                      </div>
                     </div>
 
-                    <p className="mt-4 min-h-[44px] text-sm leading-6 text-white/48">
+                    <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-white/30">
+                      What changes
+                    </p>
+
+                    <p className="mt-2 min-h-[44px] text-sm leading-6 text-white/58">
                       {tier.promise}
+                    </p>
+
+                    <p className="mt-4 text-[11px] uppercase tracking-[0.16em] text-white/30">
+                      How GEORGE does it
                     </p>
 
                     <button
@@ -386,7 +396,7 @@ export default function TopUpPage() {
                       onClick={() => setExpandedTier(expanded ? null : tier.id)}
                       className="mt-4 flex w-full items-center justify-between rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-3 py-2.5 text-left text-[12px] font-medium text-white/58 transition hover:border-white/[0.08] hover:bg-white/[0.022] hover:text-white/80"
                     >
-                      <span>{tier.label}</span>
+                      <span>{expanded ? 'Hide mechanism' : 'Show mechanism'}</span>
                       <span className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>⌄</span>
                     </button>
 
@@ -396,7 +406,7 @@ export default function TopUpPage() {
                       }`}
                     >
                       <div className="overflow-hidden">
-                        <ul className="mt-3 space-y-2 border-t border-white/[0.035] pt-3 text-sm leading-6 text-white/46">
+                        <ul className="mt-3 space-y-2 border-t border-white/[0.035] pt-3 text-sm leading-6 text-white/52">
                           {tier.details.map((detail) => (
                             <li key={detail}>{detail}</li>
                           ))}
