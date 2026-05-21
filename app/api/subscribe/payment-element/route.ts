@@ -200,34 +200,7 @@ export async function POST(req: NextRequest) {
 
     if (!clientSecret) {
       return NextResponse.json(
-        {
-          error: 'Unable to prepare the payment form.',
-          debug: {
-            subscriptionId: subscription.id,
-            status: subscription.status,
-            collectionMethod: subscription.collection_method,
-            latestInvoice:
-              typeof subscription.latest_invoice === 'string'
-                ? subscription.latest_invoice
-                : subscription.latest_invoice?.id ?? null,
-            latestInvoiceKeys:
-              typeof subscription.latest_invoice === 'string'
-                ? []
-                : Object.keys(subscription.latest_invoice ?? {}),
-            latestInvoicePaymentIntent:
-              typeof subscription.latest_invoice === 'string'
-                ? null
-                : (subscription.latest_invoice as ExpandedInvoice)?.payment_intent ?? null,
-            latestInvoiceConfirmationSecret:
-              typeof subscription.latest_invoice === 'string'
-                ? null
-                : (subscription.latest_invoice as ExpandedInvoice)?.confirmation_secret ?? null,
-            pendingSetupIntent:
-              typeof subscription.pending_setup_intent === 'string'
-                ? subscription.pending_setup_intent
-                : subscription.pending_setup_intent?.id ?? null,
-          },
-        },
+        { error: 'Unable to prepare the payment form.' },
         { status: 500 }
       )
     }
