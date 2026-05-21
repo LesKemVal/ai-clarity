@@ -104,8 +104,8 @@ export async function POST(req: NextRequest) {
       ...sessionBase,
       success_url:
         tier === 'brilliant_day'
-          ? `${appUrl}/top-up?daily=success&session_id={CHECKOUT_SESSION_ID}`
-          : `${appUrl}/george?subscription=success&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
+          ? `${appUrl}/top-up?daily=success&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`
+          : `${appUrl}/top-up?subscription=success&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:
         tier === 'brilliant_day'
           ? `${appUrl}/top-up?daily=cancelled`
