@@ -128,6 +128,64 @@ const ROOM_RUNTIME_ESTIMATES: Record<
   },
 }
 
+const ROOM_ESTIMATED_MINUTES: Record<string, number> = {
+  Interview: 35,
+  Meeting: 45,
+  Boardroom: 60,
+  Negotiation: 45,
+  Debate: 40,
+  'Sales Call': 35,
+  'Doctor Appointment': 40,
+  Presentation: 30,
+  Influencer: 35,
+  'Everyday Conversation': 20,
+}
+
+function buildRuntimeCostEstimate({
+  selectedRoom,
+  runtimeEstimate,
+  selectedCapacityCents,
+  capacityCents,
+  liveAssistMode,
+}: {
+  selectedRoom: string
+  runtimeEstimate?: {
+    baseCents: number
+    support: Array<{ label: string; cents: number }>
+  }
+  selectedCapacityCents: number | null
+  capacityCents: number
+  liveAssistMode: 'cues' | 'lines'
+}) {
+  if (!runtimeEstimate) return null
+
+  const expectedMinutes = ROOM_ESTIMATED_MINUTES[selectedRoom] ?? 30
+  const baseCents = selectedCapacityCents ?? runtimeEstimate.baseCents
+  const outputModeCents = liveAssistMode === 'lines' ? 3 : 1
+  const totalCents = baseCents + capacityCents + outputModeCents
+
+  const liveAudioCents = Math.max(1, Math.round(totalCents * 0.30))
+  const reasoningCents = Math.max(1, Math.round(totalCents * 0.42))
+  const outputCents = Math.max(1, Math.round(totalCents * (liveAssistMode === 'lines' ? 0.16 : 0.10)))
+  const continuityCents = Math.max(1, totalCents - liveAudioCents - reasoningCents - outputCents)
+
+  return {
+    expectedMinutes,
+    totalCents,
+    baseCents,
+    capacityCents,
+    outputModeCents,
+    outputMode: liveAssistMode,
+    breakdown: [
+      { label: 'LIVE audio + speech detection', cents: liveAudioCents },
+      { label: 'OpenAI runtime reasoning', cents: reasoningCents },
+      { label: liveAssistMode === 'lines' ? 'Repeatable line generation' : 'Cue generation', cents: outputCents },
+      { label: 'Continuity + runtime overhead', cents: continuityCents },
+    ],
+    basis: 'Estimated from expected room duration, selected support intensity, LIVE output mode, and added runtime capacity.',
+  }
+}
+
 type LiveDeliveryOverlay = {
   cadenceProfile: 'measured' | 'precise' | 'field-direct' | 'clinical' | 'executive'
   compressionBias: number
@@ -462,8 +520,15 @@ export default function GeorgeLiveEntryPage() {
   const runtimeEstimate = ROOM_RUNTIME_ESTIMATES[selectedRoom]
   const selectedCapabilities = LIVE_CAPACITY_OPTIONS.filter((item) => selectedCapabilityIds.includes(item.id))
   const capacityCents = selectedCapabilities.reduce((sum, item) => sum + item.cents, 0)
-  const baseRuntimeCents = selectedCapacityCents ?? runtimeEstimate?.baseCents ?? null
-  const estimatedCents = baseRuntimeCents === null ? null : baseRuntimeCents + capacityCents
+  const runtimeCostEstimate = buildRuntimeCostEstimate({
+    selectedRoom,
+    runtimeEstimate,
+    selectedCapacityCents,
+    capacityCents,
+    liveAssistMode,
+  })
+  const baseRuntimeCents = runtimeCostEstimate?.baseCents ?? null
+  const estimatedCents = runtimeCostEstimate?.totalCents ?? null
 
   const suggestedControls = ROOM_CONTROLS[selectedRoom] || ['line', 'pause', 'shorter', 'help me respond']
 
@@ -613,6 +678,7 @@ export default function GeorgeLiveEntryPage() {
       baseRuntimeCents,
       capacityCents,
       estimatedCents,
+      resourceEstimate: runtimeCostEstimate,
       runtimeBias: selectedCapabilities.map((item) => item.runtimeBias),
       purview: finalPurview,
       deliveryOverlay: finalPurview.deliveryOverlay,
@@ -748,7 +814,7 @@ export default function GeorgeLiveEntryPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-[11px] uppercase tracking-[0.18em] text-[#C9D0FF]/52">
-                    Runtime estimate
+                    Estimated runtime cost
                   </div>
 
                   <div className="mt-2 text-[30px] font-semibold tracking-[-0.045em] text-white/92">
@@ -757,13 +823,34 @@ export default function GeorgeLiveEntryPage() {
                 </div>
 
                 <div className="rounded-full border border-[#AAB4FF]/12 bg-black/24 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-[#C9D0FF]/52">
-                  Room + capacity
+                  Room + resources
                 </div>
               </div>
 
               <p className="mt-3 text-[13px] leading-6 text-white/48">
-                This is not a subscription price. It is a visible runtime estimate for how much support GEORGE is carrying in this room.
+                This estimates what GEORGE may spend in runtime resources for a typical {ROOM_ESTIMATED_MINUTES[selectedRoom] ?? 30}-minute {selectedRoom.toLowerCase()} using the support level and capacity selected here.
               </p>
+
+              {runtimeCostEstimate && (
+                <div className="mt-4 rounded-[0.8rem] border border-white/[0.045] bg-black/20 p-3">
+                  <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-white/34">
+                    Resource basis
+                  </div>
+
+                  <div className="grid gap-2">
+                    {runtimeCostEstimate.breakdown.map((item) => (
+                      <div key={item.label} className="flex items-center justify-between gap-3 text-[12px]">
+                        <span className="text-white/44">{item.label}</span>
+                        <span className="font-semibold text-[#C9D0FF]/76">~{item.cents}¢</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="mt-3 text-[11px] leading-5 text-white/34">
+                    {runtimeCostEstimate.basis}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-4 grid gap-2 sm:grid-cols-3">
                 {runtimeEstimate.support.map((item) => {
@@ -1167,7 +1254,7 @@ export default function GeorgeLiveEntryPage() {
                 <div><span className="text-white/34">Output:</span> {liveAssistMode === 'lines' ? 'Repeatable lines' : 'Cues'}</div>
                 <div><span className="text-white/34">Cadence:</span> {speechCadence}</div>
                 {estimatedCents !== null && (
-                  <div><span className="text-white/34">Runtime estimate:</span> ~{estimatedCents}¢</div>
+                  <div><span className="text-white/34">Estimated runtime cost:</span> ~{estimatedCents}¢</div>
                 )}
                 {objective.trim() && (
                   <div><span className="text-white/34">Context:</span> {objective.trim()}</div>
