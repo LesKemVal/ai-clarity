@@ -253,7 +253,7 @@ export default function TopUpPage() {
       }
 
       setFallbackCheckoutUrl(fallbackData.url)
-      window.location.href = fallbackData.url
+      setMessage('Embedded activation is not available yet. Use secure checkout while GEORGE activation is being prepared.')
     } catch {
       setMessage('Unable to start checkout right now.')
     }
