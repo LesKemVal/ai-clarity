@@ -94,6 +94,8 @@ export default function TopUpPage() {
   const [embeddedClientSecret, setEmbeddedClientSecret] = useState('')
   const [embeddedTierLabel, setEmbeddedTierLabel] = useState('')
   const [fallbackCheckoutUrl, setFallbackCheckoutUrl] = useState('')
+  const [activationTier, setActivationTier] = useState<TierId | null>(null)
+  const [hasPriorGeorgeSessions, setHasPriorGeorgeSessions] = useState(false)
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -123,8 +125,28 @@ export default function TopUpPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
+    const activatedTier = params.get('tier') as TierId | null
+    const activationReturned =
+      params.get('activation') === 'return' ||
+      params.get('subscription') === 'success' ||
+      params.get('daily') === 'success'
+
     setIntent(params.get('intent'))
     setCheckoutEmail(localStorage.getItem('george_email') || '')
+
+    if (activationReturned && activatedTier) {
+      const normalizedTier =
+        activatedTier === 'brilliant_day' ? 'brilliant' : activatedTier
+
+      if (normalizedTier === 'intelligent' || normalizedTier === 'brilliant') {
+        localStorage.setItem('george_tier', normalizedTier)
+      }
+
+      const storedSessions = JSON.parse(localStorage.getItem('GEORGE_SESSIONS') || '[]')
+      setHasPriorGeorgeSessions(Array.isArray(storedSessions) && storedSessions.length > 0)
+      setActivationTier(activatedTier)
+      setMessage('')
+    }
   }, [])
 
   const headline = useMemo(() => {
@@ -464,6 +486,79 @@ export default function TopUpPage() {
             </div>
           </div>
         </section>
+
+        {activationTier && (
+          <section className="rounded-[1rem] border border-[#AAB4FF]/14 bg-[linear-gradient(180deg,rgba(123,140,255,0.075),rgba(255,255,255,0.012))] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.34)]">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#C9D0FF]/58">
+              Activation ready
+            </p>
+
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.035em] text-white/90">
+              GEORGE is ready to continue.
+            </h2>
+
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/52">
+              Payment activated capability. Choose the next operational step: continue in Brilliant, prepare the room, resume prior context, or start fresh.
+            </p>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-4">
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = '/george?tier=brilliant&activated=1'
+                }}
+                className="rounded-[0.85rem] border border-[#AAB4FF]/20 bg-[#AAB4FF]/[0.08] px-4 py-3 text-left text-sm font-semibold text-[#D7DCFF] transition hover:bg-[#AAB4FF]/[0.12]"
+              >
+                Continue Brilliant
+                <span className="mt-1 block text-xs font-normal leading-5 text-white/42">
+                  Stay in GEORGE with capability active.
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = '/george/live-entry?from=activation'
+                }}
+                className="rounded-[0.85rem] border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-semibold text-white/74 transition hover:bg-white/[0.035]"
+              >
+                Prepare Room
+                <span className="mt-1 block text-xs font-normal leading-5 text-white/38">
+                  Give GEORGE the context before LIVE.
+                </span>
+              </button>
+
+              <button
+                type="button"
+                disabled={!hasPriorGeorgeSessions}
+                onClick={() => {
+                  window.location.href = '/george?resume=1&tier=brilliant'
+                }}
+                className="rounded-[0.85rem] border border-white/[0.06] bg-white/[0.018] px-4 py-3 text-left text-sm font-semibold text-white/74 transition hover:bg-white/[0.035] disabled:cursor-not-allowed disabled:opacity-35"
+              >
+                Resume
+                <span className="mt-1 block text-xs font-normal leading-5 text-white/38">
+                  {hasPriorGeorgeSessions ? 'Return to saved context.' : 'No saved session found yet.'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.removeItem('george_active_live_session_id')
+                  localStorage.removeItem('george_active_campaign_session_id')
+                  window.location.href = '/george?fresh=1&tier=brilliant'
+                }}
+                className="rounded-[0.85rem] border border-white/[0.05] bg-black/24 px-4 py-3 text-left text-sm font-semibold text-white/62 transition hover:bg-white/[0.025]"
+              >
+                Start Fresh
+                <span className="mt-1 block text-xs font-normal leading-5 text-white/34">
+                  Begin without loading prior context.
+                </span>
+              </button>
+            </div>
+          </section>
+        )}
 
         {message && (
           <div className="rounded-[0.8rem] border border-[#AAB4FF]/16 bg-[#AAB4FF]/[0.045] px-4 py-3 text-sm text-[#D7DCFF]">
