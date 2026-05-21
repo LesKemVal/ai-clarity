@@ -34,6 +34,27 @@ function extractPaymentIntentClientSecret(subscription: Stripe.Subscription) {
   return paymentIntent.client_secret
 }
 
+function extractSetupIntentClientSecret(subscription: Stripe.Subscription) {
+  const setupIntent = subscription.pending_setup_intent
+
+  if (!setupIntent || typeof setupIntent === 'string') return null
+
+  return setupIntent.client_secret
+}
+
+async function getOneTimePriceAmount(priceId: string) {
+  const price = await stripe.prices.retrieve(priceId)
+
+  if (!price.unit_amount || !price.currency) {
+    throw new Error('Stripe price must include a unit amount and currency.')
+  }
+
+  return {
+    amount: price.unit_amount,
+    currency: price.currency,
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
@@ -90,20 +111,23 @@ export async function POST(req: NextRequest) {
     })
 
     if (tier === 'brilliant_day') {
+      const oneTimePrice = await getOneTimePriceAmount(priceId)
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: 500,
-        currency: 'usd',
+        amount: oneTimePrice.amount,
+        currency: oneTimePrice.currency,
         customer: customer.id,
         automatic_payment_methods: { enabled: true },
         metadata: {
           tier,
           source: 'george_payment_element',
+          priceId,
           ...(validEmail ? { email } : {}),
         },
       })
 
       return NextResponse.json({
         clientSecret: paymentIntent.client_secret,
+        intentType: 'payment',
         mode: 'payment',
         publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
         returnUrl: getActivationReturnUrl(appUrl, tier),
@@ -121,13 +145,16 @@ export async function POST(req: NextRequest) {
       metadata: {
         tier,
         source: 'george_payment_element',
+        priceId,
         ...(validEmail ? { email } : {}),
       },
       ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
-      expand: ['latest_invoice.payment_intent'],
+      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
     })
 
-    const clientSecret = extractPaymentIntentClientSecret(subscription)
+    const paymentClientSecret = extractPaymentIntentClientSecret(subscription)
+    const setupClientSecret = extractSetupIntentClientSecret(subscription)
+    const clientSecret = paymentClientSecret ?? setupClientSecret
 
     if (!clientSecret) {
       return NextResponse.json(
@@ -138,6 +165,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       clientSecret,
+      intentType: paymentClientSecret ? 'payment' : 'setup',
       mode: 'subscription',
       publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
       returnUrl: getActivationReturnUrl(appUrl, tier),
