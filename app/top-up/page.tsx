@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
+import EmbeddedActivation from '@/components/george/checkout/EmbeddedActivation'
 
 type TierId = 'smart' | 'intelligent' | 'brilliant' | 'brilliant_day'
 
@@ -90,6 +91,9 @@ export default function TopUpPage() {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
   const [checkoutEmail, setCheckoutEmail] = useState('')
+  const [embeddedClientSecret, setEmbeddedClientSecret] = useState('')
+  const [embeddedTierLabel, setEmbeddedTierLabel] = useState('')
+  const [fallbackCheckoutUrl, setFallbackCheckoutUrl] = useState('')
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -211,21 +215,45 @@ export default function TopUpPage() {
   async function startCheckout(tier: 'intelligent' | 'brilliant' | 'brilliant_day') {
     try {
       setMessage('Preparing secure activation...')
+      setEmbeddedClientSecret('')
+      setFallbackCheckoutUrl('')
+
+      const activeTier = tiers.find((item) => item.checkout === tier)
+      setEmbeddedTierLabel(activeTier ? activeTier.name : 'GEORGE access')
 
       const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier,
+          checkoutMode: 'embedded',
+          email: checkoutEmail.trim().toLowerCase() || undefined,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok && data?.clientSecret) {
+        setEmbeddedClientSecret(data.clientSecret)
+        setMessage('')
+        return
+      }
+
+      const fallbackRes = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tier, email: checkoutEmail.trim().toLowerCase() || undefined }),
       })
 
-      const data = await res.json()
+      const fallbackData = await fallbackRes.json()
 
-      if (!res.ok || !data?.url) {
-        setMessage(data?.error || 'Unable to start checkout right now.')
+      if (!fallbackRes.ok || !fallbackData?.url) {
+        setMessage(fallbackData?.error || data?.error || 'Unable to start checkout right now.')
         return
       }
 
-      window.location.href = data.url
+      setFallbackCheckoutUrl(fallbackData.url)
+      window.location.href = fallbackData.url
     } catch {
       setMessage('Unable to start checkout right now.')
     }
@@ -441,6 +469,25 @@ export default function TopUpPage() {
           <div className="rounded-[0.8rem] border border-[#AAB4FF]/16 bg-[#AAB4FF]/[0.045] px-4 py-3 text-sm text-[#D7DCFF]">
             {message}
           </div>
+        )}
+
+        {embeddedClientSecret && (
+          <EmbeddedActivation
+            clientSecret={embeddedClientSecret}
+            tierLabel={embeddedTierLabel}
+            onCancel={() => {
+              setEmbeddedClientSecret('')
+              setEmbeddedTierLabel('')
+            }}
+            onFallback={() => {
+              if (fallbackCheckoutUrl) {
+                window.location.href = fallbackCheckoutUrl
+              } else {
+                setEmbeddedClientSecret('')
+                setMessage('Choose a capability to restart secure activation.')
+              }
+            }}
+          />
         )}
 
         <section className="grid gap-4 lg:grid-cols-2">
