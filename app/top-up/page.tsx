@@ -204,7 +204,7 @@ export default function TopUpPage() {
     const existing = JSON.parse(localStorage.getItem('GEORGE_FEEDBACK') || '[]')
     existing.push(payload)
     localStorage.setItem('GEORGE_FEEDBACK', JSON.stringify(existing))
-    setMessage('Feedback saved. Thank you.')
+    setMessage('Help improve GEORGE saved. Thank you.')
     setFeedback('')
   }
 
@@ -286,7 +286,7 @@ export default function TopUpPage() {
         <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 md:p-6">
           <div className="max-w-5xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">
-              ACCESS LEVELS
+              GEORGE CAPABILITIES
             </p>
 
             <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white md:text-5xl">
@@ -298,7 +298,7 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-[0.8rem] border border-white/[0.028] bg-black/20 px-4 py-3 text-sm text-white/64">
-              Pay for the level of recall, support, and LIVE access you actually need.
+              Activate the level of continuity, LIVE support, and operational guidance that fits how you work.
             </div>
 
             <div className="rounded-[0.8rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.045),rgba(255,255,255,0.012))] px-4 py-3">
@@ -348,7 +348,7 @@ export default function TopUpPage() {
               </button>
 
               <span className="text-[11px] tracking-[0.08em] text-white/30">
-                Founder access restores local continuity access.
+                Founder access restores continuity and capability access.
               </span>
             </div>
 
@@ -446,9 +446,9 @@ export default function TopUpPage() {
         <section className="grid gap-4 lg:grid-cols-2">
           <div id="feedback" className="scroll-mt-24 rounded-[0.9rem] border border-white/[0.028] bg-white/[0.010] p-5">
             <div className="space-y-4">
-              <p className="text-sm font-medium text-white/84">Feedback</p>
+              <p className="text-sm font-medium text-white/84">Help improve GEORGE</p>
               <p className="text-sm leading-7 text-white/44">
-                Note what feels confusing, useful, missing, or worth tightening.
+                Help improve how GEORGE supports real-world thinking, conversations, and execution.
               </p>
 
               <select
@@ -466,7 +466,7 @@ export default function TopUpPage() {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 rows={6}
-                placeholder="What should change?"
+                placeholder="What would make GEORGE or LIVE more useful?"
                 className="w-full rounded-[0.85rem] border border-white/[0.04] bg-[#10131B]/58 px-4 py-3 text-white outline-none placeholder:text-white/28"
               />
 
@@ -475,7 +475,7 @@ export default function TopUpPage() {
                 onClick={submitFeedback}
                 className="w-full rounded-[0.7rem] border border-white/[0.045] px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/[0.10] hover:bg-white/[0.022] hover:text-white/86"
               >
-                Save feedback
+                Send signal
               </button>
             </div>
           </div>
