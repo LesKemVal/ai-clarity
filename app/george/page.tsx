@@ -14,6 +14,14 @@ import { createSession, getActiveMode, getActiveSessionForMode, getActiveSession
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
+import {
+  applyPreparedRuntimeMemory,
+  markLiveRuntimeStarted,
+  persistActiveLiveRuntimeSupport,
+  readActiveLiveRuntimeSupport,
+  reconcileActiveLiveRuntimeUsage,
+  type LivePrepSetup,
+} from '@/lib/george/live-runtime/prep-runtime'
 
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
@@ -1105,6 +1113,34 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
 
+  const recordActiveLiveRuntimeUsage = () => {
+    if (typeof window === 'undefined') return null
+
+    let setup: LivePrepSetup | null = null
+
+    try {
+      const rawSetup = window.localStorage.getItem('george_live_setup_active')
+      setup = rawSetup ? JSON.parse(rawSetup) : null
+    } catch {
+      setup = null
+    }
+
+    const record = reconcileActiveLiveRuntimeUsage({
+      setup,
+      runtimeSupport: readActiveLiveRuntimeSupport(),
+    })
+
+    if (!record) return null
+
+    window.localStorage.setItem('george_last_live_runtime_summary', record.summary)
+
+    const actual = typeof record.actualCents === 'number' ? `${record.actualCents}¢` : 'not estimated'
+    setToastMessage(`Actual runtime usage: ${actual} · ${record.summary}`)
+    setShowToast(true)
+
+    return record
+  }
+
   const ACCESS_CODES: Record<string, 'intelligent' | 'brilliant'> = {
     ...Object.fromEntries(
       Array.from({ length: 100 }, (_, index) => [
@@ -1210,17 +1246,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       // Resume will return later only after it is scoped to verified LIVE sessions.
       const existingLive = null
 
-      let liveSetup: {
-        room?: string
-        objective?: string
-        controlWords?: string
-        liveAssistMode?: 'cues' | 'lines'
-        estimatedCents?: number
-        runtimeSupport?: {
-          selectedCapabilities?: Array<{ label?: string; description?: string }>
-        }
-        createdAt?: number
-      } | null = null
+      let liveSetup: LivePrepSetup | null = null
 
       try {
         const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
@@ -1228,6 +1254,16 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         window.localStorage.removeItem('GEORGE_LIVE_SETUP')
       } catch {
         liveSetup = null
+      }
+
+      markLiveRuntimeStarted()
+      persistActiveLiveRuntimeSupport(liveSetup)
+      liveRuntimeMemoryRef.current = applyPreparedRuntimeMemory(liveRuntimeMemoryRef.current, liveSetup)
+
+      if (liveSetup) {
+        window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
+      } else {
+        window.localStorage.removeItem('george_live_setup_active')
       }
 
       const setupRoom = liveSetup?.room || ''
@@ -5499,6 +5535,7 @@ ${simplifyTarget}`
           onClick={() => {
 if (liveMode) {
   stopListening()
+  recordActiveLiveRuntimeUsage()
   exitLiveMode()
   setShowConversationMenu(false)
   setConversationMenuLane('selector')
@@ -5864,6 +5901,7 @@ if (liveMode) {
             type="button"
             onClick={() => {
               setShowExitPopup(false)
+              recordActiveLiveRuntimeUsage()
               exitLiveMode()
             }}
             className="w-full rounded-xl border border-white/[0.09] bg-white/[0.035] px-4 py-3 text-left text-sm font-medium text-[#D7DBE4] transition hover:border-white/[0.09] hover:bg-white/[0.032]"
