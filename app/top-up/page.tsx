@@ -108,17 +108,60 @@ export default function TopUpPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
 
-    if (params.get('payment') === 'success') {
+    async function verifyActivationReturn() {
+      if (params.get('payment') !== 'success') return
+
       const tier = params.get('tier')
-      if (tier === 'intelligent' || tier === 'brilliant' || tier === 'brilliant_day') {
-        localStorage.setItem('george_tier', tier === 'brilliant_day' ? 'brilliant' : tier)
-        localStorage.setItem('george_activation_source', 'payment_element')
-        setMessage('Activation confirmed. GEORGE continuity is ready.')
+      const paymentIntentId = params.get('payment_intent')
+      const setupIntentId = params.get('setup_intent')
+      const redirectStatus = params.get('redirect_status')
+
+      if (tier !== 'intelligent' && tier !== 'brilliant' && tier !== 'brilliant_day') return
+
+      if (redirectStatus && redirectStatus !== 'succeeded') {
+        setMessage('Activation was not completed. GEORGE has not changed your access level.')
+        return
+      }
+
+      if (!paymentIntentId && !setupIntentId) {
+        setMessage('Activation returned without a Stripe confirmation reference. Please use Restore or try again.')
+        return
+      }
+
+      setMessage('Verifying activation with Stripe...')
+
+      try {
+        const response = await fetch('/api/subscribe/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tier,
+            paymentIntentId,
+            setupIntentId,
+          }),
+        })
+
+        const data = await response.json().catch(() => ({}))
+
+        if (!response.ok || data?.verified !== true || (data?.tier !== 'intelligent' && data?.tier !== 'brilliant')) {
+          setMessage(data?.error || 'Activation could not be verified yet. GEORGE has not changed your access level.')
+          return
+        }
+
+        localStorage.setItem('george_tier', data.tier)
+        localStorage.setItem('george_activation_source', 'payment_element_verified')
+        localStorage.setItem('george_verified_continuity', 'true')
+        setMessage('Activation verified. GEORGE continuity is ready.')
+      } catch {
+        setMessage('Activation verification failed. GEORGE has not changed your access level.')
       }
     }
+
+    verifyActivationReturn()
   }, [])
 
   const headline = useMemo(() => {
