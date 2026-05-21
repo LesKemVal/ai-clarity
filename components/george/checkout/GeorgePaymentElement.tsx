@@ -39,21 +39,24 @@ declare global {
   }
 }
 
-const tierCopy: Record<CheckoutTier, { label: string; line: string; confirm: string }> = {
+const tierCopy: Record<CheckoutTier, { label: string; line: string; confirm: string; descriptor: string }> = {
   intelligent: {
     label: 'Intelligent',
-    line: 'Continuity, follow-through, and stronger execution support.',
+    line: 'LIVE runtime support, contextual recall, and continuity-aware execution.',
     confirm: 'Activate Intelligent',
+    descriptor: 'Contextual recall · adaptive response shaping · operational memory carry',
   },
   brilliant: {
     label: 'Brilliant',
-    line: 'LIVE support for rooms where timing, wording, and pressure matter.',
+    line: 'Persistent LIVE runtime for pressure, timing, and real-time operational support.',
     confirm: 'Activate Brilliant',
+    descriptor: 'Deeper contextual carry · pressure-aware cues · runtime support escalation',
   },
   brilliant_day: {
     label: 'Brilliant Day',
-    line: 'Temporary LIVE access for the room in front of you today.',
+    line: 'Temporary access to GEORGE’s LIVE runtime and operational support layer.',
     confirm: 'Activate Day Access',
+    descriptor: 'Temporary LIVE runtime · contextual carry · real-time guidance',
   },
 }
 
@@ -98,46 +101,63 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       theme: 'night',
       variables: {
         colorPrimary: '#AAB4FF',
-        colorBackground: '#0B0D12',
+        colorBackground: '#080A0F',
         colorText: '#E7EAF7',
         colorDanger: '#FCA5A5',
-        colorTextSecondary: 'rgba(231,234,247,0.58)',
-        colorTextPlaceholder: 'rgba(231,234,247,0.28)',
+        colorSuccess: '#8FE7B0',
+        colorTextSecondary: 'rgba(231,234,247,0.54)',
+        colorTextPlaceholder: 'rgba(231,234,247,0.24)',
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        fontSizeBase: '14px',
-        spacingUnit: '4px',
+        fontSizeBase: '13px',
+        spacingUnit: '3px',
         borderRadius: '12px',
       },
       rules: {
         '.Input': {
-          backgroundColor: 'rgba(16,19,27,0.74)',
+          backgroundColor: 'rgba(12,15,22,0.92)',
           border: '1px solid rgba(255,255,255,0.055)',
           boxShadow: 'none',
           color: '#E7EAF7',
+          padding: '12px 14px',
         },
         '.Input:focus': {
           border: '1px solid rgba(170,180,255,0.30)',
           boxShadow: '0 0 0 1px rgba(170,180,255,0.10)',
         },
         '.Label': {
-          color: 'rgba(231,234,247,0.58)',
+          color: 'rgba(231,234,247,0.50)',
           fontSize: '12px',
           letterSpacing: '0.02em',
         },
         '.Tab': {
-          backgroundColor: 'rgba(255,255,255,0.012)',
+          backgroundColor: 'rgba(255,255,255,0.010)',
           border: '1px solid rgba(255,255,255,0.045)',
-          color: 'rgba(231,234,247,0.66)',
+          boxShadow: 'none',
+          color: 'rgba(231,234,247,0.62)',
+        },
+        '.Tab:hover': {
+          backgroundColor: 'rgba(170,180,255,0.050)',
+          color: '#E7EAF7',
         },
         '.Tab--selected': {
           backgroundColor: 'rgba(170,180,255,0.075)',
           border: '1px solid rgba(170,180,255,0.22)',
+          boxShadow: '0 0 0 1px rgba(170,180,255,0.060)',
           color: '#D7DCFF',
         },
         '.Block': {
-          backgroundColor: 'rgba(255,255,255,0.010)',
-          border: '1px solid rgba(255,255,255,0.040)',
+          backgroundColor: 'rgba(255,255,255,0.006)',
+          border: '1px solid rgba(255,255,255,0.035)',
+          boxShadow: 'none',
+        },
+        '.AccordionItem': {
+          backgroundColor: 'rgba(255,255,255,0.006)',
+          border: '1px solid rgba(255,255,255,0.035)',
+          boxShadow: 'none',
+        },
+        '.Text': {
+          color: 'rgba(231,234,247,0.58)',
         },
       },
     }),
@@ -148,7 +168,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
     setLoading(true)
     setReady(false)
     setError('')
-    setStatus('Preparing secure activation...')
+    setStatus('Preparing runtime activation...')
 
     try {
       await loadStripeScript()
@@ -162,7 +182,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       const data = (await response.json().catch(() => ({}))) as PaymentElementResponse
 
       if (!response.ok || !data.clientSecret || !data.publishableKey || !data.returnUrl) {
-        setError(data.error || 'Unable to prepare the payment form.')
+        setError(data.error || 'Unable to prepare runtime activation.')
         setStatus('')
         return
       }
@@ -178,6 +198,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       const stripeElements = stripeInstance.elements({
         clientSecret: data.clientSecret,
         appearance,
+        loader: 'always',
       })
 
       const paymentElement = stripeElements.create('payment', {
@@ -186,6 +207,10 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           defaultCollapsed: false,
         },
         defaultValues: targetEmail.trim() ? { billingDetails: { email: targetEmail.trim() } } : undefined,
+        wallets: {
+          applePay: 'never',
+          googlePay: 'never',
+        },
       })
 
       paymentElement.mount('#george-payment-element')
@@ -195,9 +220,9 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       setIntentType(data.intentType === 'setup' ? 'setup' : 'payment')
       setReturnUrl(data.returnUrl)
       setReady(true)
-      setStatus('Secure activation is ready.')
+      setStatus('Runtime activation is ready.')
     } catch {
-      setError('Unable to prepare the payment form.')
+      setError('Unable to prepare runtime activation.')
       setStatus('')
     } finally {
       setLoading(false)
@@ -219,7 +244,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
 
     setSubmitting(true)
     setError('')
-    setStatus('Confirming activation...')
+    setStatus('Confirming runtime activation...')
 
     const submitResult = await elements.submit()
 
@@ -249,7 +274,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
   }
 
   return (
-    <div className="fixed inset-0 z-[260] overflow-y-auto bg-[#050608]/82 px-4 py-5 backdrop-blur-xl md:py-8">
+    <div className="fixed inset-0 z-[260] overflow-y-auto bg-[#050608]/86 px-4 py-4 backdrop-blur-xl md:py-6">
       <button
         type="button"
         aria-label="Close payment activation"
@@ -257,21 +282,24 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
         className="fixed inset-0 cursor-default"
       />
 
-      <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-[1.1rem] border border-white/[0.045] bg-[#0B0D12] shadow-[0_32px_110px_rgba(0,0,0,0.72)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(170,180,255,0.10),transparent_26%),radial-gradient(circle_at_84%_18%,rgba(126,201,218,0.07),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.030),transparent_42%)]" />
+      <div className="relative mx-auto w-full max-w-[30rem] overflow-hidden rounded-[1.05rem] border border-white/[0.045] bg-[#0B0D12] shadow-[0_32px_110px_rgba(0,0,0,0.72)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(170,180,255,0.10),transparent_26%),radial-gradient(circle_at_84%_18%,rgba(126,201,218,0.06),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.026),transparent_42%)]" />
 
-        <div className="relative border-b border-white/[0.045] px-5 py-4 md:px-6">
+        <div className="relative border-b border-white/[0.045] px-5 py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.26em] text-[#C9D0FF]/48">
-                GEORGE ACTIVATION
+              <p className="text-[10px] uppercase tracking-[0.30em] text-[#C9D0FF]/48">
+                GEORGE RUNTIME ACTIVATION
               </p>
               <div>
-                <h2 className="text-2xl font-semibold tracking-[-0.035em] text-white md:text-3xl">
+                <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.045em] text-white">
                   {copy.label}
                 </h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-white/48">
+                <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
                   {copy.line}
+                </p>
+                <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-[#C9D0FF]/38">
+                  {copy.descriptor}
                 </p>
               </div>
             </div>
@@ -286,12 +314,12 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           </div>
         </div>
 
-        <form onSubmit={confirmActivation} className="relative space-y-5 px-5 py-5 md:px-6 md:py-6">
+        <form onSubmit={confirmActivation} className="relative space-y-4 px-5 py-5">
           <div className="rounded-[0.85rem] border border-white/[0.035] bg-white/[0.010] p-4">
             <label className="text-[11px] uppercase tracking-[0.18em] text-white/38">
               Continuity email
             </label>
-            <div className="mt-3 flex flex-col gap-2 md:flex-row">
+            <div className="mt-3 flex flex-col gap-2">
               <input
                 type="email"
                 value={email}
@@ -305,16 +333,19 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
                 disabled={loading}
                 className="rounded-[0.75rem] border border-white/[0.055] bg-white/[0.014] px-4 py-3 text-xs font-medium uppercase tracking-[0.16em] text-white/58 transition hover:border-white/[0.10] hover:bg-white/[0.030] hover:text-white/76 disabled:cursor-not-allowed disabled:opacity-45"
               >
-                Bind
+                Bind continuity
               </button>
             </div>
             <p className="mt-2 text-xs leading-5 text-white/32">
-              Used only to restore access and continuity after activation.
+              Binds activation to recognition, restoration, and runtime continuity.
             </p>
           </div>
 
-          <div className="rounded-[0.85rem] border border-white/[0.035] bg-[#080A0F]/86 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
-            <div id="george-payment-element" className="min-h-[180px]" />
+          <div className="rounded-[0.85rem] border border-white/[0.035] bg-[#07090D]/92 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.022)]">
+            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
+              Secure payment rail
+            </p>
+            <div id="george-payment-element" className="min-h-[150px]" />
           </div>
 
           {(status || error) && (
@@ -329,27 +360,27 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
             </div>
           )}
 
-          <div className="flex flex-col gap-3 border-t border-white/[0.04] pt-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <button
-                type="button"
-                onClick={() => onLegacyCheckout(tier)}
-                className="text-left text-xs font-medium uppercase tracking-[0.18em] text-white/30 transition hover:text-white/58"
-              >
-                Classic checkout fallback
-              </button>
-              <p className="max-w-xs text-[11px] leading-4 text-white/24">
-                Use only if the native payment form cannot complete activation.
-              </p>
-            </div>
-
+          <div className="flex flex-col gap-3 border-t border-white/[0.04] pt-4">
             <button
               type="submit"
               disabled={!ready || submitting || loading}
               className="rounded-[0.78rem] border border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.085] px-5 py-3 text-sm font-semibold text-[#D7DCFF] transition hover:bg-[#AAB4FF]/[0.13] disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {submitting ? 'Activating...' : copy.confirm}
+              {submitting ? 'Activating runtime...' : copy.confirm}
             </button>
+
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => onLegacyCheckout(tier)}
+                className="text-left text-[11px] font-medium uppercase tracking-[0.18em] text-white/24 transition hover:text-white/52"
+              >
+                Classic checkout fallback
+              </button>
+              <p className="max-w-xs text-[11px] leading-4 text-white/20">
+                Use only if native runtime activation cannot complete.
+              </p>
+            </div>
           </div>
         </form>
       </div>
