@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         ...sessionBase,
         ui_mode: 'embedded',
         return_url: `${appUrl}/top-up?activation=return&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
-      } as Stripe.Checkout.SessionCreateParams)
+      } as unknown as Stripe.Checkout.SessionCreateParams)
 
       return NextResponse.json({
         mode: 'embedded',
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         tier === 'brilliant_day'
           ? `${appUrl}/top-up?daily=cancelled`
           : `${appUrl}/george?subscription=cancelled&tier=${tier}`,
-    } as Stripe.Checkout.SessionCreateParams)
+    } as unknown as Stripe.Checkout.SessionCreateParams)
 
     return NextResponse.json({ mode: 'redirect', url: session.url })
   } catch (error) {
