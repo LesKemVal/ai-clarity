@@ -1436,6 +1436,13 @@ async function canGovernorInjectLiveCue(transcript: string) {
             ? 'lines'
             : 'cues',
         runtimeMemory: liveRuntimeMemoryRef.current,
+        runtimeSupport: (() => {
+          try {
+            return JSON.parse(window.localStorage.getItem('george_live_runtime_support_active') || 'null')
+          } catch {
+            return null
+          }
+        })(),
       }),
     })
 
