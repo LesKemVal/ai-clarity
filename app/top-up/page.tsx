@@ -45,7 +45,7 @@ const tiers: TierCard[] = [
       'Uses continuity and signal to sharpen execution, planning, momentum, and decision support.',
       'Useful for long-term projects, business direction, operational thinking, and ongoing execution.',
     ],
-    action: 'Activate Intelligent',
+    action: 'Activate Intelligent continuity',
     checkout: 'intelligent',
   },
   {
@@ -61,7 +61,7 @@ const tiers: TierCard[] = [
       'Adjusts pacing, wording, silence, and rhetorical posture based on the room and user direction.',
       'Useful for negotiations, interviews, difficult conversations, calls, meetings, and high-pressure communication.',
     ],
-    action: 'Activate Brilliant',
+    action: 'Activate LIVE capability',
     checkout: 'brilliant',
   },
   {
@@ -77,7 +77,7 @@ const tiers: TierCard[] = [
       'Useful when timing, wording, pressure, or one important conversation may affect the next opportunity.',
       'Designed for immediate operational support during specific high-leverage moments.',
     ],
-    action: 'Activate Day Access',
+    action: 'Activate LIVE for today',
     checkout: 'brilliant_day',
   },
 ]
@@ -128,10 +128,10 @@ export default function TopUpPage() {
       return 'Configure GEORGE.'
     }
     if (intent === 'conversation') {
-      return 'Activate LIVE support.'
+      return 'Activate LIVE capability.'
     }
     if (intent === 'pro') {
-      return 'Open Brilliant Day.'
+      return 'Activate LIVE for today.'
     }
     return 'Access and continuity.'
   }, [intent])
@@ -210,7 +210,7 @@ export default function TopUpPage() {
 
   async function startCheckout(tier: 'intelligent' | 'brilliant' | 'brilliant_day') {
     try {
-      setMessage('Opening secure checkout...')
+      setMessage('Preparing secure activation...')
 
       const res = await fetch('/api/subscribe', {
         method: 'POST',
