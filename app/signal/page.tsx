@@ -140,26 +140,26 @@ export default function SignalPage() {
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Name"
+                  placeholder="What should GEORGE call you?"
                   className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
                 <input
                   value={mission}
                   onChange={(e) => setMission(e.target.value)}
-                  placeholder="Primary objective"
+                  placeholder="What is your goal right now?"
                   className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
                 <input
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  placeholder="Current pressure"
+                  placeholder="What should GEORGE account for right now?"
                   className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
 
                 <input
                   value={learningStyle}
                   onChange={(e) => setLearningStyle(e.target.value)}
-                  placeholder="Preferred operating style"
+                  placeholder="How should GEORGE work with you?"
                   className="rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-white outline-none placeholder:text-white/28"
                 />
               </div>
@@ -189,7 +189,7 @@ export default function SignalPage() {
               value={adaptiveAnswer}
               onChange={(e) => setAdaptiveAnswer(e.target.value)}
               rows={3}
-              placeholder="Add the detail GEORGE should preserve for sharper guidance."
+              placeholder="What should GEORGE understand before helping you move forward?"
               className="mt-3 w-full rounded-[0.82rem] border border-white/[0.06] bg-black/24 px-4 py-2.5 text-sm text-white outline-none placeholder:text-white/28"
             />
           </div>
@@ -204,7 +204,7 @@ export default function SignalPage() {
             </button>
 
             <p className="text-xs leading-5 text-white/32">
-              Update signal when the objective, pressure, or operating style changes.
+              Update what GEORGE should account for when your goal, pressure, or working style changes.
             </p>
           </div>
         </div>
