@@ -89,6 +89,7 @@ export default function TopUpPage() {
   const [message, setMessage] = useState('')
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
+  const [checkoutEmail, setCheckoutEmail] = useState('')
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -119,6 +120,7 @@ export default function TopUpPage() {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
+    setCheckoutEmail(localStorage.getItem('george_email') || '')
   }, [])
 
   const headline = useMemo(() => {
@@ -213,7 +215,7 @@ export default function TopUpPage() {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, email: checkoutEmail.trim().toLowerCase() || undefined }),
       })
 
       const data = await res.json()
@@ -306,6 +308,33 @@ export default function TopUpPage() {
 
               <p className="mt-2 text-sm leading-6 text-white/62">
                 {currentUsageGuidance.message}
+              </p>
+            </div>
+
+            <div className="rounded-[0.8rem] border border-white/[0.035] bg-black/22 px-4 py-3">
+              <label className="block text-[10px] uppercase tracking-[0.18em] text-white/34">
+                Continuity email
+              </label>
+
+              <input
+                type="email"
+                value={checkoutEmail}
+                onChange={(event) => {
+                  const value = event.target.value.trim().toLowerCase()
+                  setCheckoutEmail(value)
+
+                  if (value) {
+                    localStorage.setItem('george_email', value)
+                  } else {
+                    localStorage.removeItem('george_email')
+                  }
+                }}
+                placeholder="you@example.com"
+                className="mt-2 w-full bg-transparent text-sm text-white/82 outline-none placeholder:text-white/24"
+              />
+
+              <p className="mt-2 text-xs leading-5 text-white/38">
+                GEORGE uses this to connect access, restoration, and continuity across devices.
               </p>
             </div>
 
