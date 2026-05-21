@@ -177,10 +177,10 @@ function buildRuntimeCostEstimate({
     outputModeCents,
     outputMode: liveAssistMode,
     breakdown: [
-      { label: 'LIVE audio + speech detection', cents: liveAudioCents },
-      { label: 'OpenAI runtime reasoning', cents: reasoningCents },
-      { label: liveAssistMode === 'lines' ? 'Repeatable line generation' : 'Cue generation', cents: outputCents },
-      { label: 'Continuity + runtime overhead', cents: continuityCents },
+      { label: 'speech processing', cents: liveAudioCents },
+      { label: 'adaptive reasoning', cents: reasoningCents },
+      { label: liveAssistMode === 'lines' ? 'response shaping' : 'response shaping', cents: outputCents },
+      { label: 'continuity active', cents: continuityCents },
     ],
     basis: 'Estimated from expected room duration, selected support intensity, LIVE output mode, and added runtime capacity.',
   }
@@ -832,23 +832,22 @@ export default function GeorgeLiveEntryPage() {
               </p>
 
               {runtimeCostEstimate && (
-                <div className="mt-4 rounded-[0.8rem] border border-white/[0.045] bg-black/20 p-3">
-                  <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-white/34">
-                    Resource basis
-                  </div>
+                <div className="mt-4 rounded-[0.8rem] border border-white/[0.045] bg-black/20 px-3 py-2.5">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] leading-5 text-white/42">
+                    <span className="uppercase tracking-[0.16em] text-white/28">
+                      LIVE session resources:
+                    </span>
 
-                  <div className="grid gap-2">
-                    {runtimeCostEstimate.breakdown.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between gap-3 text-[12px]">
-                        <span className="text-white/44">{item.label}</span>
-                        <span className="font-semibold text-[#C9D0FF]/76">~{item.cents}¢</span>
-                      </div>
+                    {runtimeCostEstimate.breakdown.map((item, index) => (
+                      <span key={item.label} className="inline-flex items-center gap-2">
+                        <span>{item.label}</span>
+
+                        {index < runtimeCostEstimate.breakdown.length - 1 && (
+                          <span className="text-white/18">·</span>
+                        )}
+                      </span>
                     ))}
                   </div>
-
-                  <p className="mt-3 text-[11px] leading-5 text-white/34">
-                    {runtimeCostEstimate.basis}
-                  </p>
                 </div>
               )}
 
