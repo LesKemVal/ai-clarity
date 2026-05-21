@@ -7,6 +7,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 type PlanTier = 'intelligent' | 'brilliant' | 'brilliant_day'
 type ExpandedInvoice = Stripe.Invoice & {
   payment_intent?: string | Stripe.PaymentIntent | null
+  confirmation_secret?: {
+    client_secret?: string | null
+  } | null
+  payments?: {
+    data?: Array<{
+      payment?:
+        | {
+            payment_intent?: string | Stripe.PaymentIntent | null
+            type?: string
+          }
+        | Stripe.PaymentIntent
+        | null
+    }>
+  } | null
 }
 
 function getPriceIdForTier(tier: PlanTier) {
@@ -25,16 +39,41 @@ function getActivationReturnUrl(appUrl: string, tier: PlanTier) {
   return `${appUrl}/top-up?${params.toString()}`
 }
 
-function extractPaymentIntentClientSecret(subscription: Stripe.Subscription) {
+async function extractPaymentIntentClientSecret(subscription: Stripe.Subscription) {
   const invoice = subscription.latest_invoice as ExpandedInvoice | string | null
 
-  if (!invoice || typeof invoice === 'string') return null
+  if (!invoice) return null
 
-  const paymentIntent = invoice.payment_intent
+  const expandedInvoice =
+    typeof invoice === 'string'
+      ? ((await stripe.invoices.retrieve(invoice, {
+          expand: ['payment_intent', 'confirmation_secret', 'payments'],
+        })) as ExpandedInvoice)
+      : invoice
 
-  if (!paymentIntent || typeof paymentIntent === 'string') return null
+  if (expandedInvoice.confirmation_secret?.client_secret) {
+    return expandedInvoice.confirmation_secret.client_secret
+  }
 
-  return paymentIntent.client_secret
+  const invoicePayment = expandedInvoice.payments?.data?.[0]?.payment
+  const paymentIntentRef =
+    expandedInvoice.payment_intent ??
+    (invoicePayment && 'payment_intent' in invoicePayment
+      ? invoicePayment.payment_intent
+      : invoicePayment)
+
+  if (!paymentIntentRef) return null
+
+  if (typeof paymentIntentRef === 'string') {
+    const retrievedPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentRef)
+    return retrievedPaymentIntent.client_secret
+  }
+
+  if ('client_secret' in paymentIntentRef) {
+    return paymentIntentRef.client_secret
+  }
+
+  return null
 }
 
 function extractSetupIntentClientSecret(subscription: Stripe.Subscription) {
@@ -152,16 +191,43 @@ export async function POST(req: NextRequest) {
         ...(validEmail ? { email } : {}),
       },
       ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
-      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+      expand: ['latest_invoice', 'latest_invoice.payments', 'pending_setup_intent'],
     })
 
-    const paymentClientSecret = extractPaymentIntentClientSecret(subscription)
+    const paymentClientSecret = await extractPaymentIntentClientSecret(subscription)
     const setupClientSecret = extractSetupIntentClientSecret(subscription)
     const clientSecret = paymentClientSecret ?? setupClientSecret
 
     if (!clientSecret) {
       return NextResponse.json(
-        { error: 'Unable to prepare the payment form.' },
+        {
+          error: 'Unable to prepare the payment form.',
+          debug: {
+            subscriptionId: subscription.id,
+            status: subscription.status,
+            collectionMethod: subscription.collection_method,
+            latestInvoice:
+              typeof subscription.latest_invoice === 'string'
+                ? subscription.latest_invoice
+                : subscription.latest_invoice?.id ?? null,
+            latestInvoiceKeys:
+              typeof subscription.latest_invoice === 'string'
+                ? []
+                : Object.keys(subscription.latest_invoice ?? {}),
+            latestInvoicePaymentIntent:
+              typeof subscription.latest_invoice === 'string'
+                ? null
+                : (subscription.latest_invoice as ExpandedInvoice)?.payment_intent ?? null,
+            latestInvoiceConfirmationSecret:
+              typeof subscription.latest_invoice === 'string'
+                ? null
+                : (subscription.latest_invoice as ExpandedInvoice)?.confirmation_secret ?? null,
+            pendingSetupIntent:
+              typeof subscription.pending_setup_intent === 'string'
+                ? subscription.pending_setup_intent
+                : subscription.pending_setup_intent?.id ?? null,
+          },
+        },
         { status: 500 }
       )
     }
