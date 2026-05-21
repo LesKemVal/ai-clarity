@@ -37,13 +37,11 @@ const tiers: TierCard[] = [
     id: 'intelligent',
     name: 'Intelligent',
     price: '$10',
-    tone: 'Structured execution',
-    promise: 'Turn direction into clear steps, better decisions, and consistent forward movement.',
+    tone: 'LIVE runtime',
+    promise: 'Structured execution with LIVE runtime support and contextual recall by default.',
     label: 'Explain Intelligent',
     details: [
-      'Break goals, problems, and choices into steps you can actually follow.',
-      'Keep decisions tied to your objective instead of drifting into noise.',
-      'Stay on track with stronger continuity and practical next moves.',
+      'LIVE runtime support, contextual recall by default, continuity-aware execution, adaptive response shaping, operational memory carry, active conversational support, persistent objective tracking.',
     ],
     action: 'Activate Intelligent',
     checkout: 'intelligent',
@@ -52,13 +50,11 @@ const tiers: TierCard[] = [
     id: 'brilliant',
     name: 'Brilliant',
     price: '$25',
-    tone: 'LIVE execution',
-    promise: 'Bring GEORGE into moments where timing, pressure, and words matter.',
+    tone: 'Persistent runtime',
+    promise: 'Persistent LIVE runtime with deeper continuity, stronger contextual awareness, and real-time operational support.',
     label: 'Explain Brilliant',
     details: [
-      'Use LIVE support for interviews, negotiations, calls, meetings, and difficult conversations.',
-      'Get cues, repeatable lines, silence guidance, and sharper next moves in the room.',
-      'Carry deeper continuity when the conversation should not reset.',
+      'Persistent LIVE runtime, deeper contextual carry, adaptive pressure handling, continuity-linked operational memory, real-time conversational guidance, runtime-aware support escalation, stronger execution persistence.',
     ],
     action: 'Activate Brilliant',
     checkout: 'brilliant',
@@ -67,19 +63,16 @@ const tiers: TierCard[] = [
     id: 'brilliant_day',
     name: 'Brilliant Day',
     price: '$5',
-    tone: 'One-day LIVE',
-    promise: 'Open LIVE support for the important room in front of you today.',
+    tone: 'Temporary runtime',
+    promise: 'Temporary access to GEORGE’s LIVE runtime and operational support layer.',
     label: 'Explain Day Access',
     details: [
-      'Use Brilliant for one day when a meeting, call, interview, or decision carries weight.',
-      'Get immediate wording, timing, posture, and next-move support without changing tiers.',
-      'Designed for the day you need GEORGE most.',
+      'Temporary LIVE runtime access, contextual carry enabled, real-time operational guidance, adaptive conversational support, pressure-aware assistance, continuity-linked execution support.',
     ],
     action: 'Activate Day Access',
     checkout: 'brilliant_day',
   },
 ]
-
 export default function TopUpPage() {
   const [intent, setIntent] = useState<string | null>(null)
   const [feedbackType, setFeedbackType] = useState('suggestion')
@@ -374,11 +367,9 @@ export default function TopUpPage() {
                       }`}
                     >
                       <div className="overflow-hidden">
-                        <ul className="mt-3 space-y-2 border-t border-white/[0.035] pt-3 text-sm leading-6 text-white/46">
-                          {tier.details.map((detail) => (
-                            <li key={detail}>{detail}</li>
-                          ))}
-                        </ul>
+                        <div className="mt-3 border-t border-white/[0.035] pt-3 text-[13px] leading-7 tracking-[0.01em] text-white/44">
+                          {tier.details.join(' ')}
+                        </div>
                       </div>
                     </div>
 
