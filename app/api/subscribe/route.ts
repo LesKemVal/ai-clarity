@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     if (checkoutMode === 'embedded') {
       const session = await stripe.checkout.sessions.create({
         ...sessionBase,
-        ui_mode: 'embedded',
+        ui_mode: 'embedded_page',
         return_url: `${appUrl}/top-up?activation=return&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
       } as unknown as Stripe.Checkout.SessionCreateParams)
 
