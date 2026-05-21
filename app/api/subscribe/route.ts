@@ -5,11 +5,16 @@ import { upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
 type PlanTier = 'intelligent' | 'brilliant' | 'brilliant_day'
+type CheckoutMode = 'redirect' | 'embedded'
 
 function getPriceIdForTier(tier: PlanTier) {
   if (tier === 'brilliant_day') return process.env.STRIPE_BRILLIANT_DAY_PRICE_ID
   if (tier === 'brilliant') return process.env.STRIPE_BRILLIANT_PRICE_ID
   return process.env.STRIPE_INTELLIGENT_PRICE_ID
+}
+
+function getSessionModeForTier(tier: PlanTier) {
+  return tier === 'brilliant_day' ? 'payment' : 'subscription'
 }
 
 export async function POST(req: NextRequest) {
@@ -22,6 +27,9 @@ export async function POST(req: NextRequest) {
         : body?.tier === 'brilliant'
           ? 'brilliant'
           : 'intelligent'
+
+    const checkoutMode: CheckoutMode =
+      body?.checkoutMode === 'embedded' ? 'embedded' : 'redirect'
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
     const priceId = getPriceIdForTier(tier)
@@ -51,8 +59,8 @@ export async function POST(req: NextRequest) {
       upsertSubscriber({ email, currentTier: 'smart' })
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode: tier === 'brilliant_day' ? 'payment' : 'subscription',
+    const sessionBase = {
+      mode: getSessionModeForTier(tier),
       payment_method_types: ['card'],
       ...(tier === 'brilliant_day' ? {} : { payment_method_collection: 'always' as const }),
       line_items: [
@@ -77,6 +85,23 @@ export async function POST(req: NextRequest) {
               ...(tier === 'intelligent' ? { trial_period_days: 30 } : {}),
             },
           }),
+    } satisfies Partial<Stripe.Checkout.SessionCreateParams>
+
+    if (checkoutMode === 'embedded') {
+      const session = await stripe.checkout.sessions.create({
+        ...sessionBase,
+        ui_mode: 'embedded',
+        return_url: `${appUrl}/top-up?activation=return&tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
+      } as Stripe.Checkout.SessionCreateParams)
+
+      return NextResponse.json({
+        mode: 'embedded',
+        clientSecret: session.client_secret,
+      })
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      ...sessionBase,
       success_url:
         tier === 'brilliant_day'
           ? `${appUrl}/top-up?daily=success&session_id={CHECKOUT_SESSION_ID}`
@@ -85,9 +110,9 @@ export async function POST(req: NextRequest) {
         tier === 'brilliant_day'
           ? `${appUrl}/top-up?daily=cancelled`
           : `${appUrl}/george?subscription=cancelled&tier=${tier}`,
-    })
+    } as Stripe.Checkout.SessionCreateParams)
 
-    return NextResponse.json({ url: session.url })
+    return NextResponse.json({ mode: 'redirect', url: session.url })
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unable to create checkout session.'
