@@ -89,6 +89,61 @@ function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInp
   }
 }
 
+function applyRuntimeSupport(packet: LiveVoicePacket, input: LiveVoiceGovernorInput) {
+  const runtimeSupport = input.runtimeSupport
+
+  if (!runtimeSupport) return packet
+
+  const capabilityIds = runtimeSupport.selectedCapabilityIds || []
+  const overlay = runtimeSupport.deliveryOverlay || null
+  const resourceEstimate = runtimeSupport.resourceEstimate || null
+
+  let nextPacket = {
+    ...packet,
+    runtimeSupportApplied: true,
+  }
+
+  if (overlay?.cadenceProfile === 'Sharp') {
+    nextPacket.responseCompression = 'tight'
+    nextPacket.deliveryStyle = 'compressed_operational'
+  }
+
+  if (overlay?.cadenceProfile === 'Measured') {
+    nextPacket.responseCompression = 'measured'
+    nextPacket.deliveryStyle = 'calm_operational'
+  }
+
+  if (overlay?.qualificationStyle === 'Direct') {
+    nextPacket.responseTone = 'firm'
+  }
+
+  if (overlay?.silenceTolerance === 'High') {
+    nextPacket.intervention = 'hold_unless_necessary'
+  }
+
+  if (capabilityIds.includes('pressure_management')) {
+    nextPacket.roomPressure = nextPacket.roomPressure === 'authority'
+      ? 'authority'
+      : 'high'
+
+    nextPacket.confidence = Math.max(nextPacket.confidence, 0.82)
+  }
+
+  if (capabilityIds.includes('negotiation_support')) {
+    nextPacket.responseTone = 'negotiation'
+  }
+
+  if (capabilityIds.includes('decision_support')) {
+    nextPacket.status = `${nextPacket.status} Decision-support runtime active.`.trim()
+  }
+
+  if (resourceEstimate?.totalCents) {
+    nextPacket.runtimeSupportSummary = `Estimated runtime cost ~${resourceEstimate.totalCents}¢`
+  }
+
+  return nextPacket
+}
+
 function applySpeakerIntentAuthority(
   packet: LiveVoicePacket,
   transcript: string
@@ -237,6 +292,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   }
 
   packet = applyRuntimeMemory(packet, input)
+  packet = applyRuntimeSupport(packet, input)
 
   if (TEACHER_LANGUAGE.test(packet.volley)) {
     packet.volley = 'Say it plainly.'
