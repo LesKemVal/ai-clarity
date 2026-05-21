@@ -311,3 +311,31 @@ The Stripe form itself must visually match the site:
 - Stripe remains responsible for payment security
 
 Current embedded Stripe Checkout has limited styling control. If full form visual control is required, move later toward Stripe Payment Element, but preserve the working embedded checkout until the new flow is fully ready.
+
+Additional activation continuity rule:
+
+Users entering Brilliant mode should retain control of flow.
+
+After activation:
+- user may continue directly into Brilliant mode
+- user may enter Prep Room
+- user may resume prior continuity/session
+- user may start fresh
+
+Prep Room should be framed as optional operational preparation, not a required onboarding gate.
+
+Returning users should not feel reset.
+GEORGE should recognize continuity and offer:
+- Resume
+- Continue
+- Prepare Room
+- Start Fresh
+
+The system should feel:
+- continuity-aware
+- operational
+- adaptive
+- low-friction
+- user-directed
+
+GEORGE should guide without trapping the user in forced setup flows.
