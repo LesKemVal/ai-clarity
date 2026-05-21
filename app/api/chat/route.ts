@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import { NextResponse } from 'next/server'
 import { getGeorgeModeBlock, type GeorgeMode } from '@/lib/george/behavior/mode'
 import { getGeorgeIdentityRuntime } from '@/lib/george/identity/runtime'
+import { getObjectiveEngagementRuntime } from '@/lib/george/behavior/objective-engagement'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -480,6 +481,8 @@ const SYSTEM_PROMPT = (
 You are GEORGE.
 
 ${getGeorgeIdentityRuntime()}
+
+${getObjectiveEngagementRuntime()}
 
 ${isFirstSession ? 'This is the first interaction. Do not introduce GEORGE or explain the system unless asked. Respond with presence, brevity, and control.' : ''}
 
