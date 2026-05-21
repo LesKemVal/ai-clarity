@@ -12,6 +12,33 @@ export type LiveRuntimeMemory = {
   hesitationCount?: number
 }
 
+export type LiveRuntimeSupportInput = {
+  selectedCapabilityIds?: string[]
+  selectedCapabilities?: Array<{ label?: string; description?: string }>
+  runtimeBias?: unknown[]
+  resourceEstimate?: {
+    expectedMinutes?: number
+    totalCents?: number
+    breakdown?: Array<{ label?: string; cents?: number }>
+    basis?: string
+  } | null
+  purview?: {
+    label?: string
+    body?: string
+    line?: string
+  } | null
+  deliveryOverlay?: {
+    cadenceProfile?: string
+    compressionBias?: number
+    declarativeStrength?: number
+    silenceTolerance?: string
+    interruptionTiming?: string
+    qualificationStyle?: string
+    linguisticDensity?: string
+    deliveryNotes?: string[]
+  } | null
+}
+
 export type LiveVoicePacket = {
   speaker: LiveSpeakerRole
   shouldSpeak: boolean
@@ -35,6 +62,8 @@ export type LiveVoicePacket = {
   liveAssistMode?: 'cues' | 'lines'
   runtimeForce?: 'light' | 'balanced' | 'strong'
   runtimeMemoryApplied?: boolean
+  runtimeSupportApplied?: boolean
+  runtimeSupportSummary?: string
 }
 
 export type LiveVoiceGovernorInput = {
@@ -46,4 +75,5 @@ export type LiveVoiceGovernorInput = {
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'
   runtimeMemory?: LiveRuntimeMemory
+  runtimeSupport?: LiveRuntimeSupportInput | null
 }
