@@ -5,6 +5,9 @@ import { upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
 type PlanTier = 'intelligent' | 'brilliant' | 'brilliant_day'
+type ExpandedInvoice = Stripe.Invoice & {
+  payment_intent?: string | Stripe.PaymentIntent | null
+}
 
 function getPriceIdForTier(tier: PlanTier) {
   if (tier === 'brilliant_day') return process.env.STRIPE_BRILLIANT_DAY_PRICE_ID
@@ -23,7 +26,7 @@ function getActivationReturnUrl(appUrl: string, tier: PlanTier) {
 }
 
 function extractPaymentIntentClientSecret(subscription: Stripe.Subscription) {
-  const invoice = subscription.latest_invoice
+  const invoice = subscription.latest_invoice as ExpandedInvoice | string | null
 
   if (!invoice || typeof invoice === 'string') return null
 
