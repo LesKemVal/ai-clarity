@@ -279,3 +279,35 @@ Rules:
 
 UX principle:
 The Signal page should feel like “teach GEORGE what matters,” not “manage a chatbot profile.”
+
+## Activation → Prep Room / Resume Direction
+
+After activation, GEORGE should not drop users into a generic state.
+
+Activation should lead into a GEORGE-owned transition:
+
+For new or unrecognized users:
+- ask whether they want to prepare the room
+- or send them to Prep Room with a clear option to skip
+- Prep Room should explain what GEORGE will account for
+- user can prepare context or continue directly
+
+For returning recognized users:
+- GEORGE should recognize continuity
+- first message should offer Start / Resume
+- previous conversations should be accessible
+- GEORGE should surface relevant prior context without overwhelming the user
+- user can resume prior work, start fresh, or enter LIVE/Prep Room
+
+Activation flow principle:
+Payment activates capability, but GEORGE owns the next operational step.
+
+The Stripe form itself must visually match the site:
+- dark shell
+- restrained contrast
+- modern functional utility
+- no harsh white interruption where avoidable
+- Bx/GEORGE trust framing around the payment surface
+- Stripe remains responsible for payment security
+
+Current embedded Stripe Checkout has limited styling control. If full form visual control is required, move later toward Stripe Payment Element, but preserve the working embedded checkout until the new flow is fully ready.
