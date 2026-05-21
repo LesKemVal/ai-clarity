@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
+import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 
 type TierId = 'smart' | 'intelligent' | 'brilliant' | 'brilliant_day'
+type CheckoutTier = 'intelligent' | 'brilliant' | 'brilliant_day'
 
 type TierCard = {
   id: TierId
@@ -14,7 +16,7 @@ type TierCard = {
   label: string
   details: string[]
   action?: string
-  checkout?: 'intelligent' | 'brilliant' | 'brilliant_day'
+  checkout?: CheckoutTier
 }
 
 const tiers: TierCard[] = [
@@ -85,6 +87,7 @@ export default function TopUpPage() {
   const [message, setMessage] = useState('')
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
+  const [activeCheckout, setActiveCheckout] = useState<CheckoutTier | null>(null)
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -110,11 +113,19 @@ export default function TopUpPage() {
     }
   }, [intent])
 
-
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
+
+    if (params.get('payment') === 'success') {
+      const tier = params.get('tier')
+      if (tier === 'intelligent' || tier === 'brilliant' || tier === 'brilliant_day') {
+        localStorage.setItem('george_tier', tier === 'brilliant_day' ? 'brilliant' : tier)
+        localStorage.setItem('george_activation_source', 'payment_element')
+        setMessage('Activation confirmed. GEORGE continuity is ready.')
+      }
+    }
   }, [])
 
   const headline = useMemo(() => {
@@ -202,7 +213,7 @@ export default function TopUpPage() {
     setFeedback('')
   }
 
-  async function startCheckout(tier: 'intelligent' | 'brilliant' | 'brilliant_day') {
+  async function startCheckout(tier: CheckoutTier) {
     try {
       setMessage('Opening secure checkout...')
 
@@ -374,10 +385,7 @@ export default function TopUpPage() {
                     {tier.action && tier.checkout && (
                       <button
                         type="button"
-                        onClick={() => {
-                          if (!tier.checkout) return
-                          startCheckout(tier.checkout)
-                        }}
+                        onClick={() => setActiveCheckout(tier.checkout ?? null)}
                         className={`mt-4 w-full rounded-[0.7rem] border px-4 py-3 text-sm font-semibold transition ${
                           featured
                             ? 'border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.075] text-[#D7DCFF] hover:bg-[#AAB4FF]/[0.11]'
@@ -438,6 +446,17 @@ export default function TopUpPage() {
           </div>
         </section>
       </div>
+
+      {activeCheckout && (
+        <GeorgePaymentElement
+          tier={activeCheckout}
+          onClose={() => setActiveCheckout(null)}
+          onLegacyCheckout={(tier) => {
+            setActiveCheckout(null)
+            startCheckout(tier)
+          }}
+        />
+      )}
     </PageShell>
   )
 }
