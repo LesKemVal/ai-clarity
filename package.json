@@ -10,6 +10,8 @@
     "live:proxy": "node server/live/deepgram-proxy.js"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.5.2",
     "@supabase/supabase-js": "^2.100.1",
     "mammoth": "^1.12.0",
     "next": "16.2.1",
