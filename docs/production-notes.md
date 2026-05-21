@@ -179,3 +179,53 @@ Tone:
 
 Principle:
 GEORGE helps the user avoid getting stuck without announcing that this is what GEORGE is doing.
+
+## Signal Memory Architecture Direction
+
+Signal is not a profile form.
+
+Signal is how GEORGE absorbs operational context so it can serve the user better over time.
+
+Current rule:
+- visible signal fields should not feel permanently stuck on the page after save
+- GEORGE may retain useful signal invisibly
+- the user should feel that GEORGE absorbed the context, not that they are trapped in settings
+
+Signal layers:
+
+1. Visible Signal
+Temporary form/input state.
+Used when the user intentionally updates GEORGE.
+Should reset or stay visually light after save.
+
+2. Durable Operational Signal
+Stored context GEORGE can use later:
+- current objective
+- current pressure
+- preferred operating style
+- useful user constraints
+- goal-linked direction
+- context that improves execution
+
+3. Derived Signal
+Future layer.
+GEORGE may infer patterns from repeated interaction:
+- hesitation patterns
+- pressure environments
+- pacing needs
+- communication preferences
+- rhetorical posture fit
+- prior progress that helped the user move
+- recurring blocks
+
+Rules:
+- Do not store everything.
+- Do not treat raw memory as intelligence.
+- Do not label the user.
+- Derived signal must remain probabilistic and revisable.
+- Sensitive signal should be handled carefully.
+- Fear, pressure, and hesitation are execution signals, not identity labels.
+- Signal should serve the user's movement toward goals.
+
+UX principle:
+The Signal page should feel like “teach GEORGE what matters,” not “manage a chatbot profile.”
