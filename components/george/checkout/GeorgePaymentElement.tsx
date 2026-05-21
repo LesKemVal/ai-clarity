@@ -330,13 +330,18 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           )}
 
           <div className="flex flex-col gap-3 border-t border-white/[0.04] pt-4 md:flex-row md:items-center md:justify-between">
-            <button
-              type="button"
-              onClick={() => onLegacyCheckout(tier)}
-              className="text-left text-xs font-medium uppercase tracking-[0.18em] text-white/32 transition hover:text-white/62"
-            >
-              Use classic checkout
-            </button>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => onLegacyCheckout(tier)}
+                className="text-left text-xs font-medium uppercase tracking-[0.18em] text-white/30 transition hover:text-white/58"
+              >
+                Classic checkout fallback
+              </button>
+              <p className="max-w-xs text-[11px] leading-4 text-white/24">
+                Use only if the native payment form cannot complete activation.
+              </p>
+            </div>
 
             <button
               type="submit"
