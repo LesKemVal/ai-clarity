@@ -4683,45 +4683,27 @@ return (
     }
   }}
   className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showIdleGeorgeSurface && (
-    <div className={`flex min-h-[560px] flex-col items-center justify-start px-4 pt-[27dvh] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+  {showMobileHero && !liveMode && !hasUserMessageForSurface && (
+    <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
-        ? '-translate-y-16 opacity-0 pointer-events-none'
+        ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="text-center text-[46px] font-[300] tracking-[0.34em] text-[#D7DBE4]/24">
-        GEORGE
-      </div>
+      <div className="mx-auto w-full max-w-[390px] px-6 text-center">
+        <div className="text-[46px] font-[300] tracking-[0.34em] text-[#D7DBE4]/24">
+          GEORGE
+        </div>
 
-      <div className="mt-4 text-center text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">
-        Move. Build. Create.
-      </div>
-
-
-      <ContinuityCapsule
-        email={subscriberEmail}
-        onClear={() => {
-          setSubscriberEmail('')
-          setCurrentTier('smart')
-          window.localStorage.removeItem('george_email')
-          window.localStorage.removeItem('george_tier')
-          window.localStorage.removeItem('george_verified_continuity')
-          window.localStorage.removeItem('GEORGE_SESSIONS_V2')
-          window.localStorage.removeItem('GEORGE_ACTIVE_SESSION_ID')
-          window.localStorage.removeItem('GEORGE_ACTIVE_NORMAL_SESSION_ID')
-          window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
-          window.localStorage.removeItem('GEORGE_ACTIVE_CAMPAIGN_SESSION_ID')
-          setMessages([])
-          messagesRef.current = []
-          window.location.reload()
-        }}
-      />
-
-      <div className="hidden">
+        <div className="mt-4 text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">
+          Move. Build. Create.
+        </div>
       </div>
     </div>
   )}
 
+  {showTypingPrescription && (
+    <TypingPrescriptionSurface />
+  )}
 
   {liveMode && (
     <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
@@ -6533,7 +6515,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           </div>
         </div>
 
-      {false && showTypingPrescription && <TypingPrescriptionSurface />}
+
 
 {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
@@ -6772,6 +6754,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   }
 
                   setToastMessage('Login link sent. Check your email.')
+                  setShowUpgradeModal(false)
                   setShowToast(true)
                 } catch {
                   setToastMessage('Unable to send login link.')
