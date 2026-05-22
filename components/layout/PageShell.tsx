@@ -21,12 +21,6 @@ export default function PageShell({
 }: PageShellProps) {
   const [showSidebar, setShowSidebar] = useState(false)
 
-  useEffect(() => {
-    try {
-      window.localStorage.getItem('george_tier')
-    } catch {}
-  }, [])
-
   const goToGeorge = (prompt?: PromptItem) => {
     if (!prompt) {
       window.location.href = '/george'

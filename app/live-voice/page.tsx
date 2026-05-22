@@ -13,6 +13,7 @@ import { finalTranscriptRuntime } from '@/lib/george/live-voice/runtime/final-st
 import { georgeLatencyMetrics, type LatencySnapshot } from '@/lib/george/live-voice/runtime/latency-metrics'
 import { LIVE_TEXT_SCENARIOS } from '@/lib/george/live-voice/runtime/text-scenarios'
 import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '@/lib/george/live-voice/runtime/delivery-profile'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
 import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveObjectiveId } from '@/lib/george/live-voice/runtime/objective-engine'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
@@ -202,8 +203,7 @@ function isForceIntervention(text: string) {
 
 
   function getVerifiedLiveEmail() {
-    if (typeof window === 'undefined') return ''
-    return (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
+    return readCachedGeorgeSessionAuthority().email
   }
 
   function pushLog(line: string) {
@@ -245,13 +245,19 @@ function isForceIntervention(text: string) {
 
 
   useEffect(() => {
-    try {
-      const savedTier = window.localStorage.getItem('george_tier')
+    const cachedAuthority = readCachedGeorgeSessionAuthority()
 
-      if (savedTier === 'intelligent' || savedTier === 'brilliant') {
-        setLiveTier(savedTier)
-      }
-    } catch {}
+    if (cachedAuthority.tier === 'intelligent' || cachedAuthority.tier === 'brilliant') {
+      setLiveTier(cachedAuthority.tier)
+    }
+
+    fetchGeorgeSessionAuthority()
+      .then((authority) => {
+        if (authority.tier === 'intelligent' || authority.tier === 'brilliant') {
+          setLiveTier(authority.tier)
+        }
+      })
+      .catch(() => {})
   }, [])
 
 

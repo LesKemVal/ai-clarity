@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -17,7 +18,13 @@ export default function SignalPage() {
   const [adaptiveQuestion, setAdaptiveQuestion] = useState('')
 
   useEffect(() => {
-    setTier((localStorage.getItem('george_tier') || 'smart') as Tier)
+    const cachedAuthority = readCachedGeorgeSessionAuthority()
+    setTier(cachedAuthority.tier)
+
+    fetchGeorgeSessionAuthority()
+      .then((authority) => setTier(authority.tier))
+      .catch(() => {})
+
     setName(localStorage.getItem('george_name') || '')
     setMission(localStorage.getItem('george_user_mission') || '')
     setPriority(localStorage.getItem('george_user_priority') || '')
