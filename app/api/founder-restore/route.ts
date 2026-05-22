@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { setGeorgeSessionCookie } from '@/lib/security/george-session'
+import { upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 
 export async function POST(req: NextRequest) {
   const adminSecret = process.env.GEORGE_ADMIN_RESTORE_SECRET
@@ -22,6 +23,15 @@ export async function POST(req: NextRequest) {
       { error: 'Valid email and tier required.' },
       { status: 400 }
     )
+  }
+
+  try {
+    upsertSubscriber({
+      email,
+      currentTier: tier,
+    })
+  } catch (error) {
+    console.error('[GEORGE][founder-restore][subscriber-upsert-failed]', error)
   }
 
   const response = NextResponse.json({
