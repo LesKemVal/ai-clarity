@@ -1,90 +1,98 @@
 import crypto from 'crypto'
-import fs from 'fs'
-import path from 'path'
+import { getRedis } from '@/lib/storage/redis'
 import { getSubscriberByEmail } from '@/lib/subscriptions/subscriber-store'
 
-type ContinuityTokenRecord = {
-  tokenHash: string
-  email: string
-  expiresAt: number
-  used: boolean
-  createdAt: number
-}
-
-type ContinuityTokenStore = {
-  tokens: ContinuityTokenRecord[]
-}
-
-const storePath =
-  process.env.NODE_ENV === 'production'
-    ? path.join('/tmp', 'continuity-tokens.json')
-    : path.join(process.cwd(), 'data', 'continuity-tokens.json')
-const TOKEN_TTL_MS = 15 * 60 * 1000
-
-function readStore(): ContinuityTokenStore {
-  try {
-    const parsed = JSON.parse(fs.readFileSync(storePath, 'utf8'))
-    return {
-      tokens: Array.isArray(parsed?.tokens) ? parsed.tokens : [],
-    }
-  } catch {
-    return { tokens: [] }
-  }
-}
-
-function writeStore(store: ContinuityTokenStore) {
-  fs.mkdirSync(path.dirname(storePath), { recursive: true })
-  fs.writeFileSync(storePath, JSON.stringify(store, null, 2))
-}
+const TOKEN_TTL_SECONDS = 15 * 60
 
 function hashToken(token: string) {
   return crypto.createHash('sha256').update(token).digest('hex')
 }
 
+function tokenKey(tokenHash: string) {
+  return `george:continuity:${tokenHash}`
+}
+
 export async function createContinuityToken(emailInput: unknown) {
   const email = String(emailInput || '').trim().toLowerCase()
-  if (!email) return { error: 'Enter an email address.' }
 
-  const subscriber = await getSubscriberByEmail(email)
-  if (!subscriber) return { error: 'No subscriber continuity was found for that email.' }
-
-  const token = crypto.randomBytes(32).toString('hex')
-  const now = Date.now()
-  const record: ContinuityTokenRecord = {
-    tokenHash: hashToken(token),
-    email,
-    expiresAt: now + TOKEN_TTL_MS,
-    used: false,
-    createdAt: now,
+  if (!email) {
+    return { error: 'Enter an email address.' }
   }
 
-  const store = readStore()
-  const activeTokens = store.tokens.filter((item) => item.expiresAt > now && !item.used)
-  writeStore({ tokens: [record, ...activeTokens].slice(0, 100) })
+  const subscriber = await getSubscriberByEmail(email)
 
-  return { token, email, expiresAt: record.expiresAt }
+  if (!subscriber) {
+    return { error: 'No subscriber continuity was found for that email.' }
+  }
+
+  const token = crypto.randomBytes(32).toString('hex')
+  const tokenHash = hashToken(token)
+
+  const redis = getRedis()
+
+  const expiresAt = Date.now() + TOKEN_TTL_SECONDS * 1000
+
+  await redis.set(
+    tokenKey(tokenHash),
+    JSON.stringify({
+      email,
+      used: false,
+      expiresAt,
+    }),
+    {
+      EX: TOKEN_TTL_SECONDS,
+    }
+  )
+
+  return {
+    token,
+    email,
+    expiresAt,
+  }
 }
 
 export async function verifyContinuityToken(tokenInput: unknown) {
   const token = String(tokenInput || '').trim()
-  if (!token) return { error: 'Missing continuity token.' }
 
-  const now = Date.now()
+  if (!token) {
+    return { error: 'Missing continuity token.' }
+  }
+
   const tokenHash = hashToken(token)
-  const store = readStore()
-  const index = store.tokens.findIndex((item) => item.tokenHash === tokenHash)
 
-  if (index < 0) return { error: 'Continuity link is invalid.' }
+  const redis = getRedis()
 
-  const record = store.tokens[index]
-  if (record.used) return { error: 'Continuity link has already been used.' }
-  if (record.expiresAt < now) return { error: 'Continuity link has expired.' }
+  const raw = await redis.get(tokenKey(tokenHash))
+
+  if (!raw) {
+    return { error: 'Continuity link is invalid or expired.' }
+  }
+
+  const record = JSON.parse(raw as string)
+
+  if (record.used) {
+    return { error: 'Continuity link has already been used.' }
+  }
+
+  if (record.expiresAt < Date.now()) {
+    return { error: 'Continuity link has expired.' }
+  }
 
   const subscriber = await getSubscriberByEmail(record.email)
-  if (!subscriber) return { error: 'Subscriber continuity was not found.' }
 
-  store.tokens[index] = { ...record, used: true }
-  writeStore(store)
+  if (!subscriber) {
+    return { error: 'Subscriber continuity was not found.' }
+  }
+
+  record.used = true
+
+  await redis.set(
+    tokenKey(tokenHash),
+    JSON.stringify(record),
+    {
+      EX: TOKEN_TTL_SECONDS,
+    }
+  )
 
   return {
     email: subscriber.email,
