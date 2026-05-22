@@ -44,7 +44,15 @@ export async function POST(req: NextRequest) {
       expiresAt: result.expiresAt,
     })
   } catch (error) {
-    console.error('[GEORGE][continuity][request-error]', error)
-    return NextResponse.json({ error: 'Unable to create continuity link.' }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[GEORGE][continuity][request-error]', message)
+
+    return NextResponse.json(
+      {
+        error: 'Unable to create continuity link.',
+        detail: process.env.NODE_ENV === 'production' ? undefined : message,
+      },
+      { status: 500 }
+    )
   }
 }
