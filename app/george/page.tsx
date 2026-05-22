@@ -1222,6 +1222,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     if (forceLive && liveParam !== 'segue') {
       normalSessionBootedRef.current = true
       setActiveMode('live')
+      setMessages([])
+      messagesRef.current = []
       setLiveMode(true)
       setConversationMode('manual_live')
       setActivePromptContext('manual_live')
@@ -1997,6 +1999,7 @@ setPreLiveMessages(null)
 
     if (conversationMode === 'manual_live') {
   // hard override any existing messages
+  setMessages([])
   messagesRef.current = []
   const liveIntro: Message = {
     role: 'assistant',
