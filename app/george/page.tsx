@@ -4429,6 +4429,10 @@ return (
               setShowSidebar(false)
               window.location.href = '/george/live-entry'
             }}
+            onOpenLogin={() => {
+              setShowSidebar(false)
+              setShowUpgradeModal(true)
+            }}
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
           voiceActive={voiceOn}

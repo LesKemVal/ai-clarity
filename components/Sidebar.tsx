@@ -46,6 +46,7 @@ type SidebarProps = {
   activePromptContext?: string | null
   onToggleScripture?: () => void
   onOpenLiveGate?: () => void
+  onOpenLogin?: () => void
   currentTier?: 'smart' | 'intelligent' | 'brilliant'
   liveMode?: boolean
 }
@@ -60,6 +61,7 @@ export default function Sidebar({
   activePromptContext = null,
   onToggleScripture = () => {},
   onOpenLiveGate = () => {},
+  onOpenLogin = () => {},
   currentTier = 'smart',
   liveMode = false,
 }: SidebarProps) {
@@ -376,7 +378,8 @@ return (
                   <button
                     type="button"
                     onClick={() => {
-                      window.location.href = '/george'
+                      setShowSidebar?.(false)
+                      onOpenLogin()
                     }}
                     className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
                   >
