@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 
 const ROOM_CONTROLS: Record<string, string[]> = {
@@ -580,8 +581,12 @@ export default function GeorgeLiveEntryPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const tier = window.localStorage.getItem('george_tier') || 'smart'
-    setCurrentTier(tier)
+    const cachedAuthority = readCachedGeorgeSessionAuthority()
+    setCurrentTier(cachedAuthority.tier)
+
+    fetchGeorgeSessionAuthority()
+      .then((authority) => setCurrentTier(authority.tier))
+      .catch(() => {})
 
     const freshLiveEntry = window.localStorage.getItem('george_fresh_live_entry') === '1'
     if (freshLiveEntry) {

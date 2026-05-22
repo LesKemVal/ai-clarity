@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { fetchGeorgeSessionAuthority } from '@/lib/george/session-authority'
 
 type LiveChooserProps = {
   open: boolean
@@ -30,17 +31,15 @@ export default function LiveChooser({
     if (!open) return
     let cancelled = false
 
-    fetch('/api/session', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
+    fetchGeorgeSessionAuthority()
+      .then((authority) => {
         if (cancelled) return
-        setSessionAccess(Boolean(data?.liveAccess))
+        setSessionAccess(Boolean(authority.liveAccess))
         setSessionChecked(true)
       })
       .catch(() => {
         if (cancelled) return
-        const localTier = window.localStorage.getItem('george_tier')
-        setSessionAccess(localTier === 'intelligent' || localTier === 'brilliant')
+        setSessionAccess(false)
         setSessionChecked(true)
       })
 

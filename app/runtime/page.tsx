@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import PageShell from '@/components/layout/PageShell'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 
 type SessionResponse = {
   authenticated?: boolean
@@ -120,10 +121,12 @@ export default function RuntimePage() {
   useEffect(() => {
     let cancelled = false
 
-    fetch('/api/session', { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!cancelled) setSession(data)
+    fetchGeorgeSessionAuthority()
+      .then((authority) => {
+        if (!cancelled) {
+          setSession(authority)
+          setLocalEmail(authority.email)
+        }
       })
       .catch(() => {
         if (!cancelled) setSession({ authenticated: false, tier: 'smart', liveAccess: false })
@@ -139,26 +142,15 @@ export default function RuntimePage() {
       .catch(() => {})
 
     try {
-      const email = window.localStorage.getItem('george_email') || ''
-      const verified = window.localStorage.getItem('george_verified_continuity') === 'true'
-      const tier = window.localStorage.getItem('george_tier') || 'smart'
+      const authority = readCachedGeorgeSessionAuthority()
       const raw = window.localStorage.getItem('GEORGE_LIVE_SESSION_METRICS') || '[]'
       const parsed = JSON.parse(raw)
 
-      setLocalEmail(email)
+      setLocalEmail(authority.email)
       setRecords(Array.isArray(parsed) ? parsed : [])
 
-      if (verified && email) {
-        setSession((current) =>
-          current?.authenticated
-            ? current
-            : {
-                authenticated: true,
-                tier: tier === 'brilliant' ? 'brilliant' : tier === 'intelligent' ? 'intelligent' : 'smart',
-                liveAccess: tier === 'brilliant' || tier === 'intelligent',
-                email,
-              }
-        )
+      if (authority.authenticated) {
+        setSession((current) => current?.authenticated ? current : authority)
       }
     } catch {
       setRecords([])
