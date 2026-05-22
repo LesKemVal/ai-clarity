@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { setGeorgeSessionCookie } from '@/lib/security/george-session'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
+import { upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 
 type Tier = 'intelligent' | 'brilliant'
 
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}))
   const code = String(body?.code || '').trim().toUpperCase()
+  const email = String(body?.email || '').trim().toLowerCase()
 
   if (!code) {
     return NextResponse.json({ error: 'Founder code required.' }, { status: 400 })
@@ -56,16 +58,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid founder code.' }, { status: 403 })
   }
 
+  if (email && email.includes('@')) {
+    upsertSubscriber({
+      email,
+      currentTier: tier,
+    })
+  }
+
   const response = NextResponse.json({
     ok: true,
     tier,
+    email: email && email.includes('@') ? email : null,
   })
 
-  // Founder sessions intentionally avoid exposing subscriber records or raw codes.
   setGeorgeSessionCookie(response, {
-    email: `founder:${getFounderSessionLabel(code)}`,
+    email: email && email.includes('@') ? email : `founder:${getFounderSessionLabel(code)}`,
     tier,
-    source: 'founder',
+    source: email && email.includes('@') ? 'continuity' : 'founder',
   })
 
   return response

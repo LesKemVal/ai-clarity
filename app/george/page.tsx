@@ -1593,7 +1593,10 @@ const redeemFounderCode = async () => {
     const response = await fetch('/api/founder-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({
+        code,
+        email: subscriberEmail.trim().toLowerCase() || undefined,
+      }),
     })
 
     const data = await response.json().catch(() => ({}))
