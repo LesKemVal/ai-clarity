@@ -109,7 +109,7 @@ export default function SignalPage() {
         <div className="absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-4xl space-y-6">
+      <div className="relative z-10 mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between">
           <img
             src="/logofav.png"
@@ -125,9 +125,9 @@ export default function SignalPage() {
           </button>
         </div>
 
-        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.46)] md:p-7">
-          <div className="space-y-3 border-b border-white/[0.045] pb-6">
-            <p className="text-xs uppercase tracking-[0.28em] text-white/42">
+        <div className="space-y-5 rounded-[1.15rem] border border-white/[0.03] bg-black/22 p-4 shadow-[0_10px_40px_rgba(0,0,0,0.24)] backdrop-blur-[18px] md:p-5">
+          <div className="space-y-2 border-b border-white/[0.04] pb-5">
+            <p className="text-[10px] uppercase tracking-[0.24em] text-white/34">
               Add Signal
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
