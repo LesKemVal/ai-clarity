@@ -188,7 +188,7 @@ export default function RuntimePage() {
 
           <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/24 px-4 py-3 text-right">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/30">
-              Recognized access
+              Logged in
             </div>
             <div className="mt-1 text-sm text-white/70">
               {session?.email || localEmail || 'Not restored'}
@@ -199,7 +199,7 @@ export default function RuntimePage() {
 
       {!authenticated && (
         <section className="rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.035] p-5">
-          <p className="text-sm font-medium text-[#D7DCFF]">Restore continuity to view LIVE Bx Prescriptions.</p>
+          <p className="text-sm font-medium text-[#D7DCFF]">Login to view LIVE Bx Prescriptions.</p>
           <p className="mt-2 text-sm leading-6 text-white/45">
             Runtime receipts are tied to recognized GEORGE continuity on this device.
           </p>
@@ -208,7 +208,7 @@ export default function RuntimePage() {
             onClick={() => (window.location.href = '/top-up')}
             className="mt-4 rounded-[0.8rem] border border-white/[0.08] bg-white/[0.024] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/64 transition hover:bg-white/[0.045] hover:text-white/84"
           >
-            Restore access
+            Login
           </button>
         </section>
       )}

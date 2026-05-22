@@ -1680,7 +1680,7 @@ const redeemFounderCode = async () => {
         .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
         .then(({ ok, data }) => {
           if (!ok) {
-            setToastMessage(data?.error || 'Continuity link could not be verified.')
+            setToastMessage(data?.error || 'Login link could not be verified.')
             setShowToast(true)
             window.history.replaceState({}, '', window.location.pathname)
             return
@@ -1703,12 +1703,12 @@ const redeemFounderCode = async () => {
             window.localStorage.setItem('george_tier', 'smart')
           }
 
-          setToastMessage('Continuity verified.')
+          setToastMessage('Login verified.')
           setShowToast(true)
           window.history.replaceState({}, '', window.location.pathname)
         })
         .catch(() => {
-          setToastMessage('Continuity link could not be verified.')
+          setToastMessage('Login link could not be verified.')
           setShowToast(true)
           window.history.replaceState({}, '', window.location.pathname)
         })
@@ -6677,22 +6677,22 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       >
         <div className="mb-5 text-center">
           <p className="text-[11px] uppercase tracking-[0.18em] text-[#D7DBE4]/58">
-            GEORGE Continuity
+            GEORGE Login
           </p>
 
           <p className="mt-3 text-sm font-medium text-[#D7DBE4]">
-            Restore continuity
+            Login
           </p>
 
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Restore recognition, tier access, and GEORGE continuity on this device.
+            Login to restore GEORGE access, LIVE support, runtime history, and subscription recognition on this device.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-[1rem] border border-white/[0.045] bg-black/28 px-4 py-3">
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Continuity identity
+              Login email
             </label>
             <ContinuityCapsule
               email={subscriberEmail}
@@ -6720,7 +6720,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               className="mt-2 w-full bg-transparent text-sm text-[#D7DBE4] outline-none placeholder:text-neutral-700"
             />
             <p className="mt-2 text-[11px] leading-5 text-neutral-500">
-              This is passwordless continuity. It restores GEORGE recognition without creating a traditional login yet.
+              Passwordless login restores GEORGE access and subscription recognition without requiring a password.
             </p>
 
             <button
@@ -6758,7 +6758,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               }}
               className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#D7DBE4]/70 transition hover:bg-white/[0.12] hover:text-[#D7DBE4]"
             >
-              Send restore link
+              Send login link
             </button>
           </div>
 
@@ -6954,7 +6954,7 @@ onClick={() => {
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     {[
                       ['live', 'LIVE'],
-                      ['continuity', 'Continuity'],
+                      ['continuity', 'Login'],
                       ['images', 'Images'],
                       ['signal', 'Signal'],
                     ].map(([id, label]) => (
@@ -6976,14 +6976,14 @@ onClick={() => {
                   <div className="mt-5 rounded-xl border border-white/[0.055] bg-black/24 p-4">
                     <h3 className="text-[15px] font-semibold text-white/88">
                       {activeHelpTopic === 'live' && 'LIVE GEORGE'}
-                      {activeHelpTopic === 'continuity' && 'Continuity'}
+                      {activeHelpTopic === 'continuity' && 'Login'}
                       {activeHelpTopic === 'images' && 'Images'}
                       {activeHelpTopic === 'signal' && 'Signal'}
                     </h3>
 
                     <p className="mt-2 text-[13px] leading-6 text-white/52">
                       {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations. Use Prep Room to set the room, purview, support level, and context before entering LIVE.'}
-                      {activeHelpTopic === 'continuity' && 'Continuity restores GEORGE recognition, tier access, and LIVE eligibility on this device through your verified access session.'}
+                      {activeHelpTopic === 'continuity' && 'Login restores GEORGE recognition, tier access, and LIVE eligibility on this device through your verified session.'}
                       {activeHelpTopic === 'images' && 'Images lets you generate visual direction, product concepts, campaign visuals, and references from GEORGE.'}
                       {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns over time so guidance can better serve your interest.'}
                     </p>

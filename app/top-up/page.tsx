@@ -93,7 +93,7 @@ export default function TopUpPage() {
 
     if (intent === 'make-george-yours') {
       return {
-        tone: 'Continuity fit',
+        tone: 'Login fit',
         message:
           'Intelligent already covers most continuity and execution workflows comfortably.',
       }
