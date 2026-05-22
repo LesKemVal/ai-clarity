@@ -344,36 +344,49 @@ return (
                 )}
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-1.5">
                 <a
                   href="/runtime"
-                  className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                  className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                 >
                   Runtime
                 </a>
 
                 <a
                   href="/top-up"
-                  className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                  className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                 >
                   Access
                 </a>
 
                 {identityAuthenticated ? (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await fetch('/api/logout', { method: 'POST' })
-                      } catch {}
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSidebar?.(false)
+                        onOpenLiveGate()
+                      }}
+                      className="inline-flex items-center rounded-[0.7rem] border border-[#C6D4FF]/[0.08] bg-[#C6D4FF]/[0.05] px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-[#DCE6FF]/72 backdrop-blur-[10px] transition hover:bg-[#C6D4FF]/[0.09] hover:text-white"
+                    >
+                      LIVE
+                    </button>
 
-                      clearCachedGeorgeSessionAuthority()
-                      window.location.href = '/george'
-                    }}
-                    className="inline-flex items-center rounded-[0.55rem] border border-red-400/[0.08] bg-red-400/[0.04] px-2.5 py-1.5 text-[11px] text-red-100/58 transition hover:bg-red-400/[0.08] hover:text-red-100/82"
-                  >
-                    Logout
-                  </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/logout', { method: 'POST' })
+                        } catch {}
+
+                        clearCachedGeorgeSessionAuthority()
+                        window.location.href = '/george'
+                      }}
+                      className="inline-flex items-center rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/36 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/68"
+                    >
+                      Sign out
+                    </button>
+                  </>
                 ) : (
                   <button
                     type="button"
@@ -381,9 +394,9 @@ return (
                       setShowSidebar?.(false)
                       onOpenLogin()
                     }}
-                    className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                    className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                   >
-                    Login
+                    Continue
                   </button>
                 )}
               </div>

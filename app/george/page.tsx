@@ -4424,7 +4424,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-black/72 xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/48 backdrop-blur-[10px] xl:hidden"
           />
         )}
 
@@ -6682,12 +6682,12 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/34 backdrop-blur-[12px]"
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/24 backdrop-blur-[8px]"
     />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/52 p-[14px] shadow-[0_10px_30px_rgba(0,0,0,0.18)] ring-1 ring-white/[0.022] backdrop-blur-[18px]"
+        className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/42 p-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.14)] ring-1 ring-white/[0.018] backdrop-blur-[14px]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4">
