@@ -14,6 +14,7 @@ import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession } from '@/lib/george/session/store'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
@@ -141,7 +142,7 @@ function saveSessionToV2(params: {
 }) {
   const subscriberEmail =
     typeof window !== 'undefined'
-      ? (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
+      ? readCachedGeorgeSessionAuthority().email
       : ''
 
   const now = Date.now()
@@ -1669,7 +1670,17 @@ const redeemFounderCode = async () => {
     const continuityToken = params.get('continuity')
     const tierParam = params.get('tier')
     const subStatus = params.get('subscription')
-    const savedTier = window.localStorage.getItem('george_tier')
+    const cachedAuthority = readCachedGeorgeSessionAuthority()
+
+    setSubscriberEmail(cachedAuthority.email)
+    setCurrentTier(cachedAuthority.tier)
+
+    fetchGeorgeSessionAuthority()
+      .then((authority) => {
+        setSubscriberEmail(authority.email)
+        setCurrentTier(authority.tier)
+      })
+      .catch(() => {})
 
     if (continuityToken) {
       void fetch('/api/continuity/verify', {
@@ -1689,19 +1700,21 @@ const redeemFounderCode = async () => {
           const verifiedEmail = String(data?.email || '').trim().toLowerCase()
           const verifiedTier = data?.currentTier
 
-          if (verifiedEmail) {
-            setSubscriberEmail(verifiedEmail)
-            window.localStorage.setItem('george_email', verifiedEmail)
-            window.localStorage.setItem('george_verified_continuity', 'true')
-          }
+          const normalizedTier =
+            verifiedTier === 'intelligent' || verifiedTier === 'brilliant'
+              ? verifiedTier
+              : 'smart'
 
-          if (verifiedTier === 'intelligent' || verifiedTier === 'brilliant') {
-            setCurrentTier(verifiedTier)
-            window.localStorage.setItem('george_tier', verifiedTier)
-          } else {
-            setCurrentTier('smart')
-            window.localStorage.setItem('george_tier', 'smart')
-          }
+          setSubscriberEmail(verifiedEmail)
+          setCurrentTier(normalizedTier)
+
+          writeCachedGeorgeSessionAuthority({
+            authenticated: Boolean(verifiedEmail),
+            email: verifiedEmail,
+            tier: normalizedTier,
+            liveAccess: normalizedTier === 'intelligent' || normalizedTier === 'brilliant',
+            source: 'continuity',
+          })
 
           setToastMessage('Login verified.')
           setShowToast(true)
@@ -1715,8 +1728,7 @@ const redeemFounderCode = async () => {
 
       return
     }
-    const savedEmail = window.localStorage.getItem('george_email') || ''
-    const cleanSavedEmail = savedEmail.trim().toLowerCase()
+    const cleanSavedEmail = cachedAuthority.email
     if (cleanSavedEmail) setSubscriberEmail(cleanSavedEmail)
 
     const validTier = tierParam === 'smart' || tierParam === 'intelligent' || tierParam === 'brilliant'
@@ -1728,7 +1740,6 @@ const redeemFounderCode = async () => {
 
     if (!cleanSavedEmail) {
       setCurrentTier('smart')
-      window.localStorage.setItem('george_tier', 'smart')
       return
     }
 
@@ -1736,20 +1747,22 @@ const redeemFounderCode = async () => {
       .then((res) => res.json())
       .then((data) => {
         const serverTier = data?.currentTier
-        if (data?.email) {
-          const restoredEmail = String(data.email).trim().toLowerCase()
-          if (restoredEmail) {
-            setSubscriberEmail(restoredEmail)
-            window.localStorage.setItem('george_email', restoredEmail)
-          }
-        }
+        const restoredEmail = String(data?.email || cleanSavedEmail || '').trim().toLowerCase()
+        const normalizedTier =
+          serverTier === 'intelligent' || serverTier === 'brilliant'
+            ? serverTier
+            : 'smart'
 
-        if (serverTier === 'intelligent' || serverTier === 'brilliant') {
-          setCurrentTier(serverTier)
-          window.localStorage.setItem('george_tier', serverTier)
-        } else {
-          setCurrentTier('smart')
-        }
+        setSubscriberEmail(restoredEmail)
+        setCurrentTier(normalizedTier)
+
+        writeCachedGeorgeSessionAuthority({
+          authenticated: Boolean(restoredEmail),
+          email: restoredEmail,
+          tier: normalizedTier,
+          liveAccess: normalizedTier === 'intelligent' || normalizedTier === 'brilliant',
+          source: 'subscription-state',
+        })
 
         if (subStatus === 'success') {
           const cleanUrl = window.location.pathname
