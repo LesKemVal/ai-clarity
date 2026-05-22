@@ -58,11 +58,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid founder code.' }, { status: 403 })
   }
 
-  if (email && email.includes('@')) {
-    upsertSubscriber({
-      email,
-      currentTier: tier,
-    })
+  try {
+    if (email && email.includes('@')) {
+      upsertSubscriber({
+        email,
+        currentTier: tier,
+      })
+    }
+  } catch (error) {
+    console.error('[GEORGE][founder-code][subscriber-upsert-failed]', error)
   }
 
   const response = NextResponse.json({
