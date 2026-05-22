@@ -110,8 +110,8 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         fontSizeBase: '13px',
-        spacingUnit: '3px',
-        borderRadius: '12px',
+        spacingUnit: '2.5px',
+        borderRadius: '10px',
       },
       rules: {
         '.Input': {
@@ -119,7 +119,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           border: '1px solid rgba(255,255,255,0.055)',
           boxShadow: 'none',
           color: '#E7EAF7',
-          padding: '12px 14px',
+          padding: '10px 12px',
         },
         '.Input:focus': {
           border: '1px solid rgba(170,180,255,0.30)',
@@ -205,6 +205,8 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
         layout: {
           type: 'tabs',
           defaultCollapsed: false,
+          radios: false,
+          spacedAccordionItems: false,
         },
         defaultValues: targetEmail.trim() ? { billingDetails: { email: targetEmail.trim() } } : undefined,
         wallets: {
@@ -274,22 +276,15 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
   }
 
   return (
-    <div className="fixed inset-0 z-[260] overflow-y-auto bg-[#050608]/86 px-4 py-4 backdrop-blur-xl md:py-6">
-      <button
-        type="button"
-        aria-label="Close payment activation"
-        onClick={onClose}
-        className="fixed inset-0 cursor-default"
-      />
-
-      <div className="relative mx-auto w-full max-w-[30rem] overflow-hidden rounded-[1.05rem] border border-white/[0.045] bg-[#0B0D12] shadow-[0_32px_110px_rgba(0,0,0,0.72)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(170,180,255,0.10),transparent_26%),radial-gradient(circle_at_84%_18%,rgba(126,201,218,0.06),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.026),transparent_42%)]" />
+    <div className="w-full">
+      <div className="relative w-full overflow-hidden rounded-[0.9rem] border border-white/[0.03] bg-white/[0.008] shadow-[0_18px_48px_rgba(0,0,0,0.22)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(170,180,255,0.055),transparent_26%),radial-gradient(circle_at_84%_18%,rgba(126,201,218,0.035),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_42%)]" />
 
         <div className="relative border-b border-white/[0.045] px-5 py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.30em] text-[#C9D0FF]/48">
-                GEORGE RUNTIME ACTIVATION
+                Runtime activation
               </p>
               <div>
                 <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.045em] text-white">
@@ -314,18 +309,18 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           </div>
         </div>
 
-        <form onSubmit={confirmActivation} className="relative space-y-4 px-5 py-5">
-          <div className="rounded-[0.85rem] border border-white/[0.035] bg-white/[0.010] p-4">
+        <form onSubmit={confirmActivation} className="relative space-y-3 px-4 py-4 md:px-5 md:py-5">
+          <div className="rounded-[0.8rem] bg-white/[0.012] p-3.5">
             <label className="text-[11px] uppercase tracking-[0.18em] text-white/38">
               Continuity email
             </label>
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
-                className="min-h-[46px] flex-1 rounded-[0.75rem] border border-white/[0.045] bg-[#10131B]/74 px-4 text-sm text-white outline-none transition placeholder:text-white/24 focus:border-[#AAB4FF]/30 focus:bg-[#10131B]"
+                className="min-h-[42px] flex-1 rounded-[0.75rem] border border-white/[0.045] bg-[#10131B]/74 px-4 text-sm text-white outline-none transition placeholder:text-white/24 focus:border-[#AAB4FF]/30 focus:bg-[#10131B]"
               />
               <button
                 type="button"
@@ -341,11 +336,11 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
             </p>
           </div>
 
-          <div className="rounded-[0.85rem] border border-white/[0.035] bg-[#07090D]/92 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.022)]">
+          <div className="rounded-[0.8rem] bg-[#07090D]/88 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.018)]">
             <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
-              Secure payment rail
+              Payment method
             </p>
-            <div id="george-payment-element" className="min-h-[150px]" />
+            <div id="george-payment-element" className="min-h-[128px]" />
           </div>
 
           {(status || error) && (
@@ -360,7 +355,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
             </div>
           )}
 
-          <div className="flex flex-col gap-3 border-t border-white/[0.04] pt-4">
+          <div className="flex flex-col gap-2.5 pt-1">
             <button
               type="submit"
               disabled={!ready || submitting || loading}
