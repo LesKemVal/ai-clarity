@@ -1583,6 +1583,9 @@ const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+const [loginEmailInput, setLoginEmailInput] = useState('')
+const [loginLinkSent, setLoginLinkSent] = useState(false)
+const [loginSending, setLoginSending] = useState(false)
 const [activeCheckout, setActiveCheckout] = useState<'intelligent' | 'brilliant' | 'brilliant_day' | null>(null)
 const redeemFounderCode = async () => {
   const code = window.prompt('Enter founder access code')
@@ -4434,6 +4437,8 @@ return (
             }}
             onOpenLogin={() => {
               setShowSidebar(false)
+              setLoginEmailInput('')
+              setLoginLinkSent(false)
               setShowUpgradeModal(true)
             }}
           showSidebar={showSidebar}
@@ -5441,6 +5446,13 @@ ${simplifyTarget}`
                   <button
                     type="button"
                     onClick={() => {
+                      if (hasLiveGeorgeAccess) {
+                        setShowLiveChooser(true)
+                        return
+                      }
+
+                      setLoginEmailInput('')
+                      setLoginLinkSent(false)
                       setShowUpgradeModal(true)
                     }}
                     className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#B7CDD9]/78 transition hover:bg-white/[0.03] hover:text-white"
@@ -6663,83 +6675,90 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
     <div
       role="button"
       tabIndex={0}
-      aria-label="Close upgrade menu"
+      aria-label="Close continuity panel"
       onClick={() => setShowUpgradeModal(false)}
       onKeyDown={(event) => {
         if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/68 backdrop-blur-[10px]" />
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/34 backdrop-blur-[12px]"
+    />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[400px] rounded-[1.65rem] border border-white/[0.045] bg-[#11131A]/92 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)] ring-1 ring-white/[0.04]"
+        className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/52 p-[14px] shadow-[0_10px_30px_rgba(0,0,0,0.18)] ring-1 ring-white/[0.022] backdrop-blur-[18px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-5 text-center">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-[#D7DBE4]/58">
-            GEORGE Login
+        <div className="mb-4">
+          <div className="inline-flex rounded-full border border-white/[0.055] bg-black/28 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/58">
+            GEORGE Continuity
+          </div>
+
+          <p className="mt-4 text-[15px] font-medium text-[#F4F6FA]/92">
+            Restore this device.
           </p>
 
-          <p className="mt-3 text-sm font-medium text-[#D7DBE4]">
-            Login
-          </p>
-
-          <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Login to restore GEORGE access, LIVE support, runtime history, and subscription recognition on this device.
+          <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/42">
+            A secured link verifies continuity, tier access, and LIVE eligibility.
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="rounded-[1rem] border border-white/[0.045] bg-black/28 px-4 py-3">
-            <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Login email
-            </label>
-            <ContinuityCapsule
-              email={subscriberEmail}
-              label="Recognized as"
-              onClear={async () => {
-                setSubscriberEmail('')
-                setCurrentTier('smart')
-                window.localStorage.removeItem('george_email')
-                window.localStorage.removeItem('george_verified_continuity')
-                window.localStorage.removeItem('george_tier')
-                await fetch('/api/logout', { method: 'POST' }).catch(() => {})
-                setToastMessage('Logged out.')
-                setShowToast(true)
-              }}
-            />
-
-            <input
-              type="email"
-              value={subscriberEmail}
-              onChange={(event) => {
-                const value = event.target.value.trim().toLowerCase()
-                setSubscriberEmail(value)
-                if (value) {
-                  window.localStorage.setItem('george_email', value)
-                } else {
-                  window.localStorage.removeItem('george_email')
-                }
-              }}
-              placeholder="email for continuity"
-              className="mt-2 w-full bg-transparent text-sm text-[#D7DBE4] outline-none placeholder:text-neutral-700"
-            />
-            <p className="mt-2 text-[11px] leading-5 text-neutral-500">
-              Passwordless login restores GEORGE access and subscription recognition without requiring a password.
-            </p>
+        {loginLinkSent ? (
+          <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-[12px] text-[#D7DBE4]">
+                ✓
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[#D7DBE4]/90">Link sent</p>
+                <p className="mt-0.5 text-[11px] text-[#D7DBE4]/42">
+                  Check your email and open the GEORGE link.
+                </p>
+              </div>
+            </div>
 
             <button
               type="button"
+              onClick={() => {
+                setLoginLinkSent(false)
+                setLoginEmailInput('')
+              }}
+              className="mt-4 text-[11px] text-[#D7DBE4]/48 transition hover:text-[#D7DBE4]/80"
+            >
+              Use a different email
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="rounded-[1rem] border border-white/[0.05] bg-black/18 px-3.5 py-2.5">
+              <label className="block text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/38">
+                Email
+              </label>
+
+              <input
+                type="email"
+                value={loginEmailInput}
+                onChange={(event) => setLoginEmailInput(event.target.value.trim().toLowerCase())}
+                placeholder="you@example.com"
+                autoComplete="email"
+                className="mt-2 w-full bg-transparent text-sm text-[#D7DBE4] outline-none placeholder:text-[#D7DBE4]/22"
+              />
+            </div>
+
+            <button
+              type="button"
+              disabled={loginSending}
               onClick={async () => {
-                const email = subscriberEmail.trim().toLowerCase()
+                const email = loginEmailInput.trim().toLowerCase()
 
                 if (!email) {
                   setToastMessage('Enter your email first.')
                   setShowToast(true)
                   return
                 }
+
+                setLoginSending(true)
 
                 try {
                   const response = await fetch('/api/continuity/request-link', {
@@ -6756,89 +6775,51 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     return
                   }
 
-                  setToastMessage('Login link sent. Check your email.')
-                  setShowUpgradeModal(false)
+                  setLoginLinkSent(true)
+                  setToastMessage('Secure link sent.')
                   setShowToast(true)
                 } catch {
                   setToastMessage('Unable to send login link.')
                   setShowToast(true)
+                } finally {
+                  setLoginSending(false)
                 }
               }}
-              className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#D7DBE4]/70 transition hover:bg-white/[0.12] hover:text-[#D7DBE4]"
+              className="w-full rounded-full border border-white/[0.07] bg-[#D7DBE4]/88 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-[#05070B] transition hover:bg-white disabled:opacity-45"
             >
-              Send login link
+              {loginSending ? 'Sending…' : 'Send secure link'}
             </button>
+
+            <p className="px-1 text-[10.5px] leading-5 text-[#D7DBE4]/35">
+              Intelligent and Brilliant use verified continuity before LIVE access.
+            </p>
           </div>
+        )}
 
-          <button
-            type="button"
-onClick={() => {
-              setShowUpgradeModal(false)
-              setActiveCheckout('intelligent')
-            }}
-            className="block w-full rounded-[1rem] max-w-full border border-white/[0.055] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.12] hover:bg-white/[0.04]"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm font-medium text-[#D7DBE4]">Intelligent</div>
-                <div className="mt-1 text-xs leading-5 text-neutral-500">
-                  Activate stronger memory, execution support, and adaptive guidance.
-                </div>
-              </div>
-
-              <div className="text-[11px] font-medium text-[#D7DBE4]/70">
-                $9.99
-              </div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-onClick={() => {
-              setShowUpgradeModal(false)
-              setActiveCheckout('brilliant')
-            }}
-            className="block w-full rounded-[1rem] max-w-full border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-left transition hover:border-white/[0.09] hover:bg-white/[0.05]"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm font-medium text-[#D7DBE4]">Brilliant</div>
-                <div className="mt-1 text-xs leading-5 text-neutral-300">
-                  Activate deeper LIVE support, stronger restoration, and continuity.
-                </div>
-              </div>
-
-              <div className="text-[11px] font-medium text-[#D7DBE4]/70">
-                $25
-              </div>
-            </div>
-          </button>
-        </div>
-
-        <div className="mt-5 border-t border-white/5 pt-4 space-y-3">
+        <div className="mt-3 flex items-center justify-between border-t border-white/[0.03] pt-2.5">
           <button
             type="button"
             onClick={redeemFounderCode}
-            className="w-full rounded-full border border-white/[0.06] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/70 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
+            className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
           >
-            Use Founder Code
+            Founder code
           </button>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => setShowUpgradeModal(false)}
-              className="text-xs text-neutral-500 transition hover:text-[#D7DBE4]"
+              onClick={() => window.open('/top-up','_blank')}
+              className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
             >
-              Close
+              Options
             </button>
 
             <button
               type="button"
-              onClick={() => window.open('/top-up','_blank')}
-              className="text-xs text-[#D7DBE4]/72 transition hover:opacity-80"
+              onClick={() => setShowUpgradeModal(false)}
+              className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
             >
-              See full options
+              Close
             </button>
           </div>
         </div>
