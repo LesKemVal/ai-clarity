@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
+import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
@@ -1053,6 +1054,7 @@ const [isListening, setIsListening] = useState(false)
   }, [adaptiveCueLabel])
 
   const [isIOS, setIsIOS] = useState(false)
+  const [isAndroid, setIsAndroid] = useState(false)
   const [profileName, setProfileName] = useState('')
   const [subscriberEmail, setSubscriberEmail] = useState('')
 
@@ -1580,6 +1582,7 @@ const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+const [activeCheckout, setActiveCheckout] = useState<'intelligent' | 'brilliant' | 'brilliant_day' | null>(null)
 const redeemFounderCode = async () => {
   const code = window.prompt('Enter founder access code')
 
@@ -2566,7 +2569,9 @@ requestAnimationFrame(() => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    setIsIOS(/iPhone|iPad|iPod/i.test(window.navigator.userAgent))
+    const ua = window.navigator.userAgent
+    setIsIOS(/iPhone|iPad|iPod/i.test(ua))
+    setIsAndroid(/Android/i.test(ua))
 
     const storedName = window.localStorage.getItem('george_name') || ''
     const storedBirthdayMD = window.localStorage.getItem('george_birthday_md') || ''
@@ -4286,12 +4291,17 @@ responseTimerRef.current = setTimeout(() => {
   })
 
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
-  const showMobileHero = !showConversation && messages.length <= 1
+  const showMobileHero = !liveMode && messages.length <= 1
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
     showMobileHero && !liveMode && !input.trim() && !pendingImage && !hasUserMessageForSurface
   const showTypingPrescription =
     !liveMode && input.trim().length > 0 && !pendingImage && !hasUserMessageForSurface
+
+  const isRuntimeTransitioning =
+    input.trim().length > 0 ||
+    hasVisibleThread ||
+    liveMode
 
 useEffect(() => {
   if (!showMobileHero || liveMode) return
@@ -4390,7 +4400,7 @@ useEffect(() => {
 return (
     <>
       <style>{georgeAmbientPulseStyles}</style>
-      <main className="app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
+      <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
@@ -4656,13 +4666,20 @@ return (
     }
   }}
   className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showIdleGeorgeSurface && (
-    <div className="flex min-h-[560px] flex-col items-center justify-start px-4 pt-[27dvh] md:hidden">
+  {!isRuntimeTransitioning && showIdleGeorgeSurface && (
+    <div className={`flex min-h-[560px] flex-col items-center justify-start px-4 pt-[27dvh] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      showTypingPrescription
+        ? '-translate-y-16 opacity-0 pointer-events-none'
+        : 'translate-y-0 opacity-100'
+    }`}>
       <div className="text-center text-[46px] font-[300] tracking-[0.34em] text-[#D7DBE4]/24">
         GEORGE
       </div>
 
-      <div className="mt-4 text-center text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">Operational fluency.</div>
+      <div className="mt-4 text-center text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">
+        Move. Build. Create.
+      </div>
+
 
       <ContinuityCapsule
         email={subscriberEmail}
@@ -4687,6 +4704,7 @@ return (
       </div>
     </div>
   )}
+
 
   {liveMode && (
     <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
@@ -5421,11 +5439,7 @@ ${simplifyTarget}`
                   <button
                     type="button"
                     onClick={() => {
-                      if (hasLiveGeorgeAccess) {
-                        setShowLiveChooser(true)
-                      } else {
-                        setShowUpgradeModal(true)
-                      }
+                      setShowUpgradeModal(true)
                     }}
                     className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#B7CDD9]/78 transition hover:bg-white/[0.03] hover:text-white"
                     aria-label="Try LIVE GEORGE"
@@ -6287,8 +6301,8 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(showConversation || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto  transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
+${isRuntimeTransitioning ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+                    <div className="george-composer-shell relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
 
                       <input
                         ref={fileInputRef}
@@ -6750,34 +6764,9 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
           <button
             type="button"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/subscribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    tier: 'intelligent',
-                    email: subscriberEmail || undefined,
-                  }),
-                })
-
-                const data = await response.json()
-
-                if (data?.url) {
-                  if (data.url && data.url.startsWith('http')) {
-                    window.location.href = data.url
-                  } else {
-                    router.replace(data.url)
-                  }
-                  return
-                }
-
-                setToastMessage(data?.error || 'Unable to open checkout.')
-                setShowToast(true)
-              } catch {
-                setToastMessage('Unable to open checkout.')
-                setShowToast(true)
-              }
+onClick={() => {
+              setShowUpgradeModal(false)
+              setActiveCheckout('intelligent')
             }}
             className="block w-full rounded-[1rem] max-w-full border border-white/[0.055] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.12] hover:bg-white/[0.04]"
           >
@@ -6797,34 +6786,9 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
           <button
             type="button"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/subscribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    tier: 'brilliant',
-                    email: subscriberEmail || undefined,
-                  }),
-                })
-
-                const data = await response.json()
-
-                if (data?.url) {
-                  if (data.url && data.url.startsWith('http')) {
-                    window.location.href = data.url
-                  } else {
-                    router.replace(data.url)
-                  }
-                  return
-                }
-
-                setToastMessage(data?.error || 'Unable to open checkout.')
-                setShowToast(true)
-              } catch {
-                setToastMessage('Unable to open checkout.')
-                setShowToast(true)
-              }
+onClick={() => {
+              setShowUpgradeModal(false)
+              setActiveCheckout('brilliant')
             }}
             className="block w-full rounded-[1rem] max-w-full border border-white/[0.08] bg-white/[0.03] px-4 py-3 text-left transition hover:border-white/[0.09] hover:bg-white/[0.05]"
           >
@@ -6915,6 +6879,52 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             </button>
           </div>
         </div>
+      )}
+
+      {activeCheckout && typeof document !== 'undefined' && createPortal(
+        <>
+          <button
+            type="button"
+            aria-label="Close activation"
+            onClick={() => setActiveCheckout(null)}
+            className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
+          />
+
+          <div className="fixed inset-0 z-[250] flex items-center justify-center px-4 py-6">
+            <div className="w-full max-w-[430px]">
+              <GeorgePaymentElement
+                tier={activeCheckout}
+                onClose={() => setActiveCheckout(null)}
+                onLegacyCheckout={async (tier) => {
+                  try {
+                    const response = await fetch('/api/subscribe', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        tier,
+                        email: subscriberEmail || undefined,
+                      }),
+                    })
+
+                    const data = await response.json()
+
+                    if (data?.url) {
+                      window.location.href = data.url
+                      return
+                    }
+
+                    setToastMessage(data?.error || 'Unable to open checkout.')
+                    setShowToast(true)
+                  } catch {
+                    setToastMessage('Unable to open checkout.')
+                    setShowToast(true)
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </>,
+        document.body
       )}
 
       {showHelpModal && typeof document !== 'undefined' && createPortal(
