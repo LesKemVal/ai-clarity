@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const access = verifyLiveAccessFromRequest(req, body?.email)
+    const access = await verifyLiveAccessFromRequest(req, body?.email)
 
     if (!access.ok) {
       console.warn('[LIVE][govern][auth-failed]', {

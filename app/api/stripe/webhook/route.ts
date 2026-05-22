@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
               : existing.lastCustomerId,
         })
 
-        upsertSubscriber({
+        await upsertSubscriber({
           email: session.customer_details?.email || session.metadata?.email,
           currentTier:
             session.metadata?.tier === 'brilliant'
@@ -137,9 +137,9 @@ export async function POST(req: NextRequest) {
           lastCustomerId: customerId,
         })
 
-        const subscriber = getSubscriberByCustomerId(customerId)
+        const subscriber = await getSubscriberByCustomerId(customerId)
 
-        upsertSubscriber({
+        await upsertSubscriber({
           email: subscription.metadata?.email || subscriber?.email,
           currentTier: nextTier,
           stripeCustomerId: customerId,

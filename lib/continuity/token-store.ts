@@ -41,11 +41,11 @@ function hashToken(token: string) {
   return crypto.createHash('sha256').update(token).digest('hex')
 }
 
-export function createContinuityToken(emailInput: unknown) {
+export async function createContinuityToken(emailInput: unknown) {
   const email = String(emailInput || '').trim().toLowerCase()
   if (!email) return { error: 'Enter an email address.' }
 
-  const subscriber = getSubscriberByEmail(email)
+  const subscriber = await getSubscriberByEmail(email)
   if (!subscriber) return { error: 'No subscriber continuity was found for that email.' }
 
   const token = crypto.randomBytes(32).toString('hex')
@@ -65,7 +65,7 @@ export function createContinuityToken(emailInput: unknown) {
   return { token, email, expiresAt: record.expiresAt }
 }
 
-export function verifyContinuityToken(tokenInput: unknown) {
+export async function verifyContinuityToken(tokenInput: unknown) {
   const token = String(tokenInput || '').trim()
   if (!token) return { error: 'Missing continuity token.' }
 
@@ -80,7 +80,7 @@ export function verifyContinuityToken(tokenInput: unknown) {
   if (record.used) return { error: 'Continuity link has already been used.' }
   if (record.expiresAt < now) return { error: 'Continuity link has expired.' }
 
-  const subscriber = getSubscriberByEmail(record.email)
+  const subscriber = await getSubscriberByEmail(record.email)
   if (!subscriber) return { error: 'Subscriber continuity was not found.' }
 
   store.tokens[index] = { ...record, used: true }

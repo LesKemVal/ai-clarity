@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  const subscriber = getSubscriberByEmail(email)
+  const subscriber = await getSubscriberByEmail(email)
 
   if (!subscriber) {
     return NextResponse.json({

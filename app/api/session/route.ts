@@ -3,7 +3,7 @@ import { readGeorgeSession } from '@/lib/security/george-session'
 import { logOperationalEvent } from '@/lib/security/telemetry'
 
 export async function GET(req: NextRequest) {
-  const session = readGeorgeSession(req)
+  const session = await readGeorgeSession(req)
 
   if (!session) {
     logOperationalEvent('session_missing', { liveAccess: false })

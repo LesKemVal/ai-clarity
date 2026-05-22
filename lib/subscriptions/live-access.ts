@@ -6,14 +6,14 @@ export type LiveAccessResult =
   | { ok: true; email: string; tier: Exclude<SubscriberTier, 'smart'> }
   | { ok: false; status: number; error: string }
 
-export function verifyLiveAccess(emailInput: unknown): LiveAccessResult {
+export async function verifyLiveAccess(emailInput: unknown): Promise<LiveAccessResult> {
   const email = String(emailInput || '').trim().toLowerCase()
 
   if (!email) {
     return { ok: false, status: 401, error: 'Verified continuity email required.' }
   }
 
-  const subscriber = getSubscriberByEmail(email)
+  const subscriber = await getSubscriberByEmail(email)
 
   if (!subscriber) {
     return { ok: false, status: 403, error: 'Subscriber continuity was not found.' }
@@ -30,11 +30,11 @@ export function verifyLiveAccess(emailInput: unknown): LiveAccessResult {
   }
 }
 
-export function verifyLiveAccessFromRequest(
+export async function verifyLiveAccessFromRequest(
   req: NextRequest,
   fallbackEmailInput?: unknown
-): LiveAccessResult {
-  const session = readGeorgeSession(req)
+): Promise<LiveAccessResult> {
+  const session = await readGeorgeSession(req)
 
   if (session) {
     if (session.tier !== 'intelligent' && session.tier !== 'brilliant') {
@@ -50,5 +50,5 @@ export function verifyLiveAccessFromRequest(
 
   // Temporary migration fallback for the internal LIVE lab until the UI fully
   // moves from localStorage/email hints to HTTP-only session authority.
-  return verifyLiveAccess(fallbackEmailInput)
+  return await verifyLiveAccess(fallbackEmailInput)
 }

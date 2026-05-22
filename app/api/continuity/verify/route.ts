@@ -5,7 +5,7 @@ import { setGeorgeSessionCookie } from '@/lib/security/george-session'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
-    const result = verifyContinuityToken(body?.token)
+    const result = await verifyContinuityToken(body?.token)
 
     if ('error' in result) {
       return NextResponse.json({ error: result.error }, { status: 400 })

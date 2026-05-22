@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}))
-    const result = createContinuityToken(body?.email)
+    const result = await createContinuityToken(body?.email)
 
     if ('error' in result) {
       console.warn('[GEORGE][continuity][request-failed]', {

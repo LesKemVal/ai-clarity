@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { getRedis } from '@/lib/storage/redis'
 
 export type SubscriberTier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -12,97 +11,84 @@ export type SubscriberRecord = {
   updatedAt: string
 }
 
-type SubscriberStore = {
-  subscribers: Record<string, SubscriberRecord>
-  customers: Record<string, string>
-}
-
-const storePath =
-  process.env.NODE_ENV === 'production'
-    ? path.join('/tmp', 'subscribers.json')
-    : path.join(process.cwd(), 'data', 'subscribers.json')
-
 function normalizeEmail(email: unknown) {
   return String(email || '').trim().toLowerCase()
 }
 
-function defaultStore(): SubscriberStore {
-  return {
-    subscribers: {},
-    customers: {},
-  }
+function customerKey(customerId: string) {
+  return `george:customer:${customerId}`
 }
 
-function readStore(): SubscriberStore {
-  try {
-    const parsed = JSON.parse(fs.readFileSync(storePath, 'utf8'))
-    return {
-      subscribers: parsed?.subscribers || {},
-      customers: parsed?.customers || {},
-    }
-  } catch {
-    return defaultStore()
-  }
+function subscriberKey(email: string) {
+  return `george:subscriber:${email}`
 }
 
-function writeStore(store: SubscriberStore) {
-  fs.mkdirSync(path.dirname(storePath), { recursive: true })
-  fs.writeFileSync(storePath, JSON.stringify(store, null, 2))
-}
-
-export function getSubscriberByEmail(email: unknown): SubscriberRecord | null {
+export async function getSubscriberByEmail(email: unknown): Promise<SubscriberRecord | null> {
   const cleanEmail = normalizeEmail(email)
+
   if (!cleanEmail) return null
 
-  const store = readStore()
-  return store.subscribers[cleanEmail] || null
+  const redis = getRedis()
+  const raw = await redis.get(subscriberKey(cleanEmail))
+
+  if (!raw) return null
+
+  return JSON.parse(raw as string)
 }
 
-export function getSubscriberByCustomerId(customerId: unknown): SubscriberRecord | null {
+export async function getSubscriberByCustomerId(customerId: unknown): Promise<SubscriberRecord | null> {
   const cleanCustomerId = String(customerId || '').trim()
+
   if (!cleanCustomerId) return null
 
-  const store = readStore()
-  const email = store.customers[cleanCustomerId]
+  const redis = getRedis()
+
+  const email = await redis.get(customerKey(cleanCustomerId))
+
   if (!email) return null
 
-  return store.subscribers[email] || null
+  return getSubscriberByEmail(String(email))
 }
 
-export function upsertSubscriber(input: {
+export async function upsertSubscriber(input: {
   email?: unknown
   currentTier?: SubscriberTier
   stripeCustomerId?: unknown
   lastCheckoutSessionId?: unknown
   lastSubscriptionId?: unknown
 }) {
-  const store = readStore()
+  const redis = getRedis()
 
   const emailFromInput = normalizeEmail(input.email)
   const customerId = String(input.stripeCustomerId || '').trim()
-  const emailFromCustomer = customerId ? store.customers[customerId] : ''
-  const email = emailFromInput || emailFromCustomer
+
+  let email = emailFromInput
+
+  if (!email && customerId) {
+    const existing = await redis.get(customerKey(customerId))
+    email = String(existing || '')
+  }
 
   if (!email) return null
 
-  const previous = store.subscribers[email]
+  const previous = await getSubscriberByEmail(email)
 
   const next: SubscriberRecord = {
     email,
     currentTier: input.currentTier || previous?.currentTier || 'smart',
     stripeCustomerId: customerId || previous?.stripeCustomerId || null,
-    lastCheckoutSessionId: String(input.lastCheckoutSessionId || previous?.lastCheckoutSessionId || '') || null,
-    lastSubscriptionId: String(input.lastSubscriptionId || previous?.lastSubscriptionId || '') || null,
+    lastCheckoutSessionId:
+      String(input.lastCheckoutSessionId || previous?.lastCheckoutSessionId || '') || null,
+    lastSubscriptionId:
+      String(input.lastSubscriptionId || previous?.lastSubscriptionId || '') || null,
     updatedAt: new Date().toISOString(),
   }
 
-  store.subscribers[email] = next
+  await redis.set(subscriberKey(email), JSON.stringify(next))
 
   if (next.stripeCustomerId) {
-    store.customers[next.stripeCustomerId] = email
+    await redis.set(customerKey(next.stripeCustomerId), email)
   }
-
-  writeStore(store)
 
   return next
 }

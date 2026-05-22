@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'LIVE speech access temporarily rate limited.' }, { status: 429 })
   }
 
-  const access = verifyLiveAccessFromRequest(
+  const access = await verifyLiveAccessFromRequest(
     req,
     req.nextUrl.searchParams.get('email')
   )

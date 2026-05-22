@@ -72,7 +72,7 @@ export function createGeorgeSessionToken(input: {
   return `${payload}.${signature}`
 }
 
-export function readGeorgeSession(req: NextRequest): GeorgeSession | null {
+export async function readGeorgeSession(req: NextRequest): Promise<GeorgeSession | null> {
   const token = req.cookies.get(COOKIE_NAME)?.value || ''
   const [payload, signature] = token.split('.')
 
@@ -90,7 +90,7 @@ export function readGeorgeSession(req: NextRequest): GeorgeSession | null {
     if (parsed.source !== 'continuity' && parsed.source !== 'founder') return null
 
     if (parsed.source === 'continuity') {
-      const subscriber = getSubscriberByEmail(parsed.email)
+      const subscriber = await getSubscriberByEmail(parsed.email)
       if (!subscriber) return null
       if (subscriber.currentTier !== parsed.tier) return null
     }

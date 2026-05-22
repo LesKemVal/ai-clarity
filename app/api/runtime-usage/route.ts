@@ -3,7 +3,7 @@ import { readGeorgeSession } from '@/lib/security/george-session'
 import { appendRuntimeUsageRecord, getRuntimeUsageRecords } from '@/lib/runtime/runtime-store'
 
 export async function GET(req: NextRequest) {
-  const session = readGeorgeSession(req)
+  const session = await readGeorgeSession(req)
   const email = session?.email
 
   if (!session || !email) {
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = readGeorgeSession(req)
+  const session = await readGeorgeSession(req)
   const email = session?.email
 
   if (!session || !email) {
