@@ -322,14 +322,14 @@ return (
               />
             </div>
 
-            <div className="mt-3 rounded-[0.9rem] border border-white/[0.045] bg-white/[0.018] px-3 py-3">
-              <div className="truncate text-[13px] font-medium text-white/84">
+            <div className="mt-3 rounded-[1rem] border border-white/[0.03] bg-black/24 px-3 py-3.5 backdrop-blur-[14px]">
+              <div className="truncate text-[13px] font-medium tracking-[-0.01em] text-white/88">
                 {identityAuthenticated
                   ? identityEmail
                   : 'Guest access'}
               </div>
 
-              <div className="mt-1 flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-white/34">
+              <div className="mt-1 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-white/28">
                 <span>
                   {identityTier}
                 </span>
@@ -337,26 +337,26 @@ return (
                 {(identityTier === 'intelligent' || identityTier === 'brilliant') && (
                   <>
                     <span className="text-white/16">•</span>
-                    <span className="text-[#C6D4FF]/72">
-                      LIVE enabled
+                    <span className="text-[#C6D4FF]/68">
+                      Enter LIVE
                     </span>
                   </>
                 )}
               </div>
 
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 <a
                   href="/runtime"
-                  className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                  className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                 >
-                  Runtime
+                  System
                 </a>
 
                 <a
                   href="/top-up"
-                  className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                  className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                 >
-                  Access
+                  Upgrade
                 </a>
 
                 {identityAuthenticated ? (
@@ -367,9 +367,9 @@ return (
                         setShowSidebar?.(false)
                         onOpenLiveGate()
                       }}
-                      className="inline-flex items-center rounded-[0.7rem] border border-[#C6D4FF]/[0.08] bg-[#C6D4FF]/[0.05] px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-[#DCE6FF]/72 backdrop-blur-[10px] transition hover:bg-[#C6D4FF]/[0.09] hover:text-white"
+                      className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-[#C6D4FF]/[0.08] bg-[#C6D4FF]/[0.05] px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-[#DCE6FF]/72 backdrop-blur-[10px] transition hover:bg-[#C6D4FF]/[0.09] hover:text-white"
                     >
-                      LIVE
+                      Enter LIVE
                     </button>
 
                     <button
@@ -382,9 +382,9 @@ return (
                         clearCachedGeorgeSessionAuthority()
                         window.location.href = '/george'
                       }}
-                      className="inline-flex items-center rounded-[0.7rem] border border-white/[0.035] bg-black/18 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/36 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/68"
+                      className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.035] bg-black/18 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/36 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/68"
                     >
-                      Sign out
+                      Exit
                     </button>
                   </>
                 ) : (
@@ -394,7 +394,7 @@ return (
                       setShowSidebar?.(false)
                       onOpenLogin()
                     }}
-                    className="inline-flex items-center rounded-[0.7rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                    className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
                   >
                     Continue
                   </button>
