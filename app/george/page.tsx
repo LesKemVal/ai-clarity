@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
-import LiveSignalMark from '@/components/george/LiveSignalMark'
+import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
+import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState } from '@/lib/george/goal-engine'
@@ -2086,7 +2087,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
             label: campaignLabel,
             createdAt: Date.now(),
 
-            // 🔥 campaign intelligence layer
+            //  campaign intelligence layer
             intelligence: {
               productOrService,
               targetAudience,
@@ -3919,7 +3920,7 @@ if (responseTimerRef.current) {
         }
       }
 
-// 🔥 live sales signal detection
+//  live sales signal detection
       if (liveMode && liveTranscript) {
 
         const intent = detectTriggerIntent(liveTranscript)
@@ -4286,6 +4287,11 @@ responseTimerRef.current = setTimeout(() => {
 
   const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
   const showMobileHero = !showConversation && messages.length <= 1
+  const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
+  const showIdleGeorgeSurface =
+    showMobileHero && !liveMode && !input.trim() && !pendingImage && !hasUserMessageForSurface
+  const showTypingPrescription =
+    !liveMode && input.trim().length > 0 && !pendingImage && !hasUserMessageForSurface
 
 useEffect(() => {
   if (!showMobileHero || liveMode) return
@@ -4650,15 +4656,13 @@ return (
     }
   }}
   className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showMobileHero && (
-    <div className="flex min-h-[92px] flex-col items-center justify-start px-4 pt-3 md:hidden">
-      <div className="text-center text-[32px] md:text-[40px] font-[300] tracking-[0.24em] text-[#D7DBE4]/42">
+  {showIdleGeorgeSurface && (
+    <div className="flex min-h-[560px] flex-col items-center justify-start px-4 pt-[27dvh] md:hidden">
+      <div className="text-center text-[46px] font-[300] tracking-[0.34em] text-[#D7DBE4]/24">
         GEORGE
       </div>
 
-      <div className="mt-2 text-center text-[12px] font-[300] tracking-[0.28em] text-[#D7DBE4]/22">
-        Operational fluency.
-      </div>
+      <div className="mt-4 text-center text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">Operational fluency.</div>
 
       <ContinuityCapsule
         email={subscriberEmail}
@@ -4683,6 +4687,7 @@ return (
       </div>
     </div>
   )}
+
   {liveMode && (
     <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
       <div className="relative grid min-h-[255px] grid-cols-1 overflow-hidden rounded-[1.35rem] px-6 py-8 sm:px-8 sm:py-9 md:grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] md:px-10 md:py-10">
@@ -4725,7 +4730,7 @@ return (
       GEORGE is working
     </div>
   )}
-  {messages
+  {(messages.some((message) => message.role === 'user') ? messages : [])
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -4779,7 +4784,7 @@ return (
               [i]: !prev[i],
             }))
           }
-          className="mt-1 px-1 text-[11px] tracking-[0.12em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/62"
+          className="mt-1 px-1 text-[11px] tracking-[0.12em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/34"
         >
           {expandedMessages[i] ? 'See less' : 'See more'}
         </button>
@@ -5389,55 +5394,29 @@ ${simplifyTarget}`
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-between pointer-events-none leading-none`}>
-                <div className="pointer-events-auto flex h-5 items-center gap-5 leading-none">
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
+                <div className="pointer-events-auto flex h-7 items-center justify-center gap-5 rounded-full border border-white/[0.045] bg-[#0B0D12]/78 px-5 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-xl">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveHelpTopic('live')
                       setShowHelpModal(true)
                     }}
-                    className="inline-flex h-5 items-center text-[11px] font-medium leading-none tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
+                    className="inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
                   >
                     Help
                   </button>
 
-                  <div className="relative" data-george-language-menu>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setShowLanguageMenu((prev) => !prev)
-                      }}
-                      className="inline-flex h-5 items-center text-[11px] font-medium leading-none tracking-[0.12em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/76"
-                    >
-                      {language}
-                    </button>
-
-                    {showLanguageMenu && (
-                      <div className="absolute bottom-full left-0 z-[120] mb-3 w-[172px] overflow-hidden rounded-[1rem] border border-white/[0.075] bg-[#0B0D12]/96 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl">
-                        {languageOptions.map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setLanguage(option)
-                              window.localStorage.setItem('george_language', option)
-                              setShowLanguageMenu(false)
-                            }}
-                            className={`w-full rounded-[0.75rem] px-3 py-2 text-left text-[12px] transition ${
-                              language === option
-                                ? 'bg-white/[0.032] text-[#D7DBE4]'
-                                : 'text-[#D7DBE4]/52 hover:bg-white/[0.025] hover:text-[#D7DBE4]/82'
-                            }`}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowLanguageMenu((prev) => !prev)
+                    }}
+                    className="inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                  >
+                    {language}
+                  </button>
 
                   <button
                     type="button"
@@ -5448,38 +5427,13 @@ ${simplifyTarget}`
                         setShowUpgradeModal(true)
                       }
                     }}
-                    className="relative inline-flex h-5 w-[270px] max-w-[58vw] items-center self-center overflow-hidden text-left text-[11px] font-medium leading-none tracking-[0.05em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#B7CDD9]/78 transition hover:bg-white/[0.03] hover:text-white"
+                    aria-label="Try LIVE GEORGE"
+                    title="Try LIVE GEORGE"
                   >
-                    <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalPrimary_4.8s_ease-in-out_infinite]">
-                      <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                        {currentTier !== 'smart' && (
-                          <LiveSignalMark className="text-[#8FB6C9] drop-shadow-[0_0_8px_rgba(143,182,201,0.22)]" />
-                        )}
-                      </span>
-                      <span className="whitespace-nowrap">{tierPrimarySignal}</span>
-                    </span>
-
-                    {hasLiveGeorgeAccess && (
-                      <span className="absolute inset-0 flex items-center gap-1.5 animate-[tierSignalSecondary_4.8s_ease-in-out_infinite]">
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                          <LiveSignalMark className="text-[#8FB6C9] drop-shadow-[0_0_8px_rgba(143,182,201,0.22)]" />
-                        </span>
-                        <span className="whitespace-nowrap">You have access to LIVE GEORGE</span>
-                      </span>
-                    )}
+                    <HeadsetOperatorIcon className="h-[16px] w-[16px]" />
                   </button>
-
-
                 </div>
-
-                <button
-                  type="button"
-                  onClick={enterLiveConversation}
-                  className="pointer-events-auto inline-flex h-5 translate-x-2 items-center self-center text-[11px] font-semibold leading-none tracking-[0.16em] text-[#8FB6C9]/82 transition hover:text-[#D7F1FF] md:translate-x-0" 
-                >
-                  ◉ LIVE
-                </button>
-
               </div>
 
               <div className="hidden">
@@ -5565,7 +5519,7 @@ if (liveMode) {
                       className={`block w-full rounded-xl px-3 py-1.5 text-left text-[13px] transition ${
                         activeMemoryFolder === folder
                           ? 'bg-white/[0.08] text-[#D7DBE4]'
-                          : 'text-[#D7DBE4]/62 hover:bg-white/[0.022] hover:text-[#D7DBE4]'
+                          : 'text-[#D7DBE4]/34 hover:bg-white/[0.022] hover:text-[#D7DBE4]'
                       }`}
                     >
                       {folder}
@@ -5871,7 +5825,7 @@ if (liveMode) {
           Exit
         </div>
 
-        <div className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/62">
+        <div className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/34">
           Return to GEORGE.
         </div>
 
@@ -6106,7 +6060,7 @@ Continue from here, tell me what changed, or start fresh.`
                       ? 'bg-white/[0.026] text-[#D7DBE4]/72'
                       : 'bg-white/[0.022] text-[#D7DBE4]/52'
                   }`}>
-                    ◉ LIVE
+                    
                   </span>
                 </div>
 
@@ -6312,7 +6266,7 @@ Continue from here, tell me what changed, or start fresh.`
       className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition ${
         voiceOn
           ? 'border-[#8FB6C9]/35 bg-[#8FB6C9]/12 text-[#D7F1FF]/90 hover:bg-[#8FB6C9]/18'
-          : 'border-white/12 bg-white/[0.035] text-[#D7DBE4]/62 hover:border-white/22 hover:bg-white/[0.055] hover:text-[#D7DBE4]'
+          : 'border-white/12 bg-white/[0.035] text-[#D7DBE4]/34 hover:border-white/22 hover:bg-white/[0.055] hover:text-[#D7DBE4]'
       }`}
     >
       <span className="inline-flex items-center gap-1.5">
@@ -6543,35 +6497,14 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       </div>
                     </div>
                   </div>
-
-
-
-                
-
-
-
-
-
-{!liveMode && !showConversation && !input.trim() && !pendingImage && (
-                  <div className="pointer-events-auto fixed left-0 right-0 top-[calc(57%+42px)] z-[81] mx-auto w-full max-w-[900px] px-3 md:top-[calc(60%+44px)]">
-                    <div className="mx-auto flex w-full max-w-[620px] items-center justify-center gap-4 overflow-x-auto whitespace-nowrap pb-1 text-[12px] text-[#D7DBE4]/38">
-                      <a
-                        href="/images"
-                        className="inline-flex items-center gap-2 transition hover:text-[#D7DBE4]/72"
-                      >
-                        <span className="text-[#D7DBE4]/58">◌</span>
-                        <span>Create Images</span>
-                      </a>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
-      
-      {showWalkthrough && (
+      {showTypingPrescription && <TypingPrescriptionSurface />}
+
+{showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
@@ -7047,7 +6980,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                     <a
                       href="/help"
-                      className="mt-4 inline-flex text-[12px] font-medium text-[#D7DBE4]/62 underline-offset-4 transition hover:text-white hover:underline"
+                      className="mt-4 inline-flex text-[12px] font-medium text-[#D7DBE4]/34 underline-offset-4 transition hover:text-white hover:underline"
                     >
                       Open full help topics
                     </a>

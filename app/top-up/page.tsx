@@ -112,6 +112,11 @@ export default function TopUpPage() {
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
 
+    const checkout = params.get('checkout')
+    if (checkout === 'intelligent' || checkout === 'brilliant' || checkout === 'brilliant_day') {
+      setActiveCheckout(checkout)
+    }
+
     async function verifyActivationReturn() {
       if (params.get('payment') !== 'success') return
 
