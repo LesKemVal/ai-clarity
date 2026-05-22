@@ -93,6 +93,29 @@ export async function fetchGeorgeSessionAuthority(): Promise<GeorgeSessionAuthor
       return authority
     }
 
+    if (cached.email) {
+      try {
+        const subResponse = await fetch(
+          `/api/subscription-state?email=${encodeURIComponent(cached.email)}`,
+          { cache: 'no-store' }
+        )
+
+        const subData = await subResponse.json()
+        const tier = normalizeTier(subData?.currentTier)
+
+        const authority: GeorgeSessionAuthority = {
+          authenticated: true,
+          tier,
+          liveAccess: tier === 'intelligent' || tier === 'brilliant',
+          email: cached.email,
+          source: 'subscriber-restore',
+        }
+
+        writeCachedGeorgeSessionAuthority(authority)
+        return authority
+      } catch {}
+    }
+
     return {
       authenticated: false,
       tier: 'smart',
