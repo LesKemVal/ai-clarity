@@ -6681,18 +6681,18 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           </p>
 
           <p className="mt-3 text-sm font-medium text-[#D7DBE4]">
-            Restore GEORGE access
+            Restore continuity
           </p>
 
           <p className="mt-1 text-xs leading-6 text-neutral-500">
-            Restore your access, preferences, and LIVE support.
+            Restore recognition, tier access, and GEORGE continuity on this device.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="rounded-[1rem] border border-white/[0.045] bg-black/28 px-4 py-3">
             <label className="block text-[10px] uppercase tracking-[0.18em] text-neutral-500">
-              Recognized access
+              Continuity identity
             </label>
             <ContinuityCapsule
               email={subscriberEmail}
@@ -6716,11 +6716,11 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   window.localStorage.removeItem('george_email')
                 }
               }}
-              placeholder="you@example.com"
+              placeholder="email for continuity"
               className="mt-2 w-full bg-transparent text-sm text-[#D7DBE4] outline-none placeholder:text-neutral-700"
             />
             <p className="mt-2 text-[11px] leading-5 text-neutral-500">
-              Your access link restores GEORGE recognition and LIVE access on this device.
+              This is passwordless continuity. It restores GEORGE recognition without creating a traditional login yet.
             </p>
 
             <button
@@ -6758,7 +6758,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               }}
               className="mt-3 w-full rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[#D7DBE4]/70 transition hover:bg-white/[0.12] hover:text-[#D7DBE4]"
             >
-              Send access link
+              Send restore link
             </button>
           </div>
 
@@ -6774,7 +6774,7 @@ onClick={() => {
               <div>
                 <div className="text-sm font-medium text-[#D7DBE4]">Intelligent</div>
                 <div className="mt-1 text-xs leading-5 text-neutral-500">
-                  Stronger memory, execution support, and adaptive guidance.
+                  Activate stronger memory, execution support, and adaptive guidance.
                 </div>
               </div>
 
@@ -6796,7 +6796,7 @@ onClick={() => {
               <div>
                 <div className="text-sm font-medium text-[#D7DBE4]">Brilliant</div>
                 <div className="mt-1 text-xs leading-5 text-neutral-300">
-                  Deep LIVE conversational support and stronger restoration.
+                  Activate deeper LIVE support, stronger restoration, and continuity.
                 </div>
               </div>
 
@@ -6813,7 +6813,7 @@ onClick={() => {
             onClick={redeemFounderCode}
             className="w-full rounded-full border border-white/[0.06] bg-white/[0.018] px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/70 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
           >
-            Enter Founder Code
+            Use Founder Code
           </button>
 
           <div className="flex items-center justify-between">
