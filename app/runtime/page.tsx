@@ -129,6 +129,15 @@ export default function RuntimePage() {
         if (!cancelled) setSession({ authenticated: false, tier: 'smart', liveAccess: false })
       })
 
+    fetch('/api/runtime-usage', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.records) && data.records.length > 0) {
+          setRecords(data.records)
+        }
+      })
+      .catch(() => {})
+
     try {
       const email = window.localStorage.getItem('george_email') || ''
       const verified = window.localStorage.getItem('george_verified_continuity') === 'true'

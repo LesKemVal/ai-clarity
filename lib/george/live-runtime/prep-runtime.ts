@@ -265,6 +265,13 @@ export function persistLiveRuntimeUsageRecord(record: LiveRuntimeUsageRecord) {
   } catch {
     window.localStorage.setItem(LIVE_RUNTIME_USAGE_KEY, JSON.stringify([record]))
   }
+
+  fetch('/api/runtime-usage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ record }),
+    keepalive: true,
+  }).catch(() => {})
 }
 
 export function reconcileActiveLiveRuntimeUsage(params: {
