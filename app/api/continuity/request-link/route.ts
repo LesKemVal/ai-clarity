@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
       email: result.email,
       expiresAt: result.expiresAt,
     })
-  } catch {
+  } catch (error) {
+    console.error('[GEORGE][continuity][request-error]', error)
     return NextResponse.json({ error: 'Unable to create continuity link.' }, { status: 500 })
   }
 }
