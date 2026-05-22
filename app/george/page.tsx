@@ -6697,10 +6697,15 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             <ContinuityCapsule
               email={subscriberEmail}
               label="Recognized as"
-              onClear={() => {
+              onClear={async () => {
                 setSubscriberEmail('')
+                setCurrentTier('smart')
                 window.localStorage.removeItem('george_email')
                 window.localStorage.removeItem('george_verified_continuity')
+                window.localStorage.removeItem('george_tier')
+                await fetch('/api/logout', { method: 'POST' }).catch(() => {})
+                setToastMessage('Logged out.')
+                setShowToast(true)
               }}
             />
 

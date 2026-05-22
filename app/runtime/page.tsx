@@ -193,6 +193,22 @@ export default function RuntimePage() {
             <div className="mt-1 text-sm text-white/70">
               {session?.email || localEmail || 'Not restored'}
             </div>
+
+            {(session?.email || localEmail) && (
+              <button
+                type="button"
+                onClick={async () => {
+                  window.localStorage.removeItem('george_email')
+                  window.localStorage.removeItem('george_verified_continuity')
+                  window.localStorage.removeItem('george_tier')
+                  await fetch('/api/logout', { method: 'POST' }).catch(() => {})
+                  window.location.reload()
+                }}
+                className="mt-3 rounded-full border border-white/[0.07] bg-white/[0.018] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/38 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white/70"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </section>
