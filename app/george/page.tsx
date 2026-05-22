@@ -6766,15 +6766,15 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                   const data = await response.json()
 
                   if (!response.ok) {
-                    setToastMessage(data?.error || 'Unable to send continuity link.')
+                    setToastMessage(data?.error || 'Unable to send login link.')
                     setShowToast(true)
                     return
                   }
 
-                  setToastMessage('Access link sent.')
+                  setToastMessage('Login link sent. Check your email.')
                   setShowToast(true)
                 } catch {
-                  setToastMessage('Unable to send continuity link.')
+                  setToastMessage('Unable to send login link.')
                   setShowToast(true)
                 }
               }}
