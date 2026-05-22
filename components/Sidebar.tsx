@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { deleteSession, safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
+import { fetchGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority, type GeorgeSessionTier } from '@/lib/george/session-authority'
 
 export type PromptItem = {
   label: string
@@ -70,6 +71,11 @@ export default function Sidebar({
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [railPanel, setRailPanel] = useState<'new' | 'search' | 'sessions' | null>(null)
 
+  const [identityEmail, setIdentityEmail] = useState('')
+  const [identityTier, setIdentityTier] = useState<GeorgeSessionTier>('smart')
+  const [identityAuthenticated, setIdentityAuthenticated] = useState(false)
+
+
   const loadNormalSessions = () => {
     setNormalSessions(
       safeReadSessions()
@@ -84,6 +90,24 @@ export default function Sidebar({
     window.addEventListener('storage', loadNormalSessions)
     return () => window.removeEventListener('storage', loadNormalSessions)
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetchGeorgeSessionAuthority()
+      .then((authority) => {
+        if (cancelled) return
+        setIdentityEmail(authority.email)
+        setIdentityTier(authority.tier)
+        setIdentityAuthenticated(authority.authenticated)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
 
   useEffect(() => {
     const loadGoalChecks = () => {
@@ -285,20 +309,88 @@ return (
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
-      <div className="border-b border-white/[0.035] px-4 pb-3 pt-3 xl:h-[56px] xl:flex xl:items-center">
-        <div className="relative flex items-center justify-between opacity-90">
-          <div className="flex items-center gap-2.5 translate-y-[2px]">
-            <img
-              src="/logofav.png"
-              alt="BRANESx"
-              className="h-[60px] w-[60px] rounded-[1.1rem] object-contain opacity-94"
-            />
+      <div className="border-b border-white/[0.035] px-4 pb-4 pt-3">
+        <div className="relative flex items-start justify-between opacity-90">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2.5 translate-y-[2px]">
+              <img
+                src="/logofav.png"
+                alt="BRANESx"
+                className="h-[60px] w-[60px] rounded-[1.1rem] object-contain opacity-94"
+              />
+            </div>
+
+            <div className="mt-3 rounded-[0.9rem] border border-white/[0.045] bg-white/[0.018] px-3 py-3">
+              <div className="truncate text-[13px] font-medium text-white/84">
+                {identityAuthenticated
+                  ? identityEmail
+                  : 'Guest access'}
+              </div>
+
+              <div className="mt-1 flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-white/34">
+                <span>
+                  {identityTier}
+                </span>
+
+                {(identityTier === 'intelligent' || identityTier === 'brilliant') && (
+                  <>
+                    <span className="text-white/16">•</span>
+                    <span className="text-[#C6D4FF]/72">
+                      LIVE enabled
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href="/runtime"
+                  className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                >
+                  Runtime
+                </a>
+
+                <a
+                  href="/top-up"
+                  className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                >
+                  Access
+                </a>
+
+                {identityAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await fetch('/api/logout', { method: 'POST' })
+                      } catch {}
+
+                      clearCachedGeorgeSessionAuthority()
+                      window.location.href = '/george'
+                    }}
+                    className="inline-flex items-center rounded-[0.55rem] border border-red-400/[0.08] bg-red-400/[0.04] px-2.5 py-1.5 text-[11px] text-red-100/58 transition hover:bg-red-400/[0.08] hover:text-red-100/82"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.location.href = '/george'
+                    }}
+                    className="inline-flex items-center rounded-[0.55rem] border border-white/[0.05] bg-white/[0.02] px-2.5 py-1.5 text-[11px] text-white/64 transition hover:bg-white/[0.04] hover:text-white/84"
+                  >
+                    Login
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={() => setShowSidebar?.(false)}
-            className="text-white/34 transition hover:text-white/62"
+            className="ml-2 text-white/34 transition hover:text-white/62"
             aria-label="Close sidebar"
           >
             ×
