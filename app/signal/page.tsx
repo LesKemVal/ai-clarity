@@ -90,6 +90,12 @@ export default function SignalPage() {
     localStorage.setItem('george_user_adaptive_question', adaptiveQuestion)
     localStorage.setItem('george_user_adaptive_answer', adaptiveAnswer)
 
+    setName('')
+    setMission('')
+    setPriority('')
+    setLearningStyle('')
+    setAdaptiveAnswer('')
+
     window.location.href = '/george'
   }
 
@@ -104,20 +110,22 @@ export default function SignalPage() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl space-y-6">
-        <button
-          onClick={() => (window.location.href = '/george')}
-          className="text-sm text-white/48 transition hover:text-white/72"
-        >
-          ← Back to GEORGE
-        </button>
-
-        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.46)] md:p-7">
+        <div className="flex items-center justify-between">
           <img
             src="/logofav.png"
             alt="BRANESx"
-            className="h-24 w-24 rounded-[1.6rem] object-contain opacity-94 md:h-28 md:w-28"
+            className="h-14 w-14 rounded-[1rem] object-contain opacity-94"
           />
 
+          <button
+            onClick={() => (window.location.href = '/george')}
+            className="text-xs uppercase tracking-[0.18em] text-white/38 transition hover:text-white/68"
+          >
+            Back
+          </button>
+        </div>
+
+        <div className="space-y-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.012] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.46)] md:p-7">
           <div className="space-y-3 border-b border-white/[0.045] pb-6">
             <p className="text-xs uppercase tracking-[0.28em] text-white/42">
               Add Signal
