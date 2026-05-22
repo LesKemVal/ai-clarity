@@ -4303,16 +4303,16 @@ responseTimerRef.current = setTimeout(() => {
     return m.role === 'user'
   })
 
-  const showConversation = input.trim().length > 0 || hasVisibleThread || liveMode
+  const hasDraftInput = input.trim().length > 0
+  const showConversation = hasDraftInput || hasVisibleThread || liveMode
   const showMobileHero = !liveMode && messages.length <= 1
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
-    showMobileHero && !liveMode && !input.trim() && !pendingImage && !hasUserMessageForSurface
+    showMobileHero && !liveMode && !hasDraftInput && !pendingImage && !hasUserMessageForSurface
   const showTypingPrescription =
-    !liveMode && input.trim().length > 0 && !pendingImage && !hasUserMessageForSurface
+    !liveMode && hasDraftInput && !pendingImage && !hasUserMessageForSurface
 
   const isRuntimeTransitioning =
-    input.trim().length > 0 ||
     hasVisibleThread ||
     liveMode
 
@@ -4683,9 +4683,9 @@ return (
     }
   }}
   className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {!isRuntimeTransitioning && showIdleGeorgeSurface && (
+  {showIdleGeorgeSurface && (
     <div className={`flex min-h-[560px] flex-col items-center justify-start px-4 pt-[27dvh] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-      showTypingPrescription
+      hasDraftInput
         ? '-translate-y-16 opacity-0 pointer-events-none'
         : 'translate-y-0 opacity-100'
     }`}>
@@ -6318,7 +6318,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${isRuntimeTransitioning ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
+${(hasDraftInput || hasVisibleThread || liveMode) ? (liveMode && input.length > 160 ? 'fixed bottom-[18px]' : 'fixed bottom-[6px]') : 'fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
                     <div className="george-composer-shell relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
 
                       <input
@@ -6533,7 +6533,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           </div>
         </div>
 
-      {showTypingPrescription && <TypingPrescriptionSurface />}
+      {false && showTypingPrescription && <TypingPrescriptionSurface />}
 
 {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
