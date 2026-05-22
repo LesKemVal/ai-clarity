@@ -17,7 +17,10 @@ type SubscriberStore = {
   customers: Record<string, string>
 }
 
-const storePath = path.join(process.cwd(), 'data', 'subscribers.json')
+const storePath =
+  process.env.NODE_ENV === 'production'
+    ? path.join('/tmp', 'subscribers.json')
+    : path.join(process.cwd(), 'data', 'subscribers.json')
 
 function normalizeEmail(email: unknown) {
   return String(email || '').trim().toLowerCase()
