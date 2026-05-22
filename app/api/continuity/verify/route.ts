@@ -16,13 +16,11 @@ export async function POST(req: NextRequest) {
       ...result,
     })
 
-    if (result.currentTier === 'intelligent' || result.currentTier === 'brilliant') {
-      setGeorgeSessionCookie(response, {
-        email: result.email,
-        tier: result.currentTier,
-        source: 'continuity',
-      })
-    }
+    setGeorgeSessionCookie(response, {
+      email: result.email,
+      tier: result.currentTier,
+      source: 'continuity',
+    })
 
     return response
   } catch {

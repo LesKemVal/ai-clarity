@@ -6,7 +6,7 @@ export type GeorgeSessionSource = 'continuity' | 'founder'
 
 export type GeorgeSession = {
   email: string
-  tier: Exclude<SubscriberTier, 'smart'>
+  tier: SubscriberTier
   source: GeorgeSessionSource
   issuedAt: number
   expiresAt: number
@@ -52,7 +52,7 @@ function safeEqual(a: string, b: string) {
 
 export function createGeorgeSessionToken(input: {
   email: string
-  tier: Exclude<SubscriberTier, 'smart'>
+  tier: SubscriberTier
   source: GeorgeSessionSource
 }) {
   const email = input.email.trim().toLowerCase()
@@ -86,7 +86,7 @@ export function readGeorgeSession(req: NextRequest): GeorgeSession | null {
 
     if (!parsed.email || !parsed.tier || !parsed.expiresAt || !parsed.source) return null
     if (parsed.expiresAt < Date.now()) return null
-    if (parsed.tier !== 'intelligent' && parsed.tier !== 'brilliant') return null
+    if (parsed.tier !== 'smart' && parsed.tier !== 'intelligent' && parsed.tier !== 'brilliant') return null
     if (parsed.source !== 'continuity' && parsed.source !== 'founder') return null
 
     if (parsed.source === 'continuity') {
@@ -111,7 +111,7 @@ export function setGeorgeSessionCookie(
   response: NextResponse,
   input: {
     email: string
-    tier: Exclude<SubscriberTier, 'smart'>
+    tier: SubscriberTier
     source: GeorgeSessionSource
   }
 ) {

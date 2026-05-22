@@ -37,6 +37,10 @@ export function verifyLiveAccessFromRequest(
   const session = readGeorgeSession(req)
 
   if (session) {
+    if (session.tier !== 'intelligent' && session.tier !== 'brilliant') {
+      return { ok: false, status: 403, error: 'LIVE requires Intelligent or Brilliant access.' }
+    }
+
     return {
       ok: true,
       email: session.email,
