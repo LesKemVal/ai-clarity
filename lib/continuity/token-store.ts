@@ -15,7 +15,10 @@ type ContinuityTokenStore = {
   tokens: ContinuityTokenRecord[]
 }
 
-const storePath = path.join(process.cwd(), 'data', 'continuity-tokens.json')
+const storePath =
+  process.env.NODE_ENV === 'production'
+    ? path.join('/tmp', 'continuity-tokens.json')
+    : path.join(process.cwd(), 'data', 'continuity-tokens.json')
 const TOKEN_TTL_MS = 15 * 60 * 1000
 
 function readStore(): ContinuityTokenStore {
