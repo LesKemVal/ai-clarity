@@ -743,11 +743,11 @@ export default function GeorgeLiveEntryPage() {
         </p>
 
         <h1 className="text-[32px] font-semibold tracking-[-0.052em] text-white md:text-[52px]">
-          Prepare the room.
+          Prepare for the conversation.
         </h1>
 
         <p className="mt-4 max-w-[590px] text-[14px] leading-6 text-white/54 md:text-[16px]">
-          Answer a few questions and pre-load context so GEORGE is sharpest.
+          Tell GEORGE what kind of conversation you’re walking into so responses are more useful from the start.
         </p>
 
         <div className="mt-3 flex items-center justify-center gap-5 text-[12px] font-medium">
@@ -785,8 +785,8 @@ export default function GeorgeLiveEntryPage() {
 
         <div className="mt-7 w-full max-w-[620px] rounded-[1.05rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.010))] p-5 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-[10px]">
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-3 text-[11px] tracking-[0.18em] text-white/34">
-            <span>ROOM</span>
-            <span className="text-white/38">OPTIONAL</span>
+            <span>WHAT KIND OF CONVERSATION?</span>
+            <span className="text-white/38">SELECT ONE</span>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">

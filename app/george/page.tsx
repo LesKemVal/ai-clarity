@@ -1224,6 +1224,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setActiveMode('live')
       setMessages([])
       messagesRef.current = []
+
       setLiveMode(true)
       setConversationMode('manual_live')
       setActivePromptContext('manual_live')
@@ -1318,7 +1319,7 @@ ${objectiveLine ? `${objectiveLine}
 ` : ''}${capacityLine ? `${capacityLine}` : ''}`.trim()
           : `I am LIVE and present.
 
-No room was selected. I will listen first, read the room, and support you accordingly.
+No room was selected. I’m listening first and will infer context directly from the room.
 
 Use a trigger word if you need a line, cue, pause, reword, or shorter response.${steeringLine ? `
 
@@ -1998,7 +1999,7 @@ setPreLiveMessages(null)
     }
 
     if (conversationMode === 'manual_live') {
-  // hard override any existing messages
+  // initialize LIVE surface
   setMessages([])
   messagesRef.current = []
   const liveIntro: Message = {

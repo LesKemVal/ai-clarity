@@ -77,6 +77,16 @@ export default function HelpPage() {
 
   return (
     <main className="min-h-[100dvh] bg-[#06070A] px-5 py-8 text-[#D7DBE4]">
+<div className="mb-6 flex items-center">
+  <button
+    onClick={() => window.history.back()}
+    className="text-sm text-white/60 transition hover:text-white"
+  >
+    ← Back
+  </button>
+</div>
+
+
       <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[920px] flex-col justify-center">
         <section className="mb-7 max-w-[660px]">
           <img
