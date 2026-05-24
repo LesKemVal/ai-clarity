@@ -20,7 +20,7 @@ export default function BxPageHeader({
       <div className="relative flex min-h-[70px] items-center justify-between gap-4">
         <div className="flex items-center gap-5">
           <Link href="/george" aria-label="Go to GEORGE" className="group flex items-center gap-4">
-            <img src="/logofav.png" alt="BRANESx" className="h-[58px] w-[88px] object-contain opacity-90 transition group-hover:opacity-100" />
+            <img src="/logofav.png" alt="BRANESx" className="h-[64px] w-[96px] object-contain opacity-90 transition group-hover:opacity-100" />
           </Link>
 
           <Link href={backHref} className="inline-flex items-center gap-2 text-[13px] font-medium tracking-[0.01em] text-white/35 transition hover:text-white/68">
