@@ -5,11 +5,13 @@
   --foreground: #171717;
   --bx-ink: #05060A;
   --bx-panel: #0B0D12;
-  --bx-surface: rgba(255,255,255,0.014);
-  --bx-surface-strong: rgba(255,255,255,0.026);
-  --bx-border: rgba(255,255,255,0.052);
-  --bx-border-strong: rgba(174,182,255,0.18);
-  --bx-signal: #AEB6FF;
+  --bx-surface: rgba(255,255,255,0.010);
+  --bx-surface-strong: rgba(255,255,255,0.018);
+  --bx-border: rgba(255,255,255,0.038);
+  --bx-border-strong: rgba(174,182,255,0.12);
+  --bx-signal: rgba(174,182,255,0.78);
+  --bx-muted: rgba(215,219,228,0.42);
+  --bx-soft: rgba(215,219,228,0.64);
 }
 
 @theme inline {
@@ -81,7 +83,7 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 1px solid rgba(174, 182, 255, 0.38);
+  outline: 1px solid rgba(174, 182, 255, 0.30);
   outline-offset: 2px;
 }
 
@@ -103,25 +105,49 @@ canvas {
   overflow-x: hidden;
 }
 
+.bx-quiet-surface {
+  border: 1px solid var(--bx-border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.004));
+  box-shadow: 0 18px 54px rgba(0,0,0,0.26);
+}
+
+.bx-quiet-grid {
+  background-image:
+    radial-gradient(circle at 72% 8%, rgba(124,140,255,0.045), transparent 24%),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.020) 1px, transparent 1px);
+  background-size: auto, 112px 112px, 112px 112px;
+}
+
+.bx-muted-copy { color: var(--bx-muted); }
+.bx-soft-copy { color: var(--bx-soft); }
+.bx-soft-border { border-color: var(--bx-border); }
+
+@media (max-width: 640px) {
+  .bx-quiet-surface {
+    box-shadow: 0 14px 42px rgba(0,0,0,0.22);
+  }
+}
+
 @keyframes flashLineA {
-  0%, 100% { opacity: 0.08; transform: scaleX(0.96); }
-  10% { opacity: 0.35; transform: scaleX(1); }
-  16% { opacity: 0.75; transform: scaleX(1.03); }
-  24% { opacity: 0.12; transform: scaleX(0.98); }
+  0%, 100% { opacity: 0.06; transform: scaleX(0.96); }
+  10% { opacity: 0.22; transform: scaleX(1); }
+  16% { opacity: 0.48; transform: scaleX(1.03); }
+  24% { opacity: 0.09; transform: scaleX(0.98); }
 }
 
 @keyframes flashLineB {
-  0%, 100% { opacity: 0.06; transform: scaleX(0.95); }
-  18% { opacity: 0.25; transform: scaleX(1); }
-  26% { opacity: 0.62; transform: scaleX(1.04); }
-  34% { opacity: 0.10; transform: scaleX(0.98); }
+  0%, 100% { opacity: 0.05; transform: scaleX(0.95); }
+  18% { opacity: 0.18; transform: scaleX(1); }
+  26% { opacity: 0.42; transform: scaleX(1.04); }
+  34% { opacity: 0.08; transform: scaleX(0.98); }
 }
 
 @keyframes flashLineC {
-  0%, 100% { opacity: 0.05; transform: scaleX(0.94); }
-  12% { opacity: 0.22; transform: scaleX(1); }
-  20% { opacity: 0.55; transform: scaleX(1.02); }
-  30% { opacity: 0.08; transform: scaleX(0.97); }
+  0%, 100% { opacity: 0.04; transform: scaleX(0.94); }
+  12% { opacity: 0.16; transform: scaleX(1); }
+  20% { opacity: 0.36; transform: scaleX(1.02); }
+  30% { opacity: 0.06; transform: scaleX(0.97); }
 }
 
 .flash-line-a {
@@ -139,8 +165,6 @@ canvas {
   transform-origin: center;
 }
 
-
-
 textarea {
   font-size: 16px;
 }
@@ -150,7 +174,6 @@ textarea {
   transform: translateZ(0);
 }
 
-
 /* GEORGE subtle glow system */
 .glow-soft {
   box-shadow: 0 0 0px rgba(174, 182, 255, 0);
@@ -158,12 +181,12 @@ textarea {
 }
 
 .glow-soft:hover {
-  box-shadow: 0 0 10px rgba(174, 182, 255, 0.12);
+  box-shadow: 0 0 8px rgba(174, 182, 255, 0.08);
 }
 
 .glow-focus:focus,
 .glow-focus:focus-visible {
-  box-shadow: 0 0 12px rgba(174, 182, 255, 0.16);
+  box-shadow: 0 0 10px rgba(174, 182, 255, 0.12);
   outline: none;
 }
 
@@ -171,21 +194,20 @@ textarea {
   transform: scale(0.992);
 }
 
-
 @keyframes glowTwice {
   0% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
-  18% { box-shadow: 0 0 12px rgba(174, 182, 255, 0.20); color: #AEB6FF; }
+  18% { box-shadow: 0 0 10px rgba(174, 182, 255, 0.15); color: #AEB6FF; }
   36% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
-  62% { box-shadow: 0 0 12px rgba(174, 182, 255, 0.20); color: #AEB6FF; }
+  62% { box-shadow: 0 0 10px rgba(174, 182, 255, 0.15); color: #AEB6FF; }
   100% { box-shadow: 0 0 0 rgba(174, 182, 255, 0); color: inherit; }
 }
 
 @keyframes alertDotTwice {
-  0% { opacity: 0.25; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
-  18% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px rgba(255, 59, 48, 0.38); }
-  36% { opacity: 0.25; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
-  62% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px rgba(255, 59, 48, 0.38); }
-  100% { opacity: 0.25; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
+  0% { opacity: 0.22; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
+  18% { opacity: .82; transform: scale(1.12); box-shadow: 0 0 8px rgba(255, 59, 48, 0.28); }
+  36% { opacity: 0.22; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
+  62% { opacity: .82; transform: scale(1.12); box-shadow: 0 0 8px rgba(255, 59, 48, 0.28); }
+  100% { opacity: 0.22; transform: scale(1); box-shadow: 0 0 0 rgba(255, 59, 48, 0); }
 }
 
 .glow-twice {
@@ -196,10 +218,9 @@ textarea {
   animation: alertDotTwice 1.15s ease-in-out 1;
 }
 
-
 .button-selected {
-  background-color: rgba(174, 182, 255, 0.075);
-  color: #AEB6FF;
+  background-color: rgba(174, 182, 255, 0.055);
+  color: rgba(174, 182, 255, 0.84);
 }
 
 .button-press {
@@ -211,19 +232,19 @@ textarea {
 }
 
 .button-row-selected {
-  color: #AEB6FF;
+  color: rgba(174, 182, 255, 0.84);
 }
 
 @keyframes branesPulseFlow {
-  0% { opacity: .16; transform: translateX(10px) scale(.84); }
-  35% { opacity: 1; transform: translateX(0) scale(1.08); }
-  100% { opacity: .16; transform: translateX(-10px) scale(.84); }
+  0% { opacity: .12; transform: translateX(10px) scale(.84); }
+  35% { opacity: .72; transform: translateX(0) scale(1.08); }
+  100% { opacity: .12; transform: translateX(-10px) scale(.84); }
 }
 
 @keyframes pulseSmileArc {
-  0% { opacity: .18; transform: translateY(2px) scale(.84); }
-  35% { opacity: 1; transform: translateY(0) scale(1.08); }
-  100% { opacity: .18; transform: translateY(2px) scale(.84); }
+  0% { opacity: .14; transform: translateY(2px) scale(.84); }
+  35% { opacity: .74; transform: translateY(0) scale(1.08); }
+  100% { opacity: .14; transform: translateY(2px) scale(.84); }
 }
 
 .branes-pulse-1 { animation: branesPulseFlow .85s ease-in-out 0s infinite; }
@@ -240,9 +261,6 @@ textarea {
 .pulse-smile-3 { animation: pulseSmileArc .95s ease-in-out .16s infinite; }
 .pulse-smile-4 { animation: pulseSmileArc .95s ease-in-out .24s infinite; }
 .pulse-smile-5 { animation: pulseSmileArc .95s ease-in-out .32s infinite; }
-
-
-
 
 @keyframes menuLift {
   from {
@@ -266,7 +284,6 @@ textarea {
   }
 }
 
-
 @keyframes pickerTwistUp {
   0% {
     opacity: 0;
@@ -281,8 +298,8 @@ textarea {
 }
 
 @keyframes georgePulse {
-  0%, 100% { opacity: .46; transform: scale(1); }
-  50% { opacity: .9; transform: scale(1.12); }
+  0%, 100% { opacity: .36; transform: scale(1); }
+  50% { opacity: .72; transform: scale(1.1); }
 }
 
 .animate-george-pulse {
@@ -297,7 +314,6 @@ textarea {
     border-radius: 0.68rem;
   }
 }
-
 
 @supports (-webkit-touch-callout: none) {
   .george-mobile-root {
@@ -317,12 +333,11 @@ textarea {
   }
 }
 
-
 /* ANDROID RUNTIME SHARPENING */
 
 .android-runtime {
   --android-panel: rgba(11,13,18,0.96);
-  --android-border: rgba(255,255,255,0.055);
+  --android-border: rgba(255,255,255,0.045);
 }
 
 .android-runtime .backdrop-blur-xl,
@@ -335,7 +350,7 @@ textarea {
 .android-runtime [class*="shadow-\[0_24px_72px"],
 .android-runtime [class*="shadow-\[0_18px_48px"],
 .android-runtime [class*="shadow-\[0_14px_34px"] {
-  box-shadow: 0 10px 26px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.24) !important;
 }
 
 .android-runtime [class*="bg-\[#0B0D12\]\/92"],
@@ -354,7 +369,6 @@ textarea {
   transform: translateZ(0);
 }
 
-
 /* GEORGE GLASS POPUP SYSTEM */
 
 .george-mobile-root .george-glass,
@@ -363,15 +377,15 @@ textarea {
 .george-mobile-root [class*="bg-[#0B0D12]/96"],
 .george-mobile-root [class*="bg-[#11131A]/92"] {
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028)),
-    rgba(9, 12, 18, 0.72) !important;
-  border-color: rgba(255,255,255,0.105) !important;
+    linear-gradient(180deg, rgba(255,255,255,0.050), rgba(255,255,255,0.018)),
+    rgba(9, 12, 18, 0.78) !important;
+  border-color: rgba(255,255,255,0.070) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.11),
-    inset 0 -1px 0 rgba(255,255,255,0.035),
-    0 24px 70px rgba(0,0,0,0.48) !important;
-  backdrop-filter: blur(18px) saturate(1.28) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.28) !important;
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    inset 0 -1px 0 rgba(255,255,255,0.024),
+    0 18px 54px rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(16px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.18) !important;
 }
 
 .george-mobile-root [class*="bg-black/68"],
@@ -379,10 +393,10 @@ textarea {
 .george-mobile-root [class*="bg-black/74"],
 .george-mobile-root [class*="bg-black/62"] {
   background:
-    radial-gradient(circle at 50% 30%, rgba(143,182,201,0.055), transparent 42%),
-    rgba(0,0,0,0.58) !important;
-  backdrop-filter: blur(10px) saturate(1.12) !important;
-  -webkit-backdrop-filter: blur(10px) saturate(1.12) !important;
+    radial-gradient(circle at 50% 30%, rgba(143,182,201,0.035), transparent 42%),
+    rgba(0,0,0,0.56) !important;
+  backdrop-filter: blur(9px) saturate(1.06) !important;
+  -webkit-backdrop-filter: blur(9px) saturate(1.06) !important;
 }
 
 .george-mobile-root .george-glass button,
@@ -399,15 +413,14 @@ textarea {
 .android-runtime [class*="bg-[#0B0D12]/96"],
 .android-runtime [class*="bg-[#11131A]/92"] {
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.068), rgba(255,255,255,0.030)),
+    linear-gradient(180deg, rgba(255,255,255,0.044), rgba(255,255,255,0.020)),
     rgba(10, 13, 19, 0.86) !important;
-  backdrop-filter: blur(8px) saturate(1.12) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
+  backdrop-filter: blur(8px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.08) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.10),
-    0 14px 38px rgba(0,0,0,0.36) !important;
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 12px 32px rgba(0,0,0,0.30) !important;
 }
-
 
 /* GEORGE COMPOSER SHIMMER */
 
@@ -418,15 +431,15 @@ textarea {
   }
 
   18% {
-    opacity: 0.18;
+    opacity: 0.12;
   }
 
   50% {
-    opacity: 0.34;
+    opacity: 0.22;
   }
 
   82% {
-    opacity: 0.16;
+    opacity: 0.10;
   }
 
   100% {
@@ -451,9 +464,9 @@ textarea {
       105deg,
       transparent 0%,
       rgba(255,255,255,0.00) 38%,
-      rgba(170,180,255,0.16) 48%,
-      rgba(210,220,255,0.12) 50%,
-      rgba(170,180,255,0.14) 52%,
+      rgba(170,180,255,0.10) 48%,
+      rgba(210,220,255,0.075) 50%,
+      rgba(170,180,255,0.09) 52%,
       rgba(255,255,255,0.00) 62%,
       transparent 100%
     );
@@ -462,5 +475,5 @@ textarea {
 }
 
 .android-runtime .george-composer-shell::before {
-  opacity: 0.58;
+  opacity: 0.48;
 }
