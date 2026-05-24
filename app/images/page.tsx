@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import BxPageHeader from '@/components/BxPageHeader'
 
 export default function ImagesPage() {
   const [prompt, setPrompt] = useState('')
@@ -28,11 +29,7 @@ export default function ImagesPage() {
       const res = await fetch('/api/images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: cleanPrompt,
-          size: '1024x1024',
-          quality: 'medium',
-        }),
+        body: JSON.stringify({ prompt: cleanPrompt, size: '1024x1024', quality: 'medium' }),
       })
 
       const data = await res.json()
@@ -56,107 +53,67 @@ export default function ImagesPage() {
   }
 
   return (
-    <main className="min-h-[100dvh] overflow-x-hidden overscroll-none bg-[#06070A] px-4 py-6 text-white sm:px-5 sm:py-8">
+    <main className="min-h-[100dvh] overflow-x-hidden overscroll-none bg-[#06070A] px-4 py-5 text-white sm:px-5 sm:py-8">
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
-        <div className="mb-8 flex items-center justify-between border-b border-white/[0.055] pb-4">
-          <Link
-            href="/george"
-            className="flex items-center gap-3 text-[13px] text-white/44 transition hover:text-white/70"
-          >
-            <img
-              src="/logofav.png"
-              alt="BRANESx"
-              className="h-[58px] w-[58px] rounded-[1.1rem] object-contain opacity-95"
-            />
+        <BxPageHeader
+          backLabel="GEORGE"
+          rightSlot={
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowMenu((value) => !value)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.012] text-[16px] text-white/42 transition hover:bg-white/[0.024] hover:text-white/70"
+                aria-label="Open menu"
+              >
+                ☰
+              </button>
 
-            <span className="text-[14px] tracking-[0.18em] text-white/72">
-              GEORGE
-            </span>
-          </Link>
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowMenu((value) => !value)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.018] text-[18px] text-white/58 transition hover:bg-white/[0.045] hover:text-white"
-              aria-label="Open menu"
-            >
-              ☰
-            </button>
-
-            {showMenu && (
-              <div className="absolute right-0 top-12 z-50 w-44 rounded-[1rem] border border-white/[0.07] bg-[#0B0D12]/95 p-2 text-sm shadow-[0_18px_48px_rgba(0,0,0,0.42)] backdrop-blur-xl">
-                <Link href="/george" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">GEORGE</Link>
-                <Link href="/george/live-entry" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">LIVE</Link>
-                <Link href="/help" className="block rounded-xl px-3 py-2 text-white/68 transition hover:bg-white/[0.04] hover:text-white">Help</Link>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <section className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
-          <div>
-            <div className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/28">
-              VISUAL GENERATION
+              {showMenu && (
+                <div className="absolute right-0 top-11 z-50 w-44 rounded-[1rem] border border-white/[0.055] bg-[#0B0D12]/95 p-2 text-sm shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur-xl">
+                  <Link href="/george" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">GEORGE</Link>
+                  <Link href="/george/live-entry" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">LIVE</Link>
+                  <Link href="/help" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">Help</Link>
+                </div>
+              )}
             </div>
+          }
+        />
 
-            <h1 className="text-[34px] font-semibold tracking-[-0.055em] text-white md:text-[52px]">
-              Generate visual direction.
-            </h1>
-
-            <p className="mt-4 max-w-[520px] text-[14px] leading-6 text-white/48">
+        <section className="grid gap-7 md:grid-cols-[0.95fr_1.05fr] md:items-start">
+          <div>
+            <div className="mb-3 text-[10px] uppercase tracking-[0.26em] text-white/26">VISUAL GENERATION</div>
+            <h1 className="text-[34px] font-semibold leading-[0.96] tracking-[-0.055em] text-white/88 md:text-[52px]">Generate visual direction.</h1>
+            <p className="mt-4 max-w-[520px] text-[14px] leading-6 text-white/44">
               Use GEORGE to generate concepts, visual references, campaign ideas, product direction, scenes, interfaces, and operational creative work.
             </p>
 
-            <div className="mt-7 rounded-[1rem] border border-white/[0.055] bg-white/[0.015] p-4">
+            <div className="mt-7 rounded-[1rem] border border-white/[0.04] bg-white/[0.010] p-4 shadow-[0_14px_44px_rgba(0,0,0,0.20)]">
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 rows={7}
-                placeholder="Example: A restrained monochrome poster for an operational intelligence product, premium black background, subtle prescription-mark influence, institutional, minimal, useful."
-                className="w-full resize-none rounded-[0.85rem] border border-white/[0.055] bg-black/30 px-4 py-3 text-[16px] leading-6 text-white/82 outline-none placeholder:text-white/24 sm:text-[14px]"
+                placeholder="Example: restrained monochrome poster for an operational intelligence product, premium black background, institutional, minimal, useful."
+                className="w-full resize-none rounded-[0.85rem] border border-white/[0.04] bg-black/26 px-4 py-3 text-[16px] leading-6 text-white/82 outline-none placeholder:text-white/24 sm:text-[14px]"
               />
 
               <div className="mt-4 flex items-center justify-between gap-3">
-                <p className="text-[12px] leading-5 text-white/30">
-                  Specific prompts produce stronger visual direction.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={createImage}
-                  disabled={loading}
-                  className="touch-manipulation shrink-0 rounded-[0.8rem] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#07080B] transition hover:bg-white/88 disabled:cursor-not-allowed disabled:opacity-45"
-                >
+                <p className="text-[12px] leading-5 text-white/30">Specific prompts produce stronger visual direction.</p>
+                <button type="button" onClick={createImage} disabled={loading} className="touch-manipulation shrink-0 rounded-[0.8rem] bg-white/88 px-4 py-2.5 text-[13px] font-semibold text-[#07080B] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-45">
                   {loading ? 'Creating…' : 'Generate'}
                 </button>
               </div>
 
-              {error && (
-                <div className="mt-4 rounded-[0.75rem] border border-red-300/18 bg-red-300/[0.045] px-3 py-2 text-[13px] text-red-100/72">
-                  {error}
-                </div>
-              )}
+              {error && <div className="mt-4 rounded-[0.75rem] border border-red-300/18 bg-red-300/[0.045] px-3 py-2 text-[13px] text-red-100/72">{error}</div>}
             </div>
           </div>
 
-          <div className="rounded-[1rem] border border-white/[0.055] bg-white/[0.012] p-3">
-            <div className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.85rem] bg-black/34">
-              {image ? (
-                <img src={image} alt="Generated visual" className="h-full w-full object-contain" />
-              ) : (
-                <div className="px-8 text-center text-[13px] leading-6 text-white/34">
-                  Visual output appears here.
-                </div>
-              )}
+          <div className="rounded-[1rem] border border-white/[0.04] bg-white/[0.010] p-3 shadow-[0_14px_44px_rgba(0,0,0,0.18)]">
+            <div className="flex aspect-square items-center justify-center overflow-hidden rounded-[0.85rem] bg-black/30">
+              {image ? <img src={image} alt="Generated visual" className="h-full w-full object-contain" /> : <div className="px-8 text-center text-[13px] leading-6 text-white/30">Visual output appears here.</div>}
             </div>
 
             {image && (
-              <a
-                href={image}
-                download="bx-image.png"
-                className="mt-3 block touch-manipulation rounded-[0.75rem] border border-white/[0.055] px-4 py-2.5 text-center text-[13px] text-white/56 transition hover:bg-white/[0.018] hover:text-white/78"
-              >
+              <a href={image} download="bx-image.png" className="mt-3 block touch-manipulation rounded-[0.75rem] border border-white/[0.04] px-4 py-2.5 text-center text-[13px] text-white/50 transition hover:bg-white/[0.018] hover:text-white/76">
                 Export visual
               </a>
             )}
