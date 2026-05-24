@@ -1,0 +1,127 @@
+/* BRANESx operational polish overrides */
+
+@keyframes bxBorderShimmer {
+  0% { transform: translateX(-120%); opacity: 0; }
+  18% { opacity: 0.28; }
+  50% { opacity: 0.62; }
+  82% { opacity: 0.22; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button) {
+  position: relative;
+  border-color: rgba(174, 214, 255, 0.16) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(174, 214, 255, 0.105), transparent 34%),
+    linear-gradient(180deg, rgba(174, 214, 255, 0.078), rgba(174, 214, 255, 0.018)),
+    rgba(8, 13, 20, 0.54) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(216, 236, 255, 0.10),
+    inset 0 -1px 0 rgba(174, 214, 255, 0.035),
+    0 18px 48px rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(210, 234, 255, 0.75), rgba(124, 180, 255, 0.44), transparent);
+  animation: bxBorderShimmer 4.2s ease-in-out infinite;
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button) button {
+  position: relative;
+  z-index: 1;
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button) button div[class*="text-white/58"] {
+  color: rgba(211, 232, 255, 0.72) !important;
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button) [class*="border-t"] {
+  border-color: rgba(174, 214, 255, 0.09) !important;
+}
+
+main[class*="bg-[#06070A]"] div[class*="overflow-hidden"][class*="rounded-[1rem]"][class*="bg-black/18"]:has(button) [class*="grid-cols-3"] > div {
+  border-color: rgba(174, 214, 255, 0.10) !important;
+  background: rgba(210, 234, 255, 0.026) !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child {
+  padding: 0.75rem 0.75rem 0.9rem !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child > div {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.050), rgba(255,255,255,0.020)),
+    rgba(42, 42, 42, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 18px 54px rgba(0,0,0,0.36);
+  padding: 0.75rem;
+}
+
+aside[class*="w-[258px]"] > div:first-child img[alt="BRANESx"] {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 999px !important;
+  opacity: 0.88 !important;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] {
+  margin-top: 0.65rem !important;
+  border-radius: 1rem !important;
+  border-color: rgba(255,255,255,0.05) !important;
+  background: rgba(0,0,0,0.18) !important;
+  box-shadow: none !important;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] > div:first-child {
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em !important;
+  color: rgba(255,255,255,0.90) !important;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] > div:nth-child(2) {
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  color: rgba(255,255,255,0.44) !important;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] div[class*="grid-cols-2"] {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0.15rem !important;
+  margin-top: 0.9rem !important;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 0.55rem;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] div[class*="grid-cols-2"] a,
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] div[class*="grid-cols-2"] button {
+  min-height: 36px !important;
+  justify-content: flex-start !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 0.8rem !important;
+  padding-left: 0.55rem !important;
+  padding-right: 0.55rem !important;
+  font-size: 13px !important;
+  letter-spacing: -0.01em !important;
+  color: rgba(255,255,255,0.76) !important;
+}
+
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] div[class*="grid-cols-2"] a:hover,
+aside[class*="w-[258px]"] div[class*="rounded-[1rem]"][class*="bg-black/24"] div[class*="grid-cols-2"] button:hover {
+  background: rgba(255,255,255,0.055) !important;
+  color: white !important;
+}
