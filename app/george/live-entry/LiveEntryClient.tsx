@@ -114,6 +114,23 @@ function estimateResources({
   }
 }
 
+function estimateWithResources(base: ResourceEstimate, resources: string[]): ResourceEstimate {
+  const delta = resources.length - base.resources.length
+  const estimatedCents = Math.max(8, base.estimatedCents + delta * 3)
+  const runtimeMinutes = Math.max(8, base.runtimeMinutes + delta * 2)
+  const prepSeconds = Math.max(4, Math.min(16, base.prepSeconds + delta))
+  const intensity = estimatedCents >= 44 ? 'Heavy' : estimatedCents >= 28 ? 'Standard' : 'Light'
+
+  return {
+    ...base,
+    estimatedCents,
+    runtimeMinutes,
+    prepSeconds,
+    intensity,
+    resources,
+  }
+}
+
 function CompactSelect({
   label,
   value,
@@ -156,7 +173,10 @@ export default function LiveEntryClient() {
   const [objective, setObjective] = useState('')
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
   const [hasLiveSession, setHasLiveSession] = useState(false)
-  const [showResourceMeter, setShowResourceMeter] = useState(false)
+  const [showResourceMeter, setShowResourceMeter] = useState(true)
+  const [showPrepPreview, setShowPrepPreview] = useState(false)
+  const [editableResources, setEditableResources] = useState<string[]>([])
+  const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
 
   useEffect(() => {
@@ -187,36 +207,56 @@ export default function LiveEntryClient() {
     setReady(true)
   }, [])
 
-  useEffect(() => {
-    setShowResourceMeter(true)
-  }, [conversationType, audienceType])
-
   const liveAssistMode = outputMode === 'Repeatable lines' ? 'lines' : 'cues'
 
   const resourceEstimate = useMemo(() => {
     return estimateResources({ conversationType, audienceType, pacing, outputMode, objective })
   }, [conversationType, audienceType, pacing, outputMode, objective])
 
+  useEffect(() => {
+    setShowResourceMeter(true)
+    setEditableResources(resourceEstimate.resources)
+  }, [conversationType, audienceType, pacing, outputMode, objective, resourceEstimate.resources.join('|')])
+
+  const finalResourceEstimate = useMemo(() => {
+    return estimateWithResources(resourceEstimate, editableResources.length ? editableResources : resourceEstimate.resources)
+  }, [resourceEstimate, editableResources])
+
   const loadedSummary = useMemo(() => {
     return `${conversationType} with ${audienceType.toLowerCase()} audience · ${pacing.toLowerCase()} pacing · ${outputMode.toLowerCase()}`
   }, [conversationType, audienceType, pacing, outputMode])
 
-  const startLive = (skipPrep = false) => {
+  const addResource = () => {
+    const clean = customResource.trim()
+    if (!clean) return
+    setEditableResources((items) => Array.from(new Set([...items, clean])))
+    setCustomResource('')
+  }
+
+  const removeResource = (resource: string) => {
+    setEditableResources((items) => items.filter((item) => item !== resource))
+  }
+
+  const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
 
+    const finalResources = skipPrep ? resourceEstimate.resources : (resources.length ? resources : resourceEstimate.resources)
+    const finalEstimate = skipPrep ? resourceEstimate : estimateWithResources(resourceEstimate, finalResources)
+
     const runtimeSupport = {
-      selectedCapacityCents: resourceEstimate.estimatedCents,
-      selectedCapabilityIds: resourceEstimate.resources,
-      selectedCapabilities: resourceEstimate.resources,
-      baseRuntimeCents: resourceEstimate.estimatedCents,
-      capacityCents: resourceEstimate.estimatedCents,
-      estimatedCents: resourceEstimate.estimatedCents,
-      resourceEstimate,
-      runtimeBias: resourceEstimate.resources,
+      selectedCapacityCents: finalEstimate.estimatedCents,
+      selectedCapabilityIds: finalResources,
+      selectedCapabilities: finalResources,
+      baseRuntimeCents: finalEstimate.estimatedCents,
+      capacityCents: finalEstimate.estimatedCents,
+      estimatedCents: finalEstimate.estimatedCents,
+      resourceEstimate: finalEstimate,
+      runtimeBias: finalResources,
       audienceType,
       conversationType,
       pacing,
       compactPrep: true,
+      editedByUser: !skipPrep,
     }
 
     const liveSetup = {
@@ -229,9 +269,9 @@ export default function LiveEntryClient() {
       liveAssistMode,
       skipPrep,
       runtimeSupport,
-      selectedCapacityCents: resourceEstimate.estimatedCents,
-      selectedCapabilityIds: resourceEstimate.resources,
-      estimatedCents: resourceEstimate.estimatedCents,
+      selectedCapacityCents: finalEstimate.estimatedCents,
+      selectedCapabilityIds: finalResources,
+      estimatedCents: finalEstimate.estimatedCents,
       compactPrep: true,
       createdAt: Date.now(),
     }
@@ -246,7 +286,7 @@ export default function LiveEntryClient() {
     window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
-    window.localStorage.setItem('george_live_estimated_cents', String(resourceEstimate.estimatedCents))
+    window.localStorage.setItem('george_live_estimated_cents', String(finalEstimate.estimatedCents))
 
     window.location.href = '/george/live'
   }
@@ -259,6 +299,17 @@ export default function LiveEntryClient() {
 
       <div className="relative z-10 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
+
+        <div className="mb-3 flex items-center justify-between gap-3 px-1">
+          <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep optional</div>
+          <button
+            type="button"
+            onClick={() => startLive(true)}
+            className="text-[12px] font-medium text-[#AEB6FF]/62 underline-offset-4 transition hover:text-[#D7DCFF] hover:underline"
+          >
+            Skip prep
+          </button>
+        </div>
 
         <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-5">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
@@ -294,7 +345,7 @@ export default function LiveEntryClient() {
               <div>
                 <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">Resource meter</div>
                 <div className="mt-1 text-[13px] text-white/58">
-                  ~{resourceEstimate.runtimeMinutes} min support · ~{resourceEstimate.estimatedCents}¢ · {resourceEstimate.intensity}
+                  ~{finalResourceEstimate.runtimeMinutes} min support · ~{finalResourceEstimate.estimatedCents}¢ · {finalResourceEstimate.intensity}
                 </div>
               </div>
               <span className="text-[12px] text-white/34">{showResourceMeter ? 'Hide' : 'Show'}</span>
@@ -304,28 +355,20 @@ export default function LiveEntryClient() {
               <div className="border-t border-white/[0.035] px-4 pb-4 pt-3">
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{resourceEstimate.prepSeconds}s</div>
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.prepSeconds}s</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">prep</div>
                   </div>
                   <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{resourceEstimate.runtimeMinutes}m</div>
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.runtimeMinutes}m</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">runtime</div>
                   </div>
                   <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{resourceEstimate.estimatedCents}¢</div>
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{finalResourceEstimate.estimatedCents}¢</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">cost</div>
                   </div>
                 </div>
 
-                <p className="mt-3 text-[12px] leading-5 text-white/38">{resourceEstimate.reason}</p>
-
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {resourceEstimate.resources.map((resource) => (
-                    <span key={resource} className="rounded-full border border-white/[0.035] bg-white/[0.012] px-2.5 py-1 text-[11px] text-white/38">
-                      {resource}
-                    </span>
-                  ))}
-                </div>
+                <p className="mt-3 text-[12px] leading-5 text-white/38">{finalResourceEstimate.reason}</p>
               </div>
             )}
           </div>
@@ -358,10 +401,10 @@ export default function LiveEntryClient() {
           <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
             <button
               type="button"
-              onClick={() => startLive(false)}
+              onClick={() => setShowPrepPreview(true)}
               className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
             >
-              Start LIVE
+              Enter room
             </button>
 
             <button
@@ -386,6 +429,65 @@ export default function LiveEntryClient() {
           </p>
         )}
       </div>
+
+      {showPrepPreview && (
+        <div className="fixed inset-0 z-[240] flex items-end justify-center bg-black/68 px-3 pb-3 backdrop-blur-[10px] sm:items-center sm:pb-0">
+          <div className="w-full max-w-[560px] rounded-[1.25rem] border border-white/[0.06] bg-[#07090E]/96 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.24em] text-white/30">Prep room</div>
+                <h2 className="mt-2 text-[24px] font-semibold tracking-[-0.05em] text-white/86">Review what GEORGE will load.</h2>
+              </div>
+              <button type="button" onClick={() => setShowPrepPreview(false)} className="rounded-full px-2 py-1 text-[12px] text-white/38 hover:text-white/70">Close</button>
+            </div>
+
+            <div className="mt-4 rounded-[1rem] border border-white/[0.04] bg-black/24 px-4 py-3 text-[13px] leading-6 text-white/48">
+              {loadedSummary} · ~{finalResourceEstimate.runtimeMinutes}m · ~{finalResourceEstimate.estimatedCents}¢
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-white/28">Resources</div>
+              <div className="flex flex-wrap gap-2">
+                {editableResources.map((resource) => (
+                  <button
+                    key={resource}
+                    type="button"
+                    onClick={() => removeResource(resource)}
+                    className="rounded-full border border-white/[0.05] bg-white/[0.018] px-3 py-1.5 text-[12px] text-white/48 transition hover:border-red-300/20 hover:bg-red-300/[0.04] hover:text-red-100/76"
+                    title="Tap to remove"
+                  >
+                    {resource} ×
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-3 flex gap-2">
+                <input
+                  value={customResource}
+                  onChange={(event) => setCustomResource(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') addResource()
+                  }}
+                  placeholder="Add resource, e.g. silence timing"
+                  className="min-w-0 flex-1 rounded-[0.9rem] border border-white/[0.045] bg-black/24 px-3 py-2.5 text-[13px] text-white/72 outline-none placeholder:text-white/24"
+                />
+                <button type="button" onClick={addResource} className="rounded-[0.9rem] border border-white/[0.05] px-3 py-2.5 text-[12px] text-white/56 hover:bg-white/[0.025] hover:text-white/78">Add</button>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+              <button
+                type="button"
+                onClick={() => startLive(false, editableResources)}
+                className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
+              >
+                Enter LIVE
+              </button>
+              <button type="button" onClick={() => setShowPrepPreview(false)} className="min-h-[48px] rounded-[0.95rem] border border-white/[0.045] bg-black/18 px-5 py-3 text-[13px] font-medium text-white/44 transition hover:bg-white/[0.02] hover:text-white/68">Edit setup</button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
