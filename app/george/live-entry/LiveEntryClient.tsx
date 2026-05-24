@@ -404,7 +404,7 @@ export default function LiveEntryClient() {
               onClick={() => setShowPrepPreview(true)}
               className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
             >
-              Enter room
+              Start LIVE
             </button>
 
             <button
@@ -481,7 +481,7 @@ export default function LiveEntryClient() {
                 onClick={() => startLive(false, editableResources)}
                 className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
               >
-                Enter LIVE
+                Now Start LIVE
               </button>
               <button type="button" onClick={() => setShowPrepPreview(false)} className="min-h-[48px] rounded-[0.95rem] border border-white/[0.045] bg-black/18 px-5 py-3 text-[13px] font-medium text-white/44 transition hover:bg-white/[0.02] hover:text-white/68">Edit setup</button>
             </div>
