@@ -13,6 +13,15 @@ type SelectOption = {
   helper?: string
 }
 
+type ResourceEstimate = {
+  prepSeconds: number
+  runtimeMinutes: number
+  estimatedCents: number
+  intensity: 'Light' | 'Standard' | 'Heavy'
+  resources: string[]
+  reason: string
+}
+
 const CONVERSATION_TYPES: SelectOption[] = [
   { label: 'Interview', helper: 'answers, confidence, proof' },
   { label: 'Meeting', helper: 'clarity, timing, decisions' },
@@ -44,6 +53,66 @@ const OUTPUT_OPTIONS: SelectOption[] = [
   { label: 'Cues', helper: 'short directional support' },
   { label: 'Repeatable lines', helper: 'exact words to say' },
 ]
+
+const CONVERSATION_BASE: Record<string, { minutes: number; cents: number; resource: string }> = {
+  Interview: { minutes: 24, cents: 21, resource: 'answer framing + proof recall' },
+  Meeting: { minutes: 28, cents: 23, resource: 'decision tracking + timing cues' },
+  Negotiation: { minutes: 34, cents: 34, resource: 'leverage tracking + restraint cues' },
+  'Sales Call': { minutes: 30, cents: 29, resource: 'objection handling + close timing' },
+  'Doctor Appointment': { minutes: 24, cents: 22, resource: 'question tracking + advocacy prompts' },
+  Presentation: { minutes: 36, cents: 31, resource: 'flow support + recovery cues' },
+  'Everyday Conversation': { minutes: 18, cents: 14, resource: 'tone support + clarity cues' },
+}
+
+const AUDIENCE_WEIGHT: Record<string, { cents: number; resource: string }> = {
+  Executive: { cents: 5, resource: 'executive compression' },
+  Investor: { cents: 8, resource: 'risk/upside framing' },
+  Recruiter: { cents: 4, resource: 'fit and experience framing' },
+  Customer: { cents: 4, resource: 'trust and value framing' },
+  Physician: { cents: 5, resource: 'factual recall discipline' },
+  'Spouse / Family': { cents: 3, resource: 'tone sensitivity' },
+  Regulator: { cents: 9, resource: 'precision and compliance posture' },
+  'Audience / Crowd': { cents: 6, resource: 'public clarity structure' },
+}
+
+function estimateResources({
+  conversationType,
+  audienceType,
+  pacing,
+  outputMode,
+  objective,
+}: {
+  conversationType: string
+  audienceType: string
+  pacing: string
+  outputMode: string
+  objective: string
+}): ResourceEstimate {
+  const base = CONVERSATION_BASE[conversationType] || CONVERSATION_BASE.Meeting
+  const audience = AUDIENCE_WEIGHT[audienceType] || AUDIENCE_WEIGHT.Executive
+  const pacingCents = pacing === 'Sharp' ? 3 : pacing === 'Measured' ? 2 : 0
+  const outputCents = outputMode === 'Repeatable lines' ? 4 : 1
+  const objectiveCents = objective.trim().length > 20 ? 3 : 0
+  const estimatedCents = base.cents + audience.cents + pacingCents + outputCents + objectiveCents
+  const prepSeconds = Math.min(14, 5 + Math.ceil(estimatedCents / 9))
+  const runtimeMinutes = base.minutes + (audience.cents >= 8 ? 6 : 0) + (outputMode === 'Repeatable lines' ? 3 : 0)
+  const intensity = estimatedCents >= 44 ? 'Heavy' : estimatedCents >= 28 ? 'Standard' : 'Light'
+
+  return {
+    prepSeconds,
+    runtimeMinutes,
+    estimatedCents,
+    intensity,
+    resources: [
+      base.resource,
+      audience.resource,
+      pacing === 'Sharp' ? 'compressed timing' : pacing === 'Measured' ? 'slower cue spacing' : 'balanced pacing',
+      outputMode === 'Repeatable lines' ? 'repeatable line generation' : 'short cue generation',
+      objective.trim().length > 20 ? 'objective-specific preload' : 'general room preload',
+    ],
+    reason: `${conversationType} + ${audienceType.toLowerCase()} audience requires ${intensity.toLowerCase()} runtime support.`,
+  }
+}
 
 function CompactSelect({
   label,
@@ -87,6 +156,7 @@ export default function LiveEntryClient() {
   const [objective, setObjective] = useState('')
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
   const [hasLiveSession, setHasLiveSession] = useState(false)
+  const [showResourceMeter, setShowResourceMeter] = useState(false)
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
 
   useEffect(() => {
@@ -117,7 +187,15 @@ export default function LiveEntryClient() {
     setReady(true)
   }, [])
 
+  useEffect(() => {
+    setShowResourceMeter(true)
+  }, [conversationType, audienceType])
+
   const liveAssistMode = outputMode === 'Repeatable lines' ? 'lines' : 'cues'
+
+  const resourceEstimate = useMemo(() => {
+    return estimateResources({ conversationType, audienceType, pacing, outputMode, objective })
+  }, [conversationType, audienceType, pacing, outputMode, objective])
 
   const loadedSummary = useMemo(() => {
     return `${conversationType} with ${audienceType.toLowerCase()} audience · ${pacing.toLowerCase()} pacing · ${outputMode.toLowerCase()}`
@@ -127,14 +205,14 @@ export default function LiveEntryClient() {
     if (typeof window === 'undefined') return
 
     const runtimeSupport = {
-      selectedCapacityCents: null,
-      selectedCapabilityIds: [],
-      selectedCapabilities: [],
-      baseRuntimeCents: null,
-      capacityCents: 0,
-      estimatedCents: null,
-      resourceEstimate: null,
-      runtimeBias: [],
+      selectedCapacityCents: resourceEstimate.estimatedCents,
+      selectedCapabilityIds: resourceEstimate.resources,
+      selectedCapabilities: resourceEstimate.resources,
+      baseRuntimeCents: resourceEstimate.estimatedCents,
+      capacityCents: resourceEstimate.estimatedCents,
+      estimatedCents: resourceEstimate.estimatedCents,
+      resourceEstimate,
+      runtimeBias: resourceEstimate.resources,
       audienceType,
       conversationType,
       pacing,
@@ -151,9 +229,9 @@ export default function LiveEntryClient() {
       liveAssistMode,
       skipPrep,
       runtimeSupport,
-      selectedCapacityCents: null,
-      selectedCapabilityIds: [],
-      estimatedCents: null,
+      selectedCapacityCents: resourceEstimate.estimatedCents,
+      selectedCapabilityIds: resourceEstimate.resources,
+      estimatedCents: resourceEstimate.estimatedCents,
       compactPrep: true,
       createdAt: Date.now(),
     }
@@ -168,7 +246,7 @@ export default function LiveEntryClient() {
     window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
-    window.localStorage.removeItem('george_live_estimated_cents')
+    window.localStorage.setItem('george_live_estimated_cents', String(resourceEstimate.estimatedCents))
 
     window.location.href = '/george/live'
   }
@@ -205,6 +283,51 @@ export default function LiveEntryClient() {
             <CompactSelect label="Audience type" value={audienceType} options={AUDIENCE_TYPES} onChange={setAudienceType} />
             <CompactSelect label="Pacing" value={pacing} options={PACING_OPTIONS} onChange={setPacing} />
             <CompactSelect label="Output" value={outputMode} options={OUTPUT_OPTIONS} onChange={setOutputMode} />
+          </div>
+
+          <div className="mt-3 overflow-hidden rounded-[1rem] border border-white/[0.04] bg-black/18">
+            <button
+              type="button"
+              onClick={() => setShowResourceMeter((value) => !value)}
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+            >
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">Resource meter</div>
+                <div className="mt-1 text-[13px] text-white/58">
+                  ~{resourceEstimate.runtimeMinutes} min support · ~{resourceEstimate.estimatedCents}¢ · {resourceEstimate.intensity}
+                </div>
+              </div>
+              <span className="text-[12px] text-white/34">{showResourceMeter ? 'Hide' : 'Show'}</span>
+            </button>
+
+            {showResourceMeter && (
+              <div className="border-t border-white/[0.035] px-4 pb-4 pt-3">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{resourceEstimate.prepSeconds}s</div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">prep</div>
+                  </div>
+                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{resourceEstimate.runtimeMinutes}m</div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">runtime</div>
+                  </div>
+                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{resourceEstimate.estimatedCents}¢</div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">cost</div>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-[12px] leading-5 text-white/38">{resourceEstimate.reason}</p>
+
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {resourceEstimate.resources.map((resource) => (
+                    <span key={resource} className="rounded-full border border-white/[0.035] bg-white/[0.012] px-2.5 py-1 text-[11px] text-white/38">
+                      {resource}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <label className="mt-3 block rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
