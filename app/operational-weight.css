@@ -1,0 +1,102 @@
+/* BRANESx / GEORGE operational weight overrides
+   Keep this file visual-only. Do not place runtime behavior here. */
+
+aside[class*="w-[258px]"] {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.010), rgba(255,255,255,0.002)),
+    #06070a !important;
+  border-color: rgba(255,255,255,0.026) !important;
+  box-shadow: 16px 0 54px rgba(0,0,0,0.24);
+}
+
+aside[class*="w-[258px]"] > div:first-child {
+  border-color: rgba(255,255,255,0.026) !important;
+}
+
+aside[class*="w-[258px]"] img[alt="BRANESx"] {
+  opacity: 0.82 !important;
+  filter: saturate(0.92) brightness(0.92);
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255,255,255,0.038) !important;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(124,140,255,0.045), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.004)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035), 0 14px 38px rgba(0,0,0,0.22);
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"]::before {
+  content: "Continuity";
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(215,219,228,0.28);
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] div[class*="text-white/88"] {
+  color: rgba(244,246,250,0.72) !important;
+  font-size: 12px !important;
+  letter-spacing: -0.015em !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] div[class*="text-white/28"] {
+  color: rgba(215,219,228,0.30) !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] a,
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] button {
+  min-height: 36px !important;
+  border-color: rgba(255,255,255,0.032) !important;
+  background: rgba(0,0,0,0.16) !important;
+  color: rgba(215,219,228,0.46) !important;
+  box-shadow: none !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] a:hover,
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] button:hover {
+  border-color: rgba(255,255,255,0.060) !important;
+  background: rgba(255,255,255,0.018) !important;
+  color: rgba(244,246,250,0.74) !important;
+}
+
+aside[class*="w-[258px]"] > div:first-child [class*="rounded-[1rem]"] button[class*="C6D4FF"] {
+  border-color: rgba(174,182,255,0.12) !important;
+  background: rgba(174,182,255,0.045) !important;
+  color: rgba(220,230,255,0.70) !important;
+}
+
+aside[class*="w-[258px]"] .text-white\/82,
+aside[class*="w-[258px]"] .text-white\/88,
+aside[class*="w-[258px]"] .text-white\/90 {
+  color: rgba(244,246,250,0.70) !important;
+}
+
+aside[class*="w-[258px]"] .text-white\/48,
+aside[class*="w-[258px]"] .text-white\/52,
+aside[class*="w-[258px]"] .text-white\/62,
+aside[class*="w-[258px]"] .text-white\/64,
+aside[class*="w-[258px]"] .text-white\/68 {
+  color: rgba(215,219,228,0.42) !important;
+}
+
+aside[class*="w-[258px]"] [class*="border-white"] {
+  border-color: rgba(255,255,255,0.032) !important;
+}
+
+@media (max-width: 640px) {
+  aside[class*="w-[258px]"] {
+    width: min(258px, 84vw) !important;
+    box-shadow: 12px 0 42px rgba(0,0,0,0.26);
+  }
+
+  aside[class*="w-[258px]"] > div:first-child {
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.85rem !important;
+  }
+}
