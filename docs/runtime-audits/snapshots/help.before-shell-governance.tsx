@@ -87,8 +87,14 @@ export default function HelpPage() {
 </div>
 
 
-      <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[920px] flex-col justify-center pt-4">
+      <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[920px] flex-col justify-center">
         <section className="mb-7 max-w-[660px]">
+          <img
+            src="/logofav.png"
+            alt="BRANESx"
+            className="mb-7 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
+          />
+
           <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
             OPERATIONAL HELP
           </div>

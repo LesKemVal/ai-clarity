@@ -4717,7 +4717,7 @@ return (
     <TypingPrescriptionSurface />
   )}
 
-  {liveMode && !messages.some((message) => message.role === 'assistant' && message.content.trim()) && (
+  {liveMode && (
     <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
       <div className="relative grid min-h-[255px] grid-cols-1 overflow-hidden rounded-[1.35rem] px-6 py-8 sm:px-8 sm:py-9 md:grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] md:px-10 md:py-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_62%,rgba(42,108,170,0.28),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_38%)]" />
@@ -4759,7 +4759,7 @@ return (
       GEORGE is working
     </div>
   )}
-  {(liveMode ? messages : messages.some((message) => message.role === 'user') ? messages : [])
+  {(messages.some((message) => message.role === 'user') ? messages : [])
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')

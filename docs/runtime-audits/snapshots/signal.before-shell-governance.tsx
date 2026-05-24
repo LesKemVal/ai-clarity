@@ -110,7 +110,13 @@ export default function SignalPage() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl space-y-4">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <img
+            src="/logofav.png"
+            alt="BRANESx"
+            className="h-14 w-14 rounded-[1rem] object-contain opacity-94"
+          />
+
           <button
             onClick={() => (window.location.href = '/george')}
             className="text-xs uppercase tracking-[0.18em] text-white/38 transition hover:text-white/68"
