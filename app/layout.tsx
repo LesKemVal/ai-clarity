@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import './operational-overrides.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
 import LanguageRailSupport from '@/components/george/LanguageRailSupport'
 
