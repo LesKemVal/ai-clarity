@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import BxPageHeader from '@/components/BxPageHeader'
 
 type HelpSection =
   | 'george'
@@ -33,7 +34,7 @@ const HELP_ITEMS: Array<{
     index: '02',
     label: 'LIVE',
     title: 'Timing under pressure.',
-    body: 'Use Bx for interviews, negotiations, calls, meetings, presentations, conflict, or moments where words matter.',
+    body: 'Use LIVE for interviews, negotiations, calls, meetings, presentations, conflict, or moments where words matter.',
     utility: 'Timing. Pressure. Execution.',
     accent: true,
   },
@@ -76,34 +77,20 @@ export default function HelpPage() {
   const active = HELP_ITEMS.find((item) => item.id === open) || HELP_ITEMS[0]
 
   return (
-    <main className="min-h-[100dvh] bg-[#06070A] px-5 py-8 text-[#D7DBE4]">
-<div className="mb-6 flex items-center">
-  <button
-    onClick={() => window.history.back()}
-    className="text-sm text-white/60 transition hover:text-white"
-  >
-    ← Back
-  </button>
-</div>
+    <main className="min-h-[100dvh] bg-[#06070A] px-4 py-5 text-[#D7DBE4] sm:px-5 sm:py-8">
+      <div className="mx-auto flex min-h-[calc(100dvh-40px)] w-full max-w-[920px] flex-col">
+        <BxPageHeader backLabel="GEORGE" />
 
-
-      <div className="mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[920px] flex-col justify-center">
-        <section className="mb-7 max-w-[660px]">
-          <img
-            src="/logofav.png"
-            alt="BRANESx"
-            className="mb-7 h-28 w-28 rounded-[1.65rem] object-contain opacity-95"
-          />
-
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8D949F]">
+        <section className="mb-6 max-w-[660px]">
+          <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">
             OPERATIONAL HELP
           </div>
 
-          <h1 className="mt-3 text-[31px] font-semibold tracking-[-0.05em] text-[#DADFE8] sm:text-[38px]">
+          <h1 className="mt-3 text-[31px] font-semibold leading-[0.98] tracking-[-0.05em] text-white/88 sm:text-[38px]">
             Utility, not feature list.
           </h1>
 
-          <p className="mt-3 max-w-[560px] text-[14px] leading-6 text-[#8F96A3]">
+          <p className="mt-3 max-w-[560px] text-[14px] leading-6 text-white/44">
             GEORGE is built for direction, preparation, conversation, and continuity. Open only what you need.
           </p>
         </section>
@@ -118,20 +105,20 @@ export default function HelpPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setOpen(selected ? null : item.id)}
-                  className={`min-h-[96px] rounded-[0.9rem] border px-4 py-4 text-left transition-all duration-200 ${
+                  className={`min-h-[88px] rounded-[0.9rem] border px-4 py-4 text-left transition-all duration-200 ${
                     selected
                       ? item.accent
-                        ? 'border-[#8FB6C9]/[0.24] bg-[#8FB6C9]/[0.060] text-[#E0EDF4] shadow-[0_14px_36px_rgba(4,10,18,0.28)]'
-                        : 'border-white/[0.105] bg-white/[0.032] text-[#E2E5EA] shadow-[0_14px_34px_rgba(0,0,0,0.22)]'
-                      : 'border-white/[0.045] bg-black/[0.16] text-[#8F96A3] hover:border-white/[0.085] hover:bg-white/[0.018] hover:text-[#C8CDD6]'
+                        ? 'border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.045] text-[#E0EDF4] shadow-[0_12px_30px_rgba(4,10,18,0.22)]'
+                        : 'border-white/[0.075] bg-white/[0.024] text-white/84 shadow-[0_12px_28px_rgba(0,0,0,0.18)]'
+                      : 'border-white/[0.04] bg-black/[0.14] text-white/44 hover:border-white/[0.07] hover:bg-white/[0.014] hover:text-white/68'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] tracking-[0.16em] text-current/58">{item.index}</span>
-                    <span className="text-[12px] text-current/52">{selected ? '—' : '+'}</span>
+                    <span className="text-[11px] tracking-[0.16em] text-current/54">{item.index}</span>
+                    <span className="text-[12px] text-current/48">{selected ? '—' : '+'}</span>
                   </div>
 
-                  <div className="mt-3 text-[12px] uppercase tracking-[0.14em] text-current/72">
+                  <div className="mt-3 text-[12px] uppercase tracking-[0.14em] text-current/70">
                     {item.label}
                   </div>
                 </button>
@@ -139,31 +126,31 @@ export default function HelpPage() {
             })}
           </div>
 
-          <div className="min-h-[268px] rounded-[1rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.008))] px-5 py-5 text-left shadow-[0_18px_46px_rgba(0,0,0,0.24)]">
-            <div className="flex items-start justify-between gap-4 border-b border-white/[0.045] pb-4">
+          <div className="min-h-[252px] rounded-[1rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.014),rgba(255,255,255,0.005))] px-5 py-5 text-left shadow-[0_14px_38px_rgba(0,0,0,0.20)]">
+            <div className="flex items-start justify-between gap-4 border-b border-white/[0.035] pb-4">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.24em] text-[#7F8794]">
+                <div className="text-[10px] uppercase tracking-[0.24em] text-white/30">
                   {active.index} — {active.label}
                 </div>
 
-                <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.045em] text-[#DDE2EA]">
+                <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.045em] text-white/84">
                   {active.title}
                 </h2>
               </div>
 
-              <div className={`mt-1 h-2 w-2 rounded-full ${active.accent ? 'bg-[#8FB6C9]/70' : 'bg-[#A7ADB8]/50'}`} />
+              <div className={`mt-1 h-2 w-2 rounded-full ${active.accent ? 'bg-[#8FB6C9]/58' : 'bg-white/32'}`} />
             </div>
 
-            <p className="mt-5 text-[15px] leading-7 text-[#A3AAB5]">
+            <p className="mt-5 text-[15px] leading-7 text-white/50">
               {active.body}
             </p>
 
-            <div className="mt-6 rounded-[0.85rem] border border-white/[0.04] bg-black/[0.20] px-4 py-3">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-[#777F8B]">
+            <div className="mt-6 rounded-[0.85rem] border border-white/[0.035] bg-black/[0.18] px-4 py-3">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/28">
                 Utility
               </div>
 
-              <div className="mt-2 text-[14px] font-medium text-[#C9CED8]">
+              <div className="mt-2 text-[14px] font-medium text-white/68">
                 {active.utility}
               </div>
             </div>
