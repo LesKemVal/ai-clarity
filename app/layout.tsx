@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
+import LanguageRailSupport from '@/components/george/LanguageRailSupport'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -70,6 +71,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation font-[var(--font-inter)]">
         <MobileHeaderGate />
+        <LanguageRailSupport />
+
         <div className="flex-1 pt-[max(env(safe-area-inset-top),0px)]">
           {children}
         </div>
