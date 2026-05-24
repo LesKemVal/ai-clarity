@@ -68,9 +68,6 @@ export default function SidebarAccountDropdownEnhancer() {
       if (!card || !target) return
 
       if (card.contains(target)) {
-        const isExistingAction = target.closest('a, button') && !target.closest('[data-bx-account-trigger]')
-        if (isExistingAction && open) return
-
         event.preventDefault()
         event.stopPropagation()
 
@@ -87,7 +84,7 @@ export default function SidebarAccountDropdownEnhancer() {
 
     document.addEventListener('click', onClick, true)
     return () => document.removeEventListener('click', onClick, true)
-  }, [mounted, open])
+  }, [mounted])
 
   useEffect(() => {
     if (!mounted) return
@@ -118,7 +115,8 @@ export default function SidebarAccountDropdownEnhancer() {
   const width = Math.max(224, Math.min(260, anchor.width))
   const label = authenticated ? (email || 'GEORGE account') : 'Guest access'
 
-  const actionRow = 'block w-full rounded-[0.78rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.06] hover:text-white'
+  const actionRow =
+    'block w-full rounded-[0.78rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.06] hover:text-white'
 
   return createPortal(
     <div

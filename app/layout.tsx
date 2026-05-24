@@ -4,6 +4,7 @@ import './globals.css'
 import './operational-overrides.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
 import LanguageRailSupport from '@/components/george/LanguageRailSupport'
+import SidebarAccountDropdownEnhancer from '@/components/george/SidebarAccountDropdownEnhancer'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -73,6 +74,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation font-[var(--font-inter)]">
         <MobileHeaderGate />
         <LanguageRailSupport />
+        <SidebarAccountDropdownEnhancer />
 
         <div className="flex-1 pt-[max(env(safe-area-inset-top),0px)]">
           {children}
