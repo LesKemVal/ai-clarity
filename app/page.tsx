@@ -53,7 +53,7 @@ export default function RootPage() {
           <button
             type="button"
             onClick={() => setOpenCapability(georgeOpen ? null : 'george')}
-            className={`group w-full group relative overflow-hidden rounded-[1.2rem] border px-5 py-4 backdrop-blur-xl text-left transition-all duration-300 ${
+            className={`group relative w-full overflow-hidden rounded-[1.2rem] border px-5 py-4 text-left backdrop-blur-xl transition-all duration-300 ${
               georgeOpen
                 ? 'border-[#DCE1E7]/[0.18] bg-white/[0.055] shadow-[0_22px_54px_rgba(0,0,0,0.30)]'
                 : 'border-white/[0.055] bg-black/[0.18] hover:border-white/[0.11] hover:bg-white/[0.03] hover:shadow-[0_18px_48px_rgba(0,0,0,0.34)]'
@@ -76,8 +76,10 @@ export default function RootPage() {
                 <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Ask GEORGE</div>
               </div>
 
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] bg-black/30 text-[14px] text-white/42 transition-all duration-300 ${georgeOpen ? 'rotate-45 bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
-                <span className="translate-y-[-1px]">⌄</span>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] bg-black/30 text-[14px] text-white/42 transition-all duration-300 ${georgeOpen ? 'scale-[1.04] bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
+                <span className="flex h-3.5 w-3.5 items-center justify-center">
+                  <span className="h-[5px] w-[5px] rounded-full bg-current opacity-70" />
+                </span>
               </div>
             </div>
 
@@ -100,7 +102,7 @@ export default function RootPage() {
           <button
             type="button"
             onClick={() => setOpenCapability(liveOpen ? null : 'live')}
-            className={`group relative w-full overflow-hidden group relative overflow-hidden rounded-[1.2rem] border px-5 py-4 backdrop-blur-xl text-left transition-all duration-300 ${
+            className={`group relative w-full overflow-hidden rounded-[1.2rem] border px-5 py-4 text-left backdrop-blur-xl transition-all duration-300 ${
               liveOpen
                 ? 'border-[#8FB6C9]/[0.28] bg-[linear-gradient(180deg,rgba(143,182,201,0.10),rgba(8,17,29,0.72))] shadow-[0_24px_60px_rgba(4,10,18,0.42),inset_0_1px_0_rgba(143,182,201,0.08)]'
                 : 'border-[#DCE1E7]/[0.14] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.28] hover:bg-[#8FB6C9]/[0.06] hover:shadow-[0_18px_52px_rgba(5,12,22,0.42)]'
@@ -115,8 +117,10 @@ export default function RootPage() {
                 <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-[#E6F3FA]/90">GEORGE LIVE</div>
               </div>
 
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#8FB6C9]/[0.14] bg-black/30 text-[14px] text-[#B8D4E6]/56 transition-all duration-300 ${liveOpen ? 'rotate-45 bg-[#8FB6C9]/[0.08] text-white' : 'group-hover:text-white/84'}`}>
-                <span className="translate-y-[-1px]">⌄</span>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#8FB6C9]/[0.14] bg-black/30 text-[14px] text-[#B8D4E6]/56 transition-all duration-300 ${liveOpen ? 'scale-[1.04] bg-[#8FB6C9]/[0.08] text-white' : 'group-hover:text-white/84'}`}>
+                <span className="flex h-3.5 w-3.5 items-center justify-center">
+                  <span className="h-[5px] w-[5px] rounded-full bg-current opacity-70" />
+                </span>
               </div>
             </div>
 
@@ -168,7 +172,7 @@ export default function RootPage() {
             className="absolute inset-0 cursor-default"
           />
 
-          <div className="relative w-full max-w-[390px] rounded-[1.15rem] border border-[#8FB6C9]/[0.10] bg-[#080D14]/[0.98] p-4 text-left shadow-[0_26px_70px_rgba(0,0,0,0.58)]">
+          <div className="relative w-full max-w-[390px] overflow-hidden rounded-[1.2rem] border border-[#8FB6C9]/[0.12] bg-[#080D14]/[0.98] p-4 text-left shadow-[0_26px_70px_rgba(0,0,0,0.58)] bx-command-shimmer">
             <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/60">
               LIVE GEORGE
             </div>
