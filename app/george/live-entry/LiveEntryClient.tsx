@@ -54,6 +54,69 @@ const OUTPUT_OPTIONS: SelectOption[] = [
   { label: 'Repeatable lines', helper: 'exact words to say' },
 ]
 
+function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
+  if (conversationType === 'Interview') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload résumé',
+      helper: 'Resume, job description, cover letter, or notes GEORGE should use.',
+      resource: 'resume/document preload',
+    }
+  }
+
+  if (conversationType === 'Negotiation') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload offer or terms',
+      helper: 'Offer, contract, pricing, terms, notes, or leverage points.',
+      resource: 'terms/document preload',
+    }
+  }
+
+  if (conversationType === 'Doctor Appointment') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload notes',
+      helper: 'Symptoms, questions, lab notes, medications, timeline, or concerns.',
+      resource: 'medical notes preload',
+    }
+  }
+
+  if (conversationType === 'Sales Call') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload pitch notes',
+      helper: 'Product notes, objection notes, pricing, offer, or prospect context.',
+      resource: 'sales brief preload',
+    }
+  }
+
+  if (conversationType === 'Presentation') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload outline',
+      helper: 'Slides, outline, speaking notes, or audience context.',
+      resource: 'presentation material preload',
+    }
+  }
+
+  if (audienceType === 'Investor') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload deck or memo',
+      helper: 'Pitch deck, one-pager, investor notes, traction, or risk notes.',
+      resource: 'investor material preload',
+    }
+  }
+
+  return {
+    label: 'Relevant document optional',
+    action: 'Upload context',
+    helper: 'Agenda, brief, screenshot, notes, or anything GEORGE should account for.',
+    resource: 'context document preload',
+  }
+}
+
 const CONVERSATION_BASE: Record<string, { minutes: number; cents: number; resource: string }> = {
   Interview: { minutes: 24, cents: 21, resource: 'answer framing + proof recall' },
   Meeting: { minutes: 28, cents: 23, resource: 'decision tracking + timing cues' },
@@ -171,6 +234,8 @@ export default function LiveEntryClient() {
   const [pacing, setPacing] = useState('Balanced')
   const [outputMode, setOutputMode] = useState('Cues')
   const [objective, setObjective] = useState('')
+  const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
+  const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [showResourceMeter, setShowResourceMeter] = useState(true)
@@ -209,9 +274,27 @@ export default function LiveEntryClient() {
 
   const liveAssistMode = outputMode === 'Repeatable lines' ? 'lines' : 'cues'
 
+  const prepDocumentPrompt = useMemo(() => {
+    return getPrepDocumentPrompt(conversationType, audienceType)
+  }, [conversationType, audienceType])
+
   const resourceEstimate = useMemo(() => {
-    return estimateResources({ conversationType, audienceType, pacing, outputMode, objective })
-  }, [conversationType, audienceType, pacing, outputMode, objective])
+    const adjustedObjective = prepDocument
+      ? `${objective}\n\nLoaded document: ${prepDocument.name}`
+      : objective
+
+    const estimate = estimateResources({ conversationType, audienceType, pacing, outputMode, objective: adjustedObjective })
+
+    if (!prepDocument) return estimate
+
+    return {
+      ...estimate,
+      estimatedCents: estimate.estimatedCents + 3,
+      runtimeMinutes: estimate.runtimeMinutes + 2,
+      resources: Array.from(new Set([...estimate.resources, prepDocumentPrompt.resource])),
+      reason: `${estimate.reason} Uploaded context adds document-aware support.`,
+    }
+  }, [conversationType, audienceType, pacing, outputMode, objective, prepDocument, prepDocumentPrompt.resource])
 
   useEffect(() => {
     setShowResourceMeter(true)
@@ -225,6 +308,74 @@ export default function LiveEntryClient() {
   const loadedSummary = useMemo(() => {
     return `${conversationType} with ${audienceType.toLowerCase()} audience · ${pacing.toLowerCase()} pacing · ${outputMode.toLowerCase()}`
   }, [conversationType, audienceType, pacing, outputMode])
+
+  const handlePrepDocumentUpload = async (file: File | null) => {
+    if (!file) return
+
+    setPrepDocumentReading(true)
+
+    try {
+      const lower = file.name.toLowerCase()
+      const isImage = file.type.startsWith('image/')
+      const isText = file.type === 'text/plain' || lower.endsWith('.txt')
+      const isPdf = file.type === 'application/pdf' || lower.endsWith('.pdf')
+      const isDocx = file.type.includes('officedocument.wordprocessingml.document') || lower.endsWith('.docx')
+
+      if (isPdf || isDocx) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const res = await fetch('/api/extract-file', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data?.error || 'Unable to read document.')
+
+        const text = String(data?.text || '').trim()
+        setPrepDocument({
+          name: data?.name || file.name,
+          kind: isPdf ? 'pdf' : 'docx',
+          summary: text.slice(0, 2400),
+        })
+        return
+      }
+
+      if (isText) {
+        const text = await file.text()
+        setPrepDocument({
+          name: file.name,
+          kind: 'text',
+          summary: text.trim().slice(0, 2400),
+        })
+        return
+      }
+
+      if (isImage) {
+        setPrepDocument({
+          name: file.name,
+          kind: 'image',
+          summary: 'Image context uploaded. GEORGE should treat this as visual context for the room.',
+        })
+        return
+      }
+
+      setPrepDocument({
+        name: file.name,
+        kind: 'file',
+        summary: 'File attached as room context. GEORGE should ask for clarification if the content is needed.',
+      })
+    } catch {
+      setPrepDocument({
+        name: file.name,
+        kind: 'file',
+        summary: 'File attached, but GEORGE could not extract readable text.',
+      })
+    } finally {
+      setPrepDocumentReading(false)
+    }
+  }
 
   const addResource = () => {
     const clean = customResource.trim()
@@ -240,7 +391,10 @@ export default function LiveEntryClient() {
   const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
 
-    const finalResources = skipPrep ? resourceEstimate.resources : (resources.length ? resources : resourceEstimate.resources)
+    const finalResources = Array.from(new Set([
+      ...(skipPrep ? resourceEstimate.resources : (resources.length ? resources : resourceEstimate.resources)),
+      ...(prepDocument ? [prepDocumentPrompt.resource] : []),
+    ]))
     const finalEstimate = skipPrep ? resourceEstimate : estimateWithResources(resourceEstimate, finalResources)
 
     const runtimeSupport = {
@@ -265,6 +419,8 @@ export default function LiveEntryClient() {
       language: window.localStorage.getItem('george_live_language') || 'English',
       cadence: pacing,
       objective,
+      prepDocument,
+      prepDocumentPrompt,
       controlWords,
       liveAssistMode,
       skipPrep,
@@ -385,6 +541,52 @@ export default function LiveEntryClient() {
               placeholder="Example: help me ask for the raise without overexplaining."
               className="mt-2 w-full resize-none bg-transparent text-[15px] leading-6 text-white/76 outline-none placeholder:text-white/24"
             />
+          </label>
+
+          <label className="mt-3 block rounded-[1rem] border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.025] px-4 py-3 backdrop-blur-md">
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate text-[13px] text-white/62">
+                  {prepDocument ? prepDocument.name : prepDocumentPrompt.helper}
+                </div>
+                {prepDocument && (
+                  <div className="mt-1 text-[11px] text-[#8FB6C9]/50">
+                    Loaded into LIVE prep · {prepDocument.kind}
+                  </div>
+                )}
+              </div>
+
+              <input
+                type="file"
+                accept=".pdf,.docx,.txt,image/*"
+                className="hidden"
+                id="george-live-prep-document"
+                onChange={(event) => {
+                  void handlePrepDocumentUpload(event.target.files?.[0] || null)
+                  event.currentTarget.value = ''
+                }}
+              />
+
+              <span className="flex shrink-0 items-center gap-2">
+                {prepDocument && (
+                  <button
+                    type="button"
+                    onClick={() => setPrepDocument(null)}
+                    className="text-[12px] text-white/34 transition hover:text-white/62"
+                  >
+                    Clear
+                  </button>
+                )}
+
+                <span
+                  onClick={() => document.getElementById('george-live-prep-document')?.click()}
+                  className="cursor-pointer rounded-[0.8rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.04] px-3 py-2 text-[12px] text-[#D7DCFF]/60 transition hover:bg-[#8FB6C9]/[0.075] hover:text-white"
+                >
+                  {prepDocumentReading ? 'Reading…' : prepDocumentPrompt.action}
+                </span>
+              </span>
+            </div>
           </label>
 
           <label className="mt-3 block rounded-[1rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
