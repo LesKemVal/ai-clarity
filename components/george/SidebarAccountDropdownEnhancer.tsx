@@ -30,6 +30,25 @@ function clickExistingAccountAction(match: RegExp) {
   return true
 }
 
+function clickSidebarLiveGate() {
+  if (typeof document === 'undefined') return false
+  const aside = document.querySelector('aside[class*="w-[258px]"]')
+  if (!aside) return false
+
+  const controls = Array.from(aside.querySelectorAll('button')) as HTMLButtonElement[]
+  const target = controls.find((control) => (control.textContent || '').trim().toLowerCase() === 'live')
+  if (!target) return false
+  target.click()
+  return true
+}
+
+function maskEmail(value: string) {
+  const [name, domain] = value.split('@')
+  if (!name || !domain) return 'GEORGE account'
+  const visible = name.slice(0, 2)
+  return `${visible}••••@${domain}`
+}
+
 export default function SidebarAccountDropdownEnhancer() {
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
@@ -113,7 +132,7 @@ export default function SidebarAccountDropdownEnhancer() {
   const top = Math.max(12, anchor.top + anchor.height + 8)
   const left = Math.max(12, anchor.left)
   const width = Math.max(224, Math.min(260, anchor.width))
-  const label = authenticated ? (email || 'GEORGE account') : 'Guest access'
+  const label = authenticated ? maskEmail(email) : 'Guest access'
 
   const actionRow =
     'block w-full rounded-[0.78rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.06] hover:text-white'
@@ -132,7 +151,16 @@ export default function SidebarAccountDropdownEnhancer() {
       <div className="mt-2 space-y-1">
         <a href="/runtime" className={actionRow}>Dashboard / System</a>
         <a href="/top-up" className={actionRow}>Upgrade</a>
-        <a href="/george/live-entry" className={actionRow}>Enter LIVE</a>
+        <button
+          type="button"
+          className={actionRow}
+          onClick={() => {
+            setOpen(false)
+            if (!clickSidebarLiveGate()) window.location.href = '/george/live-entry'
+          }}
+        >
+          Enter LIVE
+        </button>
         <a href="/signal" className={actionRow}>Personalization / Signal</a>
         <a href="/help" className={actionRow}>Help</a>
       </div>
