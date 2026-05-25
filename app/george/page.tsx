@@ -558,27 +558,29 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   const unfinishedTrajectories = useMemo(() => {
     if (typeof window === 'undefined') return []
 
-    return getSessionsForMode('normal')
-      .filter((session) => !dismissedTrajectoryIds.includes(session.id))
-      .filter((session) => hasMeaningfulUserMessage(session.messages || []))
-      .sort((a, b) => b.updatedAt - a.updatedAt)
-      .slice(0, 3)
-      .map((session) => {
-        const title =
-          session.userGoal ||
-          session.suggestedRestart ||
-          session.title ||
-          'Unfinished direction'
+    try {
+      const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as any[]
 
-        const cleanTitle = String(title).replace(/\s+/g, ' ').trim()
+      return existing
+        .filter((item) => item?.type === 'goal')
+        .filter((item) => (item.status || 'active') !== 'completed')
+        .filter((item) => !dismissedTrajectoryIds.includes(item.id))
+        .sort((a, b) => (b.updatedAt || b.timestamp || 0) - (a.updatedAt || a.timestamp || 0))
+        .slice(0, 3)
+        .map((item) => {
+          const title = String(item.trajectoryTitle || item.preview || 'Active direction').replace(/\s+/g, ' ').trim()
+          const summary = String(item.trajectorySummary || 'Still in chamber. Ready when you are.').replace(/\s+/g, ' ').trim()
 
-        return {
-          id: session.id,
-          title: cleanTitle.length > 78 ? `${cleanTitle.slice(0, 78)}…` : cleanTitle,
-          summary: session.suggestedRestart || session.lastKnownState || 'Still available when you are ready.',
-        }
-      })
-  }, [dismissedTrajectoryIds, messages])
+          return {
+            id: item.id,
+            title: title.length > 78 ? `${title.slice(0, 78)}…` : title,
+            summary: summary.length > 92 ? `${summary.slice(0, 92)}…` : summary,
+          }
+        })
+    } catch {
+      return []
+    }
+  }, [dismissedTrajectoryIds])
 
   useEffect(() => {
     // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
@@ -2429,6 +2431,49 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     }
 
     return null
+  }
+
+  const saveGoal = (message: Message, messageIndex: number) => {
+    if (typeof window === 'undefined') return
+
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]')
+    const previousUserMessage =
+      message.role === 'assistant'
+        ? [...messagesRef.current.slice(0, messageIndex)].reverse().find((item) => item.role === 'user') || null
+        : null
+
+    const sourceText = previousUserMessage?.content || message.content || ''
+    const assistantText = message.role === 'assistant' ? message.content || '' : ''
+    const titleSource = sourceText || assistantText || 'Active direction'
+    const cleanTitle = titleSource.replace(/\s+/g, ' ').trim().slice(0, 110)
+    const cleanSummary = assistantText.replace(/\s+/g, ' ').trim().slice(0, 220)
+
+    existing.push({
+      id: `goal_${Date.now()}`,
+      type: 'goal',
+      status: 'active',
+      trajectoryTitle: cleanTitle || 'Active direction',
+      trajectorySummary: cleanSummary || 'GEORGE will keep this in chamber until you finish, clear, or share it.',
+      content: message.content,
+      preview: cleanTitle || 'Active direction',
+      role: message.role,
+      folder: 'Goals',
+      timestamp: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      savedPair: message.role === 'assistant',
+      userPromptContent: previousUserMessage?.content || null,
+      completionState: 'unfinished',
+      source: 'user_classified_goal',
+    })
+
+    window.localStorage.setItem('GEORGE_MEMORY', JSON.stringify(existing))
+    window.localStorage.setItem('GEORGE_LAST_FOLDER', 'Goals')
+    setMemoryVersion((prev) => prev + 1)
+    setToastMessage('Kept in chamber')
+    setShowToast(true)
+    setActiveSaveIndex(null)
+    setNewFolderName('')
   }
 
   const saveMemory = (message: Message, messageIndex: number, folderOverride?: string) => {
@@ -4788,10 +4833,10 @@ return (
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#AEB6FF]/70 shadow-[0_0_12px_rgba(174,182,255,0.52)]" />
             <span className="text-[10px] uppercase tracking-[0.24em] text-[#D7DCFF]/38">
-              In Chamber
+              Project Tray
             </span>
           </div>
-          <span className="text-[10px] text-white/22">quiet continuity</span>
+          <span className="text-[10px] text-white/22">confirmed goals</span>
         </div>
 
         <div className="grid gap-1.5">
@@ -5407,6 +5452,27 @@ ${simplifyTarget}`
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
                   Save
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveMemoryFolder('Sessions')
+                      saveMemory(m, i, 'Sessions')
+                    }}
+                    className="rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[10px] font-medium leading-4 text-[#D7DBE4]/76 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
+                  >
+                    Session
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => saveGoal(m, i)}
+                    className="rounded-lg border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] px-2.5 py-2 text-[10px] font-medium leading-4 text-[#D7DCFF]/82 transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09]"
+                  >
+                    Goal
+                  </button>
                 </div>
 
                 <div className="flex gap-1.5">
