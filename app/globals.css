@@ -471,11 +471,24 @@ textarea {
       transparent 100%
     );
   mix-blend-mode: soft-light;
-  animation: georgeComposerShimmer 8.5s ease-in-out infinite;
+  animation: georgeComposerShimmer 11s cubic-bezier(0.22,1,0.36,1) infinite;
 }
 
 .android-runtime .george-composer-shell::before {
-  opacity: 0.48;
+  opacity: 0.34;
+  animation-duration: 13s;
+}
+
+.android-runtime .george-composer-shell {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  contain: paint;
+}
+
+.android-runtime .george-composer-shell input,
+.android-runtime .george-composer-shell textarea {
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* BRANESx enterprise quieting pass: sidebar + LIVE-entry surfaces */
@@ -666,4 +679,44 @@ main[class*="bg-[#06070A]"] [class*="text-white/34"] {
 
 .bx-command-dot::after {
   bottom: 7px;
+}
+
+
+@keyframes georgeComposerSweep {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.10;
+  }
+
+  50% {
+    opacity: 0.16;
+  }
+
+  100% {
+    transform: translateX(220%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.george-composer-shell::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 28%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(180,220,255,0.04),
+    rgba(180,220,255,0.10),
+    rgba(180,220,255,0.04),
+    transparent
+  );
+  animation: georgeComposerSweep 12s cubic-bezier(0.22,1,0.36,1) infinite;
 }
