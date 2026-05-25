@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   description: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.',
   applicationName: 'GEORGE',
   icons: {
-    icon: [{ url: '/logo900.png', type: 'image/png' }],
-    shortcut: '/logo900.png',
-    apple: '/logo900.png',
+    icon: [{ url: '/logofav.png', type: 'image/png' }],
+    shortcut: '/logofav.png',
+    apple: '/logofav.png',
   },
   appleWebApp: {
     title: 'GEORGE',
