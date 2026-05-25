@@ -531,9 +531,54 @@ const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
 const [conversationMode, setConversationMode] = useState<string | null>(null)
+const [dismissedTrajectoryIds, setDismissedTrajectoryIds] = useState<string[]>([])
 const [showWalkthrough, setShowWalkthrough] = useState(false)
 const [walkthroughStep, setWalkthroughStep] = useState(1)
 
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('GEORGE_DISMISSED_TRAJECTORIES') || '[]')
+      setDismissedTrajectoryIds(Array.isArray(saved) ? saved : [])
+    } catch {
+      setDismissedTrajectoryIds([])
+    }
+  }, [])
+
+  const dismissTrajectory = (id: string) => {
+    setDismissedTrajectoryIds((prev) => {
+      const next = Array.from(new Set([...prev, id]))
+      window.localStorage.setItem('GEORGE_DISMISSED_TRAJECTORIES', JSON.stringify(next))
+      return next
+    })
+  }
+
+  const unfinishedTrajectories = useMemo(() => {
+    if (typeof window === 'undefined') return []
+
+    return getSessionsForMode('normal')
+      .filter((session) => !dismissedTrajectoryIds.includes(session.id))
+      .filter((session) => hasMeaningfulUserMessage(session.messages || []))
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .slice(0, 3)
+      .map((session) => {
+        const title =
+          session.userGoal ||
+          session.suggestedRestart ||
+          session.title ||
+          'Unfinished direction'
+
+        const cleanTitle = String(title).replace(/\s+/g, ' ').trim()
+
+        return {
+          id: session.id,
+          title: cleanTitle.length > 78 ? `${cleanTitle.slice(0, 78)}…` : cleanTitle,
+          summary: session.suggestedRestart || session.lastKnownState || 'Still available when you are ready.',
+        }
+      })
+  }, [dismissedTrajectoryIds, messages])
 
   useEffect(() => {
     // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
@@ -4715,6 +4760,55 @@ return (
 
   {showTypingPrescription && (
     <TypingPrescriptionSurface />
+  )}
+
+  {!liveMode && unfinishedTrajectories.length > 0 && !hasUserMessageForSurface && (
+    <div className="pointer-events-auto fixed inset-x-0 top-[118px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
+      <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#AEB6FF]/70 shadow-[0_0_12px_rgba(174,182,255,0.52)]" />
+            <span className="text-[10px] uppercase tracking-[0.24em] text-[#D7DCFF]/38">
+              In Chamber
+            </span>
+          </div>
+          <span className="text-[10px] text-white/22">quiet continuity</span>
+        </div>
+
+        <div className="grid gap-1.5">
+          {unfinishedTrajectories.map((item) => (
+            <div key={item.id} className="group rounded-[0.85rem] border border-white/[0.035] bg-black/18 px-3 py-2">
+              <div className="flex items-start justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const session = getSessionsForMode('normal').find((s) => s.id === item.id)
+                    if (!session) return
+                    setActiveSessionIdForMode('normal', item.id)
+                    setActiveMode('normal')
+                    window.location.href = '/george'
+                  }}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <div className="truncate text-[12px] font-medium text-white/62">{item.title}</div>
+                  <div className="mt-0.5 truncate text-[11px] text-white/30">{item.summary}</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => dismissTrajectory(item.id)}
+                  className="shrink-0 text-[11px] text-white/24 transition hover:text-white/52"
+                  aria-label="Dismiss unfinished business"
+                  title="Dismiss"
+                >
+                  done
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   )}
 
   {liveMode && (
