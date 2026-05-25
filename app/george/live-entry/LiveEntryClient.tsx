@@ -543,7 +543,7 @@ export default function LiveEntryClient() {
             />
           </label>
 
-          <label className="mt-3 block rounded-[1rem] border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.025] px-4 py-3 backdrop-blur-md">
+          <label className="mt-3 block rounded-[1rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-4 py-3 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
             <div className="mt-2 flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -581,7 +581,7 @@ export default function LiveEntryClient() {
 
                 <span
                   onClick={() => document.getElementById('george-live-prep-document')?.click()}
-                  className="cursor-pointer rounded-[0.8rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.04] px-3 py-2 text-[12px] text-[#D7DCFF]/60 transition hover:bg-[#8FB6C9]/[0.075] hover:text-white"
+                  className="cursor-pointer rounded-[0.8rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.09] px-3 py-2 text-[12px] text-[#D7DCFF]/76 transition hover:bg-[#8FB6C9]/[0.16] hover:text-white"
                 >
                   {prepDocumentReading ? 'Reading…' : prepDocumentPrompt.action}
                 </span>
