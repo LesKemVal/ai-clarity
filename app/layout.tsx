@@ -13,6 +13,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.branesx.com'),
   title: {
     default: 'GEORGE by BRANESx',
     template: '%s | GEORGE',
@@ -20,9 +21,9 @@ export const metadata: Metadata = {
   description: 'GEORGE helps you prepare, respond, and keep momentum when timing, pressure, and words matter.',
   applicationName: 'GEORGE',
   icons: {
-    icon: [{ url: '/logofav.png', type: 'image/png' }],
-    shortcut: '/logofav.png',
-    apple: '/logofav.png',
+    icon: [{ url: '/logo900.png', type: 'image/png' }],
+    shortcut: '/logo900.png',
+    apple: '/logo900.png',
   },
   appleWebApp: {
     title: 'GEORGE',
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/logofav.png',
+        url: '/logo900.png',
         width: 900,
         height: 900,
         alt: 'GEORGE by BRANESx',
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'GEORGE by BRANESx',
     description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.',
-    images: ['/logofav.png'],
+    images: ['/logo900.png'],
   },
 }
 
@@ -58,7 +59,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#0B0D12',
+  themeColor: '#06070A',
 }
 
 export default function RootLayout({
