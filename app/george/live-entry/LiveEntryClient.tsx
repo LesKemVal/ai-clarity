@@ -144,7 +144,7 @@ function CompactSelect({
 }) {
   return (
     <label className="block rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
-      <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">{label}</span>
+      <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -376,8 +376,8 @@ export default function LiveEntryClient() {
             )}
           </div>
 
-          <label className="mt-3 block rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
-            <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">Objective optional</span>
+          <label className="mt-3 block rounded-[1rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective optional</span>
             <textarea
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
@@ -387,8 +387,8 @@ export default function LiveEntryClient() {
             />
           </label>
 
-          <label className="mt-3 block rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
-            <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">Steering words</span>
+          <label className="mt-3 block rounded-[1rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Steering words</span>
             <input
               value={controlWords}
               onChange={(event) => setControlWords(event.target.value)}
@@ -397,8 +397,11 @@ export default function LiveEntryClient() {
             />
           </label>
 
-          <div className="mt-4 rounded-[1rem] border border-white/[0.035] bg-black/16 px-4 py-3 text-[13px] leading-6 text-white/42">
-            Loaded: <span className="text-white/66">{loadedSummary}</span>
+          <div className="mt-4 flex items-center gap-2 text-[12px] leading-5 text-white/34">
+            <span className="h-[5px] w-[5px] rounded-full bg-[#8FB6C9]/70 shadow-[0_0_12px_rgba(143,182,201,0.42)]" />
+            <span>
+              Runtime loaded: <span className="text-white/58">{loadedSummary}</span>
+            </span>
           </div>
 
           <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
@@ -413,7 +416,7 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => startLive(true)}
-              className="min-h-[48px] rounded-[0.95rem] border border-white/[0.045] bg-black/18 px-5 py-3 text-[13px] font-medium text-white/44 transition hover:bg-white/[0.02] hover:text-white/68"
+              className="min-h-[48px] rounded-[0.95rem] border border-white/[0.032] bg-black/14 px-5 py-3 text-[13px] font-medium text-white/38 transition hover:bg-white/[0.018] hover:text-white/60"
             >
               Skip prep
             </button>
@@ -444,19 +447,19 @@ export default function LiveEntryClient() {
               <button type="button" onClick={() => setShowPrepPreview(false)} className="rounded-full px-2 py-1 text-[12px] text-white/38 hover:text-white/70">Close</button>
             </div>
 
-            <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.045] px-4 py-3 text-[13px] leading-6 text-white/58 shadow-[0_12px_32px_rgba(0,0,0,0.22)]">
+            <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.05] bg-[#8FB6C9]/[0.032] px-4 py-3 text-[13px] leading-6 text-white/54">
               {loadedSummary} · ~{finalResourceEstimate.runtimeMinutes}m · ~{finalResourceEstimate.estimatedCents}¢
             </div>
 
             <div className="mt-4">
-              <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-white/28">Resources</div>
+              <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/22">Resources</div>
               <div className="flex flex-wrap gap-2">
                 {editableResources.map((resource) => (
                   <button
                     key={resource}
                     type="button"
                     onClick={() => removeResource(resource)}
-                    className="rounded-full border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-1.5 text-[12px] text-[#D7DCFF]/58 shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition hover:border-red-300/24 hover:bg-red-300/[0.05] hover:text-red-100/82"
+                    className="rounded-full border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.032] px-3 py-1.5 text-[12px] text-[#D7DCFF]/54 transition hover:border-red-300/20 hover:bg-red-300/[0.04] hover:text-red-100/78"
                     title="Tap to remove"
                   >
                     {resource} ×
@@ -474,7 +477,7 @@ export default function LiveEntryClient() {
                   placeholder="Add resource, e.g. silence timing"
                   className="bx-command-shimmer min-w-0 flex-1 rounded-[0.95rem] border border-[#8FB6C9]/[0.08] bg-black/24 px-3 py-2.5 text-[13px] text-white/76 outline-none placeholder:text-white/24"
                 />
-                <button type="button" onClick={addResource} className="rounded-[0.95rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.04] px-3 py-2.5 text-[12px] text-[#D7DCFF]/58 transition hover:bg-[#8FB6C9]/[0.08] hover:text-white">Add</button>
+                <button type="button" onClick={addResource} className="rounded-[0.95rem] border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.03] px-3 py-2.5 text-[12px] text-[#D7DCFF]/54 transition hover:bg-[#8FB6C9]/[0.06] hover:text-white/88">Add</button>
               </div>
             </div>
 
@@ -486,7 +489,7 @@ export default function LiveEntryClient() {
               >
                 Now Start LIVE
               </button>
-              <button type="button" onClick={() => setShowPrepPreview(false)} className="min-h-[48px] rounded-[0.95rem] border border-white/[0.045] bg-black/18 px-5 py-3 text-[13px] font-medium text-white/44 transition hover:bg-white/[0.02] hover:text-white/68">Edit setup</button>
+              <button type="button" onClick={() => setShowPrepPreview(false)} className="min-h-[48px] rounded-[0.95rem] border border-white/[0.032] bg-black/14 px-5 py-3 text-[13px] font-medium text-white/38 transition hover:bg-white/[0.018] hover:text-white/60">Edit setup</button>
             </div>
           </div>
         </div>
