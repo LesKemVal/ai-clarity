@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
+import DesktopOperationalSurface from '@/components/george/DesktopOperationalSurface'
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
@@ -4428,6 +4429,15 @@ responseTimerRef.current = setTimeout(() => {
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
     showMobileHero && !liveMode && !hasDraftInput && !pendingImage && !hasUserMessageForSurface
+
+  const showDesktopOperationalSurface =
+    !liveMode &&
+    hasDraftInput &&
+    !hasUserMessageForSurface &&
+    typeof window !== 'undefined' &&
+    window.innerWidth >= 768
+
+
   const showTypingPrescription =
     !liveMode && hasDraftInput && !pendingImage && !hasUserMessageForSurface
 
@@ -4823,7 +4833,10 @@ return (
   )}
 
   {showTypingPrescription && (
-    <TypingPrescriptionSurface />
+    <>
+      <TypingPrescriptionSurface />
+      <DesktopOperationalSurface visible={showDesktopOperationalSurface} />
+    </>
   )}
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
