@@ -7011,7 +7011,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           currentTier === 'intelligent' ||
           currentTier === 'brilliant'
         }
-        hasLiveSession={false}
+        hasLiveSession={getSessionsForMode('live').some((session) => hasMeaningfulUserMessage(session.messages || []))}
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
           setShowLiveChooser(false)
