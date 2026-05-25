@@ -1315,6 +1315,25 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       if (liveSetup) {
         window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
+
+        const contextSummary = [
+          liveSetup.room ? `Room: ${liveSetup.room}` : null,
+          liveSetup.objective ? `Objective: ${liveSetup.objective}` : null,
+          liveSetup.cadence ? `Cadence: ${liveSetup.cadence}` : null,
+          liveSetup.liveAssistMode ? `Mode: ${liveSetup.liveAssistMode}` : null,
+        ].filter(Boolean).join(' · ')
+
+        if (contextSummary) {
+          const visibleSetupMessage: Message = {
+            role: 'assistant',
+            content: `LIVE context loaded. ${contextSummary}. I’m listening.`,
+            source: 'system_override',
+          }
+
+          const nextMessages = [...messagesRef.current, visibleSetupMessage]
+          setMessages(nextMessages)
+          messagesRef.current = nextMessages
+        }
       } else {
         window.localStorage.removeItem('george_live_setup_active')
       }
@@ -4762,7 +4781,7 @@ return (
     <TypingPrescriptionSurface />
   )}
 
-  {!liveMode && unfinishedTrajectories.length > 0 && !hasUserMessageForSurface && (
+  {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[118px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
       <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
         <div className="mb-2 flex items-center justify-between gap-3">
