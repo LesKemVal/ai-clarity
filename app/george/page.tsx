@@ -4948,7 +4948,7 @@ I am listening now. Speak naturally. I will respond ${
           {isLatestAssistant && liveMode && (
   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#D7DBE4]/50">
 
-    <div className="relative">
+    <div className="relative bx-command-shimmer">
       {tonePopupIndex === i && (
         <div
           className={`absolute left-0 z-[80] w-48 rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
@@ -6454,7 +6454,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-2.5 top-1/2 z-[2] flex -translate-y-1/2 items-center justify-center rounded-full text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/78"
+                        className="absolute left-2.5 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.035] bg-black/24 text-[#D7DBE4]/38 transition hover:border-white/[0.08] hover:bg-white/[0.026] hover:text-[#D7DBE4]/78"
                         aria-label="Upload file"
                       >
                         <svg
@@ -6479,7 +6479,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-11 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-[#D7DBE4]/90 outline-none placeholder:text-[#D7DBE4]/22 focus:ring-0"
+                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-11 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-[#D7DBE4]/90 outline-none placeholder:text-[#D7DBE4]/24 focus:ring-0"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -6500,7 +6500,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className="flex h-7 w-7 items-center justify-center rounded-full text-[#D7DBE4]/52 transition hover:text-[#D7DBE4]/82 disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.035] bg-black/24 text-[#D7DBE4]/52 transition hover:border-white/[0.08] hover:bg-white/[0.026] hover:text-[#D7DBE4]/82 disabled:cursor-not-allowed disabled:opacity-40"
                               aria-label="Voice"
                             >
                               <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -6518,7 +6518,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           onClick={() => {
                             handleSend()
                           }}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.025] text-[#D7DBE4]/72 transition hover:border-white/[0.09] hover:bg-white/[0.026] hover:text-[#D7DBE4]"
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] text-[#D7DBE4]/78 shadow-[0_0_18px_rgba(174,182,255,0.055)] transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09] hover:text-white"
                           aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

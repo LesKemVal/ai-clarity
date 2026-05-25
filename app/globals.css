@@ -592,3 +592,78 @@ main[class*="bg-[#06070A]"] [class*="text-white/34"] {
     opacity: 0;
   }
 }
+
+
+@keyframes bxCommandShimmer {
+  0% {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.12;
+  }
+  48% {
+    opacity: 0.34;
+  }
+  72% {
+    opacity: 0.16;
+  }
+  100% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
+}
+
+.bx-command-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.bx-command-shimmer::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background:
+    linear-gradient(115deg, transparent 18%, rgba(174,182,255,0.34) 45%, rgba(143,182,201,0.24) 55%, transparent 82%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: bxCommandShimmer 6.8s ease-in-out infinite;
+}
+
+.bx-command-shimmer:focus-within::before,
+.bx-command-shimmer:hover::before {
+  animation-duration: 4.8s;
+  background:
+    linear-gradient(115deg, transparent 16%, rgba(215,220,255,0.44) 46%, rgba(143,182,201,0.32) 56%, transparent 84%);
+}
+
+.bx-command-dot {
+  position: relative;
+}
+
+.bx-command-dot::before,
+.bx-command-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateX(-50%);
+  opacity: 0.72;
+}
+
+.bx-command-dot::before {
+  top: 7px;
+}
+
+.bx-command-dot::after {
+  bottom: 7px;
+}
