@@ -336,16 +336,19 @@ export default function LiveEntryClient() {
             <CompactSelect label="Output" value={outputMode} options={OUTPUT_OPTIONS} onChange={setOutputMode} />
           </div>
 
-          <div className="mt-3 overflow-hidden rounded-[1rem] border border-white/[0.04] bg-black/18">
+          <div className="bx-command-shimmer mt-3 overflow-hidden rounded-[1.08rem] border border-[#8FB6C9]/[0.10] bg-[linear-gradient(180deg,rgba(143,182,201,0.055),rgba(8,12,18,0.92))] shadow-[0_20px_60px_rgba(0,0,0,0.32)]">
             <button
               type="button"
               onClick={() => setShowResourceMeter((value) => !value)}
               className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
             >
               <div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">Resource meter</div>
-                <div className="mt-1 text-[13px] text-white/58">
-                  ~{finalResourceEstimate.runtimeMinutes} min support · ~{finalResourceEstimate.estimatedCents}¢ · {finalResourceEstimate.intensity}
+                <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">Operational runtime</div>
+                <div className="mt-1 text-[13px] text-white/72">
+                  Runtime Window ~{finalResourceEstimate.runtimeMinutes}m · Runtime Cost ~{finalResourceEstimate.estimatedCents}¢
+                </div>
+                <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[#8FB6C9]/52">
+                  {finalResourceEstimate.intensity} runtime load
                 </div>
               </div>
               <span className="text-[12px] text-white/34">{showResourceMeter ? 'Hide' : 'Show'}</span>
@@ -354,21 +357,21 @@ export default function LiveEntryClient() {
             {showResourceMeter && (
               <div className="border-t border-white/[0.035] px-4 pb-4 pt-3">
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.prepSeconds}s</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">prep</div>
                   </div>
-                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.runtimeMinutes}m</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">runtime</div>
                   </div>
-                  <div className="rounded-[0.8rem] border border-white/[0.035] bg-white/[0.012] px-2 py-2">
+                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{finalResourceEstimate.estimatedCents}¢</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">cost</div>
                   </div>
                 </div>
 
-                <p className="mt-3 text-[12px] leading-5 text-white/38">{finalResourceEstimate.reason}</p>
+                <p className="mt-3 text-[12px] leading-5 text-[#D7DCFF]/42">{finalResourceEstimate.reason}</p>
               </div>
             )}
           </div>
@@ -402,7 +405,7 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => setShowPrepPreview(true)}
-              className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
+              className="min-h-[50px] rounded-[1rem] border border-[#D7DCFF]/[0.12] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(222,232,255,0.92))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#05060A] shadow-[0_18px_48px_rgba(0,0,0,0.26)] transition hover:scale-[1.01] hover:bg-white"
             >
               Start LIVE
             </button>
@@ -432,7 +435,7 @@ export default function LiveEntryClient() {
 
       {showPrepPreview && (
         <div className="fixed inset-0 z-[240] flex items-end justify-center bg-black/68 px-3 pb-3 backdrop-blur-[10px] sm:items-center sm:pb-0">
-          <div className="w-full max-w-[560px] rounded-[1.25rem] border border-white/[0.06] bg-[#07090E]/96 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
+          <div className="bx-command-shimmer w-full max-w-[560px] overflow-hidden rounded-[1.3rem] border border-[#8FB6C9]/[0.10] bg-[linear-gradient(180deg,rgba(11,16,24,0.98),rgba(6,8,12,0.98))] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.58)]">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.24em] text-white/30">Prep room</div>
@@ -441,7 +444,7 @@ export default function LiveEntryClient() {
               <button type="button" onClick={() => setShowPrepPreview(false)} className="rounded-full px-2 py-1 text-[12px] text-white/38 hover:text-white/70">Close</button>
             </div>
 
-            <div className="mt-4 rounded-[1rem] border border-white/[0.04] bg-black/24 px-4 py-3 text-[13px] leading-6 text-white/48">
+            <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.045] px-4 py-3 text-[13px] leading-6 text-white/58 shadow-[0_12px_32px_rgba(0,0,0,0.22)]">
               {loadedSummary} · ~{finalResourceEstimate.runtimeMinutes}m · ~{finalResourceEstimate.estimatedCents}¢
             </div>
 
@@ -453,7 +456,7 @@ export default function LiveEntryClient() {
                     key={resource}
                     type="button"
                     onClick={() => removeResource(resource)}
-                    className="rounded-full border border-white/[0.05] bg-white/[0.018] px-3 py-1.5 text-[12px] text-white/48 transition hover:border-red-300/20 hover:bg-red-300/[0.04] hover:text-red-100/76"
+                    className="rounded-full border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-1.5 text-[12px] text-[#D7DCFF]/58 shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition hover:border-red-300/24 hover:bg-red-300/[0.05] hover:text-red-100/82"
                     title="Tap to remove"
                   >
                     {resource} ×
@@ -469,9 +472,9 @@ export default function LiveEntryClient() {
                     if (event.key === 'Enter') addResource()
                   }}
                   placeholder="Add resource, e.g. silence timing"
-                  className="min-w-0 flex-1 rounded-[0.9rem] border border-white/[0.045] bg-black/24 px-3 py-2.5 text-[13px] text-white/72 outline-none placeholder:text-white/24"
+                  className="bx-command-shimmer min-w-0 flex-1 rounded-[0.95rem] border border-[#8FB6C9]/[0.08] bg-black/24 px-3 py-2.5 text-[13px] text-white/76 outline-none placeholder:text-white/24"
                 />
-                <button type="button" onClick={addResource} className="rounded-[0.9rem] border border-white/[0.05] px-3 py-2.5 text-[12px] text-white/56 hover:bg-white/[0.025] hover:text-white/78">Add</button>
+                <button type="button" onClick={addResource} className="rounded-[0.95rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.04] px-3 py-2.5 text-[12px] text-[#D7DCFF]/58 transition hover:bg-[#8FB6C9]/[0.08] hover:text-white">Add</button>
               </div>
             </div>
 
@@ -479,7 +482,7 @@ export default function LiveEntryClient() {
               <button
                 type="button"
                 onClick={() => startLive(false, editableResources)}
-                className="min-h-[48px] rounded-[0.95rem] bg-white/[0.88] px-5 py-3 text-[14px] font-semibold text-[#05060A] transition hover:bg-white"
+                className="min-h-[50px] rounded-[1rem] border border-[#D7DCFF]/[0.12] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(222,232,255,0.92))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#05060A] shadow-[0_18px_48px_rgba(0,0,0,0.26)] transition hover:scale-[1.01] hover:bg-white"
               >
                 Now Start LIVE
               </button>
