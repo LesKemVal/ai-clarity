@@ -38,18 +38,18 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/logo900.png',
-        width: 900,
-        height: 900,
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
         alt: 'GEORGE by BRANESx',
       },
     ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'GEORGE by BRANESx',
     description: 'Prepare. Respond. Keep momentum when timing, pressure, and words matter.',
-    images: ['/logo900.png'],
+    images: ['/opengraph-image'],
   },
 }
 
