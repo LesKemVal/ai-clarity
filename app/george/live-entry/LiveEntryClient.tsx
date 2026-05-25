@@ -314,12 +314,12 @@ export default function LiveEntryClient() {
         <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-5">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
 
-          <h1 className="mt-3 text-[34px] font-semibold leading-[0.94] tracking-[-0.06em] text-white/88 sm:text-[46px]">
-            Load the room.
+          <h1 className="mt-3 text-[28px] font-semibold leading-[1.02] tracking-[-0.05em] text-white/88 sm:text-[38px]">
+            Prepare for conversation.
           </h1>
 
           <p className="mt-4 text-[14px] leading-6 text-white/46">
-            Choose the room and audience. GEORGE will preload pacing, posture, cue density, and response style without making setup heavy.
+            Choose the type of conversation and who you are speaking with. GEORGE prepares pacing, support, and conversational guidance before LIVE begins.
           </p>
 
           {runtimeMotionContext && (

@@ -330,7 +330,7 @@ export default function TopUpPage() {
 
       <div className="relative z-10 space-y-6">
         <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 md:p-6">
-          <div className="max-w-5xl space-y-5">
+          <div className="max-w-6xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">
               ACCESS LEVELS
             </p>
@@ -371,7 +371,7 @@ export default function TopUpPage() {
               </span>
             </div>
 
-            <div className="grid gap-3 pt-2 lg:grid-cols-4">
+            <div className="grid gap-4 pt-3 lg:grid-cols-4">
               {tiers.map((tier) => {
                 const expanded = expandedTier === tier.id
                 const featured = tier.id === 'brilliant'
@@ -379,7 +379,7 @@ export default function TopUpPage() {
                 return (
                   <div
                     key={tier.id}
-                    className={`rounded-[0.9rem] border bg-white/[0.010] p-4 transition-all duration-200 ${
+                    className={`rounded-[1rem] border bg-[#0B0D12] p-5 transition-all duration-200 ${
                       featured
                         ? 'border-[#AAB4FF]/16 shadow-[0_0_28px_rgba(170,180,255,0.045)]'
                         : 'border-white/[0.028]'

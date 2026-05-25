@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import BxPageHeader from '@/components/BxPageHeader'
 
 export default function ImagesPage() {
@@ -9,8 +8,7 @@ export default function ImagesPage() {
   const [image, setImage] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
-
+  
   const createImage = async () => {
     if (loading) return
 
@@ -57,26 +55,7 @@ export default function ImagesPage() {
       <div className="mx-auto flex w-full max-w-[860px] flex-col">
         <BxPageHeader
           backLabel="GEORGE"
-          rightSlot={
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowMenu((value) => !value)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.05] bg-white/[0.012] text-[16px] text-white/42 transition hover:bg-white/[0.024] hover:text-white/70"
-                aria-label="Open menu"
-              >
-                ☰
-              </button>
-
-              {showMenu && (
-                <div className="absolute right-0 top-11 z-50 w-44 rounded-[1rem] border border-white/[0.055] bg-[#0B0D12]/95 p-2 text-sm shadow-[0_18px_48px_rgba(0,0,0,0.34)] backdrop-blur-xl">
-                  <Link href="/george" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">GEORGE</Link>
-                  <Link href="/george/live-entry" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">LIVE</Link>
-                  <Link href="/help" className="block rounded-xl px-3 py-2 text-white/58 transition hover:bg-white/[0.035] hover:text-white">Help</Link>
-                </div>
-              )}
-            </div>
-          }
+          rightSlot={null}
         />
 
         <section className="grid gap-7 md:grid-cols-[0.95fr_1.05fr] md:items-start">
