@@ -567,3 +567,28 @@ main[class*="bg-[#06070A]"] [class*="text-white/34"] {
     border-radius: 0.95rem !important;
   }
 }
+
+
+@keyframes operationalShimmer {
+  0% {
+    transform: translateX(-135%);
+    opacity: 0;
+  }
+
+  14% {
+    opacity: 0.10;
+  }
+
+  48% {
+    opacity: 0.22;
+  }
+
+  52% {
+    opacity: 0.18;
+  }
+
+  100% {
+    transform: translateX(135%);
+    opacity: 0;
+  }
+}

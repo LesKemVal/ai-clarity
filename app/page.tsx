@@ -36,51 +36,62 @@ export default function RootPage() {
         <img
           src="/logofav.png"
           alt="BRANESx"
-          className="mb-7 h-36 w-36 rounded-[2.1rem] object-contain opacity-95 sm:h-40 sm:w-40"
+          className="mb-6 h-28 w-28 rounded-[2rem] object-contain opacity-95 sm:h-32 sm:w-32"
         />
 
         <div className="mb-3 text-[10px] font-medium tracking-[0.28em] text-white/34">
           OPERATIONAL INTELLIGENCE
         </div>
-        <h1 className="max-w-[640px] text-[33px] font-semibold leading-[1.05] tracking-[-0.055em] text-white/94 md:text-[52px]">
-          LIVE Conversation assistance
+        <h1 className="max-w-[640px] text-[31px] font-semibold leading-[1.02] tracking-[-0.06em] text-white/94 md:text-[52px]">
+          Operational conversational intelligence
         </h1>
         <p className="mt-5 max-w-[620px] text-[15px] leading-7 text-white/62 md:text-[17px]">
-          Use GEORGE to plan, decide, prepare, respond, and keep momentum when timing, pressure, and words matter most.
+          Direction, continuity, and conversational support when timing, pressure, and words matter.
         </p>
 
-        <div className="mt-8 grid w-full max-w-[520px] gap-3 text-left">
+        <div className="mt-8 grid w-full max-w-[560px] gap-4 text-left">
           <button
             type="button"
             onClick={() => setOpenCapability(georgeOpen ? null : 'george')}
-            className={`group w-full rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
+            className={`group w-full group relative overflow-hidden rounded-[1.2rem] border px-5 py-4 backdrop-blur-xl text-left transition-all duration-300 ${
               georgeOpen
                 ? 'border-[#DCE1E7]/[0.18] bg-white/[0.055] shadow-[0_22px_54px_rgba(0,0,0,0.30)]'
-                : 'border-white/[0.055] bg-black/[0.18] hover:border-white/[0.10] hover:bg-white/[0.028]'
+                : 'border-white/[0.055] bg-black/[0.18] hover:border-white/[0.11] hover:bg-white/[0.03] hover:shadow-[0_18px_48px_rgba(0,0,0,0.34)]'
             }`}
             aria-expanded={georgeOpen}
           >
-            <div className="flex items-center justify-between gap-4">
+            
+            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.2rem]">
+              <span className="absolute inset-0 opacity-[0.16] [background:linear-gradient(115deg,transparent_18%,rgba(255,255,255,0.24)_50%,transparent_82%)] animate-[operationalShimmer_7s_linear_infinite]" />
+            </span>
+
+            
+            <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.2rem]">
+              <span className="absolute inset-0 opacity-[0.16] [background:linear-gradient(115deg,transparent_18%,rgba(255,255,255,0.24)_50%,transparent_82%)] animate-[operationalShimmer_7s_linear_infinite]" />
+            </span>
+
+            <div className="relative flex items-center justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.24em] text-white/34">GEORGE</div>
-                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Normal GEORGE</div>
+                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-white/88">Ask GEORGE</div>
               </div>
 
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] text-[18px] text-white/42 transition ${georgeOpen ? 'rotate-45 bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
-                +
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.06] bg-black/30 text-[14px] text-white/42 transition-all duration-300 ${georgeOpen ? 'rotate-45 bg-white/[0.06] text-white/78' : 'group-hover:text-white/72'}`}>
+                <span className="translate-y-[-1px]">⌄</span>
               </div>
             </div>
 
             <div className={`grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${georgeOpen ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
               <div className="overflow-hidden">
                 <p className="text-[14px] leading-6 text-white/58">
-                  Turn a goal, problem, document, idea, or decision into direction and a useful next step.
+                  Set the direction. GEORGE helps map the route.
                 </p>
 
                 <div className="mt-4 grid gap-2 text-[12px] text-white/44">
-                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">Build, decide, plan, learn, prepare.</div>
-                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">Use documents, screenshots, ideas, or pressure.</div>
-                  <div className="rounded-[0.75rem] border border-[#DCE1E7]/[0.12] bg-black/20 px-3 py-2">GEORGE keeps moving toward the outcome.</div>
+                  <div className="rounded-[0.82rem] border border-[#DCE1E7]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Strategic mapping</div>
+                  <div className="rounded-[0.82rem] border border-[#DCE1E7]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Goal alignment</div>
+                  <div className="rounded-[0.82rem] border border-[#DCE1E7]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Momentum recovery</div>
+                  <div className="rounded-[0.82rem] border border-[#DCE1E7]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Decision framing</div>
                 </div>
               </div>
             </div>
@@ -89,10 +100,10 @@ export default function RootPage() {
           <button
             type="button"
             onClick={() => setOpenCapability(liveOpen ? null : 'live')}
-            className={`group relative w-full overflow-hidden rounded-[1.15rem] border px-5 py-4 text-left transition-all duration-300 ${
+            className={`group relative w-full overflow-hidden group relative overflow-hidden rounded-[1.2rem] border px-5 py-4 backdrop-blur-xl text-left transition-all duration-300 ${
               liveOpen
                 ? 'border-[#8FB6C9]/[0.28] bg-[linear-gradient(180deg,rgba(143,182,201,0.10),rgba(8,17,29,0.72))] shadow-[0_24px_60px_rgba(4,10,18,0.42),inset_0_1px_0_rgba(143,182,201,0.08)]'
-                : 'border-[#DCE1E7]/[0.14] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.22] hover:bg-[#8FB6C9]/[0.045]'
+                : 'border-[#DCE1E7]/[0.14] bg-[#8FB6C9]/[0.018] hover:border-[#8FB6C9]/[0.28] hover:bg-[#8FB6C9]/[0.06] hover:shadow-[0_18px_52px_rgba(5,12,22,0.42)]'
             }`}
             aria-expanded={liveOpen}
           >
@@ -101,24 +112,25 @@ export default function RootPage() {
             <div className="relative flex items-center justify-between gap-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.24em] text-[#B8D4E6]/58">LIVE GEORGE</div>
-                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-[#E6F3FA]/90">Real-time support</div>
+                <div className="mt-2 text-[18px] font-semibold tracking-[-0.03em] text-[#E6F3FA]/90">GEORGE LIVE</div>
               </div>
 
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#8FB6C9]/[0.14] text-[18px] text-[#B8D4E6]/56 transition ${liveOpen ? 'rotate-45 bg-[#8FB6C9]/[0.08] text-white' : 'group-hover:text-white/84'}`}>
-                +
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full border border-[#8FB6C9]/[0.14] bg-black/30 text-[14px] text-[#B8D4E6]/56 transition-all duration-300 ${liveOpen ? 'rotate-45 bg-[#8FB6C9]/[0.08] text-white' : 'group-hover:text-white/84'}`}>
+                <span className="translate-y-[-1px]">⌄</span>
               </div>
             </div>
 
             <div className={`relative grid transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${liveOpen ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
               <div className="overflow-hidden">
                 <p className="text-[14px] leading-6 text-white/66">
-                  Use LIVE when the room matters: interviews, negotiations, calls, meetings, conflict, presentations, or any moment where timing and words count.
+                  Real-time conversational support when timing, pressure, and words matter.
                 </p>
 
                 <div className="mt-4 grid gap-2 text-[12px] text-white/48">
-                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Timing. Pressure. The next useful line.</div>
-                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Use one earbud. Let GEORGE track the room.</div>
-                  <div className="rounded-[0.75rem] border border-[#8FB6C9]/[0.08] bg-black/20 px-3 py-2">Prepare the room first, or enter quickly.</div>
+                  <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Conversational recovery</div>
+                  <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Pressure navigation</div>
+                  <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Bluetooth earbuds, glasses, or text</div>
+                  <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-black/24 px-3 py-2.5 backdrop-blur-md">Tactical pacing + response shaping</div>
                 </div>
               </div>
             </div>
