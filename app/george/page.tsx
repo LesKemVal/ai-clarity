@@ -5642,7 +5642,11 @@ ${simplifyTarget}`
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
-                    <HeadsetOperatorIcon className="h-[16px] w-[16px]" />
+                    <img
+                      src="/newearbudicon.png"
+                      alt=""
+                      className="h-[18px] w-[18px] object-contain opacity-80"
+                    />
                   </button>
                 </div>
               </div>
