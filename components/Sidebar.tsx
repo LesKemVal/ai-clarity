@@ -332,7 +332,7 @@ return (
             <div className="mt-3 rounded-[1rem] border border-white/[0.03] bg-black/24 px-3 py-3.5 backdrop-blur-[14px]">
               <div className="truncate text-[13px] font-medium tracking-[-0.01em] text-white/88">
                 {identityAuthenticated
-                  ? maskAccountEmail(identityEmail)
+                  ? 'GEORGE account'
                   : 'Guest access'}
               </div>
 

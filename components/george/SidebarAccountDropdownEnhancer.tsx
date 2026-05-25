@@ -132,7 +132,7 @@ export default function SidebarAccountDropdownEnhancer() {
   const top = Math.max(12, anchor.top + anchor.height + 8)
   const left = Math.max(12, anchor.left)
   const width = Math.max(224, Math.min(260, anchor.width))
-  const label = authenticated ? maskEmail(email) : 'Guest access'
+  const label = authenticated ? 'GEORGE account' : 'Guest access'
 
   const actionRow =
     'block w-full rounded-[0.78rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.06] hover:text-white'

@@ -101,7 +101,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       theme: 'night',
       variables: {
         colorPrimary: '#AAB4FF',
-        colorBackground: '#080A0F',
+        colorBackground: '#0B0D12',
         colorText: '#E7EAF7',
         colorDanger: '#FCA5A5',
         colorSuccess: '#8FE7B0',
@@ -109,9 +109,9 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
         colorTextPlaceholder: 'rgba(231,234,247,0.24)',
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-        fontSizeBase: '13px',
-        spacingUnit: '2.5px',
-        borderRadius: '10px',
+        fontSizeBase: '14px',
+        spacingUnit: '3px',
+        borderRadius: '12px',
       },
       rules: {
         '.Input': {
@@ -203,11 +203,12 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
 
       const paymentElement = stripeElements.create('payment', {
         layout: {
-          type: 'tabs',
+          type: 'accordion',
           defaultCollapsed: false,
-          radios: false,
+          radios: true,
           spacedAccordionItems: false,
         },
+        paymentMethodOrder: ['cashapp', 'card', 'link'],
         defaultValues: targetEmail.trim() ? { billingDetails: { email: targetEmail.trim() } } : undefined,
         wallets: {
           applePay: 'never',
@@ -277,24 +278,21 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
 
   return (
     <div className="w-full">
-      <div className="relative w-full overflow-hidden rounded-[0.9rem] border border-white/[0.03] bg-white/[0.008] shadow-[0_18px_48px_rgba(0,0,0,0.22)]">
+      <div className="relative w-full overflow-hidden rounded-[1rem] border border-white/[0.035] bg-[#0B0D12] shadow-[0_24px_70px_rgba(0,0,0,0.46)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(170,180,255,0.055),transparent_26%),radial-gradient(circle_at_84%_18%,rgba(126,201,218,0.035),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_42%)]" />
 
-        <div className="relative border-b border-white/[0.045] px-5 py-4">
+        <div className="relative border-b border-white/[0.04] px-4 py-3 md:px-5 md:py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.30em] text-[#C9D0FF]/48">
                 Runtime activation
               </p>
               <div>
-                <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.045em] text-white">
+                <h2 className="text-[1.35rem] font-semibold leading-tight tracking-[-0.04em] text-white md:text-[1.6rem]">
                   {copy.label}
                 </h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
+                <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-white/46">
                   {copy.line}
-                </p>
-                <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-[#C9D0FF]/38">
-                  {copy.descriptor}
                 </p>
               </div>
             </div>
@@ -309,8 +307,8 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           </div>
         </div>
 
-        <form onSubmit={confirmActivation} className="relative space-y-3 px-4 py-4 md:px-5 md:py-5">
-          <div className="rounded-[0.8rem] bg-white/[0.012] p-3.5">
+        <form onSubmit={confirmActivation} className="relative space-y-3 px-3.5 py-3.5 md:px-5 md:py-5">
+          <div className="rounded-[0.85rem] border border-white/[0.035] bg-black/20 p-3">
             <label className="text-[11px] uppercase tracking-[0.18em] text-white/38">
               Continuity email
             </label>
@@ -331,16 +329,16 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
                 Bind continuity
               </button>
             </div>
-            <p className="mt-2 text-xs leading-5 text-white/32">
-              Binds activation to recognition, restoration, and runtime continuity.
+            <p className="mt-2 text-[11px] leading-4 text-white/28">
+              Used only for continuity and restoration.
             </p>
           </div>
 
-          <div className="rounded-[0.8rem] bg-[#07090D]/88 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.018)]">
-            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
+          <div className="rounded-[0.9rem] border border-white/[0.035] bg-[#0B0D12] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.018)] md:p-3">
+            <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/30">
               Payment method
             </p>
-            <div id="george-payment-element" className="min-h-[128px]" />
+            <div id="george-payment-element" className="min-h-[220px]" />
           </div>
 
           {(status || error) && (

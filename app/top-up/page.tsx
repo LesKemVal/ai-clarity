@@ -423,27 +423,31 @@ export default function TopUpPage() {
 
                     {tier.action && tier.checkout && (
                       <div className="mt-4 space-y-3">
-                        <button
-                          type="button"
-                          onClick={() => setActiveCheckout(activeCheckout === tier.checkout ? null : tier.checkout ?? null)}
-                          className={`w-full rounded-[0.7rem] border px-4 py-3 text-sm font-semibold transition ${
-                            featured
-                              ? 'border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.075] text-[#D7DCFF] hover:bg-[#AAB4FF]/[0.11]'
-                              : 'border-white/[0.055] bg-white/[0.014] text-white/72 hover:border-white/[0.10] hover:bg-white/[0.03] hover:text-white/88'
-                          }`}
-                        >
-                          {activeCheckout === tier.checkout ? 'Close purchase' : tier.action}
-                        </button>
+                        {activeCheckout !== tier.checkout && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveCheckout(tier.checkout ?? null)}
+                            className={`w-full rounded-[0.7rem] border px-4 py-3 text-sm font-semibold transition ${
+                              featured
+                                ? 'border-[#AAB4FF]/22 bg-[#AAB4FF]/[0.075] text-[#D7DCFF] hover:bg-[#AAB4FF]/[0.11]'
+                                : 'border-white/[0.055] bg-white/[0.014] text-white/72 hover:border-white/[0.10] hover:bg-white/[0.03] hover:text-white/88'
+                            }`}
+                          >
+                            {tier.action}
+                          </button>
+                        )}
 
                         {activeCheckout === tier.checkout && (
-                          <GeorgePaymentElement
-                            tier={tier.checkout}
-                            onClose={() => setActiveCheckout(null)}
-                            onLegacyCheckout={(checkoutTier) => {
-                              setActiveCheckout(null)
-                              startCheckout(checkoutTier)
-                            }}
-                          />
+                          <div className="lg:col-span-4">
+                            <GeorgePaymentElement
+                              tier={tier.checkout}
+                              onClose={() => setActiveCheckout(null)}
+                              onLegacyCheckout={(checkoutTier) => {
+                                setActiveCheckout(null)
+                                startCheckout(checkoutTier)
+                              }}
+                            />
+                          </div>
                         )}
                       </div>
                     )}
