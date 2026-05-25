@@ -36,6 +36,13 @@ function safeWriteGoalChecks(items: GoalCheckItem[]) {
   window.localStorage.setItem(GEORGE_GOAL_CHECKS_KEY, JSON.stringify(items.slice(0, 30)))
 }
 
+function maskAccountEmail(value: string) {
+  const [name, domain] = value.split('@')
+  if (!name || !domain) return 'GEORGE account'
+  return `${name.slice(0, 2)}••••@${domain}`
+}
+
+
 type SidebarProps = {
   showSidebar?: boolean
   setShowSidebar?: (v: boolean) => void
@@ -325,7 +332,7 @@ return (
             <div className="mt-3 rounded-[1rem] border border-white/[0.03] bg-black/24 px-3 py-3.5 backdrop-blur-[14px]">
               <div className="truncate text-[13px] font-medium tracking-[-0.01em] text-white/88">
                 {identityAuthenticated
-                  ? identityEmail
+                  ? maskAccountEmail(identityEmail)
                   : 'Guest access'}
               </div>
 

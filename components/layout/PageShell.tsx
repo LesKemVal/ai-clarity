@@ -88,7 +88,7 @@ export default function PageShell({
         {withSidebar && showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-30 bg-black/50 xl:hidden"
+            className="fixed inset-0 z-30 bg-black/58 backdrop-blur-[8px] xl:hidden"
           />
         )}
 
