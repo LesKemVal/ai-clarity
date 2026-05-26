@@ -14,7 +14,6 @@ import {
 import {
   normalizeCurrentGeorgeMode,
   getCurrentGeorgeRuntime,
-  shouldApplyLegacyCampaignContext,
   getShelvedCampaignRuntimeNote,
 } from '@/lib/george/chat/current-runtime-policy'
 import {
@@ -62,275 +61,6 @@ type CleanMessage = {
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
 }
 
-type ActiveCampaign = {
-  id?: string
-  name?: string
-  mode?: 'solo' | 'firm'
-  productOrService?: string
-  targetMarket?: string
-  callingFromRegion?: string
-  callingToRegion?: string
-  desiredOutcome?: string
-  assistMode?: 'manual' | 'negotiation' | 'objection_handling' | 'discovery' | 'closing' | 'compliance'
-  deliveryMode?: 'text' | 'audio' | 'both'
-  outputStyle?: 'say_ask_boundary_close' | 'short_cues' | 'repeatable_lines'
-  assistTone?: 'calm' | 'direct' | 'assertive' | 'firm' | 'warm' | 'neutral'
-  successSignal?: string
-  currentGoal?: string
-  complianceBoundaries?: string
-  requiredLanguage?: string[]
-  forbiddenClaims?: string[]
-  timingRules?: string[]
-  qualificationRules?: string[]
-  dataToPreserve?: string[]
-  defaultAnswersEnabled?: boolean
-  performance?: {
-    wins?: number
-    losses?: number
-    followUps?: number
-    calls?: number
-    objections?: number
-    callbacks?: number
-    closes?: number
-    weakSpots?: string[]
-    history?: Array<{ signal?: string; context?: string | null; ts?: number; duration?: number | null }>
-  }
-} | null
-
-function getOutputStyleRules(activeCampaign: ActiveCampaign) {
-  const outputStyle = activeCampaign?.outputStyle || 'short_cues'
-
-  if (outputStyle === 'repeatable_lines') {
-    return `OUTPUT STYLE ENFORCEMENT
-- Output style: repeatable_lines
-- Give exact full sentences the user can say out loud.
-- Keep lines natural, clean, socially calibrated, and usable immediately.
-- If resistance, hesitation, or stress is present, label the emotional subtext before the ask.
-- Do not explain unless the user asks why.
-- Cue should include delivery instruction when useful, such as [PAUSE], [SINCERE / LOWER VOLUME], [CALM / PEER], [INQUISITIVE], or [SOFTEN].
-- Prefer:
-Say:
-Backup:
-Cue:`
-  }
-
-  if (outputStyle === 'say_ask_boundary_close') {
-    return `OUTPUT STYLE ENFORCEMENT
-- Output style: say_ask_boundary_close
-- Structure the response exactly as:
-Say:
-Ask:
-Boundary:
-Close:
-- Keep each line short, human, and usable.
-- If emotional resistance is present, the Say line should label the concern before moving.
-- Do not add extra sections.`
-  }
-
-  return `OUTPUT STYLE ENFORCEMENT
-- Output style: short_cues
-- Give short live cues, not paragraphs.
-- Prefer fragments, timing signals, and next-move guidance.
-- Use [PAUSE] or [LISTEN] when silence is strongest.
-- Do not explain unless the user asks.`
-}
-
-function getCampaignContextBlock(activeCampaign: ActiveCampaign, campaignDefaultsEnabled: boolean) {
-  if (!activeCampaign) {
-    return campaignDefaultsEnabled
-      ? `CAMPAIGN DEFAULTS
-- No active campaign is selected.
-- If the user is in a professional, sales, calling, fundraising, appointment-setting, or live conversation context, use best-practice defaults.
-- Keep words and cues in the user's mouth.
-- Do not wait for a perfect setup before helping.
-- Ask only the next highest-leverage question when details are missing.`
-      : ''
-  }
-
-  const dataToPreserve = Array.isArray(activeCampaign.dataToPreserve) && activeCampaign.dataToPreserve.length
-    ? activeCampaign.dataToPreserve.join(', ')
-    : 'objections, callbacks, hot leads, winning lines, personal notes, best call times, compliance boundaries, and outcomes'
-
-  const requiredLanguage = Array.isArray(activeCampaign.requiredLanguage) && activeCampaign.requiredLanguage.length
-    ? activeCampaign.requiredLanguage.join(', ')
-    : 'none provided'
-
-  const forbiddenClaims = Array.isArray(activeCampaign.forbiddenClaims) && activeCampaign.forbiddenClaims.length
-    ? activeCampaign.forbiddenClaims.join(', ')
-    : 'guaranteed returns, unverified approvals, price before qualification, cancellation promises unless true, and claims outside verified campaign rules'
-
-  const timingRules = Array.isArray(activeCampaign.timingRules) && activeCampaign.timingRules.length
-    ? activeCampaign.timingRules.join(', ')
-    : 'qualify before pricing, confirm need before closing, preserve callback commitments'
-
-  const qualificationRules = Array.isArray(activeCampaign.qualificationRules) && activeCampaign.qualificationRules.length
-    ? activeCampaign.qualificationRules.join(', ')
-    : 'ask enough qualifying questions before making strong claims or moving to close'
-
-  return `ACTIVE CAMPAIGN
-- Campaign name: ${activeCampaign.name || 'Unnamed campaign'}
-- Mode: ${activeCampaign.mode || 'solo'}
-- Product/service: ${activeCampaign.productOrService || 'not provided'}
-- Target market: ${activeCampaign.targetMarket || 'not provided'}
-- Calling from region: ${activeCampaign.callingFromRegion || 'not provided'}
-- Calling to region: ${activeCampaign.callingToRegion || 'not provided'}
-- Desired outcome: ${activeCampaign.desiredOutcome || 'not provided'}
-- Current goal: ${activeCampaign.currentGoal || activeCampaign.desiredOutcome || 'not provided'}
-- Assist mode: ${activeCampaign.assistMode || 'manual'}
-- Delivery mode: ${activeCampaign.deliveryMode || 'text'}
-- Output style: ${activeCampaign.outputStyle || 'short_cues'}
-- Assist tone: ${activeCampaign.assistTone || 'direct'}
-- Success signal: ${activeCampaign.successSignal || 'not provided'}
-- Performance math:
-  Calls/attempts: ${activeCampaign.performance?.calls || 0}
-  Wins/closes: ${activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0}
-  Losses: ${activeCampaign.performance?.losses || 0}
-  Follow-ups/rain-checks: ${activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0}
-  Objections detected: ${activeCampaign.performance?.objections || 0}
-  Close rate: ${(() => {
-    const calls = activeCampaign.performance?.calls || 0
-    const wins = activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0
-    return calls > 0 ? `${Math.round((wins / calls) * 100)}%` : 'not enough data'
-  })()}
-  Follow-up rate: ${(() => {
-    const calls = activeCampaign.performance?.calls || 0
-    const followUps = activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0
-    return calls > 0 ? `${Math.round((followUps / calls) * 100)}%` : 'not enough data'
-  })()}
-  Loss rate: ${(() => {
-    const calls = activeCampaign.performance?.calls || 0
-    const losses = activeCampaign.performance?.losses || 0
-    return calls > 0 ? `${Math.round((losses / calls) * 100)}%` : 'not enough data'
-  })()}
-
-- Weak spot diagnosis:
-  ${(() => {
-    const history = activeCampaign.performance?.history || []
-    const weakSpots = activeCampaign.performance?.weakSpots || []
-    const objections = activeCampaign.performance?.objections || 0
-    const callbacks = activeCampaign.performance?.callbacks || activeCampaign.performance?.followUps || 0
-    const closes = activeCampaign.performance?.closes || activeCampaign.performance?.wins || 0
-    const losses = activeCampaign.performance?.losses || 0
-
-    if (weakSpots.length) {
-      return `Known weak spots: ${weakSpots.slice(0, 5).join(', ')}. Compensate before the user reaches that point.`
-    }
-
-    if (callbacks > closes && callbacks >= losses) {
-      return "Likely weak spot: accepting delay too easily. Push for a decision or scheduled commitment before fallback."
-    }
-
-    if (objections > closes) {
-      return "Likely weak spot: objection control. Isolate the objection, reframe value, then reattempt the close."
-    }
-
-    if (losses > closes) {
-      return "Likely weak spot: weak opening or poor qualification. Tighten the opening, identify decision power faster, and avoid pitching before need is clear."
-    }
-
-    if (history.length < 3) {
-      return "Not enough weak-spot data yet. Watch for hesitation, objections, delays, and missed closing moments."
-    }
-
-    return "No dominant weak spot detected. Keep collecting outcomes and preserve what works."
-  })()}
-- Streak detection:
-  ${(() => {
-    const history = activeCampaign.performance?.history || []
-    if (history.length < 3) return "No streak detected."
-
-    const recent = history.slice(0, 5).map(h => h.signal)
-
-    let streakType = null
-    let streakCount = 1
-
-    for (let i = 1; i < recent.length; i++) {
-      if (recent[i] === recent[0]) {
-        streakCount++
-      } else {
-        break
-      }
-    }
-
-    if (streakCount >= 3) {
-      streakType = recent[0]
-    }
-
-    if (streakType === "LOSS") {
-      return "Loss streak detected. Change behavior immediately. Tighten control, reduce passive language, and push for decision earlier."
-    }
-
-    if (streakType === "FOLLOW_UP") {
-      return "Follow-up streak detected. Stop allowing delay. Push for commitment and reduce soft exits."
-    }
-
-    if (streakType === "WIN") {
-      return "Win streak detected. Reinforce current structure. Maintain pressure and consistency."
-    }
-
-    return "No strong streak. Continue normal adaptive behavior."
-  })()}
-- Pacing intelligence:
-  ${(() => {
-    const history = activeCampaign.performance?.history || []
-    if (history.length < 3) return "Not enough pacing data yet."
-
-    const recent = history.slice(0, 5)
-    const avgDuration = recent.reduce((sum, h) => sum + (h.duration || 0), 0) / recent.length
-
-    if (avgDuration < 60000) return "Fast attempts detected. Maintain pressure but avoid rushing past key objections."
-    if (avgDuration > 180000) return "Slow pacing detected. Tighten conversations and push toward decisions sooner."
-    return "Balanced pacing. Maintain control and continue applying pressure intelligently."
-  })()}
-- Performance behavior directive:
-  ${(() => {
-    const calls = activeCampaign.performance?.calls || 0
-    const wins = activeCampaign.performance?.wins || activeCampaign.performance?.closes || 0
-    const losses = activeCampaign.performance?.losses || 0
-    const followUps = activeCampaign.performance?.followUps || activeCampaign.performance?.callbacks || 0
-    const objections = activeCampaign.performance?.objections || 0
-
-    if (calls < 3) return "Not enough data yet. Use strong best-practice closing behavior, collect clean outcomes, and avoid pretending the pattern is proven."
-    if (wins >= losses && wins >= followUps) return "Winning pattern detected. Preserve the strongest structure, keep pressure intelligent, and do not over-change the script."
-    if (followUps > wins && followUps >= losses) return "Too many rain-checks/follow-ups. Tighten the close, ask for commitment sooner, and stop accepting passive delay too early."
-    if (losses > wins) return "Loss pattern detected. Change behavior earlier: clarify need, isolate objection, reframe value, and push for a decision before fallback."
-    if (objections >= calls) return "Objections are frequent. Prepare objection handling earlier and ask sharper qualifying questions before pitching."
-    return "Performance is mixed. Push for clearer outcomes, keep lines short, and force a measurable next step."
-  })()}
-- Compliance boundaries: ${activeCampaign.complianceBoundaries || 'not provided'}
-- Required language: ${requiredLanguage}
-- Forbidden claims: ${forbiddenClaims}
-- Timing rules: ${timingRules}
-- Qualification rules: ${qualificationRules}
-- Data to preserve: ${dataToPreserve}
-- Campaign defaults enabled: ${campaignDefaultsEnabled ? 'yes' : 'no'}
-
-CAMPAIGN OPERATING RULES
-
-SCRIPT CONSISTENCY RULE
-- If the user asks to reword, rescript, or improve a line:
-  - Check if any of the following changed:
-    - campaign goal
-    - assist mode
-    - constraints
-    - objection type
-    - outcome signal
-  - If nothing meaningful changed:
-    - Return the SAME or nearly identical winning line.
-    - Do NOT fabricate improvement.
-  - If improvement is possible:
-    - Provide a better version and explain briefly why it improves conversion.
-
-- Treat this active campaign as governing context until the user switches campaigns.
-- If fields are missing and defaults are enabled, fill gaps with strong best-practice defaults.
-- Keep practical words, cues, questions, and lines in the user's mouth.
-- Adapt scripts and cues to product, audience, region, desired outcome, and compliance boundaries.
-- Never generate lines that violate forbidden claims, timing rules, qualification rules, or required language.
-- If the user asks for a line that would violate campaign guardrails, rewrite it into a compliant usable line.
-- Do not drift into generic advice when campaign context exists.
-- For sales/calling contexts, prioritize openers, screeners/gatekeepers, objection counters, close timing, callbacks, and follow-up lines.
-- Encourage disciplined call volume without becoming reckless or ignoring compliance.`
-}
 
 function getPromptContextBlock(
   promptContext: string | null,
@@ -1149,15 +879,6 @@ export async function POST(req: Request) {
         ? body.contextTurnCount
         : 0
 
-    const activeCampaign =
-      body?.activeCampaign && typeof body.activeCampaign === 'object'
-        ? body.activeCampaign as ActiveCampaign
-        : null
-
-    const campaignDefaultsEnabled =
-      typeof body?.campaignDefaultsEnabled === 'boolean'
-        ? body.campaignDefaultsEnabled
-        : true
 
     const tier =
       body?.tier === 'intelligent' || body?.tier === 'brilliant'
@@ -1230,10 +951,6 @@ LANGUAGE MODE: SPANISH
 
     const mode: GeorgeMode = normalizeCurrentGeorgeMode(body?.mode)
     const currentRuntime = getCurrentGeorgeRuntime(mode)
-    const legacyCampaignContextAllowed = shouldApplyLegacyCampaignContext({
-      mode,
-      activeCampaign,
-    })
 
     const modeBlock = getGeorgeModeBlock(mode)
     const shelvedCampaignRuntimeNote = getShelvedCampaignRuntimeNote()
@@ -1276,10 +993,6 @@ LANGUAGE MODE: SPANISH
         contextTurnCount,
         tier
       ) + `
-
-${legacyCampaignContextAllowed ? getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled) : ''}
-
-${legacyCampaignContextAllowed ? getOutputStyleRules(activeCampaign) : ''}
 
 MESSAGE SOURCE
 - Latest user message source: ${latestUserSource}
