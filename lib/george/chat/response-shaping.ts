@@ -1,5 +1,6 @@
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
 import type { LiveContextPrimitive } from '@/lib/george/chat/live-context'
+import type { GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 
 // Response shaping owns behavioral posture: how GEORGE should carry itself.
 // Output governance owns visible answer structure: sections, stop rules, and formatting.
@@ -18,15 +19,19 @@ export function getCurrentResponseShape(input: {
   pressureLevel?: string
   liveContext?: LiveContextPrimitive | null
   voiceMode?: boolean
+  runtimeAdapter?: GeorgeRuntimeAdapter | null
 }): GeorgeResponseShape {
   const pressure = String(input.pressureLevel || 'low').toLowerCase()
   const highPressure = pressure === 'high' || pressure === 'medium'
+  const adapter = input.runtimeAdapter || null
+  const adapterCompression = adapter?.shouldCompress || adapter?.responseMode === 'compressed' || adapter?.responseMode === 'live'
+  const adapterLivePressure = adapter?.livePressure || adapter?.responseMode === 'live'
 
   if (input.runtime === 'live_george') {
     return {
       runtime: input.runtime,
-      maxSentences: input.voiceMode ? 2 : highPressure ? 3 : 4,
-      defaultFormat: highPressure ? 'say_backup_cue' : 'word_say_cue_need',
+      maxSentences: input.voiceMode ? 2 : adapterLivePressure ? 2 : highPressure || adapterCompression ? 3 : 4,
+      defaultFormat: highPressure || adapterLivePressure ? 'say_backup_cue' : 'word_say_cue_need',
       posture: input.liveContext
         ? `Operate inside ${input.liveContext.label}. Help the individual user with the current room, not a campaign workflow.`
         : 'Operate as individual LIVE GEORGE. Help the user with the current room, timing, tone, and next move.',
@@ -49,7 +54,7 @@ export function getCurrentResponseShape(input: {
 
   return {
     runtime: input.runtime,
-    maxSentences: highPressure ? 4 : 6,
+    maxSentences: adapterCompression ? 4 : highPressure ? 4 : 6,
     defaultFormat: 'direct',
     posture: 'Operate as normal GEORGE: direction, execution, continuity, and anti-drift support.',
     avoid: [

@@ -719,6 +719,7 @@ LANGUAGE MODE: SPANISH
       pressureLevel: control.pressureLevel,
       liveContext: individualLiveContext,
       voiceMode,
+      runtimeAdapter,
     })
     const responseShapeNote = buildResponseShapeNote(responseShape)
     const continuityDecision = classifyContinuitySignal({
