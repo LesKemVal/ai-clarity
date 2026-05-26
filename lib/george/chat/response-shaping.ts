@@ -1,6 +1,9 @@
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
 import type { LiveContextPrimitive } from '@/lib/george/chat/live-context'
 
+// Response shaping owns behavioral posture: how GEORGE should carry itself.
+// Output governance owns visible answer structure: sections, stop rules, and formatting.
+// Keep these separate unless a future consolidation is deliberately planned.
 export type GeorgeResponseShape = {
   runtime: CurrentGeorgeRuntime
   maxSentences: number
