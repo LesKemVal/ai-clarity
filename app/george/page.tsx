@@ -2022,8 +2022,28 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   ])
 
   const enterLiveMode = () => {
+    const normalMessages = [...messagesRef.current]
+
     preLiveSessionIdRef.current = getActiveSessionIdForMode('normal')
-setPreLiveMessages([...messagesRef.current])
+    setPreLiveMessages(normalMessages)
+
+    if (
+      typeof window !== 'undefined' &&
+      normalMessages.length > 0 &&
+      hasMeaningfulUserMessage(normalMessages)
+    ) {
+      window.localStorage.setItem(
+        GEORGE_LAST_NORMAL_DRAFT,
+        JSON.stringify({
+          messages: normalMessages,
+          conversationMode,
+          activePromptContext,
+          currentTier,
+          updatedAt: Date.now(),
+        })
+      )
+    }
+
     setLiveMode(true)
   }
 
@@ -2041,7 +2061,6 @@ setPreLiveMessages([...messagesRef.current])
     setVoiceOn(false)
     setInteractionMode('text')
     setConversationMode(null)
-window.location.href = '/george'
     setShowConversationMenu(false)
     setConversationMenuLane('selector')
     setShowSessionPicker(false)
@@ -2073,7 +2092,6 @@ window.location.href = '/george'
   // 🔒 CLEAR ANY LIVE CONTEXT FLAGS
   setLiveMode(false)
   setConversationMode(null)
-window.location.href = '/george'
   setActivePromptContext(null)
 
   setMessages(preLiveMessages)
