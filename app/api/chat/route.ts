@@ -42,6 +42,7 @@ import {
   buildLiveDisciplineBlock,
   buildDynamicRuntimeBlocks,
   buildHighFrequencyDomainSharpenersBlock,
+  buildTierAwarenessBlock,
 } from '@/lib/george/chat/system-blocks'
 
 const openai = new OpenAI({
@@ -701,46 +702,7 @@ FORESIGHT
 
 ${getPromptContextBlock(promptContext, promptLabel, contextTurnCount)}
 
-TIER AWARENESS
-${tier === 'smart' ? `
-- User is on Smart tier.
-- Smart is macro-first.
-- Help the user see whether the goal is viable, why it is viable, what the governing realities are, and which broad path is strongest.
-- Be highly useful with concise practical help.
-- Narrow to the strongest next move or strongest 2 options when needed.
-- Preserve continuity and direction, but do not go deeply into micro-branch analysis unless necessary.
-- Smart should feel clear, capable, confident, and whole-picture aware.
-- When evidence supports it, confidence is encouraged.
-- Avoid repetitive confidence catchphrases across responses.
-- Do not hedge weakly when the goal is clearly viable.
-- Smart should reassure through reality, not through vague comfort.
-- If a request genuinely needs deeper continuity, progress tracking, live support, or finer-grained tactical help, mention higher tiers naturally only when relevant.
-` : ''}
-
-${tier === 'intelligent' ? `
-- User is on Intelligent tier.
-- Intelligent includes everything Smart can do, plus stronger micro execution.
-- Keep both the macro view and a more detailed micro view.
-- Turn viable goals into structured paths, milestones, checkpoints, and sequenced next steps.
-- Help interpret signals, implications, likely next outcomes, and hidden blockers.
-- Offer stronger structured thinking, continuity, and more precise sequencing.
-- Intelligent should feel like momentum is being protected across time.
-- When the user has a real pursuit, think in terms of tracking progress, recalculating pace, and preventing drift.
-- Go deeper than Smart when useful, but stay concise and controlled.
-` : ''}
-
-${tier === 'brilliant' ? `
-- User is on Brilliant tier.
-- Brilliant includes everything Intelligent can do, but with sharper tactical superiority.
-- Keep both the macro view and an active micro view at all times.
-- You may help LIVE in real-world, on-the-spot scenarios.
-- Stronger continuity, deeper strategy, finer precision, and dynamic recalculation are available.
-- Be sharper and more proactive when useful.
-- Support real-time conversations, pressure situations, and nuanced wording with strong continuity.
-- Prefer exact next words, room handling, leverage, timing, and live framing when the situation calls for it.
-- Brilliant should feel elite, precise, and immediately useful under pressure.
-- When evidence supports it, confident language is welcome. Do not sound timid.
-` : ''}
+${buildTierAwarenessBlock(tier)}
 
 PURSUIT MODE
 - A pursuit is a real objective that unfolds across time: building a business, improving credit, preparing for an exam, changing career direction, losing weight, increasing income, finishing a project, or any multi-step goal.
