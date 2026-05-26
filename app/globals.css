@@ -720,3 +720,43 @@ main[class*="bg-[#06070A]"] [class*="text-white/34"] {
   );
   animation: georgeComposerSweep 12s cubic-bezier(0.22,1,0.36,1) infinite;
 }
+
+
+@keyframes georgeControlSweep {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+    opacity: 0;
+  }
+
+  16% {
+    opacity: 0.08;
+  }
+
+  50% {
+    opacity: 0.14;
+  }
+
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.pointer-events-auto.relative.flex.h-11::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 24%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(180,220,255,0.04),
+    rgba(180,220,255,0.09),
+    rgba(180,220,255,0.04),
+    transparent
+  );
+  animation: georgeControlSweep 14s cubic-bezier(0.22,1,0.36,1) infinite;
+}

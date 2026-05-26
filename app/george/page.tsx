@@ -5616,7 +5616,7 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
-                <div className="pointer-events-auto flex h-11 items-center justify-center gap-3 rounded-full border border-white/[0.055] bg-[#0B0D12]/84 px-4 py-2 shadow-[0_16px_40px_rgba(0,0,0,0.34)] backdrop-blur-xl md:h-9 md:gap-5 md:px-5 md:py-1.5">
+                <div className="pointer-events-auto relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-full border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.84),rgba(8,14,24,0.74))] px-4 py-2 shadow-[0_18px_42px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(143,182,201,0.035)] backdrop-blur-xl md:h-9 md:gap-5 md:px-5 md:py-1.5">
                   <button
                     type="button"
                     onClick={() => {
