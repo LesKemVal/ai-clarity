@@ -10,8 +10,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ records: [], authenticated: false })
   }
 
+  const records = await getRuntimeUsageRecords(email)
+
   return NextResponse.json({
-    records: getRuntimeUsageRecords(email),
+    records,
     authenticated: true,
     email,
     tier: session.tier,
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Runtime record is required.' }, { status: 400 })
     }
 
-    appendRuntimeUsageRecord(email, record)
+    await appendRuntimeUsageRecord(email, record)
 
     return NextResponse.json({ ok: true })
   } catch {
