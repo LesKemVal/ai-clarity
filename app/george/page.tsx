@@ -5616,14 +5616,14 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
-                <div className="pointer-events-auto flex h-7 items-center justify-center gap-5 rounded-full border border-white/[0.045] bg-[#0B0D12]/78 px-5 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                <div className="pointer-events-auto flex h-11 items-center justify-center gap-3 rounded-full border border-white/[0.055] bg-[#0B0D12]/84 px-4 py-2 shadow-[0_16px_40px_rgba(0,0,0,0.34)] backdrop-blur-xl md:h-9 md:gap-5 md:px-5 md:py-1.5">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveHelpTopic('live')
                       setShowHelpModal(true)
                     }}
-                    className="inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    className="inline-flex h-8 items-center rounded-full px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/56 transition hover:bg-white/[0.03] hover:text-[#D7DBE4]/82 md:h-5 md:px-2 md:text-[10px]"
                   >
                     Help
                   </button>
@@ -5634,7 +5634,7 @@ ${simplifyTarget}`
                       e.stopPropagation()
                       setShowLanguageMenu((prev) => !prev)
                     }}
-                    className="inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    className="inline-flex h-8 items-center rounded-full px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/56 transition hover:bg-white/[0.03] hover:text-[#D7DBE4]/82 md:h-5 md:px-2 md:text-[10px]"
                   >
                     {language}
                   </button>
@@ -5651,14 +5651,14 @@ ${simplifyTarget}`
                       setLoginLinkSent(false)
                       setShowUpgradeModal(true)
                     }}
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-full text-[#B7CDD9]/78 transition hover:bg-white/[0.03] hover:text-white"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.04] bg-white/[0.02] text-[#B7CDD9]/88 transition hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-white md:h-6 md:w-6 md:border-0 md:bg-transparent"
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
                     <img
                       src="/newearbudicon.png"
                       alt=""
-                      className="h-[18px] w-[18px] object-contain opacity-80"
+                      className="h-[22px] w-[22px] object-contain opacity-90 md:h-[18px] md:w-[18px]"
                     />
                   </button>
                 </div>
@@ -6660,7 +6660,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-2.5 top-1/2 z-[2] flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.035] bg-black/24 text-[#D7DBE4]/38 transition hover:border-white/[0.08] hover:bg-white/[0.026] hover:text-[#D7DBE4]/78"
+                        className="absolute left-2.5 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.045] bg-black/28 text-[#D7DBE4]/52 transition hover:border-white/[0.08] hover:bg-white/[0.03] hover:text-[#D7DBE4]/88 md:h-7 md:w-7"
                         aria-label="Upload file"
                       >
                         <svg
@@ -6685,7 +6685,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className="min-h-[44px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-11 pr-[84px] py-2.5 text-[15.5px] leading-[1.5] font-normal tracking-[0em] text-[#D7DBE4]/90 outline-none placeholder:text-[#D7DBE4]/24 focus:ring-0"
+                        className="min-h-[52px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-14 pr-[92px] py-3 text-[16.5px] leading-[1.5] font-normal tracking-[0em] text-[#D7DBE4]/92 outline-none placeholder:text-[#D7DBE4]/26 focus:ring-0 md:min-h-[44px] md:pl-11 md:pr-[84px] md:py-2.5 md:text-[15.5px]"
                       />
 
                       <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
