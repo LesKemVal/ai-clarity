@@ -8,62 +8,59 @@ export default function DesktopOperationalSurface({
   if (!visible) return null
 
   if (mode === 'active') {
-    return (
-      <div className="pointer-events-none fixed inset-x-0 top-[132px] bottom-[178px] z-[18] hidden items-end justify-center md:flex">
-        <div className="relative w-full max-w-[920px] px-10 pb-12">
-          <div className="absolute inset-x-10 bottom-0 h-[180px] rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.045),transparent_64%)]" />
+    const useCases = [
+      ['Draft', 'emails, outreach, replies'],
+      ['Build', 'plans, decks, workflows'],
+      ['Review', 'docs, offers, context'],
+      ['Prepare', 'interviews, calls, rooms'],
+      ['Decide', 'tradeoffs, risk, next move'],
+      ['Execute', 'sequence, simplify, finish'],
+    ]
 
-          <div className="relative mx-auto rounded-[1.25rem] border border-[#8FB6C9]/[0.045] bg-[#08111D]/[0.22] px-7 py-5 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-[10px]">
-            <div className="mb-4 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.055] pb-3">
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/45">
-                  GEORGE operational guide
-                </div>
-                <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/34">
-                  Use the space clearly. GEORGE serves the direction you give it.
+    return (
+      <div className="pointer-events-none fixed inset-x-0 top-[124px] bottom-[178px] z-[18] hidden items-end justify-center md:flex">
+        <div className="relative w-full max-w-[940px] px-10 pb-12 opacity-80 transition-opacity duration-500">
+          <div className="absolute inset-x-10 bottom-0 h-[190px] rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.045),transparent_66%)]" />
+
+          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.06] bg-[#08111D]/[0.32] px-7 py-5 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-[12px]">
+            <div className="mb-4 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.06] pb-3">
+              <div className="flex items-center gap-3">
+                <img src="/logofav.png" alt="" className="h-7 w-7 object-contain opacity-60" />
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/50">
+                    Bx · GEORGE operational guide
+                  </div>
+                  <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/38">
+                    Give direction. Add pressure. Let GEORGE narrow the move.
+                  </div>
                 </div>
               </div>
 
-              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/24">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/26">
                 Direction → Context → Move
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-5 text-left">
-              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
-                <div className="text-[12px] font-medium text-[#D7DBE4]/58">1. State the direction</div>
-                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
-                  Tell GEORGE what you want to build, decide, finish, fix, become, or prepare for.
-                </p>
-              </div>
-
-              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
-                <div className="text-[12px] font-medium text-[#D7DBE4]/58">2. Add useful pressure</div>
-                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
-                  Share timing, constraints, documents, people involved, risk, leverage, or what cannot be missed.
-                </p>
-              </div>
-
-              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
-                <div className="text-[12px] font-medium text-[#D7DBE4]/58">3. Let GEORGE narrow</div>
-                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
-                  GEORGE can draft, sequence, prepare, reframe, review, or move you to the next useful step.
-                </p>
-              </div>
+            <div className="grid grid-cols-3 gap-4 text-left">
+              {[
+                ['1. State the direction', 'What are you trying to build, decide, fix, finish, become, or prepare for?'],
+                ['2. Add useful pressure', 'Share timing, constraints, documents, people involved, risk, leverage, or what cannot be missed.'],
+                ['3. Let GEORGE narrow', 'GEORGE can draft, sequence, prepare, reframe, review, or move you to the next useful step.'],
+              ].map(([title, body]) => (
+                <div key={title} className="rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
+                  <div className="text-[12px] font-medium text-[#D7DBE4]/62">{title}</div>
+                  <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/34">{body}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/36">
-              <span>emails</span>
-              <span>pitch decks</span>
-              <span>negotiation</span>
-              <span>documents</span>
-              <span>career moves</span>
-              <span>funding</span>
-              <span>execution plans</span>
-              <span className="inline-flex items-center gap-1.5">
-                <img src="/newearbudicon.png" alt="" className="h-[13px] w-[13px] object-contain opacity-55" />
-                live pressure
-              </span>
+            <div className="mt-4 grid grid-cols-6 gap-2">
+              {useCases.map(([title, body]) => (
+                <div key={title} className="rounded-[0.8rem] border border-[#8FB6C9]/[0.045] bg-[#8FB6C9]/[0.025] px-3 py-2 text-center">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#8FB6C9]/48">{title}</div>
+                  <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/28">{body}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -73,10 +70,10 @@ export default function DesktopOperationalSurface({
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-[142px] bottom-[180px] z-[18] hidden items-center justify-center md:flex">
-      <div className="relative w-full max-w-[980px] px-10">
+      <div className="relative w-full max-w-[980px] px-10 opacity-80 transition-opacity duration-500">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.08),transparent_58%)]" />
 
-        <div className="relative text-center transition-opacity duration-500">
+        <div className="relative text-center">
           <div className="text-[82px] font-[260] tracking-[0.34em] text-[#D7DBE4]/[0.045]">
             GEORGE
           </div>

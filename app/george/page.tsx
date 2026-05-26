@@ -4432,9 +4432,7 @@ responseTimerRef.current = setTimeout(() => {
 
   const showDesktopOperationalSurface =
     !liveMode &&
-    !hasUserMessageForSurface &&
-    typeof window !== 'undefined' &&
-    window.innerWidth >= 768
+    !hasUserMessageForSurface
 
 
   const showTypingPrescription =
