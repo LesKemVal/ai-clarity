@@ -1,3 +1,5 @@
+import { getRedis } from '@/lib/storage/redis'
+
 const buckets = new Map<string, { count: number; resetAt: number }>()
 
 export function checkRateLimit(input: {
@@ -36,6 +38,33 @@ export function checkRateLimit(input: {
     ok: true,
     remaining: Math.max(0, input.limit - bucket.count),
     resetAt: bucket.resetAt,
+  }
+}
+
+export async function checkRateLimitAsync(input: {
+  key: string
+  limit: number
+  windowMs: number
+}) {
+  try {
+    const redis = getRedis()
+    const key = `george:rate-limit:${input.key}`
+    const count = await redis.incr(key)
+
+    if (count === 1) {
+      await redis.pExpire(key, input.windowMs)
+    }
+
+    const ttl = await redis.pTTL(key)
+    const resetAt = Date.now() + Math.max(0, ttl)
+
+    return {
+      ok: count <= input.limit,
+      remaining: Math.max(0, input.limit - count),
+      resetAt,
+    }
+  } catch {
+    return checkRateLimit(input)
   }
 }
 
