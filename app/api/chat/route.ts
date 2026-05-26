@@ -29,6 +29,10 @@ import {
   classifyContinuitySignal,
   buildContinuityGovernanceNote,
 } from '@/lib/george/chat/continuity-governance'
+import {
+  getOutputGovernance,
+  buildOutputGovernanceNote,
+} from '@/lib/george/chat/output-governance'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1251,12 +1255,19 @@ LANGUAGE MODE: SPANISH
       source: latestUserSource,
     })
     const continuityGovernanceNote = buildContinuityGovernanceNote(continuityDecision)
+    const outputGovernance = getOutputGovernance({
+      runtime: currentRuntime,
+      pressureLevel: control.pressureLevel,
+      voiceMode,
+    })
+    const outputGovernanceNote = buildOutputGovernanceNote(outputGovernance)
 
     const systemContent = languageRule + modeBlock +
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
       (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
+      (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
