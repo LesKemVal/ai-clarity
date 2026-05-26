@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createContinuityToken } from '@/lib/continuity/token-store'
 import { sendContinuityEmail } from '@/lib/continuity/send-continuity-email'
-import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
+import { checkRateLimitAsync, getRequestIdentity } from '@/lib/security/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
-    const rate = checkRateLimit({
+    const rate = await checkRateLimitAsync({
       key: `continuity-request:${getRequestIdentity(req)}`,
       limit: 6,
       windowMs: 15 * 60_000,
