@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   try {
     if (email && email.includes('@')) {
-      upsertSubscriber({
+      await upsertSubscriber({
         email,
         currentTier: tier,
       })
