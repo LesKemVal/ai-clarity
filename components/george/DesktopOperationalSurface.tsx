@@ -18,25 +18,25 @@ export default function DesktopOperationalSurface({
     ]
 
     return (
-      <div className="pointer-events-none fixed inset-x-0 top-[124px] bottom-[178px] z-[18] hidden items-end justify-center md:flex">
-        <div className="relative w-full max-w-[940px] px-10 pb-12 opacity-80 transition-opacity duration-500">
+      <div className="pointer-events-none fixed inset-x-0 top-[118px] bottom-[205px] z-[18] hidden items-end justify-center md:flex">
+        <div className="relative w-full max-w-[940px] px-10 pb-5 opacity-82 transition-opacity duration-500">
           <div className="absolute inset-x-10 bottom-0 h-[190px] rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.045),transparent_66%)]" />
 
-          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.06] bg-[#08111D]/[0.32] px-7 py-5 shadow-[0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-[12px]">
+          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.065] bg-[#08111D]/[0.35] px-7 py-5 shadow-[0_20px_70px_rgba(0,0,0,0.30)] backdrop-blur-[12px]">
             <div className="mb-4 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.06] pb-3">
               <div className="flex items-center gap-3">
-                <img src="/logofav.png" alt="" className="h-7 w-7 object-contain opacity-60" />
+                <img src="/logofav.png" alt="" className="h-8 w-8 object-contain opacity-68" />
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/50">
-                    Bx · GEORGE operational guide
+                  <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/52">
+                    Bx · How to use GEORGE
                   </div>
-                  <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/38">
+                  <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/40">
                     Give direction. Add pressure. Let GEORGE narrow the move.
                   </div>
                 </div>
               </div>
 
-              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/26">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/28">
                 Direction → Context → Move
               </div>
             </div>
@@ -47,18 +47,18 @@ export default function DesktopOperationalSurface({
                 ['2. Add useful pressure', 'Share timing, constraints, documents, people involved, risk, leverage, or what cannot be missed.'],
                 ['3. Let GEORGE narrow', 'GEORGE can draft, sequence, prepare, reframe, review, or move you to the next useful step.'],
               ].map(([title, body]) => (
-                <div key={title} className="rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
-                  <div className="text-[12px] font-medium text-[#D7DBE4]/62">{title}</div>
-                  <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/34">{body}</p>
+                <div key={title} className="rounded-[1rem] border border-white/[0.045] bg-black/22 px-4 py-3">
+                  <div className="text-[12px] font-medium text-[#D7DBE4]/64">{title}</div>
+                  <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/36">{body}</p>
                 </div>
               ))}
             </div>
 
             <div className="mt-4 grid grid-cols-6 gap-2">
               {useCases.map(([title, body]) => (
-                <div key={title} className="rounded-[0.8rem] border border-[#8FB6C9]/[0.045] bg-[#8FB6C9]/[0.025] px-3 py-2 text-center">
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#8FB6C9]/48">{title}</div>
-                  <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/28">{body}</div>
+                <div key={title} className="rounded-[0.8rem] border border-[#8FB6C9]/[0.05] bg-[#8FB6C9]/[0.03] px-3 py-2 text-center">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#8FB6C9]/52">{title}</div>
+                  <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/31">{body}</div>
                 </div>
               ))}
             </div>
@@ -69,24 +69,24 @@ export default function DesktopOperationalSurface({
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[142px] bottom-[180px] z-[18] hidden items-center justify-center md:flex">
-      <div className="relative w-full max-w-[980px] px-10 opacity-80 transition-opacity duration-500">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.08),transparent_58%)]" />
+    <div className="pointer-events-none fixed inset-x-0 top-[130px] bottom-[230px] z-[18] hidden items-center justify-center md:flex">
+      <div className="relative w-full max-w-[980px] px-10 opacity-74 transition-opacity duration-500">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.07),transparent_58%)]" />
 
         <div className="relative text-center">
-          <div className="text-[82px] font-[260] tracking-[0.34em] text-[#D7DBE4]/[0.045]">
+          <div className="text-[82px] font-[260] tracking-[0.34em] text-[#D7DBE4]/[0.04]">
             GEORGE
           </div>
 
-          <div className="mt-4 text-[15px] font-light tracking-[0.12em] text-[#D7DBE4]/26">
+          <div className="mt-4 text-[15px] font-light tracking-[0.12em] text-[#D7DBE4]/24">
             Direction sharpens when the room becomes real.
           </div>
 
-          <div className="mx-auto mt-10 max-w-[820px] text-[17px] font-[300] leading-[1.8] tracking-[0.02em] text-[#D7DBE4]/16">
+          <div className="mx-auto mt-9 max-w-[820px] text-[17px] font-[300] leading-[1.75] tracking-[0.02em] text-[#D7DBE4]/14">
             Build carefully. Move deliberately. Let pressure reveal structure instead of fear.
           </div>
 
-          <div className="mx-auto mt-12 flex max-w-[860px] flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/34">
+          <div className="mx-auto mt-10 flex max-w-[860px] flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/30">
             <span>trajectory awareness</span>
             <span>room pressure</span>
             <span>execution sequencing</span>
