@@ -215,17 +215,12 @@ export function updateActiveSessionMessages(
   mode: GeorgeSessionMode = getActiveMode(),
   metadataUpdates: GeorgeStoredSessionMetadata = {}
 ) {
-  // --- session intelligence extraction ---
-  let userGoal = undefined
+  // Session messages can update operational state, but they must not silently become goals.
+  // Goals require explicit user classification elsewhere in the product flow.
   let lastKnownState = undefined
 
   try {
-    const lastUser = [...messages].reverse().find(m => m.role === 'user')
     const lastAssistant = [...messages].reverse().find(m => m.role === 'assistant')
-
-    if (lastUser?.content) {
-      userGoal = lastUser.content.slice(0, 120)
-    }
 
     if (lastAssistant?.content) {
       lastKnownState = lastAssistant.content.slice(0, 120)
@@ -242,9 +237,8 @@ export function updateActiveSessionMessages(
           ...session,
           messages,
           updatedAt: Date.now(),
-          userGoal: userGoal || session.userGoal,
           lastKnownState: lastKnownState || session.lastKnownState,
-          title: generateSessionTitle(userGoal || session.userGoal, lastKnownState || session.lastKnownState),
+          title: generateSessionTitle(session.userGoal, lastKnownState || session.lastKnownState),
           metadata: {
             ...(session.metadata || {}),
             ...metadataUpdates,
