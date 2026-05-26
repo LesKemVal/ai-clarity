@@ -255,8 +255,6 @@ ${getGeorgeIdentityRuntime()}
 
 ${getObjectiveEngagementRuntime()}
 
-${buildHighFrequencyDomainSharpenersBlock()}
-
 ${isFirstSession ? 'This is the first interaction. Do not introduce GEORGE or explain the system unless asked. Respond with presence, brevity, and control.' : ''}
 
 IDENTITY
@@ -473,6 +471,8 @@ RESPONSE DEFAULT
 
 
 
+
+${buildHighFrequencyDomainSharpenersBlock()}
 
 CORE STANDARD
 - Answer what the user actually asked first.
