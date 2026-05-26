@@ -97,8 +97,5 @@ export async function verifyContinuityToken(tokenInput: unknown) {
   return {
     email: subscriber.email,
     currentTier: subscriber.currentTier,
-    lastCheckoutSessionId: subscriber.lastCheckoutSessionId,
-    lastSubscriptionId: subscriber.lastSubscriptionId,
-    lastCustomerId: subscriber.stripeCustomerId,
   }
 }
