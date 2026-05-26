@@ -1459,15 +1459,6 @@ ${steeringLine}` : ''}`
       }
     }
 
-    if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
-      skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
-      setMessages(activeSession.messages)
-      messagesRef.current = activeSession.messages
-      normalSessionWriteReadyRef.current = true
-      return
-    }
-
     if (
       transientDraft &&
       Array.isArray(transientDraft.messages) &&
@@ -1487,6 +1478,15 @@ ${steeringLine}` : ''}`
         setActivePromptContext(transientDraft.activePromptContext)
       }
 
+      normalSessionWriteReadyRef.current = true
+      return
+    }
+
+    if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+      skipNextTypewriterRef.current = true
+      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
+      setMessages(activeSession.messages)
+      messagesRef.current = activeSession.messages
       normalSessionWriteReadyRef.current = true
       return
     }
@@ -2021,14 +2021,12 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     { role: 'assistant', content: 'Bring the situation. I’ll help narrow what matters and what to do next.' },
   ])
 
-  const enterLiveMode = () => {
+  const preserveNormalDraft = () => {
+    if (typeof window === 'undefined') return
+
     const normalMessages = [...messagesRef.current]
 
-    preLiveSessionIdRef.current = getActiveSessionIdForMode('normal')
-    setPreLiveMessages(normalMessages)
-
     if (
-      typeof window !== 'undefined' &&
       normalMessages.length > 0 &&
       hasMeaningfulUserMessage(normalMessages)
     ) {
@@ -2043,6 +2041,14 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
         })
       )
     }
+  }
+
+  const enterLiveMode = () => {
+    const normalMessages = [...messagesRef.current]
+
+    preLiveSessionIdRef.current = getActiveSessionIdForMode('normal')
+    setPreLiveMessages(normalMessages)
+    preserveNormalDraft()
 
     setLiveMode(true)
   }
@@ -2126,6 +2132,10 @@ if (messagesRef.current.length > 2) {
 }
 
 setPreLiveMessages(null)
+
+    if (typeof window !== 'undefined' && window.location.pathname === '/george/live') {
+      router.replace('/george')
+    }
   }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
@@ -4632,7 +4642,8 @@ return (
           liveMode={liveMode}
             onOpenLiveGate={() => {
               setShowSidebar(false)
-              window.location.href = '/george/live-entry'
+              preserveNormalDraft()
+          window.location.href = '/george/live-entry'
             }}
             onOpenLogin={() => {
               setShowSidebar(false)
@@ -7289,6 +7300,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         hasLiveSession={getSessionsForMode('live').some((session) => hasMeaningfulUserMessage(session.messages || []))}
         onClose={() => setShowLiveChooser(false)}
         onStartLiveConversation={() => {
+          preserveNormalDraft()
           setShowLiveChooser(false)
 
           window.localStorage.setItem('george_fresh_live_entry', '1')
@@ -7302,6 +7314,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           window.localStorage.removeItem('george_active_context')
           window.localStorage.removeItem('george_active_label')
 
+          preserveNormalDraft()
           window.location.href = '/george/live-entry'
         }}
         onResumeLiveConversation={() => {
