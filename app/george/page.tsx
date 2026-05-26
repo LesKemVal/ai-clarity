@@ -28,6 +28,8 @@ import {
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
 
+const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
+
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
   'Say “shorter” if you want compressed responses.',
@@ -1269,6 +1271,28 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     if (forceLive && liveParam !== 'segue') {
       normalSessionBootedRef.current = true
+
+      if (typeof window !== 'undefined') {
+        const existingNormalMessages = messagesRef.current
+
+        if (
+          Array.isArray(existingNormalMessages) &&
+          existingNormalMessages.length > 0 &&
+          hasMeaningfulUserMessage(existingNormalMessages)
+        ) {
+          window.localStorage.setItem(
+            GEORGE_LAST_NORMAL_DRAFT,
+            JSON.stringify({
+              messages: existingNormalMessages,
+              conversationMode,
+              activePromptContext,
+              currentTier,
+              updatedAt: Date.now(),
+            })
+          )
+        }
+      }
+
       setActiveMode('live')
       setMessages([])
       messagesRef.current = []
@@ -1420,12 +1444,49 @@ ${steeringLine}` : ''}`
         ? getLatestSubscriberSession(subscriberEmail, 'normal')
         : null)
 
+    let transientDraft: {
+      messages?: Message[]
+      conversationMode?: string
+      activePromptContext?: string
+    } | null = null
+
+    if (typeof window !== 'undefined') {
+      try {
+        const rawDraft = window.localStorage.getItem(GEORGE_LAST_NORMAL_DRAFT)
+        transientDraft = rawDraft ? JSON.parse(rawDraft) : null
+      } catch {
+        transientDraft = null
+      }
+    }
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
       skipNextTypewriterRef.current = true
       restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
       setMessages(activeSession.messages)
       messagesRef.current = activeSession.messages
+      normalSessionWriteReadyRef.current = true
+      return
+    }
+
+    if (
+      transientDraft &&
+      Array.isArray(transientDraft.messages) &&
+      transientDraft.messages.length > 0
+    ) {
+      skipNextTypewriterRef.current = true
+      restoredMessagesSignatureRef.current = getMessagesSignature(transientDraft.messages)
+
+      setMessages(transientDraft.messages)
+      messagesRef.current = transientDraft.messages
+
+      if (typeof transientDraft.conversationMode === 'string') {
+        setConversationMode(transientDraft.conversationMode as typeof conversationMode)
+      }
+
+      if (typeof transientDraft.activePromptContext === 'string') {
+        setActivePromptContext(transientDraft.activePromptContext)
+      }
+
       normalSessionWriteReadyRef.current = true
       return
     }
