@@ -39,6 +39,7 @@ import {
   buildScoreAwareSteeringBlock,
   buildConversationEngineRulesBlock,
   buildUniversalLiveOpeningBlock,
+  buildDynamicRuntimeBlocks,
 } from '@/lib/george/chat/system-blocks'
 
 const openai = new OpenAI({
@@ -992,6 +993,13 @@ LANGUAGE MODE: SPANISH
     const scoreAwareSteeringBlock = buildScoreAwareSteeringBlock()
     const conversationEngineRulesBlock = buildConversationEngineRulesBlock()
     const universalLiveOpeningBlock = buildUniversalLiveOpeningBlock()
+    const dynamicRuntimeBlocks = buildDynamicRuntimeBlocks({
+      bottleneck,
+      cadenceAvoid,
+      builderSubtype,
+      tier,
+      liveScenario,
+    })
 
     const systemContent = languageRule + modeBlock +
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
@@ -1201,48 +1209,7 @@ ANTI-GENERIC RULE
 
 
 
-BOTTLENECK SIGNAL
-- Likely bottleneck: ${bottleneck.label}
-- Confidence: ${bottleneck.confidence}
-- If confidence is high, often lead with the bottleneck early.
-- If confidence is medium, test it lightly.
-- If confidence is low, do not force diagnosis.
-
-CADENCE CONTROL
-- Avoid repeating these recent patterns: ${cadenceAvoid.join(', ') || 'none'}
-- Use fresh openings, varied sentence rhythm, and alternate structures.
-- Do not sound templated across turns.
-
-BUILDER MODE RUNTIME
-- Builder subtype: ${builderSubtype}
-- If objective mode is planning or the user wants to start/build/launch something:
-  - narrow fast to the strongest model, not generic setup advice
-  - do not give broad article-style startup overviews
-  - identify the strongest 1 or 2 starting paths based on capital, skill, licensing, network, and speed
-  - ask one leverage question only
-- If builder subtype is trucking:
-  - narrow quickly to likely starting lanes such as owner-operator, dispatch/brokerage, or later fleet-building
-  - do not explain trucking company setup broadly unless the user asks for step-by-step setup
-  - prefer questions about current cash, CDL/status, driving experience, and access to shippers or clients
-  - if the goal is viable, say so directly
-
-BRILLIANT LIVE ENGINE
-- Tier check: ${tier}
-- Live scenario active: ${liveScenario.active}
-- Scenario type: ${liveScenario.type}
-- If tier is brilliant and live scenario is active:
-  - prioritize exact next words, framing, timing, and leverage
-  - give concise lines the user can actually say
-  - identify power dynamics quickly
-  - protect dignity and objective
-  - avoid essays
-  - prefer 1 strong move over many ideas
-- If immediate-live:
-  - respond as if the moment is happening now
-  - compress sharply
-  - give fast usable language first
-- If not brilliant tier:
-  - you may still help, but reserve strongest live precision for Brilliant.`
+${dynamicRuntimeBlocks}`
 
     let reply = ''
 
