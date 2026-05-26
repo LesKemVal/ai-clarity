@@ -715,7 +715,7 @@ export async function POST(req: Request) {
     const liveScenario = detectLiveScenario(latestUserRaw, promptContext)
 
     const recentMessages = messages.slice(
-      liveScenario.active || control.pressureLevel === 'HIGH' ? -6 : -10
+      liveScenario.active || control.pressureLevel.toLowerCase() === 'high' ? -6 : -10
     )
 
     const hasImageInput = recentMessages.some(
