@@ -4432,7 +4432,6 @@ responseTimerRef.current = setTimeout(() => {
 
   const showDesktopOperationalSurface =
     !liveMode &&
-    !hasDraftInput &&
     !hasUserMessageForSurface &&
     typeof window !== 'undefined' &&
     window.innerWidth >= 768
@@ -4836,7 +4835,10 @@ return (
     <TypingPrescriptionSurface />
   )}
 
-  <DesktopOperationalSurface visible={showDesktopOperationalSurface} />
+  <DesktopOperationalSurface
+    visible={showDesktopOperationalSurface}
+    mode={hasDraftInput ? 'active' : 'idle'}
+  />
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[118px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
