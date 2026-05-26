@@ -9,64 +9,62 @@ export default function DesktopOperationalSurface({
 
   if (mode === 'active') {
     return (
-      <div className="pointer-events-none fixed inset-x-0 top-[150px] bottom-[190px] z-[18] hidden items-center justify-center md:flex">
-        <div className="relative w-full max-w-[1040px] px-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.055),transparent_60%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-[132px] bottom-[178px] z-[18] hidden items-end justify-center md:flex">
+        <div className="relative w-full max-w-[920px] px-10 pb-12">
+          <div className="absolute inset-x-10 bottom-0 h-[180px] rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.045),transparent_64%)]" />
 
-          <div className="relative mx-auto grid max-w-[940px] grid-cols-3 gap-8 text-left">
-            <section>
-              <div className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/42">
-                How to use GEORGE
-              </div>
-
-              <div className="space-y-5 text-[#D7DBE4]/38">
-                <div>
-                  <div className="text-[14px] text-[#D7DBE4]/58">1. State the direction</div>
-                  <p className="mt-1 text-[12px] leading-5">Tell GEORGE what you are trying to become, build, fix, decide, or finish.</p>
+          <div className="relative mx-auto rounded-[1.25rem] border border-[#8FB6C9]/[0.045] bg-[#08111D]/[0.22] px-7 py-5 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-[10px]">
+            <div className="mb-4 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.055] pb-3">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/45">
+                  GEORGE operational guide
                 </div>
-
-                <div>
-                  <div className="text-[14px] text-[#D7DBE4]/58">2. Add the context</div>
-                  <p className="mt-1 text-[12px] leading-5">Share constraints, documents, pressure, people, timing, and what cannot be missed.</p>
-                </div>
-
-                <div>
-                  <div className="text-[14px] text-[#D7DBE4]/58">3. Move from there</div>
-                  <p className="mt-1 text-[12px] leading-5">GEORGE narrows the path, prepares the next move, and keeps useful continuity.</p>
+                <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/34">
+                  Use the space clearly. GEORGE serves the direction you give it.
                 </div>
               </div>
-            </section>
 
-            <section>
-              <div className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/42">
-                Use GEORGE for
+              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/24">
+                Direction → Context → Move
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-5 text-left">
+              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
+                <div className="text-[12px] font-medium text-[#D7DBE4]/58">1. State the direction</div>
+                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
+                  Tell GEORGE what you want to build, decide, finish, fix, become, or prepare for.
+                </p>
               </div>
 
-              <div className="space-y-4 text-[13px] text-[#D7DBE4]/44">
-                <div>Strategy, direction, and execution plans</div>
-                <div>Emails, outreach, pitches, and proposals</div>
-                <div>Negotiation posture and response shaping</div>
-                <div>Interview preparation and proof recall</div>
-                <div>Documents, decisions, and next-step clarity</div>
-              </div>
-            </section>
-
-            <section>
-              <div className="mb-5 text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/42">
-                Runtime support
+              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
+                <div className="text-[12px] font-medium text-[#D7DBE4]/58">2. Add useful pressure</div>
+                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
+                  Share timing, constraints, documents, people involved, risk, leverage, or what cannot be missed.
+                </p>
               </div>
 
-              <div className="space-y-4 rounded-[1.1rem] border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.025] p-5 text-[13px] leading-6 text-[#D7DBE4]/42">
-                <div>Continuity without clutter.</div>
-                <div>Structure without pressure.</div>
-                <div>Guidance without taking control.</div>
-
-                <div className="flex items-center gap-2 pt-2 text-[#D7DBE4]/50">
-                  <img src="/newearbudicon.png" alt="" className="h-[15px] w-[15px] object-contain opacity-60" />
-                  LIVE is available when words, timing, or pressure matter.
-                </div>
+              <div className="rounded-[1rem] border border-white/[0.035] bg-black/18 px-4 py-3">
+                <div className="text-[12px] font-medium text-[#D7DBE4]/58">3. Let GEORGE narrow</div>
+                <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/30">
+                  GEORGE can draft, sequence, prepare, reframe, review, or move you to the next useful step.
+                </p>
               </div>
-            </section>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/36">
+              <span>emails</span>
+              <span>pitch decks</span>
+              <span>negotiation</span>
+              <span>documents</span>
+              <span>career moves</span>
+              <span>funding</span>
+              <span>execution plans</span>
+              <span className="inline-flex items-center gap-1.5">
+                <img src="/newearbudicon.png" alt="" className="h-[13px] w-[13px] object-contain opacity-55" />
+                live pressure
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -78,7 +76,7 @@ export default function DesktopOperationalSurface({
       <div className="relative w-full max-w-[980px] px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.08),transparent_58%)]" />
 
-        <div className="relative text-center">
+        <div className="relative text-center transition-opacity duration-500">
           <div className="text-[82px] font-[260] tracking-[0.34em] text-[#D7DBE4]/[0.045]">
             GEORGE
           </div>
