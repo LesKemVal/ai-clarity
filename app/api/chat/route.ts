@@ -48,6 +48,7 @@ import {
 } from '@/lib/george/chat/system-blocks'
 import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-foresight-block'
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
+import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -644,6 +645,14 @@ export async function POST(req: Request) {
     const builderSubtype = detectBuilderSubtype(latestUserRaw)
     const cadenceAvoid = detectCadenceAvoidance(messages)
     const liveScenario = detectLiveScenario(latestUserRaw, promptContext)
+
+    const passiveIntentState = buildPassiveIntentState({
+      latestUserText: latestUserRaw,
+      messages,
+      promptContext,
+    })
+
+    void passiveIntentState
 
     const recentMessages = messages.slice(
       liveScenario.active || control.pressureLevel.toLowerCase() === 'high' ? -6 : -10
