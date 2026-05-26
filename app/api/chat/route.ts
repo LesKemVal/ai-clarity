@@ -654,6 +654,19 @@ export async function POST(req: Request) {
 
     void passiveIntentState
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[GEORGE passiveIntentState]', {
+        operational: passiveIntentState.operational,
+        exploratory: passiveIntentState.exploratory,
+        actionable: passiveIntentState.actionable,
+        pressureLevel: passiveIntentState.pressureLevel,
+        objectiveState: passiveIntentState.objectiveState,
+        narrowingReadiness: passiveIntentState.narrowingReadiness,
+        continuityDependency: passiveIntentState.continuityDependency,
+        liveRisk: passiveIntentState.liveRisk,
+      })
+    }
+
     const recentMessages = messages.slice(
       liveScenario.active || control.pressureLevel.toLowerCase() === 'high' ? -6 : -10
     )
