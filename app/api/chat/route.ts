@@ -11,6 +11,12 @@ import {
   detectCadenceAvoidance,
   detectLiveScenario,
 } from '@/lib/george/chat/runtime-signals'
+import {
+  normalizeCurrentGeorgeMode,
+  getCurrentGeorgeRuntime,
+  shouldApplyLegacyCampaignContext,
+  getShelvedCampaignRuntimeNote,
+} from '@/lib/george/chat/current-runtime-policy'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1206,14 +1212,18 @@ LANGUAGE MODE: SPANISH
 `
         : ''
 
-    const mode: GeorgeMode =
-      body?.mode === 'conversation' || body?.mode === 'campaign'
-        ? body.mode
-        : 'normal'
+    const mode: GeorgeMode = normalizeCurrentGeorgeMode(body?.mode)
+    const currentRuntime = getCurrentGeorgeRuntime(mode)
+    const legacyCampaignContextAllowed = shouldApplyLegacyCampaignContext({
+      mode,
+      activeCampaign,
+    })
 
     const modeBlock = getGeorgeModeBlock(mode)
+    const shelvedCampaignRuntimeNote = getShelvedCampaignRuntimeNote()
 
     const systemContent = languageRule + modeBlock +
+      (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
@@ -1223,9 +1233,9 @@ LANGUAGE MODE: SPANISH
         tier
       ) + `
 
-${getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled)}
+${legacyCampaignContextAllowed ? getCampaignContextBlock(activeCampaign, campaignDefaultsEnabled) : ''}
 
-${activeCampaign ? getOutputStyleRules(activeCampaign) : ''}
+${legacyCampaignContextAllowed ? getOutputStyleRules(activeCampaign) : ''}
 
 MESSAGE SOURCE
 - Latest user message source: ${latestUserSource}
