@@ -47,6 +47,7 @@ import {
   buildPursuitAndPremiumResponseBlock,
 } from '@/lib/george/chat/system-blocks'
 import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-foresight-block'
+import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -808,43 +809,11 @@ ${dynamicRuntimeBlocks}`
     const latestUserText =
       latestUserRaw.toLowerCase()
 
-    const isDegraded = messages.length > 10
-
-    const needsMemory =
-      /before|earlier|remember|last time|continue|pick up where we left off|as i said/i.test(latestUserText)
-
-    const needsDepth =
-      /plan|step by step|full plan|walk me through|break it down|roadmap|strategy|build this|launch/i.test(latestUserText)
-
-    let capacityNotice = ''
-
-    if (isDegraded && needsMemory) {
-      capacityNotice = "I may be missing earlier context. Give me the missing piece and I’ll reconnect it."
-    } else if (isDegraded && needsDepth) {
-      capacityNotice = 'I can move this forward here. Stronger continuity helps when you want GEORGE to carry the thread across longer work.'
-    }
-
-    if (capacityNotice && !reply.includes(capacityNotice)) {
-      reply = `${reply}\n\n${capacityNotice}`
-    }
-
-    let riskDisclaimer = ''
-
-    const legalHighRisk =
-      /lawsuit|sue|court|judge|appeal|petition|hearing|motion|complaint|affidavit|charged|arrested|statute|case number/i.test(latestUserText)
-
-    const medicalHighRisk =
-      /chest pain|stroke|heart attack|diagnosis|diagnose|prescription|medication|hospital|severe pain|symptoms|treatment/i.test(latestUserText)
-
-    if (legalHighRisk) {
-      riskDisclaimer = 'Use this as preparation, not legal advice.'
-    } else if (medicalHighRisk) {
-      riskDisclaimer = 'Use this to prepare better questions, not as medical advice.'
-    }
-
-    if (riskDisclaimer && !reply.includes(riskDisclaimer)) {
-      reply = `${reply}\n\n${riskDisclaimer}`
-    }
+    reply = appendPostResponseNotices({
+      reply,
+      messageCount: messages.length,
+      latestUserText,
+    })
 
     return NextResponse.json({ message: reply })
   } catch (err: unknown) {
