@@ -28,6 +28,17 @@ export const GEORGE_UI_CLEANUP_TODO = {
     },
   ],
 
+  liveExitContinuity: [
+    {
+      item: 'Exit LIVE returns to normal GEORGE state',
+      note: 'When user exits LIVE, restore last known active normal GEORGE session/state, even if the session was unsaved.',
+    },
+    {
+      item: 'Cross-session context awareness',
+      note: 'Keep GEORGE context-aware across sessions without showing unnecessary continuity messages.',
+    },
+  ],
+
   activeRule:
     'Do not address these during runtime governance work unless specifically switching to UI cleanup. Preserve current architecture direction first.',
 } as const
