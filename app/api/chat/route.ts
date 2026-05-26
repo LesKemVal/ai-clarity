@@ -17,6 +17,14 @@ import {
   shouldApplyLegacyCampaignContext,
   getShelvedCampaignRuntimeNote,
 } from '@/lib/george/chat/current-runtime-policy'
+import {
+  detectIndividualLiveContext,
+  buildIndividualLiveContextNote,
+} from '@/lib/george/chat/live-context'
+import {
+  getCurrentResponseShape,
+  buildResponseShapeNote,
+} from '@/lib/george/chat/response-shaping'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1221,9 +1229,24 @@ LANGUAGE MODE: SPANISH
 
     const modeBlock = getGeorgeModeBlock(mode)
     const shelvedCampaignRuntimeNote = getShelvedCampaignRuntimeNote()
+    const individualLiveContext = currentRuntime === 'live_george'
+      ? detectIndividualLiveContext(latestUserRaw)
+      : null
+    const individualLiveContextNote = individualLiveContext
+      ? buildIndividualLiveContextNote(individualLiveContext)
+      : ''
+    const responseShape = getCurrentResponseShape({
+      runtime: currentRuntime,
+      pressureLevel: control.pressureLevel,
+      liveContext: individualLiveContext,
+      voiceMode,
+    })
+    const responseShapeNote = buildResponseShapeNote(responseShape)
 
     const systemContent = languageRule + modeBlock +
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
+      (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
+      (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
