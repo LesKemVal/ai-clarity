@@ -8,22 +8,24 @@ export default function DesktopOperationalSurface({
   if (!visible) return null
 
   if (mode === 'active') {
-    const useCases = [
-      ['Draft', 'emails, outreach, replies'],
-      ['Build', 'plans, decks, workflows'],
-      ['Review', 'docs, offers, context'],
-      ['Prepare', 'interviews, calls, rooms'],
-      ['Decide', 'tradeoffs, risk, next move'],
-      ['Execute', 'sequence, simplify, finish'],
+    const lanes = [
+      ['Direction', 'Name the outcome, audience, pressure, and desired finish.'],
+      ['Draft', 'Emails, outreach, replies, proposals, scripts, and asks.'],
+      ['Build', 'Plans, decks, workflows, product paths, and launch steps.'],
+      ['Prepare', 'Interviews, calls, rooms, objections, and proof recall.'],
+      ['Review', 'Documents, offers, risk, leverage, and missing context.'],
+      ['Execute', 'Sequence the work, reduce friction, and move the next step.'],
+      ['LIVE', 'Use one earbud when timing, tone, or pressure matters.'],
+      ['Chamber', 'Save confirmed goals so GEORGE can preserve the path.'],
     ]
 
     return (
-      <div className="pointer-events-none fixed inset-x-0 top-[118px] bottom-[205px] z-[18] hidden items-end justify-center md:flex">
-        <div className="relative w-full max-w-[940px] px-10 pb-5 opacity-82 transition-opacity duration-500">
-          <div className="absolute inset-x-10 bottom-0 h-[190px] rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.045),transparent_66%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[205px] z-[18] hidden items-center justify-center md:flex">
+        <div className="relative w-full max-w-[1080px] px-10 opacity-82 transition-opacity duration-500">
+          <div className="absolute inset-x-8 inset-y-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.052),transparent_68%)]" />
 
-          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.065] bg-[#08111D]/[0.35] px-7 py-5 shadow-[0_20px_70px_rgba(0,0,0,0.30)] backdrop-blur-[12px]">
-            <div className="mb-4 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.06] pb-3">
+          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.065] bg-[#08111D]/[0.34] px-7 py-6 shadow-[0_20px_70px_rgba(0,0,0,0.30)] backdrop-blur-[12px]">
+            <div className="mb-5 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.06] pb-4">
               <div className="flex items-center gap-3">
                 <img src="/logofav.png" alt="" className="h-8 w-8 object-contain opacity-68" />
                 <div>
@@ -41,26 +43,24 @@ export default function DesktopOperationalSurface({
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 text-left">
-              {[
-                ['1. State the direction', 'What are you trying to build, decide, fix, finish, become, or prepare for?'],
-                ['2. Add useful pressure', 'Share timing, constraints, documents, people involved, risk, leverage, or what cannot be missed.'],
-                ['3. Let GEORGE narrow', 'GEORGE can draft, sequence, prepare, reframe, review, or move you to the next useful step.'],
-              ].map(([title, body]) => (
-                <div key={title} className="rounded-[1rem] border border-white/[0.045] bg-black/22 px-4 py-3">
-                  <div className="text-[12px] font-medium text-[#D7DBE4]/64">{title}</div>
-                  <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/36">{body}</p>
+            <div className="grid grid-cols-4 gap-3">
+              {lanes.map(([title, body]) => (
+                <div key={title} className="min-h-[112px] rounded-[1rem] border border-white/[0.045] bg-black/22 px-4 py-3">
+                  <div className="text-[10px] uppercase tracking-[0.20em] text-[#8FB6C9]/52">{title}</div>
+                  <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/34">{body}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-6 gap-2">
-              {useCases.map(([title, body]) => (
-                <div key={title} className="rounded-[0.8rem] border border-[#8FB6C9]/[0.05] bg-[#8FB6C9]/[0.03] px-3 py-2 text-center">
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#8FB6C9]/52">{title}</div>
-                  <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/31">{body}</div>
-                </div>
-              ))}
+            <div className="mt-5 flex items-center justify-between gap-5 border-t border-[#8FB6C9]/[0.05] pt-4 text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/34">
+              <span>trajectory awareness</span>
+              <span>response shaping</span>
+              <span>document context</span>
+              <span>continuity memory</span>
+              <span className="inline-flex items-center gap-1.5">
+                <img src="/newearbudicon.png" alt="" className="h-[13px] w-[13px] object-contain opacity-55" />
+                live pressure
+              </span>
             </div>
           </div>
         </div>
