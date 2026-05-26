@@ -89,6 +89,7 @@ const LIVE_RUNTIME_USAGE_KEY = 'GEORGE_LIVE_SESSION_METRICS'
 const LIVE_RUNTIME_START_KEY = 'george_live_runtime_started_at'
 const LIVE_ASSIST_MODE_KEY = 'george_live_assist_mode'
 const LIVE_RUNTIME_SUPPORT_ACTIVE_KEY = 'george_live_runtime_support_active'
+const LIVE_RUNTIME_SUPPORT_LEGACY_KEY = 'george_live_runtime_support'
 
 export function readPreparedLiveSetup(): LivePrepSetup | null {
   if (typeof window === 'undefined') return null
@@ -119,9 +120,12 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
   }
 
   if (setup?.runtimeSupport) {
-    window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, JSON.stringify(setup.runtimeSupport))
+    const serializedSupport = JSON.stringify(setup.runtimeSupport)
+    window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
+    window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY, serializedSupport)
   } else {
     window.localStorage.removeItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY)
+    window.localStorage.removeItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY)
   }
 }
 
@@ -129,7 +133,12 @@ export function readActiveLiveRuntimeSupport(): LiveRuntimeSupport | null {
   if (typeof window === 'undefined') return null
 
   try {
-    return JSON.parse(window.localStorage.getItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY) || 'null')
+    const raw =
+      window.localStorage.getItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY) ||
+      window.localStorage.getItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY) ||
+      'null'
+
+    return JSON.parse(raw)
   } catch {
     return null
   }
