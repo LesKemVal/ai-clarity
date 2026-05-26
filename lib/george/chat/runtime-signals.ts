@@ -1,3 +1,5 @@
+import { detectIndividualLiveContext } from '@/lib/george/chat/live-context'
+
 export type ChatSignalMessage = {
   role: 'user' | 'assistant'
   content: string
@@ -154,7 +156,6 @@ export function detectCadenceAvoidance(messages: ChatSignalMessage[]) {
 }
 
 export function detectLiveScenario(input: string, promptContext?: string | null) {
-  const t = input.toLowerCase().trim()
   const context = (promptContext || '').toLowerCase()
 
   if (
@@ -166,24 +167,14 @@ export function detectLiveScenario(input: string, promptContext?: string | null)
     return { active: true, type: 'live-context' }
   }
 
-  if (/interview|hiring manager|recruiter|job offer|salary question|tell me about yourself/.test(t)) {
-    return { active: true, type: 'interview' }
+  const liveContext = detectIndividualLiveContext(input)
+
+  if (liveContext.type !== 'unknown') {
+    return { active: true, type: liveContext.type }
   }
-  if (/boss|manager|coworker|hr|meeting|presentation|briefing|workplace|supervisor|employee/.test(t)) {
-    return { active: true, type: 'workplace' }
-  }
-  if (/deal|price|seller|dealer|negotiat|offer|counter|terms|discount/.test(t)) {
-    return { active: true, type: 'negotiation' }
-  }
-  if (/girlfriend|boyfriend|wife|husband|dating|text her|text him|relationship|argument|apologize|family/.test(t)) {
-    return { active: true, type: 'relationship' }
-  }
-  if (/doctor|nurse|hospital|appointment|diagnosis|symptoms|medication|insurance/.test(t)) {
-    return { active: true, type: 'advocacy' }
-  }
-  if (/customer|client|prospect|lead|objection|close|follow up|follow-up|sales call|cold call/.test(t)) {
-    return { active: true, type: 'sales' }
-  }
+
+  const t = input.toLowerCase().trim()
+
   if (/call in 5|about to call|right now talking|live conversation|on the phone|in the room|they just said|he just said|she just said/.test(t)) {
     return { active: true, type: 'immediate-live' }
   }
