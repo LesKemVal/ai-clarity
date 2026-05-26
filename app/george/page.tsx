@@ -2026,10 +2026,11 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
     const normalMessages = [...messagesRef.current]
 
-    if (
-      normalMessages.length > 0 &&
-      hasMeaningfulUserMessage(normalMessages)
-    ) {
+    const hasUserMessage = normalMessages.some(
+      (message) => message.role === 'user' && String(message.content || '').trim().length > 0
+    )
+
+    if (normalMessages.length > 0 && hasUserMessage) {
       window.localStorage.setItem(
         GEORGE_LAST_NORMAL_DRAFT,
         JSON.stringify({
@@ -2040,6 +2041,44 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
           updatedAt: Date.now(),
         })
       )
+    }
+  }
+
+  const restoreNormalDraft = () => {
+    if (typeof window === 'undefined') return false
+
+    try {
+      const rawDraft = window.localStorage.getItem(GEORGE_LAST_NORMAL_DRAFT)
+      const draft = rawDraft ? JSON.parse(rawDraft) : null
+      const draftMessages = Array.isArray(draft?.messages) ? draft.messages : []
+
+      if (!draftMessages.length) return false
+
+      skipNextTypewriterRef.current = true
+      restoredMessagesSignatureRef.current = getMessagesSignature(draftMessages)
+
+      setMessages(draftMessages)
+      messagesRef.current = draftMessages
+
+      if (typeof draft?.conversationMode === 'string') {
+        setConversationMode(draft.conversationMode as typeof conversationMode)
+      } else {
+        setConversationMode(null)
+      }
+
+      if (typeof draft?.activePromptContext === 'string') {
+        setActivePromptContext(draft.activePromptContext)
+      } else {
+        setActivePromptContext(null)
+      }
+
+      normalSessionWriteReadyRef.current = true
+      liveSessionWriteReadyRef.current = false
+      setActiveMode('normal')
+
+      return true
+    } catch {
+      return false
     }
   }
 
@@ -2084,27 +2123,28 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       window.localStorage.setItem('george_voice', 'off')
     }
 
-    if (preLiveMessages) {
-  skipNextTypewriterRef.current = true
-  if (preLiveSessionIdRef.current) {
-    setActiveSessionIdForMode('normal', preLiveSessionIdRef.current)
-  }
+    const restoredDraft = restoreNormalDraft()
 
-  // 🔒 FORCE NORMAL MODE + BREAK LIVE STATE
-  setActiveMode('normal')
-  liveSessionWriteReadyRef.current = false
-  normalSessionWriteReadyRef.current = true
+    if (!restoredDraft && preLiveMessages) {
+      skipNextTypewriterRef.current = true
 
-  // 🔒 CLEAR ANY LIVE CONTEXT FLAGS
-  setLiveMode(false)
-  setConversationMode(null)
-  setActivePromptContext(null)
+      if (preLiveSessionIdRef.current) {
+        setActiveSessionIdForMode('normal', preLiveSessionIdRef.current)
+      }
 
-  setMessages(preLiveMessages)
-  messagesRef.current = preLiveMessages
-  setTypedMessageIndex(null) // prevent re-type animation
-  setTypedMessageContent('')
-}
+      setActiveMode('normal')
+      liveSessionWriteReadyRef.current = false
+      normalSessionWriteReadyRef.current = true
+
+      setLiveMode(false)
+      setConversationMode(null)
+      setActivePromptContext(null)
+
+      setMessages(preLiveMessages)
+      messagesRef.current = preLiveMessages
+      setTypedMessageIndex(null)
+      setTypedMessageContent('')
+    }
 // save LIVE conversation if meaningful
 if (messagesRef.current.length > 2) {
   try {
@@ -2605,6 +2645,29 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (liveMode || isManualLive) return
+    if (!Array.isArray(messages) || messages.length === 0) return
+
+    const hasUserMessage = messages.some(
+      (message) => message.role === 'user' && String(message.content || '').trim().length > 0
+    )
+
+    if (!hasUserMessage) return
+
+    window.localStorage.setItem(
+      GEORGE_LAST_NORMAL_DRAFT,
+      JSON.stringify({
+        messages,
+        conversationMode,
+        activePromptContext,
+        currentTier,
+        updatedAt: Date.now(),
+      })
+    )
+  }, [messages, liveMode, conversationMode, activePromptContext, currentTier])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
