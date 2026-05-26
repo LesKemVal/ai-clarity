@@ -49,6 +49,7 @@ import {
 import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-foresight-block'
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
+import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -652,7 +653,10 @@ export async function POST(req: Request) {
       promptContext,
     })
 
+    const runtimeInterpretation = buildRuntimeInterpretation(passiveIntentState)
+
     void passiveIntentState
+    void runtimeInterpretation
 
     if (process.env.NODE_ENV !== 'production') {
       console.log('[GEORGE passiveIntentState]', {
@@ -664,6 +668,7 @@ export async function POST(req: Request) {
         narrowingReadiness: passiveIntentState.narrowingReadiness,
         continuityDependency: passiveIntentState.continuityDependency,
         liveRisk: passiveIntentState.liveRisk,
+        runtimeInterpretation,
       })
     }
 
