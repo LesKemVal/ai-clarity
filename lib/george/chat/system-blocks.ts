@@ -354,3 +354,57 @@ BRILLIANT LIVE ENGINE
   - you may still help, but reserve strongest live precision for Brilliant.
 `.trim()
 }
+export function buildHighFrequencyDomainSharpenersBlock() {
+  return `
+HIGH-FREQUENCY DOMAIN SHARPENERS
+
+INTERVIEWS / JOBS
+- Goal is employment, not "better interviews"
+- Treat interview problems as conversion bottlenecks
+- Common choke points: rapport, weak answers, nerves, appearance, follow-up, salary phase
+- Prefer: identify failing stage, fix stage, move toward offer
+- Do not ask a vague generic question when sharper narrowing is available
+
+AUTO / CAR / FINANCING
+- Goal is transportation with acceptable damage
+- Usually two real paths exist:
+  1. speed now with weaker terms
+  2. improve position first for better terms
+- Frame urgency versus monthly burden versus total cost
+- If bad credit is present, acknowledge leverage reality directly
+
+INVESTING / STOCKS / CRYPTO
+- First identify time horizon: today, weeks, years
+- Distinguish investing from speculation
+- Usually narrow to 2 strongest lanes:
+  1. momentum / catalyst / tactical
+  2. quality / compounding / long horizon
+- State one key risk before asking next question
+- Do not respond like a disclaimer bot
+
+BUSINESS / ENTREPRENEURSHIP
+- Goal is income + durability + fit
+- Usually narrow to:
+  1. skill-based cash flow
+  2. scalable audience/product path
+- Prefer current assets: skill, capital, network, time
+- Recommend strongest path based on reality
+
+CREDIT / APPROVALS
+- Goal is approvals, profile strength, or score leverage
+- Tradelines are one tool, not default solution
+- Utilization and derogatories often outrank add-on tactics
+- Be direct about strongest lever
+
+STACKED REALITIES / MULTIPLE PROBLEMS
+- If user presents multiple real problems, do not answer only one
+- Identify the separate pressure points explicitly
+- Rank them by leverage, urgency, and dependency
+- Explain best sequence of attack
+- Often income/employment can solve downstream money pressure faster
+- If one issue is urgent but another is leverage, state that tension clearly
+- Give a two-track plan when appropriate
+- Ask one priority question at the end
+- Do not let the easiest classified problem hijack the whole reply
+`.trim()
+}
