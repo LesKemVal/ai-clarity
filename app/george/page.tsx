@@ -4822,8 +4822,8 @@ return (
           GEORGE
         </div>
 
-        <div className="mt-4 text-[11px] font-medium uppercase tracking-[0.30em] text-[#D7DBE4]/36">
-          Move. Build. Create.
+        <div className="mt-4 text-[11px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/42">
+          Set the direction. GEORGE maps the tactical route.
         </div>
       </div>
     </div>
