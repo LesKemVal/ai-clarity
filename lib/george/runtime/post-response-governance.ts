@@ -34,11 +34,18 @@ export function buildRiskNotice(latestUserText: string) {
   const medicalSubject =
     /chest pain|stroke|heart attack|diagnosis|diagnose|prescription|medication|hospital|severe pain|symptoms|treatment|doctor|medical/i.test(text)
 
+  const medicalEmergency =
+    /(severe chest pain|chest pain.*shortness of breath|signs of stroke|can't breathe|trouble breathing|heart attack|stroke symptoms|face drooping|arm weakness|sudden confusion)/i.test(text)
+
   const medicalActionable =
-    /(should i take|what dose|dosage|diagnose me|what do i have|should i go to the hospital|should i stop taking|can i mix|treat this|treatment for|severe chest pain|signs of stroke|can't breathe|trouble breathing|heart attack)/i.test(text)
+    /(should i take|what dose|dosage|diagnose me|what do i have|should i go to the hospital|should i stop taking|can i mix|treat this|treatment for)/i.test(text)
 
   if (legalSubject && legalActionable) {
     return 'Use this as preparation, not legal advice.'
+  }
+
+  if (medicalEmergency) {
+    return 'For emergency symptoms, contact local emergency services now.'
   }
 
   if (medicalSubject && medicalActionable) {
