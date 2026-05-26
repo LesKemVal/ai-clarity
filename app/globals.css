@@ -95,7 +95,6 @@ main[class*="bg-[#06070A]"] {
   background-color: #06070A !important;
 }
 
-main[class*="bg-[#06070A]"] .shadow-[0_18px_40px_rgba\(0,0,0,0\.28\)],
-main[class*="bg-[#06070A]"] .shadow-[0_18px_40px_rgba\(0,0,0,0\.24\)] {
+main[class*="bg-[#06070A]"] [class*="shadow-"] {
   box-shadow: 0 14px 34px rgba(0,0,0,0.20) !important;
 }
