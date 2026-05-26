@@ -4432,7 +4432,7 @@ responseTimerRef.current = setTimeout(() => {
 
   const showDesktopOperationalSurface =
     !liveMode &&
-    hasDraftInput &&
+    !hasDraftInput &&
     !hasUserMessageForSurface &&
     typeof window !== 'undefined' &&
     window.innerWidth >= 768
@@ -4833,11 +4833,10 @@ return (
   )}
 
   {showTypingPrescription && (
-    <>
-      <TypingPrescriptionSurface />
-      <DesktopOperationalSurface visible={showDesktopOperationalSurface} />
-    </>
+    <TypingPrescriptionSurface />
   )}
+
+  <DesktopOperationalSurface visible={showDesktopOperationalSurface} />
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[118px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
@@ -6516,15 +6515,6 @@ Continue from here, tell me what changed, or start fresh.`
 <div className={`
 
 ${(hasDraftInput || hasVisibleThread || liveMode) ? (liveMode && input.length > 160 ? '!fixed bottom-[18px]' : '!fixed bottom-[6px]') : '!fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 ${liveMode ? 'z-[80] border-t-0 bg-[#08111D]/82 px-2 py-1 shadow-[0_-18px_42px_rgba(4,10,18,0.34)]' : 'z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)]'} flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-                    <div className="pointer-events-none absolute -top-[66px] left-1/2 hidden -translate-x-1/2 text-center md:block">
-                      <div className="text-[22px] font-[320] tracking-[0.32em] text-[#D7DBE4]/18">
-                        GEORGE
-                      </div>
-
-                      <div className="mt-2 text-[11px] font-light tracking-[0.18em] text-[#8FB6C9]/38">
-                        Direction becomes momentum when pressure meets structure.
-                      </div>
-                    </div>
 
                     <div className="george-composer-shell relative flex-1 rounded-[0.85rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-[0_10px_28px_rgba(4,10,18,0.28),inset_0_1px_0_rgba(143,182,201,0.035)] ">
 
