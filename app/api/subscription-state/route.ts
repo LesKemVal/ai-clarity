@@ -32,8 +32,8 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     currentTier: subscriber.currentTier,
     email: subscriber.email,
-    lastCheckoutSessionId: subscriber.lastCheckoutSessionId,
-    lastSubscriptionId: subscriber.lastSubscriptionId,
-    lastCustomerId: subscriber.stripeCustomerId,
+    lastCheckoutSessionId: null,
+    lastSubscriptionId: null,
+    lastCustomerId: null,
   })
 }
