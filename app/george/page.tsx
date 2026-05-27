@@ -5099,7 +5099,7 @@ return (
         </div>
 
         <div className="relative z-0">
-          <div className="absolute right-[32px] bottom-[18px] h-[58px] w-[190px] rounded-full bg-[#2F6FFF]/18 blur-[38px]" />
+          <div className="absolute right-[32px] bottom-[18px] h-[58px] w-[220px] rounded-full bg-[#2F6FFF]/18 blur-[38px]" />
 
           <img
             src="/earbud400.png"
@@ -6723,7 +6723,7 @@ Continue from here, tell me what changed, or start fresh.`
       </button>
 
       {showLiveQuickMenu && (
-        <div className={`absolute bottom-full left-1/2 mb-3 w-[190px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+        <div className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
             Controls
           </div>
@@ -6745,7 +6745,7 @@ Continue from here, tell me what changed, or start fresh.`
               setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
               setShowToast(true)
             }}
-            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/48 transition hover:text-white active:scale-[0.98]"
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
             {voiceOn ? 'Audio active' : 'Audio standby'}
           </button>
@@ -6783,7 +6783,7 @@ Continue from here, tell me what changed, or start fresh.`
               setShowLiveQuickMenu(false)
               requestExitLiveMode()
             }}
-            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/46 transition hover:text-red-100/82 active:scale-[0.98]"
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/52 transition hover:text-red-100/82 active:scale-[0.98]"
           >
             Exit LIVE
           </button>

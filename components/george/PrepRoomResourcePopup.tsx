@@ -23,6 +23,13 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
       <style jsx>{`
+        @keyframes liveOperationalPulse {
+          0%,100% { box-shadow: 0 10px 30px rgba(0,0,0,0.32); }
+          18% { box-shadow: 0 0 0 1px rgba(143,182,255,0.24), 0 0 40px rgba(143,182,255,0.20); transform: scale(1.01); }
+          48% { box-shadow: 0 10px 30px rgba(0,0,0,0.32); }
+          66% { box-shadow: 0 0 0 1px rgba(143,182,255,0.28), 0 0 48px rgba(143,182,255,0.24); transform: scale(1.012); }
+        }
+
         @keyframes prepShimmer {
           0% { transform: translateX(-45%) rotate(12deg); opacity: 0; }
           20% { opacity: 0.85; }

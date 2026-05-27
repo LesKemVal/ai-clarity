@@ -37,9 +37,9 @@ export default function HomePage() {
       <style jsx>{`
         @keyframes liveEntryPulse {
           0%, 100% { box-shadow: 0 20px 70px rgba(0,0,0,0.38); border-color: rgba(255,255,255,0.05); }
-          24% { box-shadow: 0 0 0 1px rgba(143,182,255,0.22), 0 0 34px rgba(143,182,255,0.18); border-color: rgba(143,182,255,0.28); }
+          18% { box-shadow: 0 0 0 1px rgba(143,182,255,0.24), 0 0 42px rgba(143,182,255,0.22); border-color: rgba(143,182,255,0.34); transform: scale(1.01); }
           48% { box-shadow: 0 20px 70px rgba(0,0,0,0.38); border-color: rgba(255,255,255,0.05); }
-          72% { box-shadow: 0 0 0 1px rgba(143,182,255,0.24), 0 0 38px rgba(143,182,255,0.20); border-color: rgba(143,182,255,0.32); }
+          66% { box-shadow: 0 0 0 1px rgba(143,182,255,0.26), 0 0 46px rgba(143,182,255,0.24); border-color: rgba(143,182,255,0.38); transform: scale(1.012); }
         }
       `}</style>
 
@@ -100,7 +100,7 @@ export default function HomePage() {
             }}
             onTouchStart={() => setActive('live')}
             className={`group relative overflow-hidden rounded-[1.4rem] border border-white/[0.05] bg-[#0A1016]/32 px-6 py-5 text-left transition duration-500 active:scale-[0.992] ${
-              liveLaunching ? 'animate-[liveEntryPulse_720ms_ease-in-out_1]' : ''
+              liveLaunching ? 'animate-[liveEntryPulse_980ms_cubic-bezier(0.22,1,0.36,1)_1]' : ''
             }`}
           >
             <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100">
