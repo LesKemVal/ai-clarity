@@ -50,7 +50,7 @@ import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-fores
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
-import { buildRuntimeAdapter, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
+import { buildRuntimeAdapter, buildRuntimeAdapterNote, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 
@@ -705,6 +705,8 @@ LANGUAGE MODE: SPANISH
                 : runtimeAdapter.responseMode,
           }
 
+    const runtimeAdapterNote = buildRuntimeAdapterNote(modeAwareRuntimeAdapter)
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -751,6 +753,7 @@ LANGUAGE MODE: SPANISH
     const systemContent = languageRule + modeBlock +
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
       (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
+      (runtimeAdapterNote ? `\n\n${runtimeAdapterNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
