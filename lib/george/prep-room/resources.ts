@@ -1,3 +1,5 @@
+import { interpretRoom } from '@/lib/george/prep-room/room-interpreter'
+
 export type PrepRoomPosture =
   | 'composed_executive'
   | 'collaborative'
@@ -48,84 +50,57 @@ export const DEFAULT_PREP_ROOM_RESOURCE_PROFILE: PrepRoomResourceProfile = {
   userOverride: false,
 }
 
-function hasAny(text: string, terms: string[]) {
-  return terms.some((term) => text.includes(term))
+function resourcesFromRoom(contextText?: string | null): PrepRoomResourceProfile {
+  const room = interpretRoom(contextText)
+
+  if (room.roomType === 'negotiation') {
+    return {
+      ...DEFAULT_PREP_ROOM_RESOURCE_PROFILE,
+      roomType: room.roomType,
+      pressureLevel: room.pressure,
+      recommendedPosture: 'negotiation',
+      tone: 'firm, calm, and non-reactive',
+      cadence: 'measured',
+      compression: 'high',
+      cueDensity: room.pressure === 'high' ? 'balanced' : 'light',
+      interruptionHandling: 'controlled',
+      bridgeStyle: 'validate pressure, then protect leverage',
+      responseTexture: 'executive_concise',
+      strategy: room.recommendedStrategy,
+    }
+  }
+
+  if (room.roomType === 'professional meeting') {
+    return {
+      ...DEFAULT_PREP_ROOM_RESOURCE_PROFILE,
+      roomType: room.roomType,
+      pressureLevel: room.pressure,
+      recommendedPosture: 'composed_executive',
+      tone: 'calm, evidence-first, and credible',
+      cadence: 'measured',
+      compression: room.requiresCompression ? 'medium' : 'low',
+      cueDensity: 'light',
+      interruptionHandling: room.interruptionRisk > 0.5 ? 'assertive' : 'controlled',
+      bridgeStyle: 'locate the disagreement before defending',
+      responseTexture: 'executive_concise',
+      strategy: room.recommendedStrategy,
+    }
+  }
+
+  return {
+    ...DEFAULT_PREP_ROOM_RESOURCE_PROFILE,
+    roomType: room.roomType,
+    pressureLevel: room.pressure,
+    compression: room.requiresCompression ? 'medium' : 'low',
+    strategy: room.recommendedStrategy,
+  }
 }
 
 export function inferPrepRoomResources(input: {
   contextText?: string | null
   userOverride?: Partial<PrepRoomResourceProfile> | null
 }): PrepRoomResourceProfile {
-  const text = String(input.contextText || '').toLowerCase()
-  let profile: PrepRoomResourceProfile = { ...DEFAULT_PREP_ROOM_RESOURCE_PROFILE }
-
-  if (hasAny(text, ['meeting', 'board', 'executive', 'budget', 'numbers', 'deck', 'stakeholder'])) {
-    profile = {
-      ...profile,
-      roomType: 'professional meeting',
-      pressureLevel: hasAny(text, ['challenged', 'pushback', 'tense', 'defensive', 'pressure']) ? 'medium' : 'low',
-      recommendedPosture: 'composed_executive',
-      tone: 'calm, evidence-first, and credible',
-      cadence: 'measured',
-      compression: 'medium',
-      cueDensity: 'light',
-      interruptionHandling: 'controlled',
-      bridgeStyle: 'locate the disagreement before defending',
-      responseTexture: 'executive_concise',
-      strategy: 'reconcile source, timeframe, and assumption before arguing the conclusion',
-    }
-  }
-
-  if (hasAny(text, ['negotiat', 'deal', 'price', 'offer', 'counter', 'terms'])) {
-    profile = {
-      ...profile,
-      roomType: 'negotiation',
-      pressureLevel: 'medium',
-      recommendedPosture: 'negotiation',
-      tone: 'firm, calm, and non-reactive',
-      cadence: 'measured',
-      compression: 'high',
-      cueDensity: 'balanced',
-      interruptionHandling: 'controlled',
-      bridgeStyle: 'validate pressure, then protect leverage',
-      responseTexture: 'executive_concise',
-      strategy: 'slow urgency, clarify interests, and trade concessions deliberately',
-    }
-  }
-
-  if (hasAny(text, ['interview', 'hiring', 'recruiter', 'job', 'panel'])) {
-    profile = {
-      ...profile,
-      roomType: 'interview',
-      pressureLevel: 'medium',
-      recommendedPosture: 'warm_authority',
-      tone: 'confident, grounded, and specific',
-      cadence: 'balanced',
-      compression: 'medium',
-      cueDensity: 'balanced',
-      interruptionHandling: 'passive',
-      bridgeStyle: 'answer directly, then prove with one example',
-      responseTexture: 'natural_conversational',
-      strategy: 'connect experience to the role without overexplaining',
-    }
-  }
-
-  if (hasAny(text, ['doctor', 'medical', 'diagnosis', 'symptom', 'appointment'])) {
-    profile = {
-      ...profile,
-      roomType: 'medical appointment',
-      pressureLevel: 'medium',
-      recommendedPosture: 'investigative',
-      tone: 'clear, calm, and precise',
-      cadence: 'measured',
-      compression: 'medium',
-      cueDensity: 'balanced',
-      interruptionHandling: 'controlled',
-      bridgeStyle: 'clarify what was said, then ask the next necessary question',
-      responseTexture: 'teaching_oriented',
-      strategy: 'protect understanding and get the next concrete medical step',
-    }
-  }
+  let profile = resourcesFromRoom(input.contextText)
 
   if (input.userOverride) {
     profile = {
