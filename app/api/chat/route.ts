@@ -709,12 +709,7 @@ LANGUAGE MODE: SPANISH
 
     const runtimeAdapterNote = buildRuntimeAdapterNote(modeAwareRuntimeAdapter)
 
-    const latestUserMessage =
-      typeof latestMessage?.content === 'string'
-        ? latestMessage.content
-        : ''
-
-    const earbudRuntime = detectEarbudRuntime(latestUserMessage)
+    const earbudRuntime = detectEarbudRuntime(latestUserRaw)
 
     const earbudRuntimeNote = buildEarbudRuntimeNote(earbudRuntime)
 
