@@ -180,10 +180,10 @@ export default function RuntimePage() {
 
           <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/24 px-4 py-3 text-right">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/30">
-              Logged in
+              Continuity
             </div>
             <div className="mt-1 text-sm text-white/70">
-              {session?.email || localEmail || 'Not restored'}
+              {authenticated ? 'Restored' : 'Not restored'}
             </div>
 
             {(session?.email || localEmail) && (
@@ -221,69 +221,65 @@ export default function RuntimePage() {
         </section>
       )}
 
-      {authenticated && (
-        <>
-          <section className="grid gap-3 lg:grid-cols-3">
-            <div className="rounded-[1rem] border border-white/[0.045] bg-black/22 p-4 lg:col-span-2">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-white/30">
-                Best tier use vs expected next month use
-              </div>
-              <div className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white/88">
-                {projection.tier}
-              </div>
-              <p className="mt-2 text-sm leading-6 text-white/50">
-                {projection.reason}
-              </p>
+      <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.008] p-5">
+        <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
+          Best tier use vs expected next month use
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/20 p-4">
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/28">Use pattern</div>
+            <div className="mt-2 text-sm text-white/72">{projection.level}</div>
+          </div>
+          <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/20 p-4">
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/28">Likely fit</div>
+            <div className="mt-2 text-sm text-white/72">{projection.tier}</div>
+          </div>
+          <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/20 p-4">
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/28">Next month</div>
+            <div className="mt-2 text-sm text-white/72">{projection.nextMonth}</div>
+          </div>
+        </div>
+        <p className="mt-4 text-sm leading-6 text-white/42">{projection.reason}</p>
+      </section>
+
+      <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.008] p-5">
+        <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
+          Recent runtime receipts
+        </p>
+
+        <div className="mt-4 space-y-3">
+          {visibleRecords.length === 0 ? (
+            <div className="rounded-[0.9rem] border border-white/[0.035] bg-black/20 p-4 text-sm leading-6 text-white/42">
+              No LIVE runtime receipts yet. Start LIVE from GEORGE to begin recording estimated room use.
             </div>
-
-            <div className="rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.040] p-4">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#C9D0FF]/40">
-                Projected next-month runtime
-              </div>
-              <div className="mt-3 text-sm font-medium text-[#D7DCFF]/86">
-                {projection.level}
-              </div>
-              <p className="mt-2 text-xs leading-5 text-white/42">
-                {projection.nextMonth}
-              </p>
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            {visibleRecords.length === 0 ? (
-              <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.010] p-5 text-sm leading-6 text-white/45">
-                No LIVE prescriptions yet. Start a LIVE room, exit cleanly, and GEORGE will record the runtime composition.
-              </div>
-            ) : (
-              visibleRecords.map((record, index) => (
-                <article
-                  key={record.id || `${record.createdAt}-${index}`}
-                  className="rounded-[1rem] border border-white/[0.045] bg-white/[0.010] p-4 transition hover:border-white/[0.075] hover:bg-white/[0.016]"
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <div className="text-base font-semibold text-white/84">
-                        {normalizeRoom(record)} · {formatDate(record.createdAt)}
-                      </div>
-                      <div className="mt-2 text-sm text-white/54">
-                        {formatCost(record.estimatedCents)} estimated → {formatCost(record.actualCents)} actual
-                      </div>
-                    </div>
-
-                    <div className="rounded-full border border-white/[0.045] bg-black/22 px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white/30">
-                      LIVE Bx
-                    </div>
+          ) : (
+            visibleRecords.map((record, index) => (
+              <div
+                key={record.id || `${record.createdAt || index}`}
+                className="rounded-[0.9rem] border border-white/[0.04] bg-black/22 p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-white/76">{normalizeRoom(record)}</div>
+                    <div className="mt-1 text-xs text-white/34">{formatDate(record.createdAt)}</div>
                   </div>
-
-                  <div className="mt-3 text-[12px] leading-6 text-white/42">
-                    {normalizeComposition(record)}
+                  <div className="text-right text-sm text-white/62">
+                    {formatCost(record.actualCents ?? record.estimatedCents)}
                   </div>
-                </article>
-              ))
-            )}
-          </section>
-        </>
-      )}
+                </div>
+                <div className="mt-3 text-xs leading-5 text-white/42">
+                  {normalizeComposition(record)}
+                </div>
+                {record.durationMinutes && (
+                  <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/24">
+                    {record.durationMinutes} runtime minutes
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </PageShell>
   )
 }
