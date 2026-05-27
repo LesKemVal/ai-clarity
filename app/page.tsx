@@ -73,7 +73,7 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/george/live-entry"
+            href="/george/intake"
             onMouseEnter={() => setActive('live')}
             onMouseLeave={() => setActive(null)}
             onTouchStart={() => setActive('live')}
