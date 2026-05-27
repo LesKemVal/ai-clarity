@@ -4,7 +4,7 @@ export function detectTrainingTrack(raw: string): TrainingTrack | null {
   const value = raw.toLowerCase()
   if (/driver'?s license|drivers license|driver'?s test|driving test|permit|road test|dmv/.test(value)) return 'drivers'
   if (/cdl/.test(value)) return 'cdl'
-  if (/ged/.test(value)) return 'ged'
+  if (/\bged\b|high school equivalency/.test(value)) return 'ged'
   if (/cna/.test(value)) return 'cna'
   return null
 }
@@ -14,9 +14,9 @@ export function trainingNeedsJurisdiction(raw: string) {
 }
 
 export function extractAnswers(raw: string) {
-  const matches = raw.match(/[A-Da-d]/g)
+  const matches = raw.match(/(?:^|\s|[,.;:])([A-Da-d])(?:\s|[,.;:]|$)/g)
   if (!matches) return []
-  return matches.map((m) => m.toUpperCase())
+  return matches.map((m) => m.replace(/[^A-Da-d]/g, '').toUpperCase()).filter(Boolean)
 }
 
 export function evaluateDrivers(answers: string[]) {

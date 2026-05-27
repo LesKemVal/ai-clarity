@@ -50,7 +50,8 @@ import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-fores
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
-import { buildRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
+import { buildRuntimeAdapter, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
+import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -534,38 +535,15 @@ NARROWING DISCIPLINE
 - Do not sound like a coach, therapist, or helpdesk bot
 - Do not praise reflexively
 
-LIVE RESPONSE DISCIPLINE
-- In LIVE or pressure contexts, default shorter.
-- Prefer the next move over explanation.
-- Prefer tactical usefulness over completeness.
-- One strong sentence beats five weak ones.
-- If the user is under pressure, do not dump frameworks.
-- Avoid sounding like a consultant, trainer, or AI assistant.
-- Reduce transition phrases.
-- Avoid over-contextualizing obvious points.
-- Do not restate the user's situation unless strategically useful.
+PRESSURE RESPONSE DISCIPLINE
+- In normal GEORGE, pressure does not automatically mean LIVE formatting.
+- In normal GEORGE, answer pressure questions conversationally unless the user explicitly asks for exact wording, a script, cues, or LIVE-style help.
+- In LIVE GEORGE, default shorter and prioritize immediate usable wording.
+- Prefer the next move over explanation when timing matters.
+- If the user needs words, provide words naturally.
+- Do not use Say / Backup / Cue formatting unless LIVE mode is active or the user explicitly requests that structure.
 - Preserve conversational momentum.
-- If the user already understands the situation, move directly into leverage.
-- Use plain language when possible.
-- Translate jargon automatically unless precision requires the original term.
-- If a simpler phrase works, prefer it.
-- Reduce generic "advice energy."
-- Sound present in the room.
-- If timing matters, write like timing matters.
-- If the user needs words, give words.
-- If the user needs judgment, give judgment.
-- If the user needs restraint, give restraint.
-- Do not mix all three unless necessary.
-- In high-pressure moments:
-  - shorter
-  - calmer
-  - clearer
-  - more usable
-- Avoid ending strong answers with weak softeners.
-- Do not dilute conviction unnecessarily.
-- If the strongest move is silence, patience, or slowing down, say so directly.
-- Preserve the user's dignity while improving their position.
-- If the user is vague, narrow the field instead of interrogating them.
+- Keep pressure responses calm, clear, and useful without over-formatting.
 
 ${buildOperationalModesBlock()}
 
@@ -714,12 +692,24 @@ LANGUAGE MODE: SPANISH
     const individualLiveContextNote = individualLiveContext
       ? buildIndividualLiveContextNote(individualLiveContext)
       : ''
+    const modeAwareRuntimeAdapter: GeorgeRuntimeAdapter =
+      currentRuntime === 'live_george'
+        ? runtimeAdapter
+        : {
+            ...runtimeAdapter,
+            livePressure: false,
+            responseMode:
+              runtimeAdapter.responseMode === 'live'
+                ? 'direct'
+                : runtimeAdapter.responseMode,
+          }
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
       liveContext: individualLiveContext,
       voiceMode,
-      runtimeAdapter,
+      runtimeAdapter: modeAwareRuntimeAdapter,
     })
     const responseShapeNote = buildResponseShapeNote(responseShape)
     const continuityDecision = classifyContinuitySignal({
@@ -729,17 +719,26 @@ LANGUAGE MODE: SPANISH
     const continuityGovernanceNote = buildContinuityGovernanceNote(continuityDecision)
     const outputGovernance = getOutputGovernance({
       runtime: currentRuntime,
-      pressureLevel: control.pressureLevel,
+      pressureLevel: currentRuntime === 'live_george' ? control.pressureLevel : 'low',
       voiceMode,
     })
+    const presentationMode = determinePresentationMode({
+      runtime: currentRuntime,
+      explicitRequest: latestUserRaw,
+      voiceMode,
+      runtimeAdapter: modeAwareRuntimeAdapter,
+    })
+
     const outputGovernanceNote = buildOutputGovernanceNote(outputGovernance)
+    const presentationAuthorityNote = buildPresentationAuthorityNote(presentationMode)
+
     const messageSourceBlock = buildMessageSourceBlock(latestUserSource)
     const controlStateBlock = buildControlStateBlock(control)
     const runtimeScoresBlock = buildRuntimeScoresBlock(scores)
     const scoreAwareSteeringBlock = buildScoreAwareSteeringBlock()
     const conversationEngineRulesBlock = buildConversationEngineRulesBlock()
-    const universalLiveOpeningBlock = buildUniversalLiveOpeningBlock()
-    const liveDisciplineBlock = buildLiveDisciplineBlock()
+    const universalLiveOpeningBlock = currentRuntime === 'live_george' ? buildUniversalLiveOpeningBlock() : ''
+    const liveDisciplineBlock = currentRuntime === 'live_george' ? buildLiveDisciplineBlock() : ''
     const dynamicRuntimeBlocks = buildDynamicRuntimeBlocks({
       bottleneck,
       cadenceAvoid,
@@ -754,6 +753,7 @@ LANGUAGE MODE: SPANISH
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
+      (presentationAuthorityNote ? `\n\n${presentationAuthorityNote}\n\n` : '') +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
@@ -775,9 +775,9 @@ ${conversationEngineRulesBlock}
 
 
 
-${universalLiveOpeningBlock}
+${presentationMode === 'live' || presentationMode === 'cue_based' || presentationMode === 'compressed' ? universalLiveOpeningBlock : ''}
 
-${liveDisciplineBlock}
+${presentationMode === 'live' || presentationMode === 'cue_based' || presentationMode === 'compressed' ? liveDisciplineBlock : ''}
 
 
 
@@ -840,6 +840,8 @@ ${dynamicRuntimeBlocks}`
 
     const latestUserText =
       latestUserRaw.toLowerCase()
+
+    reply = enforcePresentationMode(reply, presentationMode)
 
     reply = appendPostResponseNotices({
       reply,

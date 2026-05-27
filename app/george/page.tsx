@@ -386,7 +386,7 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
 
   const wantsLine =
     storedAssistMode === 'lines' ||
-    /what should i say|how do i say|give me a line|line|say/i.test(liveUserText)
+    /what should i say|what do i say|how do i say|give me a line|exact line|exact wording/i.test(liveUserText)
 
   if (wantsLine) {
     return say || cleanCue || ''
@@ -514,6 +514,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
           url,
         })
 
+        console.log('[GEORGE SEND TRACE] return: brilliantLiveTrigger')
         return
       }
 
@@ -3455,7 +3456,24 @@ const handleSend = useCallback(
       }
     ) => {
       let text = (overrideText ?? input).trim()
+      console.log('[GEORGE SEND TRACE] entered', { text, liveMode, currentTier, activePromptContext, conversationMode, isThinking })
 
+      const isConversationAssistContext =
+        activePromptContext?.startsWith('conversation_assist_')
+
+      const shouldForceNormalSend =
+        !liveMode &&
+        conversationMode !== 'manual_live' &&
+        isConversationAssistContext
+
+      if (shouldForceNormalSend) {
+        console.log('[GEORGE SEND TRACE] clearing stale conversation assist context')
+
+        setActivePromptContext(null)
+        setActivePromptLabel(null)
+      }
+
+      console.log('[GEORGE SEND TRACE] checkpoint: before liveRuntimeSetup')
       const liveRuntimeSetup = (() => {
         if (typeof window === 'undefined' || !liveMode) return null
 
@@ -3470,6 +3488,7 @@ const handleSend = useCallback(
         }
       })()
 
+      console.log('[GEORGE SEND TRACE] checkpoint: before detectDomain')
       const domain = detectDomain(text)
 
       const memoryDomain =
@@ -3503,12 +3522,15 @@ const handleSend = useCallback(
       let creditType = ""
       let firstResponseOverride = null
 
-      const brilliantLiveTrigger = buildBrilliantLiveTriggerResponse(
-        text,
-        currentTier,
-        activePromptContext,
-        conversationMode
-      )
+      console.log('[GEORGE SEND TRACE] checkpoint: before brilliantLiveTrigger')
+      const brilliantLiveTrigger = liveMode
+        ? buildBrilliantLiveTriggerResponse(
+            text,
+            currentTier,
+            activePromptContext,
+            conversationMode
+          )
+        : null
       if (brilliantLiveTrigger) {
         setConversationSignal('LIVE cue')
         setAdaptiveCueLabel('Guidance update')
@@ -3543,6 +3565,7 @@ setTimeout(() => {
 
       
 
+      console.log('[GEORGE SEND TRACE] checkpoint: before extractAnswers')
       const answers = extractAnswers(text)
       if (answers.length >= 3) {
         const track = detectTrainingTrack(text)
@@ -3573,6 +3596,7 @@ setTimeout(() => {
       }
 
 
+console.log('[GEORGE SEND TRACE] checkpoint: before trainingFollowThrough')
 const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptContext)
       if (trainingFollowThrough) {
         firstResponseOverride = trainingFollowThrough
@@ -3682,7 +3706,9 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         domainPrefix = "You are helping with CNA. Focus on certification steps, exam, skills check, and fastest path to employment."
       }
 
+      console.log('[GEORGE SEND TRACE] checkpoint: before empty check')
       if (!text && !pendingImage) {
+        console.log('[GEORGE SEND TRACE] return: empty text')
         setVoiceError('Type a message first.')
         return
       }
@@ -3699,8 +3725,11 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       hasUserInteractedRef.current = true
 
+      console.log('[GEORGE SEND TRACE] before stopSpeech')
       await stopSpeech()
+      console.log('[GEORGE SEND TRACE] after stopSpeech')
       stopListening()
+      console.log('[GEORGE SEND TRACE] after stopListening')
 
       const userMessage: Message | null = options?.hidden
         ? null
@@ -3869,6 +3898,7 @@ Steering doctrine:
             activePromptContext?.includes('brilliant_live')
           )
 
+        console.log('[GEORGE SEND TRACE] before fetch /api/chat', { text, liveMode, activePromptContext, conversationMode })
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
