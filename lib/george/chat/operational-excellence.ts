@@ -20,30 +20,45 @@ function stripLiveScaffolding(text: string) {
     .replace(/^\s*[-•]\s+/gm, '')
 }
 
-function needsBridgeLanguage(text: string) {
-  const lines = text
+function splitUsefulLines(text: string) {
+  return text
     .split(/\n+/)
-    .map((x) => x.trim())
+    .map((line) => line.trim())
     .filter(Boolean)
-
-  if (lines.length < 2) return false
-
-  return lines.every(
-    (line) =>
-      line.length < 220 &&
-      !/[.!?]/.test(line.slice(0, Math.min(line.length, 50)))
-  )
 }
 
-function buildBridge(reply: string) {
-  const quoted =
-    reply.match(/[“"][^”"]{12,240}[”"]/)?.[0]
+function asksForWords(text: string) {
+  return /what do i say|what should i say|how do i respond|how should i respond|what's my response|whats my response/i.test(text)
+}
 
-  if (!quoted) return reply
+function looksLikeDisconnectedLineSet(text: string) {
+  const lines = splitUsefulLines(text)
+  if (lines.length < 3) return false
 
-  return `Start by slowing the room down and locating the disagreement. ${quoted}
+  const shortOperationalLines = lines.filter((line) => line.length >= 18 && line.length <= 260)
+  const hasMultipleQuotedOrPlaceholderLines = lines.filter((line) => /[“"].+[”"]|\[[^\]]+\]/.test(line)).length >= 2
+  const hasFallbackCadence = /\b(if|when|then|otherwise|after that|from there)\b/i.test(lines.slice(1).join(' '))
 
-That keeps the conversation grounded instead of defensive. Compare source, timeframe, and assumptions before arguing conclusions.`
+  return shortOperationalLines.length >= 3 || hasMultipleQuotedOrPlaceholderLines || hasFallbackCadence
+}
+
+function extractFirstSpeakableLine(text: string) {
+  const quoted = text.match(/[“"][^”"]{12,240}[”"]/)?.[0]
+  if (quoted) return quoted
+
+  const line = splitUsefulLines(text).find((item) => item.length >= 20 && item.length <= 260)
+  return line || ''
+}
+
+function buildConversationalBridge(reply: string) {
+  const firstLine = extractFirstSpeakableLine(reply)
+  if (!firstLine) return reply
+
+  const cleanLine = firstLine.replace(/^\s*[-•]\s*/, '').trim()
+
+  return `Start by slowing the room down and identifying what they are challenging: source, timeframe, or assumption. You can say: ${cleanLine}
+
+That keeps you from defending blindly. After that, compare the two numbers side by side and anchor the conversation to method, not ego. If you catch an error, own it cleanly and state whether it changes the decision.`
 }
 
 export function renderEliteGeorgeOutput(input: Input) {
@@ -51,15 +66,11 @@ export function renderEliteGeorgeOutput(input: Input) {
     return normalizeWhitespace(input.reply)
   }
 
-  const asksForWords =
-    /what do i say|what should i say|how do i respond|how should i respond|what's my response|whats my response/i.test(
-      input.latestUserText.toLowerCase()
-    )
+  const clean = stripLiveScaffolding(input.reply)
+  const shouldBridge = asksForWords(input.latestUserText.toLowerCase()) && looksLikeDisconnectedLineSet(clean)
 
-  let clean = stripLiveScaffolding(input.reply)
-
-  if (asksForWords && needsBridgeLanguage(clean)) {
-    clean = buildBridge(clean)
+  if (shouldBridge) {
+    return normalizeWhitespace(buildConversationalBridge(clean))
   }
 
   return normalizeWhitespace(clean)
