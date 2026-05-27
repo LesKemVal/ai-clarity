@@ -7,166 +7,166 @@ export default function DesktopOperationalSurface({
 }) {
   if (!visible) return null
 
-  if (mode === 'active') {
-    return (
-      <div className="pointer-events-none fixed inset-x-0 top-[102px] bottom-[206px] z-[18] hidden items-center justify-center md:flex">
-        <div className="relative w-full max-w-[1220px] px-10 opacity-[0.985] transition-opacity duration-500">
+  return (
+    <div className="pointer-events-none fixed inset-x-0 top-[92px] bottom-[198px] z-[14] overflow-hidden">
 
-          <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.08),transparent_68%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(75,105,180,0.08),transparent_68%)]" />
 
-            <div className="absolute -left-[30%] top-0 h-full w-[42%] animate-[desktopShimmer_9s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.05] to-transparent blur-[26px]" />
-          </div>
+      <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_10s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.045] to-transparent blur-[28px]" />
 
-          <div className="relative overflow-hidden rounded-[1.45rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(5,8,14,0.88),rgba(5,8,14,0.72))] shadow-[0_24px_90px_rgba(0,0,0,0.42)] backdrop-blur-[18px]">
+      {/* MOBILE */}
+      <div className="relative h-full md:hidden">
 
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_49.6%,rgba(143,182,201,0.08)_50%,transparent_50.4%)]" />
+        <div className="absolute inset-x-6 top-8 bottom-0 overflow-hidden rounded-[1.6rem] border border-[#8FB6C9]/[0.07] bg-[linear-gradient(180deg,rgba(5,8,14,0.92),rgba(5,8,14,0.78))] shadow-[0_24px_90px_rgba(0,0,0,0.44)] backdrop-blur-[20px]">
 
-            <div className="grid grid-cols-2">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(90,120,210,0.08),transparent_72%)]" />
 
-              <div className="relative min-h-[520px] border-r border-white/[0.05] px-10 py-8">
-                <div className="mb-8 flex items-center gap-3">
-                  <img
-                    src="/logofav.png"
-                    alt=""
-                    className="h-8 w-8 object-contain opacity-80"
-                  />
+          <div className="relative flex h-full flex-col items-center px-8 pt-14 text-center">
 
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/68">
-                      NORMAL GEORGE
-                    </div>
+            <img
+              src="/logofav.png"
+              alt=""
+              className="h-20 w-20 object-contain opacity-[0.18]"
+            />
 
-                    <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/52">
-                      Direction → tools → execution
-                    </div>
-                  </div>
-                </div>
+            <div className="mt-8 text-[11px] uppercase tracking-[0.34em] text-[#8FB6C9]/66">
+              NORMAL GEORGE
+            </div>
 
-                <div className="space-y-5">
-                  {[
-                    ['CONTACT', 'draft email · prepare message · send after review'],
-                    ['CREATE', 'pitch deck · briefing · proposal · roadmap'],
-                    ['BUILD', 'code · systems · workflows · launch steps'],
-                    ['MOVE', 'plan · sequence · next step · reduce friction'],
-                  ].map(([title, body]) => (
-                    <div
-                      key={title}
-                      className="overflow-hidden rounded-[1rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.74),rgba(8,12,18,0.58))] px-5 py-4 shadow-[0_14px_40px_rgba(0,0,0,0.22)]"
-                    >
-                      <div className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/62">
-                        {title}
-                      </div>
+            <div className="mt-7 space-y-6 text-[15px] leading-8 text-[#D7DBE4]/48">
+              <div>Set the objective.</div>
+              <div>Attach context.</div>
+              <div>Execute deliberately.</div>
+            </div>
 
-                      <div className="mt-2 text-[14px] leading-8 text-[#D7DBE4]/42">
-                        {body}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="mt-14 w-full space-y-5">
 
-              <div className="relative min-h-[520px] px-10 py-8">
-                <div className="mb-8 flex items-center justify-between">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/68">
-                      LIVE GEORGE
-                    </div>
-
-                    <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/52">
-                      Real-time operational support
-                    </div>
+              {[
+                ['CONTACT', 'emails · replies · outreach'],
+                ['CREATE', 'decks · proposals · briefings'],
+                ['BUILD', 'code · systems · launch paths'],
+                ['MOVE', 'next step · sequence · clarity'],
+              ].map(([title, body]) => (
+                <div
+                  key={title}
+                  className="overflow-hidden rounded-[1.15rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.74),rgba(8,12,18,0.58))] px-5 py-4 text-left"
+                >
+                  <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/64">
+                    {title}
                   </div>
 
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/34">
-                    timing · pressure · response
+                  <div className="mt-2 text-[14px] leading-8 text-[#D7DBE4]/42">
+                    {body}
                   </div>
                 </div>
+              ))}
 
-                <div className="grid gap-4">
-                  {[
-                    ['PREPARE', 'interviews · negotiations · objections · recall'],
-                    ['OPERATE', 'one earbud · next move · tactical response'],
-                    ['ADAPT', 'timing · pacing · pressure · room awareness'],
-                    ['CONTINUE', 'memory · continuity · operational recall'],
-                  ].map(([title, body]) => (
-                    <div
-                      key={title}
-                      className="overflow-hidden rounded-[1rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.74),rgba(8,12,18,0.58))] px-5 py-4 shadow-[0_14px_40px_rgba(0,0,0,0.22)]"
-                    >
-                      <div className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/62">
-                        {title}
-                      </div>
-
-                      <div className="mt-2 text-[14px] leading-8 text-[#D7DBE4]/42">
-                        {body}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
           </div>
         </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="pointer-events-none fixed inset-x-0 top-[102px] bottom-[212px] z-[18] flex items-center justify-center md:hidden">
-      <div className="relative w-full px-7">
+      {/* DESKTOP */}
+      <div className="relative hidden h-full items-center justify-center px-10 md:flex">
 
-        <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.09),transparent_70%)]" />
+        <div className="relative h-[560px] w-full max-w-[1240px] overflow-hidden rounded-[1.7rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(5,8,14,0.90),rgba(5,8,14,0.76))] shadow-[0_28px_110px_rgba(0,0,0,0.46)] backdrop-blur-[20px]">
 
-          <div className="absolute -left-[45%] top-0 h-full w-[55%] animate-[desktopShimmer_10s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent blur-[28px]" />
-        </div>
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_49.8%,rgba(143,182,201,0.06)_50%,transparent_50.2%)]" />
 
-        <div className="relative overflow-hidden rounded-[1.5rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(5,8,14,0.90),rgba(5,8,14,0.74))] px-6 py-8 shadow-[0_24px_90px_rgba(0,0,0,0.42)] backdrop-blur-[18px]">
+          <div className="grid h-full grid-cols-2">
 
-          <div className="flex items-center justify-center">
-            <img
-              src="/logofav.png"
-              alt=""
-              className="h-16 w-16 object-contain opacity-24"
-            />
-          </div>
+            {/* LEFT */}
+            <div className="relative border-r border-white/[0.05] px-12 py-10">
 
-          <div className="mt-6 text-center text-[11px] uppercase tracking-[0.30em] text-[#8FB6C9]/62">
-            NORMAL GEORGE
-          </div>
+              <div className="mb-10 flex items-center gap-4">
+                <img
+                  src="/logofav.png"
+                  alt=""
+                  className="h-10 w-10 object-contain opacity-70"
+                />
 
-          <div className="mt-3 text-center text-[15px] leading-8 text-[#D7DBE4]/40">
-            Set the objective.
-            <br />
-            Attach context.
-            <br />
-            Execute deliberately.
-          </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.30em] text-[#8FB6C9]/66">
+                    NORMAL GEORGE
+                  </div>
 
-          <div className="mt-8 space-y-4">
-            {[
-              ['CONTACT', 'emails · replies · outreach'],
-              ['CREATE', 'decks · proposals · briefings'],
-              ['BUILD', 'code · systems · launch paths'],
-              ['MOVE', 'next step · sequence · clarity'],
-            ].map(([title, body]) => (
-              <div
-                key={title}
-                className="rounded-[1rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.72),rgba(8,12,18,0.56))] px-4 py-3"
-              >
-                <div className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/62">
-                  {title}
-                </div>
-
-                <div className="mt-1 text-[13px] leading-7 text-[#D7DBE4]/40">
-                  {body}
+                  <div className="mt-1 text-[12px] text-[#D7DBE4]/44">
+                    Direction → tools → execution
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
 
+              <div className="space-y-5">
+
+                {[
+                  ['CONTACT', 'draft email · outreach · review'],
+                  ['CREATE', 'pitch deck · proposal · briefing'],
+                  ['BUILD', 'code · workflows · systems'],
+                  ['MOVE', 'next step · execution · clarity'],
+                ].map(([title, body]) => (
+                  <div
+                    key={title}
+                    className="overflow-hidden rounded-[1.15rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.74),rgba(8,12,18,0.58))] px-5 py-4"
+                  >
+                    <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/64">
+                      {title}
+                    </div>
+
+                    <div className="mt-2 text-[14px] leading-8 text-[#D7DBE4]/42">
+                      {body}
+                    </div>
+                  </div>
+                ))}
+
+              </div>
+            </div>
+
+            {/* RIGHT */}
+            <div className="relative px-12 py-10">
+
+              <div className="mb-10 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.30em] text-[#8FB6C9]/66">
+                    LIVE GEORGE
+                  </div>
+
+                  <div className="mt-1 text-[12px] text-[#D7DBE4]/44">
+                    Real-time operational support
+                  </div>
+                </div>
+
+                <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/28">
+                  timing · pressure · response
+                </div>
+              </div>
+
+              <div className="space-y-5">
+
+                {[
+                  ['PREPARE', 'interviews · negotiations · objections'],
+                  ['OPERATE', 'one earbud · tactical guidance'],
+                  ['ADAPT', 'timing · pacing · room awareness'],
+                  ['CONTINUE', 'memory · continuity · recall'],
+                ].map(([title, body]) => (
+                  <div
+                    key={title}
+                    className="overflow-hidden rounded-[1.15rem] border border-white/[0.05] bg-[linear-gradient(180deg,rgba(10,16,24,0.74),rgba(8,12,18,0.58))] px-5 py-4"
+                  >
+                    <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/64">
+                      {title}
+                    </div>
+
+                    <div className="mt-2 text-[14px] leading-8 text-[#D7DBE4]/42">
+                      {body}
+                    </div>
+                  </div>
+                ))}
+
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
