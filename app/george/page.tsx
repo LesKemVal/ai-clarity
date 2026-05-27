@@ -5289,7 +5289,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative bx-command-shimmer">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 text-[11px] text-[#D7DBE4]/66 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -5720,7 +5720,7 @@ ${simplifyTarget}`
                       setShowLanguageMenu(false)
                       setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
                     }}
-                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
+                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
                     Help
                   </button>
@@ -5731,7 +5731,7 @@ ${simplifyTarget}`
                       e.stopPropagation()
                                     setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
                     }}
-                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
+                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
                     {language}
                   </button>
@@ -5748,7 +5748,7 @@ ${simplifyTarget}`
                       setLoginLinkSent(false)
                       setShowUpgradeModal(true)
                     }}
-                    className="inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
+                    className="inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
@@ -6003,7 +6003,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 px-2.5 py-1.5 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-2.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -6626,7 +6626,7 @@ Continue from here, tell me what changed, or start fresh.`
           setShowLanguageMenu(false)
                 setShowLiveQuickMenu((value) => !value)
         }}
-        className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 transition duration-200 hover:text-white active:scale-[0.96]"
+        className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
       >
         <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/28'}`} />
         LIVE
