@@ -52,6 +52,8 @@ import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 import { buildRuntimeAdapter, buildRuntimeAdapterNote, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtime/earbud-runtime'
+import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
+import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 
 import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
@@ -713,6 +715,30 @@ LANGUAGE MODE: SPANISH
 
     const earbudRuntimeNote = buildEarbudRuntimeNote(earbudRuntime)
 
+    const runtimeArbitration = arbitrateRuntimeSignals({
+      explicitUserSignal: /\b(do it|go ahead|yes|no|stop|continue|next|my gut|i want|i don't want|use this|don't)\b/i.test(latestUserRaw),
+      safetyOrDamageRisk: /\b(police|court|lawsuit|fired|danger|harm|unsafe|threat|illegal|arrest|violence|weapon|self-harm)\b/i.test(latestUserRaw),
+      objectiveRisk: control.pressureLevel.toLowerCase() === 'high' || /\b(leverage|risk|lose|deadline|deal|terms|approval|concession|money|job)\b/i.test(latestUserRaw),
+      earbudActive: earbudRuntime.active,
+      continuitySensitive: modeAwareRuntimeAdapter.continuitySensitive,
+      livePressure: modeAwareRuntimeAdapter.livePressure,
+      emotionalCareNeeded: modeAwareRuntimeAdapter.emotionalCareNeeded,
+      shouldCompress: modeAwareRuntimeAdapter.shouldCompress,
+      shouldNarrow: modeAwareRuntimeAdapter.shouldNarrow,
+      currentRuntime,
+    })
+
+    const runtimeSignalArbitrationNote = runtimeArbitration.note
+
+    const continuityRestoration = buildContinuityRestorationState({
+      latestUserText: latestUserRaw,
+      earbudActive: earbudRuntime.active,
+      continuityWeight: passiveIntentState.continuityDependency,
+    })
+
+    const continuityRestorationNote = continuityRestoration.instruction
+
+
 
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
@@ -762,6 +788,8 @@ LANGUAGE MODE: SPANISH
       (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
       (runtimeAdapterNote ? `\n\n${runtimeAdapterNote}\n\n` : '') +
       (earbudRuntimeNote ? `\n\n${earbudRuntimeNote}\n\n` : '') +
+      (runtimeSignalArbitrationNote ? `\n\n${runtimeSignalArbitrationNote}\n\n` : '') +
+      (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
