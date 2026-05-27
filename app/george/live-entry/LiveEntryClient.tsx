@@ -5,6 +5,8 @@ import BxPageHeader from '@/components/BxPageHeader'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
+import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
+import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -243,6 +245,7 @@ export default function LiveEntryClient() {
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
+  const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
 
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
@@ -308,6 +311,38 @@ export default function LiveEntryClient() {
   const loadedSummary = useMemo(() => {
     return `${conversationType} with ${audienceType.toLowerCase()} audience · ${pacing.toLowerCase()} pacing · ${outputMode.toLowerCase()}`
   }, [conversationType, audienceType, pacing, outputMode])
+
+  useEffect(() => {
+    let cancelled = false
+
+    const contextText = [
+      conversationType,
+      audienceType,
+      pacing,
+      outputMode,
+      objective,
+      prepDocument?.summary,
+    ].filter(Boolean).join('\n')
+
+    fetch('/api/george/prep-room/resources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contextText }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data?.profile) {
+          setPrepRoomProfile(data.profile)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPrepRoomProfile(null)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [conversationType, audienceType, pacing, outputMode, objective, prepDocument?.summary])
 
   const handlePrepDocumentUpload = async (file: File | null) => {
     if (!file) return
@@ -388,6 +423,21 @@ export default function LiveEntryClient() {
     setEditableResources((items) => items.filter((item) => item !== resource))
   }
 
+  const editPrepRoomResource = <K extends keyof PrepRoomResourceProfile>(
+    key: K,
+    value: PrepRoomResourceProfile[K]
+  ) => {
+    setPrepRoomProfile((profile) => {
+      if (!profile) return profile
+
+      return {
+        ...profile,
+        [key]: value,
+        userOverride: true,
+      }
+    })
+  }
+
   const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
 
@@ -411,6 +461,7 @@ export default function LiveEntryClient() {
       pacing,
       compactPrep: true,
       editedByUser: !skipPrep,
+      prepRoomProfile,
     }
 
     const liveSetup = {
@@ -429,6 +480,7 @@ export default function LiveEntryClient() {
       selectedCapabilityIds: finalResources,
       estimatedCents: finalEstimate.estimatedCents,
       compactPrep: true,
+      prepRoomProfile,
       createdAt: Date.now(),
     }
 
@@ -638,64 +690,13 @@ export default function LiveEntryClient() {
         )}
       </div>
 
-      {showPrepPreview && (
-        <div className="fixed inset-0 z-[240] flex items-end justify-center bg-black/68 px-3 pb-3 backdrop-blur-[10px] sm:items-center sm:pb-0">
-          <div className="bx-command-shimmer w-full max-w-[560px] overflow-hidden rounded-[1.3rem] border border-[#8FB6C9]/[0.10] bg-[linear-gradient(180deg,rgba(11,16,24,0.98),rgba(6,8,12,0.98))] p-4 shadow-[0_28px_90px_rgba(0,0,0,0.58)]">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.24em] text-white/30">Prep room</div>
-                <h2 className="mt-2 text-[24px] font-semibold tracking-[-0.05em] text-white/86">Review what GEORGE will load.</h2>
-              </div>
-              <button type="button" onClick={() => setShowPrepPreview(false)} className="rounded-full px-2 py-1 text-[12px] text-white/38 hover:text-white/70">Close</button>
-            </div>
-
-            <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.05] bg-[#8FB6C9]/[0.032] px-4 py-3 text-[13px] leading-6 text-white/54">
-              {loadedSummary} · ~{finalResourceEstimate.runtimeMinutes}m · ~{finalResourceEstimate.estimatedCents}¢
-            </div>
-
-            <div className="mt-4">
-              <div className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/22">Resources</div>
-              <div className="flex flex-wrap gap-2">
-                {editableResources.map((resource) => (
-                  <button
-                    key={resource}
-                    type="button"
-                    onClick={() => removeResource(resource)}
-                    className="rounded-full border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.032] px-3 py-1.5 text-[12px] text-[#D7DCFF]/54 transition hover:border-red-300/20 hover:bg-red-300/[0.04] hover:text-red-100/78"
-                    title="Tap to remove"
-                  >
-                    {resource} ×
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-3 flex gap-2">
-                <input
-                  value={customResource}
-                  onChange={(event) => setCustomResource(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') addResource()
-                  }}
-                  placeholder="Add resource, e.g. silence timing"
-                  className="bx-command-shimmer min-w-0 flex-1 rounded-[0.95rem] border border-[#8FB6C9]/[0.08] bg-black/24 px-3 py-2.5 text-[13px] text-white/76 outline-none placeholder:text-white/24"
-                />
-                <button type="button" onClick={addResource} className="rounded-[0.95rem] border border-[#8FB6C9]/[0.07] bg-[#8FB6C9]/[0.03] px-3 py-2.5 text-[12px] text-[#D7DCFF]/54 transition hover:bg-[#8FB6C9]/[0.06] hover:text-white/88">Add</button>
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
-              <button
-                type="button"
-                onClick={() => startLive(false, editableResources)}
-                className="min-h-[50px] rounded-[1rem] border border-[#D7DCFF]/[0.12] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(222,232,255,0.92))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#05060A] shadow-[0_18px_48px_rgba(0,0,0,0.26)] transition hover:scale-[1.01] hover:bg-white"
-              >
-                Now Start LIVE
-              </button>
-              <button type="button" onClick={() => setShowPrepPreview(false)} className="min-h-[48px] rounded-[0.95rem] border border-white/[0.032] bg-black/14 px-5 py-3 text-[13px] font-medium text-white/38 transition hover:bg-white/[0.018] hover:text-white/60">Edit setup</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PrepRoomResourcePopup
+        open={showPrepPreview}
+        profile={prepRoomProfile}
+        onClose={() => setShowPrepPreview(false)}
+        onEditResource={editPrepRoomResource}
+        onEnterLive={() => startLive(false, editableResources)}
+      />
     </main>
   )
 }
