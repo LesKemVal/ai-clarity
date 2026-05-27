@@ -21,7 +21,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
   const options = getPrepRoomResourceOptions()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
       <style jsx>{`
         @keyframes prepShimmer {
           0% { transform: translateX(-45%) rotate(12deg); opacity: 0; }
@@ -31,9 +31,9 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
         }
       `}</style>
 
-      <div className="relative flex max-h-[88dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[1.55rem] border border-white/10 bg-[#030407]/92 shadow-[0_28px_120px_rgba(0,0,0,0.78)] backdrop-blur-2xl">
+      <div className="relative flex max-h-[88dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[1.55rem] border border-white/[0.07] bg-[#05080D]/88 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%)] opacity-75" />
-        <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.075] to-transparent" />
+        <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[#8FB6FF]/[0.08] to-transparent" />
         <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
 
         <div className="relative shrink-0 px-4 pb-3 pt-4 md:px-5 md:pt-5">
@@ -81,7 +81,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
           </div>
         </div>
 
-        <div className="relative shrink-0 border-t border-white/10 bg-[#030407]/95 px-4 py-3 md:px-5">
+        <div className="relative shrink-0 border-t border-white/10 bg-[#05080D]/92 px-4 py-3 md:px-5">
           <div className="flex items-center justify-between gap-4">
             <button
               onClick={onClose}

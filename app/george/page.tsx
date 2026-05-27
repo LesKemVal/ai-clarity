@@ -5762,10 +5762,12 @@ ${simplifyTarget}`
                     type="button"
                     onClick={() => {
                       if (hasLiveGeorgeAccess) {
+                        setShowNormalUtilityMenu(null)
                         setShowLiveChooser(true)
                         return
                       }
 
+                      setShowNormalUtilityMenu(null)
                       setLoginEmailInput('')
                       setLoginLinkSent(false)
                       setShowUpgradeModal(true)

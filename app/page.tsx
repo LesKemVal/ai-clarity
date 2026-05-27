@@ -1,10 +1,20 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function HomePage() {
+  const router = useRouter()
   const [active, setActive] = useState<'normal' | 'live' | null>(null)
+  const [liveLaunching, setLiveLaunching] = useState(false)
+
+  const startLivePath = () => {
+    if (liveLaunching) return
+    setActive('live')
+    setLiveLaunching(true)
+    window.setTimeout(() => router.push('/george/intake'), 720)
+  }
 
   return (
     <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#040507] text-white">
@@ -23,6 +33,15 @@ export default function HomePage() {
 
         <div className="absolute left-1/2 top-1/2 h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.015] blur-3xl" />
       </div>
+
+      <style jsx>{`
+        @keyframes liveEntryPulse {
+          0%, 100% { box-shadow: 0 20px 70px rgba(0,0,0,0.38); border-color: rgba(255,255,255,0.05); }
+          24% { box-shadow: 0 0 0 1px rgba(143,182,255,0.22), 0 0 34px rgba(143,182,255,0.18); border-color: rgba(143,182,255,0.28); }
+          48% { box-shadow: 0 20px 70px rgba(0,0,0,0.38); border-color: rgba(255,255,255,0.05); }
+          72% { box-shadow: 0 0 0 1px rgba(143,182,255,0.24), 0 0 38px rgba(143,182,255,0.20); border-color: rgba(143,182,255,0.32); }
+        }
+      `}</style>
 
       <section className="relative z-10 flex w-full max-w-[760px] flex-col items-center px-8 text-center">
         <div className="mb-8">
@@ -72,12 +91,17 @@ export default function HomePage() {
             </div>
           </Link>
 
-          <Link
-            href="/george/intake"
+          <button
+            type="button"
+            onClick={startLivePath}
             onMouseEnter={() => setActive('live')}
-            onMouseLeave={() => setActive(null)}
+            onMouseLeave={() => {
+              if (!liveLaunching) setActive(null)
+            }}
             onTouchStart={() => setActive('live')}
-            className="group relative overflow-hidden rounded-[1.4rem] border border-white/[0.05] bg-[#0A1016]/32 px-6 py-5 transition duration-500 active:scale-[0.992]"
+            className={`group relative overflow-hidden rounded-[1.4rem] border border-white/[0.05] bg-[#0A1016]/32 px-6 py-5 text-left transition duration-500 active:scale-[0.992] ${
+              liveLaunching ? 'animate-[liveEntryPulse_720ms_ease-in-out_1]' : ''
+            }`}
           >
             <div className="absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100">
               <div className="absolute inset-y-0 left-[-35%] w-[40%] rotate-[18deg] bg-gradient-to-r from-transparent via-[#B7D4E8]/[0.08] to-transparent blur-xl transition-all duration-1000 group-hover:left-[120%]" />
@@ -98,7 +122,7 @@ export default function HomePage() {
                 ACTIVE
               </div>
             </div>
-          </Link>
+          </button>
         </div>
 
         <div className="mt-14 text-[10px] uppercase tracking-[0.28em] text-white/18">
