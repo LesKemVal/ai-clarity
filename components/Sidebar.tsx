@@ -351,17 +351,17 @@ return (
                 )}
               </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <div className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2">
                 <a
                   href="/runtime"
-                  className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                  className="inline-flex min-h-[28px] items-center justify-center px-1 py-1 text-[10px] uppercase tracking-[0.14em] text-white/42 transition duration-200 hover:text-white/72 active:scale-[0.96]"
                 >
                   System
                 </a>
 
                 <a
                   href="/top-up"
-                  className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                  className="inline-flex min-h-[28px] items-center justify-center px-1 py-1 text-[10px] uppercase tracking-[0.14em] text-white/42 transition duration-200 hover:text-white/72 active:scale-[0.96]"
                 >
                   Upgrade
                 </a>
@@ -374,7 +374,7 @@ return (
                         setShowSidebar?.(false)
                         onOpenLiveGate()
                       }}
-                      className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-[#C6D4FF]/[0.08] bg-[#C6D4FF]/[0.05] px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-[#DCE6FF]/72 backdrop-blur-[10px] transition hover:bg-[#C6D4FF]/[0.09] hover:text-white"
+                      className="inline-flex min-h-[28px] items-center justify-center px-1 py-1 text-[10px] uppercase tracking-[0.14em] text-[#DCE6FF]/62 transition duration-200 hover:text-white active:scale-[0.96]"
                     >
                       Enter LIVE
                     </button>
@@ -389,7 +389,7 @@ return (
                         clearCachedGeorgeSessionAuthority()
                         window.location.href = '/george'
                       }}
-                      className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.035] bg-black/18 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/36 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/68"
+                      className="inline-flex min-h-[28px] items-center justify-center px-1 py-1 text-[10px] uppercase tracking-[0.14em] text-white/34 transition duration-200 hover:text-white/62 active:scale-[0.96]"
                     >
                       Exit
                     </button>
@@ -401,7 +401,7 @@ return (
                       setShowSidebar?.(false)
                       onOpenLogin()
                     }}
-                    className="min-h-[40px] justify-center inline-flex items-center rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-2.5 py-1.5 text-[10px] tracking-[0.08em] text-white/52 backdrop-blur-[10px] transition hover:bg-white/[0.03] hover:text-white/82"
+                    className="inline-flex min-h-[28px] items-center justify-center px-1 py-1 text-[10px] uppercase tracking-[0.14em] text-white/42 transition duration-200 hover:text-white/72 active:scale-[0.96]"
                   >
                     Continue
                   </button>
