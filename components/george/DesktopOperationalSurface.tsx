@@ -61,9 +61,9 @@ export default function DesktopOperationalSurface({
             <div className="mt-8 space-y-4">
               {[
                 ['CONTACT', 'emails · replies · outreach'],
-                ['CREATE', 'decks · proposals · briefings'],
-                ['BUILD', 'code · systems · launch paths'],
-                ['MOVE', 'next step · sequence · clarity'],
+                ['CREATE', 'briefings · proposals · operational planning'],
+                ['BUILD', 'systems · runtime flows · launch sequencing'],
+                ['MOVE', 'pressure handling · sequencing · execution clarity'],
               ].map(([title, body]) => (
                 <div
                   key={title}
@@ -109,10 +109,10 @@ export default function DesktopOperationalSurface({
 
               <div className="space-y-5">
                 {[
-                  ['CONTACT', 'draft email · outreach · review'],
-                  ['CREATE', 'pitch deck · proposal · briefing'],
-                  ['BUILD', 'code · workflows · systems'],
-                  ['MOVE', 'next step · execution · clarity'],
+                  ['CONTACT', 'drafting · outreach · response shaping'],
+                  ['CREATE', 'runtime planning · proposals · strategic framing'],
+                  ['BUILD', 'systems · workflows · operational architecture'],
+                  ['MOVE', 'execution sequencing · pressure navigation'],
                 ].map(([title, body]) => (
                   <div
                     key={title}
@@ -149,9 +149,9 @@ export default function DesktopOperationalSurface({
 
               <div className="space-y-5">
                 {[
-                  ['PREPARE', 'interviews · negotiations · objections'],
-                  ['OPERATE', 'one earbud · tactical guidance'],
-                  ['ADAPT', 'timing · pacing · room awareness'],
+                  ['PREPARE', 'interviews · negotiations · objection pressure'],
+                  ['OPERATE', 'LIVE runtime · earbuds · tactical response'],
+                  ['ADAPT', 'timing · cadence · room pressure awareness'],
                   ['CONTINUE', 'memory · continuity · recall'],
                 ].map(([title, body]) => (
                   <div
