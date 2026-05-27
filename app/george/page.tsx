@@ -6641,43 +6641,43 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {liveMode && (
-  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-between gap-2 px-4 xl:pl-[280px]">
-    <button
-      type="button"
-      onClick={() => {
-        if (currentTier === 'smart') {
-          setToastMessage('Voice replies unlock above Smart.')
+  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
+    <div className="flex items-center gap-6 rounded-full border border-white/[0.045] bg-[#05080D]/72 px-4 py-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+      <button
+        type="button"
+        onClick={() => {
+          if (currentTier === 'smart') {
+            setToastMessage('Voice replies unlock above Smart.')
+            setShowToast(true)
+            return
+          }
+
+          const nextVoice = !voiceOn
+          hasUserInteractedRef.current = true
+          setVoiceOn(nextVoice)
+          setInteractionMode(nextVoice ? 'speech' : 'text')
+          window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+          setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
           setShowToast(true)
-          return
-        }
+        }}
+        className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] transition duration-200 active:scale-[0.96] ${
+          voiceOn
+            ? 'text-[#D7F1FF]/78 hover:text-white'
+            : 'text-[#D7DBE4]/34 hover:text-[#D7DBE4]/70'
+        }`}
+      >
+        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/24'}`} />
+        {voiceOn ? 'Audio active' : 'Audio standby'}
+      </button>
 
-        const nextVoice = !voiceOn
-        hasUserInteractedRef.current = true
-        setVoiceOn(nextVoice)
-        setInteractionMode(nextVoice ? 'speech' : 'text')
-        window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-        setToastMessage(nextVoice ? 'LIVE Audio Active' : 'LIVE Audio Standby')
-        setShowToast(true)
-      }}
-      className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition ${
-        voiceOn
-          ? 'border-[#8FB6C9]/35 bg-[#8FB6C9]/12 text-[#D7F1FF]/90 hover:bg-[#8FB6C9]/18'
-          : 'border-white/12 bg-white/[0.035] text-[#D7DBE4]/34 hover:border-white/22 hover:bg-white/[0.055] hover:text-[#D7DBE4]'
-      }`}
-    >
-      <span className="inline-flex items-center gap-1.5">
-        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/28'}`} />
-        {voiceOn ? 'AUDIO ACTIVE' : 'AUDIO STANDBY'}
-      </span>
-    </button>
-
-    <button
-      type="button"
-      onClick={requestExitLiveMode}
-      className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-semibold tracking-[0.16em] text-red-100/85 shadow-[0_12px_34px_rgba(0,0,0,0.38)] backdrop-blur-xl transition hover:border-red-300/35 hover:bg-red-500/16 hover:text-red-50"
-    >
-      EXIT LIVE
-    </button>
+      <button
+        type="button"
+        onClick={requestExitLiveMode}
+        className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-red-100/46 transition duration-200 hover:text-red-100/82 active:scale-[0.96]"
+      >
+        Exit LIVE
+      </button>
+    </div>
   </div>
 )}
 
