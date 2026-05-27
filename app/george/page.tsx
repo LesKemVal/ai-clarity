@@ -5712,14 +5712,14 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
-                <div className="pointer-events-auto relative flex h-11 items-center justify-center gap-3 overflow-hidden rounded-full border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(10,18,30,0.84),rgba(8,14,24,0.74))] px-4 py-2 shadow-[0_18px_42px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(143,182,201,0.035)] backdrop-blur-xl md:h-9 md:gap-5 md:px-5 md:py-1.5">
+                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.045] bg-[#05080D]/72 px-4 py-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl">
                   <button
                     type="button"
                     onClick={() => {
                       setActiveHelpTopic('live')
                       setShowHelpModal(true)
                     }}
-                    className="inline-flex h-8 items-center rounded-full px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/56 transition hover:bg-white/[0.03] hover:text-[#D7DBE4]/82 md:h-5 md:px-2 md:text-[10px]"
+                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                   >
                     Help
                   </button>
@@ -5730,7 +5730,7 @@ ${simplifyTarget}`
                       e.stopPropagation()
                       setShowLanguageMenu((prev) => !prev)
                     }}
-                    className="inline-flex h-8 items-center rounded-full px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/56 transition hover:bg-white/[0.03] hover:text-[#D7DBE4]/82 md:h-5 md:px-2 md:text-[10px]"
+                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                   >
                     {language}
                   </button>
@@ -5747,15 +5747,12 @@ ${simplifyTarget}`
                       setLoginLinkSent(false)
                       setShowUpgradeModal(true)
                     }}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.04] bg-white/[0.02] text-[#B7CDD9]/88 transition hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-white md:h-6 md:w-6 md:border-0 md:bg-transparent"
+                    className="inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
-                    <img
-                      src="/newearbudicon.png"
-                      alt=""
-                      className="h-[22px] w-[22px] object-contain opacity-90 md:h-[18px] md:w-[18px]"
-                    />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white/24" />
+                    LIVE
                   </button>
                 </div>
               </div>
