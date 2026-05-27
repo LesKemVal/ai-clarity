@@ -5779,7 +5779,14 @@ ${simplifyTarget}`
                   </button>
 
                   {showNormalUtilityMenu && (
-                    <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Close GEORGE utility menu"
+                        onClick={() => setShowNormalUtilityMenu(null)}
+                        className="fixed inset-0 z-[-1] cursor-default bg-black/52 backdrop-blur-[14px]"
+                      />
+                      <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
                         <>
                           <div className={`w-[160px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
@@ -5885,6 +5892,7 @@ ${simplifyTarget}`
                         </div>
                       )}
                     </div>
+                    </>
                   )}
                 </div>
               </div>
