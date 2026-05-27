@@ -1464,6 +1464,8 @@ ${steeringLine}` : ''}`
       Array.isArray(transientDraft.messages) &&
       transientDraft.messages.length > 0
     ) {
+      window.localStorage.removeItem(GEORGE_LAST_NORMAL_DRAFT)
+
       skipNextTypewriterRef.current = true
       restoredMessagesSignatureRef.current = getMessagesSignature(transientDraft.messages)
 
