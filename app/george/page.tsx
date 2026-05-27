@@ -1118,7 +1118,6 @@ const [isListening, setIsListening] = useState(false)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
-  const [showLiveToolsMenu, setShowLiveToolsMenu] = useState(false)
 
   useEffect(() => {
     // LIVE route ownership now belongs exclusively to /george/live
@@ -4625,7 +4624,6 @@ useEffect(() => {
 
     setShowLiveChooser(true)
     setShowLiveQuickMenu(false)
-    setShowLiveToolsMenu(false)
   }
 
   const startNewLiveConversation = () => {
@@ -4662,7 +4660,6 @@ useEffect(() => {
     } catch {}
 
     setShowLiveQuickMenu(false)
-    setShowLiveToolsMenu(false)
     setActiveCampaignId(null)
     setCampaigns((prev) =>
       prev.map((c) => ({
@@ -6601,7 +6598,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-{liveMode && (showLiveQuickMenu || showLiveToolsMenu) && (
+{liveMode && showLiveQuickMenu && (
                 <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 backdrop-blur-[10px]" />
               )}
 
@@ -6649,8 +6646,7 @@ Continue from here, tell me what changed, or start fresh.`
         type="button"
         onClick={() => {
           setShowLanguageMenu(false)
-          setShowLiveToolsMenu(false)
-          setShowLiveQuickMenu((value) => !value)
+                setShowLiveQuickMenu((value) => !value)
         }}
         className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 transition duration-200 hover:text-white active:scale-[0.96]"
       >
