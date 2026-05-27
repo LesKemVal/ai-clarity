@@ -6611,16 +6611,32 @@ Continue from here, tell me what changed, or start fresh.`
             {voiceOn ? 'Audio active' : 'Audio standby'}
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setShowLiveQuickMenu(false)
-              setShowLanguageMenu((value) => !value)
-            }}
-            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/48 transition hover:text-white active:scale-[0.98]"
-          >
-            Language
-          </button>
+          <div className="border-t border-white/[0.045] pt-2 mt-1">
+            <div className="mb-1 text-[9px] uppercase tracking-[0.20em] text-white/22">
+              Language
+            </div>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+              {languageOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => {
+                    setLanguage(option)
+                    window.localStorage.setItem('george_language', option)
+                    setToastMessage(`Language set: ${option}`)
+                    setShowToast(true)
+                  }}
+                  className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
+                    language === option
+                      ? 'text-white/82'
+                      : 'text-white/34 hover:text-white/68'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <button
             type="button"
