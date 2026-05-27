@@ -52,7 +52,7 @@ import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 import { buildRuntimeAdapter, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
-import { renderEliteGeorgeOutput } from '@/lib/george/chat/operational-excellence'
+import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -843,7 +843,7 @@ ${dynamicRuntimeBlocks}`
       latestUserRaw.toLowerCase()
 
     reply = enforcePresentationMode(reply, presentationMode)
-    reply = renderEliteGeorgeOutput({
+    reply = renderOperationalExcellenceOutput({
       reply,
       presentationMode,
       latestUserText,
