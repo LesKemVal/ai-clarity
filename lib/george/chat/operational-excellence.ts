@@ -61,7 +61,7 @@ function buildConversationalBridge(reply: string) {
 That keeps you from defending blindly. After that, compare the two numbers side by side and anchor the conversation to method, not ego. If you catch an error, own it cleanly and state whether it changes the decision.`
 }
 
-export function renderEliteGeorgeOutput(input: Input) {
+export function renderOperationalExcellenceOutput(input: Input) {
   if (input.presentationMode !== 'conversational') {
     return normalizeWhitespace(input.reply)
   }
@@ -75,3 +75,7 @@ export function renderEliteGeorgeOutput(input: Input) {
 
   return normalizeWhitespace(clean)
 }
+
+
+// Backward-compatible alias until all callers are migrated.
+export const renderEliteGeorgeOutput = renderOperationalExcellenceOutput
