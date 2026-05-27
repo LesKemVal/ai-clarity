@@ -738,6 +738,7 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showHelpModal, setShowHelpModal] = useState(false)
+const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
 const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
 
 useEffect(() => {
@@ -5717,7 +5718,8 @@ ${simplifyTarget}`
                     type="button"
                     onClick={() => {
                       setActiveHelpTopic('live')
-                      setShowHelpModal(true)
+                      setShowLanguageMenu(false)
+                      setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
                     }}
                     className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                   >
@@ -5728,7 +5730,8 @@ ${simplifyTarget}`
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setShowLanguageMenu((prev) => !prev)
+                      setShowHelpModal(false)
+                      setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
                     }}
                     className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                   >
@@ -5754,6 +5757,57 @@ ${simplifyTarget}`
                     <span className="h-1.5 w-1.5 rounded-full bg-white/24" />
                     LIVE
                   </button>
+
+                  {showNormalUtilityMenu && (
+                    <div className="absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-3 py-2.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+                      {showNormalUtilityMenu === 'help' && (
+                        <div>
+                          <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
+                            Help
+                          </div>
+                          <p className="text-[11px] leading-5 text-white/48">
+                            GEORGE helps you think, decide, prepare, and move. LIVE is for real-time conversations where timing and words matter.
+                          </p>
+                          <a
+                            href="/help"
+                            className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
+                          >
+                            Full help
+                          </a>
+                        </div>
+                      )}
+
+                      {showNormalUtilityMenu === 'language' && (
+                        <div>
+                          <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
+                            Language
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                            {languageOptions.map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                onClick={() => {
+                                  setLanguage(option)
+                                  window.localStorage.setItem('george_language', option)
+                                  setToastMessage(`Language set: ${option}`)
+                                  setShowToast(true)
+                                  setShowNormalUtilityMenu(null)
+                                }}
+                                className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
+                                  language === option
+                                    ? 'text-white/82'
+                                    : 'text-white/34 hover:text-white/68'
+                                }`}
+                              >
+                                {option}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -7255,7 +7309,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         document.body
       )}
 
-      {showHelpModal && typeof document !== 'undefined' && createPortal(
+      {false && showHelpModal && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"
