@@ -98,3 +98,23 @@ main[class*="bg-[#06070A]"] {
 main[class*="bg-[#06070A]"] [class*="shadow-"] {
   box-shadow: 0 14px 34px rgba(0,0,0,0.20) !important;
 }
+
+@keyframes desktopShimmer {
+  0% {
+    transform: translateX(0%);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.85;
+  }
+
+  100% {
+    transform: translateX(340%);
+    opacity: 0;
+  }
+}
