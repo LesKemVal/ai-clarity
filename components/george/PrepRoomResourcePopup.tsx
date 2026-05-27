@@ -21,101 +21,79 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
   const options = getPrepRoomResourceOptions()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-xl transition-opacity duration-300">
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#030407]/90 shadow-[0_28px_120px_rgba(0,0,0,0.75)] backdrop-blur-2xl">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_34%),linear-gradient(120deg,transparent,rgba(255,255,255,0.08),transparent)] opacity-70" />
-        <div className="pointer-events-none absolute -inset-x-32 top-0 h-px animate-[pulse_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-        <div className="relative grid gap-6 p-6 md:p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.38em] text-white/35">Prep Room</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white md:text-3xl">
-                Resource setup
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">
-                GEORGE has read the room and prepared the operating posture. Adjust only what should change before entering LIVE.
-              </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-300">
+      <style jsx>{`
+        @keyframes prepShimmer {
+          0% { transform: translateX(-45%) rotate(12deg); opacity: 0; }
+          20% { opacity: 0.85; }
+          55% { opacity: 0.55; }
+          100% { transform: translateX(215%) rotate(12deg); opacity: 0; }
+        }
+      `}</style>
+
+      <div className="relative flex max-h-[88dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[1.55rem] border border-white/10 bg-[#030407]/92 shadow-[0_28px_120px_rgba(0,0,0,0.78)] backdrop-blur-2xl">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%)] opacity-75" />
+        <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.075] to-transparent" />
+        <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+
+        <div className="relative shrink-0 px-4 pb-3 pt-4 md:px-5 md:pt-5">
+          <p className="text-[10px] uppercase tracking-[0.34em] text-white/32">Prep Room</p>
+          <h2 className="mt-2 text-[26px] font-semibold tracking-[-0.045em] text-white md:text-[30px]">
+            Resource setup
+          </h2>
+          <p className="mt-2 max-w-xl text-[13px] leading-6 text-white/50">
+            GEORGE has read the room and prepared the operating posture. Adjust only what should change before entering LIVE.
+          </p>
+        </div>
+
+        <div className="relative min-h-0 flex-1 overflow-y-auto px-4 pb-4 md:px-5">
+          <div className="rounded-[1.35rem] border border-white/10 bg-black/35 p-3 shadow-inner shadow-white/[0.02]">
+            <div className="grid gap-3 md:grid-cols-3">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.26em] text-white/28">Room</p>
+                <p className="mt-1.5 text-[13px] font-medium capitalize text-white/84">{profile.roomType}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.26em] text-white/28">Pressure</p>
+                <p className="mt-1.5 text-[13px] font-medium capitalize text-white/84">{profile.pressureLevel}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.26em] text-white/28">Strategy</p>
+                <p className="mt-1.5 text-[12px] leading-5 text-white/52">{profile.strategy}</p>
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs uppercase tracking-[0.24em] text-white/45 transition hover:bg-white/[0.07] hover:text-white"
-            >
-              Close
-            </button>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-black/35 p-4 shadow-inner shadow-white/[0.02]">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-white/30">Room</p>
-                <p className="mt-2 text-sm font-medium capitalize text-white">{profile.roomType}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-white/30">Pressure</p>
-                <p className="mt-2 text-sm font-medium capitalize text-white">{profile.pressureLevel}</p>
-              </div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-white/30">Strategy</p>
-                <p className="mt-2 text-sm text-white/65">{profile.strategy}</p>
-              </div>
-            </div>
+          <div className="mt-3 grid gap-2 md:grid-cols-2">
+            <ResourceSelect label="Posture" value={profile.recommendedPosture} options={options.posture} onChange={(value) => onEditResource?.('recommendedPosture', value as PrepRoomResourceProfile['recommendedPosture'])} />
+            <ResourceSelect label="Cadence" value={profile.cadence} options={options.cadence} onChange={(value) => onEditResource?.('cadence', value as PrepRoomResourceProfile['cadence'])} />
+            <ResourceSelect label="Compression" value={profile.compression} options={options.compression} onChange={(value) => onEditResource?.('compression', value as PrepRoomResourceProfile['compression'])} />
+            <ResourceSelect label="Cue density" value={profile.cueDensity} options={options.cueDensity} onChange={(value) => onEditResource?.('cueDensity', value as PrepRoomResourceProfile['cueDensity'])} />
+            <ResourceSelect label="Interruption handling" value={profile.interruptionHandling} options={options.interruptionHandling} onChange={(value) => onEditResource?.('interruptionHandling', value as PrepRoomResourceProfile['interruptionHandling'])} />
+            <ResourceSelect label="Response texture" value={profile.responseTexture} options={options.responseTexture} onChange={(value) => onEditResource?.('responseTexture', value as PrepRoomResourceProfile['responseTexture'])} />
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2">
-            <ResourceSelect
-              label="Posture"
-              value={profile.recommendedPosture}
-              options={options.posture}
-              onChange={(value) => onEditResource?.('recommendedPosture', value as PrepRoomResourceProfile['recommendedPosture'])}
-            />
-            <ResourceSelect
-              label="Cadence"
-              value={profile.cadence}
-              options={options.cadence}
-              onChange={(value) => onEditResource?.('cadence', value as PrepRoomResourceProfile['cadence'])}
-            />
-            <ResourceSelect
-              label="Compression"
-              value={profile.compression}
-              options={options.compression}
-              onChange={(value) => onEditResource?.('compression', value as PrepRoomResourceProfile['compression'])}
-            />
-            <ResourceSelect
-              label="Cue density"
-              value={profile.cueDensity}
-              options={options.cueDensity}
-              onChange={(value) => onEditResource?.('cueDensity', value as PrepRoomResourceProfile['cueDensity'])}
-            />
-            <ResourceSelect
-              label="Interruption handling"
-              value={profile.interruptionHandling}
-              options={options.interruptionHandling}
-              onChange={(value) => onEditResource?.('interruptionHandling', value as PrepRoomResourceProfile['interruptionHandling'])}
-            />
-            <ResourceSelect
-              label="Response texture"
-              value={profile.responseTexture}
-              options={options.responseTexture}
-              onChange={(value) => onEditResource?.('responseTexture', value as PrepRoomResourceProfile['responseTexture'])}
-            />
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs uppercase tracking-[0.28em] text-white/35">Cue explanation</p>
-            <p className="mt-2 text-sm leading-6 text-white/62">
+          <div className="mt-3 rounded-[1.15rem] border border-white/10 bg-white/[0.025] p-3">
+            <p className="text-[10px] uppercase tracking-[0.26em] text-white/32">Cue explanation</p>
+            <p className="mt-2 text-[12px] leading-5 text-white/52">
               Cues control how often GEORGE intervenes during LIVE. Light cues protect flow. Balanced cues catch important openings. Dense cues are for training, difficult rooms, or close guidance.
             </p>
           </div>
+        </div>
 
-          <div className="flex flex-col gap-3 border-t border-white/10 pt-5 md:flex-row md:items-center md:justify-between">
-            <p className="text-xs leading-5 text-white/40">
-              User authority stays active. GEORGE recommends the setup; you approve or edit before entering LIVE.
-            </p>
+        <div className="relative shrink-0 border-t border-white/10 bg-[#030407]/95 px-4 py-3 md:px-5">
+          <div className="flex items-center justify-between gap-4">
+            <button
+              onClick={onClose}
+              className="px-1 py-1 text-[11px] uppercase tracking-[0.22em] text-white/30 transition duration-200 hover:text-white/62 active:scale-[0.96] active:text-white"
+            >
+              Close
+            </button>
             <button
               onClick={onEnterLive}
-              className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-white/85"
+              className="px-1 py-1 text-[12px] font-medium uppercase tracking-[0.2em] text-[#D7DCFF]/62 transition duration-200 hover:text-white active:scale-[0.96] active:text-white"
             >
-              Enter LIVE now
+              Now start LIVE
             </button>
           </div>
         </div>
@@ -145,23 +123,23 @@ function ResourceSelect({
   const selected = options.find((option) => option.value === value)
 
   return (
-    <label className="group rounded-3xl border border-white/10 bg-black/30 p-4 transition hover:border-white/20 hover:bg-white/[0.04]">
-      <span className="text-[11px] uppercase tracking-[0.28em] text-white/30">{label}</span>
+    <label className="group rounded-[1.15rem] border border-white/10 bg-black/28 p-3 transition hover:border-white/18 hover:bg-white/[0.035]">
+      <span className="text-[10px] uppercase tracking-[0.26em] text-white/28">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-3 w-full appearance-none rounded-2xl border border-white/10 bg-black/60 px-3 py-3 text-sm capitalize text-white outline-none transition focus:border-white/30"
+        className="mt-2 w-full appearance-none rounded-[0.95rem] border border-white/10 bg-black/55 px-3 py-2.5 text-[13px] capitalize text-white/86 outline-none transition focus:border-white/26"
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} className="bg-[#090B10] text-white">
             {option.label || formatValue(option.value)}
           </option>
         ))}
       </select>
       {selected ? (
-        <p className="mt-3 text-xs leading-5 text-white/48">
+        <p className="mt-2 text-[11px] leading-5 text-white/44">
           {selected.description}
-          {selected.bestFor ? <span className="block pt-1 text-white/32">Best for: {selected.bestFor}</span> : null}
+          {selected.bestFor ? <span className="block pt-1 text-white/28">Best for: {selected.bestFor}</span> : null}
         </p>
       ) : null}
     </label>
