@@ -4,6 +4,7 @@
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
+import { operationalMotion } from '@/lib/george/ui/operational-motion'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
@@ -5711,7 +5712,7 @@ ${simplifyTarget}`
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
-                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.045] bg-[#05080D]/72 px-4 py-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+                <div className={`pointer-events-auto relative flex items-center justify-center gap-6 px-4 py-2 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
                   <button
                     type="button"
                     onClick={() => {
@@ -5756,7 +5757,7 @@ ${simplifyTarget}`
                   </button>
 
                   {showNormalUtilityMenu && (
-                    <div className="absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-3 py-2.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+                    <div className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
                         <div>
                           <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
@@ -6632,7 +6633,7 @@ Continue from here, tell me what changed, or start fresh.`
       </button>
 
       {showLiveQuickMenu && (
-        <div className="absolute bottom-full left-1/2 mb-3 w-[190px] -translate-x-1/2 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-3 py-2.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+        <div className={`absolute bottom-full left-1/2 mb-3 w-[190px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
             Controls
           </div>
