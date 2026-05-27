@@ -737,7 +737,6 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [rerouteSignal, setRerouteSignal] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 const [tierSignalPhase, setTierSignalPhase] = useState(0)
-const [showHelpModal, setShowHelpModal] = useState(false)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
 const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
 
@@ -2778,7 +2777,6 @@ requestAnimationFrame(() => {
       if (event.key === 'Escape') {
         setShowPromptMenu(false)
         setShowLanguageMenu(false)
-        setShowHelpModal(false)
       }
 
       if (typing && event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
@@ -5730,8 +5728,7 @@ ${simplifyTarget}`
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
-                      setShowHelpModal(false)
-                      setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
+                                    setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
                     }}
                     className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition duration-200 hover:text-white active:scale-[0.96]"
                   >
