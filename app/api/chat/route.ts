@@ -58,6 +58,7 @@ import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity
 import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
+import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -741,6 +742,20 @@ LANGUAGE MODE: SPANISH
     const arbitrationResponseShapeNote =
       arbitrationResponseShape.note
 
+    const adaptiveUserProfile =
+      adaptUserProfile(
+        DEFAULT_ADAPTIVE_USER_PROFILE,
+        {
+          userText: latestUserRaw,
+          earbudActive: earbudRuntime.active,
+          pressureHigh:
+            control.pressureLevel.toLowerCase() === 'high',
+        }
+      )
+
+    const adaptiveUserProfileNote =
+      buildAdaptiveUserProfileNote(adaptiveUserProfile)
+
     const continuityRestoration = buildContinuityRestorationState({
       latestUserText: latestUserRaw,
       earbudActive: earbudRuntime.active,
@@ -801,6 +816,7 @@ LANGUAGE MODE: SPANISH
       (earbudRuntimeNote ? `\n\n${earbudRuntimeNote}\n\n` : '') +
       (runtimeSignalArbitrationNote ? `\n\n${runtimeSignalArbitrationNote}\n\n` : '') +
       (arbitrationResponseShapeNote ? `\n\n${arbitrationResponseShapeNote}\n\n` : '') +
+      (adaptiveUserProfileNote ? `\n\n${adaptiveUserProfileNote}\n\n` : '') +
       (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
