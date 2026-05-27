@@ -23,7 +23,13 @@ export type RuntimeSignalArbitrationInput = {
 
 export type RuntimeSignalArbitration = {
   winner: RuntimeSignalPriority
-  posture: 'warn_and_move' | 'protect_objective' | 'compress' | 'restore_context' | 'steady' | 'direct'
+  posture:
+    | 'warn_and_move'
+    | 'protect_objective'
+    | 'compress'
+    | 'restore_context'
+    | 'steady'
+    | 'direct'
   delivery: 'minimal' | 'short' | 'structured' | 'normal'
   agency: 'user_decides' | 'light_confirmation' | 'strong_warning'
   note: string
@@ -33,15 +39,53 @@ export function arbitrateRuntimeSignals(
   input: RuntimeSignalArbitrationInput
 ): RuntimeSignalArbitration {
   const winner = resolveWinner(input)
-  const arbitration = buildArbitration(winner, input)
+
+  const posture =
+    winner === 'safety_or_damage_risk'
+      ? 'warn_and_move'
+      : winner === 'objective_protection'
+        ? 'protect_objective'
+        : winner === 'earbud_delivery'
+          ? 'compress'
+          : winner === 'continuity_restoration'
+            ? 'restore_context'
+            : input.shouldNarrow
+              ? 'direct'
+              : 'steady'
+
+  const delivery =
+    winner === 'earbud_delivery'
+      ? 'minimal'
+      : input.shouldCompress
+        ? 'short'
+        : winner === 'objective_protection'
+          ? 'structured'
+          : 'normal'
+
+  const agency =
+    winner === 'safety_or_damage_risk'
+      ? 'strong_warning'
+      : winner === 'continuity_restoration'
+        ? 'light_confirmation'
+        : 'user_decides'
 
   return {
-    ...arbitration,
-    note: buildRuntimeSignalArbitrationNote(winner, arbitration),
+    winner,
+    posture,
+    delivery,
+    agency,
+    note: buildRuntimeSignalArbitrationNote(
+      winner,
+      posture,
+      delivery,
+      agency
+    ),
   }
 }
 
-function resolveWinner(input: RuntimeSignalArbitrationInput): RuntimeSignalPriority {
+function resolveWinner(
+  input: RuntimeSignalArbitrationInput
+): RuntimeSignalPriority {
   if (input.explicitUserSignal) return 'user_explicit_signal'
   if (input.safetyOrDamageRisk) return 'safety_or_damage_risk'
   if (input.objectiveRisk) return 'objective_protection'
@@ -52,84 +96,21 @@ function resolveWinner(input: RuntimeSignalArbitrationInput): RuntimeSignalPrior
   return 'default_runtime_posture'
 }
 
-function buildArbitration(
-  winner: RuntimeSignalPriority,
-  input: RuntimeSignalArbitrationInput
-): Omit<RuntimeSignalArbitration, 'note'> {
-  switch (winner) {
-    case 'user_explicit_signal':
-      return {
-        winner,
-        posture: input.shouldNarrow ? 'direct' : 'steady',
-        delivery: input.earbudActive ? 'minimal' : input.shouldCompress ? 'short' : 'normal',
-        agency: 'user_decides',
-      }
-    case 'safety_or_damage_risk':
-      return {
-        winner,
-        posture: 'warn_and_move',
-        delivery: input.earbudActive ? 'minimal' : 'short',
-        agency: 'strong_warning',
-      }
-    case 'objective_protection':
-      return {
-        winner,
-        posture: 'protect_objective',
-        delivery: input.shouldCompress || input.earbudActive ? 'short' : 'structured',
-        agency: 'light_confirmation',
-      }
-    case 'earbud_delivery':
-      return {
-        winner,
-        posture: 'compress',
-        delivery: 'minimal',
-        agency: 'user_decides',
-      }
-    case 'continuity_restoration':
-      return {
-        winner,
-        posture: 'restore_context',
-        delivery: input.earbudActive ? 'minimal' : 'short',
-        agency: 'light_confirmation',
-      }
-    case 'pressure_response':
-      return {
-        winner,
-        posture: 'direct',
-        delivery: input.shouldCompress ? 'short' : 'structured',
-        agency: 'user_decides',
-      }
-    case 'emotional_calibration':
-      return {
-        winner,
-        posture: 'steady',
-        delivery: input.shouldCompress ? 'short' : 'normal',
-        agency: 'user_decides',
-      }
-    default:
-      return {
-        winner,
-        posture: input.shouldNarrow ? 'direct' : 'steady',
-        delivery: input.shouldCompress ? 'short' : 'normal',
-        agency: 'user_decides',
-      }
-  }
-}
-
 function buildRuntimeSignalArbitrationNote(
   winner: RuntimeSignalPriority,
-  arbitration: Omit<RuntimeSignalArbitration, 'note'>
+  posture: string,
+  delivery: string,
+  agency: string
 ) {
   return `
 RUNTIME SIGNAL ARBITRATION
-- Final winning signal: ${winner}.
-- Posture: ${arbitration.posture}.
-- Delivery: ${arbitration.delivery}.
-- Agency mode: ${arbitration.agency}.
-- Use this as the final runtime priority when other guidance conflicts.
-- Explicit user signal usually wins, unless safety, legal, reputational, or severe leverage damage requires a warning.
-- GEORGE may warn strongly, but should not countermand the user. Warn, orient, then move with the user.
-- If earbud delivery wins, keep phrasing short enough to understand in motion or pressure.
-- If continuity restoration wins, restore the room briefly; do not recap the transcript.
+- Final governing signal: ${winner}
+- Delivery posture: ${posture}
+- Delivery density: ${delivery}
+- Agency posture: ${agency}
+- Use this as final runtime priority when signals conflict.
+- Explicit user signals usually win unless major damage risk exists.
+- Warn clearly when necessary, then move with the user.
+- Earbud delivery should remain concise and operational.
 `.trim()
 }
