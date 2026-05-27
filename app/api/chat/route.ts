@@ -51,6 +51,8 @@ import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-go
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 import { buildRuntimeAdapter, buildRuntimeAdapterNote, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
+import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtime/earbud-runtime'
+
 import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 
@@ -707,6 +709,16 @@ LANGUAGE MODE: SPANISH
 
     const runtimeAdapterNote = buildRuntimeAdapterNote(modeAwareRuntimeAdapter)
 
+    const latestUserMessage =
+      typeof latestMessage?.content === 'string'
+        ? latestMessage.content
+        : ''
+
+    const earbudRuntime = detectEarbudRuntime(latestUserMessage)
+
+    const earbudRuntimeNote = buildEarbudRuntimeNote(earbudRuntime)
+
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -754,6 +766,7 @@ LANGUAGE MODE: SPANISH
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
       (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
       (runtimeAdapterNote ? `\n\n${runtimeAdapterNote}\n\n` : '') +
+      (earbudRuntimeNote ? `\n\n${earbudRuntimeNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
