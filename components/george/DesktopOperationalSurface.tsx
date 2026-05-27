@@ -46,7 +46,7 @@ export default function DesktopOperationalSurface({
       <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_10s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.045] to-transparent blur-[28px]" />
 
       <div className="relative h-full md:hidden">
-        <div className="absolute inset-x-6 top-8 bottom-0 overflow-hidden rounded-[1.6rem] border border-[#8FB6C9]/[0.07] bg-[linear-gradient(180deg,rgba(5,8,14,0.92),rgba(5,8,14,0.78))] shadow-[0_24px_90px_rgba(0,0,0,0.44)] backdrop-blur-[20px]">
+        <div className="absolute inset-x-6 top-8 bottom-0 overflow-hidden rounded-[1.6rem] border border-white/[0.045] bg-[linear-gradient(180deg,rgba(3,5,9,0.90),rgba(2,4,8,0.78))] shadow-[0_24px_90px_rgba(0,0,0,0.44)] backdrop-blur-[24px]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(90,120,210,0.08),transparent_72%)]" />
 
           <div className="relative flex h-full flex-col px-7 pt-9 text-left">
@@ -101,7 +101,7 @@ export default function DesktopOperationalSurface({
                     NORMAL GEORGE
                   </div>
 
-                  <div className="mt-1 text-[12px] text-[#D7DBE4]/44">
+                  <div className="mt-1 text-[12px] text-[#D7DBE4]/36">
                     Direction → tools → execution
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export default function DesktopOperationalSurface({
                     LIVE GEORGE
                   </div>
 
-                  <div className="mt-1 text-[12px] text-[#D7DBE4]/44">
+                  <div className="mt-1 text-[12px] text-[#D7DBE4]/36">
                     Real-time operational support
                   </div>
                 </div>
