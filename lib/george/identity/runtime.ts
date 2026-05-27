@@ -6,6 +6,7 @@ const IDENTITY_DIR = path.join(process.cwd(), 'core/george/identity')
 const FILES = [
   'mission.md',
   'principles.md',
+  'core-dynamics.md',
   'tiers.md',
   'live.md',
   'pro.md',
