@@ -61,9 +61,9 @@ export default function DesktopOperationalSurface({
             <div className="mt-8 space-y-4">
               {[
                 ['CONTACT', 'emails · replies · outreach'],
-                ['CREATE', 'briefings · proposals · operational planning'],
-                ['BUILD', 'systems · runtime flows · launch sequencing'],
-                ['MOVE', 'pressure handling · sequencing · execution clarity'],
+                ['CREATE', 'briefings · proposals · operational planning · framing · strategic preparation'],
+                ['BUILD', 'systems · runtime flows · launch sequencing · architecture thinking · deployment planning'],
+                ['MOVE', 'pressure handling · sequencing · execution clarity · tactical movement · decision flow'],
               ].map(([title, body]) => (
                 <div
                   key={title}
@@ -109,10 +109,10 @@ export default function DesktopOperationalSurface({
 
               <div className="space-y-5">
                 {[
-                  ['CONTACT', 'drafting · outreach · response shaping'],
-                  ['CREATE', 'runtime planning · proposals · strategic framing'],
-                  ['BUILD', 'systems · workflows · operational architecture'],
-                  ['MOVE', 'execution sequencing · pressure navigation'],
+                  ['CONTACT', 'drafting · outreach · response shaping · negotiation wording · follow-up sequencing'],
+                  ['CREATE', 'runtime planning · proposals · strategic framing · briefing structure · operational positioning'],
+                  ['BUILD', 'systems · workflows · operational architecture · launch planning · execution mapping'],
+                  ['MOVE', 'execution sequencing · pressure navigation · tactical clarity · decision pacing'],
                 ].map(([title, body]) => (
                   <div
                     key={title}
@@ -149,10 +149,10 @@ export default function DesktopOperationalSurface({
 
               <div className="space-y-5">
                 {[
-                  ['PREPARE', 'interviews · negotiations · objection pressure'],
-                  ['OPERATE', 'LIVE runtime · earbuds · tactical response'],
-                  ['ADAPT', 'timing · cadence · room pressure awareness'],
-                  ['CONTINUE', 'memory · continuity · recall'],
+                  ['PREPARE', 'interviews · negotiations · objection pressure · executive conversations · high-stakes preparation'],
+                  ['OPERATE', 'LIVE runtime · earbuds · tactical response · real-time conversational guidance · room adaptation'],
+                  ['ADAPT', 'timing · cadence · room pressure awareness · interruption handling · conversational posture'],
+                  ['CONTINUE', 'memory · continuity · recall · operational persistence · context restoration'],
                 ].map(([title, body]) => (
                   <div
                     key={title}
