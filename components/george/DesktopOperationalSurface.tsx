@@ -21,10 +21,10 @@ export default function DesktopOperationalSurface({
 
     return (
       <div className="pointer-events-none fixed inset-x-0 top-[102px] bottom-[206px] z-[18] hidden items-center justify-center md:flex">
-        <div className="relative w-full max-w-[1080px] px-10 opacity-95 transition-opacity duration-500">
+        <div className="relative w-full max-w-[1080px] px-10 opacity-[0.985] transition-opacity duration-500">
           <div className="absolute inset-x-8 inset-y-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.072),transparent_68%)]" />
 
-          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.09] bg-[#08111D]/[0.44] px-7 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-[12px]">
+          <div className="relative mx-auto rounded-[1.35rem] border border-[#8FB6C9]/[0.09] bg-[linear-gradient(180deg,rgba(8,14,22,0.82),rgba(6,10,16,0.72))] px-7 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.38)] backdrop-blur-[18px]">
             <div className="mb-5 flex items-center justify-between gap-5 border-b border-[#8FB6C9]/[0.075] pb-4">
               <div className="flex items-center gap-3">
                 <img src="/logofav.png" alt="" className="h-8 w-8 object-contain opacity-82" />
@@ -73,17 +73,17 @@ export default function DesktopOperationalSurface({
       <div className="relative w-full max-w-[980px] px-10 opacity-92 transition-opacity duration-500">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.088),transparent_58%)]" />
 
-        <div className="relative text-center">
-          <div className="text-[92px] font-[260] tracking-[0.34em] text-[#D7DBE4]/[0.065]">
+        <div className="relative mx-auto max-w-[980px] rounded-[1.35rem] border border-[#8FB6C9]/[0.08] bg-[linear-gradient(180deg,rgba(8,14,22,0.76),rgba(6,10,16,0.58))] px-10 py-12 shadow-[0_24px_80px_rgba(0,0,0,0.34)] backdrop-blur-[18px] text-center">
+          <div className="text-[92px] font-[260] tracking-[0.22em] text-[#D7DBE4]/[0.11]">
             GEORGE
           </div>
 
-          <div className="mt-5 text-[15px] font-light tracking-[0.12em] text-[#D7DBE4]/42">
+          <div className="mt-6 text-[15px] font-light tracking-[0.04em] text-[#D7DBE4]/46">
             Set the direction. GEORGE maps the tactical route.
           </div>
 
-          <div className="mx-auto mt-9 max-w-[820px] text-[17px] font-[300] leading-[1.75] tracking-[0.02em] text-[#D7DBE4]/26">
-            Build carefully. Move deliberately. Let pressure reveal structure instead of fear.
+          <div className="mx-auto mt-9 max-w-[820px] text-[16px] font-[300] leading-[1.7] tracking-[0.01em] text-[#D7DBE4]/34">
+            Build carefully. Move deliberately. Let pressure reveal structure.
           </div>
 
           <div className="mx-auto mt-10 flex max-w-[860px] flex-wrap items-center justify-center gap-x-7 gap-y-3 text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/48">
