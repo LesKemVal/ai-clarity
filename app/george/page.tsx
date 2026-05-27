@@ -6724,7 +6724,15 @@ Continue from here, tell me what changed, or start fresh.`
       </button>
 
       {showLiveQuickMenu && (
-        <div className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+        <>
+          <button
+            type="button"
+            aria-label="Close LIVE controls"
+            onClick={() => setShowLiveQuickMenu(false)}
+            className="fixed inset-0 z-[-1] cursor-default bg-black/52 backdrop-blur-[14px]"
+          />
+
+          <div data-george-language-menu className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
             Controls
           </div>
@@ -6765,6 +6773,7 @@ Continue from here, tell me what changed, or start fresh.`
                     window.localStorage.setItem('george_language', option)
                     setToastMessage(`Language set: ${option}`)
                     setShowToast(true)
+                    setShowLiveQuickMenu(false)
                   }}
                   className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
                     language === option
@@ -6789,6 +6798,7 @@ Continue from here, tell me what changed, or start fresh.`
             Exit LIVE
           </button>
         </div>
+        </>
       )}
     </div>
   </div>
