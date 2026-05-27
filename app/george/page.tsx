@@ -739,6 +739,7 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
+const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null)
 const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
 
 useEffect(() => {
@@ -1131,6 +1132,24 @@ const [isListening, setIsListening] = useState(false)
   const [accessCodeError, setAccessCodeError] = useState('')
   const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
+
+useEffect(() => {
+  function handlePointerDown(event: MouseEvent) {
+    if (
+      normalUtilityMenuRef.current &&
+      !normalUtilityMenuRef.current.contains(event.target as Node)
+    ) {
+      setShowNormalUtilityMenu(null)
+    }
+  }
+
+  document.addEventListener('mousedown', handlePointerDown)
+
+  return () => {
+    document.removeEventListener('mousedown', handlePointerDown)
+  }
+}, [])
+
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [showLiveChooser, setShowLiveChooser] = useState(false)
   const [liveCadence, setLiveCadence] = useState('Balanced')
@@ -5556,7 +5575,7 @@ ${simplifyTarget}`
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
@@ -5757,28 +5776,86 @@ ${simplifyTarget}`
                   </button>
 
                   {showNormalUtilityMenu && (
-                    <div className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+                    <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
-                        <div>
-                          <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
-                            Help
+                        <>
+                          <div className={`w-[160px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                            <div className="mb-2 flex items-center justify-between">
+                              <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
+                                Help
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => setShowNormalUtilityMenu(null)}
+                                className="text-[11px] text-white/28 transition hover:text-white/72"
+                              >
+                                ×
+                              </button>
+                            </div>
+
+                            <div className="space-y-1">
+                              {[
+                                ['live', 'LIVE'],
+                                ['continuity', 'Login'],
+                                ['images', 'Images'],
+                                ['signal', 'Signal'],
+                              ].map(([id, label]) => (
+                                <button
+                                  key={id}
+                                  type="button"
+                                  onClick={() => setActiveHelpTopic(id as any)}
+                                  className={`block w-full py-1 text-left text-[10px] uppercase tracking-[0.16em] transition ${
+                                    activeHelpTopic === id
+                                      ? 'text-white/82'
+                                      : 'text-white/38 hover:text-white/72'
+                                  }`}
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                          <p className="text-[11px] leading-5 text-white/48">
-                            GEORGE helps you think, decide, prepare, and move. LIVE is for real-time conversations where timing and words matter.
-                          </p>
-                          <a
-                            href="/help"
-                            className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
-                          >
-                            Full help
-                          </a>
-                        </div>
+
+                          <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                            <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
+                              {activeHelpTopic === 'live' && 'LIVE'}
+                              {activeHelpTopic === 'continuity' && 'LOGIN'}
+                              {activeHelpTopic === 'images' && 'IMAGES'}
+                              {activeHelpTopic === 'signal' && 'SIGNAL'}
+                            </div>
+
+                            <p className="text-[11px] leading-5 text-white/48">
+                              {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
+                              {activeHelpTopic === 'continuity' && 'Login restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
+                              {activeHelpTopic === 'images' && 'Images helps generate visual direction, concepts, references, and creative material.'}
+                              {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns and improve operational usefulness over time.'}
+                            </p>
+
+                            <a
+                              href="/help"
+                              className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
+                            >
+                              Full help
+                            </a>
+                          </div>
+                        </>
                       )}
 
                       {showNormalUtilityMenu === 'language' && (
-                        <div>
-                          <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
-                            Language
+                        <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                          <div className="mb-2 flex items-center justify-between">
+                            <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
+                              Language
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setShowNormalUtilityMenu(null)}
+                              className="text-[11px] text-white/28 transition hover:text-white/72"
+                            >
+                              ×
+                            </button>
                           </div>
                           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                             {languageOptions.map((option) => (
@@ -5872,7 +5949,7 @@ if (liveMode) {
       {showRecentFolders && (
         <div
           ref={folderBrowserRef}
-          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.2rem] border border-white/[0.07] bg-[#0B0D12]/92 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
+          className="fixed bottom-[128px] left-1/2 -translate-x-1/2 z-50 w-[min(340px,calc(100vw-32px))] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]"
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/25">
@@ -6269,7 +6346,7 @@ if (liveMode) {
     <div className="fixed inset-0 z-[210] flex items-end justify-center px-4 pb-[132px] md:items-center md:pb-0">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.2rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#0B0D12]/92 px-3 py-3 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
+        className={`relative w-full max-w-[360px] max-h-[48dvh] overflow-y-auto rounded-[1.05rem] border ${sessionPickerMode === 'campaign' ? 'border-white/[0.07]' : 'border-white/[0.075]'} bg-[#05080D]/88 px-3 py-3 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  transition-all duration-200 ease-out ${sessionPickerClosing ? 'translate-y-10 opacity-0 scale-[0.98]' : 'translate-y-0 opacity-100 scale-100'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
@@ -6819,7 +6896,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#0B0D12]/92 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#05080D]/88 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -6925,7 +7002,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 {showWalkthrough && (
         <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
-          <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
 
             {walkthroughStep === 1 && <p className="text-[#D7DBE4] text-sm leading-7">Focus menu sets the room. Choose negotiation, interview, debate, speech, study, or everyday pressure.</p>}
@@ -6965,7 +7042,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -7222,7 +7299,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#0B0D12]/92 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
+          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72 mb-2">Structured LIVE</p>
