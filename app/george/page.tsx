@@ -6644,41 +6644,71 @@ Continue from here, tell me what changed, or start fresh.`
 
 {liveMode && (
   <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
-    <div className="flex items-center gap-6 rounded-full border border-white/[0.045] bg-[#05080D]/72 px-4 py-2 shadow-[0_18px_48px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+    <div className="relative">
       <button
         type="button"
         onClick={() => {
-          if (currentTier === 'smart') {
-            setToastMessage('Voice replies unlock above Smart.')
-            setShowToast(true)
-            return
-          }
-
-          const nextVoice = !voiceOn
-          hasUserInteractedRef.current = true
-          setVoiceOn(nextVoice)
-          setInteractionMode(nextVoice ? 'speech' : 'text')
-          window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-          setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
-          setShowToast(true)
+          setShowLanguageMenu(false)
+          setShowLiveToolsMenu(false)
+          setShowLiveQuickMenu((value) => !value)
         }}
-        className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] transition duration-200 active:scale-[0.96] ${
-          voiceOn
-            ? 'text-[#D7F1FF]/78 hover:text-white'
-            : 'text-[#D7DBE4]/34 hover:text-[#D7DBE4]/70'
-        }`}
+        className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 transition duration-200 hover:text-white active:scale-[0.96]"
       >
-        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/24'}`} />
-        {voiceOn ? 'Audio active' : 'Audio standby'}
+        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/28'}`} />
+        LIVE
       </button>
 
-      <button
-        type="button"
-        onClick={requestExitLiveMode}
-        className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-red-100/46 transition duration-200 hover:text-red-100/82 active:scale-[0.96]"
-      >
-        Exit LIVE
-      </button>
+      {showLiveQuickMenu && (
+        <div className="absolute bottom-full left-1/2 mb-3 w-[190px] -translate-x-1/2 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-3 py-2.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+          <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
+            Controls
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (currentTier === 'smart') {
+                setToastMessage('Voice replies unlock above Smart.')
+                setShowToast(true)
+                return
+              }
+
+              const nextVoice = !voiceOn
+              hasUserInteractedRef.current = true
+              setVoiceOn(nextVoice)
+              setInteractionMode(nextVoice ? 'speech' : 'text')
+              window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+              setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
+              setShowToast(true)
+            }}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/48 transition hover:text-white active:scale-[0.98]"
+          >
+            {voiceOn ? 'Audio active' : 'Audio standby'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowLiveQuickMenu(false)
+              setShowLanguageMenu((value) => !value)
+            }}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/48 transition hover:text-white active:scale-[0.98]"
+          >
+            Language
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowLiveQuickMenu(false)
+              requestExitLiveMode()
+            }}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/46 transition hover:text-red-100/82 active:scale-[0.98]"
+          >
+            Exit LIVE
+          </button>
+        </div>
+      )}
     </div>
   </div>
 )}
