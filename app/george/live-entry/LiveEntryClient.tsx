@@ -625,15 +625,25 @@ export default function LiveEntryClient() {
             </div>
           </label>
 
-          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Steering words</span>
-            <input
-              value={controlWords}
-              onChange={(event) => setControlWords(event.target.value)}
-              className="mt-2 w-full bg-transparent text-[15px] text-white/76 outline-none placeholder:text-white/24"
-              placeholder="hmm, right, ok, let me think"
-            />
-          </label>
+          <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
+            <div className="flex items-center justify-between">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">
+                Steering words
+              </span>
+
+              <button
+                type="button"
+                onClick={() => startLive(true)}
+                className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/54 transition duration-150 hover:text-white/78 active:scale-[0.96]"
+              >
+                Skip prep
+              </button>
+            </div>
+
+            <p className="mt-2 text-[13px] leading-5 text-white/46">
+              Use natural phrases during LIVE to steer GEORGE’s timing, tone, cues, and repeatable lines. Preview examples before entering LIVE.
+            </p>
+          </div>
 
           <div className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-white/34">
             <span className="h-[5px] w-[5px] rounded-full bg-[#8FB6C9]/70 shadow-[0_0_12px_rgba(143,182,201,0.42)]" />
