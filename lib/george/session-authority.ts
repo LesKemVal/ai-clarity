@@ -9,8 +9,27 @@ export type GeorgeSessionAuthority = {
   expiresAt?: number
 }
 
+const SESSION_AUTHORITY_TTL_MS = 15_000
+let authorityMemoryCache: GeorgeSessionAuthority | null = null
+let authorityMemoryCacheAt = 0
+let authorityInFlight: Promise<GeorgeSessionAuthority> | null = null
+
 function normalizeTier(value: unknown): GeorgeSessionTier {
   return value === 'brilliant' || value === 'intelligent' ? value : 'smart'
+}
+
+function now() {
+  return Date.now()
+}
+
+function isFreshMemoryCache() {
+  return Boolean(authorityMemoryCache && now() - authorityMemoryCacheAt < SESSION_AUTHORITY_TTL_MS)
+}
+
+function rememberAuthority(authority: GeorgeSessionAuthority) {
+  authorityMemoryCache = authority
+  authorityMemoryCacheAt = now()
+  return authority
 }
 
 export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
@@ -23,18 +42,22 @@ export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
     }
   }
 
+  if (isFreshMemoryCache() && authorityMemoryCache) {
+    return authorityMemoryCache
+  }
+
   try {
     const email = (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
     const verified = window.localStorage.getItem('george_verified_continuity') === 'true'
     const tier = normalizeTier(window.localStorage.getItem('george_tier'))
 
-    return {
+    return rememberAuthority({
       authenticated: Boolean(email && verified),
       tier,
       liveAccess: tier === 'intelligent' || tier === 'brilliant',
       email,
       source: email && verified ? 'local-cache' : undefined,
-    }
+    })
   } catch {
     return {
       authenticated: false,
@@ -46,6 +69,8 @@ export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
 }
 
 export function writeCachedGeorgeSessionAuthority(authority: GeorgeSessionAuthority) {
+  rememberAuthority(authority)
+
   if (typeof window === 'undefined') return
 
   try {
@@ -62,6 +87,10 @@ export function writeCachedGeorgeSessionAuthority(authority: GeorgeSessionAuthor
 }
 
 export function clearCachedGeorgeSessionAuthority() {
+  authorityMemoryCache = null
+  authorityMemoryCacheAt = 0
+  authorityInFlight = null
+
   if (typeof window === 'undefined') return
 
   try {
@@ -71,7 +100,7 @@ export function clearCachedGeorgeSessionAuthority() {
   } catch {}
 }
 
-export async function fetchGeorgeSessionAuthority(): Promise<GeorgeSessionAuthority> {
+async function fetchGeorgeSessionAuthorityUncached(): Promise<GeorgeSessionAuthority> {
   const cached = readCachedGeorgeSessionAuthority()
 
   try {
@@ -116,13 +145,31 @@ export async function fetchGeorgeSessionAuthority(): Promise<GeorgeSessionAuthor
       } catch {}
     }
 
-    return {
+    return rememberAuthority({
       authenticated: false,
       tier: 'smart',
       liveAccess: false,
       email: '',
-    }
+    })
   } catch {
     return cached
   }
+}
+
+export async function fetchGeorgeSessionAuthority(): Promise<GeorgeSessionAuthority> {
+  if (isFreshMemoryCache() && authorityMemoryCache) {
+    return authorityMemoryCache
+  }
+
+  if (authorityInFlight) {
+    return authorityInFlight
+  }
+
+  authorityInFlight = fetchGeorgeSessionAuthorityUncached()
+    .then((authority) => rememberAuthority(authority))
+    .finally(() => {
+      authorityInFlight = null
+    })
+
+  return authorityInFlight
 }
