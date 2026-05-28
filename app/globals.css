@@ -126,9 +126,11 @@ button[aria-label="Open GEORGE sidebar"] {
   opacity: 1 !important;
   position: relative;
   width: auto !important;
-  min-width: 84px !important;
-  padding-left: 0.85rem !important;
-  padding-right: 0.85rem !important;
+  min-width: 74px !important;
+  margin-left: -0.65rem !important;
+  padding-left: 0.55rem !important;
+  padding-right: 0.65rem !important;
+  color: rgba(244,247,255,0.78) !important;
 }
 
 button[aria-label="Open GEORGE sidebar"] img {
@@ -144,7 +146,7 @@ button[aria-label="Open GEORGE sidebar"]::after {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(215,219,228,0.84);
+  color: rgba(244,247,255,0.92);
   pointer-events: none;
 }
 
