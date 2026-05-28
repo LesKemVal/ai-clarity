@@ -61,6 +61,7 @@ import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-res
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
 import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-behavioral-memory'
 import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
+import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -717,7 +718,10 @@ LANGUAGE MODE: SPANISH
 
     const earbudRuntime = detectEarbudRuntime(latestUserRaw)
 
-    const earbudRuntimeNote = buildEarbudRuntimeNote(earbudRuntime)
+    const earbudRuntimeNote =
+      runtimeControls.earbudCompressionEnabled
+        ? buildEarbudRuntimeNote(earbudRuntime)
+        : ''
 
     const runtimeArbitration = arbitrateRuntimeSignals({
       explicitUserSignal: /\b(do it|go ahead|yes|no|stop|continue|next|my gut|i want|i don't want|use this|don't)\b/i.test(latestUserRaw),
@@ -756,16 +760,20 @@ LANGUAGE MODE: SPANISH
       )
 
     const adaptiveUserProfileNote =
-      buildAdaptiveUserProfileNote(adaptiveUserProfile)
+      runtimeControls.adaptiveLearningEnabled
+        ? buildAdaptiveUserProfileNote(adaptiveUserProfile)
+        : ''
 
     const durableBehavioralMemory =
-      evaluateDurableBehavioralMemory({
+      runtimeControls.durableMemoryEnabled
+        ? evaluateDurableBehavioralMemory({
         latestUserText: latestUserRaw,
         adaptiveProfile: adaptiveUserProfile,
         pressureHigh:
           control.pressureLevel.toLowerCase() === 'high',
         earbudActive: earbudRuntime.active,
       })
+        : { note: '' }
 
     const durableBehavioralMemoryNote =
       durableBehavioralMemory.note
@@ -785,13 +793,26 @@ LANGUAGE MODE: SPANISH
     const runtimeOutcomeLearningNote =
       runtimeOutcomeSignals.note
 
+    const runtimeControls =
+      resolveRuntimeControls({
+        george: {
+          adaptiveLearningEnabled: true,
+          continuityEnabled: true,
+          durableMemoryEnabled: true,
+          earbudCompressionEnabled: true,
+        },
+      })
+
     const continuityRestoration = buildContinuityRestorationState({
       latestUserText: latestUserRaw,
       earbudActive: earbudRuntime.active,
       continuityWeight: passiveIntentState.continuityDependency,
     })
 
-    const continuityRestorationNote = continuityRestoration.instruction
+    const continuityRestorationNote =
+      runtimeControls.continuityEnabled
+        ? continuityRestoration.instruction
+        : ''
 
 
 
