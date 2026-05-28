@@ -333,8 +333,8 @@ function isForceIntervention(text: string) {
 
   async function speak(text: string) {
     if (speakingRef.current) {
-      pushLog('Dropped overlapping LIVE speech request.')
-      return
+      stopGeorgeAudio('LIVE speech replaced by newer room signal.')
+      await new Promise((resolve) => window.setTimeout(resolve, 40))
     }
 
     speakingRef.current = true
