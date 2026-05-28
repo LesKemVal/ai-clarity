@@ -1,5 +1,13 @@
 'use client'
 
+import {
+  readRuntimeControl,
+  resetGeorgeRuntimeMemory,
+  writeRuntimeControl,
+} from '@/lib/george/runtime/runtime-user-controls'
+
+import { useEffect, useState } from 'react'
+
 type Props = {
   adaptiveLearningEnabled?: boolean
   continuityEnabled?: boolean
@@ -11,22 +19,44 @@ export default function MemoryContinuityPanel({
   continuityEnabled = true,
   earbudModeEnabled = false,
 }: Props) {
+  const [adaptiveLearning, setAdaptiveLearning] = useState(adaptiveLearningEnabled)
+  const [continuityLearning, setContinuityLearning] = useState(continuityEnabled)
+  const [earbudCompression, setEarbudCompression] = useState(earbudModeEnabled)
+
+  useEffect(() => {
+    setAdaptiveLearning(readRuntimeControl('adaptiveLearning', true))
+    setContinuityLearning(readRuntimeControl('continuity', true))
+    setEarbudCompression(readRuntimeControl('earbudCompression', false))
+  }, [])
+
+
+  const toggleControl = (
+    key: 'adaptiveLearning' | 'continuity' | 'earbudCompression',
+    value: boolean
+  ) => {
+    writeRuntimeControl(key, value)
+
+    if (key === 'adaptiveLearning') setAdaptiveLearning(value)
+    if (key === 'continuity') setContinuityLearning(value)
+    if (key === 'earbudCompression') setEarbudCompression(value)
+  }
+
   const items = [
     {
       label: 'Adaptive Runtime Learning',
-      value: adaptiveLearningEnabled,
+      value: adaptiveLearning,
       description:
         'GEORGE adapts delivery, pacing, and response structure from runtime interaction signals.',
     },
     {
       label: 'Continuity Restoration',
-      value: continuityEnabled,
+      value: continuityLearning,
       description:
         'GEORGE restores important conversational context, objectives, and operational posture across sessions.',
     },
     {
       label: 'Earbud Runtime Compression',
-      value: earbudModeEnabled,
+      value: earbudCompression,
       description:
         'GEORGE shortens delivery and prioritizes tactical cues during high-pressure or earbud-assisted interaction.',
     },
@@ -62,8 +92,22 @@ export default function MemoryContinuityPanel({
               </div>
             </div>
 
-            <div
-              className={`mt-1 h-2.5 w-2.5 rounded-full ${
+            <button
+              type="button"
+              onClick={() => {
+                if (item.label === 'Adaptive Runtime Learning') {
+                  toggleControl('adaptiveLearning', !item.value)
+                }
+
+                if (item.label === 'Continuity Restoration') {
+                  toggleControl('continuity', !item.value)
+                }
+
+                if (item.label === 'Earbud Runtime Compression') {
+                  toggleControl('earbudCompression', !item.value)
+                }
+              }}
+              className={`mt-1 h-2.5 w-2.5 rounded-full transition ${
                 item.value
                   ? 'bg-[#8FB6C9] shadow-[0_0_12px_rgba(143,182,201,0.7)]'
                   : 'bg-white/14'
@@ -71,6 +115,20 @@ export default function MemoryContinuityPanel({
             />
           </div>
         ))}
+      </div>
+
+
+      <div className="border-t border-white/[0.05] px-6 py-4">
+        <button
+          type="button"
+          onClick={() => {
+            resetGeorgeRuntimeMemory()
+            window.location.reload()
+          }}
+          className="rounded-[1rem] border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[0.76rem] uppercase tracking-[0.18em] text-white/48 transition hover:bg-white/[0.06] hover:text-white/82"
+        >
+          Reset runtime memory
+        </button>
       </div>
 
       <div className="border-t border-white/[0.05] px-6 py-4 text-[0.78rem] leading-[1.7] text-white/34">
