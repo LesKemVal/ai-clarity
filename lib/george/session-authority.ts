@@ -18,6 +18,15 @@ function normalizeTier(value: unknown): GeorgeSessionTier {
   return value === 'brilliant' || value === 'intelligent' ? value : 'smart'
 }
 
+function unauthenticatedAuthority(): GeorgeSessionAuthority {
+  return {
+    authenticated: false,
+    tier: 'smart',
+    liveAccess: false,
+    email: '',
+  }
+}
+
 function now() {
   return Date.now()
 }
@@ -34,12 +43,7 @@ function rememberAuthority(authority: GeorgeSessionAuthority) {
 
 export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
   if (typeof window === 'undefined') {
-    return {
-      authenticated: false,
-      tier: 'smart',
-      liveAccess: false,
-      email: '',
-    }
+    return unauthenticatedAuthority()
   }
 
   if (isFreshMemoryCache() && authorityMemoryCache) {
@@ -48,23 +52,17 @@ export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
 
   try {
     const email = (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
-    const verified = window.localStorage.getItem('george_verified_continuity') === 'true'
     const tier = normalizeTier(window.localStorage.getItem('george_tier'))
 
     return rememberAuthority({
-      authenticated: Boolean(email && verified),
+      authenticated: false,
       tier,
-      liveAccess: tier === 'intelligent' || tier === 'brilliant',
+      liveAccess: false,
       email,
-      source: email && verified ? 'local-cache' : undefined,
+      source: email ? 'local-hint' : undefined,
     })
   } catch {
-    return {
-      authenticated: false,
-      tier: 'smart',
-      liveAccess: false,
-      email: '',
-    }
+    return unauthenticatedAuthority()
   }
 }
 
@@ -82,6 +80,8 @@ export function writeCachedGeorgeSessionAuthority(authority: GeorgeSessionAuthor
 
     if (authority.authenticated) {
       window.localStorage.setItem('george_verified_continuity', 'true')
+    } else {
+      window.localStorage.removeItem('george_verified_continuity')
     }
   } catch {}
 }
@@ -114,7 +114,7 @@ async function fetchGeorgeSessionAuthorityUncached(): Promise<GeorgeSessionAutho
         tier,
         liveAccess: Boolean(data?.liveAccess) || tier === 'intelligent' || tier === 'brilliant',
         email: String(data?.email || cached.email || '').trim().toLowerCase(),
-        source: data?.source,
+        source: data?.source || 'session',
         expiresAt: data?.expiresAt,
       }
 
@@ -122,35 +122,8 @@ async function fetchGeorgeSessionAuthorityUncached(): Promise<GeorgeSessionAutho
       return authority
     }
 
-    if (cached.email) {
-      try {
-        const subResponse = await fetch(
-          `/api/subscription-state?email=${encodeURIComponent(cached.email)}`,
-          { cache: 'no-store' }
-        )
-
-        const subData = await subResponse.json()
-        const tier = normalizeTier(subData?.currentTier)
-
-        const authority: GeorgeSessionAuthority = {
-          authenticated: true,
-          tier,
-          liveAccess: tier === 'intelligent' || tier === 'brilliant',
-          email: cached.email,
-          source: 'subscriber-restore',
-        }
-
-        writeCachedGeorgeSessionAuthority(authority)
-        return authority
-      } catch {}
-    }
-
-    return rememberAuthority({
-      authenticated: false,
-      tier: 'smart',
-      liveAccess: false,
-      email: '',
-    })
+    clearCachedGeorgeSessionAuthority()
+    return rememberAuthority(unauthenticatedAuthority())
   } catch {
     return cached
   }
