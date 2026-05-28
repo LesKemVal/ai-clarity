@@ -774,7 +774,7 @@ LANGUAGE MODE: SPANISH
       evaluateRuntimeOutcomeSignals({
         latestUserText: latestUserRaw,
         previousAssistantLength:
-          [...cleanMessages]
+          [...recentMessages]
             .reverse()
             .find((message) => message.role === 'assistant')
             ?.content?.length ?? 0,
