@@ -112,26 +112,29 @@ aside[class*="-translate-x-full"] {
   pointer-events: none !important;
 }
 
-/* Restore the Bx identity cue for the sidebar opener. */
+/* Explicit sidebar opener. */
 button[aria-label="Open GEORGE sidebar"] {
   position: relative;
+  width: auto !important;
+  min-width: 76px !important;
+  padding-left: 0.8rem !important;
+  padding-right: 0.8rem !important;
 }
 
 button[aria-label="Open GEORGE sidebar"] img {
-  opacity: 0.14;
+  display: none !important;
 }
 
 button[aria-label="Open GEORGE sidebar"]::after {
-  content: "Bx";
-  position: absolute;
-  inset: 0;
-  display: flex;
+  content: "← Open";
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: -0.04em;
-  color: rgba(215,219,228,0.88);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(215,219,228,0.78);
   pointer-events: none;
 }
 
