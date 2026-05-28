@@ -510,24 +510,17 @@ export default function LiveEntryClient() {
 
         <div className="mb-3 flex items-center justify-between gap-3 px-1">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
-          <button
-            type="button"
-            onClick={() => startLive(true)}
-            className="text-[12px] font-medium text-[#AEB6FF]/62 underline-offset-4 transition hover:text-[#D7DCFF] hover:underline"
-          >
-            Skip prep
-          </button>
         </div>
 
-        <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-4 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-5">
+        <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
 
-          <h1 className="mt-3 text-[28px] font-semibold leading-[1.02] tracking-[-0.05em] text-white/88 sm:text-[38px]">
-            Prepare for conversation.
+          <h1 className="mt-3 text-[24px] font-semibold leading-[1.02] tracking-[-0.05em] text-white/88 sm:text-[32px]">
+            Prepare LIVE runtime.
           </h1>
 
-          <p className="mt-4 text-[14px] leading-6 text-white/46">
-            Choose the type of conversation and who you are speaking with. GEORGE prepares pacing, support, and conversational guidance before LIVE begins.
+          <p className="mt-2 text-[13px] leading-5 text-white/42">
+            GEORGE prepares pacing, steering, compression, and conversational support before LIVE begins.
           </p>
 
           {runtimeMotionContext && (
@@ -537,7 +530,7 @@ export default function LiveEntryClient() {
             </div>
           )}
 
-          <div className="mt-5 grid gap-3">
+          <div className="mt-4 grid gap-2">
             <CompactSelect label="Conversation type" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
             <CompactSelect label="Audience type" value={audienceType} options={AUDIENCE_TYPES} onChange={setAudienceType} />
             <CompactSelect label="Pacing" value={pacing} options={PACING_OPTIONS} onChange={setPacing} />
@@ -548,12 +541,12 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => setShowResourceMeter((value) => !value)}
-              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+              className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left"
             >
               <div>
                 <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">Operational runtime</div>
                 <div className="mt-1 text-[13px] text-white/72">
-                  Runtime Window ~{finalResourceEstimate.runtimeMinutes}m · Runtime Cost ~{finalResourceEstimate.estimatedCents}¢
+                  ~{finalResourceEstimate.runtimeMinutes}m runtime · {finalResourceEstimate.intensity} load
                 </div>
                 <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[#8FB6C9]/52">
                   {finalResourceEstimate.intensity} runtime load
@@ -564,16 +557,16 @@ export default function LiveEntryClient() {
 
             {showResourceMeter && (
               <div className="border-t border-white/[0.035] px-4 pb-4 pt-3">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
+                <div className="grid grid-cols-3 gap-1.5 text-center">
+                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.prepSeconds}s</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">prep</div>
                   </div>
-                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
+                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.runtimeMinutes}m</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">runtime</div>
                   </div>
-                  <div className="rounded-[0.9rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-2 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
+                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                     <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{finalResourceEstimate.estimatedCents}¢</div>
                     <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">cost</div>
                   </div>
@@ -584,18 +577,18 @@ export default function LiveEntryClient() {
             )}
           </div>
 
-          <label className="mt-3 block rounded-[1rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective optional</span>
             <textarea
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
-              rows={3}
+              rows={2}
               placeholder="Example: help me ask for the raise without overexplaining."
               className="mt-2 w-full resize-none bg-transparent text-[15px] leading-6 text-white/76 outline-none placeholder:text-white/24"
             />
           </label>
 
-          <label className="mt-3 block rounded-[1rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-4 py-3 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-4 py-3 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
             <div className="mt-2 flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -641,7 +634,7 @@ export default function LiveEntryClient() {
             </div>
           </label>
 
-          <label className="mt-3 block rounded-[1rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Steering words</span>
             <input
               value={controlWords}
