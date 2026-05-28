@@ -98,6 +98,8 @@ function applySteeringContinuationAuthority(
         continuation.direction === 'compress' || input.audio ? 'tight' : packet.responseCompression,
       status: `${packet.status} Steering continuation: ${continuation.reason}`.trim(),
       confidence: Math.max(packet.confidence || 0, 0.82),
+      speakerIntentShouldHold: false,
+      speakerIntentShouldSpeak: true,
     }
   }
 
@@ -124,6 +126,8 @@ function applySteeringContinuationAuthority(
       continuation.direction === 'compress' || input.audio ? 'tight' : packet.responseCompression,
     status: `${packet.status} Steering cue: ${continuation.reason}`.trim(),
     confidence: Math.max(packet.confidence || 0, 0.82),
+    speakerIntentShouldHold: false,
+    speakerIntentShouldSpeak: true,
   }
 }
 
