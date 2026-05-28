@@ -537,42 +537,33 @@ export default function LiveEntryClient() {
             <CompactSelect label="Output" value={outputMode} options={OUTPUT_OPTIONS} onChange={setOutputMode} />
           </div>
 
-          <div className="bx-command-shimmer mt-3 overflow-hidden rounded-[1.08rem] border border-[#8FB6C9]/[0.10] bg-[linear-gradient(180deg,rgba(143,182,201,0.055),rgba(8,12,18,0.92))] shadow-[0_20px_60px_rgba(0,0,0,0.32)]">
-            <button
-              type="button"
-              onClick={() => setShowResourceMeter((value) => !value)}
-              className="flex w-full items-center justify-between gap-2 px-2.5 py-2 text-left"
-            >
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">Operational runtime</div>
-                <div className="mt-1 text-[13px] text-white/72">
-                  ~{finalResourceEstimate.runtimeMinutes}m runtime · {finalResourceEstimate.intensity} load
-                </div>
-                <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[#8FB6C9]/52">
-                  {finalResourceEstimate.intensity} runtime load
+          <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Runtime profile</div>
+                <div className="mt-1 truncate text-[13px] text-white/70">
+                  {finalResourceEstimate.intensity} load · ~{finalResourceEstimate.runtimeMinutes}m · {liveAssistMode === 'lines' ? 'repeatable lines' : 'cues'}
                 </div>
               </div>
-              <span className="text-[12px] text-white/34">{showResourceMeter ? 'Hide' : 'Show'}</span>
-            </button>
+
+              <button
+                type="button"
+                onClick={() => setShowResourceMeter((value) => !value)}
+                className="shrink-0 rounded-full border border-[#8FB6C9]/[0.10] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/62 transition hover:border-[#8FB6C9]/[0.22] hover:text-[#D7DCFF]/86"
+              >
+                {showResourceMeter ? 'Less' : 'More'}
+              </button>
+            </div>
 
             {showResourceMeter && (
-              <div className="border-t border-white/[0.035] px-4 pb-4 pt-3">
-                <div className="grid grid-cols-3 gap-1.5 text-center">
-                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.prepSeconds}s</div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">prep</div>
-                  </div>
-                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">{finalResourceEstimate.runtimeMinutes}m</div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">runtime</div>
-                  </div>
-                  <div className="rounded-[0.72rem] border border-[#8FB6C9]/[0.08] bg-[#8FB6C9]/[0.04] px-2 py-1.5 shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
-                    <div className="text-[18px] font-semibold tracking-[-0.04em] text-white/76">~{finalResourceEstimate.estimatedCents}¢</div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/26">cost</div>
-                  </div>
+              <div className="mt-2 border-t border-white/[0.035] pt-2">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/38">
+                  <span>{finalResourceEstimate.prepSeconds}s prep</span>
+                  <span>{finalResourceEstimate.resources.length} resources</span>
+                  <span>~{finalResourceEstimate.estimatedCents}¢ estimated</span>
                 </div>
 
-                <p className="mt-3 text-[12px] leading-5 text-[#D7DCFF]/42">{finalResourceEstimate.reason}</p>
+                <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#D7DCFF]/34">{finalResourceEstimate.reason}</p>
               </div>
             )}
           </div>
