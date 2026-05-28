@@ -774,9 +774,10 @@ LANGUAGE MODE: SPANISH
       evaluateRuntimeOutcomeSignals({
         latestUserText: latestUserRaw,
         previousAssistantLength:
-          typeof lastAssistantMessage?.content === 'string'
-            ? lastAssistantMessage.content.length
-            : 0,
+          [...cleanMessages]
+            .reverse()
+            .find((message) => message.role === 'assistant')
+            ?.content?.length ?? 0,
         pressureHigh:
           control.pressureLevel.toLowerCase() === 'high',
       })
