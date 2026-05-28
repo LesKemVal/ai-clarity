@@ -1169,6 +1169,9 @@ useEffect(() => {
     if (window.localStorage.getItem('george_resume_live_after_home') !== '1') return
 
     window.localStorage.removeItem('george_resume_live_after_home')
+    window.localStorage.removeItem('george_start_new_live')
+    window.localStorage.removeItem('george_fresh_live_entry')
+    window.localStorage.removeItem('GEORGE_LIVE_SETUP')
     setShowLiveChooser(false)
     setSessionPickerClosing(false)
     setSessionPickerMode('live')

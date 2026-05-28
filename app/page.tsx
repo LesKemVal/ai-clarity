@@ -70,6 +70,7 @@ export default function HomePage() {
   }
 
   const startNewLiveConversation = () => {
+    window.localStorage.removeItem('george_resume_live_after_home')
     window.localStorage.setItem('george_fresh_live_entry', '1')
     window.localStorage.removeItem('GEORGE_LIVE_SETUP')
     window.localStorage.removeItem('george_live_control_words')
@@ -84,6 +85,9 @@ export default function HomePage() {
   }
 
   const resumeLiveConversation = () => {
+    window.localStorage.removeItem('george_start_new_live')
+    window.localStorage.removeItem('george_fresh_live_entry')
+    window.localStorage.removeItem('GEORGE_LIVE_SETUP')
     window.localStorage.setItem('george_resume_live_after_home', '1')
     router.push('/george')
   }
