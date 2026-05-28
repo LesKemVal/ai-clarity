@@ -80,8 +80,7 @@ export default function HomePage() {
     window.localStorage.removeItem('george_active_campaign')
     window.localStorage.removeItem('george_active_context')
     window.localStorage.removeItem('george_active_label')
-    window.localStorage.setItem('george_open_live_chooser_after_home', '1')
-    router.push('/george')
+    router.push('/george/live-entry')
   }
 
   const resumeLiveConversation = () => {
