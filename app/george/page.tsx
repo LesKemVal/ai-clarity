@@ -4908,7 +4908,8 @@ return (
           <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
-                <button
+                {!showSidebar && (
+<button
                   type="button"
                   onClick={() => setShowSidebar(true)}
                   className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden"
@@ -4916,6 +4917,7 @@ return (
                 >
                   <img src="/logofav.png" alt="GEORGE" className="h-10 w-10 object-contain opacity-95" />
                 </button>
+)}
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
 

@@ -759,7 +759,7 @@ function isForceIntervention(text: string) {
             pushLog('Force intervention cleared queued speech.')
           }
 
-          if (inferredSpeaker.speaker === 'user') {
+          if (inferredSpeaker.speaker === 'user' && !forcedIntervention) {
             georgeAudioQueue.clear()
             georgeCancelEngine.bump()
 
@@ -922,8 +922,15 @@ function isForceIntervention(text: string) {
 
           if (
             !georgeCancelEngine.isExpired(generation) &&
-            orchestrated?.packet.shouldSpeak &&
-            orchestrated.queueText &&
+            orchestrated &&
+            (
+              forcedIntervention ||
+              orchestrated.packet.shouldSpeak
+            ) &&
+            (
+              forcedIntervention ||
+              orchestrated.queueText
+            ) &&
             (
               forcedIntervention ||
               shouldQueueByRuntime
@@ -942,9 +949,11 @@ function isForceIntervention(text: string) {
           ) {
             const approvedPacket = orchestrated.packet as LivePacket
             const approvedSpeech =
-              approvedPacket.liveAssistMode === 'lines'
-                ? approvedPacket.volley
-                : approvedPacket.cue
+              forcedIntervention
+                ? (approvedPacket.volley || approvedPacket.cue)
+                : approvedPacket.liveAssistMode === 'lines'
+                  ? approvedPacket.volley
+                  : approvedPacket.cue
 
             if (!approvedSpeech?.trim()) {
               pushLog('No approved LIVE audio channel to speak.')
