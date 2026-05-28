@@ -17,14 +17,7 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30
 const SESSION_TTL_MS = SESSION_TTL_SECONDS * 1000
 
 function getSessionSecret() {
-  return (
-    process.env.GEORGE_SESSION_SECRET ||
-    process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    process.env.STRIPE_WEBHOOK_SECRET ||
-    process.env.OPENAI_API_KEY ||
-    ''
-  )
+  return process.env.GEORGE_SESSION_SECRET || ''
 }
 
 function base64UrlEncode(input: string) {
@@ -37,7 +30,13 @@ function base64UrlDecode(input: string) {
 
 function sign(payload: string) {
   const secret = getSessionSecret()
-  if (!secret) return ''
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[GEORGE][session][missing-secret]')
+    }
+
+    return ''
+  }
 
   return crypto.createHmac('sha256', secret).update(payload).digest('base64url')
 }
