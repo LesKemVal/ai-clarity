@@ -1154,6 +1154,7 @@ useEffect(() => {
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [showLiveChooser, setShowLiveChooser] = useState(false)
+  const [liveEntryBlinking, setLiveEntryBlinking] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -5775,18 +5776,26 @@ ${simplifyTarget}`
                   <button
                     type="button"
                     onClick={() => {
-                      if (hasLiveGeorgeAccess) {
-                        setShowNormalUtilityMenu(null)
-                        setShowLiveChooser(true)
-                        return
-                      }
+                      if (liveEntryBlinking) return
 
-                      setShowNormalUtilityMenu(null)
-                      setLoginEmailInput('')
-                      setLoginLinkSent(false)
-                      setShowUpgradeModal(true)
+                      setLiveEntryBlinking(true)
+
+                      window.setTimeout(() => {
+                        setLiveEntryBlinking(false)
+
+                        if (hasLiveGeorgeAccess) {
+                          setShowNormalUtilityMenu(null)
+                          setShowLiveChooser(true)
+                          return
+                        }
+
+                        setShowNormalUtilityMenu(null)
+                        setLoginEmailInput('')
+                        setLoginLinkSent(false)
+                        setShowUpgradeModal(true)
+                      }, 720)
                     }}
-                    className="inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
+                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_980ms_cubic-bezier(0.22,1,0.36,1)_1]' : ''}`}
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
