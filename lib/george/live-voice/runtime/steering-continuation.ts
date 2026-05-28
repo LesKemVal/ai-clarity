@@ -10,7 +10,18 @@ export type SteeringContinuationInput = {
 export type SteeringContinuationResult = {
   matched: boolean
   phrase: string
-  direction: 'hold' | 'soften' | 'negotiate' | 'clarify' | 'compress' | 'redirect' | 'buy_time'
+  direction:
+    | 'hold'
+    | 'soften'
+    | 'firm'
+    | 'negotiate'
+    | 'clarify'
+    | 'compress'
+    | 'redirect'
+    | 'buy_time'
+    | 'scan_options'
+    | 'reframe'
+    | 'next_move'
   style: SteeringContinuationStyle
   continuation: string
   cue: string
@@ -18,7 +29,7 @@ export type SteeringContinuationResult = {
 }
 
 function clean(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, ' ')
+  return value.trim().toLowerCase().replace(/[“”]/g, '"').replace(/['']/g, "'").replace(/\s+/g, ' ')
 }
 
 function objectiveHint(objective?: string | null) {
@@ -36,7 +47,7 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
     `${room} ${objective}`
   )
 
-  if (phrase === 'hmm' || phrase === 'hmmm' || phrase === 'one second' || phrase === 'let me think') {
+  if (phrase === 'hmm' || phrase === 'hmmm' || phrase === 'one second' || phrase === 'give me a second' || phrase === 'let me think') {
     return {
       matched: true,
       phrase,
@@ -45,8 +56,70 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
       continuation: negotiationContext
         ? '...before I answer, let’s make sure we are solving the same problem.'
         : '...let me make sure I answer the right question.',
-      cue: 'Buy time. Do not rush.',
+      cue: 'Take the pause. Do not rush.',
       reason: 'User is buying time without exposing GEORGE.',
+    }
+  }
+
+  if (phrase === 'ok and' || phrase === 'okay and' || phrase === 'ok, and' || phrase === 'okay, and') {
+    return {
+      matched: true,
+      phrase,
+      direction: 'next_move',
+      style,
+      continuation: negotiationContext
+        ? '...then the next question is what actually moves this forward.'
+        : '...then the next useful thing is to narrow the choice.',
+      cue: 'Continue. Move to the next useful step.',
+      reason: 'Continuation phrase asks GEORGE to carry the user into the next move.',
+    }
+  }
+
+  if (phrase === 'let me see' || phrase === "let's see" || phrase === 'lets see') {
+    return {
+      matched: true,
+      phrase,
+      direction: 'scan_options',
+      style,
+      continuation: '...there are really two things to separate here.',
+      cue: 'Scan options. Separate the real issue.',
+      reason: 'User is asking for a room-safe scan before speaking.',
+    }
+  }
+
+  if (phrase === 'fair point' || phrase === "that's fair" || phrase === 'thats fair') {
+    return {
+      matched: true,
+      phrase,
+      direction: 'soften',
+      style,
+      continuation: '...and I think the fair way to look at it is this.',
+      cue: 'Acknowledge first. Then pivot.',
+      reason: 'User needs to preserve trust while redirecting.',
+    }
+  }
+
+  if (phrase === 'what i mean is') {
+    return {
+      matched: true,
+      phrase,
+      direction: 'reframe',
+      style,
+      continuation: '...the cleaner way to say it is this.',
+      cue: 'Reframe. Clean the point.',
+      reason: 'User is asking GEORGE to reshape the sentence naturally.',
+    }
+  }
+
+  if (phrase === "let's be clear" || phrase === 'lets be clear') {
+    return {
+      matched: true,
+      phrase,
+      direction: 'firm',
+      style,
+      continuation: '...the point I want to be clear about is this.',
+      cue: 'Firm posture. Say it plainly.',
+      reason: 'User wants a stronger, clearer frame.',
     }
   }
 
