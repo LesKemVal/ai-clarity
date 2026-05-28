@@ -5801,9 +5801,9 @@ ${simplifyTarget}`
                         setLoginEmailInput('')
                         setLoginLinkSent(false)
                         setShowUpgradeModal(true)
-                      }, 720)
+                      }, 520)
                     }}
-                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_980ms_cubic-bezier(0.22,1,0.36,1)_1]' : ''}`}
+                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_260ms_cubic-bezier(0.22,1,0.36,1)_2]' : ''}`}
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >

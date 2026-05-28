@@ -208,7 +208,7 @@ function CompactSelect({
   onChange: (value: string) => void
 }) {
   return (
-    <label className="block rounded-[1rem] border border-white/[0.04] bg-black/20 px-4 py-3">
+    <label className="block rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-3 py-2">
       <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">{label}</span>
       <select
         value={value}
@@ -508,7 +508,7 @@ export default function LiveEntryClient() {
       <div className="relative z-10 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
 
-        <div className="mb-3 flex items-center justify-between gap-3 px-1">
+        <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
         </div>
 
@@ -524,13 +524,13 @@ export default function LiveEntryClient() {
           </p>
 
           {runtimeMotionContext && (
-            <div className="mt-4 rounded-[1rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-4 py-3">
+            <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
               <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Loaded context</div>
               <div className="mt-1 text-[14px] font-medium text-white/78">{runtimeMotionContext.title}</div>
             </div>
           )}
 
-          <div className="mt-4 grid gap-2">
+          <div className="mt-2 grid gap-2">
             <CompactSelect label="Conversation type" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
             <CompactSelect label="Audience type" value={audienceType} options={AUDIENCE_TYPES} onChange={setAudienceType} />
             <CompactSelect label="Pacing" value={pacing} options={PACING_OPTIONS} onChange={setPacing} />
@@ -541,7 +541,7 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => setShowResourceMeter((value) => !value)}
-              className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left"
+              className="flex w-full items-center justify-between gap-2 px-2.5 py-2 text-left"
             >
               <div>
                 <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">Operational runtime</div>
@@ -577,7 +577,7 @@ export default function LiveEntryClient() {
             )}
           </div>
 
-          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective optional</span>
             <textarea
               value={objective}
@@ -588,9 +588,9 @@ export default function LiveEntryClient() {
             />
           </label>
 
-          <label className="mt-2 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-4 py-3 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
-            <div className="mt-2 flex items-center justify-between gap-3">
+            <div className="mt-2 flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <div className="truncate text-[13px] text-white/62">
                   {prepDocument ? prepDocument.name : prepDocumentPrompt.helper}
@@ -634,7 +634,7 @@ export default function LiveEntryClient() {
             </div>
           </label>
 
-          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-4 py-3 backdrop-blur-md">
+          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Steering words</span>
             <input
               value={controlWords}
@@ -644,7 +644,7 @@ export default function LiveEntryClient() {
             />
           </label>
 
-          <div className="mt-4 flex items-center gap-2 text-[12px] leading-5 text-white/34">
+          <div className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-white/34">
             <span className="h-[5px] w-[5px] rounded-full bg-[#8FB6C9]/70 shadow-[0_0_12px_rgba(143,182,201,0.42)]" />
             <span>
               Runtime loaded: <span className="text-white/58">{loadedSummary}</span>
@@ -655,9 +655,9 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => setShowPrepPreview(true)}
-              className="min-h-[50px] rounded-[1rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
+              className="min-h-[50px] rounded-[0.82rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
             >
-              Review and enter LIVE
+              Enter LIVE
             </button>
           </div>
 
@@ -669,7 +669,7 @@ export default function LiveEntryClient() {
         </section>
 
         {tier === 'smart' && (
-          <p className="mt-4 text-center text-[12px] leading-5 text-white/32">
+          <p className="mt-2 text-center text-[12px] leading-5 text-white/32">
             LIVE access may require Intelligent or Brilliant depending on account state.
           </p>
         )}

@@ -38,7 +38,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
         }
       `}</style>
 
-      <div className="relative flex max-h-[calc(100dvh-32px)] w-full max-w-[520px] flex-col overflow-hidden rounded-[1.2rem] border border-white/[0.07] bg-[#05080D]/92 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+      <div className="relative flex max-h-[min(540px,calc(100dvh-28px))] w-full max-w-[460px] flex-col overflow-hidden rounded-[1rem] border border-white/[0.07] bg-[#05080D]/92 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%)] opacity-75" />
         <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[#8FB6FF]/[0.08] to-transparent" />
         <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
@@ -48,7 +48,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
           <h2 className="mt-2 text-[26px] font-semibold tracking-[-0.045em] text-white md:text-[30px]">
             Final LIVE review
           </h2>
-          <p className="mt-2 max-w-xl text-[13px] leading-6 text-white/50">
+          <p className="mt-2 max-w-md text-[12px] leading-5 text-white/50">
             GEORGE has read the room and prepared the operating posture. Adjust only what should change before entering LIVE.
           </p>
         </div>
