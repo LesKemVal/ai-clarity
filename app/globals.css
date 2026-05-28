@@ -112,13 +112,23 @@ aside[class*="-translate-x-full"] {
   pointer-events: none !important;
 }
 
-/* Explicit sidebar opener. */
+/* Darken and stabilize the operational top band. */
+header.fixed.top-0 {
+  background: linear-gradient(180deg, rgba(4,5,8,0.985), rgba(7,9,13,0.965)) !important;
+  box-shadow: 0 18px 54px rgba(0,0,0,0.48) !important;
+  backdrop-filter: blur(18px);
+}
+
+/* Force the sidebar opener visible at all breakpoints. */
 button[aria-label="Open GEORGE sidebar"] {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   position: relative;
   width: auto !important;
-  min-width: 76px !important;
-  padding-left: 0.8rem !important;
-  padding-right: 0.8rem !important;
+  min-width: 84px !important;
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
 }
 
 button[aria-label="Open GEORGE sidebar"] img {
@@ -134,7 +144,7 @@ button[aria-label="Open GEORGE sidebar"]::after {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(215,219,228,0.78);
+  color: rgba(215,219,228,0.84);
   pointer-events: none;
 }
 
