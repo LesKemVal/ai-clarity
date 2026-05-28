@@ -77,7 +77,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
         }
       `}</style>
 
-      <div className="relative flex max-h-[min(510px,calc(100dvh-22px))] w-full max-w-[470px] flex-col overflow-hidden rounded-[1rem] border border-white/[0.07] bg-[#05080D]/94 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]">
+      <div className="relative flex max-h-[min(480px,calc(100dvh-22px))] w-full max-w-[470px] flex-col overflow-hidden rounded-[1rem] border border-white/[0.07] bg-[#05080D]/94 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(143,182,255,0.105),transparent_36%)] opacity-80" />
         <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_5.2s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[#8FB6FF]/[0.075] to-transparent" />
         <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -85,28 +85,28 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
         <div className="relative shrink-0 px-4 pb-3 pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">LIVE Preview</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">Conversation support</p>
               <h2 className="mt-1.5 text-[22px] font-semibold tracking-[-0.045em] text-white">
-                Steering behavior
+                Help GEORGE support the conversation
               </h2>
             </div>
             <div className="rounded-full border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/68">
-              Runtime ready
+              Ready
             </div>
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            These phrases are natural sentence starters GEORGE uses to adjust timing, tone, cues and lines during the conversation.
+            This preview shows how GEORGE can read simple cues during a conversation and adjust the help it gives you.
           </p>
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          <div className="animate-[runtimeMeterPulse_620ms_1000ms_cubic-bezier(0.22,1,0.36,1)_2] rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/24 px-3 py-2">
+          <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Runtime summary</p>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/58">GEORGE selected</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">System proof</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">active</p>
             </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/46">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/38">
               <span>{formatValue(profile.pressureLevel)} pressure</span>
               <span>{formatValue(profile.cueDensity)} cues</span>
               <span>{formatValue(profile.compression)} compression</span>
@@ -114,7 +114,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
             <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-white/34">{runtimeSummary}</p>
           </div>
 
-          <div className="mt-3 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
+          <div className="mt-2 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
             <div className="grid grid-cols-[1fr_18px_1.35fr] items-center gap-x-2 border-b border-white/[0.045] pb-2 text-[10px] uppercase tracking-[0.18em] text-white/30">
               <span>Phrase</span>
               <span />
@@ -123,17 +123,17 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
 
             <div className="divide-y divide-white/[0.035]">
               {STEERING_MAP.map((item) => (
-                <div key={item.phrase} className="grid grid-cols-[1fr_18px_1.35fr] items-center gap-x-2 py-2">
-                  <p className="text-[13px] font-medium tracking-[-0.02em] text-white/82">{item.phrase}</p>
+                <div key={item.phrase} className="grid grid-cols-[1fr_18px_1.35fr] items-center gap-x-2 py-1.5">
+                  <p className="text-[12px] font-medium tracking-[-0.02em] text-white/82">{item.phrase}</p>
                   <span className="h-px w-full bg-[#8FB6C9]/34" />
-                  <p className="text-[11px] leading-4 text-white/46">{item.behavior}</p>
+                  <p className="text-[11px] leading-4 text-white/42">{item.behavior}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <p className="mt-2 text-[11px] leading-4 text-white/34">
-            Use the phrase naturally. GEORGE treats it as the beginning of the next cue or repeatable line.
+            Use these phrases naturally inside the conversation. GEORGE treats them as steering signals, not scripts to start with.
           </p>
         </div>
 

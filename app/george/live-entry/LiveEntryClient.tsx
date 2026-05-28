@@ -510,17 +510,24 @@ export default function LiveEntryClient() {
 
         <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
+          <button
+            type="button"
+            onClick={() => startLive(true)}
+            className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/54 transition duration-150 hover:text-white/78 active:scale-[0.96]"
+          >
+            Skip prep
+          </button>
         </div>
 
         <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
 
-          <h1 className="mt-3 text-[17px] font-semibold leading-[1.02] tracking-[-0.05em] text-white/88 sm:text-[32px]">
-            Runtime ready.
+          <h1 className="mt-3 text-[19px] font-semibold leading-[1.08] tracking-[-0.05em] text-white/90 sm:text-[32px]">
+            This room prepares GEORGE to support your conversation.
           </h1>
 
           <p className="mt-2 text-[12px] leading-5 text-white/42">
-            GEORGE selected operational posture, pacing, and response shaping for this room.
+            System runtime settings below show how GEORGE adjusts posture, pacing, and response shaping for the room.
           </p>
 
           {runtimeMotionContext && (
@@ -630,14 +637,6 @@ export default function LiveEntryClient() {
               <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">
                 Steering words
               </span>
-
-              <button
-                type="button"
-                onClick={() => startLive(true)}
-                className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/54 transition duration-150 hover:text-white/78 active:scale-[0.96]"
-              >
-                Skip prep
-              </button>
             </div>
 
             <p className="mt-2 text-[13px] leading-5 text-white/46">
