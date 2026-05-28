@@ -742,7 +742,7 @@ const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
 const [showMemoryContinuityPanel, setShowMemoryContinuityPanel] = useState(false)
 const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null)
-const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
+const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'memory' | 'images' | 'signal'>('live')
 
 useEffect(() => {
   if (typeof window === 'undefined') return
