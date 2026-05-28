@@ -38,7 +38,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
         }
       `}</style>
 
-      <div className="relative flex max-h-[88dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[1.55rem] border border-white/[0.07] bg-[#05080D]/88 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+      <div className="relative flex max-h-[calc(100dvh-32px)] w-full max-w-[520px] flex-col overflow-hidden rounded-[1.2rem] border border-white/[0.07] bg-[#05080D]/92 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_34%)] opacity-75" />
         <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[#8FB6FF]/[0.08] to-transparent" />
         <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
@@ -46,7 +46,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
         <div className="relative shrink-0 px-4 pb-3 pt-4 md:px-5 md:pt-5">
           <p className="text-[10px] uppercase tracking-[0.34em] text-white/32">Prep Room</p>
           <h2 className="mt-2 text-[26px] font-semibold tracking-[-0.045em] text-white md:text-[30px]">
-            Resource setup
+            Final LIVE review
           </h2>
           <p className="mt-2 max-w-xl text-[13px] leading-6 text-white/50">
             GEORGE has read the room and prepared the operating posture. Adjust only what should change before entering LIVE.
@@ -81,7 +81,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
           </div>
 
           <div className="mt-3 rounded-[1.15rem] border border-white/10 bg-white/[0.025] p-3">
-            <p className="text-[10px] uppercase tracking-[0.26em] text-white/32">Cue explanation</p>
+            <p className="text-[10px] uppercase tracking-[0.26em] text-white/32">User last say</p>
             <p className="mt-2 text-[12px] leading-5 text-white/52">
               Cues control how often GEORGE intervenes during LIVE. Light cues protect flow. Balanced cues catch important openings. Dense cues are for training, difficult rooms, or close guidance.
             </p>
@@ -98,7 +98,7 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive, onE
             </button>
             <button
               onClick={onEnterLive}
-              className="px-1 py-1 text-[12px] font-medium uppercase tracking-[0.2em] text-[#D7DCFF]/62 transition duration-200 hover:text-white active:scale-[0.96] active:text-white"
+              className="rounded-[0.8rem] border border-[#8FB6C9]/[0.16] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/76 shadow-[0_12px_32px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-200 hover:border-[#8FB6C9]/[0.28] hover:text-white active:scale-[0.96]"
             >
               Now start LIVE
             </button>

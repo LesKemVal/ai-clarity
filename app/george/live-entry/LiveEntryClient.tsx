@@ -509,7 +509,7 @@ export default function LiveEntryClient() {
         <BxPageHeader backLabel="GEORGE" />
 
         <div className="mb-3 flex items-center justify-between gap-3 px-1">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep optional</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
           <button
             type="button"
             onClick={() => startLive(true)}
@@ -658,21 +658,13 @@ export default function LiveEntryClient() {
             </span>
           </div>
 
-          <div className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="mt-5 grid gap-2">
             <button
               type="button"
               onClick={() => setShowPrepPreview(true)}
-              className="min-h-[50px] rounded-[1rem] border border-[#D7DCFF]/[0.12] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(222,232,255,0.92))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#05060A] shadow-[0_18px_48px_rgba(0,0,0,0.26)] transition hover:scale-[1.01] hover:bg-white"
+              className="min-h-[50px] rounded-[1rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
             >
-              Start LIVE
-            </button>
-
-            <button
-              type="button"
-              onClick={() => startLive(true)}
-              className="min-h-[48px] rounded-[0.95rem] border border-white/[0.032] bg-black/14 px-5 py-3 text-[13px] font-medium text-white/38 transition hover:bg-white/[0.018] hover:text-white/60"
-            >
-              Skip prep
+              Review and enter LIVE
             </button>
           </div>
 

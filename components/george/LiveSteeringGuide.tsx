@@ -1,14 +1,14 @@
 'use client'
 
 const LIVE_STEERING_PAIRS = [
-  { phrase: 'OK', meaning: 'stop / reset' },
-  { phrase: 'Right', meaning: 'continue / proceed' },
-  { phrase: 'Hmm', meaning: 'slow down / buy time' },
-  { phrase: 'Now', meaning: 'move faster' },
-  { phrase: 'Shorter', meaning: 'compress' },
-  { phrase: 'More', meaning: 'expand' },
-  { phrase: 'Soft', meaning: 'reduce pressure' },
-  { phrase: 'Firm', meaning: 'strengthen posture' },
+  { phrase: 'let me think', meaning: 'hold / give me a second' },
+  { phrase: 'ok, and', meaning: 'next move / continue' },
+  { phrase: 'let me see', meaning: 'scan options / guide me' },
+  { phrase: 'right', meaning: 'compress / stay with pace' },
+  { phrase: 'one second', meaning: 'buy time / pause' },
+  { phrase: 'what I mean is', meaning: 'help me reframe' },
+  { phrase: 'fair point', meaning: 'soften / acknowledge' },
+  { phrase: 'let’s be clear', meaning: 'firmer posture' },
 ]
 
 const CAPACITY_BY_ROOM: Record<string, Array<{ label: string; cents: string; detail: string }>> = {
@@ -60,11 +60,11 @@ export default function LiveSteeringGuide({ room }: { room: string }) {
       <div className="grid gap-4 md:grid-cols-[0.95fr_1.05fr]">
         <section className="rounded-[0.95rem] border border-white/[0.055] bg-black/20 p-4">
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/36">
-            LIVE Steering
+            Survivable steering
           </div>
 
           <p className="mt-2 text-[13px] leading-6 text-white/54">
-            Say natural words. GEORGE treats them as sentence signals — the beginning of the next direction, not exposed commands.
+            Use phrases that survive in a real room. GEORGE treats them as steering signals without making you sound like you are operating software.
           </p>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
@@ -81,10 +81,10 @@ export default function LiveSteeringGuide({ room }: { room: string }) {
 
           <div className="mt-4 rounded-[0.8rem] border border-[#AAB4FF]/[0.10] bg-[#AAB4FF]/[0.035] px-3 py-3">
             <div className="text-[11px] uppercase tracking-[0.16em] text-[#C9D0FF]/52">
-              Sentence continuation
+              Room-safe cueing
             </div>
             <p className="mt-2 text-[12px] leading-5 text-white/48">
-              Example: “Hmm, okay…” can become “...before we decide that, let’s clarify the constraint.”
+              Example: “let me think” tells GEORGE to hold, compress, or give you the next useful line without exposing the system.
             </p>
           </div>
         </section>
