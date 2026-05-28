@@ -1154,6 +1154,18 @@ useEffect(() => {
 
   const [showProLiveComingSoon, setShowProLiveComingSoon] = useState(false)
   const [showLiveChooser, setShowLiveChooser] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.localStorage.getItem('george_resume_live_after_home') !== '1') return
+
+    window.localStorage.removeItem('george_resume_live_after_home')
+    setShowLiveChooser(false)
+    setSessionPickerClosing(false)
+    setSessionPickerMode('live')
+    setShowSessionPicker(true)
+  }, [])
+
   const [liveCadence, setLiveCadence] = useState('Balanced')
   const [liveSteeringPhrase, setLiveSteeringPhrase] = useState('hmm')
   const [sessionPickerMode, setSessionPickerMode] = useState<'live' | 'campaign'>('live')
