@@ -29,7 +29,7 @@ export type SteeringContinuationResult = {
 }
 
 function clean(value: string) {
-  return value.trim().toLowerCase().replace(/[“”]/g, '"').replace(/['']/g, "'").replace(/\s+/g, ' ')
+  return value.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
 function objectiveHint(objective?: string | null) {
@@ -75,7 +75,7 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
     }
   }
 
-  if (phrase === 'let me see' || phrase === "let's see" || phrase === 'lets see') {
+  if (phrase === 'let me see' || phrase === 'let’s see' || phrase === 'lets see') {
     return {
       matched: true,
       phrase,
@@ -87,7 +87,7 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
     }
   }
 
-  if (phrase === 'fair point' || phrase === "that's fair" || phrase === 'thats fair') {
+  if (phrase === 'fair point' || phrase === 'that’s fair' || phrase === 'thats fair') {
     return {
       matched: true,
       phrase,
@@ -99,7 +99,7 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
     }
   }
 
-  if (phrase === 'what i mean is') {
+  if (phrase === 'what i mean is' || phrase === 'what I mean is') {
     return {
       matched: true,
       phrase,
@@ -111,7 +111,7 @@ export function buildSteeringContinuation(input: SteeringContinuationInput): Ste
     }
   }
 
-  if (phrase === "let's be clear" || phrase === 'lets be clear') {
+  if (phrase === 'let’s be clear' || phrase === 'lets be clear') {
     return {
       matched: true,
       phrase,

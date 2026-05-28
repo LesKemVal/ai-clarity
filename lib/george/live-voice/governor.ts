@@ -3,12 +3,13 @@ import { analyzeRoom, inferLiveSpeaker } from './runtime/room-analyzer'
 import { detectConversationSignals } from './runtime/conversation-signals'
 import { selectLiveResponsePolicy } from './runtime/response-policy'
 import { classifyLiveSpeakerIntent } from './runtime/speaker-intent'
+import { buildSteeringContinuation } from './runtime/steering-continuation'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
 
 const USER_AGENCY_OVERRIDE =
-  /^(ok|okay|got it|i got it|i've got it|ive got it|hold|pause|wait|one second|give me a second|let me think|stop)$/i
+  /^(got it|i got it|i've got it|ive got it|hold|pause|wait|stop)$/i
 
 function cleanLine(value: string, maxWords: number) {
   const clean = value
@@ -56,6 +57,74 @@ function shouldRescueUser(input: {
     Number(input.speakerIntentConfidence || 0) < 0.58
 
   return pressureHigh || interruptionHigh || intentWeakOrAmbiguous
+}
+
+function applySteeringContinuationAuthority(
+  packet: LiveVoicePacket,
+  input: LiveVoiceGovernorInput,
+  transcript: string
+): LiveVoicePacket {
+  const phrase = transcript.trim()
+  const continuation = buildSteeringContinuation({
+    phrase,
+    room: input.contextHint || '',
+    objective: input.lastFiveSeconds || input.shadowMap || '',
+    preference: packet.liveAssistMode === 'lines' ? 'repeatable_line' : 'cue',
+  })
+
+  if (!continuation.matched) return packet
+
+  if (packet.liveAssistMode === 'lines') {
+    return {
+      ...packet,
+      shouldSpeak: true,
+      volley: cleanLine(`${phrase} ${continuation.continuation}`, input.audio ? 18 : 28),
+      cue: '',
+      intervention:
+        continuation.direction === 'buy_time' || continuation.direction === 'hold'
+          ? 'hold'
+          : continuation.direction === 'reframe'
+            ? 'redirect'
+            : 'speak',
+      deliveryStyle:
+        continuation.direction === 'buy_time' || continuation.direction === 'hold'
+          ? 'silence'
+          : continuation.direction === 'soften'
+            ? 'calm_operational'
+            : continuation.direction === 'firm'
+              ? 'direct'
+              : 'compressed_operational',
+      responseCompression:
+        continuation.direction === 'compress' || input.audio ? 'tight' : packet.responseCompression,
+      status: `${packet.status} Steering continuation: ${continuation.reason}`.trim(),
+      confidence: Math.max(packet.confidence || 0, 0.82),
+    }
+  }
+
+  return {
+    ...packet,
+    shouldSpeak: true,
+    volley: input.audio ? '' : packet.volley,
+    cue: cleanLine(continuation.cue, input.audio ? 8 : 14),
+    intervention:
+      continuation.direction === 'buy_time' || continuation.direction === 'hold'
+        ? 'hold'
+        : continuation.direction === 'reframe'
+          ? 'redirect'
+          : 'speak',
+    deliveryStyle:
+      continuation.direction === 'buy_time' || continuation.direction === 'hold'
+        ? 'silence'
+        : continuation.direction === 'soften'
+          ? 'calm_operational'
+          : continuation.direction === 'firm'
+            ? 'direct'
+            : 'compressed_operational',
+    responseCompression:
+      continuation.direction === 'compress' || input.audio ? 'tight' : packet.responseCompression,
+    status: `${packet.status} Steering cue: ${continuation.reason}`.trim(),
+    confidence: Math.max(packet.confidence || 0, 0.82),
+  }
 }
 
 function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInput) {
@@ -299,6 +368,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     packet.cue = 'Clear, calm, and human.'
     packet.status = 'Teacher language blocked.'
   }
+
+  packet = applySteeringContinuationAuthority(packet, input, transcript)
 
   return applySpeakerIntentAuthority(packet, transcript)
 }
