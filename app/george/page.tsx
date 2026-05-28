@@ -1158,6 +1158,14 @@ useEffect(() => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    if (window.localStorage.getItem('george_open_live_chooser_after_home') === '1') {
+      window.localStorage.removeItem('george_open_live_chooser_after_home')
+      setShowSessionPicker(false)
+      setShowLiveChooser(true)
+      return
+    }
+
     if (window.localStorage.getItem('george_resume_live_after_home') !== '1') return
 
     window.localStorage.removeItem('george_resume_live_after_home')

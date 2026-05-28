@@ -448,7 +448,7 @@ return (
                   setShowSidebar?.(false)
                   onOpenLiveGate()
                 }}
-                className={linkClass('/george/live-entry')}
+                className={linkClass('/george')}
               >
                 LIVE
               </button>

@@ -156,7 +156,7 @@ export default function SidebarAccountDropdownEnhancer() {
           className={actionRow}
           onClick={() => {
             setOpen(false)
-            if (!clickSidebarLiveGate()) window.location.href = '/george/live-entry'
+            if (!clickSidebarLiveGate()) { window.localStorage.setItem('george_open_live_chooser_after_home', '1'); window.location.href = '/george' }
           }}
         >
           Enter LIVE
