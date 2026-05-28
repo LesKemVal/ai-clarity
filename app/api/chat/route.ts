@@ -60,6 +60,7 @@ import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
 import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-behavioral-memory'
+import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -769,6 +770,20 @@ LANGUAGE MODE: SPANISH
     const durableBehavioralMemoryNote =
       durableBehavioralMemory.note
 
+    const runtimeOutcomeSignals =
+      evaluateRuntimeOutcomeSignals({
+        latestUserText: latestUserRaw,
+        previousAssistantLength:
+          typeof lastAssistantMessage?.content === 'string'
+            ? lastAssistantMessage.content.length
+            : 0,
+        pressureHigh:
+          control.pressureLevel.toLowerCase() === 'high',
+      })
+
+    const runtimeOutcomeLearningNote =
+      runtimeOutcomeSignals.note
+
     const continuityRestoration = buildContinuityRestorationState({
       latestUserText: latestUserRaw,
       earbudActive: earbudRuntime.active,
@@ -831,6 +846,7 @@ LANGUAGE MODE: SPANISH
       (arbitrationResponseShapeNote ? `\n\n${arbitrationResponseShapeNote}\n\n` : '') +
       (adaptiveUserProfileNote ? `\n\n${adaptiveUserProfileNote}\n\n` : '') +
       (durableBehavioralMemoryNote ? `\n\n${durableBehavioralMemoryNote}\n\n` : '') +
+      (runtimeOutcomeLearningNote ? `\n\n${runtimeOutcomeLearningNote}\n\n` : '') +
       (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
