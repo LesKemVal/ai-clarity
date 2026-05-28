@@ -7,7 +7,7 @@ export const GEORGE_RUNTIME_CONTROL_KEYS = {
 
 export function readRuntimeControl(
   key: keyof typeof GEORGE_RUNTIME_CONTROL_KEYS,
-  fallback = true
+  fallback = 'auto'
 ) {
   if (typeof window === 'undefined') return fallback
 
@@ -16,18 +16,21 @@ export function readRuntimeControl(
 
   if (value === null) return fallback
 
-  return value === 'true'
+  if (value === 'on') return 'on'
+  if (value === 'off') return 'off'
+
+  return 'auto'
 }
 
 export function writeRuntimeControl(
   key: keyof typeof GEORGE_RUNTIME_CONTROL_KEYS,
-  value: boolean
+  value: 'auto' | 'on' | 'off'
 ) {
   if (typeof window === 'undefined') return
 
   const storageKey = GEORGE_RUNTIME_CONTROL_KEYS[key]
 
-  window.localStorage.setItem(storageKey, String(value))
+  window.localStorage.setItem(storageKey, value)
 }
 
 export function resetGeorgeRuntimeMemory() {

@@ -19,20 +19,20 @@ export default function MemoryContinuityPanel({
   continuityEnabled = true,
   earbudModeEnabled = false,
 }: Props) {
-  const [adaptiveLearning, setAdaptiveLearning] = useState(adaptiveLearningEnabled)
-  const [continuityLearning, setContinuityLearning] = useState(continuityEnabled)
-  const [earbudCompression, setEarbudCompression] = useState(earbudModeEnabled)
+  const [adaptiveLearning, setAdaptiveLearning] = useState<'auto' | 'on' | 'off'>('auto')
+  const [continuityLearning, setContinuityLearning] = useState<'auto' | 'on' | 'off'>('auto')
+  const [earbudCompression, setEarbudCompression] = useState<'auto' | 'on' | 'off'>('auto')
 
   useEffect(() => {
-    setAdaptiveLearning(readRuntimeControl('adaptiveLearning', true))
-    setContinuityLearning(readRuntimeControl('continuity', true))
-    setEarbudCompression(readRuntimeControl('earbudCompression', false))
+    setAdaptiveLearning(readRuntimeControl('adaptiveLearning', 'auto') as any)
+    setContinuityLearning(readRuntimeControl('continuity', 'auto') as any)
+    setEarbudCompression(readRuntimeControl('earbudCompression', 'auto') as any)
   }, [])
 
 
   const toggleControl = (
     key: 'adaptiveLearning' | 'continuity' | 'earbudCompression',
-    value: boolean
+    value: 'auto' | 'on' | 'off'
   ) => {
     writeRuntimeControl(key, value)
 
@@ -44,19 +44,19 @@ export default function MemoryContinuityPanel({
   const items = [
     {
       label: 'Adaptive Runtime Learning',
-      value: adaptiveLearning,
+      value: adaptiveLearning !== 'off',
       description:
         'GEORGE adapts delivery, pacing, and response structure from runtime interaction signals.',
     },
     {
       label: 'Continuity Restoration',
-      value: continuityLearning,
+      value: continuityLearning !== 'off',
       description:
         'GEORGE restores important conversational context, objectives, and operational posture across sessions.',
     },
     {
       label: 'Earbud Runtime Compression',
-      value: earbudCompression,
+      value: earbudCompression !== 'off',
       description:
         'GEORGE shortens delivery and prioritizes tactical cues during high-pressure or earbud-assisted interaction.',
     },
@@ -96,15 +96,36 @@ export default function MemoryContinuityPanel({
               type="button"
               onClick={() => {
                 if (item.label === 'Adaptive Runtime Learning') {
-                  toggleControl('adaptiveLearning', !item.value)
+                  toggleControl(
+                    'adaptiveLearning',
+                    adaptiveLearning === 'auto'
+                      ? 'on'
+                      : adaptiveLearning === 'on'
+                        ? 'off'
+                        : 'auto'
+                  )
                 }
 
                 if (item.label === 'Continuity Restoration') {
-                  toggleControl('continuity', !item.value)
+                  toggleControl(
+                    'continuity',
+                    continuityLearning === 'auto'
+                      ? 'on'
+                      : continuityLearning === 'on'
+                        ? 'off'
+                        : 'auto'
+                  )
                 }
 
                 if (item.label === 'Earbud Runtime Compression') {
-                  toggleControl('earbudCompression', !item.value)
+                  toggleControl(
+                    'earbudCompression',
+                    earbudCompression === 'auto'
+                      ? 'on'
+                      : earbudCompression === 'on'
+                        ? 'off'
+                        : 'auto'
+                  )
                 }
               }}
               className={`mt-1 h-2.5 w-2.5 rounded-full transition ${
