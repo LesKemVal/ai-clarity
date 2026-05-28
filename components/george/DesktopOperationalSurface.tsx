@@ -29,34 +29,46 @@ export default function DesktopOperationalSurface({
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[198px] z-[18] overflow-hidden bg-[#05070A]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(90,120,185,0.035),transparent_68%)]" />
-      <div className="absolute inset-x-0 top-0 h-px bg-white/[0.025]" />
-      <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_12s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.018] to-transparent blur-[32px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(95,125,190,0.05),transparent_70%)]" />
+      <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_12s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.022] to-transparent blur-[32px]" />
 
       <div className="relative flex h-full items-center justify-center px-6 text-center">
-        <div className="w-full max-w-[720px] -translate-y-8">
-          <div className="mx-auto mb-9 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.045] bg-black/18 text-[11px] font-semibold tracking-[-0.02em] text-[#D7DBE4]/46 shadow-[0_18px_55px_rgba(0,0,0,0.28)]">
+        <div className="w-full max-w-[720px] -translate-y-5">
+          <div className="mx-auto mb-7 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.055] bg-black/22 text-[12px] font-semibold tracking-[-0.02em] text-[#D7DBE4]/58 shadow-[0_18px_55px_rgba(0,0,0,0.28)]">
             Bx
           </div>
 
-          <div className="text-[52px] font-[240] tracking-[0.34em] text-[#D7DBE4]/[0.055] md:text-[82px]">
-            GEORGE
+          <div className="text-[13px] uppercase tracking-[0.32em] text-[#8FB6C9]/58">
+            GEORGE OPERATING LAYER
           </div>
 
-          <div className="mx-auto mt-7 max-w-[440px] text-[10px] uppercase leading-6 tracking-[0.24em] text-[#D7DBE4]/28 md:text-[11px] md:tracking-[0.28em]">
-            Direction. Execution. Live support.
+          <div className="mx-auto mt-5 max-w-[520px] text-[18px] font-light leading-8 tracking-[-0.02em] text-[#D7DBE4]/62">
+            Use GEORGE to navigate decisions, pressure, conversations, planning, and execution in real time.
           </div>
 
-          <div className="mx-auto mt-10 grid max-w-[560px] grid-cols-3 gap-2 text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/20 md:text-[10px]">
-            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
-              Think
-            </div>
-            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
-              Decide
-            </div>
-            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
-              Move
-            </div>
+          <div className="mx-auto mt-9 grid max-w-[640px] gap-3 text-left md:grid-cols-3">
+            {[
+              ['Ask better', 'Bring the situation. GEORGE helps clarify what matters, what is missing, and what to do next.'],
+              ['Move smarter', 'GEORGE adapts around timing, pressure, tone, context, and the outcome you are trying to reach.'],
+              ['Use LIVE', 'For active conversations, GEORGE can support pacing, wording, openings, objections, and pressure shifts.'],
+            ].map(([title, body]) => (
+              <div
+                key={title}
+                className="rounded-[1.05rem] border border-white/[0.045] bg-black/18 px-4 py-3.5 shadow-[0_18px_50px_rgba(0,0,0,0.16)]"
+              >
+                <div className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/58">
+                  {title}
+                </div>
+
+                <div className="mt-2 text-[13px] leading-6 text-[#D7DBE4]/42">
+                  {body}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-7 max-w-[520px] text-[12px] leading-6 text-[#D7DBE4]/32">
+            Runtime systems help shape clarity, compression, pacing, memory, and response timing — so GEORGE can stay useful when reality changes.
           </div>
         </div>
       </div>
