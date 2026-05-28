@@ -28,141 +28,34 @@ export default function DesktopOperationalSurface({
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[198px] z-[18] overflow-hidden bg-black">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(75,105,180,0.05),transparent_72%)]" />
+    <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[198px] z-[18] overflow-hidden bg-[#05070A]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(90,120,185,0.035),transparent_68%)]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-white/[0.025]" />
+      <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_12s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.018] to-transparent blur-[32px]" />
 
-      <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_10s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.035] to-transparent blur-[28px]" />
-
-      {/* MOBILE */}
-      <div className="relative h-full overflow-y-auto px-6 py-8 md:hidden">
-        <div className="mb-7">
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/62">
-            GEORGE RESOURCES
+      <div className="relative flex h-full items-center justify-center px-6 text-center">
+        <div className="w-full max-w-[720px] -translate-y-8">
+          <div className="mx-auto mb-9 flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.045] bg-black/18 text-[11px] font-semibold tracking-[-0.02em] text-[#D7DBE4]/46 shadow-[0_18px_55px_rgba(0,0,0,0.28)]">
+            Bx
           </div>
 
-          <div className="mt-3 max-w-[320px] text-[13px] leading-7 text-[#D7DBE4]/34">
-            GEORGE uses layered operational resources to help structure decisions, communication, execution, sequencing, and runtime adaptation.
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          {[
-            [
-              'COMMUNICATION',
-              'email drafting · response shaping · negotiation wording · conversational positioning · outreach sequencing'
-            ],
-            [
-              'RUNTIME THINKING',
-              'multi-step reasoning · execution sequencing · pressure handling · tactical framing · operational clarity'
-            ],
-            [
-              'LIVE SUPPORT',
-              'real-time conversational assistance · timing awareness · pacing adjustment · adaptive response support'
-            ],
-            [
-              'BUILD SYSTEMS',
-              'workflow structure · architecture thinking · launch planning · operational mapping · deployment organization'
-            ],
-            [
-              'MEMORY + CONTINUITY',
-              'context restoration · continuity awareness · persistent operational recall · saved direction'
-            ],
-          ].map(([title, body]) => (
-            <div key={title}>
-              <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/58">
-                {title}
-              </div>
-
-              <div className="mt-2 text-[13px] leading-7 text-[#D7DBE4]/32">
-                {body}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* DESKTOP */}
-      <div className="relative hidden h-full overflow-hidden md:block">
-        <div className="grid h-full grid-cols-2 gap-x-16 px-16 py-12">
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.30em] text-[#8FB6C9]/64">
-              NORMAL GEORGE
-            </div>
-
-            <div className="mt-4 max-w-[520px] text-[15px] leading-8 text-[#D7DBE4]/34">
-              GEORGE combines reasoning systems, continuity memory, drafting assistance, runtime organization, communication shaping, and execution sequencing into one operational layer.
-            </div>
-
-            <div className="mt-12 space-y-8">
-              {[
-                [
-                  'COMMUNICATION',
-                  'emails · response shaping · negotiation language · outreach structure · conversational clarity'
-                ],
-                [
-                  'REASONING',
-                  'multi-step thinking · tactical framing · sequencing · pressure analysis · decision support'
-                ],
-                [
-                  'EXECUTION',
-                  'planning · operational movement · workflow structure · launch organization · tactical next-steps'
-                ],
-                [
-                  'BUILD',
-                  'systems thinking · architecture mapping · runtime planning · deployment sequencing'
-                ],
-              ].map(([title, body]) => (
-                <div key={title}>
-                  <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/58">
-                    {title}
-                  </div>
-
-                  <div className="mt-2 max-w-[520px] text-[14px] leading-8 text-[#D7DBE4]/30">
-                    {body}
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="text-[52px] font-[240] tracking-[0.34em] text-[#D7DBE4]/[0.055] md:text-[82px]">
+            GEORGE
           </div>
 
-          <div>
-            <div className="text-[10px] uppercase tracking-[0.30em] text-[#8FB6C9]/64">
-              LIVE GEORGE
+          <div className="mx-auto mt-7 max-w-[440px] text-[10px] uppercase leading-6 tracking-[0.24em] text-[#D7DBE4]/28 md:text-[11px] md:tracking-[0.28em]">
+            Direction. Execution. Live support.
+          </div>
+
+          <div className="mx-auto mt-10 grid max-w-[560px] grid-cols-3 gap-2 text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/20 md:text-[10px]">
+            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
+              Think
             </div>
-
-            <div className="mt-4 max-w-[520px] text-[15px] leading-8 text-[#D7DBE4]/34">
-              LIVE GEORGE uses adaptive runtime resources to support users during active conversations, pressure environments, negotiations, interviews, and operational moments.
+            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
+              Decide
             </div>
-
-            <div className="mt-12 space-y-8">
-              {[
-                [
-                  'RUNTIME AWARENESS',
-                  'timing · cadence · interruption awareness · pacing adaptation · conversational pressure detection'
-                ],
-                [
-                  'TACTICAL SUPPORT',
-                  'response guidance · conversational positioning · objection handling · live adaptation'
-                ],
-                [
-                  'CONTINUITY',
-                  'context persistence · runtime recall · conversation continuity · remembered operational direction'
-                ],
-                [
-                  'LIVE OPERATION',
-                  'earbud assistance · room awareness · pressure navigation · tactical conversational movement'
-                ],
-              ].map(([title, body]) => (
-                <div key={title}>
-                  <div className="text-[10px] uppercase tracking-[0.24em] text-[#8FB6C9]/58">
-                    {title}
-                  </div>
-
-                  <div className="mt-2 max-w-[520px] text-[14px] leading-8 text-[#D7DBE4]/30">
-                    {body}
-                  </div>
-                </div>
-              ))}
+            <div className="rounded-full border border-white/[0.035] bg-black/12 px-3 py-2">
+              Move
             </div>
           </div>
         </div>
