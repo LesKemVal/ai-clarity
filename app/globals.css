@@ -106,6 +106,12 @@ main[class*="bg-[#06070A]"] [class*="shadow-"] {
   box-shadow: 0 14px 34px rgba(0,0,0,0.20) !important;
 }
 
+/* Sidebar close state must win over the desktop rail utility classes. */
+aside[class*="-translate-x-full"] {
+  transform: translateX(-100%) !important;
+  pointer-events: none !important;
+}
+
 @keyframes desktopShimmer {
   0% {
     transform: translateX(0%);
