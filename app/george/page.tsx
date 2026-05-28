@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { operationalMotion } from '@/lib/george/ui/operational-motion'
 import Sidebar from '@/components/Sidebar'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
+import MemoryContinuityPanel from '@/components/george/settings/MemoryContinuityPanel'
 import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
 import DesktopOperationalSurface from '@/components/george/DesktopOperationalSurface'
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
@@ -739,6 +740,7 @@ const [contextTurnCount, setContextTurnCount] = useState(0)
   const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
 const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
+const [showMemoryContinuityPanel, setShowMemoryContinuityPanel] = useState(false)
 const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null)
 const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'images' | 'signal'>('live')
 
@@ -5810,6 +5812,7 @@ ${simplifyTarget}`
                               {[
                                 ['live', 'LIVE'],
                                 ['continuity', 'Login'],
+                                ['memory', 'Memory'],
                                 ['images', 'Images'],
                                 ['signal', 'Signal'],
                               ].map(([id, label]) => (
@@ -5833,6 +5836,7 @@ ${simplifyTarget}`
                             <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
                               {activeHelpTopic === 'live' && 'LIVE'}
                               {activeHelpTopic === 'continuity' && 'LOGIN'}
+                              {activeHelpTopic === 'memory' && 'MEMORY'}
                               {activeHelpTopic === 'images' && 'IMAGES'}
                               {activeHelpTopic === 'signal' && 'SIGNAL'}
                             </div>
@@ -5840,9 +5844,23 @@ ${simplifyTarget}`
                             <p className="text-[11px] leading-5 text-white/48">
                               {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
                               {activeHelpTopic === 'continuity' && 'Login restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
+                              {activeHelpTopic === 'memory' && 'GEORGE adapts carefully from continuity, runtime interaction, operational patterns, and user-controlled memory systems.'}
                               {activeHelpTopic === 'images' && 'Images helps generate visual direction, concepts, references, and creative material.'}
                               {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns and improve operational usefulness over time.'}
                             </p>
+
+                            {activeHelpTopic === 'memory' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowMemoryContinuityPanel(true)
+                                  setShowNormalUtilityMenu(null)
+                                }}
+                                className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
+                              >
+                                Open controls
+                              </button>
+                            )}
 
                             <a
                               href="/help"
