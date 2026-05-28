@@ -718,6 +718,16 @@ LANGUAGE MODE: SPANISH
 
     const earbudRuntime = detectEarbudRuntime(latestUserRaw)
 
+    const runtimeControls =
+      resolveRuntimeControls({
+        george: {
+          adaptiveLearningEnabled: true,
+          continuityEnabled: true,
+          durableMemoryEnabled: true,
+          earbudCompressionEnabled: true,
+        },
+      })
+
     const earbudRuntimeNote =
       runtimeControls.earbudCompressionEnabled
         ? buildEarbudRuntimeNote(earbudRuntime)
@@ -792,16 +802,6 @@ LANGUAGE MODE: SPANISH
 
     const runtimeOutcomeLearningNote =
       runtimeOutcomeSignals.note
-
-    const runtimeControls =
-      resolveRuntimeControls({
-        george: {
-          adaptiveLearningEnabled: true,
-          continuityEnabled: true,
-          durableMemoryEnabled: true,
-          earbudCompressionEnabled: true,
-        },
-      })
 
     const continuityRestoration = buildContinuityRestorationState({
       latestUserText: latestUserRaw,
