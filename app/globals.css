@@ -112,6 +112,29 @@ aside[class*="-translate-x-full"] {
   pointer-events: none !important;
 }
 
+/* Restore the Bx identity cue for the sidebar opener. */
+button[aria-label="Open GEORGE sidebar"] {
+  position: relative;
+}
+
+button[aria-label="Open GEORGE sidebar"] img {
+  opacity: 0.14;
+}
+
+button[aria-label="Open GEORGE sidebar"]::after {
+  content: "Bx";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: rgba(215,219,228,0.88);
+  pointer-events: none;
+}
+
 @keyframes desktopShimmer {
   0% {
     transform: translateX(0%);
