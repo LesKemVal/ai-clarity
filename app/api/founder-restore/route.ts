@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    upsertSubscriber({
+    await upsertSubscriber({
       email,
       currentTier: tier,
     })

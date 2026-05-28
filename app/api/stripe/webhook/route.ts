@@ -1,37 +1,11 @@
 import Stripe from 'stripe'
 import { NextRequest, NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
 import { getSubscriberByCustomerId, upsertSubscriber } from '@/lib/subscriptions/subscriber-store'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '')
 
 const intelligentPriceId = process.env.STRIPE_INTELLIGENT_PRICE_ID
 const brilliantPriceId = process.env.STRIPE_BRILLIANT_PRICE_ID
-
-const storePath = path.join(process.cwd(), 'data', 'subscription-state.json')
-
-function writeStore(payload: {
-  currentTier: 'smart' | 'intelligent' | 'brilliant'
-  lastCheckoutSessionId: string | null
-  lastSubscriptionId: string | null
-  lastCustomerId: string | null
-}) {
-  fs.writeFileSync(storePath, JSON.stringify(payload, null, 2))
-}
-
-function readStore() {
-  try {
-    return JSON.parse(fs.readFileSync(storePath, 'utf8'))
-  } catch {
-    return {
-      currentTier: 'smart',
-      lastCheckoutSessionId: null,
-      lastSubscriptionId: null,
-      lastCustomerId: null,
-    }
-  }
-}
 
 function getTierFromPriceIds(priceIds: string[]): 'smart' | 'intelligent' | 'brilliant' | null {
   if (brilliantPriceId && priceIds.includes(brilliantPriceId)) return 'brilliant'
@@ -68,26 +42,6 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        const existing = readStore()
-
-        writeStore({
-          currentTier:
-            session.metadata?.tier === 'brilliant'
-              ? 'brilliant'
-              : session.metadata?.tier === 'intelligent'
-              ? 'intelligent'
-              : existing.currentTier,
-          lastCheckoutSessionId: session.id,
-          lastSubscriptionId:
-            typeof session.subscription === 'string'
-              ? session.subscription
-              : existing.lastSubscriptionId,
-          lastCustomerId:
-            typeof session.customer === 'string'
-              ? session.customer
-              : existing.lastCustomerId,
-        })
-
         await upsertSubscriber({
           email: session.customer_details?.email || session.metadata?.email,
           currentTier:
@@ -95,7 +49,7 @@ export async function POST(req: NextRequest) {
               ? 'brilliant'
               : session.metadata?.tier === 'intelligent'
               ? 'intelligent'
-              : existing.currentTier,
+              : 'smart',
           stripeCustomerId: session.customer,
           lastCheckoutSessionId: session.id,
           lastSubscriptionId: session.subscription,
@@ -118,24 +72,16 @@ export async function POST(req: NextRequest) {
         const priceIds = subscription.items.data.map((item) => item.price.id)
         const activeStatuses = ['active', 'trialing', 'past_due']
 
-        const existing = readStore()
         const mappedTier = getTierFromPriceIds(priceIds)
 
         const customerId =
           typeof subscription.customer === 'string'
             ? subscription.customer
-            : existing.lastCustomerId
+            : null
 
         const nextTier = activeStatuses.includes(subscription.status)
-          ? (mappedTier ?? existing.currentTier)
+          ? (mappedTier ?? 'smart')
           : 'smart'
-
-        writeStore({
-          currentTier: nextTier,
-          lastCheckoutSessionId: existing.lastCheckoutSessionId,
-          lastSubscriptionId: subscription.id,
-          lastCustomerId: customerId,
-        })
 
         const subscriber = await getSubscriberByCustomerId(customerId)
 
@@ -143,7 +89,7 @@ export async function POST(req: NextRequest) {
           email: subscription.metadata?.email || subscriber?.email,
           currentTier: nextTier,
           stripeCustomerId: customerId,
-          lastCheckoutSessionId: existing.lastCheckoutSessionId,
+          lastCheckoutSessionId: subscriber?.lastCheckoutSessionId,
           lastSubscriptionId: subscription.id,
         })
 
