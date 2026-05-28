@@ -863,6 +863,7 @@ function isForceIntervention(text: string) {
           let shouldHoldByRuntime = true
           let shouldQueueByRuntime = false
           let runtimeDecisionReason = 'No runtime decision available.'
+          let runtimeSpeechDecision: string | null = null
 
           if (orchestrated) {
             if (georgeCancelEngine.isExpired(generation)) {
@@ -884,6 +885,7 @@ function isForceIntervention(text: string) {
               runtimeDecision.decision === 'interrupt' ||
               runtimeDecision.decision === 'queue'
             runtimeDecisionReason = runtimeDecision.reason
+            runtimeSpeechDecision = runtimeDecision.decision
 
             pushLog(`Runtime decision: ${runtimeDecision.decision} (${Math.round(runtimeDecision.confidence * 100)}%)`)
 
@@ -930,7 +932,13 @@ function isForceIntervention(text: string) {
               forcedIntervention ||
               shouldQueueByRuntime
             ) &&
-            georgeSilenceDetector.isSilenceWindow()
+            (
+              forcedIntervention ||
+              runtimeSpeechDecision === 'speak' ||
+              runtimeSpeechDecision === 'whisper' ||
+              runtimeSpeechDecision === 'interrupt' ||
+              georgeSilenceDetector.isSilenceWindow()
+            )
           ) {
             const approvedPacket = orchestrated.packet as LivePacket
             const approvedSpeech =
