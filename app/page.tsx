@@ -2,18 +2,90 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import LiveChooser from '@/components/george/LiveChooser'
+import { getSessionsForMode, hasMeaningfulUserMessage } from '@/lib/george/session/store'
 
 export default function HomePage() {
   const router = useRouter()
   const [active, setActive] = useState<'normal' | 'live' | null>(null)
   const [liveLaunching, setLiveLaunching] = useState(false)
+  const [showLiveChooser, setShowLiveChooser] = useState(false)
+  const [currentTier, setCurrentTier] = useState<'smart' | 'intelligent' | 'brilliant'>('smart')
+  const [liveSessionSignal, setLiveSessionSignal] = useState(0)
 
-  const startLivePath = () => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const savedTier = window.localStorage.getItem('george_tier')
+    if (savedTier === 'smart' || savedTier === 'intelligent' || savedTier === 'brilliant') {
+      setCurrentTier(savedTier)
+    }
+
+    let cancelled = false
+
+    fetch('/api/session', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return
+
+        if (data?.tier === 'smart' || data?.tier === 'intelligent' || data?.tier === 'brilliant') {
+          setCurrentTier(data.tier)
+          window.localStorage.setItem('george_tier', data.tier)
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const hasLiveSession = useMemo(() => {
+    if (typeof window === 'undefined') return false
+
+    try {
+      return getSessionsForMode('live').some((session) =>
+        hasMeaningfulUserMessage(session.messages || [])
+      )
+    } catch {
+      return false
+    }
+  }, [liveSessionSignal])
+
+  const openLiveChooser = () => {
     if (liveLaunching) return
     setActive('live')
     setLiveLaunching(true)
-    window.setTimeout(() => router.push('/george/intake'), 720)
+    window.setTimeout(() => {
+      setLiveSessionSignal((value) => value + 1)
+      setShowLiveChooser(true)
+    }, 720)
+  }
+
+  const closeLiveChooser = () => {
+    setShowLiveChooser(false)
+    setLiveLaunching(false)
+    setActive(null)
+  }
+
+  const startNewLiveConversation = () => {
+    window.localStorage.setItem('george_fresh_live_entry', '1')
+    window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+    window.localStorage.removeItem('george_live_control_words')
+    window.localStorage.removeItem('george_live_runtime_support')
+    window.localStorage.removeItem('george_live_estimated_cents')
+    window.localStorage.removeItem('george_active_live_session_id')
+    window.localStorage.removeItem('george_active_campaign_session_id')
+    window.localStorage.removeItem('george_active_campaign')
+    window.localStorage.removeItem('george_active_context')
+    window.localStorage.removeItem('george_active_label')
+    router.push('/george/live-entry')
+  }
+
+  const resumeLiveConversation = () => {
+    window.localStorage.setItem('george_resume_live_after_home', '1')
+    router.push('/george')
   }
 
   return (
@@ -93,7 +165,7 @@ export default function HomePage() {
 
           <button
             type="button"
-            onClick={startLivePath}
+            onClick={openLiveChooser}
             onMouseEnter={() => setActive('live')}
             onMouseLeave={() => {
               if (!liveLaunching) setActive(null)
@@ -129,6 +201,17 @@ export default function HomePage() {
           Direction → Action → Signal
         </div>
       </section>
+
+      <LiveChooser
+        open={showLiveChooser}
+        hasAccess={currentTier === 'brilliant'}
+        hasLiveSession={hasLiveSession}
+        onClose={closeLiveChooser}
+        onStartLiveConversation={startNewLiveConversation}
+        onResumeLiveConversation={resumeLiveConversation}
+        onUpgrade={() => router.push('/top-up')}
+        onEnterCode={() => router.push('/george')}
+      />
     </main>
   )
 }
