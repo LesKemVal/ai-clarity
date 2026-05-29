@@ -26,6 +26,7 @@ import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
 import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import { georgeRuntimeDecisionEngine } from '@/lib/george/live-voice/runtime/runtime-decision-engine'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
+import { classifyLiveInput } from '@/lib/george/live-voice/runtime/input-classifier'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LiveLifecycleState =
@@ -816,9 +817,12 @@ function buildRoomContextResponse(text: string) {
           partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
 
-          if (isUserRoomContext(text)) {
+          const liveInputKind = classifyLiveInput(text)
+
+          if (liveInputKind === 'room_context' || isUserRoomContext(text)) {
             const contextPacket = buildRoomContextResponse(text)
 
+            pushLog(`Live input kind: ${liveInputKind}`)
             pushLog('Room context detected from user.')
             setPacket(contextPacket)
             georgeAudioQueue.enqueue(contextPacket.volley, 10, 5000)
