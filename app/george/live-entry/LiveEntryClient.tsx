@@ -53,7 +53,7 @@ const PACING_OPTIONS: SelectOption[] = [
 
 const OUTPUT_OPTIONS: SelectOption[] = [
   { label: 'Cues', helper: 'short directional support' },
-  { label: 'Repeatable lines', helper: 'exact words to say' },
+  { label: 'Repeatable lines', helper: 'responses you can repeat or adapt' },
 ]
 
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
@@ -568,7 +568,7 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
                         : 'border-white/[0.04] bg-black/16 text-white/46 hover:text-white/76'
                     }`}
                   >
-                    <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Lines' : option.label}</span>
+                    <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Responses' : option.label}</span>
                     <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
                   </button>
                 )
