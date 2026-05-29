@@ -56,6 +56,15 @@ const OUTPUT_OPTIONS: SelectOption[] = [
   { label: 'Repeatable lines', helper: 'responses you can repeat or adapt' },
 ]
 
+const POSITION_OPTIONS: SelectOption[] = [
+  { label: 'Seeking', helper: 'trying to obtain an outcome' },
+  { label: 'Evaluating', helper: 'assessing people or opportunities' },
+  { label: 'Deciding', helper: 'making a decision' },
+  { label: 'Leading', helper: 'guiding the room' },
+  { label: 'Negotiating', helper: 'maximizing terms or leverage' },
+  { label: 'Advising', helper: 'improving another person’s outcome' },
+]
+
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
   if (conversationType === 'Interview') {
     return {
@@ -236,6 +245,7 @@ export default function LiveEntryClient() {
   const [pacing, setPacing] = useState('Balanced')
   const [outputMode, setOutputMode] = useState('Cues')
   const [objective, setObjective] = useState('')
+  const [userPosition, setUserPosition] = useState('Seeking')
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
@@ -261,6 +271,7 @@ export default function LiveEntryClient() {
       if (saved?.cadence) setPacing(saved.cadence)
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
       if (saved?.objective) setObjective(saved.objective)
+      if (saved?.userPosition) setUserPosition(saved.userPosition)
       if (saved?.controlWords) setControlWords(saved.controlWords)
     } catch {}
 
@@ -319,6 +330,7 @@ export default function LiveEntryClient() {
       pacing,
       outputMode,
       objective,
+      userPosition,
       prepDocument?.summary,
     ].filter(Boolean).join('\n')
 
@@ -340,7 +352,7 @@ export default function LiveEntryClient() {
     return () => {
       cancelled = true
     }
-  }, [conversationType, audienceType, pacing, outputMode, objective, prepDocument?.summary])
+  }, [conversationType, audienceType, pacing, outputMode, objective, userPosition, prepDocument?.summary])
 
   const handlePrepDocumentUpload = async (file: File | null) => {
     if (!file) return
@@ -456,6 +468,7 @@ export default function LiveEntryClient() {
       runtimeBias: finalResources,
       audienceType,
       conversationType,
+      userPosition,
       pacing,
       compactPrep: true,
       editedByUser: !skipPrep,
@@ -465,6 +478,7 @@ export default function LiveEntryClient() {
     const liveSetup = {
       room: skipPrep ? 'Adaptive LIVE' : conversationType,
       audienceType,
+      userPosition,
       language: window.localStorage.getItem('george_live_language') || 'English',
       cadence: pacing,
       objective,
@@ -541,15 +555,19 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
           </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
             <textarea
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
               rows={2}
-              placeholder="What are you trying to accomplish in this room?"
+              placeholder="What outcome are you hoping to achieve?"
               className="mt-2 w-full resize-none bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/24"
             />
           </label>
+
+          <div className="mt-2 grid gap-2">
+            <CompactSelect label="Your Position" value={userPosition} options={POSITION_OPTIONS} onChange={setUserPosition} />
+          </div>
 
           <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
