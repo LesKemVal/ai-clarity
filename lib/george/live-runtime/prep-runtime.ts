@@ -43,6 +43,7 @@ export type LiveRuntimeSupport = {
   resourceEstimate?: LiveRuntimeCostEstimate | null
   runtimeBias?: unknown[]
   purview?: LivePurview | null
+  userPosition?: string
   deliveryOverlay?: LiveDeliveryOverlay | null
 }
 
