@@ -240,7 +240,6 @@ export default function LiveEntryClient() {
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
   const [hasLiveSession, setHasLiveSession] = useState(false)
-  const [showResourceMeter, setShowResourceMeter] = useState(true)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
@@ -300,7 +299,6 @@ export default function LiveEntryClient() {
   }, [conversationType, audienceType, pacing, outputMode, objective, prepDocument, prepDocumentPrompt.resource])
 
   useEffect(() => {
-    setShowResourceMeter(true)
     setEditableResources(resourceEstimate.resources)
   }, [conversationType, audienceType, pacing, outputMode, objective, resourceEstimate.resources.join('|')])
 
@@ -536,34 +534,10 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
           </div>
 
           <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Runtime ready</div>
-                <div className="mt-1 truncate text-[12px] text-white/70">
-                  {finalResourceEstimate.intensity} load · ~{finalResourceEstimate.runtimeMinutes}m · {liveAssistMode === 'lines' ? 'repeatable lines' : 'cues'}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowResourceMeter((value) => !value)}
-                className="shrink-0 rounded-full border border-[#8FB6C9]/[0.10] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/62 transition hover:border-[#8FB6C9]/[0.22] hover:text-[#D7DCFF]/86"
-              >
-                {showResourceMeter ? 'Less' : 'More'}
-              </button>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Room ready</div>
+            <div className="mt-1 text-[12px] text-white/70">
+              GEORGE will enter with this room, objective, and any uploaded material loaded.
             </div>
-
-            {showResourceMeter && (
-              <div className="mt-2 border-t border-white/[0.035] pt-2">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/38">
-                  <span>{finalResourceEstimate.prepSeconds}s prep</span>
-                  <span>{finalResourceEstimate.resources.length} resources</span>
-                  <span>~{finalResourceEstimate.estimatedCents}¢ estimated</span>
-                </div>
-
-                <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#D7DCFF]/34">{finalResourceEstimate.reason}</p>
-              </div>
-            )}
           </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
