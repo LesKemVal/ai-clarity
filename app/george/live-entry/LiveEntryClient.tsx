@@ -510,13 +510,7 @@ export default function LiveEntryClient() {
 
         <div className="mb-2 flex items-center justify-between gap-2 px-1">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
-          <button
-            type="button"
-            onClick={() => startLive(true)}
-            className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/54 transition duration-150 hover:text-white/78 active:scale-[0.96]"
-          >
-            Skip prep
-          </button>
+
         </div>
 
         <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-4">
@@ -527,7 +521,7 @@ export default function LiveEntryClient() {
           </h1>
 
           <p className="mt-2 text-[12px] leading-5 text-white/42">
-            System runtime settings below show how GEORGE adjusts posture, pacing, and response shaping for the room.
+Choose the room, objective, and any material GEORGE should carry into LIVE.
           </p>
 
           {runtimeMotionContext && (
@@ -538,10 +532,7 @@ export default function LiveEntryClient() {
           )}
 
           <div className="mt-2 grid gap-2">
-            <CompactSelect label="Conversation type" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
-            <CompactSelect label="Audience type" value={audienceType} options={AUDIENCE_TYPES} onChange={setAudienceType} />
-            <CompactSelect label="Pacing" value={pacing} options={PACING_OPTIONS} onChange={setPacing} />
-            <CompactSelect label="Output" value={outputMode} options={OUTPUT_OPTIONS} onChange={setOutputMode} />
+            <CompactSelect label="Room" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
           </div>
 
           <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
@@ -632,17 +623,7 @@ export default function LiveEntryClient() {
             </div>
           </label>
 
-          <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">
-                Steering words
-              </span>
-            </div>
 
-            <p className="mt-2 text-[13px] leading-5 text-white/46">
-              Use natural phrases during LIVE to steer GEORGE’s timing, tone, cues, and repeatable lines. Preview examples before entering LIVE.
-            </p>
-          </div>
 
           <div className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-white/34">
             <span className="h-[5px] w-[5px] rounded-full bg-[#8FB6C9]/70 shadow-[0_0_12px_rgba(143,182,201,0.42)]" />
