@@ -68,38 +68,58 @@ function isUserRoomContext(text: string) {
   )
 }
 
-function buildRoomContextResponse(text: string) {
+function selectSignalAcquisitionMove(text: string) {
   const clean = text.toLowerCase()
 
   if (/interview/.test(clean) && /rush|rushing|pressur|pushing|hurry|quick|fast/.test(clean)) {
     return {
-      speaker: 'george_instruction' as const,
-      shouldSpeak: true,
-      volley: "I don’t want to rush this because I want to give you a clear answer. The short version is: I’m focused, I understand the pressure, and I can walk you through my thinking.",
-      cue: 'Interview pressure detected. Slow the pace, explain why, then answer cleanly.',
-      status: 'Room context detected: interview pressure.',
+      name: 'interview_pressure',
+      line: "I want to answer that clearly rather than quickly.",
+      cue: "Breathe. Repeat the question aloud — as if to yourself. I'm listening.",
+      read: 'They may be testing composure, judgment, or communication under pressure.',
       confidence: 0.78,
     }
   }
 
   if (/boss|manager|meeting/.test(clean) && /challenged|numbers/.test(clean)) {
     return {
-      speaker: 'george_instruction' as const,
-      shouldSpeak: true,
-      volley: "That’s fair. Let me separate the number from the assumption behind it.",
-      cue: 'Do not overexplain. Clarify the assumption first.',
-      status: 'Room context detected: numbers challenged.',
+      name: 'numbers_challenged',
+      line: "That's fair. Let me make sure we're talking about the same assumption.",
+      cue: "Repeat the number or assumption they challenged. I'm listening.",
+      read: 'They may be testing confidence in the basis behind the numbers.',
       confidence: 0.74,
     }
   }
 
+  if (/deal|offer|price|terms|negotiat/.test(clean)) {
+    return {
+      name: 'negotiation_signal',
+      line: "Let me make sure I understand the offer before I respond.",
+      cue: "Repeat their exact offer aloud. I'm listening.",
+      read: 'The strongest next move depends on the offer, pressure, and decision authority.',
+      confidence: 0.7,
+    }
+  }
+
+  return {
+    name: 'thin_context',
+    line: "I want to make sure I'm answering the right question.",
+    cue: "Repeat the question or concern aloud — as if to yourself. I'm listening.",
+    read: 'Context is thin, but GEORGE can still help you buy time and load the next signal.',
+    confidence: 0.66,
+  }
+}
+
+function buildRoomContextResponse(text: string) {
+  const move = selectSignalAcquisitionMove(text)
+
   return {
     speaker: 'george_instruction' as const,
     shouldSpeak: true,
-    volley: "Give me one second so I can answer this clearly. What matters most here — the outcome, the concern, or the next decision?",
-    cue: 'Thin context. Buy time, then ask for the signal that changes the answer.',
-    status: 'Room context detected: clarification needed.',
-    confidence: 0.68,
+    volley: `${move.line} ${move.cue}`,
+    cue: `${move.read} ${move.cue}`,
+    status: `Signal acquisition move: ${move.name}.`,
+    confidence: move.confidence,
   }
 }
 
