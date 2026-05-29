@@ -246,6 +246,7 @@ export default function LiveEntryClient() {
   const [outputMode, setOutputMode] = useState('Cues')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
+  const [knownContext, setKnownContext] = useState('')
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
@@ -272,6 +273,7 @@ export default function LiveEntryClient() {
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
       if (saved?.objective) setObjective(saved.objective)
       if (saved?.userPosition) setUserPosition(saved.userPosition)
+      if (saved?.knownContext) setKnownContext(saved.knownContext)
       if (saved?.controlWords) setControlWords(saved.controlWords)
     } catch {}
 
@@ -331,6 +333,7 @@ export default function LiveEntryClient() {
       outputMode,
       objective,
       userPosition,
+      knownContext,
       prepDocument?.summary,
     ].filter(Boolean).join('\n')
 
@@ -352,7 +355,7 @@ export default function LiveEntryClient() {
     return () => {
       cancelled = true
     }
-  }, [conversationType, audienceType, pacing, outputMode, objective, userPosition, prepDocument?.summary])
+  }, [conversationType, audienceType, pacing, outputMode, objective, userPosition, knownContext, prepDocument?.summary])
 
   const handlePrepDocumentUpload = async (file: File | null) => {
     if (!file) return
@@ -469,6 +472,7 @@ export default function LiveEntryClient() {
       audienceType,
       conversationType,
       userPosition,
+      knownContext,
       pacing,
       compactPrep: true,
       editedByUser: !skipPrep,
@@ -479,6 +483,7 @@ export default function LiveEntryClient() {
       room: skipPrep ? 'Adaptive LIVE' : conversationType,
       audienceType,
       userPosition,
+      knownContext,
       language: window.localStorage.getItem('george_live_language') || 'English',
       cadence: pacing,
       objective,
@@ -568,6 +573,17 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
           <div className="mt-2 grid gap-2">
             <CompactSelect label="Your Position" value={userPosition} options={POSITION_OPTIONS} onChange={setUserPosition} />
           </div>
+
+          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">What GEORGE should know</span>
+            <textarea
+              value={knownContext}
+              onChange={(event) => setKnownContext(event.target.value)}
+              rows={2}
+              placeholder="Counterparty, history, constraints, leverage, what matters, or what cannot be lost."
+              className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
+            />
+          </label>
 
           <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>

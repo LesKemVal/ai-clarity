@@ -71,6 +71,7 @@ function isForceIntervention(text: string) {
   const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
   const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
   const [userPosition, setUserPosition] = useState('Seeking')
+  const [knownContextAvailable, setKnownContextAvailable] = useState(false)
   const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
   const [liveTier, setLiveTier] = useState<LiveRuntimeTier>('brilliant')
 
@@ -615,6 +616,13 @@ function isForceIntervention(text: string) {
         setUserPosition(setup.userPosition)
         pushLog(`User position: ${setup.userPosition}`)
       }
+
+      if (String(setup?.knownContext || '').trim()) {
+        setKnownContextAvailable(true)
+        pushLog('Known context loaded.')
+      } else {
+        setKnownContextAvailable(false)
+      }
     } catch {}
 
     try {
@@ -888,6 +896,7 @@ function isForceIntervention(text: string) {
             const outcomeDecision = georgeOutcomeGovernor.evaluate({
               objectiveKnown: activeObjective.id !== 'clarify',
               userPosition,
+              knownContextAvailable,
               objectivePressure:
                 orchestrated.runtimeSnapshot.interventionUrgency === 'high'
                   ? 'high'
@@ -1137,6 +1146,13 @@ function isForceIntervention(text: string) {
       if (setup?.userPosition) {
         setUserPosition(setup.userPosition)
         pushLog(`User position: ${setup.userPosition}`)
+      }
+
+      if (String(setup?.knownContext || '').trim()) {
+        setKnownContextAvailable(true)
+        pushLog('Known context loaded.')
+      } else {
+        setKnownContextAvailable(false)
       }
     } catch {}
     setShadowMap('')

@@ -15,6 +15,7 @@ export type OutcomeGovernorInput = {
   consequence?: 'low' | 'moderate' | 'high'
   opportunityCost?: 'low' | 'moderate' | 'high'
   userPosition?: string
+  knownContextAvailable?: boolean
   userHasRequestedHelp?: boolean
   roomHasRecentSignal?: boolean
   missingCriticalSignal?: boolean
@@ -144,6 +145,7 @@ class GeorgeOutcomeGovernor {
       `Opportunity cost: ${input.opportunityCost}`,
       `Objective pressure: ${input.objectivePressure}`,
       `User position: ${input.userPosition || 'unknown'}`,
+      input.knownContextAvailable ? 'Known context available.' : 'Known context unavailable.',
       input.userHasRequestedHelp ? 'User requested help.' : 'No direct help request.',
       input.missingCriticalSignal ? 'Critical signal missing.' : 'Critical signal not missing.',
       input.canAcquireContextNaturally ? 'Natural context recovery available.' : 'Natural context recovery unavailable.',

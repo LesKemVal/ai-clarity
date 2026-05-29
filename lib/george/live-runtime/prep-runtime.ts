@@ -44,6 +44,7 @@ export type LiveRuntimeSupport = {
   runtimeBias?: unknown[]
   purview?: LivePurview | null
   userPosition?: string
+  knownContext?: string
   deliveryOverlay?: LiveDeliveryOverlay | null
 }
 
