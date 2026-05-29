@@ -117,7 +117,7 @@ function buildRoomContextResponse(text: string) {
   return {
     speaker: 'george_instruction' as const,
     shouldSpeak: true,
-    volley: `${move.line} ${move.cue}`,
+    volley: move.line,
     cue: `${move.read} ${move.cue}`,
     status: `Signal acquisition move: ${move.name}.`,
     confidence: move.confidence,
