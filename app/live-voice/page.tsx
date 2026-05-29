@@ -71,14 +71,14 @@ function isUserRoomContext(text: string) {
 function buildRoomContextResponse(text: string) {
   const clean = text.toLowerCase()
 
-  if (/interview/.test(clean) && /rushing|pressuring|pushing/.test(clean)) {
+  if (/interview/.test(clean) && /rush|rushing|pressur|pushing|hurry|quick|fast/.test(clean)) {
     return {
       speaker: 'george_instruction' as const,
       shouldSpeak: true,
-      volley: "I don’t want to rush this. I want to answer it clearly.",
-      cue: 'Slow the pace. Sound calm, not defensive.',
+      volley: "I don’t want to rush this because I want to give you a clear answer. The short version is: I’m focused, I understand the pressure, and I can walk you through my thinking.",
+      cue: 'Interview pressure detected. Slow the pace, explain why, then answer cleanly.',
       status: 'Room context detected: interview pressure.',
-      confidence: 0.72,
+      confidence: 0.78,
     }
   }
 
@@ -96,10 +96,10 @@ function buildRoomContextResponse(text: string) {
   return {
     speaker: 'george_instruction' as const,
     shouldSpeak: true,
-    volley: "Give me one second. I want to answer this cleanly.",
-    cue: 'Buy time and regain clarity.',
-    status: 'Room context detected.',
-    confidence: 0.66,
+    volley: "Give me one second so I can answer this clearly. What matters most here — the outcome, the concern, or the next decision?",
+    cue: 'Thin context. Buy time, then ask for the signal that changes the answer.',
+    status: 'Room context detected: clarification needed.',
+    confidence: 0.68,
   }
 }
 
