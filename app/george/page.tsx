@@ -30,6 +30,7 @@ import {
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
+import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1707,6 +1708,54 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
     profile: georgeProfile,
     userPosition: liveRuntimeSupport?.userPosition,
   })
+
+  const outcomeGovernorSnapshot = useMemo(() => {
+    if (!liveMode) return null
+
+    const knownContext =
+      liveRuntimeSupport?.knownContext ||
+      liveRuntimeSupport?.purview?.body ||
+      ''
+
+    const objectiveKnown = Boolean(
+      input.trim() ||
+      activeCampaign?.desiredOutcome ||
+      activeCampaign?.currentGoal ||
+      liveRuntimeSupport?.purview?.line
+    )
+
+    const knownContextAvailable = Boolean(
+      knownContext ||
+      interimTranscript.trim() ||
+      stableLiveGuidance?.signal
+    )
+
+    return georgeOutcomeGovernor.evaluate({
+      objectiveKnown,
+      objectivePressure: liveMode ? 'high' : 'moderate',
+      confidence: stableLiveGuidance ? 0.64 : 0.52,
+      consequence: 'moderate',
+      opportunityCost: 'moderate',
+      userPosition: liveRuntimeSupport?.userPosition,
+      knownContextAvailable,
+      userHasRequestedHelp: Boolean(input.trim()),
+      roomHasRecentSignal: Boolean(interimTranscript.trim() || stableLiveGuidance),
+      missingCriticalSignal: !knownContextAvailable && Boolean(input.trim() || interimTranscript.trim()),
+      userPositionAtRisk: false,
+      canAcquireContextNaturally: Boolean(input.trim() || interimTranscript.trim()),
+    })
+  }, [
+    liveMode,
+    input,
+    interimTranscript,
+    activeCampaign?.desiredOutcome,
+    activeCampaign?.currentGoal,
+    liveRuntimeSupport?.knownContext,
+    liveRuntimeSupport?.purview?.body,
+    liveRuntimeSupport?.purview?.line,
+    liveRuntimeSupport?.userPosition,
+    stableLiveGuidance,
+  ])
 
   useEffect(() => {
     if (!liveMode || currentTier !== 'brilliant' || !liveGuidance) {
@@ -6746,15 +6795,40 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-{liveMode && stableLiveGuidance && (
+{liveMode && (stableLiveGuidance || outcomeGovernorSnapshot) && (
   <div className="fixed bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
     <div className="w-full max-w-[420px] rounded-[1rem] border border-[#AEB6FF]/[0.10] bg-[#05070B]/72 px-3.5 py-3 shadow-[0_14px_34px_rgba(0,0,0,0.32)] backdrop-blur-[14px]">
-      <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
-        {stableLiveGuidance.signal}
-      </div>
-      <div className="text-[13px] leading-5 text-[#F4F6FA]/88">
-        {stableLiveGuidance.say.replace(/^Say:\s*/i, '')}
-      </div>
+      {stableLiveGuidance && (
+        <>
+          <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
+            {stableLiveGuidance.signal}
+          </div>
+          <div className="text-[13px] leading-5 text-[#F4F6FA]/88">
+            {stableLiveGuidance.say.replace(/^Say:\s*/i, '')}
+          </div>
+        </>
+      )}
+
+      {outcomeGovernorSnapshot && (
+        <div className={`${stableLiveGuidance ? 'mt-2 border-t border-white/[0.055] pt-2' : ''}`}>
+          <div className="text-[9px] uppercase tracking-[0.22em] text-white/28">
+            Outcome Governor
+          </div>
+          <div className="mt-1 grid grid-cols-2 gap-2 text-[10px] leading-4 text-white/42">
+            <div>
+              <span className="block text-white/24">Move</span>
+              {outcomeGovernorSnapshot.move}
+            </div>
+            <div>
+              <span className="block text-white/24">Missing</span>
+              {outcomeGovernorSnapshot.missingSignal || 'none'}
+            </div>
+          </div>
+          <div className="mt-1 text-[10px] leading-4 text-white/34">
+            {outcomeGovernorSnapshot.missingSignalReason}
+          </div>
+        </div>
+      )}
     </div>
   </div>
 )}
