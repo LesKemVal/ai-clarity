@@ -42,23 +42,11 @@ export default function SignalPage() {
   const [adaptiveAnswer, setAdaptiveAnswer] = useState('')
   const [adaptiveQuestion, setAdaptiveQuestion] = useState('')
   const [signalRoom, setSignalRoom] = useState<SignalRoom>(getDefaultSignalRoom())
-  const [signalMeaningId, setSignalMeaningId] = useState('')
-  const [signalPhrase, setSignalPhrase] = useState('')
+  const [roomTriggers, setRoomTriggers] = useState<Record<string, string>>({})
   const [savedSignals, setSavedSignals] = useState<SavedRoomSignal[]>([])
   const [signalSaved, setSignalSaved] = useState(false)
 
   const roomMeanings = useMemo(() => getSignalMeaningsForRoom(signalRoom), [signalRoom])
-  const selectedMeaning = useMemo(
-    () => roomMeanings.find((meaning) => meaning.id === signalMeaningId) || roomMeanings[0],
-    [roomMeanings, signalMeaningId]
-  )
-
-  useEffect(() => {
-    if (!signalMeaningId && roomMeanings[0]) {
-      setSignalMeaningId(roomMeanings[0].id)
-    }
-  }, [roomMeanings, signalMeaningId])
-
   useEffect(() => {
     const cachedAuthority = readCachedGeorgeSessionAuthority()
     setTier(cachedAuthority.tier)
@@ -121,28 +109,28 @@ export default function SignalPage() {
     return !!(name && mission && priority && learningStyle && adaptiveAnswer)
   }, [name, mission, priority, learningStyle, adaptiveAnswer])
 
-  const signalValid = useMemo(() => {
-    return Boolean(signalRoom && selectedMeaning && signalPhrase.trim().length >= 2)
-  }, [signalRoom, selectedMeaning, signalPhrase])
 
-  function saveRoomSignal() {
-    if (!signalValid || !selectedMeaning) return
+  function saveRoomSignals() {
+    const payload: SavedRoomSignal[] = roomMeanings
+      .map((meaning) => ({
+        id: `signal_${signalRoom}_${meaning.id}`,
+        room: signalRoom,
+        phrase: (roomTriggers[meaning.id] || '').trim(),
+        meaningId: meaning.id,
+        meaningLabel: meaning.label,
+        createdAt: Date.now(),
+      }))
+      .filter((item) => item.phrase.length > 0)
 
-    const nextSignal: SavedRoomSignal = {
-      id: `signal_${Date.now()}`,
-      room: signalRoom,
-      phrase: signalPhrase.trim(),
-      meaningId: selectedMeaning.id,
-      meaningLabel: selectedMeaning.label,
-      createdAt: Date.now(),
-    }
+    writeSavedRoomSignals(payload)
 
-    const nextSignals = [nextSignal, ...savedSignals].slice(0, 40)
-    setSavedSignals(nextSignals)
-    writeSavedRoomSignals(nextSignals)
-    setSignalPhrase('')
+    setSavedSignals(payload)
+
     setSignalSaved(true)
-    window.setTimeout(() => setSignalSaved(false), 2800)
+
+    window.setTimeout(() => {
+      setSignalSaved(false)
+    }, 2800)
   }
 
   function save() {
@@ -219,7 +207,7 @@ export default function SignalPage() {
                 onChange={(e) => {
                   const nextRoom = e.target.value as SignalRoom
                   setSignalRoom(nextRoom)
-                  setSignalMeaningId(getSignalMeaningsForRoom(nextRoom)[0]?.id || '')
+                  setRoomTriggers({})
                 }}
                 className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#080A0F] px-4 py-3 text-sm text-white outline-none"
               >
@@ -230,12 +218,12 @@ export default function SignalPage() {
 
               <div className="grid gap-2">
                 {roomMeanings.map((meaning) => {
-                  const active = meaning.id === selectedMeaning?.id
+                  const active = false
                   return (
                     <button
                       key={meaning.id}
                       type="button"
-                      onClick={() => setSignalMeaningId(meaning.id)}
+                      onClick={() => {}}
                       className={`rounded-[0.9rem] border px-3.5 py-3 text-left transition ${
                         active
                           ? 'border-white/[0.16] bg-white/[0.075] text-white'
@@ -258,21 +246,38 @@ export default function SignalPage() {
                 </p>
               </div>
 
-              <input
-                value={signalPhrase}
-                onChange={(e) => setSignalPhrase(e.target.value)}
-                placeholder="Example: Interesting... / Let me think / That's fair"
-                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
-              />
+              <div className="space-y-3">
+                {roomMeanings.map((meaning) => (
+                  <div
+                    key={meaning.id}
+                    className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.018] p-3"
+                  >
+                    <p className="text-sm text-white/80">
+                      {meaning.label}
+                    </p>
 
-              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.018] p-3">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/28">Will mean</p>
-                <p className="mt-1 text-sm text-white/76">{selectedMeaning?.label}</p>
+                    <p className="mt-1 text-[11px] text-white/38">
+                      {meaning.description}
+                    </p>
+
+                    <input
+                      value={roomTriggers[meaning.id] || ''}
+                      onChange={(e) =>
+                        setRoomTriggers((prev) => ({
+                          ...prev,
+                          [meaning.id]: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter a phrase you would naturally say..."
+                      className="mt-3 w-full rounded-[0.8rem] border border-white/[0.05] bg-black/30 px-3 py-2 text-sm text-white outline-none placeholder:text-white/28"
+                    />
+                  </div>
+                ))}
               </div>
 
               <button
-                onClick={saveRoomSignal}
-                disabled={!signalValid}
+                onClick={saveRoomSignals}
+                disabled={false}
                 className="w-full rounded-[0.9rem] bg-white px-5 py-3 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
               >
                 Load Signal
