@@ -40,6 +40,14 @@ function buildRoomLine(room: string) {
   return `I know this ${room.toLowerCase()} room.`
 }
 
+function buildPositionLine(setup: LivePrepSetup | null) {
+  const position = clean((setup as any)?.userPosition)
+
+  if (!position) return null
+
+  return `You’re approaching this from a ${position.toLowerCase()} position.`
+}
+
 function buildAssistLine(mode: LiveBriefingMode) {
   if (mode === 'lines') {
     return 'I’ll start with something you can repeat while I reference your signal.'
@@ -67,6 +75,7 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
   const room = normalizeRoom(setup?.room, input.defaultRoom || 'Adaptive LIVE')
   const mode = normalizeAssistMode(setup)
   const signalLine = buildSignalLine(setup)
+  const positionLine = buildPositionLine(setup)
 
   return [
     'Good morning. I’m GEORGE.',
@@ -75,6 +84,7 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     '',
     buildRoomLine(room),
     buildObjectiveLine(setup),
+    positionLine,
     '',
     signalLine,
     '',
