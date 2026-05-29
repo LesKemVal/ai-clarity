@@ -15,7 +15,7 @@ export function classifyLiveInput(text: string): LiveInputKind {
   if (roomContext) return 'room_context'
 
   if (
-    /\bgeorge\b|\bwhat do i say\b|\bhelp me\b|\bwhat do you need from me\b|\btell me what to say\b|\bsay something\b|\bjump in\b/.test(clean)
+    /\bgeorge\b|\bwhat do i say\b|\bhelp me\b|\bwhat do you need from me\b|\btell me what to say\b|\bsay something\b|\bjump in\b|\bi need help\b/.test(clean)
   ) {
     return 'direct_george_request'
   }

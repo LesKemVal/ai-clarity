@@ -55,7 +55,7 @@ type LivePacket = {
 export default function LiveVoicePage() {
 
 function isForceIntervention(text: string) {
-  return /george|help me|what do i say|tell me what to say|say something|jump in|i need help/i.test(
+  return /george|help me|what do i say|what do you need from me|tell me what to say|say something|jump in|i need help/i.test(
     text.toLowerCase()
   )
 }

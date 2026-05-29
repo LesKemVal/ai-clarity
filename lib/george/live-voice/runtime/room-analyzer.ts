@@ -23,7 +23,7 @@ const INTERVIEWER_QUESTION_PATTERNS =
   /(tell me about yourself|tell me about a time|give me an example|walk me through|why should we hire|why do you want|what are your strengths|what are your weaknesses|what systems are you familiar with|describe a time|how did you handle)/i
 
 const USER_REQUEST_PATTERNS =
-  /(george|help me|what should i say|how do i respond|give me|tell me|coach me)/i
+  /(george|help me|what should i say|what do i say|what do you need from me|how do i respond|give me|tell me|coach me|say something|jump in)/i
 
 export function inferLiveSpeaker(
   text: string,
