@@ -551,6 +551,31 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
             />
           </label>
 
+          <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {OUTPUT_OPTIONS.map((option) => {
+                const active = outputMode === option.label
+
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => setOutputMode(option.label)}
+                    className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
+                      active
+                        ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.10] text-white'
+                        : 'border-white/[0.04] bg-black/16 text-white/46 hover:text-white/76'
+                    }`}
+                  >
+                    <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Lines' : option.label}</span>
+                    <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <label className="mt-2 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
             <div className="mt-2 flex items-center justify-between gap-2">
