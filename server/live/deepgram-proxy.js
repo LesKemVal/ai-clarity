@@ -20,7 +20,20 @@ const server = http.createServer((req, res) => {
   res.end()
 })
 
-const wss = new WebSocket.Server({ server, path: '/live' })
+const wss = new WebSocket.Server({ noServer: true })
+
+server.on('upgrade', (req, socket, head) => {
+  const path = req.url?.split('?')[0]
+
+  if (path !== '/live' && path !== '/live/') {
+    socket.destroy()
+    return
+  }
+
+  wss.handleUpgrade(req, socket, head, (client) => {
+    wss.emit('connection', client, req)
+  })
+})
 
 wss.on('connection', (client) => {
   console.log('Client connected to GEORGE LIVE proxy')
