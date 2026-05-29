@@ -28,6 +28,8 @@ export type OutcomeGovernorSnapshot = {
   confidence: number
   reason: string
   doctrine: string[]
+  missingSignal: string | null
+  missingSignalReason: string
   checkedAt: number
 }
 
@@ -44,13 +46,16 @@ class GeorgeOutcomeGovernor {
     const opportunityCost = input.opportunityCost ?? 'moderate'
     const objectivePressure = input.objectivePressure ?? 'moderate'
 
-    const move = this.resolveMove({
+    const normalizedInput = {
       ...input,
       confidence,
       consequence,
       opportunityCost,
       objectivePressure,
-    })
+    }
+
+    const move = this.resolveMove(normalizedInput)
+    const missingSignal = this.resolveMissingSignal(normalizedInput)
 
     this.snapshot = {
       move,
@@ -69,8 +74,11 @@ class GeorgeOutcomeGovernor {
         'GEORGE does not abandon the user.',
         'GEORGE does not pretend certainty.',
         'GEORGE uses uncertainty to change action, not usefulness.',
-        'GEORGE chooses the safest useful move available.',
+        'GEORGE asks the smallest question that produces the strongest signal and materially improves the next decision.',
+        'GEORGE chooses the most intelligent useful move available in service of the desired outcome.',
       ],
+      missingSignal: missingSignal.signal,
+      missingSignalReason: missingSignal.reason,
       checkedAt: Date.now(),
     }
 
@@ -129,6 +137,69 @@ class GeorgeOutcomeGovernor {
     }
 
     return 'observe'
+  }
+
+
+  private resolveMissingSignal(input: Required<Pick<OutcomeGovernorInput, 'confidence' | 'consequence' | 'opportunityCost' | 'objectivePressure'>> & OutcomeGovernorInput) {
+    const position = String(input.userPosition || '').toLowerCase()
+    const highConsequence =
+      input.consequence === 'high' ||
+      input.opportunityCost === 'high' ||
+      input.userPositionAtRisk === true
+
+    if (input.confidence >= 0.68 && input.knownContextAvailable) {
+      return {
+        signal: null,
+        reason: 'Known context and confidence are sufficient for the current decision.',
+      }
+    }
+
+    if (!input.objectiveKnown) {
+      return {
+        signal: 'desired_outcome',
+        reason: 'Desired outcome is the highest-value missing signal.',
+      }
+    }
+
+    if (!input.knownContextAvailable && highConsequence) {
+      return {
+        signal: 'known_context',
+        reason: 'High-consequence outcome needs user-known context before stronger recommendations.',
+      }
+    }
+
+    if (position === 'evaluating' || position === 'deciding') {
+      return {
+        signal: 'decision_criteria',
+        reason: 'Evaluating or deciding requires criteria before GEORGE can judge acceptable risk and reward.',
+      }
+    }
+
+    if (position === 'negotiating') {
+      return {
+        signal: 'non_negotiable_or_tradeoff',
+        reason: 'Negotiation requires knowing what cannot be lost versus what can be traded.',
+      }
+    }
+
+    if (position === 'seeking' && highConsequence) {
+      return {
+        signal: 'acceptable_fallback',
+        reason: 'Seeking a high-consequence outcome requires knowing whether any fallback outcome is acceptable.',
+      }
+    }
+
+    if (input.missingCriticalSignal) {
+      return {
+        signal: 'critical_room_signal',
+        reason: 'A critical room signal is missing and may materially change the next move.',
+      }
+    }
+
+    return {
+      signal: null,
+      reason: 'No missing signal currently rises above action threshold.',
+    }
   }
 
   private resolveReason(input: OutcomeGovernorInput & {
