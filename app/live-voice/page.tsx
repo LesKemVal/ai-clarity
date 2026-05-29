@@ -25,6 +25,7 @@ import { georgeDeliverySessionManager } from '@/lib/george/live-voice/runtime/de
 import { inferLiveSpeaker } from '@/lib/george/live-voice/runtime/room-analyzer'
 import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import { georgeRuntimeDecisionEngine } from '@/lib/george/live-voice/runtime/runtime-decision-engine'
+import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LiveLifecycleState =
@@ -873,6 +874,39 @@ function isForceIntervention(text: string) {
 
             setRuntimeState(orchestrated.runtimeSnapshot)
             setPacket({ ...orchestrated.packet })
+
+            const outcomeDecision = georgeOutcomeGovernor.evaluate({
+              objectiveKnown: activeObjective.id !== 'clarify',
+              objectivePressure:
+                orchestrated.runtimeSnapshot.interventionUrgency === 'high'
+                  ? 'high'
+                  : orchestrated.runtimeSnapshot.interventionUrgency === 'medium'
+                    ? 'moderate'
+                    : 'low',
+              confidence: orchestrated.packet.confidence,
+              consequence:
+                orchestrated.runtimeSnapshot.roomPressure === 'authority'
+                  ? 'high'
+                  : orchestrated.runtimeSnapshot.interventionUrgency === 'high'
+                    ? 'high'
+                    : 'moderate',
+              opportunityCost:
+                ((orchestrated.runtimeSnapshot.escalationLikelihood ?? 0) > 0.72)
+                  ? 'high'
+                  : 'moderate',
+              userHasRequestedHelp: forcedIntervention,
+              roomHasRecentSignal: Boolean(transcriptBuffer.latest()),
+              missingCriticalSignal:
+                orchestrated.packet.confidence < 0.46 &&
+                orchestrated.runtimeSnapshot.interventionUrgency === 'high',
+              userPositionAtRisk:
+                orchestrated.runtimeSnapshot.roomPressure === 'authority' ||
+                orchestrated.runtimeSnapshot.trajectory === 'authority_risk',
+              canAcquireContextNaturally: true,
+            })
+
+            pushLog(`Outcome move: ${outcomeDecision.move} (${Math.round(outcomeDecision.confidence * 100)}%)`)
+            pushLog(`Outcome reason: ${outcomeDecision.reason}`)
 
             const runtimeDecision = georgeRuntimeDecisionEngine.decide()
             shouldHoldByRuntime =
