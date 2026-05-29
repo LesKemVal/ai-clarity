@@ -2,8 +2,33 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
+import {
+  getDefaultSignalRoom,
+  getSignalMeaningsForRoom,
+  SIGNAL_ROOMS,
+  type SavedRoomSignal,
+  type SignalRoom,
+} from '@/lib/george/signal/room-signal-options'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
+
+const ROOM_SIGNAL_STORAGE_KEY = 'GEORGE_ROOM_SIGNALS'
+
+function readSavedRoomSignals(): SavedRoomSignal[] {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(ROOM_SIGNAL_STORAGE_KEY) || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function writeSavedRoomSignals(signals: SavedRoomSignal[]) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(ROOM_SIGNAL_STORAGE_KEY, JSON.stringify(signals.slice(0, 40)))
+}
 
 export default function SignalPage() {
 
@@ -16,6 +41,23 @@ export default function SignalPage() {
   const [learningStyle, setLearningStyle] = useState('')
   const [adaptiveAnswer, setAdaptiveAnswer] = useState('')
   const [adaptiveQuestion, setAdaptiveQuestion] = useState('')
+  const [signalRoom, setSignalRoom] = useState<SignalRoom>(getDefaultSignalRoom())
+  const [signalMeaningId, setSignalMeaningId] = useState('')
+  const [signalPhrase, setSignalPhrase] = useState('')
+  const [savedSignals, setSavedSignals] = useState<SavedRoomSignal[]>([])
+  const [signalSaved, setSignalSaved] = useState(false)
+
+  const roomMeanings = useMemo(() => getSignalMeaningsForRoom(signalRoom), [signalRoom])
+  const selectedMeaning = useMemo(
+    () => roomMeanings.find((meaning) => meaning.id === signalMeaningId) || roomMeanings[0],
+    [roomMeanings, signalMeaningId]
+  )
+
+  useEffect(() => {
+    if (!signalMeaningId && roomMeanings[0]) {
+      setSignalMeaningId(roomMeanings[0].id)
+    }
+  }, [roomMeanings, signalMeaningId])
 
   useEffect(() => {
     const cachedAuthority = readCachedGeorgeSessionAuthority()
@@ -30,6 +72,7 @@ export default function SignalPage() {
     setPriority(localStorage.getItem('george_user_priority') || '')
     setLearningStyle(localStorage.getItem('george_user_learning_style') || '')
     setAdaptiveAnswer(localStorage.getItem('george_user_adaptive_answer') || '')
+    setSavedSignals(readSavedRoomSignals())
     setReady(true)
   }, [])
 
@@ -78,6 +121,30 @@ export default function SignalPage() {
     return !!(name && mission && priority && learningStyle && adaptiveAnswer)
   }, [name, mission, priority, learningStyle, adaptiveAnswer])
 
+  const signalValid = useMemo(() => {
+    return Boolean(signalRoom && selectedMeaning && signalPhrase.trim().length >= 2)
+  }, [signalRoom, selectedMeaning, signalPhrase])
+
+  function saveRoomSignal() {
+    if (!signalValid || !selectedMeaning) return
+
+    const nextSignal: SavedRoomSignal = {
+      id: `signal_${Date.now()}`,
+      room: signalRoom,
+      phrase: signalPhrase.trim(),
+      meaningId: selectedMeaning.id,
+      meaningLabel: selectedMeaning.label,
+      createdAt: Date.now(),
+    }
+
+    const nextSignals = [nextSignal, ...savedSignals].slice(0, 40)
+    setSavedSignals(nextSignals)
+    writeSavedRoomSignals(nextSignals)
+    setSignalPhrase('')
+    setSignalSaved(true)
+    window.setTimeout(() => setSignalSaved(false), 2800)
+  }
+
   function save() {
     if (!valid) return
 
@@ -109,7 +176,7 @@ export default function SignalPage() {
         <div className="absolute inset-x-0 top-0 h-px bg-white/[0.05]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-3xl space-y-4">
+      <div className="relative z-10 mx-auto max-w-4xl space-y-4">
         <div className="flex items-center justify-between">
           <img
             src="/logofav.png"
@@ -134,8 +201,105 @@ export default function SignalPage() {
               Give GEORGE better signal.
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-white/48 md:text-base">
-              Answer a few questions so GEORGE can understand what matters, ask sharper follow-ups, and stay useful as your goals, projects, pressure, and context change.
+              Connect your own words to GEORGE meanings. LIVE loads these signals so GEORGE can understand how you hand him the ball without forcing you to sound unnatural.
             </p>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/20 p-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Room signal</p>
+                <p className="mt-2 text-sm leading-6 text-white/48">
+                  Choose the room first. GEORGE only shows signal meanings that belong in that context.
+                </p>
+              </div>
+
+              <select
+                value={signalRoom}
+                onChange={(e) => {
+                  const nextRoom = e.target.value as SignalRoom
+                  setSignalRoom(nextRoom)
+                  setSignalMeaningId(getSignalMeaningsForRoom(nextRoom)[0]?.id || '')
+                }}
+                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-[#080A0F] px-4 py-3 text-sm text-white outline-none"
+              >
+                {SIGNAL_ROOMS.map((room) => (
+                  <option key={room} value={room}>{room}</option>
+                ))}
+              </select>
+
+              <div className="grid gap-2">
+                {roomMeanings.map((meaning) => {
+                  const active = meaning.id === selectedMeaning?.id
+                  return (
+                    <button
+                      key={meaning.id}
+                      type="button"
+                      onClick={() => setSignalMeaningId(meaning.id)}
+                      className={`rounded-[0.9rem] border px-3.5 py-3 text-left transition ${
+                        active
+                          ? 'border-white/[0.16] bg-white/[0.075] text-white'
+                          : 'border-white/[0.045] bg-white/[0.018] text-white/54 hover:border-white/[0.09] hover:text-white/78'
+                      }`}
+                    >
+                      <span className="block text-[12px] font-medium tracking-[-0.01em]">{meaning.label}</span>
+                      <span className="mt-1 block text-[11px] leading-4 text-white/36">{meaning.description}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-[1rem] border border-white/[0.045] bg-black/24 p-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Your words</p>
+                <p className="mt-2 text-sm leading-6 text-white/50">
+                  Use words you would actually say in the room. GEORGE maps the phrase to the meaning, then decides the best live behavior from room, objective, and signal.
+                </p>
+              </div>
+
+              <input
+                value={signalPhrase}
+                onChange={(e) => setSignalPhrase(e.target.value)}
+                placeholder="Example: Interesting... / Let me think / That's fair"
+                className="w-full rounded-[0.85rem] border border-white/[0.05] bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/28"
+              />
+
+              <div className="rounded-[0.9rem] border border-white/[0.045] bg-white/[0.018] p-3">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/28">Will mean</p>
+                <p className="mt-1 text-sm text-white/76">{selectedMeaning?.label}</p>
+              </div>
+
+              <button
+                onClick={saveRoomSignal}
+                disabled={!signalValid}
+                className="w-full rounded-[0.9rem] bg-white px-5 py-3 text-sm font-semibold text-[#0B0D12] transition hover:bg-[#F3F5F7] disabled:opacity-40"
+              >
+                Load Signal
+              </button>
+
+              {signalSaved && (
+                <div className="rounded-[0.9rem] border border-[#AEB6FF]/[0.16] bg-[#AEB6FF]/[0.055] px-3.5 py-3 text-sm text-[#DDE2FF]/78 shadow-[0_0_28px_rgba(174,182,255,0.08)]">
+                  Signal loaded. Upload material to sharpen cues and repeatable responses.
+                </div>
+              )}
+
+              <div className="space-y-2 border-t border-white/[0.045] pt-3">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-white/30">Loaded signals</p>
+                {savedSignals.length === 0 ? (
+                  <p className="text-xs leading-5 text-white/34">No room signals loaded yet.</p>
+                ) : (
+                  <div className="grid gap-2">
+                    {savedSignals.slice(0, 5).map((signal) => (
+                      <div key={signal.id} className="rounded-[0.8rem] border border-white/[0.04] bg-black/20 px-3 py-2">
+                        <p className="text-[11px] text-white/78">“{signal.phrase}”</p>
+                        <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/30">{signal.room} · {signal.meaningLabel}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
@@ -209,7 +373,7 @@ export default function SignalPage() {
             </button>
 
             <p className="text-xs leading-5 text-white/32">
-              You can return here whenever the project, pressure, goal, or working style changes.
+              You can return here whenever the project, pressure, goal, room, or working style changes.
             </p>
           </div>
         </div>
