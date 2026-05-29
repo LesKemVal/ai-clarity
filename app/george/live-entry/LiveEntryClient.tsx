@@ -541,12 +541,12 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
           </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective optional</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Objective</span>
             <textarea
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
               rows={2}
-              placeholder="Example: help me ask for the raise without overexplaining."
+              placeholder="What are you trying to accomplish in this room?"
               className="mt-2 w-full resize-none bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/24"
             />
           </label>
