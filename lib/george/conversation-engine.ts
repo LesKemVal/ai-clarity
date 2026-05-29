@@ -180,6 +180,7 @@ export function buildLiveGuidance({
   interimTranscript,
   input,
   profile,
+  userPosition,
 }: {
   liveMode: boolean
   currentTier: Tier
@@ -187,8 +188,20 @@ export function buildLiveGuidance({
   interimTranscript: string
   input: string
   profile: ConversationProfile
+  userPosition?: string
 }): LiveGuidance | null {
   if (!liveMode || currentTier !== 'brilliant') return null
+
+  const normalizedUserPosition = String(userPosition || '').toLowerCase()
+
+  const hasHighFloorOwnership =
+    /ceo|boss|owner|founder|manager|lead|director|executive|hiring|buyer|client|decision/.test(
+      normalizedUserPosition
+    )
+
+  const pressureLine = hasHighFloorOwnership
+    ? 'Say: “I’m not rushing this.”'
+    : 'Say: “I don’t want to rush this.”'
 
   if (profile === 'study') {
     if (isListening) {
@@ -266,7 +279,7 @@ export function buildLiveGuidance({
     if (transcript.includes('now') || transcript.includes('today')) {
       return {
         signal: 'PRESSURE DETECTED',
-        say: 'Say: “I’m not rushing this.”',
+        say: pressureLine,
       }
     }
 

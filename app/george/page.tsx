@@ -1696,6 +1696,7 @@ async function injectGovernedLiveCue(transcript: string, content: string) {
 
 
 const georgeProfile = detectConversationProfile(input, interimTranscript)
+const liveRuntimeSupport = readActiveLiveRuntimeSupport()
 
   const liveGuidance = buildLiveGuidance({
     liveMode,
@@ -1704,6 +1705,7 @@ const georgeProfile = detectConversationProfile(input, interimTranscript)
     interimTranscript,
     input,
     profile: georgeProfile,
+    userPosition: liveRuntimeSupport?.userPosition,
   })
 
   useEffect(() => {
