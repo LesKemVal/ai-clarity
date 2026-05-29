@@ -70,6 +70,7 @@ function isForceIntervention(text: string) {
   const [latency, setLatency] = useState<LatencySnapshot>(georgeLatencyMetrics.get())
   const [deliveryProfileId, setDeliveryProfileId] = useState<DeliveryProfileId>('whisperer')
   const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
+  const [userPosition, setUserPosition] = useState('Seeking')
   const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
   const [liveTier, setLiveTier] = useState<LiveRuntimeTier>('brilliant')
 
@@ -608,6 +609,15 @@ function isForceIntervention(text: string) {
     setLatency(georgeLatencyMetrics.get())
 
     try {
+      const rawSetup = window.localStorage.getItem('george_live_setup_active')
+      const setup = rawSetup ? JSON.parse(rawSetup) : null
+      if (setup?.userPosition) {
+        setUserPosition(setup.userPosition)
+        pushLog(`User position: ${setup.userPosition}`)
+      }
+    } catch {}
+
+    try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       streamRef.current = stream
 
@@ -877,6 +887,7 @@ function isForceIntervention(text: string) {
 
             const outcomeDecision = georgeOutcomeGovernor.evaluate({
               objectiveKnown: activeObjective.id !== 'clarify',
+              userPosition,
               objectivePressure:
                 orchestrated.runtimeSnapshot.interventionUrgency === 'high'
                   ? 'high'
@@ -1119,6 +1130,15 @@ function isForceIntervention(text: string) {
     georgePressureMemory.clear()
     setRuntimeState(georgeLiveRuntimeState.clear())
     setLatency(georgeLatencyMetrics.get())
+
+    try {
+      const rawSetup = window.localStorage.getItem('george_live_setup_active')
+      const setup = rawSetup ? JSON.parse(rawSetup) : null
+      if (setup?.userPosition) {
+        setUserPosition(setup.userPosition)
+        pushLog(`User position: ${setup.userPosition}`)
+      }
+    } catch {}
     setShadowMap('')
     lastGovernedRef.current = ''
 
