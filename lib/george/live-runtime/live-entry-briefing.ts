@@ -7,6 +7,11 @@ type LiveEntryBriefingInput = {
   defaultRoom?: string
 }
 
+type SignalSummary = {
+  phrase?: string
+  meaningLabel?: string
+}
+
 function clean(value: unknown) {
   return String(value || '').trim()
 }
@@ -43,10 +48,25 @@ function buildAssistLine(mode: LiveBriefingMode) {
   return 'I’ll keep cues short unless the room calls for something you can repeat.'
 }
 
+function buildSignalLine(setup: LivePrepSetup | null) {
+  const signals = (setup as any)?.roomSignals as SignalSummary[] | undefined
+
+  if (!signals || signals.length === 0) return null
+
+  const first = signals[0]
+
+  if (!first?.phrase || !first?.meaningLabel) {
+    return 'Your room signals are loaded.'
+  }
+
+  return `Signal loaded: “${first.phrase}” means “${first.meaningLabel}”.`
+}
+
 export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
   const setup = input.setup
   const room = normalizeRoom(setup?.room, input.defaultRoom || 'Adaptive LIVE')
   const mode = normalizeAssistMode(setup)
+  const signalLine = buildSignalLine(setup)
 
   return [
     'Good morning. I’m GEORGE.',
@@ -55,6 +75,8 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     '',
     buildRoomLine(room),
     buildObjectiveLine(setup),
+    '',
+    signalLine,
     '',
     'It’s your room.',
     '',
@@ -66,5 +88,5 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     'If the room changes, we’ll adapt.',
     '',
     'Go ahead.',
-  ].join('\n')
+  ].filter(Boolean).join('\n')
 }
