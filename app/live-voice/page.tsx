@@ -59,6 +59,50 @@ function isForceIntervention(text: string) {
   )
 }
 
+function isUserRoomContext(text: string) {
+  const clean = text.toLowerCase()
+
+  return (
+    /\bi'?m in\b|\bi am in\b|\bi'm at\b|\bi am at\b|\bthey'?re\b|\bthey are\b|\bmy boss\b|\bmy interviewer\b|\bthe interviewer\b|\bmy manager\b/.test(clean) &&
+    /interview|meeting|negotiation|raise|boss|manager|client|customer|deal|rushing|pressuring|challenged|numbers|questioning|pushing back/.test(clean)
+  )
+}
+
+function buildRoomContextResponse(text: string) {
+  const clean = text.toLowerCase()
+
+  if (/interview/.test(clean) && /rushing|pressuring|pushing/.test(clean)) {
+    return {
+      speaker: 'george_instruction' as const,
+      shouldSpeak: true,
+      volley: "I don’t want to rush this. I want to answer it clearly.",
+      cue: 'Slow the pace. Sound calm, not defensive.',
+      status: 'Room context detected: interview pressure.',
+      confidence: 0.72,
+    }
+  }
+
+  if (/boss|manager|meeting/.test(clean) && /challenged|numbers/.test(clean)) {
+    return {
+      speaker: 'george_instruction' as const,
+      shouldSpeak: true,
+      volley: "That’s fair. Let me separate the number from the assumption behind it.",
+      cue: 'Do not overexplain. Clarify the assumption first.',
+      status: 'Room context detected: numbers challenged.',
+      confidence: 0.74,
+    }
+  }
+
+  return {
+    speaker: 'george_instruction' as const,
+    shouldSpeak: true,
+    volley: "Give me one second. I want to answer this cleanly.",
+    cue: 'Buy time and regain clarity.',
+    status: 'Room context detected.',
+    confidence: 0.66,
+  }
+}
+
   const [running, setRunning] = useState(false)
   const [liveLifecycle, setLiveLifecycle] = useState<LiveLifecycleState>('idle')
   const liveActive = liveLifecycle === 'connecting' || liveLifecycle === 'active'
@@ -751,6 +795,16 @@ function isForceIntervention(text: string) {
 
           partialTranscriptRuntime.markStable(text)
           pushLog(`Heard: ${text}`)
+
+          if (isUserRoomContext(text)) {
+            const contextPacket = buildRoomContextResponse(text)
+
+            pushLog('Room context detected from user.')
+            setPacket(contextPacket)
+            georgeAudioQueue.enqueue(contextPacket.volley, 10, 5000)
+            void processAudioQueue()
+            return
+          }
 
           const inferredSpeaker = inferLiveSpeaker(text, shadowMap)
 
