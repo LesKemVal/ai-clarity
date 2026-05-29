@@ -6746,6 +6746,19 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
+{liveMode && stableLiveGuidance && (
+  <div className="fixed bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
+    <div className="w-full max-w-[420px] rounded-[1rem] border border-[#AEB6FF]/[0.10] bg-[#05070B]/72 px-3.5 py-3 shadow-[0_14px_34px_rgba(0,0,0,0.32)] backdrop-blur-[14px]">
+      <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
+        {stableLiveGuidance.signal}
+      </div>
+      <div className="text-[13px] leading-5 text-[#F4F6FA]/88">
+        {stableLiveGuidance.say.replace(/^Say:\s*/i, '')}
+      </div>
+    </div>
+  </div>
+)}
+
 {liveMode && (
   <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
     <div className="relative">
