@@ -29,6 +29,7 @@ import {
   reconcileActiveLiveRuntimeUsage,
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
+import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1439,27 +1440,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       const liveIntro: Message = {
         role: 'assistant',
-        content: setupRoom
-          ? `I am LIVE and present.
-
-You chose ${setupRoom} mode. I will support you accordingly.
-
-If the room shifts, tell me what changed or use a trigger word.
-
-${objectiveLine ? `${objectiveLine}
-
-` : ''}${steeringLine ? `${steeringLine}
-
-` : ''}${supportLine ? `${supportLine}
-
-` : ''}${capacityLine ? `${capacityLine}` : ''}`.trim()
-          : `I am LIVE and present.
-
-No room was selected. I’m listening first and will infer context directly from the room.
-
-Use a trigger word if you need a line, cue, pause, reword, or shorter response.${steeringLine ? `
-
-${steeringLine}` : ''}`
+        content: buildLiveEntryBriefing({
+          setup: liveSetup,
+          defaultRoom: 'Adaptive LIVE',
+        }),
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()
