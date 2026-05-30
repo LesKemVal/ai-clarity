@@ -66,11 +66,12 @@ Assist mode: ${mode}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
 Recent room memory: ${shadowMap || 'none'}
-Fallback status: ${input.fallbackPacket.status}
-Fallback volley: ${input.fallbackPacket.volley}
-Fallback cue: ${input.fallbackPacket.cue}
+Offline fallback status: ${input.fallbackPacket.status}
+Offline fallback volley, use only if reasoning cannot improve it: ${input.fallbackPacket.volley}
+Offline fallback cue: ${input.fallbackPacket.cue}
 
-Return the best next LIVE response now.
+Do not echo the offline fallback if the transcript already gives the signal.
+Reason from the live signal and return the best next LIVE response now.
 `.trim()
 
   const model =
@@ -81,6 +82,8 @@ Return the best next LIVE response now.
 
   const completion = await openai.chat.completions.create({
     model,
+    temperature: 0.25,
+    max_tokens: 80,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
