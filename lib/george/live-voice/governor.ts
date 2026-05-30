@@ -373,9 +373,9 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     TEACHER_LANGUAGE.test(packet.volley) &&
     packet.speakerIntent !== 'addressed_to_george'
   ) {
-    packet.volley = 'Say it plainly.'
-    packet.cue = 'Clear, calm, and human.'
-    packet.status = 'Teacher language blocked.'
+    packet.volley = 'Answer directly.'
+    packet.cue = 'Give the user a usable line, not a coaching label.'
+    packet.status = 'Teacher language compressed into direct instruction.'
   }
 
   packet = applySteeringContinuationAuthority(packet, input, transcript)
