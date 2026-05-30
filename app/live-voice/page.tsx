@@ -75,8 +75,9 @@ function isUserRoomContext(text: string) {
   )
 }
 
-function selectSignalAcquisitionMove(text: string) {
+function selectSignalAcquisitionMove(text: string, activeRoom = '') {
   const clean = text.toLowerCase()
+  const room = activeRoom.toLowerCase()
 
   if (/interview/.test(clean) && /rush|rushing|pressur|pushing|hurry|quick|fast/.test(clean)) {
     return {
@@ -85,6 +86,26 @@ function selectSignalAcquisitionMove(text: string) {
       cue: "Breathe. Repeat the question aloud — as if to yourself. I'm listening.",
       read: 'They may be testing composure, judgment, or communication under pressure.',
       confidence: 0.78,
+    }
+  }
+
+  if ((room === 'boardroom' || /board|executive|forecast|projection|revenue|growth/.test(clean)) && /challenged|numbers|forecast|projection|revenue|growth|pushing back/.test(clean)) {
+    return {
+      name: 'boardroom_specificity',
+      line: 'Which number are they challenging?',
+      cue: 'Get the exact metric before answering.',
+      read: 'Boardroom pressure needs metric specificity before GEORGE gives a line.',
+      confidence: 0.8,
+    }
+  }
+
+  if (room === 'boardroom' && /help|what should i do|what do i say|i need help/.test(clean)) {
+    return {
+      name: 'boardroom_zero_context',
+      line: 'What are they asking for?',
+      cue: 'Get the boardroom ask before giving a line.',
+      read: 'Boardroom selected but situation missing. Acquire the narrowest room signal.',
+      confidence: 0.72,
     }
   }
 
@@ -127,8 +148,8 @@ function selectSignalAcquisitionMove(text: string) {
   }
 }
 
-function buildRoomContextResponse(text: string) {
-  const move = selectSignalAcquisitionMove(text)
+function buildRoomContextResponse(text: string, activeRoom = '') {
+  const move = selectSignalAcquisitionMove(text, activeRoom)
 
   return {
     speaker: 'george_instruction' as const,
@@ -153,6 +174,7 @@ function buildRoomContextResponse(text: string) {
   const [objectiveId, setObjectiveId] = useState<LiveObjectiveId>('clarify')
   const [userPosition, setUserPosition] = useState('Seeking')
   const [knownContextAvailable, setKnownContextAvailable] = useState(false)
+  const [activeRoom, setActiveRoom] = useState('')
   const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
   const [liveTier, setLiveTier] = useState<LiveRuntimeTier>('brilliant')
 
@@ -718,6 +740,11 @@ function buildRoomContextResponse(text: string) {
     try {
       const rawSetup = window.localStorage.getItem('george_live_setup_active')
       const setup = rawSetup ? JSON.parse(rawSetup) : null
+      if (setup?.room) {
+        setActiveRoom(setup.room)
+        pushLog(`Room loaded: ${setup.room}`)
+      }
+
       if (setup?.userPosition) {
         setUserPosition(setup.userPosition)
         pushLog(`User position: ${setup.userPosition}`)
@@ -1300,6 +1327,11 @@ function buildRoomContextResponse(text: string) {
     try {
       const rawSetup = window.localStorage.getItem('george_live_setup_active')
       const setup = rawSetup ? JSON.parse(rawSetup) : null
+      if (setup?.room) {
+        setActiveRoom(setup.room)
+        pushLog(`Room loaded: ${setup.room}`)
+      }
+
       if (setup?.userPosition) {
         setUserPosition(setup.userPosition)
         pushLog(`User position: ${setup.userPosition}`)
