@@ -44,42 +44,42 @@ const OPERATIONAL_SIGNALS = [
 
 function getLiveRoomSignal(room: string) {
   if (room === 'Interview') {
-    return 'Interview context loaded. GEORGE will watch proof, pacing, pressure, and answer clarity.'
+    return 'Interview loaded. GEORGE is watching credibility, proof, pacing, pressure, and answer clarity.'
   }
 
   if (room === 'Meeting') {
-    return 'Meeting context loaded. GEORGE will watch alignment, timing, decision pressure, and next useful moves.'
+    return 'Meeting loaded. GEORGE is watching alignment, decision pressure, timing, and the next useful move.'
   }
 
   if (room === 'Boardroom') {
-    return 'Boardroom context loaded. GEORGE will watch authority, proof pressure, framing, and executive clarity.'
+    return 'Boardroom loaded. GEORGE is watching assumptions, methodology, evidence, variance, forecast confidence, and executive clarity.'
   }
 
   if (room === 'Negotiation') {
-    return 'Negotiation context loaded. GEORGE will watch leverage, timing, pressure, concessions, and control.'
+    return 'Negotiation loaded. GEORGE is watching leverage, concessions, timing, alternatives, pressure, and control.'
   }
 
   if (room === 'Sales Call') {
-    return 'Sales context loaded. GEORGE will watch trust, objection pressure, timing, and closing movement.'
+    return 'Sales call loaded. GEORGE is watching trust, objections, timing, buying signals, and closing movement.'
   }
 
   if (room === 'Debate') {
-    return 'Debate context loaded. GEORGE will watch contradiction, proof demands, interruptions, and framing control.'
+    return 'Debate loaded. GEORGE is watching contradiction, proof demands, interruptions, framing, and control.'
   }
 
   if (room === 'Doctor Appointment') {
-    return 'Appointment context loaded. GEORGE will watch clarity, symptoms, questions, and what cannot be missed.'
+    return 'Doctor appointment loaded. GEORGE is watching symptoms, diagnosis clarity, treatment risk, questions, and what cannot be missed.'
   }
 
   if (room === 'Presentation') {
-    return 'Presentation context loaded. GEORGE will watch pacing, audience pressure, message clarity, and the close.'
+    return 'Presentation loaded. GEORGE is watching pacing, audience pressure, message clarity, proof, and the close.'
   }
 
   if (room === 'Everyday Conversation') {
-    return 'Conversation context loaded. GEORGE will watch tone, timing, pressure, and the next useful line.'
+    return 'Conversation loaded. GEORGE is watching tone, timing, pressure, and the next useful line.'
   }
 
-  return 'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.'
+  return 'LIVE loaded. GEORGE is watching the room, the chair, the outcome, and the next useful signal.'
 }
 
 type Message = {
