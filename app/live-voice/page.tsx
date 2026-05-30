@@ -558,7 +558,9 @@ function buildRoomContextResponse(text: string) {
     }
 
     audioRef.current.src = url
-    audioRef.current.volume = deliveryProfile.volume
+    audioRef.current.muted = false
+    audioRef.current.volume = Math.max(deliveryProfile.volume, 0.9)
+    pushLog(`Audio output volume: ${audioRef.current.volume}`)
 
     audioRef.current.onloadedmetadata = () => {
       pushLog(
