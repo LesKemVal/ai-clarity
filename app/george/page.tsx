@@ -4543,9 +4543,7 @@ Never format as sections.
 Never return multiple options.
 
 ${resolvedLivePosture === 'debate' ? 'Debate posture: detect contradictions, protect the frame, answer proof demands, handle interruptions, and keep lines short and sharp.' : ''}`
-            : `I don’t have enough of the room yet.
-
-Tell me who you're speaking to, what this is about, or what outcome you want.`
+            : `What's happening right now?`
           : clean
 
         
