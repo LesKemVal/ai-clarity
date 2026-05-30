@@ -627,7 +627,11 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
 
     await audioRef.current.play()
       .then(() => {
-        pushLog('Audio playback started.')
+        pushLog(
+          `Audio playback started. duration=${Number.isFinite(audioRef.current?.duration || NaN)
+            ? audioRef.current?.duration.toFixed(2)
+            : 'unknown'} current=${audioRef.current?.currentTime?.toFixed?.(2) || '0.00'}`
+        )
       })
       .catch((error) => {
         pushLog(`Audio playback failed: ${error?.name || 'unknown'}`)
