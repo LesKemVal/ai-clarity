@@ -27,6 +27,7 @@ type ResourceEstimate = {
 const CONVERSATION_TYPES: SelectOption[] = [
   { label: 'Interview', helper: 'answers, confidence, proof' },
   { label: 'Meeting', helper: 'clarity, timing, decisions' },
+  { label: 'Boardroom', helper: 'numbers, pressure, executive framing' },
   { label: 'Negotiation', helper: 'leverage, restraint, asks' },
   { label: 'Sales Call', helper: 'objections, trust, close' },
   { label: 'Doctor Appointment', helper: 'questions, symptoms, advocacy' },
@@ -72,6 +73,15 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
       action: 'Upload résumé',
       helper: 'Resume, job description, cover letter, or notes GEORGE should use.',
       resource: 'resume/document preload',
+    }
+  }
+
+  if (conversationType === 'Boardroom') {
+    return {
+      label: 'Relevant document optional',
+      action: 'Upload deck or memo',
+      helper: 'Deck, board memo, metrics, forecast, agenda, objections, or executive notes.',
+      resource: 'boardroom material preload',
     }
   }
 
@@ -131,6 +141,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 const CONVERSATION_BASE: Record<string, { minutes: number; cents: number; resource: string }> = {
   Interview: { minutes: 24, cents: 21, resource: 'answer framing + proof recall' },
   Meeting: { minutes: 28, cents: 23, resource: 'decision tracking + timing cues' },
+  Boardroom: { minutes: 34, cents: 36, resource: 'executive framing + metric defense cues' },
   Negotiation: { minutes: 34, cents: 34, resource: 'leverage tracking + restraint cues' },
   'Sales Call': { minutes: 30, cents: 29, resource: 'objection handling + close timing' },
   'Doctor Appointment': { minutes: 24, cents: 22, resource: 'question tracking + advocacy prompts' },
