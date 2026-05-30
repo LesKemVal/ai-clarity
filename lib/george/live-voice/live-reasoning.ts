@@ -44,13 +44,44 @@ function classifyResponseForm(text: string, fallback?: LiveVoicePacket['response
   return fallback || 'direction'
 }
 
+function looksLikeRepeatedSignal(input: LiveReasoningInput) {
+  const transcript = compact(input.transcript, 240)
+  const clean = transcript.toLowerCase()
+  const words = clean.split(/\s+/).filter(Boolean)
+
+  if (!clean) return false
+
+  const shortSignal =
+    words.length <= 7 &&
+    /leadership|experience|forecast|assumption|numbers|offer|price|terms|objection|concern|travel|winter|salary|compensation|timeline|budget|risk|methodology|deadline/.test(clean)
+
+  const repeatedQuestion =
+    /\?$/.test(transcript) ||
+    /^(so )?(you'?re asking|they asked|the question is|about|regarding)\b/i.test(clean)
+
+  const signalRepairPrompted =
+    /Signal acquisition move|repeat .*question|repeat .*signal|repeat .*concern|I'm listening|im listening/i.test(
+      [
+        input.fallbackPacket.status,
+        input.fallbackPacket.cue,
+        input.fallbackPacket.volley,
+        input.shadowMap,
+      ].join(' ')
+    )
+
+  return signalRepairPrompted && (shortSignal || repeatedQuestion)
+}
+
 function shouldCarryTurn(input: LiveReasoningInput) {
   const combined = [
     input.transcript,
     input.lastFiveSeconds,
   ].join(' ').toLowerCase()
 
-  return /\b(george[,\s]+take it|take it george|take this|you answer|answer for me|carry this|speak for me|give them the answer|handle this)\b/i.test(combined)
+  return (
+    /\b(george[,\s]+take it|take it george|take this|you answer|answer for me|carry this|speak for me|give them the answer|handle this)\b/i.test(combined) ||
+    looksLikeRepeatedSignal(input)
+  )
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
