@@ -71,6 +71,8 @@ export type LiveVoiceGovernorInput = {
   mode?: 'text_test' | 'voice_live'
   audio?: boolean
   contextHint?: string
+  desiredOutcome?: string
+  activeOutcome?: string
   shadowMap?: string
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'

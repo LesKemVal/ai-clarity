@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import type { LiveVoicePacket } from './types'
-
+import { evaluateSignalSufficiency } from '../runtime/signal-sufficiency'
+import { rankSignals } from '../runtime/signal-ranking'
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -8,6 +9,8 @@ const openai = new OpenAI({
 type LiveReasoningInput = {
   transcript: string
   room?: string
+  desiredOutcome?: string
+  activeOutcome?: string
   shadowMap?: string
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'
@@ -32,8 +35,23 @@ function shouldUseReasoning(input: LiveReasoningInput) {
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
   if (!shouldUseReasoning(input)) return null
 
+  const sufficiency = evaluateSignalSufficiency({
+    transcript: input.transcript,
+    context: input.room,
+  })
+
   const room = compact(input.room || 'Adaptive LIVE', 80)
+  const desiredOutcome = compact(input.desiredOutcome || '', 180)
+  const activeOutcome = compact(input.activeOutcome || '', 180)
+
+  const signalDirective = sufficiency.sufficient
+    ? 'Enough signal exists. Act. Do not investigate.'
+    : `Signal insufficient. Acquire only the highest-value missing signal: ${sufficiency.missingSignal || 'context'}.`
   const transcript = compact(input.transcript, 900)
+  const rankedSignals = rankSignals(transcript)
+  .slice(0, 3)
+  .map((s) => `${s.name}:${s.score}`)
+  .join(', ')
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
   const mode = input.liveAssistMode === 'lines' ? 'repeatable line' : 'cue'
@@ -49,10 +67,31 @@ Your job:
 - Use the transcript, room, recent memory, and objective context.
 - Give the next useful LIVE response.
 
+Signal Sufficiency:
+${signalDirective}
+
 Rules:
-- If enough signal exists, give the user the next useful words or move.
-- If one critical signal is missing, ask for the smallest missing signal.
-- Do not use canned room questions when the signal already answers them.
+- Extract facts already present in the transcript before asking a question.
+- If the transcript already contains a likely answer, use it.
+- Prefer surfacing known facts over gathering more facts.
+- If a cause, objection, pressure, concern, metric, number, or answer is already present, lead with it.
+- Examples:
+  - "Customer churn increased" → "Lead with customer churn."
+  - "Revenue fell 10%" → "Start with the 10% decline."
+  - "They're challenging the numbers" → "State the number."
+- When the transcript already contains both a problem and a likely cause, do NOT investigate.
+- Do NOT ask for more information.
+- Give the user the next move.
+- Prefer:
+  "Lead with customer churn."
+  "Start with the 10% decline."
+  "State that churn increased."
+  "Churn appears to be the primary driver."
+over additional questions.
+- If the transcript already contains the question, do not ask for the question again.
+- Recover the missing operational variable instead.
+- If enough signal exists, give the next useful words or move.
+- Only ask a question when a critical variable is genuinely missing.
 - Keep it short enough for live use.
 - Do not explain your reasoning.
 - Do not sound like a therapist, chatbot, teacher, or helpdesk.
@@ -62,16 +101,28 @@ Rules:
 
   const user = `
 Room: ${room}
+Desired outcome: ${desiredOutcome || 'unknown'}
+Active outcome: ${activeOutcome || 'infer from current signal'}
 Assist mode: ${mode}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
+Highest value signals: ${rankedSignals || 'none'}
 Recent room memory: ${shadowMap || 'none'}
 Offline fallback status: ${input.fallbackPacket.status}
 Offline fallback volley, use only if reasoning cannot improve it: ${input.fallbackPacket.volley}
 Offline fallback cue: ${input.fallbackPacket.cue}
 
 Do not echo the offline fallback if the transcript already gives the signal.
-Reason from the live signal and return the best next LIVE response now.
+Use facts already present before requesting more information.
+
+Return the single best next move.
+
+Priority:
+1. Advance the desired outcome.
+2. Identify and serve the active outcome created by the current room signal.
+3. Use known facts.
+4. Recover missing signal only when it materially improves the next move.
+5. Ask a question only if necessary.
 `.trim()
 
   const model =
