@@ -420,6 +420,8 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
         audio,
         shadowMap,
         contextHint: activeRoom || '',
+        desiredOutcome: objectiveId || activeRoom || '',
+        activeOutcome: clean,
         lastFiveSeconds: clean,
         liveAssistMode:
           typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
@@ -462,8 +464,8 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
 
   async function speak(text: string) {
     if (speakingRef.current) {
-      stopGeorgeAudio('LIVE speech replaced by newer room signal.')
-      await new Promise((resolve) => window.setTimeout(resolve, 40))
+      pushLog('Already speaking. Ignoring replacement packet.')
+      return
     }
 
     speakingRef.current = true
@@ -928,17 +930,8 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
           const liveInputKind = classifyLiveInput(text)
 
           if (liveInputKind === 'room_context' || isUserRoomContext(text)) {
-            const contextPacket = buildRoomContextResponse(text)
-
             pushLog(`Live input kind: ${liveInputKind}`)
             pushLog('Room context detected from user.')
-            setPacket(contextPacket)
-
-            if (!packet) {
-              georgeAudioQueue.enqueue(contextPacket.volley, 10, 5000)
-              void processAudioQueue()
-            }
-
             pushLog('Room context bootstrapped into LIVE runtime.')
           }
 
@@ -1046,9 +1039,14 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
                 : objectiveId
             ]
 
-          const generation = georgeCancelEngine.bump()
-          const nextPacket = await govern(text, true, messageReceivedAt, generation)
+          const generation = georgeCancelEngine.current()
 
+          const nextPacket = await govern(
+            text,
+            true,
+            messageReceivedAt,
+            generation
+          ) 
           if (georgeCancelEngine.isExpired(generation)) {
             pushLog('Skipped stale LIVE orchestration.')
             return
