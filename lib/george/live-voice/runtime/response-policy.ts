@@ -162,14 +162,28 @@ export function selectLiveResponsePolicy(input: {
     }
   }
 
+  if (speaker === 'george_instruction') {
+    return {
+      mode: 'instruction',
+      volley: "Say: 'Give me one second to answer that clearly.'",
+      cue: 'Buy time first. Then repeat their last question or concern.',
+      status: 'GEORGE assistance requested. Giving an immediate repeatable line.',
+      confidence: 0.72,
+      tone: 'calm',
+      compression: 'medium',
+      deliveryStyle: 'direct',
+      intervention: 'speak',
+    }
+  }
+
   return {
     mode: 'instruction',
-    volley: 'Say it plainly.',
-    cue: 'Short. Calm. Direct.',
-    status: 'Instruction received.',
-    confidence: 0.6,
+    volley: "Say: 'Give me one second to answer that clearly.'",
+    cue: 'Context thin. Buy time and load the next signal.',
+    status: 'Fallback assistance. Context is thin.',
+    confidence: 0.58,
     tone: 'neutral',
-    compression: 'high',
+    compression: 'medium',
     deliveryStyle: 'direct',
     intervention: 'speak',
   }
