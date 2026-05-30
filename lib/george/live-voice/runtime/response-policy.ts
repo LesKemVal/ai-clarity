@@ -17,6 +17,7 @@ export type LiveResponsePolicy = {
   confidence?: number
   tone?: 'calm' | 'firm' | 'neutral'
   compression?: 'low' | 'medium' | 'high'
+  responseForm?: 'question' | 'cue' | 'line' | 'direction' | 'silence'
   deliveryStyle?: 'direct' | 'proof' | 'redirect' | 'silence'
   intervention?: 'hold' | 'speak' | 'redirect'
 }
@@ -55,6 +56,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'high',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 
@@ -68,6 +70,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'high',
       deliveryStyle: 'silence',
       intervention: 'hold',
+      responseForm: 'silence',
     }
   }
 
@@ -81,6 +84,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'proof',
       intervention: 'speak',
+      responseForm: 'line',
     }
   }
 
@@ -94,6 +98,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 
@@ -108,6 +113,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'high',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 
@@ -121,6 +127,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'high',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 
@@ -134,6 +141,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'proof',
       intervention: 'speak',
+      responseForm: 'line',
     }
   }
 
@@ -160,6 +168,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'redirect',
       intervention: 'redirect',
+      responseForm: 'question',
     }
   }
 
@@ -173,6 +182,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 
@@ -187,6 +197,7 @@ export function selectLiveResponsePolicy(input: {
       compression: 'medium',
       deliveryStyle: 'direct',
       intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 

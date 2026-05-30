@@ -50,6 +50,7 @@ export type LiveVoicePacket = {
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   interruptionRisk?: number
   responseMode?: string
+  responseForm?: 'question' | 'cue' | 'line' | 'direction' | 'silence'
   responseTone?: string
   responseCompression?: string
   deliveryStyle?: string
