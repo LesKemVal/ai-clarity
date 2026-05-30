@@ -21,12 +21,26 @@ export type LiveResponsePolicy = {
   intervention?: 'hold' | 'speak' | 'redirect'
 }
 
+function getThinContextQuestion(roomInput = '') {
+  const room = roomInput.toLowerCase()
+
+  if (room === 'boardroom') return "Ask: 'What are they asking for?'"
+  if (room === 'negotiation') return "Ask: 'What are they pushing on?'"
+  if (room === 'interview') return "Ask: 'What did they ask?'"
+  if (room === 'sales call') return "Ask: 'What objection did they give?'"
+  if (room === 'doctor appointment') return "Ask: 'What are they questioning?'"
+  if (room === 'presentation') return "Ask: 'Where did you lose them?'"
+
+  return "Ask: 'What's happening right now?'"
+}
+
 export function selectLiveResponsePolicy(input: {
   speaker: 'other_party' | 'george_instruction' | 'unclear'
   signals: ConversationSignalState
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
+  room?: string
 }): LiveResponsePolicy {
-  const { speaker, signals, roomPressure } = input
+  const { speaker, signals, roomPressure, room: activeRoom = '' } = input
 
   if (speaker === 'other_party' && signals.has('authority_pressure')) {
     return {
@@ -165,8 +179,8 @@ export function selectLiveResponsePolicy(input: {
   if (speaker === 'george_instruction') {
     return {
       mode: 'instruction',
-      volley: "Ask: 'What's happening right now?'",
-      cue: 'Acquire the missing situation before giving a line.',
+      volley: getThinContextQuestion(activeRoom),
+      cue: 'Acquire the missing room-specific situation before giving a line.',
       status: 'GEORGE assistance requested. Context recovery first.',
       confidence: 0.72,
       tone: 'calm',
@@ -178,8 +192,8 @@ export function selectLiveResponsePolicy(input: {
 
   return {
     mode: 'instruction',
-    volley: "Ask: 'What's happening right now?'",
-    cue: 'Context thin. Acquire the smallest missing situation signal.',
+    volley: getThinContextQuestion(activeRoom),
+    cue: 'Context thin. Acquire the smallest missing room-specific signal.',
     status: 'Context recovery. Ask the smallest operational question.',
     confidence: 0.58,
     tone: 'neutral',

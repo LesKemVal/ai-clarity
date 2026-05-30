@@ -324,6 +324,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     speaker,
     signals,
     roomPressure: room.pressure,
+    room: input.contextHint || '',
   })
 
   packet = {
