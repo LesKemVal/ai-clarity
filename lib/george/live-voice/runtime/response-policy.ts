@@ -179,9 +179,9 @@ export function selectLiveResponsePolicy(input: {
   if (speaker === 'george_instruction') {
     return {
       mode: 'instruction',
-      volley: getThinContextQuestion(activeRoom),
-      cue: 'Acquire the missing room-specific situation before giving a line.',
-      status: 'GEORGE assistance requested. Context recovery first.',
+      volley: 'Give the strongest next move from the signal you have.',
+      cue: 'Move first. Ask only if the missing signal materially improves the next move.',
+      status: 'GEORGE assistance requested. Advance outcome before probing.',
       confidence: 0.72,
       tone: 'calm',
       compression: 'medium',
@@ -192,9 +192,9 @@ export function selectLiveResponsePolicy(input: {
 
   return {
     mode: 'instruction',
-    volley: getThinContextQuestion(activeRoom),
-    cue: 'Context thin. Acquire the smallest missing room-specific signal.',
-    status: 'Context recovery. Ask the smallest operational question.',
+    volley: 'Use the current signal to move the user forward.',
+    cue: 'Context thin. Prefer a useful cue; ask only if action would be reckless.',
+    status: 'Thin context. Bias toward movement, not interrogation.',
     confidence: 0.58,
     tone: 'neutral',
     compression: 'medium',
