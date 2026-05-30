@@ -336,6 +336,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     confidence: policy.confidence ?? Math.max(0.7, speakerInference.confidence || 0),
     shadowUsed: hasShadow,
     responseMode: policy.mode,
+    responseForm: policy.responseForm,
     responseTone: policy.tone,
     responseCompression: policy.compression,
     deliveryStyle: policy.deliveryStyle,
