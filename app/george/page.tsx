@@ -1732,8 +1732,22 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       stableLiveGuidance?.signal
     )
 
+    const desiredOutcome =
+      activeCampaign?.desiredOutcome ||
+      activeCampaign?.currentGoal ||
+      liveRuntimeSupport?.purview?.line ||
+      input.trim() ||
+      ''
+
+    const activeOutcome =
+      stableLiveGuidance?.signal ||
+      interimTranscript.trim() ||
+      desiredOutcome
+
     return georgeOutcomeGovernor.evaluate({
       objectiveKnown,
+      desiredOutcome,
+      activeOutcome,
       objectivePressure: liveMode ? 'high' : 'moderate',
       confidence: stableLiveGuidance ? 0.64 : 0.52,
       consequence: 'moderate',

@@ -11,6 +11,8 @@ export type OutcomeGovernorMove =
 
 export type OutcomeGovernorInput = {
   objectiveKnown?: boolean
+  desiredOutcome?: string
+  activeOutcome?: string
   objectivePressure?: 'low' | 'moderate' | 'high'
   confidence?: number
   consequence?: 'low' | 'moderate' | 'high'
