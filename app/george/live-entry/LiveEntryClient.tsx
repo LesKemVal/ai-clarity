@@ -243,7 +243,7 @@ export default function LiveEntryClient() {
   const [conversationType, setConversationType] = useState('Meeting')
   const [audienceType, setAudienceType] = useState('Executive')
   const [pacing, setPacing] = useState('Balanced')
-  const [outputMode, setOutputMode] = useState('Cues')
+  const [outputMode, setOutputMode] = useState('Repeatable lines')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
   const [knownContext, setKnownContext] = useState('')
