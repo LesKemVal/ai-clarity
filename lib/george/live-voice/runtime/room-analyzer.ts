@@ -1,4 +1,6 @@
 
+import { detectConversationTarget } from './conversation-target'
+
 export type LiveSpeaker =
   | 'other_party'
   | 'user'
@@ -36,6 +38,16 @@ export function inferLiveSpeaker(
       speaker: 'unclear',
       confidence: 0,
       reason: 'Empty transcript.',
+    }
+  }
+
+  const target = detectConversationTarget(clean)
+
+  if (target.target === 'george') {
+    return {
+      speaker: 'user',
+      confidence: target.confidence,
+      reason: target.reason,
     }
   }
 
