@@ -1443,7 +1443,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         role: 'assistant',
         content: buildLiveEntryBriefing({
           setup: liveSetup,
-          defaultRoom: 'Adaptive LIVE',
+          defaultRoom: liveSetup?.room || 'Adaptive LIVE',
         }),
       }
 
