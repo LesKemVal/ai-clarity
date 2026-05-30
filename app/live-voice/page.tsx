@@ -419,6 +419,7 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
         mode: 'voice_live',
         audio,
         shadowMap,
+        contextHint: activeRoom || '',
         lastFiveSeconds: clean,
         liveAssistMode:
           typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
