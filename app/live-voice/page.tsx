@@ -860,9 +860,13 @@ function buildRoomContextResponse(text: string) {
             pushLog(`Live input kind: ${liveInputKind}`)
             pushLog('Room context detected from user.')
             setPacket(contextPacket)
-            georgeAudioQueue.enqueue(contextPacket.volley, 10, 5000)
-            void processAudioQueue()
-            return
+
+            if (!packet) {
+              georgeAudioQueue.enqueue(contextPacket.volley, 10, 5000)
+              void processAudioQueue()
+            }
+
+            pushLog('Room context bootstrapped into LIVE runtime.')
           }
 
           const inferredSpeaker = inferLiveSpeaker(text, shadowMap)
