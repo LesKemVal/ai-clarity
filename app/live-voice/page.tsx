@@ -92,6 +92,16 @@ function selectSignalAcquisitionMove(text: string) {
     }
   }
 
+  if (/meeting/.test(clean) && /rush|rushing|pressur|hurry|quick|fast/.test(clean)) {
+    return {
+      name: 'meeting_pressure',
+      line: "They’re pushing for speed. Don’t speed up just because they did.",
+      cue: "Ask what decision they need right now. Then repeat it aloud — as if to yourself. I'm listening.",
+      read: 'Meeting pressure detected. The next signal is what they are rushing you toward.',
+      confidence: 0.76,
+    }
+  }
+
   if (/deal|offer|price|terms|negotiat/.test(clean)) {
     return {
       name: 'negotiation_signal',
