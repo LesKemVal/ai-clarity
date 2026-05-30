@@ -178,6 +178,28 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
   const [runtimeState, setRuntimeState] = useState<LiveRuntimeSnapshot>(georgeLiveRuntimeState.get())
   const [liveTier, setLiveTier] = useState<LiveRuntimeTier>('brilliant')
 
+  useEffect(() => {
+    try {
+      const rawSetup = window.localStorage.getItem('george_live_setup_active')
+      const setup = rawSetup ? JSON.parse(rawSetup) : null
+
+      if (setup?.room) {
+        setActiveRoom(setup.room)
+        pushLog(`Room loaded: ${setup.room}`)
+      }
+
+      if (setup?.userPosition) {
+        setUserPosition(setup.userPosition)
+        pushLog(`User position: ${setup.userPosition}`)
+      }
+
+      if (String(setup?.knownContext || '').trim()) {
+        setKnownContextAvailable(true)
+        pushLog('Known context loaded.')
+      }
+    } catch {}
+  }, [])
+
 
   const socketRef = useRef<WebSocket | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
