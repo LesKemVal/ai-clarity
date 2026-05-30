@@ -16,6 +16,7 @@ import { DELIVERY_PROFILES, compressForDelivery, type DeliveryProfileId } from '
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { georgeEmotionalVelocity } from '@/lib/george/live-voice/runtime/emotional-velocity'
 import { LIVE_OBJECTIVES, inferObjectiveFromText, reinforceObjective, type LiveObjectiveId } from '@/lib/george/live-voice/runtime/objective-engine'
+import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { evaluateLiveSafety } from '@/lib/george/live-voice/runtime/safety-gate'
 import { georgeLiveRuntimeState, type LiveRuntimeSnapshot } from '@/lib/george/live-voice/runtime/live-runtime-state'
 import { georgePressureMemory } from '@/lib/george/live-voice/runtime/pressure-memory'
@@ -410,6 +411,14 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
 
     lastGovernedRef.current = clean
 
+    const activeOutcome = deriveActiveOutcome({
+      desiredOutcome: objectiveId || activeRoom || '',
+      room: activeRoom,
+      transcript: clean,
+      userPosition: 'seeking',
+      knownContext: shadowMap,
+    })
+
     const res = await fetch('/api/george/live/govern', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -421,7 +430,7 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
         shadowMap,
         contextHint: activeRoom || '',
         desiredOutcome: objectiveId || activeRoom || '',
-        activeOutcome: clean,
+        activeOutcome,
         lastFiveSeconds: clean,
         liveAssistMode:
           typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
