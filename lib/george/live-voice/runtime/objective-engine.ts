@@ -6,6 +6,7 @@ export type LiveObjectiveId =
   | 'book_appointment'
   | 'deescalate'
   | 'hold_frame'
+  | 'advance_outcome'
   | 'clarify'
 
 export type LiveObjective = {
@@ -46,6 +47,12 @@ export const LIVE_OBJECTIVES: Record<LiveObjectiveId, LiveObjective> = {
     anchor: 'Keep the user composed and centered on their position.',
     failureMode: 'chasing approval or surrendering the frame',
   },
+  advance_outcome: {
+    id: 'advance_outcome',
+    label: 'Advance Outcome',
+    anchor: 'Move the current room signal toward the user’s desired outcome.',
+    failureMode: 'collecting information when the next useful move is already available',
+  },
   clarify: {
     id: 'clarify',
     label: 'Clarify',
@@ -77,6 +84,10 @@ if (
 
   if (signals.has('proof_challenge')) {
     return 'hold_frame'
+  }
+
+  if (/interview|leadership|experience|hiring|job|role|candidate|resume/.test(clean)) {
+    return 'advance_outcome'
   }
 
   return 'clarify'
