@@ -165,9 +165,9 @@ export function selectLiveResponsePolicy(input: {
   if (speaker === 'george_instruction') {
     return {
       mode: 'instruction',
-      volley: "Say: 'Give me one second to answer that clearly.'",
-      cue: 'Buy time first. Then repeat their last question or concern.',
-      status: 'GEORGE assistance requested. Giving an immediate repeatable line.',
+      volley: "Ask: 'What's happening right now?'",
+      cue: 'Acquire the missing situation before giving a line.',
+      status: 'GEORGE assistance requested. Context recovery first.',
       confidence: 0.72,
       tone: 'calm',
       compression: 'medium',
@@ -178,9 +178,9 @@ export function selectLiveResponsePolicy(input: {
 
   return {
     mode: 'instruction',
-    volley: "Say: 'Give me one second to answer that clearly.'",
-    cue: 'Context thin. Buy time and load the next signal.',
-    status: 'Fallback assistance. Context is thin.',
+    volley: "Ask: 'What's happening right now?'",
+    cue: 'Context thin. Acquire the smallest missing situation signal.',
+    status: 'Context recovery. Ask the smallest operational question.',
     confidence: 0.58,
     tone: 'neutral',
     compression: 'medium',
