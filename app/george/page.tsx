@@ -1721,6 +1721,8 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       input.trim() ||
       activeCampaign?.desiredOutcome ||
       activeCampaign?.currentGoal ||
+      liveRuntimeSupport?.knownContext ||
+      liveRuntimeSupport?.purview?.body ||
       liveRuntimeSupport?.purview?.line
     )
 
