@@ -34,6 +34,7 @@ const GEORGE_ADDRESS_PATTERNS = [
   /\bhelp me respond\b/i,
   /\bgive me (a )?(line|response|answer)\b/i,
   /\bwhat (do|should) i say\b/i,
+  /\bwhat do you need from me\b/i,
   /\bwhat now\b/i,
   /\bcoach me\b/i,
 ]
