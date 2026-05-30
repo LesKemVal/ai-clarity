@@ -62,6 +62,7 @@ import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfi
 import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-behavioral-memory'
 import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
+import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -813,6 +814,15 @@ LANGUAGE MODE: SPANISH
       runtimeControls.continuityEnabled
         ? continuityRestoration.instruction
         : ''
+
+    const judgmentSurface = buildJudgmentSurfaceState({
+      latestUserText: latestUserRaw,
+      livePressure: modeAwareRuntimeAdapter.livePressure,
+      pressureHigh: control.pressureLevel.toLowerCase() === 'high',
+      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
+    })
+
+    const judgmentSurfaceNote = buildJudgmentSurfaceNote(judgmentSurface)
 
 
 
