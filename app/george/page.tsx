@@ -31,6 +31,7 @@ import {
 } from '@/lib/george/live-runtime/prep-runtime'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
+import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1739,10 +1740,13 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       input.trim() ||
       ''
 
-    const activeOutcome =
-      stableLiveGuidance?.signal ||
-      interimTranscript.trim() ||
-      desiredOutcome
+    const activeOutcome = deriveActiveOutcome({
+      desiredOutcome,
+      room: liveRuntimeSupport?.knownContext,
+      transcript: interimTranscript.trim() || stableLiveGuidance?.signal || '',
+      userPosition: liveRuntimeSupport?.userPosition,
+      knownContext,
+    })
 
     return georgeOutcomeGovernor.evaluate({
       objectiveKnown,
