@@ -520,11 +520,12 @@ export default function LiveEntryClient() {
     window.localStorage.removeItem('george_active_label')
     window.localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
     window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
+    window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
     window.localStorage.setItem('george_live_estimated_cents', String(finalEstimate.estimatedCents))
 
-    window.location.href = '/george/live'
+    window.location.href = '/live-voice'
   }
 
   if (!ready) return null
