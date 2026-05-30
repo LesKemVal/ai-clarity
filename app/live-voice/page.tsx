@@ -515,6 +515,7 @@ function buildRoomContextResponse(text: string) {
     }
 
     const blob = await res.blob()
+    pushLog(`Audio blob received: ${blob.type || 'unknown'} / ${blob.size} bytes`)
 
     if (!isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration)) {
       speakingRef.current = false
@@ -558,9 +559,24 @@ function buildRoomContextResponse(text: string) {
 
     audioRef.current.src = url
     audioRef.current.volume = deliveryProfile.volume
-    await audioRef.current.play().catch(() => {
-      pushLog('Audio blocked until user interaction.')
-    })
+
+    audioRef.current.onloadedmetadata = () => {
+      pushLog(
+        `Audio metadata loaded: ${Number.isFinite(audioRef.current?.duration || NaN)
+          ? `${audioRef.current?.duration.toFixed(2)}s`
+          : 'duration unavailable'}`
+      )
+    }
+
+    pushLog(`Audio play requested: ${formattedDelivery.spokenText.slice(0, 90)}`)
+
+    await audioRef.current.play()
+      .then(() => {
+        pushLog('Audio playback started.')
+      })
+      .catch((error) => {
+        pushLog(`Audio playback failed: ${error?.name || 'unknown'}`)
+      })
 
     const protectedUntil = Date.now() + 900
 
@@ -581,6 +597,7 @@ function buildRoomContextResponse(text: string) {
     }, 120)
 
     audioRef.current.onended = () => {
+      pushLog('Audio playback ended.')
       window.clearInterval(interruptionPoll)
       releaseAudioUrl()
       speakingRef.current = false
