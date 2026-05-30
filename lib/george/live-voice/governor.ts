@@ -358,6 +358,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     if (packet.liveAssistMode === 'lines') {
       packet.cue = ''
       packet.status = `${packet.status} Audio mode: repeatable-line only.`.trim()
+    } else if (packet.shouldSpeak && packet.volley) {
+      packet.status = `${packet.status} Audio mode: cue-supported line.`.trim()
     } else {
       packet.volley = ''
       packet.status = `${packet.status} Audio mode: cue-only.`.trim()
