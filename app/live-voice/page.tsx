@@ -27,6 +27,7 @@ import { inferSpeakerRole } from '@/lib/george/live-voice/runtime/speaker-role'
 import { georgeRuntimeDecisionEngine } from '@/lib/george/live-voice/runtime/runtime-decision-engine'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { classifyLiveInput } from '@/lib/george/live-voice/runtime/input-classifier'
+import { detectConversationTarget } from '@/lib/george/live-voice/runtime/conversation-target'
 import type { LiveRuntimeTier } from '@/lib/george/live-voice/runtime/tier-runtime'
 
 type LiveLifecycleState =
@@ -55,8 +56,13 @@ type LivePacket = {
 export default function LiveVoicePage() {
 
 function isForceIntervention(text: string) {
-  return /george|help me|what do i say|what do you need from me|tell me what to say|say something|jump in|i need help/i.test(
-    text.toLowerCase()
+  const target = detectConversationTarget(text)
+
+  return (
+    target.target === 'george' ||
+    /george|help me|what do i say|what do you need from me|tell me what to say|say something|jump in|i need help/i.test(
+      text.toLowerCase()
+    )
   )
 }
 
