@@ -66,10 +66,11 @@ export function inferObjectiveFromText(text: string): LiveObjectiveId {
     return 'secure_raise'
   }
 
-  if (/appointment|schedule|book|calendar|meet/.test(clean)) {
-    return 'book_appointment'
-  }
-
+if (
+  /\bappointment\b|\bschedule\b|\bcalendar\b|\bbook\b/.test(clean)
+) {
+  return 'book_appointment'
+}
   if (/angry|argument|calm|tension|hostile|upset/.test(clean)) {
     return 'deescalate'
   }
