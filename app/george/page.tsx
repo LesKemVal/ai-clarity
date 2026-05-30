@@ -5855,7 +5855,7 @@ ${simplifyTarget}`
                         type="button"
                         aria-label="Close GEORGE utility menu"
                         onClick={() => setShowNormalUtilityMenu(null)}
-                        className="fixed inset-0 z-[-1] cursor-default bg-black/52 backdrop-blur-[14px]"
+                        className="fixed inset-0 z-[80] cursor-default bg-black/52 backdrop-blur-[14px]"
                       />
                       <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
@@ -6852,10 +6852,10 @@ Continue from here, tell me what changed, or start fresh.`
             type="button"
             aria-label="Close LIVE controls"
             onClick={() => setShowLiveQuickMenu(false)}
-            className="fixed inset-0 z-[-1] cursor-default bg-black/52 backdrop-blur-[14px]"
+            className="fixed inset-0 z-[80] cursor-default bg-black/52 backdrop-blur-[14px]"
           />
 
-          <div data-george-language-menu className={`absolute bottom-full left-1/2 mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+          <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
             Controls
           </div>
