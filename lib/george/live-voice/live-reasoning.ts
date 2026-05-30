@@ -32,6 +32,18 @@ function shouldUseReasoning(input: LiveReasoningInput) {
   )
 }
 
+function classifyResponseForm(text: string, fallback?: LiveVoicePacket['responseForm']): LiveVoicePacket['responseForm'] {
+  const clean = text.trim()
+
+  if (!clean) return fallback || 'silence'
+  if (/\?$/.test(clean)) return 'question'
+  if (/^(say|tell them|respond|answer):/i.test(clean)) return 'line'
+  if (/\b(use|lead with|start with|keep|pause|wait|hold|ask|state|frame|focus)\b/i.test(clean)) return 'direction'
+  if (clean.split(/\s+/).length <= 8) return 'cue'
+
+  return fallback || 'direction'
+}
+
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
   if (!shouldUseReasoning(input)) return null
 
@@ -144,11 +156,14 @@ Priority:
   const text = completion.choices?.[0]?.message?.content?.trim()
   if (!text) return null
 
+  const volley = text.replace(/^GEORGE:\s*/i, '').trim()
+
   return {
     ...input.fallbackPacket,
     shouldSpeak: true,
-    volley: text.replace(/^GEORGE:\s*/i, '').trim(),
+    volley,
     cue: '',
+    responseForm: classifyResponseForm(volley, input.fallbackPacket.responseForm),
     status: `${input.fallbackPacket.status} LIVE reasoning applied.`,
     confidence: Math.max(input.fallbackPacket.confidence || 0, 0.82),
   }
