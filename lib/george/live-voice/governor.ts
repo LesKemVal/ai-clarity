@@ -369,7 +369,10 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   packet = applyRuntimeMemory(packet, input)
   packet = applyRuntimeSupport(packet, input)
 
-  if (TEACHER_LANGUAGE.test(packet.volley)) {
+  if (
+    TEACHER_LANGUAGE.test(packet.volley) &&
+    packet.speakerIntent !== 'addressed_to_george'
+  ) {
     packet.volley = 'Say it plainly.'
     packet.cue = 'Clear, calm, and human.'
     packet.status = 'Teacher language blocked.'
