@@ -926,6 +926,18 @@ function buildRoomContextResponse(text: string) {
 
           setShadowMap(transcriptBuffer.buildShadowMap())
 
+          const learnedContext =
+            inferredSpeaker.speaker === 'user' &&
+            (
+              text.trim().length > 20 ||
+              /meeting|interview|boss|manager|client|customer|negotiation|decision|rush|rushing|pressure|challenged|numbers/i.test(text)
+            )
+
+          if (learnedContext && !knownContextAvailable) {
+            setKnownContextAvailable(true)
+            pushLog('Runtime learned context.')
+          }
+
           const cachedPrewarm = georgePrewarmCache.get(
             text.trim().toLowerCase()
           )
