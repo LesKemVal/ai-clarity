@@ -28,7 +28,7 @@ function shouldUseReasoning(input: LiveReasoningInput) {
 
   return (
     transcript.length >= 8 ||
-    /\b(help|what do i say|asking|asked|questioning|challenged|dropped|declined|revenue|forecast|number|pressure|objection|concern|issue)\b/i.test(transcript)
+    /\b(help|what do i say|asking|asked|questioning|challenged|dropped|declined|revenue|forecast|number|pressure|objection|concern|issue|take it|take this|you answer|answer for me|carry this)\b/i.test(transcript)
   )
 }
 
@@ -44,8 +44,19 @@ function classifyResponseForm(text: string, fallback?: LiveVoicePacket['response
   return fallback || 'direction'
 }
 
+function shouldCarryTurn(input: LiveReasoningInput) {
+  const combined = [
+    input.transcript,
+    input.lastFiveSeconds,
+  ].join(' ').toLowerCase()
+
+  return /\b(george[,\s]+take it|take it george|take this|you answer|answer for me|carry this|speak for me|give them the answer|handle this)\b/i.test(combined)
+}
+
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
   if (!shouldUseReasoning(input)) return null
+
+  const carryTurn = shouldCarryTurn(input)
 
   const sufficiency = evaluateSignalSufficiency({
     transcript: input.transcript,
@@ -67,6 +78,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
   const mode = input.liveAssistMode === 'lines' ? 'repeatable line' : 'cue'
+  const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
 
   const system = `
 You are GEORGE in LIVE mode.
@@ -82,6 +94,11 @@ Your job:
 Signal Sufficiency:
 ${signalDirective}
 
+Speaker Perspective:
+${carryTurn
+  ? '- The user has delegated the next conversational turn to GEORGE. Answer as the user in first person. Do not say "say", "ask", "question", or explain the move. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then respond as the user would for this turn.'
+  : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not pretend to be the user unless transfer is requested.'}
+
 Rules:
 - Extract facts already present in the transcript before asking a question.
 - If the transcript already contains a likely answer, use it.
@@ -92,18 +109,11 @@ Rules:
   - "Revenue fell 10%" → "Start with the 10% decline."
   - "They're challenging the numbers" → "State the number."
 - When the transcript already contains both a problem and a likely cause, do NOT investigate.
-- Do NOT ask for more information.
+- Do NOT ask for more information unless a critical variable materially improves the next move.
 - Give the user the next move.
-- Prefer:
-  "Lead with customer churn."
-  "Start with the 10% decline."
-  "State that churn increased."
-  "Churn appears to be the primary driver."
-over additional questions.
 - If the transcript already contains the question, do not ask for the question again.
 - Recover the missing operational variable instead.
 - If enough signal exists, give the next useful words or move.
-- Only ask a question when a critical variable is genuinely missing.
 - Keep it short enough for live use.
 - Do not explain your reasoning.
 - Do not sound like a therapist, chatbot, teacher, or helpdesk.
@@ -116,6 +126,7 @@ Room: ${room}
 Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Assist mode: ${mode}
+Speaker perspective: ${perspective}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
 Highest value signals: ${rankedSignals || 'none'}
@@ -146,7 +157,7 @@ Priority:
   const completion = await openai.chat.completions.create({
     model,
     temperature: 0.25,
-    max_tokens: 80,
+    max_tokens: carryTurn ? 120 : 80,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
@@ -163,8 +174,9 @@ Priority:
     shouldSpeak: true,
     volley,
     cue: '',
-    responseForm: classifyResponseForm(volley, input.fallbackPacket.responseForm),
-    status: `${input.fallbackPacket.status} LIVE reasoning applied.`,
-    confidence: Math.max(input.fallbackPacket.confidence || 0, 0.82),
+    responseForm: carryTurn ? 'line' : classifyResponseForm(volley, input.fallbackPacket.responseForm),
+    responsePerspective: perspective,
+    status: `${input.fallbackPacket.status} LIVE reasoning applied.${carryTurn ? ' Carry-turn perspective active.' : ''}`,
+    confidence: Math.max(input.fallbackPacket.confidence || 0, carryTurn ? 0.86 : 0.82),
   }
 }
