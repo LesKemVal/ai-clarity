@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { governLiveVoice } from '@/lib/george/live-voice/governor'
+import { reasonLiveNextMove } from '@/lib/george/live-voice/live-reasoning'
 import { verifyLiveAccessFromRequest } from '@/lib/subscriptions/live-access'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 
@@ -55,7 +56,16 @@ export async function POST(req: NextRequest) {
           : undefined,
     })
 
-    return NextResponse.json(packet)
+    const reasonedPacket = await reasonLiveNextMove({
+      transcript: String(body?.transcript || ''),
+      room: typeof body?.contextHint === 'string' ? body.contextHint : '',
+      shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
+      lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+      liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
+      fallbackPacket: packet,
+    }).catch(() => null)
+
+    return NextResponse.json(reasonedPacket || packet)
   } catch {
     return NextResponse.json(
       {
