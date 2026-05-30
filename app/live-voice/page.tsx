@@ -1022,10 +1022,15 @@ function buildRoomContextResponse(text: string) {
             setRuntimeState(orchestrated.runtimeSnapshot)
             setPacket({ ...orchestrated.packet })
 
+            const runtimeKnownContext =
+              transcriptBuffer.recent(3).length >= 2 ||
+              transcriptBuffer.buildShadowMap().trim().length > 60
+
             const outcomeDecision = georgeOutcomeGovernor.evaluate({
               objectiveKnown: activeObjective.id !== 'clarify',
               userPosition,
-              knownContextAvailable,
+              knownContextAvailable:
+                knownContextAvailable || runtimeKnownContext,
               objectivePressure:
                 orchestrated.runtimeSnapshot.interventionUrgency === 'high'
                   ? 'high'
