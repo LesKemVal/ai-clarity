@@ -820,8 +820,25 @@ function buildRoomContextResponse(text: string) {
           return
         }
 
-        const text = data?.channel?.alternatives?.[0]?.transcript || ''
+        let text = data?.channel?.alternatives?.[0]?.transcript || ''
         const isFinal = Boolean(data?.is_final)
+
+        if (isFinal) {
+          const latestPartial = partialTranscriptRuntime.getLatest()
+          const finalWords = text.trim().split(/\s+/).filter(Boolean).length
+          const partialWords = latestPartial?.text.trim().split(/\s+/).filter(Boolean).length || 0
+
+          if (
+            latestPartial &&
+            partialTranscriptRuntime.isPredictionFresh() &&
+            finalWords <= 2 &&
+            partialWords >= 3 &&
+            latestPartial.text.length > text.trim().length + 6
+          ) {
+            pushLog(`Final fragment rescued from partial: ${latestPartial.text}`)
+            text = latestPartial.text
+          }
+        }
 
         if (!text.trim()) return
 
@@ -1143,7 +1160,7 @@ function buildRoomContextResponse(text: string) {
           ) {
             const approvedPacket = orchestrated.packet as LivePacket
             const approvedSpeech =
-              forcedIntervention
+              forcedIntervention || approvedPacket.speaker !== 'other_party'
                 ? (approvedPacket.volley || approvedPacket.cue)
                 : approvedPacket.liveAssistMode === 'lines'
                   ? approvedPacket.volley
