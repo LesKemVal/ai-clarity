@@ -9,8 +9,11 @@ export function classifyLiveInput(text: string): LiveInputKind {
   const clean = text.toLowerCase()
 
   const roomContext =
-    /\bi'?m in\b|\bi am in\b|\bthey'?re\b|\bthey are\b|\bmy boss\b|\bmy interviewer\b|\bthe interviewer\b|\bmy manager\b|\bmeeting\b|\binterview\b|\bnegotiation\b|\braise\b|\bclient\b|\bcustomer\b|\bdeal\b/.test(clean) &&
-    /rushing|rush|pressur|challenged|numbers|questioning|pushing back|meeting|interview|negotiation|raise|boss|manager|client|customer|deal/.test(clean)
+    (
+      /\bi'?m in\b|\bi am in\b|\bthey'?re\b|\bthey are\b|\bmy boss\b|\bmy interviewer\b|\bthe interviewer\b|\bmy manager\b|\bmeeting\b|\binterview\b|\bnegotiation\b|\braise\b|\bclient\b|\bcustomer\b|\bdeal\b/.test(clean) &&
+      /rushing|rush|pressur|challenged|numbers|questioning|pushing back|meeting|interview|negotiation|raise|boss|manager|client|customer|deal/.test(clean)
+    ) ||
+    /\b(the issue is|the objection is|the question is|they'?re asking|they are asking|they asked|they want to know|they'?re questioning|they are questioning|they challenged|they'?re challenging|they are challenging|the number is|the numbers are|revenue|forecast|projection|costs increased|cost increased|pressure is|the pressure is|pushback is|the concern is|the ask is)\b/.test(clean)
 
   if (roomContext) return 'room_context'
 
