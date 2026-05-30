@@ -1,5 +1,6 @@
 export type OutcomeGovernorMove =
   | 'direct_response'
+  | 'signal_acquisition'
   | 'context_recovery'
   | 'buy_time'
   | 'protect_position'
@@ -120,6 +121,14 @@ class GeorgeOutcomeGovernor {
       return 'protect_position'
     }
 
+    if (
+      input.userHasRequestedHelp &&
+      input.roomHasRecentSignal &&
+      !input.knownContextAvailable
+    ) {
+      return 'signal_acquisition'
+    }
+
     if (input.userHasRequestedHelp && input.roomHasRecentSignal) {
       return 'direct_response'
     }
@@ -165,6 +174,17 @@ class GeorgeOutcomeGovernor {
       return {
         signal: 'known_context',
         reason: 'High-consequence outcome needs user-known context before stronger recommendations.',
+      }
+    }
+
+    if (
+      input.userHasRequestedHelp &&
+      !input.knownContextAvailable
+    ) {
+      return {
+        signal: 'next_room_signal',
+        reason:
+          'User requested guidance but the room signal is incomplete. Acquire the next meaningful signal before attempting stronger intervention.',
       }
     }
 
