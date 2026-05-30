@@ -49,6 +49,7 @@ type LivePacket = {
   shadowUsed?: boolean
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   interruptionRisk?: number
+  responseForm?: 'question' | 'cue' | 'line' | 'direction' | 'silence'
   liveAssistMode?: 'cues' | 'lines'
   runtimeForce?: 'light' | 'balanced' | 'strong'
   runtimeMemoryApplied?: boolean
@@ -1655,6 +1656,7 @@ function buildRoomContextResponse(text: string, activeRoom = '') {
               <p><span className="text-white/35">Volley:</span> {packet.volley || '—'}</p>
               <p><span className="text-white/35">Cue:</span> {packet.cue || '—'}</p>
               <p><span className="text-white/35">Status:</span> {packet.status || '—'}</p>
+              <p><span className="text-white/35">Response form:</span> {packet.responseForm || '—'}</p>
               <p><span className="text-white/35">Confidence:</span> {packet.confidence}</p>
               <p><span className="text-white/35">Shadow used:</span> {String(Boolean(packet.shadowUsed))}</p>
               <p><span className="text-white/35">Room pressure:</span> {packet.roomPressure || 'low'}</p>
