@@ -140,14 +140,20 @@ export function classifyLiveSpeakerIntent(input: LiveSpeakerIntentInput): LiveSp
   const lower = transcript.toLowerCase()
   const wordCount = lower.split(' ').filter(Boolean).length
 
-  if (matchesAny(lower, GEORGE_ADDRESS_PATTERNS)) {
+  const guidanceRequest =
+    /\b(what|how|should|need|help|say|respond|answer|line|reply|do)\b/i.test(lower) &&
+    /\b(me|i|my|from me|to say|to do|respond|answer|reply|line|help)\b/i.test(lower)
+
+  if (matchesAny(lower, GEORGE_ADDRESS_PATTERNS) || guidanceRequest) {
     return {
       intent: 'addressed_to_george',
-      confidence: 0.92,
+      confidence: matchesAny(lower, GEORGE_ADDRESS_PATTERNS) ? 0.92 : 0.82,
       shouldSpeak: true,
       shouldHold: false,
       shouldRemember: true,
-      reason: 'Direct GEORGE address or explicit request for help.',
+      reason: matchesAny(lower, GEORGE_ADDRESS_PATTERNS)
+        ? 'Direct GEORGE address or explicit request for help.'
+        : 'User-owned guidance request detected.',
     }
   }
 
