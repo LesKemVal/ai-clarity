@@ -562,10 +562,16 @@ function buildRoomContextResponse(text: string) {
       pushLog('Audio blocked until user interaction.')
     })
 
+    const protectedUntil = Date.now() + 900
+
     const interruptionPoll = window.setInterval(() => {
+      const protectedPlayback =
+        Date.now() < protectedUntil &&
+        formattedDelivery.spokenText.trim().length > 0
+
       if (
         !isLiveDeliveryCurrent(deliverySessionId, deliveryGeneration) ||
-        georgeTurnManager.shouldInterruptGeorge()
+        (!protectedPlayback && georgeTurnManager.shouldInterruptGeorge())
       ) {
         stopGeorgeAudio('LIVE playback interrupted by room activity.')
         releaseAudioUrl()
