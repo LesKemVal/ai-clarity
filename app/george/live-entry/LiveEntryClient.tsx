@@ -33,6 +33,7 @@ const CONVERSATION_TYPES: SelectOption[] = [
   { label: 'Doctor Appointment', helper: 'questions, symptoms, advocacy' },
   { label: 'Presentation', helper: 'flow, points, recovery' },
   { label: 'Everyday Conversation', helper: 'tone, clarity, next words' },
+  { label: 'Other', helper: 'custom room signal' },
 ]
 
 const AUDIENCE_TYPES: SelectOption[] = [
@@ -252,6 +253,7 @@ export default function LiveEntryClient() {
   const [ready, setReady] = useState(false)
   const [tier, setTier] = useState<Tier>('smart')
   const [conversationType, setConversationType] = useState('Meeting')
+  const [customConversationType, setCustomConversationType] = useState('')
   const [audienceType, setAudienceType] = useState('Executive')
   const [pacing, setPacing] = useState('Balanced')
   const [outputMode, setOutputMode] = useState('Repeatable lines')
@@ -278,7 +280,11 @@ export default function LiveEntryClient() {
 
     try {
       const saved = JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null')
-      if (saved?.room) setConversationType(saved.room)
+      if (saved?.room) {
+        const knownRoom = CONVERSATION_TYPES.some((option) => option.label === saved.room)
+        setConversationType(knownRoom ? saved.room : 'Other')
+        if (!knownRoom) setCustomConversationType(saved.room)
+      }
       if (saved?.audienceType) setAudienceType(saved.audienceType)
       if (saved?.cadence) setPacing(saved.cadence)
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
@@ -298,18 +304,23 @@ export default function LiveEntryClient() {
     setReady(true)
   }, [])
 
+  const resolvedConversationType =
+    conversationType === 'Other' && customConversationType.trim()
+      ? customConversationType.trim()
+      : conversationType
+
   const liveAssistMode = outputMode === 'Repeatable lines' ? 'lines' : 'cues'
 
   const prepDocumentPrompt = useMemo(() => {
-    return getPrepDocumentPrompt(conversationType, audienceType)
-  }, [conversationType, audienceType])
+    return getPrepDocumentPrompt(resolvedConversationType, audienceType)
+  }, [resolvedConversationType, audienceType])
 
   const resourceEstimate = useMemo(() => {
     const adjustedObjective = prepDocument
       ? `${objective}\n\nLoaded document: ${prepDocument.name}`
       : objective
 
-    const estimate = estimateResources({ conversationType, audienceType, pacing, outputMode, objective: adjustedObjective })
+    const estimate = estimateResources({ conversationType: resolvedConversationType, audienceType, pacing, outputMode, objective: adjustedObjective })
 
     if (!prepDocument) return estimate
 
@@ -320,11 +331,11 @@ export default function LiveEntryClient() {
       resources: Array.from(new Set([...estimate.resources, prepDocumentPrompt.resource])),
       reason: `${estimate.reason} Uploaded context adds document-aware support.`,
     }
-  }, [conversationType, audienceType, pacing, outputMode, objective, prepDocument, prepDocumentPrompt.resource])
+  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, prepDocument, prepDocumentPrompt.resource])
 
   useEffect(() => {
     setEditableResources(resourceEstimate.resources)
-  }, [conversationType, audienceType, pacing, outputMode, objective, resourceEstimate.resources.join('|')])
+  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, resourceEstimate.resources.join('|')])
 
   const finalResourceEstimate = useMemo(() => {
     return estimateWithResources(resourceEstimate, editableResources.length ? editableResources : resourceEstimate.resources)
@@ -338,7 +349,7 @@ export default function LiveEntryClient() {
     let cancelled = false
 
     const contextText = [
-      conversationType,
+      resolvedConversationType,
       audienceType,
       pacing,
       outputMode,
@@ -366,7 +377,7 @@ export default function LiveEntryClient() {
     return () => {
       cancelled = true
     }
-  }, [conversationType, audienceType, pacing, outputMode, objective, userPosition, knownContext, prepDocument?.summary])
+  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, userPosition, knownContext, prepDocument?.summary])
 
   const handlePrepDocumentUpload = async (file: File | null) => {
     if (!file) return
@@ -481,7 +492,7 @@ export default function LiveEntryClient() {
       resourceEstimate: finalEstimate,
       runtimeBias: finalResources,
       audienceType,
-      conversationType,
+      resolvedConversationType,
       userPosition,
       knownContext,
       pacing,
