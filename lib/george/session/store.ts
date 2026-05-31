@@ -26,6 +26,7 @@ export type GeorgeStoredSession = {
   title: string
   createdAt: number
   updatedAt: number
+  archived?: boolean
   messages: GeorgeStoredMessage[]
   summary?: string
   userGoal?: string
@@ -160,8 +161,61 @@ export function deleteSession(sessionId: string) {
   }
 }
 
-export function getSessionsForMode(mode: GeorgeSessionMode) {
-  return safeReadSessions().filter((session) => session.mode === mode)
+export function renameSession(sessionId: string, title: string) {
+  if (typeof window === 'undefined') return
+
+  const cleanTitle = title.trim().slice(0, 80)
+  if (!cleanTitle) return
+
+  const sessions = safeReadSessions().map((session) =>
+    session.id === sessionId
+      ? {
+          ...session,
+          title: cleanTitle,
+          updatedAt: Date.now(),
+        }
+      : session
+  )
+
+  safeWriteSessions(sessions)
+}
+
+export function archiveSession(sessionId: string, archived = true) {
+  if (typeof window === 'undefined') return
+
+  const sessions = safeReadSessions().map((session) =>
+    session.id === sessionId
+      ? {
+          ...session,
+          archived,
+          updatedAt: Date.now(),
+        }
+      : session
+  )
+
+  safeWriteSessions(sessions)
+
+  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  }
+
+  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  }
+
+  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+  }
+
+  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
+    window.localStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+  }
+}
+
+
+export function getSessionsForMode(mode: GeorgeSessionMode, options: { archived?: boolean } = {}) {
+  const archived = options.archived ?? false
+  return safeReadSessions().filter((session) => session.mode === mode && Boolean(session.archived) === archived)
 }
 
 export function getCampaignSessions() {

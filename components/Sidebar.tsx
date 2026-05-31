@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { deleteSession, safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
+import { deleteSession, renameSession, archiveSession, safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority, type GeorgeSessionTier } from '@/lib/george/session-authority'
 
 export type PromptItem = {
@@ -74,6 +74,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname()
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
+  const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>([])
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
@@ -86,9 +87,18 @@ export default function Sidebar({
 
 
   const loadNormalSessions = () => {
+    const sessions = safeReadSessions()
+
     setNormalSessions(
-      safeReadSessions()
-        .filter((session) => session.mode === 'normal')
+      sessions
+        .filter((session) => session.mode === 'normal' && !session.archived)
+        .sort((a, b) => b.updatedAt - a.updatedAt)
+        .slice(0, 12)
+    )
+
+    setLiveSessions(
+      sessions
+        .filter((session) => session.mode === 'live' && !session.archived)
         .sort((a, b) => b.updatedAt - a.updatedAt)
         .slice(0, 12)
     )
@@ -589,7 +599,7 @@ return (
                     </button>
 
                     {sessionMenuId === session.id && (
-                      <div className="absolute right-1 top-8 z-20 w-32 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
+                      <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
                         {pendingDeleteSessionId === session.id ? (
                           <button
                             type="button"
@@ -599,13 +609,41 @@ return (
                             Confirm delete
                           </button>
                         ) : (
-                          <button
-                            type="button"
-                            onClick={() => setPendingDeleteSessionId(session.id)}
-                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
-                          >
-                            Delete
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextTitle = window.prompt('Rename session', getSessionTitle(session))
+                                if (!nextTitle?.trim()) return
+                                renameSession(session.id, nextTitle)
+                                setSessionMenuId(null)
+                                loadNormalSessions()
+                              }}
+                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/62 transition hover:bg-white/[0.035] hover:text-white/86"
+                            >
+                              Rename
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                archiveSession(session.id, true)
+                                setSessionMenuId(null)
+                                loadNormalSessions()
+                              }}
+                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/52 transition hover:bg-white/[0.035] hover:text-white/80"
+                            >
+                              Archive
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setPendingDeleteSessionId(session.id)}
+                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
                       </div>
                     )}
