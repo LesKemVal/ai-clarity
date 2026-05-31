@@ -6900,7 +6900,7 @@ Continue from here, tell me what changed, or start fresh.`
           setShowLiveQuickMenu(false)
           setShowLanguageMenu(false)
           setActiveHelpTopic('live')
-          setShowNormalUtilityMenu('help')
+          setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
         }}
         className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
       >
