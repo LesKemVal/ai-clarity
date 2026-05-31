@@ -585,7 +585,7 @@ return (
               </span>
             </button>
 
-            {openGroups.Continuity && normalSessions.length > 0 && (
+            {normalSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
                   <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
@@ -683,7 +683,7 @@ return (
               </span>
             </button>
 
-            {openGroups['LIVE Conversations'] && liveSessions.length > 0 && (
+            {liveSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {liveSessions.map((session) => (
                   <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
@@ -781,7 +781,7 @@ return (
               </span>
             </button>
 
-            {openGroups['LIVE Conversations'] && liveSessions.length > 0 && (
+            {liveSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {liveSessions.map((session) => (
                   <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">

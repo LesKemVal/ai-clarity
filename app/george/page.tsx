@@ -5880,6 +5880,15 @@ I am listening now. Speak naturally. I will respond ${
                   </button>
 
                   {showNormalUtilityMenu && (
+                    <button
+                      type="button"
+                      aria-label="Close GEORGE popup"
+                      onClick={() => setShowNormalUtilityMenu(null)}
+                      className="fixed inset-0 z-[70] cursor-default bg-black/68 backdrop-blur-[10px]"
+                    />
+                  )}
+
+                  {showNormalUtilityMenu && (
                     <>
                       <button
                         type="button"
@@ -5899,7 +5908,7 @@ I am listening now. Speak naturally. I will respond ${
                               <button
                                 type="button"
                                 onClick={() => setShowNormalUtilityMenu(null)}
-                                className="text-[11px] text-white/28 transition hover:text-white/72"
+                                className="text-[13px] text-white/28 transition hover:text-white/72"
                               >
                                 ×
                               </button>
@@ -5917,7 +5926,7 @@ I am listening now. Speak naturally. I will respond ${
                                   key={id}
                                   type="button"
                                   onClick={() => setActiveHelpTopic(id as any)}
-                                  className={`block w-full py-1 text-left text-[10px] uppercase tracking-[0.16em] transition ${
+                                  className={`block w-full py-1 text-left text-[13px] uppercase tracking-[0.16em] transition ${
                                     activeHelpTopic === id
                                       ? 'text-white/82'
                                       : 'text-white/38 hover:text-white/72'
@@ -5938,13 +5947,26 @@ I am listening now. Speak naturally. I will respond ${
                               {activeHelpTopic === 'signal' && 'SIGNAL'}
                             </div>
 
-                            <p className="text-[11px] leading-5 text-white/48">
+                            <p className="text-[13px] leading-5 text-white/48">
                               {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
                               {activeHelpTopic === 'continuity' && 'Login restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
                               {activeHelpTopic === 'memory' && 'GEORGE adapts carefully from continuity, runtime interaction, operational patterns, and user-controlled memory systems.'}
                               {activeHelpTopic === 'images' && 'Images helps generate visual direction, concepts, references, and creative material.'}
                               {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns and improve operational usefulness over time.'}
                             </p>
+
+                            {activeHelpTopic === 'signal' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowNormalUtilityMenu(null)
+                                  window.location.href = '/signal'
+                                }}
+                                className="mt-3 rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[12px] uppercase tracking-[0.18em] text-[#D7DBE4]/70 transition hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-white"
+                              >
+                                Open Signal Room
+                              </button>
+                            )}
 
                             {activeHelpTopic === 'memory' && (
                               <button
@@ -5953,7 +5975,7 @@ I am listening now. Speak naturally. I will respond ${
                                   setShowMemoryContinuityPanel(true)
                                   setShowNormalUtilityMenu(null)
                                 }}
-                                className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
+                                className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                               >
                                 Open controls
                               </button>
@@ -5961,7 +5983,7 @@ I am listening now. Speak naturally. I will respond ${
 
                             <a
                               href="/help"
-                              className="mt-3 block py-1 text-[10px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
+                              className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                             >
                               Full help
                             </a>

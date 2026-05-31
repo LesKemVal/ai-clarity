@@ -82,7 +82,7 @@ export default function DeployLivePage() {
       <section className="mx-auto max-w-5xl">
         <div className="flex items-center justify-between">
           <p className="text-xs uppercase tracking-[0.3em] text-[#7C8CFF]">Deploy LIVE</p>
-          <Link href="/live-voice" className="rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.18em] text-white/70">
+          <Link href="/george/live" className="rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.18em] text-white/70">
             Skip tutorial
           </Link>
         </div>
@@ -261,7 +261,7 @@ export default function DeployLivePage() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link href="/live-voice" className="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-black">
+          <Link href="/george/live" className="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-black">
             LIVE Now
           </Link>
           <Link href="/george/live-entry" className="rounded-full border border-white/15 px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-white/75">

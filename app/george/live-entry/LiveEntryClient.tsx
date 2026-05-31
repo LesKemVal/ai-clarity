@@ -536,7 +536,7 @@ export default function LiveEntryClient() {
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
     window.localStorage.setItem('george_live_estimated_cents', String(finalEstimate.estimatedCents))
 
-    window.location.href = '/live-voice'
+    window.location.href = '/george/live'
   }
 
   if (!ready) return null
