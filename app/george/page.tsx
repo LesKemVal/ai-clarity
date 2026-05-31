@@ -5885,7 +5885,7 @@ I am listening now. Speak naturally. I will respond ${
                         type="button"
                         aria-label="Close GEORGE utility menu"
                         onClick={() => setShowNormalUtilityMenu(null)}
-                        className="fixed inset-0 z-[80] cursor-default bg-black/52 backdrop-blur-[14px]"
+                        className="fixed inset-0 z-[80] cursor-default bg-black/68 backdrop-blur-[10px]"
                       />
                       <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
@@ -6867,12 +6867,27 @@ Continue from here, tell me what changed, or start fresh.`
 
 {liveMode && (
   <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
-    <div className="relative">
+    <div className="relative flex items-center justify-center gap-6">
       <button
         type="button"
         onClick={() => {
+          setShowLiveQuickMenu(false)
           setShowLanguageMenu(false)
-                setShowLiveQuickMenu((value) => !value)
+          setActiveHelpTopic('live')
+          setShowNormalUtilityMenu('help')
+        }}
+        className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
+      >
+        HELP
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setShowNormalUtilityMenu(null)
+          setActiveHelpTopic('live')
+          setShowLanguageMenu(false)
+          setShowLiveQuickMenu((value) => !value)
         }}
         className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
       >
@@ -6886,7 +6901,7 @@ Continue from here, tell me what changed, or start fresh.`
             type="button"
             aria-label="Close LIVE controls"
             onClick={() => setShowLiveQuickMenu(false)}
-            className="fixed inset-0 z-[80] cursor-default bg-black/52 backdrop-blur-[14px]"
+            className="fixed inset-0 z-[80] cursor-default bg-black/68 backdrop-blur-[10px]"
           />
 
           <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
