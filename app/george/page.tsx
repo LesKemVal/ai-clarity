@@ -1146,7 +1146,7 @@ const [isListening, setIsListening] = useState(false)
   const [showAccessCodeEntry, setShowAccessCodeEntry] = useState(false)
   const [accessCode, setAccessCode] = useState('')
   const [accessCodeError, setAccessCodeError] = useState('')
-  const [showEarbudOverlay, setShowEarbudOverlay] = useState(false)
+  const [showEarbudOverlay, setShowEarbudOverlay] = useState(true)
   const [showSessionPicker, setShowSessionPicker] = useState(false)
 
 useEffect(() => {
@@ -5102,7 +5102,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-3 md:pt-8" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-[145px] md:pt-[165px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !liveMode && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
@@ -5176,43 +5176,6 @@ return (
               </div>
             </div>
           ))}
-        </div>
-      </div>
-    </div>
-  )}
-
-  {liveMode && (
-    <div className="pointer-events-none mx-auto mb-3 w-full max-w-[1120px] overflow-hidden rounded-[1.35rem] border border-white/[0.05] bg-[linear-gradient(135deg,#030508_0%,#06101B_52%,#020407_100%)]">
-      <div className="relative grid min-h-[255px] grid-cols-1 overflow-hidden rounded-[1.35rem] px-6 py-8 sm:px-8 sm:py-9 md:grid-cols-[minmax(0,0.62fr)_minmax(220px,0.38fr)] md:px-10 md:py-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_62%,rgba(42,108,170,0.28),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.015),transparent_38%)]" />
-        <div className="absolute inset-x-0 top-[92px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/10 to-transparent" />
-        <div className="absolute inset-x-0 top-[182px] h-px bg-gradient-to-r from-transparent via-[#8FB6C9]/7 to-transparent" />
-
-        <div className="relative z-10 min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.30em] text-[#D7DBE4]/52">
-            LIVE
-          </p>
-
-          <h1 className="mt-5 max-w-[540px] text-[34px] font-semibold leading-[1.02] tracking-[-0.06em] text-[#D7DBE4] sm:text-[44px] md:text-[50px]">
-            Room changed?
-            <br />
-            Update GEORGE instantly.
-          </h1>
-
-          <p className="mt-5 max-w-[560px] text-[14px] leading-7 text-[#D7DBE4]/42">
-            Drop in documents, screenshots, or photos during LIVE so GEORGE can adapt in real time.
-          </p>
-
-        </div>
-
-        <div className="relative z-0">
-          <div className="absolute right-[32px] bottom-[18px] h-[58px] w-[220px] rounded-full bg-[#2F6FFF]/18 blur-[38px]" />
-
-          <img
-            src="/earbud400.png"
-            alt="GEORGE LIVE"
-            className="absolute right-[-18px] top-[90px] h-[132px] w-auto rotate-[12deg] object-contain opacity-[0.88] sm:right-[-8px] sm:top-[48px] sm:h-[176px] md:right-[12px] md:top-[34px] md:h-[166px] md:opacity-[0.98]"
-          />
         </div>
       </div>
     </div>
@@ -5811,7 +5774,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-{(forceLive || liveMode) && liveEntryBriefing && messages.length === 0 && (
+{false && (
   <div className="pointer-events-none fixed left-0 right-0 top-[22%] z-[45] mx-auto w-full max-w-[900px] px-8 text-center xl:pl-[280px]">
     <div className="mx-auto max-w-[620px] whitespace-pre-line text-[15px] leading-7 text-[#D7DBE4]/72 md:text-[16px] md:leading-8">
       {liveEntryBriefing}
@@ -6338,8 +6301,8 @@ if (liveMode) {
         </div>
       )}
 
-{showEarbudOverlay && (
-  <div className="fixed inset-x-0 top-[92px] z-[260] flex justify-center pointer-events-none">
+{liveMode && (
+  <div className="fixed inset-x-0 top-[58px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[pickerTwistUp_220ms_cubic-bezier(0.22,1,0.36,1)]">
       <div className="relative h-[122px] w-[122px]">
         <img
@@ -6356,9 +6319,7 @@ if (liveMode) {
       </div>
 
       <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-[#D7DBE4]/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] ">
-        LIVE Audio Active.
-        <br />
-        GEORGE is listening.
+        LIVE GEORGE.
       </div>
     </div>
   </div>
