@@ -9,7 +9,7 @@ export default function DesktopOperationalSurface({
 
   if (mode !== 'active') {
     return (
-      <div className="pointer-events-none fixed inset-x-0 top-[112px] bottom-[250px] z-[18] hidden items-center justify-center md:flex">
+      <div className="pointer-events-none fixed inset-x-0 top-[112px] bottom-[250px] z-[18] hidden items-center justify-center lg:flex">
         <div className="relative w-full max-w-[980px] px-10 opacity-92 transition-opacity duration-500">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(110,140,210,0.06),transparent_58%)]" />
 

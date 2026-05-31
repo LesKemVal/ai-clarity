@@ -515,7 +515,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Bring the situation. Get the next move.\n\nUse GEORGE for interviews, pressure, decisions, negotiations, difficult conversations, meetings, and real-world momentum.',
+          text: 'Find the next useful move.',
           url,
         })
 
@@ -2120,7 +2120,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   }
 
   const messagesRef = useRef<Message[]>([
-    { role: 'assistant', content: 'Bring the situation. I’ll help narrow what matters and what to do next.' },
+    { role: 'assistant', content: 'Find the next useful move.' },
   ])
 
   const preserveNormalDraft = () => {
@@ -5537,7 +5537,7 @@ I am listening now. Speak naturally. I will respond ${
                   if (navigator.share) {
                     await navigator.share({
                       title: 'GEORGE by BRANESx',
-                      text: `Bring the situation. Get the next move.\n\nUse GEORGE for planning, pressure, conversations, decisions, interviews, negotiations, and real-world momentum.\n\n${shareText}`,
+                      text: `Find the next useful move.\n\n${shareText}`,
                       url: window.location.origin + '/george',
                     })
                   } else if (navigator.clipboard?.writeText) {
