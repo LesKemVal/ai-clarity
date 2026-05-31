@@ -28,6 +28,10 @@ const chairSignals = {
     examples: ['Slides', 'Speaker notes', 'Research', 'Agenda', 'Audience notes'],
     value: ['Key points', 'Weak areas', 'Likely questions', 'Supporting evidence', 'Timing'],
   },
+  Other: {
+    examples: ['Notes', 'Screenshots', 'Images', 'Messages', 'Documents'],
+    value: ['Context', 'Signals', 'Risks', 'Goals', 'Next move'],
+  },
 }
 
 const defaultSteeringSignals = [
@@ -38,7 +42,13 @@ const defaultSteeringSignals = [
 ]
 
 export default function DeployLivePage() {
+  const [selectedChair, setSelectedChair] = useState<keyof typeof chairSignals>('Interview')
+  const [customChair, setCustomChair] = useState('')
   const [steeringSignals, setSteeringSignals] = useState(defaultSteeringSignals)
+
+  const chairLabel = selectedChair === 'Other' && customChair.trim()
+    ? customChair.trim()
+    : selectedChair
 
   useEffect(() => {
     try {
@@ -95,30 +105,90 @@ export default function DeployLivePage() {
           </button>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {Object.entries(chairSignals).map(([chair, data]) => (
-            <div key={chair} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-white/85">{chair}</h2>
-
-              <p className="mt-4 text-xs uppercase tracking-[0.18em] text-white/35">Upload examples</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {data.examples.map((item) => (
-                  <span key={item} className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/65">
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <p className="mt-5 text-xs uppercase tracking-[0.18em] text-white/35">GEORGE looks for</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {data.value.map((item) => (
-                  <span key={item} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/65">
-                    {item}
-                  </span>
-                ))}
-              </div>
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-white/35">Current chair</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-white">{chairLabel}</h2>
             </div>
-          ))}
+
+            <select
+              value={selectedChair}
+              onChange={(event) => setSelectedChair(event.target.value as keyof typeof chairSignals)}
+              className="rounded-full border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none focus:border-[#7C8CFF]/60"
+            >
+              {Object.keys(chairSignals).map((chair) => (
+                <option key={chair} value={chair}>
+                  {chair}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedChair === 'Other' ? (
+            <label className="mt-5 grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
+              Name this chair
+              <input
+                value={customChair}
+                onChange={(event) => setCustomChair(event.target.value)}
+                placeholder="Example: landlord call, court prep, investor update"
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/25 focus:border-[#7C8CFF]/50"
+              />
+            </label>
+          ) : null}
+
+          <p className="mt-5 text-xs uppercase tracking-[0.18em] text-white/35">Upload examples</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {chairSignals[selectedChair].examples.map((item) => (
+              <span key={item} className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/65">
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <p className="mt-5 text-xs uppercase tracking-[0.18em] text-white/35">GEORGE looks for</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {chairSignals[selectedChair].value.map((item) => (
+              <span key={item} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/65">
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-3 rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.055] p-4 text-sm leading-6 text-[#E8EAFF]/75">
+            <p>
+              This helps GEORGE support the {chairLabel} room with less explaining, faster timing, and better room awareness.
+            </p>
+            <p>
+              Example: about 41 cents of LIVE support can help GEORGE stay with you through a focused {chairLabel.toLowerCase()} moment instead of leaving you to improvise alone.
+            </p>
+            <p>
+              Scroll next to edit steering signals — the phrases GEORGE listens for while LIVE is active.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Sharpen with use</p>
+            <p className="mt-3 text-sm leading-6 text-white/55">
+              GEORGE improves as he learns your rooms, your preferred detail level, your steering phrases, and the kinds of pressure you face.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Practice first</p>
+            <p className="mt-3 text-sm leading-6 text-white/55">
+              Use normal GEORGE to prepare, rehearse, and sharpen your thinking before you need LIVE in the room.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Normal + LIVE</p>
+            <p className="mt-3 text-sm leading-6 text-white/55">
+              Normal GEORGE helps you think and prepare. LIVE GEORGE listens, adapts, and supports the next move while the conversation is happening.
+            </p>
+          </div>
         </div>
 
         <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
