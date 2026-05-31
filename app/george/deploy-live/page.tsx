@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const chairSignals = {
   Interview: {
@@ -27,7 +30,43 @@ const chairSignals = {
   },
 }
 
+const defaultSteeringSignals = [
+  { phrase: 'One second...', meaning: 'Buy time' },
+  { phrase: 'Right...', meaning: 'Continue' },
+  { phrase: 'Interesting...', meaning: 'Reframe' },
+  { phrase: 'Repeat signal', meaning: 'Repair context' },
+]
+
 export default function DeployLivePage() {
+  const [steeringSignals, setSteeringSignals] = useState(defaultSteeringSignals)
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('george_live_steering_signals')
+      if (saved) setSteeringSignals(JSON.parse(saved))
+    } catch {}
+  }, [])
+
+  function updateSteeringSignal(index: number, field: 'phrase' | 'meaning', value: string) {
+    const next = steeringSignals.map((signal, i) =>
+      i === index ? { ...signal, [field]: value } : signal
+    )
+
+    setSteeringSignals(next)
+
+    try {
+      window.localStorage.setItem('george_live_steering_signals', JSON.stringify(next))
+    } catch {}
+  }
+
+  function resetSteeringSignals() {
+    setSteeringSignals(defaultSteeringSignals)
+
+    try {
+      window.localStorage.setItem('george_live_steering_signals', JSON.stringify(defaultSteeringSignals))
+    } catch {}
+  }
+
   return (
     <main className="min-h-screen bg-[#050506] text-white px-6 py-10">
       <section className="mx-auto max-w-5xl">
@@ -83,12 +122,45 @@ export default function DeployLivePage() {
         </div>
 
         <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Default steering</p>
-          <div className="mt-4 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
-            <p>“One second...” → buy time</p>
-            <p>“Right...” → continue</p>
-            <p>“Interesting...” → reframe</p>
-            <p>Repeat signal → repair context</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Editable steering</p>
+              <p className="mt-2 text-sm leading-6 text-white/55">
+                Keep the defaults or change the phrases GEORGE should treat as steering signals.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetSteeringSignals}
+              className="rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.16em] text-white/60 hover:text-white"
+            >
+              Reset defaults
+            </button>
+          </div>
+
+          <div className="mt-5 grid gap-3">
+            {steeringSignals.map((signal, index) => (
+              <div key={index} className="grid gap-3 rounded-xl border border-white/10 bg-black/20 p-3 sm:grid-cols-2">
+                <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
+                  Phrase
+                  <input
+                    value={signal.phrase}
+                    onChange={(event) => updateSteeringSignal(index, 'phrase', event.target.value)}
+                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm normal-case tracking-normal text-white outline-none focus:border-[#7C8CFF]/50"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
+                  Meaning
+                  <input
+                    value={signal.meaning}
+                    onChange={(event) => updateSteeringSignal(index, 'meaning', event.target.value)}
+                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm normal-case tracking-normal text-white outline-none focus:border-[#7C8CFF]/50"
+                  />
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 
