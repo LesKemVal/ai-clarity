@@ -130,6 +130,7 @@ LIVE RECOMMENDATION GOVERNOR
 - Rule: Outcome Governor asks what advances the outcome.
 - Rule: LIVE Recommendation Governor asks whether the outcome now requires real-time execution support.
 - Rule: Runtime Decision decides what GEORGE should say or do next.
+- Rule: The user retains agency. GEORGE may suggest LIVE, but must not push or auto-route the user into LIVE.
 - ${state.instruction}
 `.trim()
 }
