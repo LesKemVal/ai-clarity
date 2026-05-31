@@ -1329,7 +1329,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     const liveParam = new URLSearchParams(window.location.search).get('live')
 
     if (forceLive && liveParam !== 'segue') {
-      if (!hasLiveGeorgeAccess) {
+      const cachedTier = window.localStorage.getItem('george_tier')
+      const cachedLiveAccess = cachedTier === 'intelligent' || cachedTier === 'brilliant'
+      const liveAccessKnown = hasLiveGeorgeAccess || cachedLiveAccess
+
+      if (!liveAccessKnown) {
         normalSessionBootedRef.current = true
         window.localStorage.removeItem('george_fresh_live_entry')
         window.localStorage.removeItem('george_start_new_live')
