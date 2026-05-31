@@ -6810,7 +6810,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 {liveMode && (stableLiveGuidance || outcomeGovernorSnapshot) && (
   <div className="fixed bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
-    <div className="w-full max-w-[420px] rounded-[1rem] border border-[#AEB6FF]/[0.10] bg-[#05070B]/72 px-3.5 py-3 shadow-[0_14px_34px_rgba(0,0,0,0.32)] backdrop-blur-[14px]">
+    <div className="w-full max-w-[420px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 backdrop-blur-[10px]">
       {stableLiveGuidance && (
         <>
           <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
@@ -6824,8 +6824,8 @@ Continue from here, tell me what changed, or start fresh.`
 
       {outcomeGovernorSnapshot && (
         <div className={`${stableLiveGuidance ? 'mt-2 border-t border-white/[0.055] pt-2' : ''}`}>
-          <div className="text-[9px] uppercase tracking-[0.22em] text-white/28">
-            Outcome Governor
+          <div className="text-[9px] uppercase tracking-[0.22em] text-white/22">
+            GOVERNOR
           </div>
           <div className="mt-1 grid grid-cols-2 gap-2 text-[10px] leading-4 text-white/42">
             <div>
