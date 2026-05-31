@@ -63,6 +63,7 @@ import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-be
 import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
+import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -824,6 +825,16 @@ LANGUAGE MODE: SPANISH
 
     const judgmentSurfaceNote = buildJudgmentSurfaceNote(judgmentSurface)
 
+    const liveRecommendation = evaluateLiveRecommendation({
+      latestUserText: latestUserRaw,
+      signalSufficiency: judgmentSurface.signalSufficiency,
+      currentRuntime,
+      pressureHigh: control.pressureLevel.toLowerCase() === 'high',
+      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
+    })
+
+    const liveRecommendationNote = buildLiveRecommendationNote(liveRecommendation)
+
 
 
     const responseShape = getCurrentResponseShape({
@@ -880,6 +891,8 @@ LANGUAGE MODE: SPANISH
       (durableBehavioralMemoryNote ? `\n\n${durableBehavioralMemoryNote}\n\n` : '') +
       (runtimeOutcomeLearningNote ? `\n\n${runtimeOutcomeLearningNote}\n\n` : '') +
       (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
+      (judgmentSurfaceNote ? `\n\n${judgmentSurfaceNote}\n\n` : '') +
+      (liveRecommendationNote ? `\n\n${liveRecommendationNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
