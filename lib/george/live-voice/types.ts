@@ -52,6 +52,7 @@ export type LiveVoicePacket = {
   responseMode?: string
   responseForm?: 'question' | 'cue' | 'line' | 'direction' | 'silence'
   responsePerspective?: 'assist_user' | 'carry_turn_as_user'
+  transferReady?: boolean
   responseTone?: string
   responseCompression?: string
   deliveryStyle?: string

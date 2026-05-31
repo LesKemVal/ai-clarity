@@ -199,14 +199,20 @@ Priority:
   if (!text) return null
 
   const volley = text.replace(/^GEORGE:\s*/i, '').trim()
+  const responseForm = carryTurn ? 'line' : classifyResponseForm(volley, input.fallbackPacket.responseForm)
+  const transferReady =
+    !carryTurn &&
+    sufficiency.sufficient &&
+    (responseForm === 'line' || responseForm === 'direction')
 
   return {
     ...input.fallbackPacket,
     shouldSpeak: true,
     volley,
     cue: '',
-    responseForm: carryTurn ? 'line' : classifyResponseForm(volley, input.fallbackPacket.responseForm),
+    responseForm,
     responsePerspective: perspective,
+    transferReady,
     status: `${input.fallbackPacket.status} LIVE reasoning applied.${carryTurn ? ' Carry-turn perspective active.' : ''}`,
     confidence: Math.max(input.fallbackPacket.confidence || 0, carryTurn ? 0.86 : 0.82),
   }
