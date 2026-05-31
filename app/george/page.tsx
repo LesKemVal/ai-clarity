@@ -7120,7 +7120,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="Set the direction. I’ll get you there."
+                        placeholder="Find the next useful move."
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
