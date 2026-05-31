@@ -5102,7 +5102,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-[145px] md:pt-[165px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-[188px] md:pt-[205px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !liveMode && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
@@ -5110,7 +5110,7 @@ return (
         : 'translate-y-0 opacity-100'
     }`}>
       <div className="mx-auto w-full max-w-[390px] px-6 text-center">
-        <div className="text-[46px] font-[300] tracking-[0.34em] text-[#D7DBE4]/24">
+        <div className="text-[34px] font-[300] tracking-[0.24em] text-[#D7DBE4]/24">
           GEORGE
         </div>
 
@@ -5186,7 +5186,7 @@ return (
       GEORGE is working
     </div>
   )}
-  {(messages.some((message) => message.role === 'user') ? messages : [])
+  {(liveMode ? messages : (messages.some((message) => message.role === 'user') ? messages : []))
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -6811,16 +6811,16 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-{liveMode && (stableLiveGuidance || outcomeGovernorSnapshot) && (
+{false && liveMode && stableLiveGuidance && (
   <div className="fixed bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
     <div className="w-full max-w-[420px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 backdrop-blur-[10px]">
       {stableLiveGuidance && (
         <>
           <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
-            {stableLiveGuidance.signal}
+            {stableLiveGuidance?.signal}
           </div>
           <div className="text-[13px] leading-5 text-[#F4F6FA]/88">
-            {stableLiveGuidance.say.replace(/^Say:\s*/i, '')}
+            {stableLiveGuidance?.say?.replace(/^Say:\s*/i, '')}
           </div>
         </>
       )}
@@ -6833,19 +6833,19 @@ Continue from here, tell me what changed, or start fresh.`
           <div className="mt-1 grid grid-cols-2 gap-2 text-[10px] leading-4 text-white/42">
             <div>
               <span className="block text-white/24">Move</span>
-              {outcomeGovernorSnapshot.move}
+              {outcomeGovernorSnapshot?.move}
             </div>
             <div>
               <span className="block text-white/24">Movement</span>
-              {outcomeGovernorSnapshot.movementState}
+              {outcomeGovernorSnapshot?.movementState}
             </div>
             <div>
               <span className="block text-white/24">Missing</span>
-              {outcomeGovernorSnapshot.missingSignal || 'none'}
+              {outcomeGovernorSnapshot?.missingSignal || 'none'}
             </div>
           </div>
           <div className="mt-1 text-[10px] leading-4 text-white/34">
-            {outcomeGovernorSnapshot.missingSignalReason}
+            {outcomeGovernorSnapshot?.missingSignalReason}
           </div>
         </div>
       )}
