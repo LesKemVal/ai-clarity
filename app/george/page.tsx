@@ -6351,7 +6351,7 @@ if (liveMode) {
       className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
     />
 
-    <div className="fixed inset-0 z-[250] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[141] flex items-center justify-center px-4">
       <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72">
           LIVE STRUCTURE
@@ -7540,7 +7540,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
           />
 
-          <div className="fixed inset-0 z-[250] flex items-center justify-center px-4 py-6">
+          <div className="fixed inset-0 z-[141] flex items-center justify-center px-4 py-6">
             <div className="w-full max-w-[430px]">
               <GeorgePaymentElement
                 tier={activeCheckout}
