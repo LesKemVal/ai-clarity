@@ -1198,6 +1198,7 @@ useEffect(() => {
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
+  const [liveEntryBriefing, setLiveEntryBriefing] = useState<string | null>(null)
 
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
@@ -1427,19 +1428,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
           liveSetup.cadence ? `Cadence: ${liveSetup.cadence}` : null,
           liveSetup.liveAssistMode ? `Mode: ${liveSetup.liveAssistMode}` : null,
         ].filter(Boolean).join(' · ')
-
-        if (contextSummary) {
-          const visibleSetupMessage: Message = {
-            role: 'assistant',
-            content: `LIVE context loaded. ${contextSummary}. I’m listening.`,
-            source: 'system_override',
-          }
-
-          const nextMessages = [...messagesRef.current, visibleSetupMessage]
-          setMessages(nextMessages)
-          messagesRef.current = nextMessages
-        }
-      } else {
+} else {
         window.localStorage.removeItem('george_live_setup_active')
       }
 
@@ -1470,21 +1459,24 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
             .join(', ')}`
         : ''
 
+      const liveBriefing = buildLiveEntryBriefing({
+        setup: liveSetup,
+        defaultRoom: liveSetup?.room || 'Adaptive LIVE',
+      })
+
       const liveIntro: Message = {
         role: 'assistant',
-        content: buildLiveEntryBriefing({
-          setup: liveSetup,
-          defaultRoom: liveSetup?.room || 'Adaptive LIVE',
-        }),
+        content: liveBriefing,
       }
 
       const subscriberMetadata = getSubscriberSessionMetadata()
       if (subscriberMetadata) {
-        createSession('live', [liveIntro], 'LIVE Assistance', subscriberMetadata)
+        createSession('live', [], 'LIVE Assistance', subscriberMetadata)
         liveSessionWriteReadyRef.current = true
       }
-      setMessages([liveIntro])
-      messagesRef.current = [liveIntro]
+      setLiveEntryBriefing(liveBriefing)
+      setMessages([])
+      messagesRef.current = []
       setVoiceOn(true)
       setInteractionMode('speech')
       setShowEarbudOverlay(true)
@@ -1498,6 +1490,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     normalSessionBootedRef.current = true
 
     // /george always boots into normal GEORGE.
+    setLiveEntryBriefing(null)
     setActiveMode('normal')
     const activeSession =
       getActiveSessionForMode('normal') ||
@@ -5818,6 +5811,14 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
+{(forceLive || liveMode) && liveEntryBriefing && messages.length === 0 && (
+  <div className="pointer-events-none fixed left-0 right-0 top-[22%] z-[45] mx-auto w-full max-w-[900px] px-8 text-center xl:pl-[280px]">
+    <div className="mx-auto max-w-[620px] whitespace-pre-line text-[15px] leading-7 text-[#D7DBE4]/72 md:text-[16px] md:leading-8">
+      {liveEntryBriefing}
+    </div>
+  </div>
+)}
+
 <div ref={messagesEndRef} className="h-[120px] md:h-[140px]" />
 
 </div>
@@ -7014,7 +7015,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 <div className={`
 
-${(hasDraftInput || hasVisibleThread)
+${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
   ? '!fixed bottom-[6px]'
   : '!fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 z-[80] border-t border-transparent bg-[#0B0D12]/90 px-2 py-1.5 shadow-[0_-14px_38px_rgba(0,0,0,0.26)] flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
 
