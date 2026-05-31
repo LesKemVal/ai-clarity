@@ -10,28 +10,21 @@ export default function DesktopOperationalSurface({
   if (mode !== 'active') {
     return (
       <div className="pointer-events-none fixed inset-x-0 top-[112px] bottom-[250px] z-[18] hidden items-center justify-center lg:flex">
-        <div className="relative h-full w-full overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.075),transparent_40%),radial-gradient(circle_at_78%_62%,rgba(124,140,255,0.06),transparent_48%)]" />
+        <div className="relative h-full w-full overflow-hidden bg-[#05070A]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.035),transparent_52%)]" />
 
-          <div className="absolute left-[-14%] top-[8%] animate-[georgeGhostDrift_34s_ease-in-out_infinite] select-none text-[300px] font-semibold uppercase leading-none tracking-[-0.155em] text-white/[0.052]">
-            NEXT
+          <div className="absolute inset-x-[-1.5vw] top-1/2 flex -translate-y-[58%] select-none items-center justify-between text-[clamp(118px,14vw,260px)] font-black uppercase leading-none tracking-[0.02em] text-white/[0.052]">
+            <span>G</span>
+            <span>E</span>
+            <span>O</span>
+            <span>R</span>
+            <span>G</span>
+            <span>E</span>
           </div>
 
-          <div className="absolute right-[-16%] top-[46%] animate-[georgeGhostDriftSlow_44s_ease-in-out_infinite] select-none text-[250px] font-semibold uppercase leading-none tracking-[-0.145em] text-white/[0.042]">
-            MOVE
-          </div>
-
-          <div className="relative flex h-full items-center justify-center px-10 text-center">
-            <div className="-translate-y-8">
-              <div className="text-[12px] uppercase tracking-[0.34em] text-[#F4F7FF]/38">
-                GEORGE
-              </div>
-
-              <div className="mx-auto mt-8 max-w-[620px] text-[46px] font-light leading-[1.08] tracking-[-0.07em] text-[#F7F8FF]/82">
-                Bring the situation.
-                <br />
-                Find the next useful move.
-              </div>
+          <div className="absolute inset-x-0 top-1/2 mt-[74px] flex justify-center">
+            <div className="text-[11px] font-medium uppercase tracking-[0.58em] text-[#D9C2A3]/45">
+              NEXT <span className="mx-5 text-[#D9C2A3]/22">•</span> MOVE <span className="mx-5 text-[#D9C2A3]/22">•</span> FORWARD
             </div>
           </div>
         </div>
