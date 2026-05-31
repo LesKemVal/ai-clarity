@@ -28,7 +28,7 @@ export default function DesktopOperationalSurface({
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[198px] z-[18] overflow-hidden bg-[#05070A]">
+    <div className="pointer-events-none fixed inset-x-0 top-[96px] bottom-[198px] z-[18] hidden overflow-hidden bg-[#05070A] lg:block">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(95,125,190,0.04),transparent_70%)]" />
       <div className="absolute -left-[35%] top-0 h-full w-[40%] animate-[desktopShimmer_12s_linear_infinite] bg-gradient-to-r from-transparent via-white/[0.014] to-transparent blur-[32px]" />
 
