@@ -1329,6 +1329,21 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     const liveParam = new URLSearchParams(window.location.search).get('live')
 
     if (forceLive && liveParam !== 'segue') {
+      if (!hasLiveGeorgeAccess) {
+        normalSessionBootedRef.current = true
+        window.localStorage.removeItem('george_fresh_live_entry')
+        window.localStorage.removeItem('george_start_new_live')
+        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+        window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
+        window.localStorage.removeItem('george_live_setup_active')
+        window.localStorage.removeItem('george_active_live_session_id')
+        window.localStorage.removeItem('GEORGE_ACTIVE_LIVE_SESSION_ID')
+        setActiveMode('normal')
+        setLiveMode(false)
+        router.replace('/george')
+        return
+      }
+
       normalSessionBootedRef.current = true
 
       if (typeof window !== 'undefined') {
