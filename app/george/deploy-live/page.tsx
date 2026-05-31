@@ -234,6 +234,32 @@ export default function DeployLivePage() {
           </div>
         </div>
 
+
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Before. During. After.</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-white/35">Before LIVE</p>
+              <p className="mt-2 text-sm leading-6 text-white/55">Prepare. Practice. Upload signal.</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-white/35">During LIVE</p>
+              <p className="mt-2 text-sm leading-6 text-white/55">Listen. Adapt. Support. Respond. Upload signal if the room changes.</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-white/35">After LIVE</p>
+              <p className="mt-2 text-sm leading-6 text-white/55">Review. Improve. Sharpen. Learn.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.055] p-6">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Signal philosophy</p>
+          <p className="mt-3 text-sm leading-6 text-[#E8EAFF]/75">
+            GEORGE does not reject signals. GEORGE evaluates usefulness, timing, relevance, and context. A document, image, screenshot, note, or single sentence may become useful when the room changes.
+          </p>
+        </div>
+
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Link href="/live-voice" className="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-black">
             LIVE Now
