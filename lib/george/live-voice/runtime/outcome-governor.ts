@@ -1,3 +1,10 @@
+export type MovementState =
+  | 'advancing'
+  | 'stalled'
+  | 'blocked'
+  | 'escalating'
+  | 'closing'
+
 export type OutcomeGovernorMove =
   | 'direct_response'
   | 'signal_acquisition'
@@ -28,6 +35,7 @@ export type OutcomeGovernorInput = {
 
 export type OutcomeGovernorSnapshot = {
   move: OutcomeGovernorMove
+  movementState: MovementState
   confidence: number
   reason: string
   doctrine: string[]
@@ -57,11 +65,13 @@ class GeorgeOutcomeGovernor {
       objectivePressure,
     }
 
-    const move = this.resolveMove(normalizedInput)
+    const movementState = this.resolveMovementState(normalizedInput)
+    const move = this.resolveMove(normalizedInput, movementState)
     const missingSignal = this.resolveMissingSignal(normalizedInput)
 
     this.snapshot = {
       move,
+      movementState,
       confidence,
       reason: this.resolveReason({
         ...input,
@@ -97,7 +107,26 @@ class GeorgeOutcomeGovernor {
     this.snapshot = null
   }
 
-  private resolveMove(input: Required<Pick<OutcomeGovernorInput, 'confidence' | 'consequence' | 'opportunityCost' | 'objectivePressure'>> & OutcomeGovernorInput): OutcomeGovernorMove {
+  private resolveMovementState(input: Required<Pick<OutcomeGovernorInput, 'confidence' | 'consequence' | 'opportunityCost' | 'objectivePressure'>> & OutcomeGovernorInput): MovementState {
+    const highConsequence =
+      input.consequence === 'high' ||
+      input.opportunityCost === 'high' ||
+      input.userPositionAtRisk === true
+
+    if (input.objectivePressure === 'high' && highConsequence) return 'escalating'
+    if (input.userHasRequestedHelp && input.missingCriticalSignal) return 'blocked'
+    if (input.userHasRequestedHelp && input.roomHasRecentSignal) return 'advancing'
+    if (input.roomHasRecentSignal && input.objectiveKnown) return 'advancing'
+    if (input.objectiveKnown && input.knownContextAvailable && input.confidence >= 0.68) return 'closing'
+    if (input.objectiveKnown && !input.roomHasRecentSignal) return 'stalled'
+
+    return 'stalled'
+  }
+
+  private resolveMove(
+    input: Required<Pick<OutcomeGovernorInput, 'confidence' | 'consequence' | 'opportunityCost' | 'objectivePressure'>> & OutcomeGovernorInput,
+    movementState: MovementState
+  ): OutcomeGovernorMove {
     const highConsequence =
       input.consequence === 'high' ||
       input.opportunityCost === 'high' ||
@@ -105,6 +134,18 @@ class GeorgeOutcomeGovernor {
 
     const lowConfidence = input.confidence < 0.46
     const moderateConfidence = input.confidence >= 0.46 && input.confidence < 0.68
+
+    if (movementState === 'advancing' && input.userHasRequestedHelp) {
+      return 'direct_response'
+    }
+
+    if (movementState === 'closing' && input.userHasRequestedHelp) {
+      return 'direct_response'
+    }
+
+    if (movementState === 'blocked' && input.canAcquireContextNaturally) {
+      return 'signal_acquisition'
+    }
 
     if (input.userHasRequestedHelp && lowConfidence && highConsequence) {
       if (input.canAcquireContextNaturally) return 'context_recovery'
@@ -234,6 +275,7 @@ class GeorgeOutcomeGovernor {
   }) {
     return [
       `Move: ${input.move}`,
+      `Movement state: ${'movementState' in input ? (input as any).movementState || 'unknown' : 'unknown'}`,
       `Confidence: ${input.confidence.toFixed(2)}`,
       `Consequence: ${input.consequence}`,
       `Opportunity cost: ${input.opportunityCost}`,

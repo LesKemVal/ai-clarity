@@ -6838,6 +6838,10 @@ Continue from here, tell me what changed, or start fresh.`
               {outcomeGovernorSnapshot.move}
             </div>
             <div>
+              <span className="block text-white/24">Movement</span>
+              {outcomeGovernorSnapshot.movementState}
+            </div>
+            <div>
               <span className="block text-white/24">Missing</span>
               {outcomeGovernorSnapshot.missingSignal || 'none'}
             </div>
