@@ -5102,19 +5102,19 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${liveMode ? "pt-[188px] md:pt-[205px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[210px] md:pt-[220px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !liveMode && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[390px] px-6 text-center">
-        <div className="text-[34px] font-[300] tracking-[0.24em] text-[#D7DBE4]/24">
+      <div className="mx-auto w-full max-w-[320px] px-8 text-center">
+        <div className="text-[28px] font-[300] tracking-[0.16em] text-[#D7DBE4]/24">
           GEORGE
         </div>
 
-        <div className="mt-4 text-[11px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/42">
+        <div className="mt-7 text-[11px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/42">
           Set the direction. GEORGE maps the tactical route.
         </div>
       </div>
@@ -5186,7 +5186,7 @@ return (
       GEORGE is working
     </div>
   )}
-  {(liveMode ? messages : (messages.some((message) => message.role === 'user') ? messages : []))
+  {((forceLive || liveMode) ? messages : (messages.some((message) => message.role === 'user') ? messages : []))
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -6319,7 +6319,7 @@ if (liveMode) {
       </div>
 
       <div className="rounded-[1rem] border border-white/[0.08] bg-black/74 px-4 py-2 text-[12px] leading-5 text-[#D7DBE4]/74 shadow-[0_14px_40px_rgba(0,0,0,0.50)] ">
-        LIVE GEORGE.
+        LIVE GEORGE
       </div>
     </div>
   </div>
@@ -7388,7 +7388,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 setLoginLinkSent(false)
                 setLoginEmailInput('')
               }}
-              className="mt-4 text-[11px] text-[#D7DBE4]/48 transition hover:text-[#D7DBE4]/80"
+              className="mt-7 text-[11px] text-[#D7DBE4]/48 transition hover:text-[#D7DBE4]/80"
             >
               Use a different email
             </button>
