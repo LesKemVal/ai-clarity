@@ -11,13 +11,13 @@ export default function DesktopOperationalSurface({
     return (
       <div className="pointer-events-none fixed inset-x-0 top-[112px] bottom-[250px] z-[18] hidden items-center justify-center lg:flex">
         <div className="relative h-full w-full overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.055),transparent_38%),radial-gradient(circle_at_78%_62%,rgba(124,140,255,0.045),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(255,255,255,0.075),transparent_40%),radial-gradient(circle_at_78%_62%,rgba(124,140,255,0.06),transparent_48%)]" />
 
-          <div className="absolute left-[-6%] top-[18%] animate-[georgeGhostDrift_34s_ease-in-out_infinite] select-none text-[210px] font-semibold uppercase leading-none tracking-[-0.13em] text-white/[0.032]">
+          <div className="absolute left-[-14%] top-[8%] animate-[georgeGhostDrift_34s_ease-in-out_infinite] select-none text-[300px] font-semibold uppercase leading-none tracking-[-0.155em] text-white/[0.052]">
             NEXT
           </div>
 
-          <div className="absolute right-[-8%] top-[48%] animate-[georgeGhostDriftSlow_44s_ease-in-out_infinite] select-none text-[165px] font-semibold uppercase leading-none tracking-[-0.11em] text-white/[0.024]">
+          <div className="absolute right-[-16%] top-[46%] animate-[georgeGhostDriftSlow_44s_ease-in-out_infinite] select-none text-[250px] font-semibold uppercase leading-none tracking-[-0.145em] text-white/[0.042]">
             MOVE
           </div>
 
