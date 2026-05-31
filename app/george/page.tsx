@@ -5522,7 +5522,7 @@ I am listening now. Speak naturally. I will respond ${
 
           {!liveMode && !isWelcomeAssistant &&
             !liveMode && (
-          <div className="flex items-center gap-2 flex-nowrap overflow-x-auto divide-x divide-white/10 text-[11px] text-neutral-500">
+          <div className="flex items-center gap-3 flex-nowrap overflow-x-auto text-[11px] text-[#D7DBE4]/50">
             {!isWelcomeAssistant && (
               <>
             <button
@@ -5545,6 +5545,20 @@ I am listening now. Speak naturally. I will respond ${
             <button
               type="button"
               onClick={async () => {
+                try {
+                  await navigator.clipboard?.writeText(m.content)
+                  setToastMessage('Copied')
+                  setShowToast(true)
+                } catch {}
+              }}
+              className="px-1.5 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
+            >
+              Copy
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
                 const shareText = m.content
                 try {
                   if (navigator.share) {
@@ -5560,42 +5574,9 @@ I am listening now. Speak naturally. I will respond ${
                   }
                 } catch {}
               }}
-              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
+              className="px-1.5 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
             >
-              Send
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                const simplifyTarget = m.content
-
-                const prompt = `Simplify this GEORGE response into short, plain, everyday language.
-
-Remove:
-- jargon
-- business language
-- complicated explanations
-- unnecessary detail
-
-Replace terms like:
-KPI, ROI, funnel, wedge, SKU, ACV, positioning, conversion, objection handling
-
-with normal human language.
-
-Keep the meaning.
-Keep the tone calm and direct.
-Return ONLY the simplified response.
-
-Response:
-${simplifyTarget}`
-
-                setConversationSignal('Simplifying…')
-                void handleSend(prompt, { hidden: true })
-              }}
-              className="rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.09] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
-            >
-              Simplify
+              Share
             </button>
 
               </>
