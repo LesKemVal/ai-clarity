@@ -407,6 +407,17 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
 
 
 const georgeAmbientPulseStyles = `
+@keyframes georgeGhostDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  50% { transform: translate3d(2.5%, -1.5%, 0) scale(1.025); opacity: 0.82; }
+}
+
+@keyframes georgeGhostDriftSlow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.92; }
+  50% { transform: translate3d(-2%, 1.5%, 0) scale(1.018); opacity: 1; }
+}
+
+
 @keyframes terminalDot {
   0%, 100% {
     opacity: 0.24;
@@ -4803,7 +4814,9 @@ useEffect(() => {
 
 return (
     <>
-      <style>{georgeAmbientPulseStyles}</style>
+      <style>{georgeAmbientPulseStyles}
+
+</style>
       <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
