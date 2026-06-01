@@ -279,6 +279,8 @@ export default function LiveEntryClient() {
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
   const [relatedSessions, setRelatedSessions] = useState<any[]>([])
   const [liveToaAccepted, setLiveToaAccepted] = useState(false)
+  const [sessionSectionCollapsed, setSessionSectionCollapsed] = useState(false)
+  const [chairSectionCollapsed, setChairSectionCollapsed] = useState(false)
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
@@ -290,6 +292,7 @@ export default function LiveEntryClient() {
   const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
 
   const toggleChair = (value: string) => {
+    setChairSectionCollapsed(true)
     setChairs((current) => {
       if (current.includes(value)) {
         const next = current.filter((item) => item !== value)
@@ -363,6 +366,8 @@ export default function LiveEntryClient() {
     }
 
     setHasLiveSession(!!getActiveSessionForMode('live'))
+    setSessionSectionCollapsed(false)
+    setChairSectionCollapsed(false)
     setReady(true)
   }, [])
 
@@ -683,6 +688,8 @@ export default function LiveEntryClient() {
     setKnownContext('')
     setPrepDocument(null)
     setLiveToaAccepted(false)
+    setSessionSectionCollapsed(false)
+    setChairSectionCollapsed(false)
 
     window.localStorage.setItem('george_live_prep_inputs_cleared', '1')
 
@@ -743,6 +750,24 @@ Choose the related session, your chair, the outcome, and what is happening now.
 
           {relatedSessions.length > 0 && (
           <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+            {sessionSectionCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setSessionSectionCollapsed(false)}
+                className="flex w-full items-center justify-between gap-3 text-left"
+              >
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Related Session</span>
+                  <span className="mt-1 block truncate text-[13px] text-white/62">
+                    {relatedSessionId === 'not_related'
+                      ? 'Not related'
+                      : selectedRelatedSession?.title || 'Selected session'}
+                  </span>
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+              </button>
+            ) : (
+              <>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">
               Which session is this LIVE conversation related to?
             </div>
@@ -752,7 +777,10 @@ Choose the related session, your chair, the outcome, and what is happening now.
                 <button
                   key={session.id}
                   type="button"
-                  onClick={() => setRelatedSessionId(session.id)}
+                  onClick={() => {
+                    setRelatedSessionId(session.id)
+                    setSessionSectionCollapsed(true)
+                  }}
                   className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
                     relatedSessionId === session.id
                       ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.09] text-white'
@@ -768,7 +796,10 @@ Choose the related session, your chair, the outcome, and what is happening now.
 
               <button
                 type="button"
-                onClick={() => setRelatedSessionId('not_related')}
+                onClick={() => {
+                  setRelatedSessionId('not_related')
+                  setSessionSectionCollapsed(true)
+                }}
                 className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
                   relatedSessionId === 'not_related'
                     ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.09] text-white'
@@ -779,11 +810,27 @@ Choose the related session, your chair, the outcome, and what is happening now.
                 <span className="mt-1 block text-[11px] text-white/34">Start LIVE without normal-session context.</span>
               </button>
             </div>
+              </>
+            )}
           </div>
           )}
 
           <div className={`${relatedSessions.length > 0 ? 'mt-2' : 'mt-3'} rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2`}>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Chair</div>
+            {chairSectionCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setChairSectionCollapsed(false)}
+                className="flex w-full items-center justify-between gap-3 text-left"
+              >
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Your Position</span>
+                  <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+              </button>
+            ) : (
+              <>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Your Position</div>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               {CHAIR_OPTIONS.map((option) => {
                 const active = chairs.includes(option.label)
@@ -805,6 +852,8 @@ Choose the related session, your chair, the outcome, and what is happening now.
                 )
               })}
             </div>
+              </>
+            )}
           </div>
 
           <div className="mt-2 grid gap-2">
