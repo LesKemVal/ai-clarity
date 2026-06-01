@@ -996,27 +996,17 @@ const resolvedAssistTone =
       : 'direct')
 
 const syncCampaignEnvironment = (
-  campaignId: string | null,
-  updates: Partial<{
+  _campaignId: string | null,
+  _updates: Partial<{
     assistMode: string
     outputStyle: string
     deliveryMode: string
     assistTone: string
   }>
 ) => {
-  if (!campaignId) return
-
-  updateCampaignSessionMetadata(campaignId, (metadata) => {
-    const currentEnvironment = (metadata.savedEnvironment || {}) as any
-
-    return {
-      ...metadata,
-      savedEnvironment: {
-        ...currentEnvironment,
-        ...updates,
-      },
-    }
-  })
+  // PRO LIVE / campaign architecture is archived.
+  // This helper remains only as a legacy no-op until campaign code is extracted or deleted.
+  return
 }
 
 const replaceLastLiveGuidance = (guidance: string) => {
