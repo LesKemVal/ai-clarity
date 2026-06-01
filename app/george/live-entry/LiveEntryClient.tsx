@@ -557,11 +557,11 @@ export default function LiveEntryClient() {
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
 
           <h1 className="mt-3 text-[19px] font-semibold leading-[1.08] tracking-[-0.05em] text-white/90 sm:text-[32px]">
-            This room prepares GEORGE to support your conversation.
+            Sharpen your cues, lines and conversation.
           </h1>
 
           <p className="mt-2 text-[12px] leading-5 text-white/42">
-Choose the room, objective, and any material GEORGE should carry into LIVE.
+Answer a few questions and create the best version of your conversation.
           </p>
 
           {runtimeMotionContext && (
@@ -574,6 +574,52 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
           <div className="mt-2 grid gap-2">
             <CompactSelect label="Room" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
           </div>
+
+          <details open className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-3 py-2">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+              <span>
+                <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">
+                  30-minute resource estimate
+                </span>
+                <span className="mt-1 block text-[12px] text-white/68">
+                  ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)} typical OpenAI resources · {finalResourceEstimate.intensity}
+                </span>
+              </span>
+              <span className="text-[18px] leading-none text-white/32">⌄</span>
+            </summary>
+
+            <div className="mt-3 border-t border-white/[0.05] pt-3">
+              <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
+                <div
+                  className="h-full rounded-full bg-[#8FB6C9]/55"
+                  style={{ width: `${Math.min(100, Math.max(12, finalResourceEstimate.estimatedCents * 2))}%` }}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-[11px] text-white/38">
+                <div>
+                  <span className="block text-white/22">Prep</span>
+                  {finalResourceEstimate.prepSeconds}s
+                </div>
+                <div>
+                  <span className="block text-white/22">Runtime</span>
+                  30m
+                </div>
+                <div>
+                  <span className="block text-white/22">Typical</span>
+                  ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {finalResourceEstimate.resources.slice(0, 5).map((resource) => (
+                  <span key={resource} className="rounded-full border border-white/[0.045] bg-black/18 px-2 py-1 text-[10px] text-white/38">
+                    {resource}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </details>
 
           <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
             <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Room ready</div>
@@ -592,10 +638,6 @@ Choose the room, objective, and any material GEORGE should carry into LIVE.
               className="mt-2 w-full resize-none bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/24"
             />
           </label>
-
-          <div className="mt-2 grid gap-2">
-            <CompactSelect label="Your Position" value={userPosition} options={POSITION_OPTIONS} onChange={setUserPosition} />
-          </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">What GEORGE should know</span>

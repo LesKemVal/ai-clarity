@@ -1,273 +1,305 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-const chairSignals = {
+type ChairKey =
+  | 'Interview'
+  | 'Meeting'
+  | 'Boardroom'
+  | 'Negotiation'
+  | 'Sales Call'
+  | 'Doctor Appointment'
+  | 'Presentation'
+  | 'Everyday Conversation'
+  | 'Other'
+
+const chairProfiles: Record<ChairKey, {
+  examples: string[]
+  looksFor: string[]
+  steering: { phrase: string; meaning: string }[]
+  prompt: string
+}> = {
   Interview: {
-    examples: ['Resume', 'Job description', 'Portfolio', 'Certifications', 'Interview notes'],
-    value: ['Experience', 'Achievements', 'Credibility', 'Likely questions', 'Skill gaps'],
+    examples: ['Résumé', 'Job description', 'Portfolio', 'Certifications', 'Interview notes'],
+    looksFor: ['Proof points', 'Likely questions', 'Gaps', 'Confidence risks', 'Strong answers'],
+    steering: [
+      { phrase: 'Let me think.', meaning: 'Buy time before answering' },
+      { phrase: 'That’s a good question.', meaning: 'Prepare a structured answer' },
+      { phrase: 'Can I clarify that?', meaning: 'Repair unclear question' },
+      { phrase: 'Right.', meaning: 'Continue with confidence' },
+    ],
+    prompt: 'Give GEORGE role details, job requirements, achievements, weak spots, and questions you expect.',
+  },
+  Meeting: {
+    examples: ['Agenda', 'Decision notes', 'Stakeholder list', 'Numbers', 'Email thread'],
+    looksFor: ['Decision pressure', 'Alignment', 'Timing', 'Risks', 'Next move'],
+    steering: [
+      { phrase: 'Let’s pause there.', meaning: 'Slow the room down' },
+      { phrase: 'What’s the decision?', meaning: 'Force clarity' },
+      { phrase: 'One second.', meaning: 'Buy time' },
+      { phrase: 'Let’s define that.', meaning: 'Clarify vague language' },
+    ],
+    prompt: 'Give GEORGE the meeting goal, who is present, what decision matters, and what cannot be missed.',
   },
   Boardroom: {
     examples: ['Board packet', 'Forecast', 'KPIs', 'Financial report', 'Meeting notes'],
-    value: ['Numbers', 'Risks', 'Assumptions', 'Stakeholders', 'Decision history'],
+    looksFor: ['Assumptions', 'Risk', 'Variance', 'Credibility', 'Capital allocation'],
+    steering: [
+      { phrase: 'Let me separate that.', meaning: 'Break issue into parts' },
+      { phrase: 'The assumption is...', meaning: 'Defend methodology' },
+      { phrase: 'That depends on...', meaning: 'Qualify answer' },
+      { phrase: 'Let’s isolate the risk.', meaning: 'Focus the board' },
+    ],
+    prompt: 'Give GEORGE the numbers, assumptions, risks, likely objections, and who has authority in the room.',
   },
   Negotiation: {
-    examples: ['Contract', 'Proposal', 'Term sheet', 'Pricing sheet', 'Email thread'],
-    value: ['Leverage', 'Concessions', 'Deadlines', 'Terms', 'Objections'],
+    examples: ['Offer', 'Contract', 'Term sheet', 'Pricing sheet', 'Email thread'],
+    looksFor: ['Leverage', 'Concessions', 'Deadlines', 'Alternatives', 'Pressure'],
+    steering: [
+      { phrase: 'Let me consider that.', meaning: 'Do not concede too fast' },
+      { phrase: 'That does not work as stated.', meaning: 'Reject without overexplaining' },
+      { phrase: 'What flexibility is there?', meaning: 'Probe movement' },
+      { phrase: 'I need that in writing.', meaning: 'Protect position' },
+    ],
+    prompt: 'Give GEORGE your target, fallback, leverage, deadline, other party’s pressure, and what you cannot give up.',
   },
-  Sales: {
-    examples: ['Sales script', 'Discovery notes', 'CRM notes', 'Proposal', 'Competitor comparison'],
-    value: ['Pain points', 'Objections', 'Buying signals', 'Decision makers', 'Next step'],
+  'Sales Call': {
+    examples: ['Pitch notes', 'CRM notes', 'Proposal', 'Objection list', 'Competitor notes'],
+    looksFor: ['Pain points', 'Buying signals', 'Objections', 'Decision maker', 'Close timing'],
+    steering: [
+      { phrase: 'That makes sense.', meaning: 'Acknowledge objection' },
+      { phrase: 'What matters most?', meaning: 'Find buying motive' },
+      { phrase: 'Let me make it simple.', meaning: 'Compress pitch' },
+      { phrase: 'Should we set the next step?', meaning: 'Move toward close' },
+    ],
+    prompt: 'Give GEORGE the product, prospect, pain point, offer, objections, and desired next step.',
   },
-  Doctor: {
-    examples: ['Medical notes', 'Lab results', 'Medication list', 'Symptoms', 'Referral notes'],
-    value: ['History', 'Symptoms', 'Questions', 'Concerns', 'Treatment context'],
+  'Doctor Appointment': {
+    examples: ['Symptoms', 'Medication list', 'Lab results', 'Timeline', 'Questions'],
+    looksFor: ['Symptoms', 'History', 'Risks', 'Missed questions', 'Treatment clarity'],
+    steering: [
+      { phrase: 'Can you explain that plainly?', meaning: 'Clarify medical language' },
+      { phrase: 'What should I watch for?', meaning: 'Surface risk signs' },
+      { phrase: 'What are my options?', meaning: 'Compare choices' },
+      { phrase: 'Can we go back to symptoms?', meaning: 'Refocus appointment' },
+    ],
+    prompt: 'Give GEORGE symptoms, timeline, medications, concerns, prior diagnosis, and questions you need answered.',
   },
   Presentation: {
-    examples: ['Slides', 'Speaker notes', 'Research', 'Agenda', 'Audience notes'],
-    value: ['Key points', 'Weak areas', 'Likely questions', 'Supporting evidence', 'Timing'],
+    examples: ['Slides', 'Outline', 'Speaker notes', 'Audience notes', 'Research'],
+    looksFor: ['Flow', 'Weak points', 'Likely questions', 'Timing', 'Close'],
+    steering: [
+      { phrase: 'Let me frame this.', meaning: 'Reset audience attention' },
+      { phrase: 'The point is...', meaning: 'Compress message' },
+      { phrase: 'Here’s the evidence.', meaning: 'Support claim' },
+      { phrase: 'Let’s bring it back.', meaning: 'Recover flow' },
+    ],
+    prompt: 'Give GEORGE your audience, message, weak sections, time limit, likely questions, and desired close.',
+  },
+  'Everyday Conversation': {
+    examples: ['Text thread', 'Situation notes', 'Relationship context', 'Goal', 'Concerns'],
+    looksFor: ['Tone', 'Timing', 'Trust', 'Misunderstanding', 'Best next words'],
+    steering: [
+      { phrase: 'I hear you.', meaning: 'Acknowledge before redirecting' },
+      { phrase: 'Let me say that better.', meaning: 'Reword softer' },
+      { phrase: 'That’s not what I meant.', meaning: 'Repair misunderstanding' },
+      { phrase: 'Give me a second.', meaning: 'Buy time' },
+    ],
+    prompt: 'Give GEORGE the relationship, what happened, what you want, what could go wrong, and your preferred tone.',
   },
   Other: {
-    examples: ['Notes', 'Screenshots', 'Images', 'Messages', 'Documents'],
-    value: ['Context', 'Signals', 'Risks', 'Goals', 'Next move'],
+    examples: ['Notes', 'Screenshots', 'Messages', 'Documents', 'Context'],
+    looksFor: ['Signals', 'Risks', 'Goals', 'Constraints', 'Next move'],
+    steering: [
+      { phrase: 'One second.', meaning: 'Buy time' },
+      { phrase: 'Right.', meaning: 'Continue' },
+      { phrase: 'Let me reframe.', meaning: 'Change angle' },
+      { phrase: 'What matters is...', meaning: 'Focus outcome' },
+    ],
+    prompt: 'Give GEORGE the room, people involved, desired outcome, pressure, and what must not be missed.',
   },
 }
 
-const defaultSteeringSignals = [
-  { phrase: 'One second...', meaning: 'Buy time' },
-  { phrase: 'Right...', meaning: 'Continue' },
-  { phrase: 'Interesting...', meaning: 'Reframe' },
-  { phrase: 'Repeat signal', meaning: 'Repair context' },
-]
+function normalizeChair(value: string | null | undefined): ChairKey {
+  const clean = String(value || '').trim()
+  if (clean === 'Sales') return 'Sales Call'
+  if (clean === 'Doctor') return 'Doctor Appointment'
+  if (clean in chairProfiles) return clean as ChairKey
+  return 'Other'
+}
 
 export default function DeployLivePage() {
-  const [selectedChair, setSelectedChair] = useState<keyof typeof chairSignals>('Interview')
+  const [chair, setChair] = useState<ChairKey>('Interview')
   const [customChair, setCustomChair] = useState('')
-  const [steeringSignals, setSteeringSignals] = useState(defaultSteeringSignals)
+  const [objective, setObjective] = useState('')
+  const [knownContext, setKnownContext] = useState('')
+  const [signals, setSignals] = useState(chairProfiles.Interview.steering)
 
-  const chairLabel = selectedChair === 'Other' && customChair.trim()
-    ? customChair.trim()
-    : selectedChair
+  const profile = chairProfiles[chair]
+  const chairLabel = chair === 'Other' && customChair.trim() ? customChair.trim() : chair
 
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem('george_live_steering_signals')
-      if (saved) setSteeringSignals(JSON.parse(saved))
+      const setup = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null')
+      const nextChair = normalizeChair(setup?.room)
+      setChair(nextChair)
+      setObjective(setup?.objective || '')
+      setKnownContext(setup?.knownContext || '')
+      setSignals(chairProfiles[nextChair].steering)
+      if (nextChair === 'Other' && setup?.room) setCustomChair(setup.room)
     } catch {}
   }, [])
 
-  function updateSteeringSignal(index: number, field: 'phrase' | 'meaning', value: string) {
-    const next = steeringSignals.map((signal, i) =>
-      i === index ? { ...signal, [field]: value } : signal
-    )
+  useEffect(() => {
+    setSignals(chairProfiles[chair].steering)
+  }, [chair])
 
-    setSteeringSignals(next)
-
+  const saveAndReturn = () => {
     try {
-      window.localStorage.setItem('george_live_steering_signals', JSON.stringify(next))
-    } catch {}
-  }
+      const existing = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || '{}')
+      const next = {
+        ...existing,
+        room: chairLabel,
+        objective,
+        knownContext,
+        deployLiveSignals: {
+          chair: chairLabel,
+          examples: profile.examples,
+          looksFor: profile.looksFor,
+          steering: signals,
+          prompt: profile.prompt,
+        },
+        updatedAt: Date.now(),
+      }
 
-  function resetSteeringSignals() {
-    setSteeringSignals(defaultSteeringSignals)
-
-    try {
-      window.localStorage.setItem('george_live_steering_signals', JSON.stringify(defaultSteeringSignals))
+      window.localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(next))
+      window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(next))
+      window.localStorage.setItem('george_live_steering_signals', JSON.stringify(signals))
     } catch {}
+
+    window.location.href = '/george/live-entry'
   }
 
   return (
-    <main className="min-h-screen bg-[#050506] text-white px-6 py-10">
-      <section className="mx-auto max-w-5xl">
+    <main className="min-h-screen bg-[#050506] px-4 py-7 text-white">
+      <section className="mx-auto max-w-[680px]">
         <div className="flex items-center justify-between">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#7C8CFF]">Deploy LIVE</p>
-          <Link href="/george/live" className="rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.18em] text-white/70">
-            Skip tutorial
+          <p className="text-[10px] uppercase tracking-[0.26em] text-white/28">More Signal</p>
+          <Link href="/george/live-entry" className="text-[11px] uppercase tracking-[0.18em] text-white/42">
+            Back
           </Link>
         </div>
 
-        <h1 className="mt-8 max-w-3xl text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">
-          Bring GEORGE up to speed.
+        <h1 className="mt-6 text-[25px] font-medium leading-[1.12] tracking-[-0.03em] text-white/90">
+          Add signal for the {chairLabel} chair.
         </h1>
 
-        <p className="mt-6 max-w-2xl text-white/60 leading-7">
-          Upload anything that contains relevant signals. GEORGE uses those signals to reduce explanation, improve timing, and support the room faster.
+        <p className="mt-3 text-[13px] leading-6 text-white/46">
+          This page should stay specific to the chair you selected. Add only what helps GEORGE understand this conversation faster.
         </p>
 
-        <div className="mt-10 rounded-2xl border border-[#7C8CFF]/25 bg-[#7C8CFF]/[0.06] p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Give GEORGE better signal</p>
-          <p className="mt-3 text-sm leading-6 text-white/60">
-            Upload documents, notes, screenshots, images, or anything else that helps GEORGE understand the room before pressure rises.
-          </p>
-          <button className="mt-5 rounded-full bg-white px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-black">
-            Upload relevant signal
-          </button>
-        </div>
-
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-white/35">Current chair</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-white">{chairLabel}</h2>
-            </div>
-
+        <div className="mt-5 rounded-[1rem] border border-white/[0.07] bg-white/[0.025] p-3">
+          <label className="block">
+            <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Chair</span>
             <select
-              value={selectedChair}
-              onChange={(event) => setSelectedChair(event.target.value as keyof typeof chairSignals)}
-              className="rounded-full border border-white/10 bg-black px-4 py-3 text-sm text-white outline-none focus:border-[#7C8CFF]/60"
+              value={chair}
+              onChange={(event) => setChair(event.target.value as ChairKey)}
+              className="mt-2 w-full rounded-[0.75rem] border border-white/[0.07] bg-black/40 px-3 py-3 text-[14px] text-white outline-none"
             >
-              {Object.keys(chairSignals).map((chair) => (
-                <option key={chair} value={chair}>
-                  {chair}
-                </option>
+              {Object.keys(chairProfiles).map((item) => (
+                <option key={item} value={item}>{item}</option>
               ))}
             </select>
-          </div>
+          </label>
 
-          {selectedChair === 'Other' ? (
-            <label className="mt-5 grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
-              Name this chair
-              <input
-                value={customChair}
-                onChange={(event) => setCustomChair(event.target.value)}
-                placeholder="Example: landlord call, court prep, investor update"
-                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-white/25 focus:border-[#7C8CFF]/50"
-              />
-            </label>
-          ) : null}
+          {chair === 'Other' && (
+            <input
+              value={customChair}
+              onChange={(event) => setCustomChair(event.target.value)}
+              placeholder="Name this chair"
+              className="mt-2 w-full rounded-[0.75rem] border border-white/[0.07] bg-black/30 px-3 py-3 text-[14px] text-white outline-none placeholder:text-white/24"
+            />
+          )}
+        </div>
 
-          <p className="mt-5 text-xs uppercase tracking-[0.18em] text-white/35">Upload examples</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {chairSignals[selectedChair].examples.map((item) => (
-              <span key={item} className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/65">
+        <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/38">Useful {chairLabel} signal</p>
+
+          <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-white/28">Examples</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {profile.examples.map((item) => (
+              <span key={item} className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
                 {item}
               </span>
             ))}
           </div>
 
-          <p className="mt-5 text-xs uppercase tracking-[0.18em] text-white/35">GEORGE looks for</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {chairSignals[selectedChair].value.map((item) => (
-              <span key={item} className="rounded-full bg-white/[0.06] px-3 py-1 text-xs text-white/65">
+          <p className="mt-4 text-[12px] uppercase tracking-[0.18em] text-white/28">GEORGE should look for</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {profile.looksFor.map((item) => (
+              <span key={item} className="rounded-full bg-white/[0.055] px-2.5 py-1 text-[11px] text-white/48">
                 {item}
               </span>
             ))}
           </div>
-
-          <div className="mt-6 grid gap-3 rounded-xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.055] p-4 text-sm leading-6 text-[#E8EAFF]/75">
-            <p>
-              This helps GEORGE support the {chairLabel} room with less explaining, faster timing, and better room awareness.
-            </p>
-            <p>
-              Example: about 41 cents of LIVE support can help GEORGE stay with you through a focused {chairLabel.toLowerCase()} moment instead of leaving you to improvise alone.
-            </p>
-            <p>
-              Scroll next to edit steering signals — the phrases GEORGE listens for while LIVE is active.
-            </p>
-          </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Sharpen with use</p>
-            <p className="mt-3 text-sm leading-6 text-white/55">
-              GEORGE improves as he learns your rooms, your preferred detail level, your steering phrases, and the kinds of pressure you face.
-            </p>
-          </div>
+        <label className="mt-4 block rounded-[1rem] border border-white/[0.055] bg-black/18 p-3">
+          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Desired outcome</span>
+          <textarea
+            value={objective}
+            onChange={(event) => setObjective(event.target.value)}
+            rows={2}
+            placeholder="What are you trying to make happen?"
+            className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/72 outline-none placeholder:text-white/24"
+          />
+        </label>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Practice first</p>
-            <p className="mt-3 text-sm leading-6 text-white/55">
-              Use normal GEORGE to prepare, rehearse, and sharpen your thinking before you need LIVE in the room.
-            </p>
-          </div>
+        <label className="mt-3 block rounded-[1rem] border border-white/[0.055] bg-black/18 p-3">
+          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">More chair signal</span>
+          <textarea
+            value={knownContext}
+            onChange={(event) => setKnownContext(event.target.value)}
+            rows={4}
+            placeholder={profile.prompt}
+            className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/72 outline-none placeholder:text-white/24"
+          />
+        </label>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Normal + LIVE</p>
-            <p className="mt-3 text-sm leading-6 text-white/55">
-              Normal GEORGE helps you think and prepare. LIVE GEORGE listens, adapts, and supports the next move while the conversation is happening.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Editable steering</p>
-              <p className="mt-2 text-sm leading-6 text-white/55">
-                Keep the defaults or change the phrases GEORGE should treat as steering signals.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={resetSteeringSignals}
-              className="rounded-full border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.16em] text-white/60 hover:text-white"
-            >
-              Reset defaults
-            </button>
-          </div>
-
-          <div className="mt-5 grid gap-3">
-            {steeringSignals.map((signal, index) => (
-              <div key={index} className="grid gap-3 rounded-xl border border-white/10 bg-black/20 p-3 sm:grid-cols-2">
-                <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
-                  Phrase
-                  <input
-                    value={signal.phrase}
-                    onChange={(event) => updateSteeringSignal(index, 'phrase', event.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm normal-case tracking-normal text-white outline-none focus:border-[#7C8CFF]/50"
-                  />
-                </label>
-
-                <label className="grid gap-2 text-xs uppercase tracking-[0.14em] text-white/35">
-                  Meaning
-                  <input
-                    value={signal.meaning}
-                    onChange={(event) => updateSteeringSignal(index, 'meaning', event.target.value)}
-                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm normal-case tracking-normal text-white outline-none focus:border-[#7C8CFF]/50"
-                  />
-                </label>
+        <div className="mt-4 rounded-[1rem] border border-white/[0.055] bg-white/[0.02] p-3">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Chair-specific steering signals</p>
+          <div className="mt-3 grid gap-2">
+            {signals.map((signal, index) => (
+              <div key={index} className="grid grid-cols-[1fr_1fr] gap-2">
+                <input
+                  value={signal.phrase}
+                  onChange={(event) => {
+                    const next = signals.map((item, i) => i === index ? { ...item, phrase: event.target.value } : item)
+                    setSignals(next)
+                  }}
+                  className="rounded-[0.7rem] border border-white/[0.06] bg-black/26 px-3 py-2 text-[12px] text-white/70 outline-none"
+                />
+                <input
+                  value={signal.meaning}
+                  onChange={(event) => {
+                    const next = signals.map((item, i) => i === index ? { ...item, meaning: event.target.value } : item)
+                    setSignals(next)
+                  }}
+                  className="rounded-[0.7rem] border border-white/[0.06] bg-black/26 px-3 py-2 text-[12px] text-white/70 outline-none"
+                />
               </div>
             ))}
           </div>
         </div>
 
-
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Before. During. After.</p>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-white/35">Before LIVE</p>
-              <p className="mt-2 text-sm leading-6 text-white/55">Prepare. Practice. Upload signal.</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-white/35">During LIVE</p>
-              <p className="mt-2 text-sm leading-6 text-white/55">Listen. Adapt. Support. Respond. Upload signal if the room changes.</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-white/35">After LIVE</p>
-              <p className="mt-2 text-sm leading-6 text-white/55">Review. Improve. Sharpen. Learn.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 rounded-2xl border border-[#7C8CFF]/20 bg-[#7C8CFF]/[0.055] p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white">Signal philosophy</p>
-          <p className="mt-3 text-sm leading-6 text-[#E8EAFF]/75">
-            GEORGE does not reject signals. GEORGE evaluates usefulness, timing, relevance, and context. A document, image, screenshot, note, or single sentence may become useful when the room changes.
-          </p>
-        </div>
-
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link href="/george/live" className="rounded-full bg-white px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-black">
-            LIVE Now
-          </Link>
-          <Link href="/george/live-entry" className="rounded-full border border-white/15 px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-white/75">
-            Back to Prep
-          </Link>
-        </div>
+        <button
+          type="button"
+          onClick={saveAndReturn}
+          className="mt-5 w-full rounded-[0.9rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.10] px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/82"
+        >
+          Save Signal
+        </button>
       </section>
     </main>
   )

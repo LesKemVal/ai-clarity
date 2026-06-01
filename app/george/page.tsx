@@ -1199,6 +1199,28 @@ useEffect(() => {
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
   const [liveEntryBriefing, setLiveEntryBriefing] = useState<string | null>(null)
+const [typedLiveEntryBriefing, setTypedLiveEntryBriefing] = useState('')
+
+useEffect(() => {
+  if (!(forceLive || liveMode) || !liveEntryBriefing) {
+    setTypedLiveEntryBriefing('')
+    return
+  }
+
+  let index = 0
+  setTypedLiveEntryBriefing('')
+
+  const timer = window.setInterval(() => {
+    index += 1
+    setTypedLiveEntryBriefing(liveEntryBriefing.slice(0, index))
+
+    if (index >= liveEntryBriefing.length) {
+      window.clearInterval(timer)
+    }
+  }, 18)
+
+  return () => window.clearInterval(timer)
+}, [forceLive, liveMode, liveEntryBriefing])
 
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
@@ -1840,6 +1862,18 @@ const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 const [loginEmailInput, setLoginEmailInput] = useState('')
+const [showAccountMenu, setShowAccountMenu] = useState(false)
+
+const handleAccountSignOut = () => {
+  setShowAccountMenu(false)
+  setSubscriberEmail('')
+  setCurrentTier('smart')
+  window.localStorage.removeItem('george_email')
+  window.localStorage.removeItem('george_session_authority')
+  window.localStorage.removeItem('george_founder_restore')
+  setToastMessage('Signed out.')
+  setShowToast(true)
+}
 const [loginLinkSent, setLoginLinkSent] = useState(false)
 const [loginSending, setLoginSending] = useState(false)
 const [activeCheckout, setActiveCheckout] = useState<'intelligent' | 'brilliant' | 'brilliant_day' | null>(null)
@@ -5044,33 +5078,65 @@ return (
                     </button>
                   </div>
                 </div>
+                <div className="relative flex items-center gap-1 xl:hidden">
+                  <button
+                    type="button"
+                    onClick={handleShareGeorge}
+                    className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    aria-label="Send George"
+                    title="Send George"
+                  >
+                    <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
+                      Share G
+                    </span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleShareGeorge}
-                  className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72 xl:hidden"
-                  aria-label="Send George"
-                  title="Send George"
-                >
-                      <div className="flex items-center gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.9"
-                          className="h-[14px] w-[14px] text-[#D7DBE4]/54"
-                        >
-                          <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
-                          <path d="M12 3v12" />
-                          <path d="M8 7l4-4 4 4" />
-                        </svg>
+                  <button
+                    type="button"
+                    onClick={() => setShowAccountMenu((value) => !value)}
+                    className="inline-flex h-9 w-8 items-center justify-center rounded-full text-[20px] leading-none text-[#D7DBE4]/52 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/82"
+                    aria-label="Account menu"
+                    title="Account"
+                  >
+                    ⋮
+                  </button>
 
-                        <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                          Share G
-                        </span>
+                  {showAccountMenu && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Close account menu"
+                        onClick={() => setShowAccountMenu(false)}
+                        className="fixed inset-0 z-[85] cursor-default bg-transparent"
+                      />
+
+                      <div className="absolute right-0 top-full z-[90] mt-2 w-[150px] rounded-[0.9rem] border border-white/[0.065] bg-[#05080D]/94 p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.42)] backdrop-blur-[14px]">
+                        {subscriberEmail ? (
+                          <button
+                            type="button"
+                            onClick={handleAccountSignOut}
+                            className="block w-full rounded-[0.7rem] px-3 py-2 text-left text-[12px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/68 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
+                          >
+                            Sign Out
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowAccountMenu(false)
+                              setLoginEmailInput('')
+                              setLoginLinkSent(false)
+                              setShowUpgradeModal(true)
+                            }}
+                            className="block w-full rounded-[0.7rem] px-3 py-2 text-left text-[12px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/68 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
+                          >
+                            Sign In
+                          </button>
+                        )}
                       </div>
-                    </button>
+                    </>
+                  )}
+                </div>
               </div>
             </header>
 
@@ -5078,6 +5144,20 @@ return (
 
 {!showMobileHero && (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
+  </div>
+)}
+{(forceLive || liveMode) && (
+  <div className="pointer-events-none fixed left-0 right-0 top-[56px] z-[64] flex justify-center xl:pl-[280px]">
+    <div className="flex items-center gap-2 rounded-full border border-white/[0.055] bg-[#0B0D12]/88 px-3 py-1.5 shadow-[0_12px_34px_rgba(0,0,0,0.34)] backdrop-blur-[14px]">
+      <img
+        src="/earbudlive500.png"
+        alt=""
+        className="h-8 w-8 object-contain opacity-80"
+      />
+      <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/58">
+        LIVE GEORGE
+      </span>
+    </div>
   </div>
 )}
 <div
@@ -5102,35 +5182,40 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[210px] md:pt-[220px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showMobileHero && !liveMode && !hasUserMessageForSurface && (
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[118px] md:pt-[128px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  {showMobileHero && !liveMode && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[320px] px-8 text-center">
-        <div className="text-[28px] font-[300] tracking-[0.16em] text-[#D7DBE4]/24">
+      <div className="mx-auto w-full max-w-[360px] px-8 text-center">
+        <div className="text-[34px] font-[300] tracking-[0.22em] text-[#D7DBE4]/24">
           GEORGE
         </div>
 
-        <div className="mt-7 text-[11px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/42">
+        <div className="mt-7 text-[10px] font-medium uppercase tracking-[0.20em] text-[#D7DBE4]/34">
           Set the direction. GEORGE maps the tactical route.
         </div>
       </div>
     </div>
   )}
 
-  {showTypingPrescription && !liveMode && (
+  {showMobileHero && !liveMode && hasDraftInput && !hasUserMessageForSurface && (
+    <div className="pointer-events-none fixed inset-0 z-[34] md:hidden flex items-center justify-center">
+      <img
+        src="/logofav.png"
+        alt=""
+        className="h-[280px] w-auto opacity-[0.10] object-contain"
+      />
+    </div>
+  )}
+
+  {false && showTypingPrescription && !liveMode && (
     <TypingPrescriptionSurface />
   )}
 
-  {!liveMode && (
-    <DesktopOperationalSurface
-      visible={showDesktopOperationalSurface}
-      mode={hasDraftInput ? 'active' : 'idle'}
-    />
-  )}
+  
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[118px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
@@ -5748,7 +5833,7 @@ I am listening now. Speak naturally. I will respond ${
   })}
   
 {showScrollHint && (
-  <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 ${liveMode ? "hidden" : "flex"} items-center justify-center opacity-70 transition hover:opacity-100`}>
+  <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center opacity-70 transition hover:opacity-100`}>
 
     <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/68 backdrop-blur-[10px] shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
 
@@ -5774,10 +5859,12 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-{false && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[22%] z-[45] mx-auto w-full max-w-[900px] px-8 text-center xl:pl-[280px]">
-    <div className="mx-auto max-w-[620px] whitespace-pre-line text-[15px] leading-7 text-[#D7DBE4]/72 md:text-[16px] md:leading-8">
-      {liveEntryBriefing}
+{(forceLive || liveMode) && messages.length === 0 && (
+  <div className="mx-auto w-full max-w-[620px] px-3 pt-[150px]">
+    <div className="h-[96px] overflow-hidden">
+      <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
+        {"I'm listening."}
+      </div>
     </div>
   </div>
 )}
@@ -5792,7 +5879,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto ${liveMode ? "hidden" : "flex"} w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
+              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
                 <div className={`pointer-events-auto relative flex items-center justify-center gap-6 px-4 py-2 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
                   <button
                     type="button"
@@ -5820,6 +5907,12 @@ I am listening now. Speak naturally. I will respond ${
                   <button
                     type="button"
                     onClick={() => {
+                      if (liveMode) {
+                        setShowNormalUtilityMenu(null)
+                        requestExitLiveMode()
+                        return
+                      }
+
                       if (liveEntryBlinking) return
 
                       setLiveEntryBlinking(true)
@@ -5839,12 +5932,12 @@ I am listening now. Speak naturally. I will respond ${
                         setShowUpgradeModal(true)
                       }, 520)
                     }}
-                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_260ms_cubic-bezier(0.22,1,0.36,1)_2]' : ''}`}
+                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/42'} ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_260ms_cubic-bezier(0.22,1,0.36,1)_2]' : ''}`}
                     aria-label="Try LIVE GEORGE"
                     title="Try LIVE GEORGE"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/24" />
-                    LIVE
+                    <span className={liveMode ? "h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.20)]" : "h-1.5 w-1.5 rounded-full bg-white/24"} />
+                    {liveMode ? 'EXIT' : 'LIVE'}
                   </button>
 
                   {showNormalUtilityMenu && (
@@ -6035,28 +6128,18 @@ I am listening now. Speak naturally. I will respond ${
           type="button"
           onClick={() => {
 if (liveMode) {
-  stopListening()
-  recordActiveLiveRuntimeUsage()
-  exitLiveMode()
-  setShowConversationMenu(false)
-  setConversationMenuLane('selector')
-  setActivePromptContext(null)
-  setActivePromptLabel(null)
-  setToastMessage('Back to GEORGE')
-  setShowToast(true)
-  window.localStorage.removeItem('george_active_context')
-  window.localStorage.removeItem('george_active_label')
+  requestExitLiveMode()
 } else {
   enterLiveConversation()
 }
 }}
           className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
-              ? 'border border-white/[0.12] bg-white/[0.026] text-[#D7DBE4]/76'
+              ? 'border border-red-200/[0.14] bg-red-200/[0.035] text-red-100/62 hover:text-red-100/86'
               : 'text-[#D7DBE4]/80 hover:text-[#D7DBE4]'
           }`}
         >
-          LIVE
+          {liveMode ? 'EXIT' : 'LIVE'}
         </button>
 
         
@@ -6301,7 +6384,7 @@ if (liveMode) {
         </div>
       )}
 
-{liveMode && (
+{false && liveMode && (
   <div className="fixed inset-x-0 top-[58px] z-[260] flex justify-center pointer-events-none">
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[pickerTwistUp_220ms_cubic-bezier(0.22,1,0.36,1)]">
       <div className="relative h-[122px] w-[122px]">
@@ -6397,6 +6480,18 @@ if (liveMode) {
         </p>
 
         <div className="grid gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setShowExitPopup(false)
+              window.localStorage.setItem('george_start_new_live', '1')
+              window.location.href = '/george/live-entry'
+            }}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
+          >
+            Start New LIVE
+          </button>
+
           <button
             type="button"
             onClick={() => {
@@ -6853,7 +6948,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-{liveMode && (
+{false && liveMode && (
   <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
     <div className="relative flex items-center justify-center gap-6">
       <button
@@ -6864,7 +6959,7 @@ Continue from here, tell me what changed, or start fresh.`
           setActiveHelpTopic('live')
           setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
         }}
-        className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
+        className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-red-100/52 hover:text-red-100/82 ${operationalMotion.press}"
       >
         HELP
       </button>
@@ -6879,8 +6974,8 @@ Continue from here, tell me what changed, or start fresh.`
         }}
         className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
       >
-        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#AEEBFF] shadow-[0_0_10px_rgba(174,235,255,0.55)]' : 'bg-white/28'}`} />
-        LIVE
+        <span className="h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.18)]" />
+        EXIT
       </button>
 
       {showLiveQuickMenu && (
@@ -6957,16 +7052,30 @@ Continue from here, tell me what changed, or start fresh.`
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setShowLiveQuickMenu(false)
-              requestExitLiveMode()
-            }}
-            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/52 transition hover:text-red-100/82 active:scale-[0.98]"
-          >
-            Exit LIVE
-          </button>
+          <div className="mt-1 border-t border-white/[0.045] pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowLiveQuickMenu(false)
+                window.localStorage.setItem('george_start_new_live', '1')
+                window.location.href = '/george/live-entry'
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
+            >
+              Start New
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowLiveQuickMenu(false)
+                requestExitLiveMode()
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/56 transition hover:text-red-100/86 active:scale-[0.98]"
+            >
+              Exit
+            </button>
+          </div>
         </div>
         </>
       )}

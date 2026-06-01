@@ -113,12 +113,24 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
             >
               Close
             </button>
-            <button
-              onClick={onEnterLive}
-              className="animate-[liveDeployPulse_520ms_cubic-bezier(0.22,1,0.36,1)_1] rounded-[0.8rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 shadow-[0_12px_32px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-150 hover:border-[#8FB6C9]/[0.32] hover:text-white active:scale-[0.96]"
-            >
-              Start LIVE
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  window.localStorage.setItem('george_deploy_live_source', 'prep-room')
+                  window.location.href = '/george/deploy-live'
+                }}
+                className="px-1 py-1 text-[11px] uppercase tracking-[0.18em] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF]"
+              >
+                More signal
+              </button>
+
+              <button
+                onClick={onEnterLive}
+                className="animate-[liveDeployPulse_520ms_cubic-bezier(0.22,1,0.36,1)_1] rounded-[0.8rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 shadow-[0_12px_32px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-150 hover:border-[#8FB6C9]/[0.32] hover:text-white active:scale-[0.96]"
+              >
+                Start LIVE
+              </button>
+            </div>
           </div>
         </div>
       </div>
