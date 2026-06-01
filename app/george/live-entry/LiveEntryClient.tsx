@@ -965,12 +965,16 @@ export default function LiveEntryClient() {
             <details className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">
-                    Estimated LIVE cost
+                  <span className="block text-[34px] font-semibold leading-none tracking-[-0.07em] text-white/92">
+                    {finalResourceEstimate.estimatedCents}¢
                   </span>
-                  <span className="mt-1 block text-[12px] text-white/68">
-                    <span className="text-[18px] font-semibold tracking-[-0.04em] text-white/88">{finalResourceEstimate.estimatedCents}¢</span>
-                    <span className="ml-2 text-white/44">typical 30-minute LIVE session</span>
+
+                  <span className="mt-2 block text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/34">
+                    Estimated LIVE Cost
+                  </span>
+
+                  <span className="mt-1 block text-[11px] text-white/40">
+                    Typical 30-Minute LIVE Session
                   </span>
                 </span>
                 <span className="text-[18px] leading-none text-white/32">⌄</span>
@@ -999,12 +1003,14 @@ export default function LiveEntryClient() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {finalResourceEstimate.resources.slice(0, 5).map((resource) => (
-                    <span key={resource} className="rounded-full border border-white/[0.045] bg-black/18 px-2 py-1 text-[10px] text-white/38">
-                      {resource}
-                    </span>
-                  ))}
+                <div className="mt-3 border-t border-white/[0.05] pt-3">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/30">
+                    Bx
+                  </span>
+
+                  <div className="mt-1 text-[12px] text-white/46">
+                    {finalResourceEstimate.resources.slice(0, 5).join(' · ')}
+                  </div>
                 </div>
               </div>
             </details>
