@@ -2588,14 +2588,6 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
     }
 
     activatePendingIntake()
-
-    window.addEventListener('focus', activatePendingIntake)
-    document.addEventListener('visibilitychange', activatePendingIntake)
-
-    return () => {
-      window.removeEventListener('focus', activatePendingIntake)
-      document.removeEventListener('visibilitychange', activatePendingIntake)
-    }
   }, [])
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -5198,8 +5190,8 @@ return (
 {(forceLive || liveMode) && (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
-    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px]">
-    <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
+    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -6161,9 +6153,9 @@ I am listening now. Speak naturally. I will respond ${
                                   setShowNormalUtilityMenu(null)
                                   window.location.href = '/signal'
                                 }}
-                                className="mt-3 rounded-full border border-white/[0.08] bg-white/[0.035] px-4 py-2 text-[12px] uppercase tracking-[0.18em] text-[#D7DBE4]/70 transition hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-white"
+                                className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                               >
-                                Open Signal Room
+                                Open Signal
                               </button>
                             )}
 
