@@ -971,29 +971,10 @@ const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
   }, [])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    try {
-      const savedCampaigns = getCampaignSessions().map((session: any) => ({
-        id: session.id,
-        name: session.metadata?.campaignName || session.title || 'LIVE Session',
-        mode: 'firm',
-        productOrService: session.metadata?.productOrService || '',
-        targetMarket: session.metadata?.targetAudience || '',
-        desiredOutcome: session.metadata?.desiredOutcome || session.userGoal || '',
-        defaultAnswersEnabled: true,
-      }))
-
-      setCampaigns(savedCampaigns as GeorgeCampaign[])
-
-      const activeCampaignSession = getActiveSessionForMode('campaign')
-      if (activeCampaignSession) {
-        setActiveCampaignId(activeCampaignSession.metadata?.activeCampaignId as string || activeCampaignSession.id)
-      }
-    } catch {
-      setCampaigns([])
-      setActiveCampaignId(null)
-    }
+    // PRO LIVE / campaign architecture is archived.
+    // Do not auto-load campaigns or restore campaign sessions into active GEORGE/LIVE runtime.
+    setCampaigns([])
+    setActiveCampaignId(null)
   }, [])
 
   useEffect(() => {
