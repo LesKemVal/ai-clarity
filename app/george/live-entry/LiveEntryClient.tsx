@@ -975,7 +975,7 @@ export default function LiveEntryClient() {
           </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Signal</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
             <textarea
               id="george-desired-outcome"
               data-live-signal="desired-outcome"
@@ -988,14 +988,14 @@ export default function LiveEntryClient() {
           </label>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Observed Reality</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">What is happening?</span>
             <textarea
               id="george-observed-reality"
               data-live-signal="observed-reality"
               value={knownContext}
               onChange={(event) => setKnownContext(event.target.value)}
               rows={2}
-              placeholder="Counterparty, history, constraints, leverage, what matters, or what cannot be lost."
+              placeholder="What is happening right now? What should GEORGE understand before LIVE begins?"
               className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
             />
           </label>
