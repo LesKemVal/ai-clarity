@@ -2355,7 +2355,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 if (messagesRef.current.length > 2) {
   try {
     saveSessionToV2({
-      mode: activeCampaignId ? 'campaign' : 'live',
+      mode: 'live',
       title: deriveSessionTitle(
             activeCampaign?.desiredOutcome,
             activeCampaignId ? 'LIVE Session' : 'LIVE Conversation'
@@ -3339,7 +3339,7 @@ requestAnimationFrame(() => {
       try {
         const subscriberMetadata = getSubscriberSessionMetadata()
         if (subscriberMetadata) {
-          updateActiveSessionMessages(next, activeCampaignId ? 'campaign' : liveMode ? 'live' : 'normal', subscriberMetadata)
+          updateActiveSessionMessages(next, liveMode ? 'live' : 'normal', subscriberMetadata)
         }
       } catch {}
       return next
@@ -4826,7 +4826,7 @@ useEffect(() => {
     try {
       if (messagesRef.current.length > 2) {
         saveSessionToV2({
-          mode: activeCampaignId ? 'campaign' : 'live',
+          mode: 'live',
           title: activeCampaignId
             ? deriveSessionTitle(activeCampaign?.desiredOutcome, 'LIVE Session')
             : getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
@@ -6763,10 +6763,10 @@ if (liveMode) {
         <div className="flex items-center justify-between mb-2">
           <div className="pr-12">
             <div className="text-[11px] tracking-[0.18em] text-[#D7DBE4]/72">
-              {sessionPickerMode === 'campaign' ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
+              {false ? 'RESUME LIVE' : 'RESUME CONVERSATION'}
             </div>
             <div className="mt-1 text-[11px] text-[#D7DBE4]/45">
-              {sessionPickerMode === 'campaign' ? 'Saved LIVE sessions.' : 'Recent LIVE conversations.'}
+              {false ? 'Saved LIVE sessions.' : 'Recent LIVE conversations.'}
             </div>
 
             <button
@@ -6780,7 +6780,7 @@ if (liveMode) {
 
                 setPendingDeleteSessionId(null)
                 setShowSessionPicker(false)
-                setToastMessage(sessionPickerMode === 'campaign' ? 'LIVE sessions cleared.' : 'LIVE conversations cleared.')
+                setToastMessage(false ? 'LIVE sessions cleared.' : 'LIVE conversations cleared.')
                 setShowToast(true)
               }}
               className="mt-2 text-[11px] text-red-100/48 transition hover:text-red-100/82"
@@ -6825,7 +6825,7 @@ if (liveMode) {
             if (!sessions.length) {
               return (
                 <div className="rounded-xl border border-white/[0.05] bg-white/[0.015] p-2 text-[12px] text-[#D7DBE4]/65">
-                  {sessionPickerMode === 'campaign' ? 'No saved LIVE sessions yet.' : 'No saved conversations yet.'}
+                  {false ? 'No saved LIVE sessions yet.' : 'No saved conversations yet.'}
                 </div>
               )
             }
@@ -7802,7 +7802,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
   document.body
 )}
 
-      {showCampaignUpgradeGate && (
+      {false && showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
           <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
             <div className="mb-2 flex items-start justify-between gap-2">
