@@ -953,10 +953,10 @@ export default function LiveEntryClient() {
           {showEstimatedLiveCost && (
             <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
               <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">
-                Signal Status
+                Ready
               </div>
               <div className="mt-1 text-[12px] leading-5 text-white/70">
-                You are free to go LIVE now, or continue strengthening your signal.
+                You have provided enough signal to confidently begin LIVE.
               </div>
             </div>
           )}
