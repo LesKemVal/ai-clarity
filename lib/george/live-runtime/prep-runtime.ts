@@ -509,38 +509,14 @@ export function buildPreparedRuntimeContextBuffer(params: {
 }
 
 export function buildPreparedRuntimeIntroLines(setup: LivePrepSetup | null) {
-  const runtimeSupport = setup?.runtimeSupport || null
-  const resourceEstimate = runtimeSupport?.resourceEstimate || null
-  const purview = runtimeSupport?.purview || setup?.purview || null
-
-  const supportLine =
-    Array.isArray(runtimeSupport?.selectedCapabilities) && runtimeSupport.selectedCapabilities.length > 0
-      ? `Support loaded: ${runtimeSupport.selectedCapabilities
-          .map((item) => item.label)
-          .filter(Boolean)
-          .join(', ')}`
-      : ''
-
-  const capacityLine =
-    typeof setup?.estimatedCents === 'number'
-      ? `Estimated runtime cost: ~${setup.estimatedCents}¢`
-      : typeof resourceEstimate?.totalCents === 'number'
-        ? `Estimated runtime cost: ~${resourceEstimate.totalCents}¢`
-        : ''
-
-  const purviewLine = purview?.label ? `Purview loaded: ${purview.label}` : ''
-
-  const resourceBasisLine = Array.isArray(resourceEstimate?.breakdown)
-    ? `Resource basis: ${resourceEstimate.breakdown
-        .map((item) => `${item.label} ~${item.cents}¢`)
-        .join('; ')}`
-    : ''
+  const room = setup?.room?.trim()
+  const objective = setup?.objective?.trim()
 
   return {
-    supportLine,
-    capacityLine,
-    purviewLine,
-    resourceBasisLine,
+    supportLine: room ? `${room} loaded.` : 'LIVE loaded.',
+    capacityLine: objective ? `Desired outcome: ${objective}` : '',
+    purviewLine: 'Signals received.',
+    resourceBasisLine: "I'm listening.",
   }
 }
 

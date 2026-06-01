@@ -757,6 +757,15 @@ Answer a few questions and create the best version of your conversation.
       <PrepRoomResourcePopup
         open={showPrepPreview}
         profile={prepRoomProfile}
+        room={conversationType}
+        desiredOutcome={objective}
+        knownContext={knownContext}
+        assistMode={liveAssistMode}
+        signals={[
+          liveAssistMode,
+          knownContext ? 'Context received' : '',
+          prepDocument ? prepDocument.name : '',
+        ].filter(Boolean)}
         onClose={() => setShowPrepPreview(false)}
         onEditResource={editPrepRoomResource}
         onEnterLive={() => startLive(false, editableResources)}

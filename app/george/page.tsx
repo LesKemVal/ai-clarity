@@ -1460,31 +1460,16 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         setConversationMode('live_debate')
         setActivePromptContext('live_debate')
       }
+      const liveRoom = String(liveSetup?.room || '').trim()
+      const liveObjective = String(liveSetup?.objective || '').trim()
+      const liveContext = String((liveSetup as any)?.knownContext || '').trim()
 
-      const objectiveLine = liveSetup?.objective?.trim()
-        ? `Objective loaded: ${liveSetup.objective.trim()}`
-        : ''
-
-      const steeringLine = liveSetup?.controlWords?.trim()
-        ? `Steering active: ${liveSetup.controlWords.trim()}`
-        : ''
-
-      const capacityLine =
-        typeof liveSetup?.estimatedCents === 'number'
-          ? `Runtime estimate: ~${liveSetup.estimatedCents}¢`
-          : ''
-
-      const supportLine = Array.isArray(liveSetup?.runtimeSupport?.selectedCapabilities) && liveSetup.runtimeSupport.selectedCapabilities.length > 0
-        ? `Support loaded: ${liveSetup.runtimeSupport.selectedCapabilities
-            .map((item) => item.label)
-            .filter(Boolean)
-            .join(', ')}`
-        : ''
-
-      const liveBriefing = buildLiveEntryBriefing({
-        setup: liveSetup,
-        defaultRoom: liveSetup?.room || 'Adaptive LIVE',
-      })
+      const liveBriefing = [
+        liveRoom ? `${liveRoom} ready.` : 'LIVE ready.',
+        liveObjective ? `Desired outcome:\n${liveObjective}` : '',
+        liveContext ? `Context:\n${liveContext}` : 'Signals received.',
+        "I'm listening...",
+      ].filter(Boolean).join('\n\n')
 
       const liveIntro: Message = {
         role: 'assistant',
@@ -5042,7 +5027,7 @@ return (
                       <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/20">
                         GEORGE
                       </span>
-                      {!showMobileHero && (
+                      {!showMobileHero && !(forceLive || liveMode) && (
                         <div className="hidden xl:flex items-center gap-1.5">
                         </div>
                       )}
@@ -5148,7 +5133,7 @@ return (
 )}
 {(forceLive || liveMode) && (
   <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[40] flex justify-center px-4 xl:pl-[280px]">
-    <div className="w-full max-w-[380px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${voiceOn || isListening ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5162,7 +5147,7 @@ return (
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] leading-4 text-[#D7DBE4]/34">
+      <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
         <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
           <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Cue</span>
           next move
@@ -5177,8 +5162,8 @@ return (
         </div>
       </div>
 
-      <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] leading-4 text-[#D7DBE4]/34">
-        <span className="block text-[#D7DBE4]/48">Audio connected?</span>
+      <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
+        <span className="block text-[#D7DBE4]/56">Audio connected?</span>
         <span>GEORGE can only support the conversation it can hear.</span>
       </div>
     </div>
@@ -5206,7 +5191,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[138px] md:pt-[150px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[128px] md:pt-[138px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !liveMode && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
@@ -5214,7 +5199,7 @@ return (
         : 'translate-y-0 opacity-100'
     }`}>
       <div className="mx-auto w-full max-w-[360px] px-8 text-center">
-        <div className="text-[34px] font-[300] tracking-[0.22em] text-[#D7DBE4]/24">
+        <div data-normal-hero className="text-[34px] font-[300] tracking-[0.22em] text-[#D7DBE4]/24">
           GEORGE
         </div>
 
@@ -5295,7 +5280,7 @@ return (
       GEORGE is working
     </div>
   )}
-  {((forceLive || liveMode) ? messages : (messages.some((message) => message.role === 'user') ? messages : []))
+  {(liveMode ? messages : forceLive ? [] : (messages.some((message) => message.role === 'user') ? messages : []))
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -5309,7 +5294,7 @@ return (
       className={`space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`relative whitespace-pre-wrap text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${liveMode ? 'leading-[1.65]' : 'leading-[1.5]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
+        className={`relative whitespace-pre-wrap text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.65]' : 'leading-[1.5]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-right rounded-[0.95rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
@@ -5883,11 +5868,11 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-{(forceLive || liveMode) && messages.length === 0 && (
-  <div className="mx-auto w-full max-w-[620px] px-3 pt-[116px] md:pt-[128px]">
-    <div className="h-[96px] overflow-hidden">
+{(forceLive || liveMode) && (forceLive || messages.length === 0) && (
+  <div className="mx-auto w-full max-w-[620px] px-3 pt-[64px] md:pt-[72px]">
+    <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
-        {"I'm listening."}
+        {typedLiveEntryBriefing || liveEntryBriefing || "I'm listening..."}
       </div>
     </div>
   </div>

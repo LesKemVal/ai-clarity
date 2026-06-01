@@ -5,6 +5,11 @@ import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 type Props = {
   open: boolean
   profile: PrepRoomResourceProfile | null
+  room?: string
+  desiredOutcome?: string
+  knownContext?: string
+  assistMode?: string
+  signals?: string[]
   onClose: () => void
   onEnterLive?: () => void
   onEditResource?: <K extends keyof PrepRoomResourceProfile>(key: K, value: PrepRoomResourceProfile[K]) => void
@@ -14,15 +19,15 @@ function formatValue(value: string) {
   return value.replace(/_/g, ' ')
 }
 
-export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: Props) {
+export function PrepRoomResourcePopup({ open, profile, room, desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
   if (!open || !profile) return null
 
-  const runtimeSummary = [
-    formatValue(profile.recommendedPosture),
-    formatValue(profile.cadence),
-    formatValue(profile.compression),
-    formatValue(profile.cueDensity),
-  ].join(' · ')
+  const roomValue = room?.trim() || profile.roomType || 'LIVE conversation'
+  const desiredOutcomeValue = desiredOutcome?.trim() || 'Not specified'
+  const knownContextValue = knownContext?.trim() || ''
+  const assistValue = assistMode?.trim() || formatValue(profile.responseTexture)
+  const signalValues = signals.map((item) => item.trim()).filter(Boolean).slice(0, 4)
+  const visibleSignals = signalValues.length > 0 ? signalValues : ['Signals received']
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
@@ -61,48 +66,38 @@ export function PrepRoomResourcePopup({ open, profile, onClose, onEnterLive }: P
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            GEORGE will enter with the room, objective, uploaded material, and assist posture already loaded.
+            GEORGE will enter with the live loadout you prepared.
           </p>
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-y-auto px-4 pb-4">
           <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">LIVE posture</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">LIVE loadout</p>
               <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">loaded</p>
             </div>
 
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/38">
-              <span>{formatValue(profile.pressureLevel)} pressure</span>
-              <span>{formatValue(profile.cueDensity)} cues</span>
-              <span>{formatValue(profile.compression)} compression</span>
+            <div className="mt-2 grid gap-2 text-[12px] leading-5 text-white/56">
+              <p><span className="text-white/78">Room:</span> {roomValue}</p>
+              <p><span className="text-white/78">Desired outcome:</span> {desiredOutcomeValue}</p>
+              {knownContextValue && (
+                <p><span className="text-white/78">Context:</span> {knownContextValue}</p>
+              )}
+              <p><span className="text-white/78">Assist:</span> {assistValue}</p>
             </div>
-
-            <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-white/34">{runtimeSummary}</p>
           </div>
 
           <div className="mt-2 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">What GEORGE carries in</p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Signals received</p>
 
-            <div className="mt-2 space-y-2 text-[12px] leading-5 text-white/54">
-              <p>
-                <span className="text-white/76">Room:</span> recognized from Prep Room.
-              </p>
-              <p>
-                <span className="text-white/76">Objective:</span> used as the default direction unless the room changes.
-              </p>
-              <p>
-                <span className="text-white/76">Material:</span> referenced when uploaded.
-              </p>
-              <p>
-                <span className="text-white/76">Assist:</span> cues or repeatable responses based on your setup.
-              </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {visibleSignals.map((signal) => (
+                <span key={signal} className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
+                  {signal}
+                </span>
+              ))}
             </div>
           </div>
-
-          <p className="mt-2 text-[11px] leading-4 text-white/34">
-            Personal Signal belongs to GEORGE’s user memory. This room prep is only for the conversation you are entering now.
-          </p>
         </div>
 
         <div className="relative shrink-0 border-t border-white/10 bg-[#05080D]/94 px-4 py-3">
