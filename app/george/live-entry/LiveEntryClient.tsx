@@ -419,6 +419,13 @@ export default function LiveEntryClient() {
   }, [resourceEstimate, editableResources])
   const showEstimatedLiveCost = objective.trim().length > 0 && knownContext.trim().length > 0
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!showEstimatedLiveCost) return
+
+    window.localStorage.setItem('george_live_estimated_cents', String(finalResourceEstimate.estimatedCents))
+    window.localStorage.setItem('george_live_estimated_cost_updated_at', String(Date.now()))
+  }, [showEstimatedLiveCost, finalResourceEstimate.estimatedCents])
 
   const loadedSummary = useMemo(() => {
     return `You can steer GEORGE’s behavior naturally during the conversation.`
