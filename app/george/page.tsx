@@ -6756,36 +6756,12 @@ if (liveMode) {
                     setShowSessionPicker(false)
                     setSessionPickerClosing(false)
                   }, 170)
-                  // LIVE handled by state/session
-                  if (sessionPickerMode === 'campaign') {
-                    const campaignId = typeof session.metadata?.activeCampaignId === 'string' ? session.metadata.activeCampaignId : session.id
-                    const savedEnvironment = session.savedEnvironment || session.metadata?.savedEnvironment || {}
-                    const restoredAssistMode = savedEnvironment.assistMode || session.assistMode || 'live_assist'
-                    const restoredOutputStyle = savedEnvironment.outputStyle || session.outputStyle || 'short_cues'
-                    const restoredDeliveryMode = savedEnvironment.deliveryMode || session.deliveryMode || 'text'
-                    const restoredTone = savedEnvironment.assistTone || session.assistTone || assistTone
-
-                    setActiveCampaignId(campaignId)
-                    setConversationMode(restoredAssistMode === 'negotiation' ? 'live_negotiation' : restoredAssistMode === 'objection_handling' ? 'live_response' : 'live_assist')
-                    setActivePromptContext(restoredAssistMode === 'negotiation' ? 'live_negotiation' : restoredAssistMode === 'objection_handling' ? 'live_response' : 'live_assist')
-                    setActivePromptLabel(session.title || 'LIVE Session')
-                    setAssistTone(restoredTone)
-                    setVoiceOn(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both')
-                    setInteractionMode(restoredDeliveryMode === 'audio' || restoredDeliveryMode === 'both' ? 'speech' : 'text')
-                    setCampaigns((prev) =>
-                      prev.map((c) =>
-                        c.id === campaignId
-                          ? { ...c, assistMode: restoredAssistMode, outputStyle: restoredOutputStyle, deliveryMode: restoredDeliveryMode }
-                          : c
-                      )
-                    )
-                  } else {
-                    setConversationMode('manual_live')
-                    setActivePromptContext('manual_live')
-                    setActivePromptLabel(session.title || 'Conversation')
-                    setVoiceOn(false)
-                    setInteractionMode('text')
-                  }
+                  // LIVE resume is conversation-only. PRO LIVE / campaign resume is archived.
+                  setConversationMode('manual_live')
+                  setActivePromptContext('manual_live')
+                  setActivePromptLabel(session.title || 'Conversation')
+                  setVoiceOn(false)
+                  setInteractionMode('text')
 
                   const goal = session.userGoal || session.currentGoal || session.desiredOutcome || 'Not set'
                   const state = session.lastKnownState || session.summary || 'Unknown'
