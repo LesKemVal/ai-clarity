@@ -612,8 +612,10 @@ export default function LiveEntryClient() {
       observedReality: knownContext,
     })
 
-    if (!roomFormation.canEnterLive) {
-      window.alert(roomFormation.confidence.suggestedQuestion || 'Additional signal required.')
+    const hasCoreLiveSignal = objective.trim().length > 0 && knownContext.trim().length > 0
+
+    if (!hasCoreLiveSignal) {
+      window.alert(roomFormation.confidence.suggestedQuestion || 'Add a desired outcome and observed reality before LIVE.')
       return
     }
 
