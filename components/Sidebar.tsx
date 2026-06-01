@@ -368,7 +368,7 @@ return (
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 px-3 py-3 [scrollbar-width:thin]">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3 [scrollbar-width:thin]">
         <div className="space-y-4">
           <section className="space-y-2.5">
             <button
