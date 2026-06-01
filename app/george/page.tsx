@@ -1076,21 +1076,6 @@ const activateNegotiationPosture = () => {
   setActivePromptContext('live_negotiation')
   setConversationMode('live_negotiation')
 
-  if (activeCampaignId) {
-    setCampaigns((prev) =>
-      prev.map((c) =>
-        c.id === activeCampaignId
-          ? { ...c, assistMode: 'negotiation', outputStyle: 'say_ask_boundary_close' }
-          : c
-      )
-    )
-    syncCampaignEnvironment(activeCampaignId, {
-      assistMode: 'negotiation',
-      outputStyle: 'say_ask_boundary_close',
-      assistTone,
-    })
-  }
-
   setToastMessage('Negotiation guidance active.')
   setShowToast(true)
   replaceLastLiveGuidance('Good. I’ll help you stay composed, reduce leakage, and move toward leverage.')
@@ -1099,21 +1084,6 @@ const activateNegotiationPosture = () => {
 const activateResponsePosture = () => {
   setActivePromptContext('live_response')
   setConversationMode('live_response')
-
-  if (activeCampaignId) {
-    setCampaigns((prev) =>
-      prev.map((c) =>
-        c.id === activeCampaignId
-          ? { ...c, assistMode: 'objection_handling', outputStyle: 'repeatable_lines' }
-          : c
-      )
-    )
-    syncCampaignEnvironment(activeCampaignId, {
-      assistMode: 'objection_handling',
-      outputStyle: 'repeatable_lines',
-      assistTone,
-    })
-  }
 
   setToastMessage('Response handling active.')
   setShowToast(true)
