@@ -281,6 +281,7 @@ export default function LiveEntryClient() {
   const [liveToaAccepted, setLiveToaAccepted] = useState(false)
   const [sessionSectionCollapsed, setSessionSectionCollapsed] = useState(false)
   const [chairSectionCollapsed, setChairSectionCollapsed] = useState(false)
+  const [roomSectionCollapsed, setRoomSectionCollapsed] = useState(false)
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
@@ -368,6 +369,8 @@ export default function LiveEntryClient() {
     setHasLiveSession(!!getActiveSessionForMode('live'))
     setSessionSectionCollapsed(false)
     setChairSectionCollapsed(false)
+    setRoomSectionCollapsed(false)
+    setRoomSectionCollapsed(false)
     setReady(true)
   }, [])
 
@@ -856,8 +859,32 @@ Choose the related session, your chair, the outcome, and what is happening now.
             )}
           </div>
 
-          <div className="mt-2 grid gap-2">
-            <CompactSelect label="Room" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
+          <div className="mt-2 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+            {roomSectionCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setRoomSectionCollapsed(false)}
+                className="flex w-full items-center justify-between gap-3 text-left"
+              >
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Room</span>
+                  <span className="mt-1 block truncate text-[13px] text-white/62">{resolvedConversationType}</span>
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+              </button>
+            ) : (
+              <>
+                <CompactSelect
+                  label="Room"
+                  value={conversationType}
+                  options={CONVERSATION_TYPES}
+                  onChange={(value) => {
+                    setConversationType(value)
+                    setRoomSectionCollapsed(true)
+                  }}
+                />
+              </>
+            )}
           </div>
 
           <details open className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-3 py-2">
