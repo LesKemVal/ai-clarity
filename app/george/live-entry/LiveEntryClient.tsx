@@ -274,6 +274,7 @@ export default function LiveEntryClient() {
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
   const [chairs, setChairs] = useState<string[]>(['Founder'])
+  const [customChair, setCustomChair] = useState('')
   const [knownContext, setKnownContext] = useState('')
   const [sessionEmail, setSessionEmail] = useState('')
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
@@ -293,7 +294,6 @@ export default function LiveEntryClient() {
   const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
 
   const toggleChair = (value: string) => {
-    setChairSectionCollapsed(true)
     setChairs((current) => {
       if (current.includes(value)) {
         const next = current.filter((item) => item !== value)
@@ -304,7 +304,9 @@ export default function LiveEntryClient() {
     })
   }
 
-  const chair = chairs.join(' + ')
+  const chair = chairs
+    .map((item) => item === 'Other' && customChair.trim() ? customChair.trim() : item)
+    .join(' + ')
 
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
@@ -855,37 +857,31 @@ Choose the related session, your chair, the outcome, and what is happening now.
                 )
               })}
             </div>
+
+            {chairs.includes('Other') && (
+              <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
+                <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Write position</span>
+                <input
+                  value={customChair}
+                  onChange={(event) => setCustomChair(event.target.value)}
+                  placeholder="Example: Sponsor, advocate, partner, owner"
+                  className="mt-2 w-full bg-transparent text-[14px] text-white/72 outline-none placeholder:text-white/24"
+                />
+              </label>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setChairSectionCollapsed(true)}
+              className="mt-2 w-full rounded-[0.72rem] border border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-[#D7DCFF]/70 transition hover:text-white"
+            >
+              Done
+            </button>
               </>
             )}
           </div>
 
-          <div className="mt-2 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
-            {roomSectionCollapsed ? (
-              <button
-                type="button"
-                onClick={() => setRoomSectionCollapsed(false)}
-                className="flex w-full items-center justify-between gap-3 text-left"
-              >
-                <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Room</span>
-                  <span className="mt-1 block truncate text-[13px] text-white/62">{resolvedConversationType}</span>
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
-              </button>
-            ) : (
-              <>
-                <CompactSelect
-                  label="Room"
-                  value={conversationType}
-                  options={CONVERSATION_TYPES}
-                  onChange={(value) => {
-                    setConversationType(value)
-                    setRoomSectionCollapsed(true)
-                  }}
-                />
-              </>
-            )}
-          </div>
+
 
           <details open className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-3 py-2">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
@@ -1087,7 +1083,7 @@ Choose the related session, your chair, the outcome, and what is happening now.
         open={showPrepPreview}
         profile={prepRoomProfile}
         room={conversationType}
-        relatedSessionTitle={selectedRelatedSession?.title || (relatedSessionId === 'not_related' ? 'Not related' : null)}
+        relatedSessionTitle={relatedSessionId === 'not_related' ? null : selectedRelatedSession?.title || null}
         chairs={chairs}
         desiredOutcome={objective}
         knownContext={knownContext}

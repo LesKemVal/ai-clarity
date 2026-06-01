@@ -70,7 +70,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
   if (!open || !profile) return null
 
   const roomValue = room?.trim() || profile.roomType || 'LIVE conversation'
-  const relatedSessionValue = relatedSessionTitle?.trim() || 'Not related'
+  const relatedSessionValue = relatedSessionTitle?.trim() || ''
   const chairValue = chairs.length ? chairs.join(' + ') : 'Not specified'
   const desiredOutcomeValue = desiredOutcome?.trim() || 'Not specified'
   const knownContextValue = knownContext?.trim() || 'Not specified'
@@ -126,7 +126,9 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
             </div>
 
             <div className="mt-2 grid gap-2 text-[12px] leading-5 text-white/56">
-              <p><span className="text-white/78">Related session:</span> {relatedSessionValue}</p>
+              {relatedSessionValue && (
+                <p><span className="text-white/78">Related session:</span> {relatedSessionValue}</p>
+              )}
               <p><span className="text-white/78">Your position:</span> {chairValue}</p>
               <p><span className="text-white/78">Desired outcome:</span> {desiredOutcomeValue}</p>
               <p><span className="text-white/78">Observed reality:</span> {knownContextValue}</p>
