@@ -684,6 +684,8 @@ export default function LiveEntryClient() {
     setPrepDocument(null)
     setLiveToaAccepted(false)
 
+    window.localStorage.setItem('george_live_prep_inputs_cleared', '1')
+
     window.location.href = '/george/live'
   }
 
@@ -739,13 +741,14 @@ Choose the related session, your chair, the outcome, and what is happening now.
             </div>
           )}
 
+          {relatedSessions.length > 0 && (
           <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">
               Which session is this LIVE conversation related to?
             </div>
 
             <div className="mt-2 grid gap-1.5">
-              {relatedSessions.length > 0 && relatedSessions.map((session) => (
+              {relatedSessions.map((session) => (
                 <button
                   key={session.id}
                   type="button"
@@ -777,8 +780,9 @@ Choose the related session, your chair, the outcome, and what is happening now.
               </button>
             </div>
           </div>
+          )}
 
-          <div className="mt-2 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+          <div className={`${relatedSessions.length > 0 ? 'mt-2' : 'mt-3'} rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2`}>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Chair</div>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
               {CHAIR_OPTIONS.map((option) => {
@@ -863,6 +867,8 @@ Choose the related session, your chair, the outcome, and what is happening now.
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
             <textarea
+              id="george-desired-outcome"
+              data-live-signal="desired-outcome"
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
               rows={2}
@@ -874,6 +880,8 @@ Choose the related session, your chair, the outcome, and what is happening now.
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Observed Reality</span>
             <textarea
+              id="george-observed-reality"
+              data-live-signal="observed-reality"
               value={knownContext}
               onChange={(event) => setKnownContext(event.target.value)}
               rows={2}
