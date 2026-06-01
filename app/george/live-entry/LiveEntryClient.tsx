@@ -1010,8 +1010,22 @@ export default function LiveEntryClient() {
             </details>
           )}
 
-          <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
+          {showEstimatedLiveCost && (
+            <div className="mt-2 grid gap-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+              <button
+                type="button"
+                onClick={() => setShowPrepPreview(true)}
+                className="min-h-[50px] rounded-[0.82rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
+              >
+                Deploy LIVE
+              </button>
+            </div>
+          )}
+
+          <details className="mt-3 rounded-[0.72rem] border border-white/[0.028] bg-black/12 px-3 py-2 backdrop-blur-md">
+            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.22em] text-white/26">Advanced Controls</summary>
+            <div className="mt-2">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {OUTPUT_OPTIONS.map((option) => {
                 const active = outputMode === option.label
@@ -1033,9 +1047,9 @@ export default function LiveEntryClient() {
                 )
               })}
             </div>
-          </div>
+            </div>
 
-          <label className="mt-2 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
+          <label className="mt-3 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
             <div className="mt-2 flex items-center justify-between gap-2">
               <div className="min-w-0">
@@ -1102,16 +1116,7 @@ export default function LiveEntryClient() {
               GEORGE may misunderstand speech, miss context, provide imperfect guidance, or experience latency. GEORGE assists. You remain responsible for decisions and actions.
             </span>
           </label>
-
-          <div className="mt-3 grid gap-2">
-            <button
-              type="button"
-              onClick={() => setShowPrepPreview(true)}
-              className="min-h-[50px] rounded-[0.82rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
-            >
-              Deploy LIVE
-            </button>
-          </div>
+          </details>
 
           {hasLiveSession && (
             <p className="mt-3 text-[12px] leading-5 text-white/34">
