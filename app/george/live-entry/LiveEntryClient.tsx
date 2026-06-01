@@ -83,17 +83,17 @@ const CHAIR_OPTIONS: SelectOption[] = [
 ]
 
 const OBSERVED_REALITY_EXAMPLES: Record<string, string> = {
-  Founder: 'Example: The investor wants board control.',
-  Operator: 'Example: The team missed the deadline.',
-  Investor: 'Example: The valuation feels too high.',
-  Candidate: 'Example: The interviewer challenged my experience.',
-  'Board Member': 'Example: The risk is not clearly explained.',
-  Buyer: 'Example: The terms feel unclear.',
-  Seller: 'Example: The buyer is hesitating on price.',
-  Patient: 'Example: The treatment options seem different.',
-  Parent: 'Example: My child is shutting down instead of talking.',
-  Advisor: 'Example: The client is missing the tradeoff.',
-  Other: 'Example: Something changed that affects the outcome.',
+  Founder: 'The investor wants board control.',
+  Operator: 'The team missed the deadline.',
+  Investor: 'The valuation feels too high.',
+  Candidate: 'The interviewer challenged my experience.',
+  'Board Member': 'The risk is not clearly explained.',
+  Buyer: 'The terms feel unclear.',
+  Seller: 'The buyer is hesitating on price.',
+  Patient: 'The treatment options seem different.',
+  Parent: 'My child is shutting down instead of talking.',
+  Advisor: 'The client is missing the tradeoff.',
+  Other: 'Something changed that affects the outcome.',
 }
 
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
@@ -288,7 +288,7 @@ export default function LiveEntryClient() {
   const [outputMode, setOutputMode] = useState('Repeatable lines')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
-  const [chairs, setChairs] = useState<string[]>(['Founder'])
+  const [chairs, setChairs] = useState<string[]>([])
   const [customChair, setCustomChair] = useState('')
   const [knownContext, setKnownContext] = useState('')
   const observedRealityPlaceholder = OBSERVED_REALITY_EXAMPLES[chairs[0] || 'Other'] || OBSERVED_REALITY_EXAMPLES.Other
