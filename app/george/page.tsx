@@ -196,7 +196,7 @@ type GeorgeConversation = {
 
 function saveSessionToV2(params: {
   id?: string
-  mode: 'normal' | 'live' | 'campaign'
+  mode: 'normal' | 'live'
   title: string
   messages: Message[]
   summary?: string
@@ -227,11 +227,9 @@ function saveSessionToV2(params: {
     suggestedRestart: params.suggestedRestart,
     metadata: {
       source:
-        params.mode === 'campaign'
-          ? 'pro_live_campaign'
-          : params.mode === 'live'
-            ? 'live_conversation'
-            : 'normal',
+        params.mode === 'live'
+          ? 'live_conversation'
+          : 'normal',
       ...(subscriberEmail ? { subscriberEmail } : { localOnly: true }),
       ...params.metadata,
     },
@@ -2554,7 +2552,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
 
           saveSessionToV2({
             id: newCampaign.id,
-            mode: 'campaign',
+            mode: 'live',
             title: newCampaign.label || 'LIVE Session',
             messages: [
               {
