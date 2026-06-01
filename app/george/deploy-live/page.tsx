@@ -135,6 +135,7 @@ export default function DeployLivePage() {
   const [objective, setObjective] = useState('')
   const [knownContext, setKnownContext] = useState('')
   const [signals, setSignals] = useState(chairProfiles.Interview.steering)
+  const [estimatedLiveCents, setEstimatedLiveCents] = useState<number | null>(null)
 
   const profile = chairProfiles[chair]
   const chairLabel = chair === 'Other' && customChair.trim() ? customChair.trim() : chair
@@ -147,6 +148,12 @@ export default function DeployLivePage() {
       setObjective(setup?.objective || '')
       setKnownContext(setup?.knownContext || '')
       setSignals(chairProfiles[nextChair].steering)
+
+      const savedCents = Number(window.localStorage.getItem('george_live_estimated_cents') || '')
+      if (Number.isFinite(savedCents) && savedCents > 0) {
+        setEstimatedLiveCents(savedCents)
+      }
+
       if (nextChair === 'Other' && setup?.room) setCustomChair(setup.room)
     } catch {}
   }, [])
@@ -266,6 +273,27 @@ export default function DeployLivePage() {
             className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/72 outline-none placeholder:text-white/24"
           />
         </label>
+
+        {estimatedLiveCents !== null && (
+          <div className="mt-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] p-3">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Estimated LIVE cost</div>
+            <div className="mt-1 flex items-end justify-between gap-3">
+              <div>
+                <div className="text-[24px] font-semibold tracking-[-0.05em] text-white/90">{estimatedLiveCents}¢</div>
+                <div className="mt-1 text-[12px] text-white/44">Typical 30-minute LIVE session</div>
+              </div>
+              <div className="text-right text-[11px] leading-4 text-white/34">
+                Updates when more signal or resources are added.
+              </div>
+            </div>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
+              <div
+                className="h-full rounded-full bg-[#8FB6C9]/55 transition-[width] duration-300 ease-out"
+                style={{ width: `${Math.min(100, Math.max(12, estimatedLiveCents * 2))}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 rounded-[1rem] border border-white/[0.055] bg-white/[0.02] p-3">
           <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Steering Signals</p>
