@@ -82,6 +82,20 @@ const CHAIR_OPTIONS: SelectOption[] = [
   { label: 'Other', helper: 'custom position' },
 ]
 
+const OBSERVED_REALITY_EXAMPLES: Record<string, string> = {
+  Founder: 'Example: The investor wants board control.',
+  Operator: 'Example: The team missed the deadline.',
+  Investor: 'Example: The valuation feels too high.',
+  Candidate: 'Example: The interviewer challenged my experience.',
+  'Board Member': 'Example: The risk is not clearly explained.',
+  Buyer: 'Example: The terms feel unclear.',
+  Seller: 'Example: The buyer is hesitating on price.',
+  Patient: 'Example: The treatment options seem different.',
+  Parent: 'Example: My child is shutting down instead of talking.',
+  Advisor: 'Example: The client is missing the tradeoff.',
+  Other: 'Example: Something changed that affects the outcome.',
+}
+
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
   if (conversationType === 'Interview') {
     return {
@@ -277,6 +291,7 @@ export default function LiveEntryClient() {
   const [chairs, setChairs] = useState<string[]>(['Founder'])
   const [customChair, setCustomChair] = useState('')
   const [knownContext, setKnownContext] = useState('')
+  const observedRealityPlaceholder = OBSERVED_REALITY_EXAMPLES[chairs[0] || 'Other'] || OBSERVED_REALITY_EXAMPLES.Other
   const [sessionEmail, setSessionEmail] = useState('')
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
   const [relatedSessions, setRelatedSessions] = useState<any[]>([])
@@ -941,7 +956,7 @@ export default function LiveEntryClient() {
               value={knownContext}
               onChange={(event) => setKnownContext(event.target.value)}
               rows={2}
-              placeholder="What is happening right now? What should be understood before LIVE begins?"
+              placeholder={observedRealityPlaceholder}
               className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
             />
           </label>
