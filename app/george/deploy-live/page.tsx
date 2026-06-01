@@ -264,7 +264,7 @@ export default function DeployLivePage() {
         </label>
 
         <label className="mt-3 block rounded-[1rem] border border-white/[0.055] bg-black/18 p-3">
-          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">What is happening?</span>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Observed Reality</span>
           <textarea
             value={knownContext}
             onChange={(event) => setKnownContext(event.target.value)}
@@ -276,15 +276,12 @@ export default function DeployLivePage() {
 
         {estimatedLiveCents !== null && (
           <div className="mt-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] p-3">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Estimated LIVE cost</div>
-            <div className="mt-1 flex items-end justify-between gap-3">
-              <div>
-                <div className="text-[24px] font-semibold tracking-[-0.05em] text-white/90">{estimatedLiveCents}¢</div>
-                <div className="mt-1 text-[12px] text-white/44">Typical 30-minute LIVE session</div>
-              </div>
-              <div className="text-right text-[11px] leading-4 text-white/34">
-                Updates when more signal or resources are added.
-              </div>
+            <div className="text-[34px] font-semibold leading-none tracking-[-0.07em] text-white/92">{estimatedLiveCents}¢</div>
+            <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/34">Estimated LIVE Cost</div>
+            <div className="mt-1 text-[11px] text-white/40">Typical 30-Minute LIVE Session</div>
+            <div className="mt-3 text-[12px] text-white/42">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/30">Bx</span>
+              <span className="ml-2">Signal strengthening · chair context · runtime preparation</span>
             </div>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
               <div
