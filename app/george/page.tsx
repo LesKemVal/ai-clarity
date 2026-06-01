@@ -5187,6 +5187,47 @@ return (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
   </div>
 )}
+{!(forceLive || liveMode) && hasUserMessageForSurface && (
+  <>
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px]">
+      <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#AEB6FF]/55 shadow-[0_0_14px_rgba(174,182,255,0.32)]" />
+            <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
+              GEORGE
+            </span>
+          </div>
+
+          <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
+            active
+          </span>
+        </div>
+
+        <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
+          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Direction</span>
+            active
+          </div>
+          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Position</span>
+            reading
+          </div>
+          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Move</span>
+            next
+          </div>
+        </div>
+
+        <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
+          <span className="block text-[#D7DBE4]/56">GEORGE is active.</span>
+          <span>Working from the conversation toward the next useful move.</span>
+        </div>
+      </div>
+    </div>
+  </>
+)}
 {(forceLive || liveMode) && (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
@@ -5312,7 +5353,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasUserMessageForSurface ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
