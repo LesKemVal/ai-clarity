@@ -7,6 +7,7 @@ import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
+import { deriveRoomFormation } from '@/lib/george/live/prep-room'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -581,13 +582,14 @@ export default function LiveEntryClient() {
       return
     }
 
-    if (!objective.trim()) {
-      window.alert('Enter the outcome you are trying to achieve.')
-      return
-    }
+    const roomFormation = deriveRoomFormation({
+      chairs,
+      desiredOutcome: objective,
+      observedReality: knownContext,
+    })
 
-    if (!knownContext.trim()) {
-      window.alert('Enter what is happening right now.')
+    if (!roomFormation.canEnterLive) {
+      window.alert(roomFormation.confidence.suggestedQuestion || 'Additional signal required.')
       return
     }
 
@@ -609,6 +611,7 @@ export default function LiveEntryClient() {
       desiredOutcome: objective.trim(),
       observedReality: knownContext.trim(),
       continuityPackage,
+      roomFormation,
       internalInstruction: [
         'Use the selected chair as a relevance signal, not as a separate brain or profession mode.',
         'User outcome is highest authority.',
@@ -639,6 +642,7 @@ export default function LiveEntryClient() {
       knownContext,
       chair,
       roomPackage,
+      roomFormation,
       pacing,
       compactPrep: true,
       editedByUser: !skipPrep,
