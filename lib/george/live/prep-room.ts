@@ -1,5 +1,26 @@
 export type LiveChair = string
 
+export type LiveSignalRequirement = {
+  key: string
+  label: string
+  required: boolean
+  reason: string
+}
+
+export type LiveSignalConfidence = {
+  level: 'low' | 'usable' | 'strong'
+  missingRequiredSignals: string[]
+  suggestedQuestion?: string
+}
+
+export type LiveRoomFormation = {
+  confidence: LiveSignalConfidence
+  interpretation: string
+  requiredSignals: LiveSignalRequirement[]
+  canEnterLive: boolean
+  entryDirective: string
+}
+
 export function resolveChairLabel(chairs: string[], customChair: string) {
   return chairs
     .map((item) => item === 'Other' && customChair.trim() ? customChair.trim() : item)
@@ -58,20 +79,7 @@ export function deriveGeorgeInterpretation(chairs: string[], outcome: string, re
     add('the outcome', 'the observed reality', 'the next useful move')
   }
 
-  return `GEORGE will enter LIVE assuming ${concerns.slice(0, 4).join(', ')} are likely to matter first.`
-}
-
-export type LiveSignalRequirement = {
-  key: string
-  label: string
-  required: boolean
-  reason: string
-}
-
-export type LiveSignalConfidence = {
-  level: 'low' | 'usable' | 'strong'
-  missingRequiredSignals: string[]
-  suggestedQuestion?: string
+  return `GEORGE will enter LIVE watching ${concerns.slice(0, 4).join(', ')} first.`
 }
 
 export function deriveRequiredSignals(chairs: string[]): LiveSignalRequirement[] {
@@ -99,19 +107,19 @@ export function deriveRequiredSignals(chairs: string[]): LiveSignalRequirement[]
         key: 'primaryConcern',
         label: 'Primary Concern',
         required: false,
-        reason: 'Medical-style conversations may improve with a concrete concern, symptom, or question.',
+        reason: 'Medical conversations may improve with the main concern, symptom, or question.',
       },
     ]
   }
 
-  if (/buyer|seller|investor|founder/.test(text)) {
+  if (/buyer|seller|investor|founder|board/.test(text)) {
     return [
       ...base,
       {
         key: 'stakes',
         label: 'Stakes',
         required: false,
-        reason: 'Business or deal conversations may improve when GEORGE knows what cannot be lost.',
+        reason: 'Deal or business conversations may improve when GEORGE knows what cannot be lost.',
       },
     ]
   }
@@ -128,7 +136,8 @@ export function deriveSignalConfidence({
   desiredOutcome: string
   observedReality: string
 }): LiveSignalConfidence {
-  const requirements = deriveRequiredSignals(chairs)
+  deriveRequiredSignals(chairs)
+
   const missingRequiredSignals: string[] = []
 
   if (!desiredOutcome.trim()) missingRequiredSignals.push('Desired Outcome')
@@ -168,13 +177,19 @@ export function deriveRoomFormation({
   chairs: string[]
   desiredOutcome: string
   observedReality: string
-}) {
+}): LiveRoomFormation {
+  const requiredSignals = deriveRequiredSignals(chairs)
   const confidence = deriveSignalConfidence({ chairs, desiredOutcome, observedReality })
   const interpretation = deriveGeorgeInterpretation(chairs, desiredOutcome, observedReality)
+  const canEnterLive = confidence.missingRequiredSignals.length === 0
 
   return {
     confidence,
     interpretation,
-    canEnterLive: confidence.missingRequiredSignals.length === 0,
+    requiredSignals,
+    canEnterLive,
+    entryDirective: canEnterLive
+      ? 'LIVE may begin. Do not repeat preview work. Execute from the outcome and observed reality.'
+      : 'Do not enter LIVE yet. Ask only for the missing required signal.',
   }
 }

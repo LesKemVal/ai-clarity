@@ -1,4 +1,5 @@
 import type { LivePrepSetup } from './prep-runtime'
+import { deriveRoomFormation } from '@/lib/george/live/prep-room'
 
 type LiveBriefingMode = 'cues' | 'lines'
 
@@ -25,35 +26,20 @@ function normalizeAssistMode(setup: LivePrepSetup | null): LiveBriefingMode {
   return setup?.liveAssistMode === 'lines' ? 'lines' : 'cues'
 }
 
-function buildObjectiveLine(setup: LivePrepSetup | null) {
-  const objective = clean(setup?.objective)
-  if (!objective) return 'I know your objective.'
-
-  return `Your primary objective is to ${objective.replace(/\.$/, '')}.`
-}
-
-function buildRoomLine(room: string) {
-  if (room === 'Adaptive LIVE') {
-    return 'I know the room may shift.'
-  }
-
-  return `I know this ${room.toLowerCase()} room.`
-}
-
 function buildPositionLine(setup: LivePrepSetup | null) {
   const position = clean((setup as any)?.userPosition)
 
   if (!position) return null
 
-  return `You’re approaching this from a ${position.toLowerCase()} position.`
+  return `Position signal: ${position}`
 }
 
 function buildAssistLine(mode: LiveBriefingMode) {
   if (mode === 'lines') {
-    return 'I’ll start with something you can repeat while I reference your signal.'
+    return 'Give repeatable lines only when they help execution.'
   }
 
-  return 'I’ll keep cues short unless the room calls for something you can repeat.'
+  return 'Keep cues short unless the moment needs a repeatable line.'
 }
 
 function buildSignalLine(setup: LivePrepSetup | null) {
@@ -64,10 +50,10 @@ function buildSignalLine(setup: LivePrepSetup | null) {
   const first = signals[0]
 
   if (!first?.phrase || !first?.meaningLabel) {
-    return 'Your room signals are loaded.'
+    return 'Steering signals are loaded.'
   }
 
-  return `Signal loaded: “${first.phrase}” means “${first.meaningLabel}”.`
+  return `Steering signal: “${first.phrase}” means “${first.meaningLabel}”.`
 }
 
 export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
@@ -76,25 +62,47 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
   const mode = normalizeAssistMode(setup)
   const signalLine = buildSignalLine(setup)
   const positionLine = buildPositionLine(setup)
+  const desiredOutcome = clean(setup?.objective)
+  const observedReality =
+    clean((setup as any)?.observedReality) ||
+    clean((setup as any)?.reality) ||
+    clean((setup as any)?.currentReality) ||
+    clean((setup as any)?.knownContext)
+
+  const chairs = [
+    clean((setup as any)?.userPosition),
+    clean((setup as any)?.chair),
+  ].filter(Boolean)
+
+  const formation = deriveRoomFormation({
+    chairs: chairs.length ? chairs : ['User'],
+    desiredOutcome,
+    observedReality,
+  })
 
   return [
     'LIVE ENTRY SIGNALS',
     '',
-    `Room signal: ${room}`,
-    buildObjectiveLine(setup),
+    `Objective: ${desiredOutcome || 'Not yet provided.'}`,
+    `Observed reality: ${observedReality || 'Not yet provided.'}`,
     positionLine,
+    `Room formed from signal: ${room}`,
+    '',
+    `Confidence: ${formation.confidence.level}`,
+    formation.interpretation,
+    formation.entryDirective,
     '',
     signalLine,
     '',
-    'Use these signals to generate the first message naturally.',
-    'Do not use a fixed opening script.',
-    'Do not create a separate room mode.',
-    'Treat the room as the first shared signal, not the whole truth.',
+    'Preview is complete. LIVE is execution.',
+    'Do not repeat preview work.',
+    'Do not create profession brains, modes, or separate expertise layers.',
+    'Use the chair only to judge relevance and signal requirements.',
+    'Treat the room as formed from signal, not selected as a static mode.',
     'Listen for new signals at all times.',
-    'If the room creates a temporary sub-goal, support that sub-goal while preserving the primary objective.',
-    'If the user uploads documents during LIVE, treat them as immediately available signal.',
-    'If the connection, context, or conversation is interrupted, use repeated important details, note-like self-talk, or user-provided signals to restore continuity.',
-    'Open briefly, confidently, and in the natural language of the selected room.',
+    'If documents are uploaded during LIVE, treat them as immediately available signal.',
+    'If context is interrupted, restore from the objective, observed reality, repeated details, and user-provided signals.',
+    'Open briefly, confidently, and in the natural language of the objective and observed reality.',
     '',
     buildAssistLine(mode),
   ].filter(Boolean).join('\n')
