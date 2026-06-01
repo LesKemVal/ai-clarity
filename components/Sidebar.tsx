@@ -508,7 +508,7 @@ return (
               </span>
             </button>
 
-            {normalSessions.length > 0 && (
+            {openGroups.Sessions && normalSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
                   <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
@@ -606,7 +606,7 @@ return (
               </span>
             </button>
 
-            {liveSessions.length > 0 && (
+            {openGroups['Conversations'] && liveSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {liveSessions.map((session) => (
                   <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
