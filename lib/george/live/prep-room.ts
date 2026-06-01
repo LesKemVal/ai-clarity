@@ -207,8 +207,19 @@ export function deriveNextMandatorySignalQuestion({
   observedReality: string
 }): LiveMandatorySignalQuestion | null {
   const chairText = chairs.join(' ').toLowerCase()
+  const hasChair = chairs.some((chair) => chair.trim() && chair.trim().toLowerCase() !== 'user')
   const outcome = desiredOutcome.trim()
   const reality = observedReality.trim()
+
+  if (!hasChair) {
+    return {
+      key: 'chair',
+      label: 'Chair',
+      question: 'Where are you standing in this situation?',
+      required: true,
+      reason: 'Chair is the first mandatory signal because recognition reduces apprehension and helps the user cooperate with the next signals.',
+    }
+  }
 
   if (!outcome) {
     return {
@@ -216,7 +227,7 @@ export function deriveNextMandatorySignalQuestion({
       label: 'Desired Outcome',
       question: 'What are you trying to accomplish?',
       required: true,
-      reason: 'Outcome is the highest-leverage missing signal because GEORGE cannot judge the next move without the destination.',
+      reason: 'Outcome is the second mandatory signal because GEORGE cannot judge the next move without the destination.',
     }
   }
 
@@ -226,7 +237,7 @@ export function deriveNextMandatorySignalQuestion({
       label: 'Observed Reality',
       question: 'What is happening right now?',
       required: true,
-      reason: 'Observed reality is the highest-leverage missing signal because GEORGE needs the terrain before execution.',
+      reason: 'Observed reality is the third mandatory signal because GEORGE needs the terrain before execution.',
     }
   }
 
@@ -238,7 +249,7 @@ export function deriveNextMandatorySignalQuestion({
       label: 'Decisive Detail',
       question: 'What is the one detail that most changes the outcome?',
       required: true,
-      reason: 'The core signals exist, but confidence is still thin. One decisive detail should improve room formation more than adding a full form.',
+      reason: 'Chair, outcome, and reality exist, but confidence is still thin. One decisive detail should improve room formation more than adding a form.',
     }
   }
 
