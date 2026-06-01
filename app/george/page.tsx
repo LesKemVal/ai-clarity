@@ -2354,26 +2354,13 @@ if (messagesRef.current.length > 2) {
   try {
     saveSessionToV2({
       mode: 'live',
-      title: deriveSessionTitle(
-            activeCampaign?.desiredOutcome,
-            activeCampaignId ? 'LIVE Session' : 'LIVE Conversation'
-          ),
+      title: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
       messages: messagesRef.current,
-      summary: activeCampaignId
-        ? 'Structured LIVE checkpoint.'
-        : 'LIVE Conversation checkpoint.',
-      userGoal: activeCampaign?.desiredOutcome || 'In progress',
+      summary: 'LIVE Conversation checkpoint.',
+      userGoal: 'In progress',
       lastKnownState: 'User exited LIVE mode.',
-      suggestedRestart: activeCampaignId
-        ? 'Resume this LIVE Session from the strongest operational next move.'
-        : 'Resume this LIVE Conversation naturally.',
-      metadata: {
-        activeCampaignId: activeCampaignId || null,
-        campaignName: activeCampaign?.name || null,
-        productOrService: activeCampaign?.productOrService || null,
-        targetAudience: activeCampaign?.targetMarket || null,
-        desiredOutcome: activeCampaign?.desiredOutcome || null,
-      },
+      suggestedRestart: 'Resume this LIVE Conversation naturally.',
+      metadata: {},
     })
   } catch {}
 }
@@ -4825,25 +4812,13 @@ useEffect(() => {
       if (messagesRef.current.length > 2) {
         saveSessionToV2({
           mode: 'live',
-          title: activeCampaignId
-            ? deriveSessionTitle(activeCampaign?.desiredOutcome, 'LIVE Session')
-            : getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
+          title: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
           messages: messagesRef.current,
-          summary: activeCampaignId
-            ? 'Structured LIVE checkpoint before new LIVE conversation.'
-            : 'LIVE Conversation checkpoint before new LIVE conversation.',
-          userGoal: activeCampaign?.desiredOutcome || 'In progress',
+          summary: 'LIVE Conversation checkpoint before new LIVE conversation.',
+          userGoal: 'In progress',
           lastKnownState: 'User started a new LIVE conversation.',
-          suggestedRestart: activeCampaignId
-            ? 'Resume this LIVE Session from the strongest operational next move.'
-            : 'Resume this LIVE Conversation naturally.',
-          metadata: {
-            activeCampaignId: activeCampaignId || null,
-            campaignName: activeCampaign?.name || null,
-            productOrService: activeCampaign?.productOrService || null,
-            targetAudience: activeCampaign?.targetMarket || null,
-            desiredOutcome: activeCampaign?.desiredOutcome || null,
-          },
+          suggestedRestart: 'Resume this LIVE Conversation naturally.',
+          metadata: {},
         })
       }
 
