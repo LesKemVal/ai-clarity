@@ -151,6 +151,10 @@ type PromptSelection = {
   context: string
 }
 
+// PRO LIVE / campaign architecture is shelved.
+// Keep remaining campaign code inert until it is extracted or deleted.
+// See docs/architecture/PRO_LIVE_CAMPAIGNS.bak.md.
+
 type GeorgeCampaign = {
   id: string
   name: string
@@ -1605,10 +1609,12 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     }
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+      // Normal GEORGE must not auto-restore old sessions or assistant-first startup messages.
+      // GEORGE wakes from user action. Saved continuity can remain available through explicit memory surfaces later.
       skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
-      setMessages(activeSession.messages)
-      messagesRef.current = activeSession.messages
+      restoredMessagesSignatureRef.current = ''
+      setMessages([])
+      messagesRef.current = []
       normalSessionWriteReadyRef.current = true
       return
     }
@@ -5912,7 +5918,7 @@ I am listening now. Speak naturally. I will respond ${
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
-                  Save
+                  Remember
                 </div>
 
                 <div className="grid grid-cols-2 gap-1.5">
@@ -5924,7 +5930,7 @@ I am listening now. Speak naturally. I will respond ${
                     }}
                     className="rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[10px] font-medium leading-4 text-[#D7DBE4]/76 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                   >
-                    Session
+                    Conversation
                   </button>
 
                   <button
@@ -5961,7 +5967,7 @@ I am listening now. Speak naturally. I will respond ${
                   }}
                   className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[11px] font-medium leading-4 text-[#D7DBE4]/86 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                 >
-                  Save to {getDefaultFolder()}
+                  Remember in {getDefaultFolder()}
                 </button>
 
                 {getExistingFolders().length > 0 && (
@@ -6013,7 +6019,7 @@ I am listening now. Speak naturally. I will respond ${
                       }}
                       className="w-full rounded-xl border border-white/[0.05] px-2.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                     >
-                      Save
+                      Remember
                     </button>
                   </div>
                 </div>
@@ -6725,7 +6731,7 @@ if (liveMode) {
   document.body
 )}
 
-{showSessionPicker && typeof document !== 'undefined' && createPortal(
+{false && showSessionPicker && typeof document !== 'undefined' && createPortal(
   <>
     <div
       role="button"
