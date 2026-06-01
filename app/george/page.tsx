@@ -1123,6 +1123,7 @@ const [forceClose, setForceClose] = useState(false)
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
+const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
     activeCampaign?.deliveryMode ||
     (voiceOn ? 'audio' : 'text')
@@ -5196,40 +5197,102 @@ return (
 )}
 {(forceLive || liveMode) && (
   <>
-    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[39] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
-    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[50] flex justify-center px-4 xl:pl-[280px]">
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px]">
     <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
           <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
             LIVE GEORGE
           </span>
         </div>
 
         <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
-          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'listening' : 'ready'}
+          {!liveGeorgeEnabled ? 'offline' : liveRoomReceiving ? 'receiving' : liveRoomActive ? 'listening' : 'ready'}
         </span>
       </div>
 
-      <div className={`mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
+        <button
+          type="button"
+          onClick={() => {
+            if (isThinking) return
+
+            const nextEnabled = !liveGeorgeEnabled
+            setLiveGeorgeEnabled(nextEnabled)
+
+            if (!nextEnabled) {
+              stopListening()
+              setInterimTranscript('')
+              setToastMessage('GEORGE offline')
+            } else {
+              startListening()
+              setToastMessage('GEORGE online')
+            }
+
+            setShowToast(true)
+          }}
+          disabled={!voiceSupported || isThinking}
+          className={`rounded-[0.72rem] border px-2 py-1.5 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${isListening ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">George</span>
+          {liveGeorgeEnabled ? 'on' : 'off'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (currentTier === 'smart') {
+              setToastMessage('Voice replies unlock above Smart.')
+              setShowToast(true)
+              return
+            }
+            const nextVoice = !voiceOn
+            hasUserInteractedRef.current = true
+            setVoiceOn(nextVoice)
+            setInteractionMode(nextVoice ? 'speech' : 'text')
+            window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+            setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
+            setShowToast(true)
+          }}
+          className={`rounded-[0.72rem] border px-2 py-1.5 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Audio</span>
+          {voiceOn ? 'on' : 'off'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            stopListening()
+            setInterimTranscript('')
+            setToastMessage('LIVE paused')
+            setShowToast(true)
+          }}
+          className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/46 transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Pause</span>
+          hold
+        </button>
+      </div>
+
+      <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Cue</span>
           {liveRoomActive ? 'room active' : 'awaiting room'}
         </div>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Line</span>
           {liveRoomActive ? 'ready line' : 'awaiting room'}
         </div>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
           {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'monitoring' : 'awaiting room'}
         </div>
       </div>
 
       <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
-        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveRoomActive ? 'Room active.' : 'Audio connected?'}</span>
-        <span>{liveRoomActive ? 'GEORGE is listening for steering language and room signal.' : 'GEORGE can only support the conversation it can hear.'}</span>
+        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveGeorgeEnabled && liveRoomActive ? 'Room active.' : 'GEORGE offline.'}</span>
+        <span>{liveGeorgeEnabled && liveRoomActive ? 'GEORGE is listening for steering language and room signal.' : 'Turn GEORGE on to activate the room.'}</span>
       </div>
     </div>
   </div>
