@@ -752,19 +752,14 @@ export default function LiveEntryClient() {
       <div className="relative z-10 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
 
-        <div className="mb-2 flex items-center justify-between gap-2 px-1">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-white/26">Prep Room</div>
+        <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
+          <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE Signal</div>
 
-        </div>
-
-        <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Signal</div>
-
-          <h1 className="mt-2 text-[24px] font-semibold leading-[1.04] tracking-[-0.045em] text-white/92 sm:text-[34px]">
+          <h1 className="mt-1.5 text-[22px] font-semibold leading-[1.04] tracking-[-0.04em] text-white/92 sm:text-[32px]">
             Help GEORGE understand what's happening.
           </h1>
 
-          <p className="mt-2 text-[13px] leading-6 text-white/48">
+          <p className="mt-1.5 text-[13px] leading-5 text-white/48">
             The stronger the signal, the more effective GEORGE becomes.
           </p>
 
@@ -776,7 +771,7 @@ export default function LiveEntryClient() {
           )}
 
           {contextSignalsCollapsed && (
-            <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+            <div className="mt-2 rounded-[0.72rem] border border-white/[0.035] bg-black/12 px-3 py-2">
               <button
                 type="button"
                 onClick={() => {
@@ -786,12 +781,12 @@ export default function LiveEntryClient() {
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Context Signals</span>
-                  <span className="mt-1 block truncate text-[13px] text-white/62">
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/24">Context Signals</span>
+                  <span className="mt-0.5 block truncate text-[12px] text-white/48">
                     {relatedSessionLabel} • {chair || 'Position not selected'}
                   </span>
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
               </button>
             </div>
           )}
@@ -812,7 +807,7 @@ export default function LiveEntryClient() {
                       : selectedRelatedSession?.title || 'Selected session'}
                   </span>
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
               </button>
             ) : (
               <>
@@ -872,15 +867,15 @@ export default function LiveEntryClient() {
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Optional Position Signal</span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Position (Optional)</span>
                   <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
               </button>
             ) : (
               <>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Optional Position Signal</div>
-            <p className="mt-1 text-[11px] leading-5 text-white/36">Use this only if your position changes what GEORGE should pay attention to.</p>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Position (Optional)</div>
+            <p className="mt-1 text-[11px] leading-5 text-white/36">Use only if your position changes what matters.</p>
             <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
               {CHAIR_OPTIONS.map((option) => {
                 const active = chairs.includes(option.label)
@@ -950,7 +945,7 @@ export default function LiveEntryClient() {
               value={knownContext}
               onChange={(event) => setKnownContext(event.target.value)}
               rows={2}
-              placeholder="What is happening right now? What should GEORGE understand before LIVE begins?"
+              placeholder="What is happening right now? What should be understood before LIVE begins?"
               className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
             />
           </label>
@@ -961,7 +956,7 @@ export default function LiveEntryClient() {
                 Signal Status
               </div>
               <div className="mt-1 text-[12px] leading-5 text-white/70">
-                You are free to go LIVE now, or continue to strengthen GEORGE.
+                You are free to go LIVE now, or continue strengthening your signal.
               </div>
             </div>
           )}
