@@ -327,8 +327,8 @@ export default function Sidebar({
   }
 
   const linkClass = (path: string, compact = false) =>
-    `block rounded-[0.5rem] px-3 py-1.5 text-[13px] transition ${
-      `${compact ? 'px-3 py-1 text-[11px]' : ''} ${pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'}`
+    `block rounded-[0.45rem] px-3 py-0.5 text-[11px] leading-4 transition ${
+      `${compact ? 'px-3 py-0.5 text-[10px] leading-4' : ''} ${pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'}`
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -375,11 +375,15 @@ return (
               type="button"
               onClick={() => {
                 setShowSidebar?.(false)
+                if (isLiveRoute) {
+                  window.location.href = '/george/live-entry'
+                  return
+                }
                 onNewSession()
               }}
-              className="block w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-left text-[12px] text-white/76 transition hover:bg-white/[0.032] hover:text-white/90"
+              className="block w-full rounded-[0.55rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/58 transition hover:bg-white/[0.026] hover:text-white/82"
             >
-              GEORGE
+              NEW SESSION
             </button>
           </section>
 
@@ -388,7 +392,7 @@ return (
               Pages
             </div>
 
-            <div className="mt-3 space-y-1">
+            <div className="mt-2 space-y-0.5">
               <button
                 type="button"
                 onClick={() => {

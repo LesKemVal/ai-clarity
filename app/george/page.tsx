@@ -5319,13 +5319,40 @@ return (
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[360px] px-8 text-center">
-        <div data-normal-hero className="text-[34px] font-[300] tracking-[0.22em] text-[#D7DBE4]/24">
-          GEORGE
-        </div>
+      <div className="mx-auto w-full max-w-[390px] px-6">
+        <div className="rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/68 px-4 py-3 text-left shadow-[0_18px_58px_rgba(0,0,0,0.30)] backdrop-blur-[16px]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#AEB6FF]/55 shadow-[0_0_14px_rgba(174,182,255,0.32)]" />
+              <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
+                GEORGE
+              </span>
+            </div>
 
-        <div className="mt-7 text-[10px] font-medium uppercase tracking-[0.20em] text-[#D7DBE4]/34">
-          Set the direction. GEORGE maps the tactical route.
+            <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
+              ready
+            </span>
+          </div>
+
+          <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] leading-4 text-[#D7DBE4]/44">
+            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Direction</span>
+              not set
+            </div>
+            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Position</span>
+              waiting
+            </div>
+            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Move</span>
+              ask
+            </div>
+          </div>
+
+          <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] leading-4 text-[#D7DBE4]/42">
+            <span className="block text-[#D7DBE4]/56">Set the direction.</span>
+            <span>GEORGE will help map the next operational move.</span>
+          </div>
         </div>
       </div>
     </div>
