@@ -13,7 +13,15 @@ export type LiveSignalConfidence = {
   suggestedQuestion?: string
 }
 
+export type LiveHumanEntry = {
+  chairLabel: string
+  recognition: string
+  trustDirective: string
+  signalAcquisitionDirective: string
+}
+
 export type LiveRoomFormation = {
+  humanEntry: LiveHumanEntry
   confidence: LiveSignalConfidence
   interpretation: string
   requiredSignals: LiveSignalRequirement[]
@@ -35,6 +43,17 @@ export function hasMinimumLiveSignals({
   observedReality: string
 }) {
   return Boolean(desiredOutcome.trim() && observedReality.trim())
+}
+
+export function deriveHumanEntry(chairs: string[]): LiveHumanEntry {
+  const chairLabel = chairs.map((chair) => chair.trim()).filter(Boolean).join(' + ') || 'User'
+
+  return {
+    chairLabel,
+    recognition: `GEORGE should first recognize the user's ${chairLabel} position without turning it into a separate mode or profession brain.`,
+    trustDirective: 'Recognition should reduce apprehension and increase cooperation before asking for deeper signal.',
+    signalAcquisitionDirective: 'Ask only for the next signal needed to improve confidence. Do not turn signal acquisition into a form.',
+  }
 }
 
 export function deriveGeorgeInterpretation(chairs: string[], outcome: string, reality: string) {
@@ -179,17 +198,19 @@ export function deriveRoomFormation({
   observedReality: string
 }): LiveRoomFormation {
   const requiredSignals = deriveRequiredSignals(chairs)
+  const humanEntry = deriveHumanEntry(chairs)
   const confidence = deriveSignalConfidence({ chairs, desiredOutcome, observedReality })
   const interpretation = deriveGeorgeInterpretation(chairs, desiredOutcome, observedReality)
   const canEnterLive = confidence.missingRequiredSignals.length === 0
 
   return {
+    humanEntry,
     confidence,
     interpretation,
     requiredSignals,
     canEnterLive,
     entryDirective: canEnterLive
       ? 'LIVE may begin. Do not repeat preview work. Execute from the outcome and observed reality.'
-      : 'Do not enter LIVE yet. Ask only for the missing required signal.',
+      : 'Do not enter LIVE yet. Recognize the user’s chair, then ask only for the missing required signal.',
   }
 }
