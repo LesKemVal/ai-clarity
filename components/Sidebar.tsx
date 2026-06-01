@@ -149,7 +149,8 @@ export default function Sidebar({
     const rawTitle = session.title?.trim()
 
     const source =
-      rawTitle && rawTitle.toLowerCase() !== 'george' && rawTitle.toLowerCase() !== 'new session'
+      rawTitle &&
+      !['george', 'new session', 'conversation', 'live conversation', 'live assistance', 'george session', 'live session'].includes(rawTitle.toLowerCase())
         ? rawTitle
         : firstUserMessage || firstAssistantMessage || 'Untitled session'
 

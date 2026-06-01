@@ -58,6 +58,35 @@ function deriveSessionTitle(
   return 'In Progress'
 }
 
+function getActiveLiveDesiredOutcomeTitle(fallback?: string | null) {
+  if (typeof window === 'undefined') return deriveSessionTitle(null, fallback)
+
+  try {
+    const activeSetup =
+      JSON.parse(window.localStorage.getItem('george_live_setup_active') || 'null') ||
+      JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null') ||
+      JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || 'null')
+
+    return deriveSessionTitle(
+      activeSetup?.objective || activeSetup?.room || null,
+      fallback
+    )
+  } catch {
+    return deriveSessionTitle(null, fallback)
+  }
+}
+
+function deriveNormalSessionTitleFromMessages(messages: Message[], fallback?: string | null) {
+  const firstUser = messages.find((message) => message.role === 'user')?.content?.trim()
+  const cleaned = firstUser
+    ?.replace(/\s+/g, ' ')
+    .replace(/^(can you|could you|please|help me|i need to|i want to)\s+/i, '')
+    .trim()
+
+  return deriveSessionTitle(cleaned, fallback || 'GEORGE Session')
+}
+
+
 
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
@@ -2352,10 +2381,9 @@ setPreLiveMessages(null)
       try {
         saveSessionToV2({
           mode: liveMode ? 'live' : 'normal',
-          title: deriveSessionTitle(
-            activePromptLabel,
-            sessionLabel
-          ),
+          title: liveMode
+            ? getActiveLiveDesiredOutcomeTitle(sessionLabel)
+            : deriveNormalSessionTitleFromMessages(messagesRef.current, sessionLabel),
           messages: messagesRef.current,
           summary: liveMode ? 'LIVE Conversation saved before starting a new session.' : 'GEORGE session saved before starting a new session.',
           userGoal: activePromptLabel || 'Not set',
@@ -4797,10 +4825,9 @@ useEffect(() => {
       if (messagesRef.current.length > 2) {
         saveSessionToV2({
           mode: activeCampaignId ? 'campaign' : 'live',
-          title: deriveSessionTitle(
-            activeCampaign?.desiredOutcome,
-            activeCampaignId ? 'LIVE Session' : 'LIVE Conversation'
-          ),
+          title: activeCampaignId
+            ? deriveSessionTitle(activeCampaign?.desiredOutcome, 'LIVE Session')
+            : getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
           messages: messagesRef.current,
           summary: activeCampaignId
             ? 'Structured LIVE checkpoint before new LIVE conversation.'
@@ -4925,10 +4952,7 @@ return (
               if (messagesRef.current.length > 1) {
                 saveSessionToV2({
                   mode: 'normal',
-                  title: deriveSessionTitle(
-                    activePromptLabel,
-                    'GEORGE Session'
-                  ),
+                  title: deriveNormalSessionTitleFromMessages(messagesRef.current, activePromptLabel || 'GEORGE Session'),
                   messages: messagesRef.current,
                   summary: 'GEORGE session checkpoint.',
                   userGoal: activePromptLabel || 'Not set',
