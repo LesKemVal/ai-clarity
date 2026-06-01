@@ -73,6 +73,7 @@ export default function Sidebar({
   liveMode = false,
 }: SidebarProps) {
   const pathname = usePathname()
+  const isLiveRoute = pathname?.startsWith('/george/live')
   const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
   const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>([])
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
@@ -314,7 +315,7 @@ export default function Sidebar({
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Runtime: true,
     Access: true,
-    Continuity: false,
+    Sessions: false,
   })
 
   const toggleGroup = (title: string) => {
@@ -338,7 +339,7 @@ return (
     {!showSidebar && null}
 
     <aside
-      className={`fixed left-0 top-0 z-[120] flex h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[120] flex h-screen max-h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
@@ -366,7 +367,7 @@ return (
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4">
+      <div className="min-h-0 flex-1 overflow-y-scroll overscroll-contain px-3 py-4 [scrollbar-width:thin]">
         <div className="space-y-4">
           <section className="space-y-2.5">
             <button
@@ -412,7 +413,7 @@ return (
             </div>
           </section>
 
-          {!liveMode && (
+          {!isLiveRoute && (
           <section>
             <button
               type="button"
@@ -491,18 +492,18 @@ return (
             </div>
           </section>
 
-          {!liveMode && (
+          {!isLiveRoute && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
-              onClick={() => toggleGroup('Continuity')}
+              onClick={() => toggleGroup('Sessions')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                Continuity
+                Sessions
               </span>
               <span className="text-[11px] text-white/20">
-                {openGroups.Continuity ? '▾' : '▸'}
+                {openGroups.Sessions ? '▾' : '▸'}
               </span>
             </button>
 
@@ -513,9 +514,9 @@ return (
                     <button
                       type="button"
                       onClick={() => openNormalSession(session)}
-                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1.5 text-left transition"
+                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[13px] text-white/48 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -589,18 +590,18 @@ return (
           </section>
           )}
 
-          {liveMode && (
+          {isLiveRoute && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
-              onClick={() => toggleGroup('LIVE Conversations')}
+              onClick={() => toggleGroup('Conversations')}
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                LIVE Conversations
+                Conversations
               </span>
               <span className="text-[11px] text-white/20">
-                {openGroups['LIVE Conversations'] ? '▾' : '▸'}
+                {openGroups['Conversations'] ? '▾' : '▸'}
               </span>
             </button>
 
@@ -611,9 +612,9 @@ return (
                     <button
                       type="button"
                       onClick={() => openLiveSession(session)}
-                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1.5 text-left transition"
+                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[13px] text-white/48 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -687,103 +688,7 @@ return (
           </section>
           )}
 
-          {liveMode && (
-          <section className="border-t border-white/[0.035] pt-4">
-            <button
-              type="button"
-              onClick={() => toggleGroup('LIVE Conversations')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                LIVE Conversations
-              </span>
-              <span className="text-[11px] text-white/20">
-                {openGroups['LIVE Conversations'] ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {liveSessions.length > 0 && (
-              <div className="mt-3 space-y-1">
-                {liveSessions.map((session) => (
-                  <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
-                    <button
-                      type="button"
-                      onClick={() => openLiveSession(session)}
-                      className="block w-full rounded-[0.45rem] px-2 py-1.5 pr-8 text-left transition"
-                    >
-                      <span className="block truncate text-[13px] text-white/48 group-hover:text-white/68">
-                        {getSessionTitle(session)}
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        setPendingDeleteSessionId(null)
-                        setSessionMenuId(sessionMenuId === session.id ? null : session.id)
-                      }}
-                      className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/28 transition hover:bg-white/[0.035] hover:text-white/72"
-                      aria-label="LIVE conversation options"
-                    >
-                      ⋯
-                    </button>
-
-                    {sessionMenuId === session.id && (
-                      <div className="absolute right-1 top-8 z-20 w-36 rounded-xl border border-white/[0.07] bg-[#0B0D12]/96 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.42)]">
-                        {pendingDeleteSessionId === session.id ? (
-                          <button
-                            type="button"
-                            onClick={() => deleteLiveSession(session.id)}
-                            className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/82 transition hover:bg-red-400/[0.06]"
-                          >
-                            Confirm delete
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const nextTitle = window.prompt('Rename LIVE conversation', getSessionTitle(session))
-                                if (!nextTitle?.trim()) return
-                                renameSession(session.id, nextTitle)
-                                setSessionMenuId(null)
-                                loadNormalSessions()
-                              }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/62 transition hover:bg-white/[0.035] hover:text-white/86"
-                            >
-                              Rename
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                archiveSession(session.id, true)
-                                setSessionMenuId(null)
-                                loadNormalSessions()
-                              }}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-white/52 transition hover:bg-white/[0.035] hover:text-white/80"
-                            >
-                              Archive
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => setPendingDeleteSessionId(session.id)}
-                              className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-red-100/60 transition hover:bg-white/[0.035] hover:text-red-100/86"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-          )}
+          
         </div>
       </div>
 

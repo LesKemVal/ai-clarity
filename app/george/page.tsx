@@ -1502,7 +1502,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       const subscriberMetadata = getSubscriberSessionMetadata()
       if (subscriberMetadata) {
-        createSession('live', [], 'LIVE Assistance', subscriberMetadata)
         liveSessionWriteReadyRef.current = true
       }
       setLiveEntryBriefing(liveBriefing)
@@ -2391,7 +2390,6 @@ I’ll stay with you.`
 
   const subscriberMetadata = getSubscriberSessionMetadata()
   if (subscriberMetadata) {
-    createSession('live', [liveIntro], 'LIVE Assistance', subscriberMetadata)
     liveSessionWriteReadyRef.current = true
   }
   setMessages([liveIntro])
@@ -2399,7 +2397,6 @@ I’ll stay with you.`
 } else {
   const subscriberMetadataForOpening = getSubscriberSessionMetadata()
   if (subscriberMetadataForOpening) {
-    createSession('live', [openingMessage], 'LIVE Assistance', subscriberMetadataForOpening)
     liveSessionWriteReadyRef.current = true
   }
   setMessages([openingMessage])
