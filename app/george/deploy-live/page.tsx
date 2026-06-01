@@ -192,16 +192,16 @@ export default function DeployLivePage() {
         </div>
 
         <h1 className="mt-6 text-[25px] font-medium leading-[1.12] tracking-[-0.03em] text-white/90">
-          Add signal for the {chairLabel} chair.
+          Strengthen GEORGE.
         </h1>
 
         <p className="mt-3 text-[13px] leading-6 text-white/46">
-          This page should stay specific to the chair you selected. Add only what helps GEORGE understand this conversation faster.
+          A few strong signals help GEORGE move toward your desired outcome.
         </p>
 
         <div className="mt-5 rounded-[1rem] border border-white/[0.07] bg-white/[0.025] p-3">
           <label className="block">
-            <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Chair</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Conversation Type</span>
             <select
               value={chair}
               onChange={(event) => setChair(event.target.value as ChairKey)}
@@ -217,14 +217,14 @@ export default function DeployLivePage() {
             <input
               value={customChair}
               onChange={(event) => setCustomChair(event.target.value)}
-              placeholder="Name this chair"
+              placeholder="Name this conversation type"
               className="mt-2 w-full rounded-[0.75rem] border border-white/[0.07] bg-black/30 px-3 py-3 text-[14px] text-white outline-none placeholder:text-white/24"
             />
           )}
         </div>
 
         <div className="mt-4 rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/38">Useful {chairLabel} signal</p>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/38">Signals That Help</p>
 
           <p className="mt-3 text-[12px] uppercase tracking-[0.18em] text-white/28">Examples</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -235,7 +235,7 @@ export default function DeployLivePage() {
             ))}
           </div>
 
-          <p className="mt-4 text-[12px] uppercase tracking-[0.18em] text-white/28">GEORGE should look for</p>
+          <p className="mt-4 text-[12px] uppercase tracking-[0.18em] text-white/28">GEORGE will pay attention to</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {profile.looksFor.map((item) => (
               <span key={item} className="rounded-full bg-white/[0.055] px-2.5 py-1 text-[11px] text-white/48">
@@ -246,7 +246,7 @@ export default function DeployLivePage() {
         </div>
 
         <label className="mt-4 block rounded-[1rem] border border-white/[0.055] bg-black/18 p-3">
-          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Desired outcome</span>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">Desired Outcome</span>
           <textarea
             value={objective}
             onChange={(event) => setObjective(event.target.value)}
@@ -257,7 +257,7 @@ export default function DeployLivePage() {
         </label>
 
         <label className="mt-3 block rounded-[1rem] border border-white/[0.055] bg-black/18 p-3">
-          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">More chair signal</span>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-white/28">What is happening?</span>
           <textarea
             value={knownContext}
             onChange={(event) => setKnownContext(event.target.value)}
@@ -268,7 +268,7 @@ export default function DeployLivePage() {
         </label>
 
         <div className="mt-4 rounded-[1rem] border border-white/[0.055] bg-white/[0.02] p-3">
-          <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Chair-specific steering signals</p>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Steering Signals</p>
           <div className="mt-3 grid gap-2">
             {signals.map((signal, index) => (
               <div key={index} className="grid grid-cols-[1fr_1fr] gap-2">
@@ -298,7 +298,7 @@ export default function DeployLivePage() {
           onClick={saveAndReturn}
           className="mt-5 w-full rounded-[0.9rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.10] px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/82"
         >
-          Save Signal
+          Save Signals
         </button>
       </section>
     </main>
