@@ -175,15 +175,17 @@ export function deriveSignalConfidence({
     return {
       level: 'low',
       missingRequiredSignals,
-      suggestedQuestion: missingRequiredSignals.includes('Desired Outcome')
-        ? 'What are you trying to accomplish?'
-        : 'What is happening right now?',
+      suggestedQuestion: missingRequiredSignals.includes('Chair')
+        ? 'Where are you standing in this situation?'
+        : missingRequiredSignals.includes('Desired Outcome')
+          ? 'What are you trying to accomplish?'
+          : 'What is happening right now?',
     }
   }
 
-  const combined = `${desiredOutcome} ${observedReality}`.trim()
+  const combined = `${chairs.join(' ')} ${desiredOutcome} ${observedReality}`.trim()
 
-  if (combined.length < 24) {
+  if (combined.length < 32) {
     return {
       level: 'usable',
       missingRequiredSignals: [],
