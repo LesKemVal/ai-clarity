@@ -326,9 +326,9 @@ export default function Sidebar({
     }))
   }
 
-  const linkClass = (path: string) =>
+  const linkClass = (path: string, compact = false) =>
     `block rounded-[0.5rem] px-3 py-1.5 text-[13px] transition ${
-      pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'
+      `${compact ? 'px-3 py-1 text-[11px]' : ''} ${pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'}`
     }`
 
   const currentGoalCheck = activeGoalCheck
@@ -340,7 +340,7 @@ return (
     {!showSidebar && null}
 
     <aside
-      className={`fixed left-0 top-0 z-[120] flex h-screen max-h-screen w-[258px] flex-col overflow-hidden border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[120] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
     >
@@ -368,7 +368,7 @@ return (
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-scroll overscroll-contain px-3 py-4 [scrollbar-width:thin]">
+      <div className="min-h-0 flex-1 px-3 py-3 [scrollbar-width:thin]">
         <div className="space-y-4">
           <section className="space-y-2.5">
             <button
@@ -377,7 +377,7 @@ return (
                 setShowSidebar?.(false)
                 onNewSession()
               }}
-              className="block w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2.5 text-left text-[13px] text-white/82 transition hover:bg-white/[0.032] hover:text-white/90"
+              className="block w-full rounded-[0.55rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-left text-[12px] text-white/76 transition hover:bg-white/[0.032] hover:text-white/90"
             >
               GEORGE
             </button>
@@ -405,10 +405,10 @@ return (
               <a href="/signal" className={linkClass('/signal')}>
                 User Signal
               </a>
-              <a href="/help" className={linkClass('/help')}>
+              <a href="/help" className={linkClass('/help', true)}>
                 Support
               </a>
-              <a href="/top-up" className={linkClass('/top-up')}>
+              <a href="/top-up" className={linkClass('/top-up', true)}>
                 Access
               </a>
             </div>
@@ -434,7 +434,7 @@ return (
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
+                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[12px] text-white/58 transition hover:bg-white/[0.014] hover:text-white/78"
                 >
                   + New Objective
                 </button>
@@ -464,7 +464,7 @@ return (
           )}
 
           <section className="border-t border-white/[0.035] pt-3">
-            <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[13px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+            <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
               Terms
             </a>
           </section>
@@ -493,7 +493,7 @@ return (
             </div>
           </section>
 
-          {!isLiveRoute && (
+          {!isLiveRoute && normalSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
@@ -511,11 +511,11 @@ return (
             {normalSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
-                  <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
+                  <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
                     <button
                       type="button"
                       onClick={() => openNormalSession(session)}
-                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1 text-left transition"
+                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
                     >
                       <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
                         {getSessionTitle(session)}
@@ -591,7 +591,7 @@ return (
           </section>
           )}
 
-          {isLiveRoute && (
+          {isLiveRoute && liveSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
@@ -609,11 +609,11 @@ return (
             {liveSessions.length > 0 && (
               <div className="mt-3 space-y-1">
                 {liveSessions.map((session) => (
-                  <div key={session.id} className="group relative rounded-[0.55rem] hover:bg-white/[0.014]">
+                  <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
                     <button
                       type="button"
                       onClick={() => openLiveSession(session)}
-                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1 text-left transition"
+                      className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
                     >
                       <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
                         {getSessionTitle(session)}
@@ -713,7 +713,7 @@ return (
                 (currentGoalCheck?.todos || []).map((todo) => (
                   <div
                     key={todo.id}
-                    className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-2 text-[13px] transition hover:bg-white/[0.02]"
+                    className="rounded-[0.55rem] border border-white/[0.055] bg-white/[0.018] px-3 py-1.5 text-[12px] transition hover:bg-white/[0.02]"
                   >
                     <button
                       type="button"
