@@ -1613,14 +1613,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       return
     }
 
-    const greeting = getInitialGreeting(profileName, currentTier)
     bumpVisitCount()
 
-    const firstMessage: Message[] = [{ role: 'assistant', content: greeting }]
-
     normalSessionWriteReadyRef.current = true
-    setMessages(firstMessage)
-    messagesRef.current = firstMessage
+    setMessages([])
+    messagesRef.current = []
   }, [profileName, currentTier, liveMode, conversationMode, activePromptContext, forceLive])
 
   useEffect(() => {
@@ -4961,11 +4958,10 @@ return (
               }
             } catch {}
 
-            const greeting = getInitialGreeting(profileName, currentTier)
             setTimeout(() => {
-              setMessages([{ role: 'assistant', content: greeting }])
-              messagesRef.current = [{ role: 'assistant', content: greeting }]
-            }, 1000)
+              setMessages([])
+              messagesRef.current = []
+            }, 250)
             setInput('')
             setInterimTranscript('')
             setVoiceError('')
@@ -5187,7 +5183,7 @@ return (
   <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
   </div>
 )}
-{!(forceLive || liveMode) && hasUserMessageForSurface && (
+{!(forceLive || liveMode) && hasVisibleThread && (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px]">
@@ -5353,15 +5349,15 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasUserMessageForSurface ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
-    <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+    <div className={`pointer-events-none fixed inset-x-0 top-[24dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[390px] px-6">
-        <div className="rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/68 px-4 py-3 text-left shadow-[0_18px_58px_rgba(0,0,0,0.30)] backdrop-blur-[16px]">
+      <div className="mx-auto w-full max-w-[430px] md:max-w-[520px] px-4">
+        <div className="rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-4 text-left shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#AEB6FF]/55 shadow-[0_0_14px_rgba(174,182,255,0.32)]" />
@@ -5375,7 +5371,7 @@ return (
             </span>
           </div>
 
-          <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] leading-4 text-[#D7DBE4]/44">
+          <div className="mt-4 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
             <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
               <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Direction</span>
               not set
@@ -5390,7 +5386,7 @@ return (
             </div>
           </div>
 
-          <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] leading-4 text-[#D7DBE4]/42">
+          <div className="mt-3 border-t border-white/[0.035] pt-3 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
             <span className="block text-[#D7DBE4]/56">Set the direction.</span>
             <span>GEORGE will help map the next operational move.</span>
           </div>
