@@ -35,6 +35,30 @@ import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outc
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
+function deriveSessionTitle(
+  desiredOutcome?: string | null,
+  fallback?: string | null
+) {
+  const outcome = String(desiredOutcome || '').trim()
+
+  if (outcome.length > 0) {
+    return outcome.length > 72
+      ? outcome.slice(0, 72).trim() + '…'
+      : outcome
+  }
+
+  const fb = String(fallback || '').trim()
+
+  if (fb.length > 0) {
+    return fb.length > 72
+      ? fb.slice(0, 72).trim() + '…'
+      : fb
+  }
+
+  return 'In Progress'
+}
+
+
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
   'Say “shorter” if you want compressed responses.',
@@ -2294,7 +2318,10 @@ if (messagesRef.current.length > 2) {
   try {
     saveSessionToV2({
       mode: activeCampaignId ? 'campaign' : 'live',
-      title: activeCampaignId ? 'LIVE Session' : 'LIVE Conversation',
+      title: deriveSessionTitle(
+            activeCampaign?.desiredOutcome,
+            activeCampaignId ? 'LIVE Session' : 'LIVE Conversation'
+          ),
       messages: messagesRef.current,
       summary: activeCampaignId
         ? 'Structured LIVE checkpoint.'
@@ -2326,7 +2353,10 @@ setPreLiveMessages(null)
       try {
         saveSessionToV2({
           mode: liveMode ? 'live' : 'normal',
-          title: sessionLabel,
+          title: deriveSessionTitle(
+            activePromptLabel,
+            sessionLabel
+          ),
           messages: messagesRef.current,
           summary: liveMode ? 'LIVE Conversation saved before starting a new session.' : 'GEORGE session saved before starting a new session.',
           userGoal: activePromptLabel || 'Not set',
@@ -4770,7 +4800,10 @@ useEffect(() => {
       if (messagesRef.current.length > 2) {
         saveSessionToV2({
           mode: activeCampaignId ? 'campaign' : 'live',
-          title: activeCampaignId ? 'LIVE Session' : 'LIVE Conversation',
+          title: deriveSessionTitle(
+            activeCampaign?.desiredOutcome,
+            activeCampaignId ? 'LIVE Session' : 'LIVE Conversation'
+          ),
           messages: messagesRef.current,
           summary: activeCampaignId
             ? 'Structured LIVE checkpoint before new LIVE conversation.'
@@ -4895,7 +4928,10 @@ return (
               if (messagesRef.current.length > 1) {
                 saveSessionToV2({
                   mode: 'normal',
-                  title: activePromptLabel || 'GEORGE Session',
+                  title: deriveSessionTitle(
+                    activePromptLabel,
+                    'GEORGE Session'
+                  ),
                   messages: messagesRef.current,
                   summary: 'GEORGE session checkpoint.',
                   userGoal: activePromptLabel || 'Not set',
