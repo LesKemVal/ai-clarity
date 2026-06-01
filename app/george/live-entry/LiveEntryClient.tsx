@@ -988,21 +988,6 @@ export default function LiveEntryClient() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-[11px] text-white/38">
-                  <div>
-                    <span className="block text-white/22">Prep</span>
-                    {finalResourceEstimate.prepSeconds}s
-                  </div>
-                  <div>
-                    <span className="block text-white/22">Runtime</span>
-                    30m
-                  </div>
-                  <div>
-                    <span className="block text-white/22">Typical</span>
-                    ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)}
-                  </div>
-                </div>
-
                 <div className="mt-3 border-t border-white/[0.05] pt-3">
                   <span className="text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/30">
                     Bx
