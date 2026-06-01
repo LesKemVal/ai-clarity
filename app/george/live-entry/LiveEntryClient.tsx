@@ -755,7 +755,7 @@ export default function LiveEntryClient() {
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE Signal</div>
 
-          <h1 className="mt-1.5 text-[22px] font-semibold leading-[1.04] tracking-[-0.04em] text-white/92 sm:text-[32px]">
+          <h1 className="mt-2 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
             Help GEORGE understand what's happening.
           </h1>
 
