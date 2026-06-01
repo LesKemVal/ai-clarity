@@ -308,6 +308,10 @@ export default function LiveEntryClient() {
     .map((item) => item === 'Other' && customChair.trim() ? customChair.trim() : item)
     .join(' + ')
 
+  const contextSignalsCollapsed =
+    (relatedSessions.length === 0 || sessionSectionCollapsed) &&
+    chairSectionCollapsed
+
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
     setTier(cached.tier)
@@ -532,6 +536,11 @@ export default function LiveEntryClient() {
 
   const selectedRelatedSession = relatedSessions.find((session) => session?.id === relatedSessionId) || null
 
+  const relatedSessionLabel =
+    relatedSessions.length === 0 || relatedSessionId === 'not_related'
+      ? 'Not related'
+      : selectedRelatedSession?.title || 'Selected session'
+
   const buildContinuityPackage = (session: any) => {
     if (!session) return null
 
@@ -743,7 +752,7 @@ export default function LiveEntryClient() {
           </h1>
 
           <p className="mt-2 text-[12px] leading-5 text-white/42">
-Choose the related session, your chair, the outcome, and what is happening now.
+Tell GEORGE what you’re trying to accomplish and what’s happening now.
           </p>
 
           {runtimeMotionContext && (
@@ -753,7 +762,28 @@ Choose the related session, your chair, the outcome, and what is happening now.
             </div>
           )}
 
-          {relatedSessions.length > 0 && (
+          {contextSignalsCollapsed && (
+            <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSessionSectionCollapsed(false)
+                  setChairSectionCollapsed(false)
+                }}
+                className="flex w-full items-center justify-between gap-3 text-left"
+              >
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Context Signals</span>
+                  <span className="mt-1 block truncate text-[13px] text-white/62">
+                    {relatedSessionLabel} • {chair || 'Position not selected'}
+                  </span>
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
+              </button>
+            </div>
+          )}
+
+          {relatedSessions.length > 0 && !contextSignalsCollapsed && (
           <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
             {sessionSectionCollapsed ? (
               <button
@@ -820,6 +850,7 @@ Choose the related session, your chair, the outcome, and what is happening now.
           </div>
           )}
 
+          {!contextSignalsCollapsed && (
           <div className={`${relatedSessions.length > 0 ? 'mt-2' : 'mt-3'} rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2`}>
             {chairSectionCollapsed ? (
               <button
@@ -880,6 +911,7 @@ Choose the related session, your chair, the outcome, and what is happening now.
               </>
             )}
           </div>
+          )}
 
 
 
