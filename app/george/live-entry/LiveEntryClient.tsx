@@ -756,12 +756,8 @@ export default function LiveEntryClient() {
           <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE Signal</div>
 
           <h1 className="mt-2 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
-            Help GEORGE understand what's happening.
+            Help GEORGE understand what is happening.
           </h1>
-
-          <p className="mt-1.5 text-[13px] leading-5 text-white/48">
-            The stronger the signal, the more effective GEORGE becomes.
-          </p>
 
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
