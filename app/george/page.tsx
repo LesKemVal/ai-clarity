@@ -6686,9 +6686,7 @@ if (liveMode) {
             <button
               type="button"
               onClick={() => {
-                const sessions = sessionPickerMode === 'campaign'
-                  ? getCampaignSessions()
-                  : getSessionsForMode('live')
+                const sessions = getSessionsForMode('live')
 
                 sessions.forEach((session: any) => deleteSession(session.id))
 
@@ -6722,12 +6720,10 @@ if (liveMode) {
           {(() => {
             let sessions: any[] = []
             try {
-              sessions = (sessionPickerMode === 'campaign'
-                ? getCampaignSessions()
-                : getSessionsForMode('live'))
+              sessions = getSessionsForMode('live')
                   .filter(hasMeaningfulUserMessage)
                   .sort((a, b) => {
-                    const activeId = getActiveSessionIdForMode(sessionPickerMode)
+                    const activeId = getActiveSessionIdForMode('live')
                     if (a.id === activeId) return -1
                     if (b.id === activeId) return 1
                     return b.updatedAt - a.updatedAt
