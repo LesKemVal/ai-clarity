@@ -734,7 +734,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   }
 
   const [interimTranscript, setInterimTranscript] = useState('')
-  const [voiceError, setVoiceError] = useState('')
+const [voiceError, setVoiceError] = useState('')
   const [interactionMode, setInteractionMode] = useState<'text' | 'speech'>('text')
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
   const [activePromptLabel, setActivePromptLabel] = useState<string | null>(null)
@@ -853,7 +853,7 @@ const tierSignalText = hasLiveGeorgeAccess && tierSignalPhase === 1
   ? 'You have access to LIVE GEORGE'
   : tierPrimarySignal
 const showLiveGeorgeFlame = hasLiveGeorgeAccess && tierSignalPhase === 1
-  const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
+const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
     if (currentTier === 'brilliant') {
       return [
         
@@ -1155,6 +1155,12 @@ function detectLiveInterruption(interim: string) {
 }
 
 const [isListening, setIsListening] = useState(false)
+const liveRoomActive = forceLive || liveMode
+const liveRoomReceiving =
+  liveRoomActive &&
+  (voiceOn || isListening || Boolean(interimTranscript.trim()))
+
+
     const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -5195,35 +5201,35 @@ return (
     <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${voiceOn || isListening ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
           <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
             LIVE GEORGE
           </span>
         </div>
 
         <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
-          {voiceOn || isListening ? 'listening' : 'ready'}
+          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'listening' : 'ready'}
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
-          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Cue</span>
-          next move
+      <div className={`mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Cue</span>
+          {liveRoomActive ? 'room active' : 'awaiting room'}
         </div>
-        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
-          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Line</span>
-          repeatable
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Line</span>
+          {liveRoomActive ? 'ready line' : 'awaiting room'}
         </div>
-        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
-          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Signal</span>
-          adapt
+        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
+          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'monitoring' : 'awaiting room'}
         </div>
       </div>
 
-      <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-        <span className="block text-[#D7DBE4]/56">Audio connected?</span>
-        <span>GEORGE can only support the conversation it can hear.</span>
+      <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
+        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveRoomActive ? 'Room active.' : 'Audio connected?'}</span>
+        <span>{liveRoomActive ? 'GEORGE is listening for steering language and room signal.' : 'GEORGE can only support the conversation it can hear.'}</span>
       </div>
     </div>
   </div>
