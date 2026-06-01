@@ -417,6 +417,8 @@ export default function LiveEntryClient() {
   const finalResourceEstimate = useMemo(() => {
     return estimateWithResources(resourceEstimate, editableResources.length ? editableResources : resourceEstimate.resources)
   }, [resourceEstimate, editableResources])
+  const showEstimatedLiveCost = objective.trim().length > 0 && knownContext.trim().length > 0
+
 
   const loadedSummary = useMemo(() => {
     return `You can steer GEORGE’s behavior naturally during the conversation.`
@@ -920,60 +922,6 @@ export default function LiveEntryClient() {
 
 
 
-          <details className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-              <span>
-                <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">
-                  Estimated LIVE cost
-                </span>
-                <span className="mt-1 block text-[12px] text-white/68">
-                  <span className="text-[18px] font-semibold tracking-[-0.04em] text-white/88">{finalResourceEstimate.estimatedCents}¢</span>
-                  <span className="ml-2 text-white/44">typical 30-minute LIVE session</span>
-                </span>
-              </span>
-              <span className="text-[18px] leading-none text-white/32">⌄</span>
-            </summary>
-
-            <div className="mt-3 border-t border-white/[0.05] pt-3">
-              <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
-                <div
-                  className="h-full rounded-full bg-[#8FB6C9]/55"
-                  style={{ width: `${Math.min(100, Math.max(12, finalResourceEstimate.estimatedCents * 2))}%` }}
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-[11px] text-white/38">
-                <div>
-                  <span className="block text-white/22">Prep</span>
-                  {finalResourceEstimate.prepSeconds}s
-                </div>
-                <div>
-                  <span className="block text-white/22">Runtime</span>
-                  30m
-                </div>
-                <div>
-                  <span className="block text-white/22">Typical</span>
-                  ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)}
-                </div>
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {finalResourceEstimate.resources.slice(0, 5).map((resource) => (
-                  <span key={resource} className="rounded-full border border-white/[0.045] bg-black/18 px-2 py-1 text-[10px] text-white/38">
-                    {resource}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </details>
-
-          <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Signal status</div>
-            <div className="mt-1 text-[12px] leading-5 text-white/70">
-              You are free to go LIVE now, or continue to strengthen GEORGE.
-            </div>
-          </div>
-
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
             <textarea
@@ -999,6 +947,62 @@ export default function LiveEntryClient() {
               className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
             />
           </label>
+
+          <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Signal status</div>
+            <div className="mt-1 text-[12px] leading-5 text-white/70">
+              You are free to go LIVE now, or continue to strengthen GEORGE.
+            </div>
+          </div>
+
+          {showEstimatedLiveCost && (
+            <details className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">
+                    Estimated LIVE cost
+                  </span>
+                  <span className="mt-1 block text-[12px] text-white/68">
+                    <span className="text-[18px] font-semibold tracking-[-0.04em] text-white/88">{finalResourceEstimate.estimatedCents}¢</span>
+                    <span className="ml-2 text-white/44">typical 30-minute LIVE session</span>
+                  </span>
+                </span>
+                <span className="text-[18px] leading-none text-white/32">⌄</span>
+              </summary>
+
+              <div className="mt-3 border-t border-white/[0.05] pt-3">
+                <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
+                  <div
+                    className="h-full rounded-full bg-[#8FB6C9]/55 transition-[width] duration-300 ease-out"
+                    style={{ width: `${Math.min(100, Math.max(12, finalResourceEstimate.estimatedCents * 2))}%` }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-[11px] text-white/38">
+                  <div>
+                    <span className="block text-white/22">Prep</span>
+                    {finalResourceEstimate.prepSeconds}s
+                  </div>
+                  <div>
+                    <span className="block text-white/22">Runtime</span>
+                    30m
+                  </div>
+                  <div>
+                    <span className="block text-white/22">Typical</span>
+                    ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {finalResourceEstimate.resources.slice(0, 5).map((resource) => (
+                    <span key={resource} className="rounded-full border border-white/[0.045] bg-black/18 px-2 py-1 text-[10px] text-white/38">
+                      {resource}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </details>
+          )}
 
           <div className="mt-2 rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
