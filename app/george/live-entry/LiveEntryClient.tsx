@@ -1011,6 +1011,8 @@ Choose the related session, your chair, the outcome, and what is happening now.
         open={showPrepPreview}
         profile={prepRoomProfile}
         room={conversationType}
+        relatedSessionTitle={selectedRelatedSession?.title || (relatedSessionId === 'not_related' ? 'Not related' : null)}
+        chairs={chairs}
         desiredOutcome={objective}
         knownContext={knownContext}
         assistMode={liveAssistMode}

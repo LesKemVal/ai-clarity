@@ -6,6 +6,8 @@ type Props = {
   open: boolean
   profile: PrepRoomResourceProfile | null
   room?: string
+  relatedSessionTitle?: string | null
+  chairs?: string[]
   desiredOutcome?: string
   knownContext?: string
   assistMode?: string
@@ -19,15 +21,16 @@ function formatValue(value: string) {
   return value.replace(/_/g, ' ')
 }
 
-export function PrepRoomResourcePopup({ open, profile, room, desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
+export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle, chairs = [], desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
   if (!open || !profile) return null
 
   const roomValue = room?.trim() || profile.roomType || 'LIVE conversation'
+  const relatedSessionValue = relatedSessionTitle?.trim() || 'Not related'
+  const chairValue = chairs.length ? chairs.join(' + ') : 'Not specified'
   const desiredOutcomeValue = desiredOutcome?.trim() || 'Not specified'
-  const knownContextValue = knownContext?.trim() || ''
+  const knownContextValue = knownContext?.trim() || 'Not specified'
   const assistValue = assistMode?.trim() || formatValue(profile.responseTexture)
-  const signalValues = signals.map((item) => item.trim()).filter(Boolean).slice(0, 4)
-  const visibleSignals = signalValues.length > 0 ? signalValues : ['Signals received']
+  const summaryLine = `GEORGE will enter LIVE using your position, outcome, and observed reality to decide what matters first.`
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
@@ -55,9 +58,9 @@ export function PrepRoomResourcePopup({ open, profile, room, desiredOutcome, kno
         <div className="relative shrink-0 px-4 pb-3 pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">Room prepared</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">GEORGE Summary</p>
               <h2 className="mt-1.5 text-[22px] font-semibold tracking-[-0.045em] text-white">
-                GEORGE is ready for this room.
+                GEORGE is ready to enter LIVE.
               </h2>
             </div>
             <div className="rounded-full border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/68">
@@ -66,36 +69,37 @@ export function PrepRoomResourcePopup({ open, profile, room, desiredOutcome, kno
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            GEORGE will enter with the live loadout you prepared.
+            Review what GEORGE will treat as the starting frame before the room opens.
           </p>
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-y-auto px-4 pb-4">
           <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">LIVE loadout</p>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">loaded</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">Starting frame</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">review</p>
             </div>
 
             <div className="mt-2 grid gap-2 text-[12px] leading-5 text-white/56">
-              <p><span className="text-white/78">Room:</span> {roomValue}</p>
+              <p><span className="text-white/78">Related session:</span> {relatedSessionValue}</p>
+              <p><span className="text-white/78">Your position:</span> {chairValue}</p>
               <p><span className="text-white/78">Desired outcome:</span> {desiredOutcomeValue}</p>
-              {knownContextValue && (
-                <p><span className="text-white/78">Context:</span> {knownContextValue}</p>
-              )}
-              <p><span className="text-white/78">Assist:</span> {assistValue}</p>
+              <p><span className="text-white/78">Observed reality:</span> {knownContextValue}</p>
             </div>
           </div>
 
           <div className="mt-2 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Signals received</p>
-
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">GEORGE will consider</p>
+            <p className="mt-2 text-[12px] leading-5 text-white/48">
+              {summaryLine}
+            </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {visibleSignals.map((signal) => (
-                <span key={signal} className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
-                  {signal}
-                </span>
-              ))}
+              <span className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
+                {roomValue}
+              </span>
+              <span className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
+                {assistValue}
+              </span>
             </div>
           </div>
         </div>
