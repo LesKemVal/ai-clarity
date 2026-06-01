@@ -20,11 +20,20 @@ export type LiveHumanEntry = {
   signalAcquisitionDirective: string
 }
 
+export type LiveMandatorySignalQuestion = {
+  key: string
+  label: string
+  question: string
+  required: true
+  reason: string
+}
+
 export type LiveRoomFormation = {
   humanEntry: LiveHumanEntry
   confidence: LiveSignalConfidence
   interpretation: string
   requiredSignals: LiveSignalRequirement[]
+  nextMandatorySignal: LiveMandatorySignalQuestion | null
   canEnterLive: boolean
   entryDirective: string
 }
@@ -188,6 +197,74 @@ export function deriveSignalConfidence({
   }
 }
 
+export function deriveNextMandatorySignalQuestion({
+  chairs,
+  desiredOutcome,
+  observedReality,
+}: {
+  chairs: string[]
+  desiredOutcome: string
+  observedReality: string
+}): LiveMandatorySignalQuestion | null {
+  const chairText = chairs.join(' ').toLowerCase()
+  const outcome = desiredOutcome.trim()
+  const reality = observedReality.trim()
+
+  if (!outcome) {
+    return {
+      key: 'desiredOutcome',
+      label: 'Desired Outcome',
+      question: 'What are you trying to accomplish?',
+      required: true,
+      reason: 'Outcome is the highest-leverage missing signal because GEORGE cannot judge the next move without the destination.',
+    }
+  }
+
+  if (!reality) {
+    return {
+      key: 'observedReality',
+      label: 'Observed Reality',
+      question: 'What is happening right now?',
+      required: true,
+      reason: 'Observed reality is the highest-leverage missing signal because GEORGE needs the terrain before execution.',
+    }
+  }
+
+  const combined = `${outcome} ${reality}`.trim()
+
+  if (combined.length < 24) {
+    return {
+      key: 'decisiveDetail',
+      label: 'Decisive Detail',
+      question: 'What is the one detail that most changes the outcome?',
+      required: true,
+      reason: 'The core signals exist, but confidence is still thin. One decisive detail should improve room formation more than adding a full form.',
+    }
+  }
+
+  if (/patient|medical|doctor/.test(chairText) && !/symptom|pain|diagnosis|test|result|medication|treatment|risk|concern/i.test(combined)) {
+    return {
+      key: 'primaryConcern',
+      label: 'Primary Concern',
+      question: 'What is the main concern you do not want missed?',
+      required: true,
+      reason: 'For patient-chair conversations, the next best signal is the concern that must not be overlooked.',
+    }
+  }
+
+  if (/buyer|seller|investor|founder|board/.test(chairText) && !/risk|runway|price|money|deadline|equity|terms|leverage|offer|stake/i.test(combined)) {
+    return {
+      key: 'stakes',
+      label: 'Stakes',
+      question: 'What cannot be lost here?',
+      required: true,
+      reason: 'For business, deal, or governance chairs, the next best signal is the stake that should control judgment.',
+    }
+  }
+
+  return null
+}
+
 export function deriveRoomFormation({
   chairs,
   desiredOutcome,
@@ -200,17 +277,19 @@ export function deriveRoomFormation({
   const requiredSignals = deriveRequiredSignals(chairs)
   const humanEntry = deriveHumanEntry(chairs)
   const confidence = deriveSignalConfidence({ chairs, desiredOutcome, observedReality })
+  const nextMandatorySignal = deriveNextMandatorySignalQuestion({ chairs, desiredOutcome, observedReality })
   const interpretation = deriveGeorgeInterpretation(chairs, desiredOutcome, observedReality)
-  const canEnterLive = confidence.missingRequiredSignals.length === 0
+  const canEnterLive = !nextMandatorySignal && confidence.missingRequiredSignals.length === 0
 
   return {
     humanEntry,
     confidence,
     interpretation,
     requiredSignals,
+    nextMandatorySignal,
     canEnterLive,
     entryDirective: canEnterLive
       ? 'LIVE may begin. Do not repeat preview work. Execute from the outcome and observed reality.'
-      : 'Do not enter LIVE yet. Recognize the user’s chair, then ask only for the missing required signal.',
+      : 'Do not enter LIVE yet. Recognize the user’s chair, then ask the single next mandatory signal question.',
   }
 }

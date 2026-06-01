@@ -94,12 +94,19 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     `Room formed from signal: ${room}`,
     '',
     `Confidence: ${formation.confidence.level}`,
+    formation.nextMandatorySignal
+      ? `Next mandatory signal: ${formation.nextMandatorySignal.question}`
+      : 'Next mandatory signal: none.',
+    formation.nextMandatorySignal
+      ? `Reason: ${formation.nextMandatorySignal.reason}`
+      : null,
     formation.interpretation,
     formation.entryDirective,
     '',
     signalLine,
     '',
     'Chair creates recognition. Recognition creates trust. Trust reduces apprehension. Cooperation produces signal.',
+    'Next best signal is mandatory. All other signals are optional.',
     'Preview is complete. LIVE is execution.',
     'Do not repeat preview work.',
     'Do not create profession brains, modes, or separate expertise layers.',
