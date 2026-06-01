@@ -233,10 +233,10 @@ export default function SignalPage() {
         <div className="rounded-[1.25rem] border border-white/[0.045] bg-black/24 p-4 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[18px] sm:p-5">
           <div className="border-b border-white/[0.045] pb-5">
             <h1 className="max-w-3xl text-[34px] font-semibold leading-[0.98] tracking-[-0.06em] text-white/92 sm:text-[48px]">
-              Sharpen your way forward.
+              Help GEORGE understand what's happening.
             </h1>
             <p className="mt-4 max-w-2xl text-[14px] leading-7 text-white/48">
-              Give GEORGE better signal so guidance can adapt to your goals, priorities, and future.
+              The stronger the signal, the more effective GEORGE becomes.
             </p>
           </div>
 
@@ -245,7 +245,7 @@ export default function SignalPage() {
               <div className="mb-4">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">Personal signals</p>
                 <p className="mt-2 text-[13px] leading-6 text-white/44">
-                  Durable preferences. GEORGE uses these to work with you without asking every time.
+                  Durable signal. GEORGE uses these answers to work with you without asking every time.
                 </p>
               </div>
 
@@ -307,7 +307,7 @@ export default function SignalPage() {
               <div className="mb-4">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Outcome signals</p>
                 <p className="mt-2 text-[13px] leading-6 text-white/48">
-                  Goal-specific signal. These answers help GEORGE justify the path and adapt while still moving toward the outcome.
+                  Goal-specific signal. These answers help GEORGE understand what matters and adapt while still moving toward the outcome.
                 </p>
               </div>
 

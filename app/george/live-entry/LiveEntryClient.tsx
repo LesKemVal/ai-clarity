@@ -749,14 +749,14 @@ export default function LiveEntryClient() {
         </div>
 
         <section className="rounded-[1.25rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_18px_54px_rgba(0,0,0,0.26)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
+          <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Signal</div>
 
-          <h1 className="mt-3 text-[19px] font-semibold leading-[1.08] tracking-[-0.05em] text-white/90 sm:text-[32px]">
-            Set the room before LIVE.
+          <h1 className="mt-2 text-[24px] font-semibold leading-[1.04] tracking-[-0.045em] text-white/92 sm:text-[34px]">
+            Help GEORGE understand what's happening.
           </h1>
 
-          <p className="mt-2 text-[12px] leading-5 text-white/42">
-Tell GEORGE what you’re trying to accomplish and what’s happening now.
+          <p className="mt-2 text-[13px] leading-6 text-white/48">
+            The stronger the signal, the more effective GEORGE becomes.
           </p>
 
           {runtimeMotionContext && (
@@ -863,15 +863,16 @@ Tell GEORGE what you’re trying to accomplish and what’s happening now.
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Your Position</span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Optional Position Signal</span>
                   <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/48">Change</span>
               </button>
             ) : (
               <>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Your Position</div>
-            <div className="mt-2 grid grid-cols-2 gap-1.5">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Optional Position Signal</div>
+            <p className="mt-1 text-[11px] leading-5 text-white/36">Use this only if your position changes what GEORGE should pay attention to.</p>
+            <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
               {CHAIR_OPTIONS.map((option) => {
                 const active = chairs.includes(option.label)
 
@@ -919,14 +920,15 @@ Tell GEORGE what you’re trying to accomplish and what’s happening now.
 
 
 
-          <details open className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-3 py-2">
+          <details className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
               <span>
                 <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/36">
-                  30-minute resource estimate
+                  Estimated LIVE cost
                 </span>
                 <span className="mt-1 block text-[12px] text-white/68">
-                  ${(finalResourceEstimate.estimatedCents / 100).toFixed(2)} typical OpenAI resources · {finalResourceEstimate.intensity}
+                  <span className="text-[18px] font-semibold tracking-[-0.04em] text-white/88">{finalResourceEstimate.estimatedCents}¢</span>
+                  <span className="ml-2 text-white/44">typical 30-minute LIVE session</span>
                 </span>
               </span>
               <span className="text-[18px] leading-none text-white/32">⌄</span>
@@ -966,14 +968,14 @@ Tell GEORGE what you’re trying to accomplish and what’s happening now.
           </details>
 
           <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Room ready</div>
-            <div className="mt-1 text-[12px] text-white/70">
-              GEORGE will enter with this room, objective, and any uploaded material loaded.
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">Signal status</div>
+            <div className="mt-1 text-[12px] leading-5 text-white/70">
+              You are free to go LIVE now, or continue to strengthen GEORGE.
             </div>
           </div>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Signal</span>
             <textarea
               id="george-desired-outcome"
               data-live-signal="desired-outcome"
