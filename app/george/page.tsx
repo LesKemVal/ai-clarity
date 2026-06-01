@@ -5147,16 +5147,40 @@ return (
   </div>
 )}
 {(forceLive || liveMode) && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[56px] z-[64] flex justify-center xl:pl-[280px]">
-    <div className="flex items-center gap-2 rounded-full border border-white/[0.055] bg-[#0B0D12]/88 px-3 py-1.5 shadow-[0_12px_34px_rgba(0,0,0,0.34)] backdrop-blur-[14px]">
-      <img
-        src="/earbudlive500.png"
-        alt=""
-        className="h-8 w-8 object-contain opacity-80"
-      />
-      <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#D7DBE4]/58">
-        LIVE GEORGE
-      </span>
+  <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[40] flex justify-center px-4 xl:pl-[280px]">
+    <div className="w-full max-w-[380px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${voiceOn || isListening ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
+            LIVE GEORGE
+          </span>
+        </div>
+
+        <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
+          {voiceOn || isListening ? 'listening' : 'ready'}
+        </span>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] leading-4 text-[#D7DBE4]/34">
+        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Cue</span>
+          next move
+        </div>
+        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Line</span>
+          repeatable
+        </div>
+        <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Signal</span>
+          adapt
+        </div>
+      </div>
+
+      <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] leading-4 text-[#D7DBE4]/34">
+        <span className="block text-[#D7DBE4]/48">Audio connected?</span>
+        <span>GEORGE can only support the conversation it can hear.</span>
+      </div>
     </div>
   </div>
 )}
@@ -5182,7 +5206,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[118px] md:pt-[128px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${liveMode ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[138px] md:pt-[150px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !liveMode && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
@@ -5860,7 +5884,7 @@ I am listening now. Speak naturally. I will respond ${
 )}
 
 {(forceLive || liveMode) && messages.length === 0 && (
-  <div className="mx-auto w-full max-w-[620px] px-3 pt-[150px]">
+  <div className="mx-auto w-full max-w-[620px] px-3 pt-[116px] md:pt-[128px]">
     <div className="h-[96px] overflow-hidden">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
         {"I'm listening."}
