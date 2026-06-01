@@ -67,6 +67,20 @@ const POSITION_OPTIONS: SelectOption[] = [
   { label: 'Advising', helper: 'improving another person’s outcome' },
 ]
 
+const CHAIR_OPTIONS: SelectOption[] = [
+  { label: 'Founder', helper: 'execution, risk, adoption, momentum' },
+  { label: 'Operator', helper: 'systems, process, execution' },
+  { label: 'Investor', helper: 'risk, return, future value' },
+  { label: 'Candidate', helper: 'fit, proof, confidence' },
+  { label: 'Board Member', helper: 'oversight, governance, allocation' },
+  { label: 'Buyer', helper: 'value, terms, risk' },
+  { label: 'Seller', helper: 'positioning, leverage, close' },
+  { label: 'Patient', helper: 'facts, symptoms, questions' },
+  { label: 'Parent', helper: 'care, judgment, responsibility' },
+  { label: 'Advisor', helper: 'clarity, tradeoffs, protection' },
+  { label: 'Other', helper: 'custom position' },
+]
+
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
   if (conversationType === 'Interview') {
     return {
@@ -259,7 +273,12 @@ export default function LiveEntryClient() {
   const [outputMode, setOutputMode] = useState('Repeatable lines')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
+  const [chair, setChair] = useState('Founder')
   const [knownContext, setKnownContext] = useState('')
+  const [sessionEmail, setSessionEmail] = useState('')
+  const [relatedSessionId, setRelatedSessionId] = useState('not_related')
+  const [relatedSessions, setRelatedSessions] = useState<any[]>([])
+  const [liveToaAccepted, setLiveToaAccepted] = useState(false)
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
   const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
@@ -273,9 +292,13 @@ export default function LiveEntryClient() {
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
     setTier(cached.tier)
+    setSessionEmail(cached.email || '')
 
     fetchGeorgeSessionAuthority()
-      .then((authority) => setTier(authority.tier))
+      .then((authority) => {
+        setTier(authority.tier)
+        setSessionEmail(authority.email || '')
+      })
       .catch(() => {})
 
     try {
@@ -288,9 +311,7 @@ export default function LiveEntryClient() {
       if (saved?.audienceType) setAudienceType(saved.audienceType)
       if (saved?.cadence) setPacing(saved.cadence)
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
-      if (saved?.objective) setObjective(saved.objective)
       if (saved?.userPosition) setUserPosition(saved.userPosition)
-      if (saved?.knownContext) setKnownContext(saved.knownContext)
       if (saved?.controlWords) setControlWords(saved.controlWords)
     } catch {}
 
@@ -298,6 +319,34 @@ export default function LiveEntryClient() {
       setRuntimeMotionContext(getActiveRuntimeMotionContext())
     } catch {
       setRuntimeMotionContext(null)
+    }
+
+    try {
+      const activeNormal = getActiveSessionForMode('normal')
+      const allSessions = JSON.parse(window.localStorage.getItem('GEORGE_SESSIONS_V2') || '[]')
+      const normalSessions = Array.isArray(allSessions)
+        ? allSessions
+            .filter((session: any) => session?.mode === 'normal' && !session?.archived)
+            .filter((session: any) => {
+              const email = cached.email || ''
+              if (!email) return true
+              return !session?.metadata?.subscriberEmail || session.metadata.subscriberEmail === email
+            })
+            .sort((a: any, b: any) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
+        : []
+
+      const merged = [
+        ...(activeNormal ? [activeNormal] : []),
+        ...normalSessions,
+      ].filter((session: any, index: number, list: any[]) =>
+        session?.id && list.findIndex((item: any) => item?.id === session.id) === index
+      ).slice(0, 5)
+
+      setRelatedSessions(merged)
+      setRelatedSessionId(merged[0]?.id || 'not_related')
+    } catch {
+      setRelatedSessions([])
+      setRelatedSessionId('not_related')
     }
 
     setHasLiveSession(!!getActiveSessionForMode('live'))
@@ -458,6 +507,25 @@ export default function LiveEntryClient() {
     setEditableResources((items) => items.filter((item) => item !== resource))
   }
 
+  const selectedRelatedSession = relatedSessions.find((session) => session?.id === relatedSessionId) || null
+
+  const buildContinuityPackage = (session: any) => {
+    if (!session) return null
+
+    return {
+      sessionId: session.id || null,
+      title: session.title || 'Related session',
+      direction: session.userGoal || session.metadata?.direction || session.title || 'Not established',
+      outcome: session.metadata?.outcome || session.userGoal || 'Not established',
+      openDecisions: session.metadata?.openDecisions || [],
+      constraints: session.metadata?.constraints || [],
+      lastKnownState: session.lastKnownState || session.summary || 'No state captured yet.',
+      suggestedRestart: session.suggestedRestart || 'Continue from the clearest next useful move.',
+      updatedAt: session.updatedAt || session.createdAt || null,
+      source: 'selected_normal_session',
+    }
+  }
+
   const editPrepRoomResource = <K extends keyof PrepRoomResourceProfile>(
     key: K,
     value: PrepRoomResourceProfile[K]
@@ -475,6 +543,47 @@ export default function LiveEntryClient() {
 
   const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
+
+    if (!sessionEmail.trim()) {
+      window.alert('Sign in to use LIVE.')
+      return
+    }
+
+    if (!objective.trim()) {
+      window.alert('Enter the outcome you are trying to achieve.')
+      return
+    }
+
+    if (!knownContext.trim()) {
+      window.alert('Enter what is happening right now.')
+      return
+    }
+
+    if (!liveToaAccepted) {
+      window.alert('Acknowledge the LIVE notice before entering.')
+      return
+    }
+
+    const continuityPackage = relatedSessionId === 'not_related'
+      ? null
+      : buildContinuityPackage(selectedRelatedSession)
+
+    const roomPackage = {
+      relatedSessionId,
+      relatedSessionTitle: selectedRelatedSession?.title || null,
+      relatedSessionMode: relatedSessionId === 'not_related' ? 'not_related' : 'normal',
+      chair,
+      desiredOutcome: objective.trim(),
+      observedReality: knownContext.trim(),
+      continuityPackage,
+      internalInstruction: [
+        'Use the selected chair as a relevance signal, not as a separate brain or profession mode.',
+        'User outcome is highest authority.',
+        'Observed reality is second authority.',
+        'Selected session context is fallback/supporting context only.',
+        'Narrow all context to LIVE usefulness: what matters now, what decision is at stake, what cue or line may help.',
+      ].join(' '),
+    }
 
     const finalResources = Array.from(new Set([
       ...(skipPrep ? resourceEstimate.resources : (resources.length ? resources : resourceEstimate.resources)),
@@ -495,6 +604,8 @@ export default function LiveEntryClient() {
       resolvedConversationType,
       userPosition,
       knownContext,
+      chair,
+      roomPackage,
       pacing,
       compactPrep: true,
       editedByUser: !skipPrep,
@@ -505,7 +616,12 @@ export default function LiveEntryClient() {
       room: skipPrep ? 'Adaptive LIVE' : conversationType,
       audienceType,
       userPosition,
+      chair,
+      relatedSessionId,
+      relatedSessionTitle: selectedRelatedSession?.title || null,
       knownContext,
+      observedReality: knownContext,
+      roomPackage,
       language: window.localStorage.getItem('george_live_language') || 'English',
       cadence: pacing,
       objective,
@@ -529,17 +645,55 @@ export default function LiveEntryClient() {
     window.localStorage.removeItem('george_active_campaign')
     window.localStorage.removeItem('george_active_context')
     window.localStorage.removeItem('george_active_label')
+    const sanitizedLastSetup = {
+      ...liveSetup,
+      objective: '',
+      knownContext: '',
+      observedReality: '',
+      prepDocument: null,
+      roomPackage: {
+        ...roomPackage,
+        desiredOutcome: '',
+        observedReality: '',
+      },
+    }
+
     window.localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(liveSetup))
-    window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(liveSetup))
+    window.localStorage.setItem('GEORGE_LAST_LIVE_SETUP', JSON.stringify(sanitizedLastSetup))
     window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
     window.localStorage.setItem('george_live_estimated_cents', String(finalEstimate.estimatedCents))
 
+    setObjective('')
+    setKnownContext('')
+    setPrepDocument(null)
+    setLiveToaAccepted(false)
+
     window.location.href = '/george/live'
   }
 
   if (!ready) return null
+
+  if (!sessionEmail.trim()) {
+    return (
+      <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
+        <div className="w-full max-w-[420px] rounded-[1.25rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.30)]">
+          <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE requires sign-in</div>
+          <h1 className="mt-3 text-[24px] font-semibold tracking-[-0.04em] text-white/90">Sign in to use LIVE.</h1>
+          <p className="mt-2 text-[13px] leading-5 text-white/46">
+            LIVE uses session continuity and room context. Sign in so GEORGE can protect the room from stale or unowned context.
+          </p>
+          <a
+            href="/george"
+            className="mt-5 block rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.08] px-4 py-3 text-center text-[13px] font-semibold text-[#D7DCFF]/86 transition hover:bg-[#8FB6C9]/[0.14] hover:text-white"
+          >
+            Return to GEORGE
+          </a>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="relative min-h-[100dvh] overflow-y-auto bg-[#06070A] px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
@@ -557,11 +711,11 @@ export default function LiveEntryClient() {
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE Runtime</div>
 
           <h1 className="mt-3 text-[19px] font-semibold leading-[1.08] tracking-[-0.05em] text-white/90 sm:text-[32px]">
-            Sharpen your cues, lines and conversation.
+            Set the room before LIVE.
           </h1>
 
           <p className="mt-2 text-[12px] leading-5 text-white/42">
-Answer a few questions and create the best version of your conversation.
+Choose the related session, your chair, the outcome, and what is happening now.
           </p>
 
           {runtimeMotionContext && (
@@ -570,6 +724,49 @@ Answer a few questions and create the best version of your conversation.
               <div className="mt-1 text-[14px] font-medium text-white/78">{runtimeMotionContext.title}</div>
             </div>
           )}
+
+          <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">
+              Which session is this LIVE conversation related to?
+            </div>
+
+            <div className="mt-2 grid gap-1.5">
+              {relatedSessions.length > 0 && relatedSessions.map((session) => (
+                <button
+                  key={session.id}
+                  type="button"
+                  onClick={() => setRelatedSessionId(session.id)}
+                  className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
+                    relatedSessionId === session.id
+                      ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.09] text-white'
+                      : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
+                  }`}
+                >
+                  <span className="block truncate text-[13px] font-medium">{session.title || 'GEORGE Session'}</span>
+                  <span className="mt-1 block truncate text-[11px] text-white/34">
+                    {session.lastKnownState || session.summary || session.userGoal || 'Last active normal session'}
+                  </span>
+                </button>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setRelatedSessionId('not_related')}
+                className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
+                  relatedSessionId === 'not_related'
+                    ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.09] text-white'
+                    : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
+                }`}
+              >
+                <span className="block text-[13px] font-medium">Not related</span>
+                <span className="mt-1 block text-[11px] text-white/34">Start LIVE without normal-session context.</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-2 grid gap-2">
+            <CompactSelect label="Chair" value={chair} options={CHAIR_OPTIONS} onChange={setChair} />
+          </div>
 
           <div className="mt-2 grid gap-2">
             <CompactSelect label="Room" value={conversationType} options={CONVERSATION_TYPES} onChange={setConversationType} />
@@ -640,7 +837,7 @@ Answer a few questions and create the best version of your conversation.
           </label>
 
           <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">What GEORGE should know</span>
+            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Observed Reality</span>
             <textarea
               value={knownContext}
               onChange={(event) => setKnownContext(event.target.value)}
@@ -729,6 +926,19 @@ Answer a few questions and create the best version of your conversation.
               <span className="text-white/48">{loadedSummary}</span>
             </span>
           </div>
+
+          <label className="mt-3 flex gap-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-3 text-[12px] leading-5 text-white/42">
+            <input
+              type="checkbox"
+              checked={liveToaAccepted}
+              onChange={(event) => setLiveToaAccepted(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+            />
+            <span>
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/28">LIVE Notice</span>
+              GEORGE may misunderstand speech, miss context, provide imperfect guidance, or experience latency. GEORGE assists. You remain responsible for decisions and actions.
+            </span>
+          </label>
 
           <div className="mt-3 grid gap-2">
             <button
