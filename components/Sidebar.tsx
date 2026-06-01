@@ -513,9 +513,9 @@ return (
                     <button
                       type="button"
                       onClick={() => openNormalSession(session)}
-                      className="block w-full rounded-[0.45rem] px-2 py-1.5 pr-8 text-left transition"
+                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1.5 text-left transition"
                     >
-                      <span className="block truncate text-[13px] text-white/48 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] text-white/48 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -611,9 +611,9 @@ return (
                     <button
                       type="button"
                       onClick={() => openLiveSession(session)}
-                      className="block w-full rounded-[0.45rem] px-2 py-1.5 pr-8 text-left transition"
+                      className="flex w-full items-center justify-between gap-2 rounded-[0.45rem] px-2 py-1.5 text-left transition"
                     >
-                      <span className="block truncate text-[13px] text-white/48 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] text-white/48 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
