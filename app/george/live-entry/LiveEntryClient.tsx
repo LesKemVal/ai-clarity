@@ -273,7 +273,7 @@ export default function LiveEntryClient() {
   const [outputMode, setOutputMode] = useState('Repeatable lines')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
-  const [chair, setChair] = useState('Founder')
+  const [chairs, setChairs] = useState<string[]>(['Founder'])
   const [knownContext, setKnownContext] = useState('')
   const [sessionEmail, setSessionEmail] = useState('')
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
@@ -288,6 +288,19 @@ export default function LiveEntryClient() {
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
   const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
+
+  const toggleChair = (value: string) => {
+    setChairs((current) => {
+      if (current.includes(value)) {
+        const next = current.filter((item) => item !== value)
+        return next.length ? next : current
+      }
+
+      return [...current, value]
+    })
+  }
+
+  const chair = chairs.join(' + ')
 
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
@@ -573,6 +586,7 @@ export default function LiveEntryClient() {
       relatedSessionTitle: selectedRelatedSession?.title || null,
       relatedSessionMode: relatedSessionId === 'not_related' ? 'not_related' : 'normal',
       chair,
+      chairs,
       desiredOutcome: objective.trim(),
       observedReality: knownContext.trim(),
       continuityPackage,
@@ -764,8 +778,29 @@ Choose the related session, your chair, the outcome, and what is happening now.
             </div>
           </div>
 
-          <div className="mt-2 grid gap-2">
-            <CompactSelect label="Chair" value={chair} options={CHAIR_OPTIONS} onChange={setChair} />
+          <div className="mt-2 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Chair</div>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {CHAIR_OPTIONS.map((option) => {
+                const active = chairs.includes(option.label)
+
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => toggleChair(option.label)}
+                    className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
+                      active
+                        ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.10] text-white'
+                        : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
+                    }`}
+                  >
+                    <span className="block text-[12px] font-medium">{option.label}</span>
+                    <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           <div className="mt-2 grid gap-2">
