@@ -4789,10 +4789,10 @@ responseTimerRef.current = setTimeout(() => {
 
   const hasDraftInput = input.trim().length > 0
   const showConversation = hasDraftInput || hasVisibleThread || liveMode
-  const showMobileHero = !liveMode && messages.length <= 1
+  const showMobileHero = !(forceLive || liveMode) && messages.length <= 1
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
-    showMobileHero && !liveMode && !hasDraftInput && !pendingImage && !hasUserMessageForSurface
+    showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !pendingImage && !hasUserMessageForSurface
 
   const showDesktopOperationalSurface =
     !hasUserMessageForSurface
@@ -4806,7 +4806,7 @@ responseTimerRef.current = setTimeout(() => {
     liveMode
 
 useEffect(() => {
-  if (!showMobileHero || liveMode) return
+  if (!showMobileHero || forceLive || liveMode) return
 
   requestAnimationFrame(() => {
     scrollHostRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -5189,7 +5189,9 @@ return (
   </div>
 )}
 {(forceLive || liveMode) && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[40] flex justify-center px-4 xl:pl-[280px]">
+  <>
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[39] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[50] flex justify-center px-4 xl:pl-[280px]">
     <div className="w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -5225,6 +5227,7 @@ return (
       </div>
     </div>
   </div>
+  </>
 )}
 <div
   ref={scrollHostRef}
@@ -5248,8 +5251,8 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-visible overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[128px] md:pt-[138px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showMobileHero && !liveMode && !hasDraftInput && !hasUserMessageForSurface && (
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[270px] md:pb-[300px]"} md:px-6 space-y-3 ${(forceLive || liveMode) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[31dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
         ? '-translate-y-12 opacity-0'
@@ -5267,7 +5270,7 @@ return (
     </div>
   )}
 
-  {showMobileHero && !liveMode && hasDraftInput && !hasUserMessageForSurface && (
+  {showMobileHero && !(forceLive || liveMode) && hasDraftInput && !hasUserMessageForSurface && (
     <div className="pointer-events-none fixed inset-0 z-[34] md:hidden flex items-center justify-center">
       <img
         src="/logofav.png"
@@ -5926,7 +5929,7 @@ I am listening now. Speak naturally. I will respond ${
 )}
 
 {(forceLive || liveMode) && (forceLive || messages.length === 0) && (
-  <div className="mx-auto w-full max-w-[620px] px-3 pt-[64px] md:pt-[72px]">
+  <div className="mx-auto w-full max-w-[620px] px-3 pt-[18px] md:pt-[22px]">
     <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
         {typedLiveEntryBriefing || liveEntryBriefing || "I'm listening..."}
