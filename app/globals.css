@@ -1132,3 +1132,151 @@ textarea:focus{
     font-size:clamp(2.7rem,10vw,4.2rem);
   }
 }
+
+
+/* conversation surface overhaul */
+
+.message-user{
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.06);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.05),
+      rgba(255,255,255,.02)
+    );
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.18);
+}
+
+.message-assistant{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+
+.message-assistant p{
+  max-width:78ch;
+}
+
+.message-assistant h1,
+.message-assistant h2,
+.message-assistant h3{
+  color:rgba(255,255,255,.95);
+}
+
+.message-assistant{
+  color:rgba(255,255,255,.82);
+}
+
+.message-assistant strong{
+  color:white;
+}
+
+.message-assistant ul{
+  opacity:.92;
+}
+
+.message-assistant blockquote{
+  border-left:2px solid rgba(174,182,255,.35);
+  padding-left:16px;
+  color:rgba(255,255,255,.72);
+}
+
+.message-assistant + .message-assistant{
+  margin-top:18px;
+}
+
+
+/* conversation surface overhaul */
+
+.message-user{
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.06);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.05),
+      rgba(255,255,255,.02)
+    );
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.18);
+}
+
+.message-assistant{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+
+.message-assistant p{
+  max-width:78ch;
+}
+
+.message-assistant h1,
+.message-assistant h2,
+.message-assistant h3{
+  color:rgba(255,255,255,.95);
+}
+
+.message-assistant{
+  color:rgba(255,255,255,.82);
+}
+
+.message-assistant strong{
+  color:white;
+}
+
+.message-assistant ul{
+  opacity:.92;
+}
+
+.message-assistant blockquote{
+  border-left:2px solid rgba(174,182,255,.35);
+  padding-left:16px;
+  color:rgba(255,255,255,.72);
+}
+
+.message-assistant + .message-assistant{
+  margin-top:18px;
+}
+
+
+/* conversation hierarchy */
+
+.message-user{
+  border:1px solid rgba(255,255,255,.05);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.018)
+    );
+  backdrop-filter:blur(14px);
+}
+
+.message-assistant{
+  border:none;
+  background:transparent;
+  box-shadow:none;
+}
+
+.message-assistant p{
+  max-width:76ch;
+}
+
+.message-assistant ul,
+.message-assistant ol{
+  max-width:76ch;
+}
+
+.message-assistant strong{
+  color:#fff;
+}
+
+.message-assistant h1,
+.message-assistant h2,
+.message-assistant h3{
+  margin-top:1.2rem;
+  margin-bottom:.65rem;
+}
