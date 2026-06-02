@@ -33,7 +33,7 @@ import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-bri
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 
-const BRANESx_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
+const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
 function deriveSessionTitle(
   desiredOutcome?: string | null,
