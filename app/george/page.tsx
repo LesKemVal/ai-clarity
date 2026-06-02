@@ -33,7 +33,7 @@ import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-bri
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 
-const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
+const BRANESx_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
 function deriveSessionTitle(
   desiredOutcome?: string | null,
@@ -541,7 +541,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     `${timeGreeting} Bring me something real.`,
     `${timeGreeting} Comfort costs. What is the bottleneck?`,
     `${timeGreeting} Protect momentum. What’s the next decisive step?`,
-    `${timeGreeting} Focus on what lasts. What durable problem are we solving?`,
+    `${timeGreeting} What are we trying to move forward?`,
     `${timeGreeting} Pressure reveals weak systems. What needs fixing?`,
     `${timeGreeting} Time is moving either way. What move are we making?`,
     `${timeGreeting} What are we building that actually matters?`,
@@ -5299,24 +5299,19 @@ return (
             </span>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
-              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Direction</span>
-              not set
+          <div className="mt-5 grid grid-cols-1 gap-3 text-[13px] leading-5 text-[#D7DBE4]/72 sm:grid-cols-3 md:text-[14px]">
+            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Current Direction</span>
+              <span className="mt-2 block text-[#D7DBE4]/78">not set</span>
             </div>
-            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
-              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Position</span>
-              waiting
+            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Open Threads</span>
+              <span className="mt-2 block text-[#D7DBE4]/78">waiting</span>
             </div>
-            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
-              <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Move</span>
-              ask
+            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Suggested Next Move</span>
+              <span className="mt-2 block text-[#D7DBE4]/78">ask</span>
             </div>
-          </div>
-
-          <div className="mt-3 border-t border-white/[0.035] pt-3 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-            <span className="block text-[#D7DBE4]/56">Set the direction.</span>
-            <span>GEORGE will help map the next operational move.</span>
           </div>
         </div>
       </div>
@@ -6067,7 +6062,7 @@ I am listening now. Speak naturally. I will respond ${
                       type="button"
                       aria-label="Close GEORGE popup"
                       onClick={() => setShowNormalUtilityMenu(null)}
-                      className="fixed inset-0 z-[70] cursor-default bg-black/68 backdrop-blur-[10px]"
+                      className="fixed inset-0 z-[70] cursor-default bg-transparent"
                     />
                   )}
 
@@ -6077,7 +6072,7 @@ I am listening now. Speak naturally. I will respond ${
                         type="button"
                         aria-label="Close GEORGE utility menu"
                         onClick={() => setShowNormalUtilityMenu(null)}
-                        className="fixed inset-0 z-[80] cursor-default bg-black/68 backdrop-blur-[10px]"
+                        className="fixed inset-0 z-[80] cursor-default bg-transparent"
                       />
                       <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
@@ -7078,7 +7073,7 @@ Continue from here, tell me what changed, or start fresh.`
             type="button"
             aria-label="Close LIVE controls"
             onClick={() => setShowLiveQuickMenu(false)}
-            className="fixed inset-0 z-[80] cursor-default bg-black/68 backdrop-blur-[10px]"
+            className="fixed inset-0 z-[80] cursor-default bg-transparent"
           />
 
           <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>

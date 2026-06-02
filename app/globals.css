@@ -264,3 +264,18 @@ a[href*="/george/live"]:active {
   background-color: rgba(16, 19, 27, 0.78) !important;
   border-color: rgba(255,255,255,0.075) !important;
 }
+
+@keyframes georgeSurfaceBorderGleam {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.george-normal-surface-box {
+  background:
+    linear-gradient(rgba(21,25,35,0.88), rgba(21,25,35,0.88)) padding-box,
+    linear-gradient(120deg, rgba(255,255,255,0.08), rgba(170,180,255,0.22), rgba(143,182,201,0.16), rgba(255,255,255,0.08)) border-box;
+  border: 1px solid transparent;
+  background-size: 100% 100%, 240% 240%;
+  animation: georgeSurfaceBorderGleam 6.5s ease-in-out infinite;
+}
