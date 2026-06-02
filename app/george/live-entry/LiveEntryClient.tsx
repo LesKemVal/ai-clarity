@@ -1017,7 +1017,10 @@ export default function LiveEntryClient() {
           <div className={`mt-2 grid gap-2 ${showEstimatedLiveCost ? 'animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]' : ''}`}>
             <button
               type="button"
-              onClick={() => setShowPrepPreview(true)}
+              onClick={() => {
+                setLiveToaAccepted(true)
+                setShowPrepPreview(true)
+              }}
               className="min-h-[50px] rounded-[0.82rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:scale-[1.01] hover:border-[#8FB6C9]/[0.28] hover:text-white"
             >
               Deploy LIVE
