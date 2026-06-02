@@ -86,7 +86,7 @@ export default function HelpPage() {
             OPERATIONAL HELP
           </div>
 
-          <h1 className="mt-3 text-[31px] font-semibold leading-[0.98] tracking-[-0.05em] text-white/88 sm:text-[38px]">
+          <h1 className="mt-3 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
             Utility, not feature list.
           </h1>
 

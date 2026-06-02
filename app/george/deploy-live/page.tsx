@@ -198,7 +198,7 @@ export default function DeployLivePage() {
           </Link>
         </div>
 
-        <h1 className="mt-6 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
+        <h1 className="mt-4 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
           Strengthen GEORGE.
         </h1>
 

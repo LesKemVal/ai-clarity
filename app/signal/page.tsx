@@ -232,7 +232,7 @@ export default function SignalPage() {
 
         <div className="rounded-[1.25rem] border border-white/[0.045] bg-black/24 p-4 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[18px] sm:p-5">
           <div className="border-b border-white/[0.045] pb-5">
-            <h1 className="max-w-3xl text-[34px] font-semibold leading-[0.98] tracking-[-0.06em] text-white/92 sm:text-[48px]">
+            <h1 className="max-w-3xl text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
               Help GEORGE understand what's happening.
             </h1>
             <p className="mt-4 max-w-2xl text-[14px] leading-7 text-white/48">
