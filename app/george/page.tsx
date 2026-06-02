@@ -1450,7 +1450,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
         const contextSummary = [
           liveSetup.room ? `Room: ${liveSetup.room}` : null,
-          liveSetup.objective ? `Objective: ${liveSetup.objective}` : null,
+          liveSetup.objective ? `BRANESx: ${liveSetup.objective}` : null,
           liveSetup.cadence ? `Cadence: ${liveSetup.cadence}` : null,
           liveSetup.liveAssistMode ? `Mode: ${liveSetup.liveAssistMode}` : null,
         ].filter(Boolean).join(' · ')
@@ -1465,7 +1465,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         setActivePromptContext('live_debate')
       }
       const liveRoom = String(liveSetup?.room || '').trim()
-      const liveObjective = String(liveSetup?.objective || '').trim()
+      const liveBRANESx = String(liveSetup?.objective || '').trim()
       const liveContext = String((liveSetup as any)?.observedReality || (liveSetup as any)?.knownContext || '').trim()
       const liveChair = String((liveSetup as any)?.chair || '').trim()
 
@@ -1473,7 +1473,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         ? [
             liveRoom ? `${liveRoom} active.` : 'LIVE active.',
             liveChair ? `Chair: ${liveChair}` : '',
-            liveObjective ? `Desired outcome:\n${liveObjective}` : '',
+            liveBRANESx ? `Desired outcome:\n${liveBRANESx}` : '',
             liveContext ? `Observed reality:\n${liveContext}` : '',
             'I’m listening for what changes next.',
           ].filter(Boolean).join('\n\n')
@@ -1930,8 +1930,8 @@ const redeemFounderCode = async () => {
     pulse: boolean
   }>(null)
   const [goalState, setGoalState] = useState<null | {
-    statedObjective: string | null
-    likelyTrueObjective: string | null
+    statedBRANESx: string | null
+    likelyTrueBRANESx: string | null
     chosenPath: string | null
     bottleneck: string | null
     urgency: 'low' | 'medium' | 'high'
@@ -3880,7 +3880,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           ? `LIVE RUNTIME SETUP — internal only.
 
 Room: ${liveRuntimeSetup?.room || 'not specified'}
-Objective: ${liveRuntimeSetup?.objective || 'not specified'}
+BRANESx: ${liveRuntimeSetup?.objective || 'not specified'}
 Language: ${liveRuntimeSetup?.language || 'English'}
 Cadence: ${liveRuntimeSetup?.cadence || 'Balanced'}
 Assist mode: ${liveRuntimeSetup?.liveAssistMode || 'cues'}
@@ -5246,7 +5246,7 @@ return (
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[560px] px-4">
+      <div className="mx-auto w-full max-w-[640px] px-4">
         <div className="mb-4">
           <div className="flex items-center gap-3">
             <img

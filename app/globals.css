@@ -556,3 +556,26 @@ textarea:focus{
   color:rgba(255,255,255,.42);
 }
 
+
+
+.branesx-operating-strip{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  margin-bottom:1.5rem;
+}
+
+.branesx-operating-strip::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:rgba(255,255,255,.06);
+}
+
+.branesx-operating-label{
+  font-size:.72rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.44);
+}
+
