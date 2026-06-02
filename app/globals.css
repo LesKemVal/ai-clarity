@@ -424,3 +424,35 @@ a[href*="/george/live"]:active {
     font-size:1.15rem!important;
   }
 }
+
+
+/* BRANESx final density pass */
+
+.george-normal-surface-box{
+  min-height:68px!important;
+  max-width:760px!important;
+  margin-inline:auto!important;
+  padding:1rem 1.15rem!important;
+}
+
+.george-normal-surface-box span:first-child{
+  font-size:.68rem!important;
+  opacity:.72!important;
+}
+
+.george-normal-surface-box span:last-child{
+  color:white!important;
+  font-size:1.42rem!important;
+  line-height:1.35!important;
+}
+
+@media (max-width:768px){
+  .george-normal-surface-box{
+    padding:.95rem 1rem!important;
+  }
+
+  .george-normal-surface-box span:last-child{
+    font-size:1.12rem!important;
+    line-height:1.4!important;
+  }
+}

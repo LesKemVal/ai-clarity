@@ -5239,9 +5239,9 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[140px] md:pb-[160px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[82px] md:pt-[96px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[118px] md:pb-[128px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[58px] md:pt-[72px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
-    <div className={`pointer-events-none fixed inset-x-0 top-[10dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+    <div className={`pointer-events-none fixed inset-x-0 top-[7dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
@@ -5252,7 +5252,7 @@ return (
             <img
               src="/logofav.png"
               alt=""
-              className="h-10 w-10 object-contain opacity-100"
+              className="h-12 w-12 object-contain opacity-100"
             />
             <span className="text-[11px] font-medium uppercase tracking-[0.26em] text-white/62">
               BRANESx
@@ -5260,10 +5260,10 @@ return (
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 text-[14px] leading-6 text-[#D7DBE4]/80">
+        <div className="grid grid-cols-1 gap-2 text-[14px] leading-6 text-[#D7DBE4]/80 max-w-[760px]">
             <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Focus</span>
-              <span className="mt-2 block text-white/92">What are we moving forward?</span>
+              <span className="mt-2 block text-white/92">State the objective.</span>
             </div>            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Suggested Next Move</span>
               <span className="mt-2 block text-white/92">Describe what you want to move forward.</span>
