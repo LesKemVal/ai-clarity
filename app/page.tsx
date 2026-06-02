@@ -9,8 +9,12 @@ export default function HomePage() {
   return (
     <main className="min-h-[100dvh] bg-[#040507] text-white">
       <div className="mx-auto flex min-h-[100dvh] max-w-[1100px] flex-col px-6 pb-12 pt-10 sm:px-8">
-        <div className="text-[11px] uppercase tracking-[0.32em] text-white/42">
-          BRANESx
+        <div className="flex items-center">
+          <img
+            src="/logofav.png"
+            alt="Bx"
+            className="h-9 w-9 object-contain opacity-90"
+          />
         </div>
 
         <div className="mt-16 max-w-[760px]">

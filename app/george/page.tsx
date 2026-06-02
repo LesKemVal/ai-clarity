@@ -5129,22 +5129,22 @@ return (
         </div>
 
         <div className="mt-3 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
             <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Direction</span>
             active
           </div>
-          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
             <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Position</span>
             reading
           </div>
-          <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+          <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
             <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/20">Move</span>
             next
           </div>
         </div>
 
         <div className="mt-2 border-t border-white/[0.035] pt-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-          <span className="block text-[#D7DBE4]/56">GEORGE is active.</span>
+          <span className="block text-[#D7DBE4]/56">BRANESx.</span>
           <span>Working from the conversation toward the next useful move.</span>
         </div>
       </div>
@@ -5190,7 +5190,7 @@ return (
             setShowToast(true)
           }}
           disabled={!voiceSupported || isThinking}
-          className={`rounded-[0.72rem] border px-2 py-1.5 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${isListening ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${isListening ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">George</span>
           {liveGeorgeEnabled ? 'on' : 'off'}
@@ -5211,7 +5211,7 @@ return (
             setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
             setShowToast(true)
           }}
-          className={`rounded-[0.72rem] border px-2 py-1.5 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Audio</span>
           {voiceOn ? 'on' : 'off'}
@@ -5232,15 +5232,15 @@ return (
       </div>
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Cue</span>
           {liveRoomActive ? 'room active' : 'awaiting room'}
         </div>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Line</span>
           {liveRoomActive ? 'ready line' : 'awaiting room'}
         </div>
-        <div className={`rounded-[0.72rem] border px-2 py-1.5 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
           {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'monitoring' : 'awaiting room'}
         </div>
@@ -5299,15 +5299,15 @@ return (
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 text-[#D7DBE4]/42">
-            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
               <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Direction</span>
               not set
             </div>
-            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
               <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Position</span>
               waiting
             </div>
-            <div className="rounded-[0.72rem] border border-white/[0.035] bg-white/[0.018] px-2 py-1.5">
+            <div className="rounded-[0.95rem] border border-white/[0.075] bg-[#10131B]/72 px-4 py-3 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
               <span className="block uppercase tracking-[0.16em] text-[#D7DBE4]/22">Move</span>
               ask
             </div>
@@ -5353,7 +5353,7 @@ return (
 
         <div className="grid gap-1.5">
           {unfinishedTrajectories.map((item) => (
-            <div key={item.id} className="group rounded-[0.85rem] border border-white/[0.035] bg-black/18 px-3 py-2">
+            <div key={item.id} className="group rounded-[0.85rem] border border-white/[0.035] bg-[#10131B]/72 px-4 py-3">
               <div className="flex items-start justify-between gap-3">
                 <button
                   type="button"
@@ -7032,7 +7032,7 @@ Continue from here, tell me what changed, or start fresh.`
               {outcomeGovernorSnapshot?.missingSignal || 'none'}
             </div>
           </div>
-          <div className="mt-1 text-[10px] leading-4 text-white/34">
+          <div className="mt-1 hidden">
             {outcomeGovernorSnapshot?.missingSignalReason}
           </div>
         </div>
