@@ -1429,3 +1429,56 @@ textarea::placeholder{
   padding-left:6px;
 }
 
+
+
+/* workspace consistency sweep */
+
+.george-command-surface{
+  border-radius:1.25rem;
+}
+
+.george-command-surface textarea{
+  font-size:1rem;
+  line-height:1.8;
+}
+
+.george-command-surface textarea::placeholder{
+  color:rgba(255,255,255,.16)!important;
+}
+
+.message-user{
+  max-width:68%;
+}
+
+.message-assistant{
+  max-width:920px;
+}
+
+.message-assistant p,
+.message-assistant ul,
+.message-assistant ol{
+  max-width:80ch;
+}
+
+.message-assistant{
+  color:rgba(255,255,255,.84);
+}
+
+.message-assistant strong{
+  font-weight:650;
+}
+
+.george-footer-surface{
+  border-top:1px solid rgba(255,255,255,.04);
+}
+
+.george-footer-surface button{
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  font-size:10px;
+}
+
+.george-footer-surface button:hover{
+  opacity:1;
+}
+
