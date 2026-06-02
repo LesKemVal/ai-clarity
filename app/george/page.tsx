@@ -5118,7 +5118,7 @@ return (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[520px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5239,15 +5239,20 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[118px] md:pb-[128px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[58px] md:pt-[72px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  `}>
-      <div className="mx-auto w-full max-w-[680px] px-4">
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
+    <div className={`pointer-events-none fixed inset-x-0 top-[18dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      hasDraftInput
+        ? '-translate-y-12 opacity-0'
+        : 'translate-y-0 opacity-100'
+    }`}>
+      <div className="mx-auto w-full max-w-[560px] px-4">
         <div className="mb-4">
           <div className="flex items-center gap-3">
             <img
               src="/logofav.png"
               alt=""
-              className="h-12 w-12 object-contain opacity-100"
+              className="h-8 w-8 object-contain opacity-95"
             />
             <span className="text-[11px] font-medium uppercase tracking-[0.26em] text-white/62">
               BRANESx
@@ -5255,10 +5260,10 @@ return (
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 text-[14px] leading-6 text-[#D7DBE4]/80 max-w-[760px]">
+        <div className="grid grid-cols-1 gap-2 text-[14px] leading-6 text-[#D7DBE4]/80">
             <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
-              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Focus</span>
-              <span className="mt-2 block text-white/92">State the objective.</span>
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Current Direction</span>
+              <span className="mt-2 block text-white/92">Waiting for direction.</span>
             </div>            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Suggested Next Move</span>
               <span className="mt-2 block text-white/92">Describe what you want to move forward.</span>
@@ -5268,7 +5273,15 @@ return (
     </div>
   )}
 
-  
+  {showMobileHero && !(forceLive || liveMode) && hasDraftInput && !hasUserMessageForSurface && (
+    <div className="pointer-events-none fixed inset-0 z-[34] md:hidden flex items-center justify-center">
+      <img
+        src="/logofav.png"
+        alt=""
+        className="h-[280px] w-auto opacity-[0.10] object-contain"
+      />
+    </div>
+  )}
 
   {false && showTypingPrescription && !liveMode && (
     <TypingPrescriptionSurface />
@@ -5276,31 +5289,8 @@ return (
 
   
 
-  
-{showMobileHero && !(forceLive || liveMode) && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[22px] z-[35] flex justify-center px-4">
-    <div className="w-full max-w-[760px]">
-      <div className="flex items-center gap-3">
-        <img
-          src="/logofav.png"
-          alt=""
-          className="h-12 w-12 object-contain opacity-100"
-        />
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.26em] text-white/55">
-            BRANESx
-          </div>
-          <div className="text-[15px] text-white/90">
-            State the objective.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-{!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
-    <div className="pointer-events-auto fixed inset-x-0 top-[44px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
+  {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
+    <div className="pointer-events-auto fixed inset-x-0 top-[96px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
       <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
