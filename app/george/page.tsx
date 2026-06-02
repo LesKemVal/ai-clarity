@@ -6027,8 +6027,8 @@ I am listening now. Speak naturally. I will respond ${
                             <div className="space-y-1">
                               {[
                                 ['live', 'LIVE'],
-                                ['continuity', 'Access'],
-                                ['memory', 'Continuity'],
+                                ['continuity', 'CONTINUITY'],
+                                ['memory', 'MEMORY'],
                                 ['images', 'Visuals'],
                                 ['signal', 'Signal'],
                               ].map(([id, label]) => (
