@@ -106,7 +106,7 @@ export default function LiveChooser({
                   <button
                     type="button"
                     onClick={onResumeLiveConversation}
-                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white"
                   >
                     Resume
                   </button>
@@ -115,7 +115,7 @@ export default function LiveChooser({
                 <button
                   type="button"
                   onClick={onStartLiveConversation}
-                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white"
                 >
                   Start new
                 </button>
@@ -124,7 +124,7 @@ export default function LiveChooser({
                   <button
                     type="button"
                     onClick={onClearLiveSessions}
-                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/52 transition hover:text-red-100/82 active:scale-[0.98]"
+                    className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/52 transition hover:text-red-100/82"
                   >
                     Clear old sessions
                   </button>
@@ -135,7 +135,7 @@ export default function LiveChooser({
                 <button
                   type="button"
                   onClick={onEnterCode || onUpgrade}
-                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white"
                 >
                   Restore account
                 </button>
@@ -143,7 +143,7 @@ export default function LiveChooser({
                 <button
                   type="button"
                   onClick={onUpgrade}
-                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+                  className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white"
                 >
                   View access
                 </button>

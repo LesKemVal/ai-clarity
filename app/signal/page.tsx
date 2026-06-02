@@ -394,7 +394,7 @@ export default function SignalPage() {
             <button
               type="button"
               onClick={saveSignals}
-              className="shrink-0 rounded-[0.85rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.08] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 transition hover:border-[#8FB6C9]/[0.32] hover:text-white active:scale-[0.97]"
+              className="shrink-0 rounded-[0.85rem] border border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.08] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 transition hover:border-[#8FB6C9]/[0.32] hover:text-white"
             >
               {saved ? 'Saved' : 'Save Signal'}
             </button>
