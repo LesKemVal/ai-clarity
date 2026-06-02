@@ -739,3 +739,41 @@ textarea:focus{
     height:72px;
   }
 }
+
+
+/* premium utility refinement */
+
+.george-utility-brand{
+  margin-bottom:2.5rem;
+}
+
+.george-utility-kicker{
+  font-size:.78rem;
+}
+
+.george-utility-instrument h1{
+  text-wrap:balance;
+  max-width:720px;
+}
+
+.george-utility-instrument p{
+  margin-top:1.4rem;
+  line-height:1.9;
+}
+
+.george-utility-line{
+  opacity:.75;
+}
+
+.george-utility-presence{
+  max-width:760px;
+}
+
+.george-utility-instrument::after{
+  width:120px;
+  opacity:.85;
+}
+
+.george-utility-instrument h1{
+  text-shadow:0 0 1px rgba(255,255,255,.08);
+}
