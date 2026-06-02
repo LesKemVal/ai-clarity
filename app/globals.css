@@ -456,3 +456,35 @@ a[href*="/george/live"]:active {
     line-height:1.4!important;
   }
 }
+
+
+/* BRANESx command-surface phase */
+
+textarea,
+textarea:focus{
+  border-color:rgba(170,180,255,.22)!important;
+  box-shadow:
+    0 0 0 1px rgba(170,180,255,.14),
+    0 24px 80px rgba(0,0,0,.30)!important;
+}
+
+@keyframes branesxBorderSweep {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+.branesx-composer-shell{
+  background:
+    linear-gradient(rgba(28,34,48,.96),rgba(20,24,34,.96)) padding-box,
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,.10),
+      rgba(170,180,255,.28),
+      rgba(143,182,201,.20),
+      rgba(255,255,255,.10)
+    ) border-box;
+  border:1px solid transparent;
+  background-size:100% 100%,240% 240%;
+  animation:branesxBorderSweep 8s ease-in-out infinite;
+}
