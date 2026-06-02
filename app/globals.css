@@ -1063,3 +1063,72 @@ textarea:focus{
     line-height:1.8;
   }
 }
+
+
+/* institutional confidence v3 */
+
+.george-utility-presence{
+  max-width:900px;
+}
+
+.george-utility-brand{
+  position:relative;
+}
+
+.george-utility-brand::after{
+  content:"";
+  position:absolute;
+  left:58px;
+  bottom:-18px;
+  width:56px;
+  height:1px;
+  background:rgba(255,255,255,.16);
+}
+
+.george-utility-instrument{
+  margin-top:6.5rem;
+}
+
+.george-utility-instrument h1{
+  font-size:clamp(3.2rem,6vw,5.8rem);
+  letter-spacing:-0.085em;
+}
+
+.george-utility-instrument p{
+  font-size:clamp(1rem,1.8vw,1.15rem);
+  max-width:720px;
+}
+
+.george-utility-line{
+  background:linear-gradient(
+    90deg,
+    rgba(255,255,255,0),
+    rgba(255,255,255,.10),
+    rgba(174,182,255,.28),
+    rgba(255,255,255,0)
+  );
+}
+
+.george-utility-instrument::after{
+  width:220px;
+}
+
+.george-utility-presence::before{
+  filter:blur(24px);
+}
+
+@media (max-width:768px){
+
+  .george-utility-brand::after{
+    width:34px;
+    left:50px;
+  }
+
+  .george-utility-instrument{
+    margin-top:4.8rem;
+  }
+
+  .george-utility-instrument h1{
+    font-size:clamp(2.7rem,10vw,4.2rem);
+  }
+}

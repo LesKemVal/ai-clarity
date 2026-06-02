@@ -5253,7 +5253,7 @@ return (
         <div className="george-utility-line" />
         <h1>GEORGE</h1>
         <p>
-          Think clearly. Communicate effectively. Move forward with confidence.
+          Support for decisions, conversations, opportunities, and the work ahead.
         </p>
       </div>
     </div>
