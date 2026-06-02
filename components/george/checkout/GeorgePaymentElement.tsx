@@ -101,7 +101,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
       theme: 'night',
       variables: {
         colorPrimary: '#AAB4FF',
-        colorBackground: '#0B0D12',
+        colorBackground: '#05070B',
         colorText: '#E7EAF7',
         colorDanger: '#FCA5A5',
         colorSuccess: '#8FE7B0',
@@ -110,13 +110,13 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         fontSizeBase: '14px',
-        spacingUnit: '3px',
-        borderRadius: '12px',
+        spacingUnit: '4px',
+        borderRadius: '14px',
       },
       rules: {
         '.Input': {
-          backgroundColor: 'rgba(12,15,22,0.92)',
-          border: '1px solid rgba(255,255,255,0.055)',
+          backgroundColor: '#080B11',
+          border: '1px solid rgba(255,255,255,0.075)',
           boxShadow: 'none',
           color: '#E7EAF7',
           padding: '10px 12px',
@@ -147,13 +147,13 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           color: '#D7DCFF',
         },
         '.Block': {
-          backgroundColor: 'rgba(255,255,255,0.006)',
-          border: '1px solid rgba(255,255,255,0.035)',
+          backgroundColor: '#070A10',
+          border: '1px solid rgba(255,255,255,0.055)',
           boxShadow: 'none',
         },
         '.AccordionItem': {
-          backgroundColor: 'rgba(255,255,255,0.006)',
-          border: '1px solid rgba(255,255,255,0.035)',
+          backgroundColor: '#070A10',
+          border: '1px solid rgba(255,255,255,0.055)',
           boxShadow: 'none',
         },
         '.Text': {
@@ -203,9 +203,9 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
 
       const paymentElement = stripeElements.create('payment', {
         layout: {
-          type: 'accordion',
+          type: 'tabs',
           defaultCollapsed: false,
-          radios: true,
+          radios: false,
           spacedAccordionItems: false,
         },
         paymentMethodOrder: ['cashapp', 'card', 'link'],
@@ -334,11 +334,11 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
             </p>
           </div>
 
-          <div className="rounded-[0.9rem] border border-white/[0.035] bg-[#0B0D12] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.018)] md:p-3">
+          <div className="rounded-[0.9rem] border border-white/[0.06] bg-[#05070B] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.024)] md:p-3">
             <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-white/30">
               Payment method
             </p>
-            <div id="george-payment-element" className="min-h-[220px]" />
+            <div id="george-payment-element" className="min-h-[220px] rounded-[0.8rem] bg-[#05070B]" />
           </div>
 
           {(status || error) && (
