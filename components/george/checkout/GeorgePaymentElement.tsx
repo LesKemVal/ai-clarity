@@ -208,7 +208,7 @@ export default function GeorgePaymentElement({ tier, onClose, onLegacyCheckout }
           radios: false,
           spacedAccordionItems: false,
         },
-        paymentMethodOrder: ['card', 'cashapp'],
+        paymentMethodOrder: ['card'],
         defaultValues: targetEmail.trim() ? { billingDetails: { email: targetEmail.trim() } } : undefined,
         wallets: {
           applePay: 'never',
