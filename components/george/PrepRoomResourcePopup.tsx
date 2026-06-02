@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 
 type Props = {
@@ -67,6 +68,8 @@ function deriveGeorgeInterpretation(chairs: string[], outcome: string, reality: 
 }
 
 export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle, chairs = [], desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
+  const [noticeAccepted, setNoticeAccepted] = useState(false)
+
   if (!open || !profile) return null
 
   const roomValue = room?.trim() || profile.roomType || 'LIVE conversation'
@@ -152,6 +155,19 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
         </div>
 
         <div className="relative shrink-0 border-t border-white/10 bg-[#05080D]/94 px-4 py-3">
+          <label className="mb-3 flex gap-3 rounded-[0.82rem] border border-white/[0.055] bg-black/18 px-3 py-3 text-[12px] leading-5 text-white/46">
+            <input
+              type="checkbox"
+              checked={noticeAccepted}
+              onChange={(event) => setNoticeAccepted(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+            />
+            <span>
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/30">LIVE Notice</span>
+              GEORGE may misunderstand speech, miss context, provide imperfect guidance, or experience latency. GEORGE assists. You remain responsible for decisions and actions.
+            </span>
+          </label>
+
           <div className="flex items-center justify-between gap-4">
             <button
               onClick={onClose}
@@ -172,7 +188,8 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
 
               <button
                 onClick={onEnterLive}
-                className="animate-[liveDeployPulse_520ms_cubic-bezier(0.22,1,0.36,1)_1] rounded-[0.8rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 shadow-[0_12px_32px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-150 hover:border-[#8FB6C9]/[0.32] hover:text-white active:scale-[0.96]"
+                disabled={!noticeAccepted}
+                className="animate-[liveDeployPulse_520ms_cubic-bezier(0.22,1,0.36,1)_1] rounded-[0.8rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-4 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/82 shadow-[0_12px_32px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.04)] transition duration-150 hover:border-[#8FB6C9]/[0.32] hover:text-white active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-[#8FB6C9]/[0.18] disabled:hover:text-[#D7DCFF]/82"
               >
                 Start LIVE
               </button>

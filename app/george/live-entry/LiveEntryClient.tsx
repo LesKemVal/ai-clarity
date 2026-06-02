@@ -619,11 +619,6 @@ export default function LiveEntryClient() {
       return
     }
 
-    if (!liveToaAccepted) {
-      window.alert('Acknowledge the LIVE notice before entering.')
-      return
-    }
-
     const continuityPackage = relatedSessionId === 'not_related'
       ? null
       : buildContinuityPackage(selectedRelatedSession)
