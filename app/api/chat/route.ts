@@ -64,6 +64,7 @@ import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-lear
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
+import { buildNormalJudgmentDoctrine } from '@/lib/george/chat/normal-judgment-doctrine'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -864,6 +865,10 @@ LANGUAGE MODE: SPANISH
 
     const outputGovernanceNote = buildOutputGovernanceNote(outputGovernance)
     const presentationAuthorityNote = buildPresentationAuthorityNote(presentationMode)
+    const normalJudgmentDoctrine = buildNormalJudgmentDoctrine({
+      runtime: currentRuntime,
+      latestUserText: latestUserRaw,
+    })
 
     const messageSourceBlock = buildMessageSourceBlock(latestUserSource)
     const controlStateBlock = buildControlStateBlock(control)
@@ -897,6 +902,7 @@ LANGUAGE MODE: SPANISH
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
       (presentationAuthorityNote ? `\n\n${presentationAuthorityNote}\n\n` : '') +
+      (normalJudgmentDoctrine ? `\n\n${normalJudgmentDoctrine}\n\n` : '') +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
