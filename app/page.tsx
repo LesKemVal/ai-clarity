@@ -27,17 +27,17 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="mt-14 max-w-[760px] rounded-[1.5rem] border border-white/[0.05] bg-white/[0.02] p-6 backdrop-blur-sm">
-          <p className="text-[18px] leading-8 text-white/76">
+        <div className="relative z-10 mt-14 w-full max-w-[920px] rounded-[1.5rem] border border-white/[0.085] bg-[#10131B]/72 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.055)] backdrop-blur-md md:p-7">
+          <p className="text-[19px] leading-8 text-white/84">
             Most people already possess more knowledge than they realize.
           </p>
 
-          <p className="mt-5 text-[15px] leading-8 text-white/42">
+          <p className="mt-5 max-w-[780px] text-[15px] leading-8 text-white/56">
             What slows them down is recall, articulation, organization, confidence,
             adaptation, and composure.
           </p>
 
-          <p className="mt-5 text-[15px] leading-8 text-white/60">
+          <p className="mt-5 text-[15px] leading-8 text-white/72">
             GEORGE helps close that gap.
           </p>
         </div>
