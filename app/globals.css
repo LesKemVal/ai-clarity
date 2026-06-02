@@ -234,3 +234,33 @@ button[title*="LIVE"]:active,
 a[href*="/george/live"]:active {
   animation: georgeLiveEntryPulse 980ms cubic-bezier(0.22,1,0.36,1) 1;
 }
+
+@keyframes georgeUtilityGleam {
+  0% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 0 rgba(170, 180, 255, 0);
+  }
+  50% {
+    background-position: 100% 50%;
+    box-shadow: 0 0 28px rgba(170, 180, 255, 0.10);
+  }
+  100% {
+    background-position: 0% 50%;
+    box-shadow: 0 0 0 rgba(170, 180, 255, 0);
+  }
+}
+
+.george-surface-awake {
+  position: relative;
+  background:
+    linear-gradient(#10131B, #10131B) padding-box,
+    linear-gradient(120deg, rgba(255,255,255,0.06), rgba(170,180,255,0.22), rgba(143,182,201,0.18), rgba(255,255,255,0.06)) border-box;
+  border: 1px solid transparent;
+  animation: georgeUtilityGleam 3.8s ease-in-out infinite;
+  background-size: 100% 100%, 240% 240%;
+}
+
+.george-surface-awake-soft {
+  background-color: rgba(16, 19, 27, 0.78) !important;
+  border-color: rgba(255,255,255,0.075) !important;
+}
