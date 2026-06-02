@@ -279,3 +279,31 @@ a[href*="/george/live"]:active {
   background-size: 100% 100%, 240% 240%;
   animation: georgeSurfaceBorderGleam 6.5s ease-in-out infinite;
 }
+
+@keyframes georgeWorkSurfaceGleam {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.george-work-surface-box {
+  min-height: 96px;
+  border-radius: 1.15rem;
+  padding: 1rem 1.1rem;
+  background:
+    linear-gradient(rgba(23, 28, 39, 0.94), rgba(18, 22, 31, 0.94)) padding-box,
+    linear-gradient(120deg, rgba(255,255,255,0.10), rgba(170,180,255,0.24), rgba(143,182,201,0.18), rgba(255,255,255,0.10)) border-box;
+  border: 1px solid transparent;
+  background-size: 100% 100%, 240% 240%;
+  box-shadow:
+    0 22px 64px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.055);
+  animation: georgeWorkSurfaceGleam 7s ease-in-out infinite;
+}
+
+@media (min-width: 768px) {
+  .george-work-surface-box {
+    min-height: 112px;
+    padding: 1.15rem 1.25rem;
+  }
+}
