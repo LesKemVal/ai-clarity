@@ -439,14 +439,21 @@ export default function TopUpPage() {
 
                         {activeCheckout === tier.checkout && (
                           <div className="lg:col-span-4">
-                            <GeorgePaymentElement
-                              tier={tier.checkout}
-                              onClose={() => setActiveCheckout(null)}
-                              onLegacyCheckout={(checkoutTier) => {
-                                setActiveCheckout(null)
-                                startCheckout(checkoutTier)
-                              }}
-                            />
+                            <div className="rounded-[1rem] border border-white/[0.05] bg-black/20 p-5">
+                              <p className="text-sm text-white/60">
+                                Runtime activation has moved to the dedicated activation page.
+                              </p>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  window.location.href = `/activate?tier=${tier.checkout}`
+                                }}
+                                className="mt-4 w-full rounded-[0.85rem] border border-[#AAB4FF]/20 bg-[#AAB4FF]/[0.08] px-4 py-3 text-sm font-semibold text-[#D7DCFF]"
+                              >
+                                Continue to Activation
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
