@@ -14,7 +14,7 @@ import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElem
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
-import { getGoalState } from '@/lib/george/goal-engine'
+import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
@@ -1929,17 +1929,7 @@ const redeemFounderCode = async () => {
     reason: string
     pulse: boolean
   }>(null)
-  const [goalState, setGoalState] = useState<null | {
-    statedBRANESx: string | null
-    likelyTrueBRANESx: string | null
-    chosenPath: string | null
-    bottleneck: string | null
-    urgency: 'low' | 'medium' | 'high'
-    resistance: 'low' | 'medium' | 'high'
-    todayMove: string | null
-    futureRisk: string | null
-    upgradeRelevance: 'none' | 'intelligent' | 'brilliant'
-  }>(null)
+  const [goalState, setGoalState] = useState<GoalState | null>(null)
 
 
   // FULL GEORGE WINDOW SYSTEM
