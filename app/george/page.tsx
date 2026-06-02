@@ -5284,35 +5284,33 @@ return (
         ? '-translate-y-12 opacity-0'
         : 'translate-y-0 opacity-100'
     }`}>
-      <div className="mx-auto w-full max-w-[430px] md:max-w-[520px] px-4">
-        <div className="rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-4 text-left shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#AEB6FF]/55 shadow-[0_0_14px_rgba(174,182,255,0.32)]" />
-              <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
-                GEORGE
-              </span>
-            </div>
-
-            <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
-              ready
+      <div className="mx-auto w-full max-w-[560px] px-4">
+        <div className="mb-4">
+          <div className="flex items-center gap-3">
+            <img
+              src="/logofav.png"
+              alt=""
+              className="h-6 w-6 object-contain opacity-90"
+            />
+            <span className="text-[11px] font-medium uppercase tracking-[0.26em] text-white/62">
+              BRANESx
             </span>
           </div>
+        </div>
 
-          <div className="mt-5 grid grid-cols-1 gap-3 text-[13px] leading-5 text-[#D7DBE4]/72 sm:grid-cols-3 md:text-[14px]">
+        <div className="grid grid-cols-1 gap-3 text-[13px] leading-5 text-[#D7DBE4]/72 sm:grid-cols-3 md:text-[14px]">
             <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Current Direction</span>
-              <span className="mt-2 block text-[#D7DBE4]/78">not set</span>
+              <span className="mt-2 block text-white/92">Waiting for direction.</span>
             </div>
             <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Open Threads</span>
-              <span className="mt-2 block text-[#D7DBE4]/78">waiting</span>
+              <span className="mt-2 block text-white/92">No active threads.</span>
             </div>
             <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Suggested Next Move</span>
-              <span className="mt-2 block text-[#D7DBE4]/78">ask</span>
+              <span className="mt-2 block text-white/92">Describe what you want to move forward.</span>
             </div>
-          </div>
         </div>
       </div>
     </div>
