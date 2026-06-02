@@ -5118,7 +5118,7 @@ return (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="pointer-events-auto w-full max-w-[520px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5239,7 +5239,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[170px] md:pb-[190px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[170px] md:pb-[190px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[118px] md:pt-[132px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
     <div className={`pointer-events-none fixed inset-x-0 top-[14dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       hasDraftInput
@@ -5273,15 +5273,7 @@ return (
     </div>
   )}
 
-  {showMobileHero && !(forceLive || liveMode) && hasDraftInput && !hasUserMessageForSurface && (
-    <div className="pointer-events-none fixed inset-0 z-[34] md:hidden flex items-center justify-center">
-      <img
-        src="/logofav.png"
-        alt=""
-        className="h-[280px] w-auto opacity-[0.10] object-contain"
-      />
-    </div>
-  )}
+  
 
   {false && showTypingPrescription && !liveMode && (
     <TypingPrescriptionSurface />
@@ -5290,7 +5282,7 @@ return (
   
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
-    <div className="pointer-events-auto fixed inset-x-0 top-[72px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
+    <div className="pointer-events-auto fixed inset-x-0 top-[56px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
       <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">

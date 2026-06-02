@@ -368,3 +368,22 @@ a[href*="/george/live"]:active {
 .george-normal-surface-box span:last-child{
   color: rgba(255,255,255,.98)!important;
 }
+
+
+/* BRANESx workspace density pass */
+
+.george-normal-surface-box{
+  backdrop-filter: blur(20px);
+  min-height:72px!important;
+  padding:.95rem 1rem!important;
+}
+
+.george-normal-surface-box span:last-child{
+  font-weight:500!important;
+}
+
+@media (max-width:768px){
+  .george-normal-surface-box{
+    margin-bottom:2px;
+  }
+}
