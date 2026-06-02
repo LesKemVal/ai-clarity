@@ -330,3 +330,21 @@ a[href*="/george/live"]:active {
     padding: 1.25rem 1.35rem;
   }
 }
+
+
+.george-normal-surface-box{
+  min-height:auto!important;
+  padding:1.2rem 1.3rem!important;
+}
+
+.george-normal-surface-box span:last-child{
+  color:rgba(255,255,255,.96)!important;
+  font-size:1.25rem!important;
+  line-height:1.5!important;
+}
+
+@media (min-width:768px){
+  .george-normal-surface-box span:last-child{
+    font-size:1.35rem!important;
+  }
+}
