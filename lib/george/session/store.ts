@@ -41,6 +41,61 @@ export const GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY = 'GEORGE_ACTIVE_NORMAL_SESSION
 export const GEORGE_ACTIVE_LIVE_SESSION_ID_KEY = 'GEORGE_ACTIVE_LIVE_SESSION_ID'
 export const GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY = 'GEORGE_ACTIVE_CAMPAIGN_SESSION_ID'
 export const GEORGE_ACTIVE_MODE_KEY = 'GEORGE_ACTIVE_MODE'
+let hydratedFromServer = false
+
+async function fetchServerSessions() {
+  try {
+    const response = await fetch('/api/george/sessions', {
+      cache: 'no-store',
+    })
+
+    if (!response.ok) return []
+
+    const data = await response.json()
+
+    return Array.isArray(data.sessions)
+      ? data.sessions
+      : []
+  } catch {
+    return []
+  }
+}
+
+export async function hydrateSessionsFromServer() {
+  if (typeof window === 'undefined') return
+
+  if (hydratedFromServer) return
+
+  hydratedFromServer = true
+
+  const sessions = await fetchServerSessions()
+
+  if (sessions.length > 0) {
+    safeWriteSessions(sessions)
+  }
+}
+
+function syncSessionToServer(session: GeorgeStoredSession) {
+  try {
+    fetch('/api/george/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        session,
+      }),
+    }).catch(() => {})
+  } catch {}
+}
+
+function deleteSessionFromServer(id: string) {
+  try {
+    fetch(`/api/george/sessions?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }).catch(() => {})
+  } catch {}
+}
 
 export function safeReadSessions(): GeorgeStoredSession[] {
   if (typeof window === 'undefined') return []
@@ -135,8 +190,8 @@ export function upsertSession(session: GeorgeStoredSession) {
   }
 
   safeWriteSessions(sessions)
+  syncSessionToServer(safeSession)
 }
-
 
 export function deleteSession(sessionId: string) {
   if (typeof window === 'undefined') return
@@ -159,6 +214,8 @@ export function deleteSession(sessionId: string) {
   if (window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
     window.localStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
   }
+
+  deleteSessionFromServer(sessionId)
 }
 
 export function renameSession(sessionId: string, title: string) {
