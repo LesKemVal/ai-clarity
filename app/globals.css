@@ -387,3 +387,40 @@ a[href*="/george/live"]:active {
     margin-bottom:2px;
   }
 }
+
+
+/* BRANESx operational utility pass */
+
+.george-normal-surface-box{
+  background:
+    linear-gradient(rgba(32,38,52,.98), rgba(22,26,36,.98)) padding-box,
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,.14),
+      rgba(170,180,255,.28),
+      rgba(143,182,201,.22),
+      rgba(255,255,255,.14)
+    ) border-box !important;
+
+  border-width:1px!important;
+  box-shadow:
+    0 26px 80px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+.george-normal-surface-box span:first-child{
+  letter-spacing:.18em!important;
+  font-weight:600!important;
+}
+
+.george-normal-surface-box span:last-child{
+  font-size:1.32rem!important;
+  line-height:1.45!important;
+  font-weight:500!important;
+}
+
+@media (max-width:768px){
+  .george-normal-surface-box span:last-child{
+    font-size:1.15rem!important;
+  }
+}
