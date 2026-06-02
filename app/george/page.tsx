@@ -5009,8 +5009,8 @@ return (
                       type="button"
                       onClick={handleShareGeorge}
                       className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
-                      aria-label="Send George"
-                      title="Send George"
+                      aria-label="Send GEORGE context"
+                      title="Send GEORGE context"
                     >
                       <div className="flex items-center gap-2">
                         <svg
@@ -5027,7 +5027,7 @@ return (
                         </svg>
 
                         <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                          Share G
+                          Send
                         </span>
                       </div>
                     </button>
@@ -5038,11 +5038,11 @@ return (
                     type="button"
                     onClick={handleShareGeorge}
                     className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
-                    aria-label="Send George"
-                    title="Send George"
+                    aria-label="Send GEORGE context"
+                    title="Send GEORGE context"
                   >
                     <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                      Share G
+                      Send
                     </span>
                   </button>
 
@@ -6027,9 +6027,9 @@ I am listening now. Speak naturally. I will respond ${
                             <div className="space-y-1">
                               {[
                                 ['live', 'LIVE'],
-                                ['continuity', 'Login'],
-                                ['memory', 'Memory'],
-                                ['images', 'Images'],
+                                ['continuity', 'Access'],
+                                ['memory', 'Continuity'],
+                                ['images', 'Visuals'],
                                 ['signal', 'Signal'],
                               ].map(([id, label]) => (
                                 <button
@@ -6087,7 +6087,7 @@ I am listening now. Speak naturally. I will respond ${
                                 }}
                                 className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                               >
-                                Open controls
+                                Continuity
                               </button>
                             )}
 
@@ -6095,7 +6095,7 @@ I am listening now. Speak naturally. I will respond ${
                               href="/help"
                               className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                             >
-                              Full help
+                              Documentation
                             </a>
                           </div>
                         </>

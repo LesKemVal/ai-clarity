@@ -1330,3 +1330,102 @@ textarea::placeholder{
   color:rgba(255,255,255,.22)!important;
 }
 
+
+
+/* unified instrument controls */
+
+.george-command-surface,
+.george-footer-surface,
+.george-header-surface{
+  backdrop-filter:blur(18px);
+}
+
+.george-header-surface{
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+
+.george-header-surface button{
+  letter-spacing:.12em;
+}
+
+.george-footer-surface{
+  border:1px solid rgba(255,255,255,.05);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.018),
+      rgba(255,255,255,.008)
+    );
+}
+
+.george-footer-surface button{
+  color:rgba(255,255,255,.54);
+}
+
+.george-footer-surface button:hover{
+  color:rgba(255,255,255,.92);
+}
+
+.george-command-surface{
+  border:1px solid rgba(255,255,255,.05);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.18);
+}
+
+.george-command-surface input,
+.george-command-surface textarea{
+  font-weight:450;
+  letter-spacing:.01em;
+}
+
+.george-command-surface textarea::placeholder{
+  color:rgba(255,255,255,.20);
+}
+
+
+/* control authority */
+
+.george-footer-surface{
+  backdrop-filter:blur(24px);
+}
+
+.george-footer-surface button{
+  transition:
+    color .18s ease,
+    opacity .18s ease,
+    transform .18s ease;
+}
+
+.george-footer-surface button:hover{
+  transform:translateY(-1px);
+}
+
+.george-command-surface{
+  border:1px solid rgba(255,255,255,.045);
+}
+
+.george-command-surface textarea{
+  font-size:1.03rem;
+  line-height:1.75;
+}
+
+.george-command-surface textarea::placeholder{
+  color:rgba(255,255,255,.18);
+}
+
+.george-command-surface button{
+  border-color:rgba(255,255,255,.05);
+}
+
+.george-command-surface button:hover{
+  border-color:rgba(255,255,255,.14);
+}
+
+.message-user{
+  max-width:72%;
+}
+
+.message-assistant{
+  padding-left:6px;
+}
+
