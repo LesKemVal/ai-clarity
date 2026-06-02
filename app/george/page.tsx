@@ -5245,7 +5245,7 @@ return (
         />
         <div>
           <div className="george-utility-kicker">BRANESx</div>
-          <div className="george-utility-label">Operational Intelligence</div>
+          <div className="george-utility-label"></div>
         </div>
       </div>
 

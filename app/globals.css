@@ -1280,3 +1280,53 @@ textarea:focus{
   margin-top:1.2rem;
   margin-bottom:.65rem;
 }
+
+
+/* institutional cleanup */
+
+.george-utility-kicker::after{
+  display:none;
+}
+
+.george-utility-line{
+  opacity:.35;
+}
+
+.george-utility-presence{
+  max-width:960px;
+}
+
+.george-utility-brand{
+  margin-bottom:1.2rem;
+}
+
+.george-utility-label{
+  display:none;
+}
+
+.george-utility-instrument{
+  margin-top:4.8rem;
+}
+
+.george-utility-instrument h1{
+  font-weight:740;
+}
+
+.george-utility-instrument p{
+  max-width:760px;
+}
+
+.george-utility-presence::before{
+  opacity:.55;
+}
+
+.george-utility-presence::after{
+  opacity:.45;
+}
+
+/* command surface */
+
+textarea::placeholder{
+  color:rgba(255,255,255,.22)!important;
+}
+
