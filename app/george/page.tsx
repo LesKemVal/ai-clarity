@@ -5230,50 +5230,37 @@ return (
     }
   }}
   className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
-  {showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
-    <div className={`pointer-events-none fixed inset-x-0 top-[18dvh] z-[35] md:hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-      hasDraftInput
-        ? '-translate-y-12 opacity-0'
-        : 'translate-y-0 opacity-100'
-    }`}>
-      <div className="mx-auto w-full max-w-[640px] px-4">
-        <div className="mb-4">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logofav.png"
-              alt=""
-              className="h-8 w-8 object-contain opacity-95"
-            />
-            <span className="text-[11px] font-medium uppercase tracking-[0.26em] text-white/62">
-              BRANESx
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-2 text-[14px] leading-6 text-[#D7DBE4]/80">
-            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
-              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Current Direction</span>
-              <span className="mt-2 block text-white/92">Waiting for direction.</span>
-            </div>            <div className="george-normal-surface-box rounded-[1.15rem] border border-white/[0.10] bg-[#151923]/82 px-5 py-4 shadow-[0_22px_64px_rgba(0,0,0,0.26)]">
-              <span className="block text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/34">Suggested Next Move</span>
-              <span className="mt-2 block text-white/92">Describe what you want to move forward.</span>
-            </div>
+  
+{showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
+  <section
+    data-george-normal-hero
+    className="pointer-events-none mx-auto w-full max-w-[760px] px-5 pt-[92px] md:pt-[122px]"
+  >
+    <div className="george-utility-presence">
+      <div className="george-utility-brand">
+        <img
+          src="/logofav.png"
+          alt=""
+          className="h-11 w-11 object-contain opacity-95"
+        />
+        <div>
+          <div className="george-utility-kicker">BRANESx</div>
+          <div className="george-utility-label">Professional Utility Layer</div>
         </div>
       </div>
-    </div>
-  )}
 
-  {showMobileHero && !(forceLive || liveMode) && hasDraftInput && !hasUserMessageForSurface && (
-    <div className="pointer-events-none fixed inset-0 z-[34] md:hidden flex items-center justify-center">
-      <img
-        src="/logofav.png"
-        alt=""
-        className="h-[280px] w-auto opacity-[0.10] object-contain"
-      />
+      <div className="george-utility-instrument">
+        <div className="george-utility-line" />
+        <h1>State the objective.</h1>
+        <p>
+          Direction first. Action follows. Reality returns signal.
+        </p>
+      </div>
     </div>
-  )}
+  </section>
+)}
 
-  {false && showTypingPrescription && !liveMode && (
+{false && showTypingPrescription && !liveMode && (
     <TypingPrescriptionSurface />
   )}
 
