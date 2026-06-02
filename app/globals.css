@@ -777,3 +777,70 @@ textarea:focus{
 .george-utility-instrument h1{
   text-shadow:0 0 1px rgba(255,255,255,.08);
 }
+
+
+/* institutional utility */
+
+.george-utility-presence{
+  position:relative;
+}
+
+.george-utility-presence::before{
+  content:"";
+  position:absolute;
+  inset:-40px -40px auto -40px;
+  height:280px;
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(174,182,255,.07),
+      transparent 55%
+    );
+  pointer-events:none;
+}
+
+.george-utility-brand img{
+  filter:
+    drop-shadow(0 0 18px rgba(174,182,255,.12));
+}
+
+.george-utility-kicker{
+  color:rgba(255,255,255,.72);
+}
+
+.george-utility-label{
+  font-size:.9rem;
+  letter-spacing:.02em;
+}
+
+.george-utility-instrument{
+  padding-bottom:2rem;
+}
+
+.george-utility-instrument h1{
+  color:rgba(255,255,255,.98);
+}
+
+.george-utility-instrument p{
+  color:rgba(255,255,255,.60);
+  max-width:640px;
+}
+
+.george-utility-instrument::before{
+  opacity:.65;
+}
+
+.george-utility-instrument::after{
+  width:140px;
+}
+
+@media (max-width:768px){
+
+  .george-utility-brand{
+    margin-bottom:2rem;
+  }
+
+  .george-utility-instrument p{
+    max-width:100%;
+  }
+}
