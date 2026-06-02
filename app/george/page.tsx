@@ -5253,7 +5253,7 @@ return (
         <div className="george-utility-line" />
         <h1>GEORGE</h1>
         <p>
-          Trusted support for decisions, conversations, and the work that follows.
+          Trusted support for decisions, communication, execution, and continuity.
         </p>
       </div>
     </div>

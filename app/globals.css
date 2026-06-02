@@ -844,3 +844,78 @@ textarea:focus{
     max-width:100%;
   }
 }
+
+
+/* premium confidence layer */
+
+.george-utility-presence{
+  max-width:820px;
+}
+
+.george-utility-brand{
+  align-items:center;
+}
+
+.george-utility-brand img{
+  transform:translateY(1px);
+}
+
+.george-utility-kicker{
+  font-weight:650;
+}
+
+.george-utility-label{
+  color:rgba(255,255,255,.42);
+}
+
+.george-utility-instrument{
+  margin-top:5.4rem;
+}
+
+.george-utility-instrument h1{
+  font-size:clamp(3rem,7vw,5.4rem);
+  line-height:.92;
+}
+
+.george-utility-instrument p{
+  font-size:clamp(1rem,2vw,1.18rem);
+  letter-spacing:.01em;
+}
+
+.george-utility-line{
+  margin-bottom:2rem;
+}
+
+.george-utility-presence::after{
+  content:"";
+  position:absolute;
+  right:-60px;
+  top:40px;
+  width:220px;
+  height:220px;
+  border-radius:999px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(174,182,255,.05),
+      transparent 72%
+    );
+  pointer-events:none;
+}
+
+@media (max-width:768px){
+
+  .george-utility-instrument{
+    margin-top:4.2rem;
+  }
+
+  .george-utility-instrument h1{
+    font-size:clamp(2.6rem,11vw,4rem);
+  }
+
+  .george-utility-presence::after{
+    width:120px;
+    height:120px;
+    right:-20px;
+  }
+}
