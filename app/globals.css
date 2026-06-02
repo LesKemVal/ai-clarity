@@ -526,3 +526,33 @@ textarea:focus{
   letter-spacing:-0.03em;
 }
 
+
+
+.branesx-command-surface{
+  position:relative;
+}
+
+.branesx-command-surface::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:-32px;
+  height:1px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.08),
+    transparent
+  );
+}
+
+.branesx-command-surface h1{
+  font-weight:600;
+  color:white;
+}
+
+.branesx-command-surface p{
+  color:rgba(255,255,255,.42);
+}
+
