@@ -348,3 +348,23 @@ a[href*="/george/live"]:active {
     font-size:1.35rem!important;
   }
 }
+
+
+/* Workspace emphasis */
+.george-composer-focus{
+  box-shadow:
+    0 0 0 1px rgba(170,180,255,.18),
+    0 18px 50px rgba(0,0,0,.32);
+}
+
+.george-normal-surface-box{
+  border-color: rgba(255,255,255,.14)!important;
+}
+
+.george-normal-surface-box span:first-child{
+  color: rgba(215,219,228,.56)!important;
+}
+
+.george-normal-surface-box span:last-child{
+  color: rgba(255,255,255,.98)!important;
+}
