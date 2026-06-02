@@ -919,3 +919,68 @@ textarea:focus{
     right:-20px;
   }
 }
+
+
+/* utility instrument v2 */
+
+.george-utility-brand{
+  opacity:.98;
+}
+
+.george-utility-kicker{
+  position:relative;
+}
+
+.george-utility-kicker::after{
+  content:"";
+  display:block;
+  width:32px;
+  height:1px;
+  margin-top:10px;
+  background:rgba(255,255,255,.22);
+}
+
+.george-utility-instrument{
+  max-width:780px;
+}
+
+.george-utility-instrument h1{
+  font-weight:700;
+  max-width:760px;
+}
+
+.george-utility-instrument p{
+  max-width:680px;
+}
+
+.george-utility-line{
+  opacity:.9;
+}
+
+.george-utility-presence::before{
+  opacity:.85;
+}
+
+.george-utility-presence::after{
+  opacity:.75;
+}
+
+.george-utility-instrument::after{
+  width:180px;
+  height:2px;
+}
+
+.george-utility-instrument{
+  animation:georgeInstrumentSettle .9s ease;
+}
+
+@keyframes georgeInstrumentSettle{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
