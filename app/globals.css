@@ -696,3 +696,46 @@ textarea:focus{
   );
   border-radius:999px;
 }
+
+
+/* instrument presence */
+
+.george-utility-presence{
+  animation: georgeFadeIn .55s ease;
+}
+
+@keyframes georgeFadeIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.george-utility-instrument{
+  position:relative;
+}
+
+.george-utility-instrument::before{
+  content:"";
+  position:absolute;
+  left:-48px;
+  top:18px;
+  width:1px;
+  height:110px;
+  background:linear-gradient(
+    180deg,
+    rgba(174,182,255,.55),
+    rgba(174,182,255,0)
+  );
+}
+
+@media (max-width:768px){
+  .george-utility-instrument::before{
+    left:-16px;
+    height:72px;
+  }
+}

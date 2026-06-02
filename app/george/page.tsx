@@ -5253,7 +5253,7 @@ return (
         <div className="george-utility-line" />
         <h1>GEORGE</h1>
         <p>
-          Professional support for decisions, conversations, and execution.
+          Judgment when it matters. Support when it counts.
         </p>
       </div>
     </div>
