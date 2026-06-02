@@ -581,7 +581,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Find the next useful move.',
+          text: 'State the objective.',
           url,
         })
 
@@ -2171,7 +2171,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   }
 
   const messagesRef = useRef<Message[]>([
-    { role: 'assistant', content: 'Find the next useful move.' },
+    { role: 'assistant', content: 'State the objective.' },
   ])
 
   const preserveNormalDraft = () => {
@@ -5402,7 +5402,7 @@ return (
           }
           className="mt-1 px-1 text-[11px] tracking-[0.12em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/34"
         >
-          {expandedMessages[i] ? 'See less' : 'See more'}
+          {expandedMessages[i] ? 'See less' : 'Continue'}
         </button>
       )}
 
@@ -5697,7 +5697,7 @@ I am listening now. Speak naturally. I will respond ${
                   if (navigator.share) {
                     await navigator.share({
                       title: 'GEORGE by BRANESx',
-                      text: `Find the next useful move.\n\n${shareText}`,
+                      text: `State the objective.\n\n${shareText}`,
                       url: window.location.origin + '/george',
                     })
                   } else if (navigator.clipboard?.writeText) {
@@ -7288,7 +7288,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="Find the next useful move."
+                        placeholder="State the objective."
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}

@@ -507,3 +507,22 @@ textarea:focus{
   line-height:1.8;
 }
 
+
+
+.objective-focus-mode{
+  max-width:780px;
+  margin:0 auto;
+}
+
+.objective-focus-mode .prose,
+.objective-focus-mode p{
+  font-size:1.05rem;
+  line-height:1.9;
+}
+
+.objective-focus-mode h1,
+.objective-focus-mode h2,
+.objective-focus-mode h3{
+  letter-spacing:-0.03em;
+}
+
