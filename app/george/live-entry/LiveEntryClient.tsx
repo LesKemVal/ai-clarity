@@ -619,7 +619,7 @@ export default function LiveEntryClient() {
 
     return {
       sessionId: session.id || null,
-      title: session.title || 'Related session',
+      title: session.title || 'Relevant context',
       direction: session.userGoal || session.metadata?.direction || session.title || 'Not established',
       outcome: session.metadata?.outcome || session.userGoal || 'Not established',
       openDecisions: session.metadata?.openDecisions || [],
