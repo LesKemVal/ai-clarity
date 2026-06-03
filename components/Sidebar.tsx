@@ -476,6 +476,40 @@ return (
           </section>
           )}
 
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
+              Identity
+            </div>
+
+            <div className="mt-3 rounded-[0.65rem] border border-white/[0.045] bg-white/[0.012] px-3 py-2">
+              <div className="truncate text-[12px] text-white/58">
+                {identityAuthenticated && identityEmail ? maskAccountEmail(identityEmail) : 'Not recognized'}
+              </div>
+
+              <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/28">
+                {identityAuthenticated ? `${identityTier} access` : 'Access not connected'}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (identityAuthenticated) {
+                    clearCachedGeorgeSessionAuthority()
+                    setIdentityEmail('')
+                    setIdentityTier('smart')
+                    setIdentityAuthenticated(false)
+                    return
+                  }
+
+                  onOpenLogin()
+                }}
+                className="mt-3 block w-full rounded-[0.5rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/48 transition hover:bg-white/[0.026] hover:text-white/78"
+              >
+                {identityAuthenticated ? 'Sign out' : 'Connect access'}
+              </button>
+            </div>
+          </section>
+
           <section className="border-t border-white/[0.035] pt-3">
             <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
               Terms
