@@ -473,76 +473,6 @@ return (
           </section>
           )}
 
-          <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Access
-            </div>
-
-            <div className="mt-3 rounded-[0.65rem] border border-white/[0.045] bg-white/[0.012] px-3 py-2">
-              <div className="truncate text-[12px] text-white/58">
-                {identityAuthenticated && identityEmail ? maskAccountEmail(identityEmail) : 'Unrecognized'}
-              </div>
-
-              <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/28">
-                {identityAuthenticated ? `${identityTier} continuity` : 'Continuity not connected'}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (identityAuthenticated) {
-                    clearCachedGeorgeSessionAuthority()
-                    setIdentityEmail('')
-                    setIdentityTier('smart')
-                    setIdentityAuthenticated(false)
-                    return
-                  }
-
-                  onOpenLogin()
-                }}
-                className="mt-3 block w-full rounded-[0.5rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/48 transition hover:bg-white/[0.026] hover:text-white/78"
-              >
-                {identityAuthenticated ? 'Disconnect' : 'Connect'}
-              </button>
-            </div>
-          </section>
-
-          <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Governance
-            </div>
-
-            <div className="mt-2 space-y-0.5">
-              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
-                Terms
-              </a>
-            </div>
-          </section>
-
-          <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Resources
-            </div>
-
-            <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
-              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/30 transition hover:text-white/56">
-                988 Lifeline
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/30 transition hover:text-white/56">
-                StopBullying.gov
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/30 transition hover:text-white/56">
-                RAINN
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/30 transition hover:text-white/56">
-                Legal Aid
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/30 transition hover:text-white/56">
-                BrokerCheck
-              </a>
-            </div>
-          </section>
-
           {!isLiveRoute && normalSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
@@ -640,6 +570,76 @@ return (
             )}
           </section>
           )}
+
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Access
+            </div>
+
+            <div className="mt-3 rounded-[0.65rem] border border-white/[0.045] bg-white/[0.012] px-3 py-2">
+              <div className="truncate text-[12px] text-white/58">
+                {identityAuthenticated && identityEmail ? maskAccountEmail(identityEmail) : 'Unrecognized'}
+              </div>
+
+              <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/28">
+                {identityAuthenticated ? `${identityTier} continuity` : 'Continuity not connected'}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (identityAuthenticated) {
+                    clearCachedGeorgeSessionAuthority()
+                    setIdentityEmail('')
+                    setIdentityTier('smart')
+                    setIdentityAuthenticated(false)
+                    return
+                  }
+
+                  onOpenLogin()
+                }}
+                className="mt-3 block w-full rounded-[0.5rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/48 transition hover:bg-white/[0.026] hover:text-white/78"
+              >
+                {identityAuthenticated ? 'Disconnect' : 'Connect'}
+              </button>
+            </div>
+          </section>
+
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Governance
+            </div>
+
+            <div className="mt-2 space-y-0.5">
+              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+                Terms
+              </a>
+            </div>
+          </section>
+
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Resources
+            </div>
+
+            <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
+              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/30 transition hover:text-white/56">
+                988 Lifeline
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/30 transition hover:text-white/56">
+                StopBullying.gov
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/30 transition hover:text-white/56">
+                RAINN
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/30 transition hover:text-white/56">
+                Legal Aid
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/30 transition hover:text-white/56">
+                BrokerCheck
+              </a>
+            </div>
+          </section>
 
           {isLiveRoute && liveSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
