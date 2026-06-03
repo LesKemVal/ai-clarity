@@ -2229,6 +2229,33 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     window.location.href = '/george/live-entry'
   }
 
+  const openLiveEntryFromMessage = (message: Message) => {
+    if (typeof window === 'undefined') return
+
+    const content = String(message?.content || '').trim()
+
+    preserveNormalDraft()
+
+    try {
+      window.localStorage.setItem(
+        'george_live_runtime_motion_context',
+        JSON.stringify({
+          source: 'message_action',
+          title: content.slice(0, 72) || 'GEORGE context',
+          summary: content.slice(0, 900),
+          selectedAt: Date.now(),
+        })
+      )
+    } catch {}
+
+    if (currentTier === 'smart') {
+      setShowUpgradeModal(true)
+      return
+    }
+
+    window.location.href = '/george/live-entry'
+  }
+
   const restoreNormalDraft = () => {
     if (typeof window === 'undefined') return false
 
@@ -5728,6 +5755,14 @@ I am listening now. Speak naturally. I will respond ${
               className="px-1.5 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
             >
               Share
+            </button>
+
+            <button
+              type="button"
+              onClick={() => openLiveEntryFromMessage(m)}
+              className="px-1.5 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
+            >
+              LIVE
             </button>
 
               </>
