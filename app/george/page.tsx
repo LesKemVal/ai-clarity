@@ -6537,7 +6537,7 @@ if (liveMode) {
             }}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
           >
-            New LIVE LIVE
+            New LIVE
           </button>
 
           <button
