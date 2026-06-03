@@ -383,7 +383,7 @@ return (
               }}
               className="block w-full rounded-[0.55rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/58 transition hover:bg-white/[0.026] hover:text-white/82"
             >
-              NEW SESSION
+              New Workspace
             </button>
           </section>
 
