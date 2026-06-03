@@ -1482,3 +1482,19 @@ textarea::placeholder{
   opacity:1;
 }
 
+
+/* hard composer single-layer correction */
+.george-composer-shell{
+  box-shadow:none!important;
+}
+
+.george-composer-shell::before,
+.george-composer-shell::after{
+  display:none!important;
+  content:none!important;
+}
+
+.george-composer-shell textarea{
+  border-radius:0!important;
+  box-shadow:none!important;
+}
