@@ -1556,12 +1556,13 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     }
 
     if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
-      // Normal GEORGE must not auto-restore old sessions or assistant-first startup messages.
-      // GEORGE wakes from user action. Saved continuity can remain available through explicit memory surfaces later.
+      // Normal GEORGE restores the user's active workspace on refresh.
+      // Sessions remain user-owned continuity, not assistant-first startup messages.
       skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = ''
-      setMessages([])
-      messagesRef.current = []
+      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
+
+      setMessages(activeSession.messages)
+      messagesRef.current = activeSession.messages
       normalSessionWriteReadyRef.current = true
       return
     }
