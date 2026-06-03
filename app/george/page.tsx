@@ -605,6 +605,7 @@ const normalSessionBootedRef = useRef(false)
 const normalSessionWriteReadyRef = useRef(false)
 const liveSessionWriteReadyRef = useRef(false)
 const preLiveSessionIdRef = useRef<string | null>(null)
+const liveEntryBootedRef = useRef(false)
 const [pendingImage, setPendingImage] = useState<{ dataUrl: string; name: string } | null>(null)
 const [feedback, setFeedback] = useState<Record<number, 'up' | 'down'>>({})
 const [feedbackPulse, setFeedbackPulse] = useState<Record<string, boolean>>({})
@@ -748,6 +749,45 @@ const [voiceError, setVoiceError] = useState('')
   const isManualLive =
     conversationMode === 'manual_live' ||
     activePromptContext === 'manual_live'
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (liveEntryBootedRef.current) return
+
+    const params = new URLSearchParams(window.location.search)
+    const shouldStartNewLive =
+      params.get('live') === '1' &&
+      params.get('start') === '1'
+
+    if (!shouldStartNewLive) return
+
+    liveEntryBootedRef.current = true
+
+    const openers = [
+      'What is happening?',
+      'Bring me up to speed.',
+      'What changed in the room?'
+    ]
+
+    const opener = openers[Math.floor(Date.now() / 60000) % openers.length]
+    const nextMessages: Message[] = [
+      {
+        role: 'assistant',
+        content: opener,
+        source: 'system_override',
+      },
+    ]
+
+    setLiveMode(true)
+    setConversationMode('manual_live')
+    setActivePromptContext('manual_live')
+    setActivePromptLabel('Start New LIVE')
+    setInput('')
+    setInterimTranscript('')
+    setMessages(nextMessages)
+    messagesRef.current = nextMessages
+    setActiveMode('live')
+  }, [])
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
   const [showCampaignMenu, setShowCampaignMenu] = useState(false)
