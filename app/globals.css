@@ -1573,3 +1573,44 @@ textarea::placeholder{
 [data-george-normal-hero] .george-utility-line{
   opacity:.5!important;
 }
+
+
+/* workspace-first layout */
+
+[data-george-normal-hero]{
+  transition:opacity .22s ease;
+}
+
+[data-george-normal-hero] .george-utility-presence{
+  max-width:820px;
+}
+
+[data-george-normal-hero] .george-utility-brand{
+  margin-bottom:.8rem;
+}
+
+[data-george-normal-hero] .george-utility-instrument{
+  margin-top:2.8rem!important;
+}
+
+[data-george-normal-hero] .george-utility-instrument h1{
+  font-size:clamp(2.8rem,5vw,4.8rem)!important;
+}
+
+[data-george-normal-hero] .george-utility-instrument p{
+  margin-top:1rem!important;
+  max-width:640px!important;
+}
+
+.george-composer-shell{
+  max-width:860px;
+  margin:0 auto;
+}
+
+.message-assistant{
+  padding-top:.15rem;
+}
+
+.message-user{
+  margin-top:.35rem;
+}
