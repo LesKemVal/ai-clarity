@@ -1614,3 +1614,46 @@ textarea::placeholder{
 .message-user{
   margin-top:.35rem;
 }
+
+
+/* GEORGE workspace convergence */
+
+[data-george-normal-hero]{
+  pointer-events:none;
+}
+
+.george-footer-surface,
+.george-command-surface,
+.george-composer-shell{
+  -webkit-font-smoothing:antialiased;
+}
+
+.george-footer-surface button,
+.george-composer-shell button{
+  font-weight:560;
+}
+
+.george-composer-shell{
+  border-radius:1.18rem!important;
+}
+
+.message-user{
+  border-radius:1.05rem!important;
+}
+
+.message-assistant{
+  font-size:15.8px;
+}
+
+.message-assistant p{
+  margin-bottom:.85rem;
+}
+
+.message-assistant ol,
+.message-assistant ul{
+  padding-left:1.15rem;
+}
+
+.message-assistant li::marker{
+  color:rgba(174,182,255,.62);
+}

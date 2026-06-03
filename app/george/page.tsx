@@ -633,7 +633,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     if (typeof window === 'undefined') return []
 
     try {
-      const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as any[]
+      const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]') as any[]
 
       return existing
         .filter((item) => item?.type === 'goal')
@@ -811,7 +811,7 @@ const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
 const [showMemoryContinuityPanel, setShowMemoryContinuityPanel] = useState(false)
 const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null)
-const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'memory' | 'images' | 'signal'>('live')
+const [activeReferenceTopic, setActiveReferenceTopic] = useState<'live' | 'continuity' | 'memory' | 'images' | 'signal'>('live')
 
 useEffect(() => {
   if (typeof window === 'undefined') return
@@ -1797,7 +1797,7 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       opportunityCost: 'moderate',
       userPosition: liveRuntimeSupport?.userPosition,
       knownContextAvailable,
-      userHasRequestedHelp: Boolean(input.trim()),
+      userHasRequestedReference: Boolean(input.trim()),
       roomHasRecentSignal: Boolean(interimTranscript.trim() || stableLiveGuidance),
       missingCriticalSignal: !knownContextAvailable && Boolean(input.trim() || interimTranscript.trim()),
       userPositionAtRisk: false,
@@ -1856,10 +1856,10 @@ const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 const [loginEmailInput, setLoginEmailInput] = useState('')
-const [showAccountMenu, setShowAccountMenu] = useState(false)
+const [showIdentityMenu, setShowIdentityMenu] = useState(false)
 
-const handleAccountSignOut = () => {
-  setShowAccountMenu(false)
+const handleIdentitySignOut = () => {
+  setShowIdentityMenu(false)
   setSubscriberEmail('')
   setCurrentTier('smart')
   window.localStorage.removeItem('george_email')
@@ -2592,7 +2592,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const getExistingFolders = () => {
     if (typeof window === 'undefined') return [] as string[]
 
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]')
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]')
     const folders = Array.from(
       new Set(
         existing
@@ -2620,7 +2620,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const getMemoriesByFolder = (folder: string) => {
     if (typeof window === 'undefined') return []
 
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as any[]
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]') as any[]
 
     return existing
       .filter((item) => (item.type || 'memory') === 'memory' && (item.folder || '').trim() === folder.trim())
@@ -2657,7 +2657,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const getLatestSavedMemoryByFolder = (folder: string) => {
     if (typeof window === 'undefined') return null
 
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]') as Array<{
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]') as Array<{
       type?: 'memory' | 'campaign'
       content?: string
       role?: string
@@ -2691,7 +2691,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const saveGoal = (message: Message, messageIndex: number) => {
     if (typeof window === 'undefined') return
 
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]')
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]')
     const previousUserMessage =
       message.role === 'assistant'
         ? [...messagesRef.current.slice(0, messageIndex)].reverse().find((item) => item.role === 'user') || null
@@ -2722,7 +2722,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
       source: 'user_classified_goal',
     })
 
-    window.localStorage.setItem('GEORGE_MEMORY', JSON.stringify(existing))
+    window.localStorage.setItem('GEORGE_WORKSPACE', JSON.stringify(existing))
     window.localStorage.setItem('GEORGE_LAST_FOLDER', 'Goals')
     setMemoryVersion((prev) => prev + 1)
     setToastMessage('Kept in chamber')
@@ -2734,7 +2734,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   const saveMemory = (message: Message, messageIndex: number, folderOverride?: string) => {
     if (typeof window === 'undefined') return
 
-    const existing = JSON.parse(window.localStorage.getItem('GEORGE_MEMORY') || '[]')
+    const existing = JSON.parse(window.localStorage.getItem('GEORGE_WORKSPACE') || '[]')
     const chosenFolder = (folderOverride || getDefaultFolder()).trim() || 'general'
 
     const previousUserMessage =
@@ -2758,7 +2758,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
       userPromptContent: previousUserMessage?.content || null,
     })
 
-    window.localStorage.setItem('GEORGE_MEMORY', JSON.stringify(existing))
+    window.localStorage.setItem('GEORGE_WORKSPACE', JSON.stringify(existing))
     window.localStorage.setItem('GEORGE_LAST_FOLDER', chosenFolder)
     setMemoryVersion((prev) => prev + 1)
     setToastMessage(`Saved to ${chosenFolder}`)
@@ -2949,14 +2949,14 @@ requestAnimationFrame(() => {
 
       const prompt =
         folder === 'Credit'
-          ? "Help me tighten my credit situation and show me the strongest path."
+          ? "Reference me tighten my credit situation and show me the strongest path."
           : folder === 'Business'
-          ? "Help me improve the business path in front of me."
+          ? "Reference me improve the business path in front of me."
           : folder === 'Legal'
-          ? "Help me understand the legal issue clearly and cautiously."
+          ? "Reference me understand the legal issue clearly and cautiously."
           : folder === 'Funding'
-          ? "Help me think clearly about funding and show me the strongest path."
-          : "Help me find the strongest next move." 
+          ? "Reference me think clearly about funding and show me the strongest path."
+          : "Reference me find the strongest next move." 
 
       setInput(prompt)
 
@@ -4383,7 +4383,7 @@ if (responseTimerRef.current) {
 
             if (personProfile.role === 'authority') {
               if (personProfile.posture === 'pressuring') return 'Authority — pressuring\n\nSay: “I understand. Tell me the exact requirement and the next step.”'
-              return 'Authority — Say: “Help me understand the exact requirement and the next step.”'
+              return 'Authority — Say: “Reference me understand the exact requirement and the next step.”'
             }
 
             if (personProfile.role === 'gatekeeper') {
@@ -5048,20 +5048,20 @@ return (
 
                   <button
                     type="button"
-                    onClick={() => setShowAccountMenu((value) => !value)}
+                    onClick={() => setShowIdentityMenu((value) => !value)}
                     className="inline-flex h-9 w-8 items-center justify-center rounded-full text-[20px] leading-none text-[#D7DBE4]/52 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/82"
-                    aria-label="Account menu"
-                    title="Account"
+                    aria-label="Identity menu"
+                    title="Identity"
                   >
                     ⋮
                   </button>
 
-                  {showAccountMenu && (
+                  {showIdentityMenu && (
                     <>
                       <button
                         type="button"
                         aria-label="Close account menu"
-                        onClick={() => setShowAccountMenu(false)}
+                        onClick={() => setShowIdentityMenu(false)}
                         className="fixed inset-0 z-[85] cursor-default bg-transparent"
                       />
 
@@ -5069,23 +5069,23 @@ return (
                         {subscriberEmail ? (
                           <button
                             type="button"
-                            onClick={handleAccountSignOut}
+                            onClick={handleIdentitySignOut}
                             className="block w-full rounded-[0.7rem] px-3 py-2 text-left text-[12px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/68 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
                           >
-                            Sign Out
+                            Sign out
                           </button>
                         ) : (
                           <button
                             type="button"
                             onClick={() => {
-                              setShowAccountMenu(false)
+                              setShowIdentityMenu(false)
                               setLoginEmailInput('')
                               setLoginLinkSent(false)
                               setShowUpgradeModal(true)
                             }}
                             className="block w-full rounded-[0.7rem] px-3 py-2 text-left text-[12px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/68 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
                           >
-                            Sign In
+                            Access
                           </button>
                         )}
                       </div>
@@ -5933,13 +5933,13 @@ I am listening now. Speak naturally. I will respond ${
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveHelpTopic('live')
+                      setActiveReferenceTopic('live')
                       setShowLanguageMenu(false)
                       setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
                     }}
                     className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
-                    Help
+                    Reference
                   </button>
 
                   <button
@@ -6012,7 +6012,7 @@ I am listening now. Speak naturally. I will respond ${
                           <div className={`w-[160px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 flex items-center justify-between">
                               <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                Help
+                                Reference
                               </div>
 
                               <button
@@ -6028,16 +6028,16 @@ I am listening now. Speak naturally. I will respond ${
                               {[
                                 ['live', 'LIVE'],
                                 ['continuity', 'CONTINUITY'],
-                                ['memory', 'MEMORY'],
+                                ['memory', 'WORKSPACE'],
                                 ['images', 'Visuals'],
                                 ['signal', 'Signal'],
                               ].map(([id, label]) => (
                                 <button
                                   key={id}
                                   type="button"
-                                  onClick={() => setActiveHelpTopic(id as any)}
+                                  onClick={() => setActiveReferenceTopic(id as any)}
                                   className={`block w-full py-1 text-left text-[13px] uppercase tracking-[0.16em] transition ${
-                                    activeHelpTopic === id
+                                    activeReferenceTopic === id
                                       ? 'text-white/82'
                                       : 'text-white/38 hover:text-white/72'
                                   }`}
@@ -6050,22 +6050,22 @@ I am listening now. Speak naturally. I will respond ${
 
                           <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
-                              {activeHelpTopic === 'live' && 'LIVE'}
-                              {activeHelpTopic === 'continuity' && 'LOGIN'}
-                              {activeHelpTopic === 'memory' && 'MEMORY'}
-                              {activeHelpTopic === 'images' && 'IMAGES'}
-                              {activeHelpTopic === 'signal' && 'SIGNAL'}
+                              {activeReferenceTopic === 'live' && 'LIVE'}
+                              {activeReferenceTopic === 'continuity' && 'ACCESS'}
+                              {activeReferenceTopic === 'memory' && 'WORKSPACE'}
+                              {activeReferenceTopic === 'images' && 'IMAGES'}
+                              {activeReferenceTopic === 'signal' && 'SIGNAL'}
                             </div>
 
                             <p className="text-[13px] leading-5 text-white/48">
-                              {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
-                              {activeHelpTopic === 'continuity' && 'Login restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
-                              {activeHelpTopic === 'memory' && 'GEORGE adapts carefully from continuity, runtime interaction, operational patterns, and user-controlled memory systems.'}
-                              {activeHelpTopic === 'images' && 'Images helps generate visual direction, concepts, references, and creative material.'}
-                              {activeHelpTopic === 'signal' && 'Signal helps GEORGE notice useful patterns and improve operational usefulness over time.'}
+                              {activeReferenceTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
+                              {activeReferenceTopic === 'continuity' && 'Access restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
+                              {activeReferenceTopic === 'memory' && 'Workspace keeps useful context available so GEORGE can continue work without starting over.'}
+                              {activeReferenceTopic === 'images' && 'Images help GEORGE understand visual context, references, screenshots, and creative direction.'}
+                              {activeReferenceTopic === 'signal' && 'Signal helps GEORGE understand what changed and what matters next.'}
                             </p>
 
-                            {activeHelpTopic === 'signal' && (
+                            {activeReferenceTopic === 'signal' && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -6078,7 +6078,7 @@ I am listening now. Speak naturally. I will respond ${
                               </button>
                             )}
 
-                            {activeHelpTopic === 'memory' && (
+                            {activeReferenceTopic === 'memory' && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -6095,7 +6095,7 @@ I am listening now. Speak naturally. I will respond ${
                               href="/help"
                               className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                             >
-                              Documentation
+                              Reference
                             </a>
                           </div>
                         </>
@@ -6203,7 +6203,7 @@ if (liveMode) {
         >
           <div className="space-y-3">
             <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/25">
-              saved memory
+              workspace
             </div>
 
             {getExistingFolders().length > 0 ? (
@@ -6229,7 +6229,7 @@ if (liveMode) {
               </div>
             ) : (
               <div className="text-[13px] text-[#D7DBE4]/30">
-                No saved memories yet
+                No saved work yet
               </div>
             )}
 
@@ -6262,7 +6262,7 @@ if (liveMode) {
                         key={idx}
                         type="button"
                         onClick={() => {
-                          const memoryContext = `You saved this earlier:\n${textBlock}\n\nDo you want me to respond, or leave it as-is?`
+                          const memoryContext = `Workspace context:\n${textBlock}\n\nUse this context, continue from it, or tell me what changed.`
 
                           const nextMessages = [
                             ...messagesRef.current,
@@ -6977,7 +6977,7 @@ Continue from here, tell me what changed, or start fresh.`
         onClick={() => {
           setShowLiveQuickMenu(false)
           setShowLanguageMenu(false)
-          setActiveHelpTopic('live')
+          setActiveReferenceTopic('live')
           setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
         }}
         className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-red-100/52 hover:text-red-100/82 ${operationalMotion.press}"
@@ -6989,7 +6989,7 @@ Continue from here, tell me what changed, or start fresh.`
         type="button"
         onClick={() => {
           setShowNormalUtilityMenu(null)
-          setActiveHelpTopic('live')
+          setActiveReferenceTopic('live')
           setShowLanguageMenu(false)
           setShowLiveQuickMenu((value) => !value)
         }}
@@ -7153,7 +7153,7 @@ ${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
                                 }
 
                                 setPendingImage(null)
-                                setInput(`I uploaded file: ${data.name || file.name}. Help me understand and use it.\\n\\n${data.text}`)
+                                setInput(`I uploaded file: ${data.name || file.name}. Reference me understand and use it.\\n\\n${data.text}`)
                                 setToastMessage(`${data.name || file.name} loaded into GEORGE.`)
                                 setShowToast(true)
                                 textareaRef.current?.focus()
@@ -7182,7 +7182,7 @@ ${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
                               setInput(`I uploaded text file: ${file.name}.
 
 ${looksLikeResume
-  ? 'This looks like a résumé or career document. Help me use it for interviews, role positioning, answer framing, and live conversation preparation. Pull out what matters most and what I should be ready to say.'
+  ? 'This looks like a résumé or career document. Reference me use it for interviews, role positioning, answer framing, and live conversation preparation. Pull out what matters most and what I should be ready to say.'
   : 'Tell me what this is, what matters most, and how I should use it.'}
 
 ${clipped}`)
