@@ -316,7 +316,6 @@ export default function Sidebar({
     Runtime: true,
     Access: true,
     Sessions: false,
-    Packets: false,
   })
 
   const toggleGroup = (title: string) => {
@@ -543,29 +542,6 @@ return (
               </a>
             </div>
           </section>
-
-          {!isLiveRoute && (
-          <section className="border-t border-white/[0.035] pt-4">
-            <button
-              type="button"
-              onClick={() => toggleGroup('Packets')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                Continuation Packets
-              </span>
-              <span className="text-[11px] text-white/20">
-                {openGroups.Packets ? '▾' : '▸'}
-              </span>
-            </button>
-
-            {openGroups.Packets && (
-              <div className="mt-3 rounded-[0.55rem] border border-white/[0.04] bg-white/[0.01] px-3 py-2 text-[12px] leading-5 text-white/30">
-                No packets yet
-              </div>
-            )}
-          </section>
-          )}
 
           {!isLiveRoute && normalSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
