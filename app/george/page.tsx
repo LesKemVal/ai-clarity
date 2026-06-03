@@ -17,7 +17,7 @@ import { getSteering } from '@/lib/george/steering'
 import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
-import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
+import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
@@ -1885,9 +1885,9 @@ const handleIdentitySignOut = () => {
   setShowIdentityMenu(false)
   setSubscriberEmail('')
   setCurrentTier('smart')
-  window.localStorage.removeItem('george_email')
-  window.localStorage.removeItem('george_session_authority')
+  clearCachedGeorgeSessionAuthority()
   window.localStorage.removeItem('george_founder_restore')
+  window.localStorage.removeItem('george_founder_access')
   setToastMessage('Signed out.')
   setShowToast(true)
 }
@@ -1918,7 +1918,13 @@ const redeemFounderCode = async () => {
     }
 
     setCurrentTier(data.tier)
-    window.localStorage.setItem('george_tier', data.tier)
+    writeCachedGeorgeSessionAuthority({
+      authenticated: true,
+      email: subscriberEmail.trim().toLowerCase() || `founder:${code.trim().toUpperCase()}`,
+      tier: data.tier,
+      liveAccess: true,
+      source: 'founder',
+    })
     window.localStorage.setItem('george_founder_access', 'server-verified')
     setToastMessage(`Founder ${data.tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access activated.`)
     setShowToast(true)
