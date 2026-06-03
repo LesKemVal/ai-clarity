@@ -296,7 +296,7 @@ export default function LiveEntryClient() {
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
   const [relatedSessions, setRelatedSessions] = useState<any[]>([])
   const [liveToaAccepted, setLiveToaAccepted] = useState(false)
-  const [sessionSectionCollapsed, setSessionSectionCollapsed] = useState(true)
+  const [contextSectionCollapsed, setContextSectionCollapsed] = useState(true)
   const [chairSectionCollapsed, setChairSectionCollapsed] = useState(true)
   const [roomSectionCollapsed, setRoomSectionCollapsed] = useState(false)
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
@@ -325,7 +325,7 @@ export default function LiveEntryClient() {
     .join(' + ')
 
   const contextSignalsCollapsed =
-    (relatedSessions.length === 0 || sessionSectionCollapsed) &&
+    (relatedSessions.length === 0 || contextSectionCollapsed) &&
     chairSectionCollapsed
 
   const groundingSignalAvailable =
@@ -437,7 +437,7 @@ export default function LiveEntryClient() {
     }
 
     setHasLiveSession(!!getActiveSessionForMode('live'))
-    setSessionSectionCollapsed(false)
+    setContextSectionCollapsed(false)
     setChairSectionCollapsed(false)
     setRoomSectionCollapsed(false)
     setRoomSectionCollapsed(false)
@@ -609,10 +609,10 @@ export default function LiveEntryClient() {
 
   const selectedRelatedSession = relatedSessions.find((session) => session?.id === relatedSessionId) || null
 
-  const relatedSessionLabel =
+  const relatedContextLabel =
     relatedSessions.length === 0 || relatedSessionId === 'not_related'
-      ? 'Not related'
-      : selectedRelatedSession?.title || 'Selected session'
+      ? 'No saved context selected'
+      : selectedRelatedSession?.title || 'Selected context'
 
   const buildContinuityPackage = (session: any) => {
     if (!session) return null
@@ -777,7 +777,7 @@ export default function LiveEntryClient() {
     setKnownContext('')
     setPrepDocument(null)
     setLiveToaAccepted(false)
-    setSessionSectionCollapsed(false)
+    setContextSectionCollapsed(false)
     setChairSectionCollapsed(false)
 
     window.localStorage.setItem('george_live_prep_inputs_cleared', '1')
@@ -833,7 +833,7 @@ export default function LiveEntryClient() {
               <button
                 type="button"
                 onClick={() => {
-                  setSessionSectionCollapsed(false)
+                  setContextSectionCollapsed(false)
                   setChairSectionCollapsed(false)
                 }}
                 className="flex w-full items-center justify-between gap-3 text-left"
@@ -841,7 +841,7 @@ export default function LiveEntryClient() {
                 <span>
                   <span className="block text-[10px] uppercase tracking-[0.2em] text-white/24">Context Signals</span>
                   <span className="mt-0.5 block truncate text-[12px] text-white/48">
-                    {relatedSessionLabel} • {chair || 'Position not selected'}
+                    {relatedContextLabel} • {chair || 'Position not selected'}
                   </span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
@@ -851,18 +851,16 @@ export default function LiveEntryClient() {
 
           {relatedSessions.length > 0 && !contextSignalsCollapsed && (
           <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2">
-            {sessionSectionCollapsed ? (
+            {contextSectionCollapsed ? (
               <button
                 type="button"
-                onClick={() => setSessionSectionCollapsed(false)}
+                onClick={() => setContextSectionCollapsed(false)}
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Related Session</span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Relevant Context</span>
                   <span className="mt-1 block truncate text-[13px] text-white/62">
-                    {relatedSessionId === 'not_related'
-                      ? 'Not related'
-                      : selectedRelatedSession?.title || 'Selected session'}
+                    {relatedContextLabel}
                   </span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
@@ -870,17 +868,17 @@ export default function LiveEntryClient() {
             ) : (
               <>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">
-              Which session is this LIVE conversation related to?
+              GEORGE found related work. Use it only if it helps this LIVE situation.
             </div>
 
             <div className="mt-2 grid gap-1.5">
-              {relatedSessions.map((session) => (
+              {relatedSessions.slice(0, 3).map((session) => (
                 <button
                   key={session.id}
                   type="button"
                   onClick={() => {
                     setRelatedSessionId(session.id)
-                    setSessionSectionCollapsed(true)
+                    setContextSectionCollapsed(true)
                   }}
                   className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
                     relatedSessionId === session.id
@@ -888,9 +886,9 @@ export default function LiveEntryClient() {
                       : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
                   }`}
                 >
-                  <span className="block truncate text-[13px] font-medium">{session.title || 'GEORGE Session'}</span>
+                  <span className="block truncate text-[13px] font-medium">{session.title || 'Prior work'}</span>
                   <span className="mt-1 block truncate text-[11px] text-white/34">
-                    {session.lastKnownState || session.summary || session.userGoal || 'Last active normal session'}
+                    {session.lastKnownState || session.summary || session.userGoal || 'Saved context GEORGE can use cautiously.'}
                   </span>
                 </button>
               ))}
@@ -899,16 +897,12 @@ export default function LiveEntryClient() {
                 type="button"
                 onClick={() => {
                   setRelatedSessionId('not_related')
-                  setSessionSectionCollapsed(true)
+                  setContextSectionCollapsed(true)
                 }}
-                className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
-                  relatedSessionId === 'not_related'
-                    ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.09] text-white'
-                    : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
-                }`}
+                className="rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2 text-left text-white/46 transition hover:text-white/76"
               >
-                <span className="block text-[13px] font-medium">Not related</span>
-                <span className="mt-1 block text-[11px] text-white/34">Start LIVE without normal-session context.</span>
+                <span className="block text-[13px] font-medium">Start clean</span>
+                <span className="mt-1 block text-[11px] text-white/34">Use only the signal entered here.</span>
               </button>
             </div>
               </>

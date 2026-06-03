@@ -50,7 +50,7 @@ export async function sendContinuityEmail({
               border-radius:999px;
             "
           >
-            Restore session
+            Restore continuity
           </a>
 
           <p style="font-size:11px;line-height:1.65;color:#697089;margin-top:24px;">

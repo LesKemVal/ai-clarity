@@ -130,7 +130,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
 
             <div className="mt-2 grid gap-2 text-[12px] leading-5 text-white/56">
               {relatedSessionValue && (
-                <p><span className="text-white/78">Related session:</span> {relatedSessionValue}</p>
+                <p><span className="text-white/78">Relevant context:</span> {relatedSessionValue}</p>
               )}
               <p><span className="text-white/78">Your position:</span> {chairValue}</p>
               <p><span className="text-white/78">Desired outcome:</span> {desiredOutcomeValue}</p>
