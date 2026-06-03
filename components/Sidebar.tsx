@@ -80,7 +80,6 @@ export default function Sidebar({
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
-  const [railPanel, setRailPanel] = useState<'new' | 'search' | 'sessions' | null>(null)
 
   const [identityEmail, setIdentityEmail] = useState('')
   const [identityTier, setIdentityTier] = useState<GeorgeSessionTier>('smart')
@@ -389,7 +388,7 @@ return (
 
           <section>
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
-              Pages
+              Workspace
             </div>
 
             <div className="mt-2 space-y-0.5">
@@ -475,7 +474,7 @@ return (
 
           <section className="border-t border-white/[0.035] pt-4">
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Public Utility
+              Public Resources
             </div>
 
             <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
