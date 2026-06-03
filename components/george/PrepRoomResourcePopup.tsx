@@ -106,25 +106,25 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
         <div className="relative shrink-0 px-4 pb-3 pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">GEORGE Summary</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">LIVE Preview</p>
               <h2 className="mt-1.5 text-[22px] font-semibold tracking-[-0.045em] text-white">
-                GEORGE is ready to enter LIVE.
+                What are we walking into?
               </h2>
             </div>
             <div className="rounded-full border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/68">
-              Ready
+              Signal Ready
             </div>
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            Review what GEORGE will treat as the starting frame before the room opens.
+            Here's what I believe.
           </p>
         </div>
 
         <div className="relative min-h-0 flex-1 overflow-y-auto px-4 pb-4">
           <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">Starting frame</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-white/24">Current understanding</p>
               <p className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">review</p>
             </div>
 
@@ -133,13 +133,13 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
                 <p><span className="text-white/78">Relevant context:</span> {relatedSessionValue}</p>
               )}
               <p><span className="text-white/78">Your position:</span> {chairValue}</p>
-              <p><span className="text-white/78">Desired outcome:</span> {desiredOutcomeValue}</p>
-              <p><span className="text-white/78">Observed reality:</span> {knownContextValue}</p>
+              <p><span className="text-white/78">Objective:</span> {desiredOutcomeValue}</p>
+              <p><span className="text-white/78">Situation:</span> {knownContextValue}</p>
             </div>
           </div>
 
           <div className="mt-2 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">GEORGE will consider</p>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">GEORGE is considering</p>
             <p className="mt-2 text-[12px] leading-5 text-white/48">
               {summaryLine}
             </p>
@@ -173,7 +173,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
               onClick={onClose}
               className="px-1 py-1 text-[11px] uppercase tracking-[0.22em] text-white/30 transition duration-150 hover:text-white/62 active:text-white"
             >
-              Close
+              Edit
             </button>
             <div className="flex items-center gap-3">
               <button
