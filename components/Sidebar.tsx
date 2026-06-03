@@ -511,15 +511,21 @@ return (
             </div>
           </section>
 
-          <section className="border-t border-white/[0.035] pt-3">
-            <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
-              Terms
-            </a>
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Governance
+            </div>
+
+            <div className="mt-2 space-y-0.5">
+              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+                Terms
+              </a>
+            </div>
           </section>
 
           <section className="border-t border-white/[0.035] pt-4">
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Public Resources
+              Resources
             </div>
 
             <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
