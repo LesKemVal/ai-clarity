@@ -2333,7 +2333,19 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     const params = new URLSearchParams(window.location.search)
     if (params.get('live') !== '1') return
 
+    const shouldResume = params.get('resume') === '1'
+
     window.history.replaceState({}, '', '/george')
+
+    if (shouldResume) {
+      window.setTimeout(() => {
+        setToastMessage('Open the sidebar to resume LIVE conversations.')
+        setShowToast(true)
+        setShowSidebar(true)
+      }, 80)
+      return
+    }
+
     window.setTimeout(() => startLiveSignalAcquisition(), 80)
   }, [])
 

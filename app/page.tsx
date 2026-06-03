@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const router = useRouter()
+  const [showLiveOptions, setShowLiveOptions] = useState(false)
 
   return (
     <main className="min-h-[100dvh] bg-[#040507] text-white">
@@ -23,21 +25,13 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 max-w-[760px] text-[20px] leading-8 text-white/60">
-            Increase your potential in conversations where judgment, timing, recall, and communication carry the day.
-          </p>
-
-          <p className="mt-6 max-w-[720px] text-[16px] leading-8 text-white/42">
-            Put GEORGE in your ear before interviews, meetings, boardrooms, negotiations, presentations, or difficult conversations.
+            Put GEORGE in your ear before walking into an interview, meeting, boardroom, negotiation, or presentation — and better your success ratio.
           </p>
         </div>
 
         <div className="relative z-10 mt-14 w-full max-w-[920px] rounded-[1.5rem] border border-white/[0.085] bg-[#10131B]/72 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.055)] backdrop-blur-md md:p-7">
           <p className="text-[19px] leading-8 text-white/84">
             Potential is rarely limited by knowledge.
-          </p>
-
-          <p className="mt-5 max-w-[780px] text-[15px] leading-8 text-white/56">
-            More often it is limited by timing, recall, communication, adaptation, and execution.
           </p>
 
           <p className="mt-5 text-[15px] leading-8 text-white/72">
@@ -54,13 +48,34 @@ export default function HomePage() {
             Open GEORGE
           </button>
 
-          <button
-            type="button"
-            onClick={() => router.push('/george?live=1')}
-            className="rounded-[1rem] border border-white/[0.06] bg-white/[0.015] px-7 py-4 text-[15px] font-medium text-white/70 transition hover:bg-white/[0.03] hover:text-white"
-          >
-            Enter LIVE
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowLiveOptions((value) => !value)}
+              className="rounded-[1rem] border border-white/[0.06] bg-white/[0.015] px-7 py-4 text-[15px] font-medium text-white/70 transition hover:bg-white/[0.03] hover:text-white"
+            >
+              Enter LIVE
+            </button>
+
+            {showLiveOptions && (
+              <div className="absolute left-0 top-full z-20 mt-2 w-[210px] rounded-[1rem] border border-white/[0.07] bg-[#070A0F]/95 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+                <button
+                  type="button"
+                  onClick={() => router.push('/george?live=1&start=1')}
+                  className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/72 transition hover:bg-white/[0.045] hover:text-white"
+                >
+                  Start New LIVE
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push('/george?live=1&resume=1')}
+                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/52 transition hover:bg-white/[0.045] hover:text-white"
+                >
+                  Resume LIVE
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-20 grid gap-4 md:grid-cols-3">
