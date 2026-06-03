@@ -1226,7 +1226,7 @@ useEffect(() => {
   return () => window.clearInterval(timer)
 }, [forceLive, liveMode, liveEntryBriefing])
 
-  const [showLeave LIVEPopup, setShowLeave LIVEPopup] = useState(false)
+  const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
 
@@ -2235,7 +2235,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   }
 
   const requestLeave LIVELiveMode = () => {
-    setShowLeave LIVEPopup(true)
+    setShowExitPopup(true)
   }
 
   const exitLiveMode = () => {
@@ -6498,12 +6498,12 @@ if (liveMode) {
 )}
 
 
-{showLeave LIVEPopup && typeof document !== 'undefined' && createPortal(
+{showExitPopup && typeof document !== 'undefined' && createPortal(
   <>
     <button
       type="button"
       aria-label="Close leave LIVE popup"
-      onClick={() => setShowLeave LIVEPopup(false)}
+      onClick={() => setShowExitPopup(false)}
       className="fixed inset-0 z-[220] bg-black/52 backdrop-blur-[14px]"
     />
 
@@ -6516,7 +6516,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => setShowLeave LIVEPopup(false)}
+            onClick={() => setShowExitPopup(false)}
             className="text-[13px] text-white/28 transition hover:text-white/72"
           >
             ×
@@ -6531,7 +6531,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => {
-              setShowLeave LIVEPopup(false)
+              setShowExitPopup(false)
               window.localStorage.setItem('george_start_new_live', '1')
               window.location.href = '/george/live-entry'
             }}
@@ -6543,7 +6543,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => {
-              setShowLeave LIVEPopup(false)
+              setShowExitPopup(false)
               recordActiveLiveRuntimeUsage()
               exitLiveMode()
             }}
@@ -6555,7 +6555,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => {
-              setShowLeave LIVEPopup(false)
+              setShowExitPopup(false)
               window.localStorage.removeItem('george_active_live_session_id')
               window.localStorage.removeItem('george_active_campaign_session_id')
               exitLiveMode()
@@ -6567,7 +6567,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => setShowLeave LIVEPopup(false)}
+            onClick={() => setShowExitPopup(false)}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
             Continue session
