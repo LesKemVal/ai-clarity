@@ -865,27 +865,25 @@ export default function LiveEntryClient() {
               <>
             <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Position</div>
             <p className="mt-1 text-[11px] leading-5 text-white/36">Select the position GEORGE should consider while helping you.</p>
-            <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-              {CHAIR_OPTIONS.map((option) => {
-                const active = chairs.includes(option.label)
 
-                return (
-                  <button
-                    key={option.label}
-                    type="button"
-                    onClick={() => toggleChair(option.label)}
-                    className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
-                      active
-                        ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.10] text-white'
-                        : 'border-white/[0.035] bg-black/14 text-white/46 hover:text-white/76'
-                    }`}
-                  >
-                    <span className="block text-[12px] font-medium">{option.label}</span>
-                    <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
-                  </button>
-                )
-              })}
-            </div>
+            <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose position</span>
+              <select
+                value={chairs[0] || ''}
+                onChange={(event) => {
+                  const value = event.target.value
+                  setChairs(value ? [value] : [])
+                }}
+                className="mt-2 w-full appearance-none bg-transparent text-[14px] text-white/72 outline-none"
+              >
+                <option value="" className="bg-[#090B10] text-white">Not selected</option>
+                {CHAIR_OPTIONS.map((option) => (
+                  <option key={option.label} value={option.label} className="bg-[#090B10] text-white">
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             {chairs.includes('Other') && (
               <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">

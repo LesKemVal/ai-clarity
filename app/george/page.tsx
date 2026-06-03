@@ -1237,6 +1237,45 @@ useEffect(() => {
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const key = 'george_removed_upgrade_test_sessions_v1'
+    if (window.localStorage.getItem(key) === '1') return
+
+    const badPatterns = [
+      /we can go further here/i,
+      /upgrade/i,
+      /support the work/i,
+      /go brilliant/i,
+      /go intelligent/i,
+      /test question/i,
+    ]
+
+    try {
+      for (const storageKey of ['GEORGE_SESSIONS_V2', 'GEORGE_SESSIONS']) {
+        const raw = window.localStorage.getItem(storageKey)
+        if (!raw) continue
+
+        const sessions = JSON.parse(raw)
+        if (!Array.isArray(sessions)) continue
+
+        const cleaned = sessions.filter((session) => {
+          const text = JSON.stringify(session || '')
+          return !badPatterns.some((pattern) => pattern.test(text))
+        })
+
+        window.localStorage.setItem(storageKey, JSON.stringify(cleaned))
+      }
+
+      window.localStorage.removeItem('george_last_normal_draft')
+      window.localStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
+      window.localStorage.setItem(key, '1')
+    } catch {
+      window.localStorage.setItem(key, '1')
+    }
+  }, [])
+
 useEffect(() => {
   if (typeof window === 'undefined') return
 
@@ -2287,6 +2326,16 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setSuggestedSignal(Date.now())
     setRerouteSignal(0)
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('live') !== '1') return
+
+    window.history.replaceState({}, '', '/george')
+    window.setTimeout(() => startLiveSignalAcquisition(), 80)
+  }, [])
 
   const restoreNormalDraft = () => {
     if (typeof window === 'undefined') return false

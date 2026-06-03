@@ -22,27 +22,26 @@ export default function HomePage() {
             GEORGE
           </h1>
 
-          <p className="mt-6 max-w-[760px] text-[20px] leading-8 text-white/54">
-            Operational intelligence for moments where judgment, timing, and communication matter.
+          <p className="mt-6 max-w-[760px] text-[20px] leading-8 text-white/60">
+            Increase your potential in conversations where judgment, timing, recall, and communication carry the day.
           </p>
 
-          <p className="mt-6 max-w-[720px] text-[16px] leading-8 text-white/40">
-            Whatever you want to become, build, solve, navigate, or say — start with GEORGE.
+          <p className="mt-6 max-w-[720px] text-[16px] leading-8 text-white/42">
+            Put GEORGE in your ear before interviews, meetings, boardrooms, negotiations, presentations, or difficult conversations.
           </p>
         </div>
 
         <div className="relative z-10 mt-14 w-full max-w-[920px] rounded-[1.5rem] border border-white/[0.085] bg-[#10131B]/72 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.055)] backdrop-blur-md md:p-7">
           <p className="text-[19px] leading-8 text-white/84">
-            Most people already possess more knowledge than they realize.
+            Potential is rarely limited by knowledge.
           </p>
 
           <p className="mt-5 max-w-[780px] text-[15px] leading-8 text-white/56">
-            What slows them down is recall, articulation, organization, confidence,
-            adaptation, and composure.
+            More often it is limited by timing, recall, communication, adaptation, and execution.
           </p>
 
           <p className="mt-5 text-[15px] leading-8 text-white/72">
-            GEORGE helps close that gap.
+            With GEORGE in your ear, you avoid losing context, misremembering important details, or losing your position as conversations evolve.
           </p>
         </div>
 
@@ -57,7 +56,7 @@ export default function HomePage() {
 
           <button
             type="button"
-            onClick={() => router.push('/george/live-entry')}
+            onClick={() => router.push('/george?live=1')}
             className="rounded-[1rem] border border-white/[0.06] bg-white/[0.015] px-7 py-4 text-[15px] font-medium text-white/70 transition hover:bg-white/[0.03] hover:text-white"
           >
             Enter LIVE
@@ -99,8 +98,8 @@ export default function HomePage() {
             </div>
 
             <div className="mt-4 text-[14px] leading-8 text-white/58">
-              When the conversation begins,
-              bring GEORGE into the room.
+              Earbuds connect you to GEORGE.<br />
+              GEORGE helps you stay connected to the conversation.
             </div>
           </section>
         </div>
