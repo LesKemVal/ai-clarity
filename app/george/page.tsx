@@ -2210,6 +2210,19 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
   }
 
+  const openLiveEntry = () => {
+    if (typeof window === 'undefined') return
+
+    preserveNormalDraft()
+
+    if (currentTier === 'smart') {
+      setShowUpgradeModal(true)
+      return
+    }
+
+    window.location.href = '/george/live-entry'
+  }
+
   const restoreNormalDraft = () => {
     if (typeof window === 'undefined') return false
 
@@ -4855,8 +4868,7 @@ return (
           liveMode={liveMode}
             onOpenLiveGate={() => {
               setShowSidebar(false)
-              preserveNormalDraft()
-          window.location.href = '/george/live-entry'
+              openLiveEntry()
             }}
             onOpenLogin={() => {
               setShowSidebar(false)
@@ -6557,7 +6569,7 @@ if (liveMode) {
             onClick={() => {
               setShowExitPopup(false)
               window.localStorage.setItem('george_start_new_live', '1')
-              window.location.href = '/george/live-entry'
+              openLiveEntry()
             }}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
           >
@@ -7102,7 +7114,7 @@ Continue from here, tell me what changed, or start fresh.`
               onClick={() => {
                 setShowLiveQuickMenu(false)
                 window.localStorage.setItem('george_start_new_live', '1')
-                window.location.href = '/george/live-entry'
+                openLiveEntry()
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
             >
@@ -7765,8 +7777,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           window.localStorage.removeItem('george_active_context')
           window.localStorage.removeItem('george_active_label')
 
-          preserveNormalDraft()
-          window.location.href = '/george/live-entry'
+          openLiveEntry()
         }}
         onResumeLiveConversation={() => {
           setShowLiveChooser(false)
