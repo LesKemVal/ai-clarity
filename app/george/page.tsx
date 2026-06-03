@@ -1184,7 +1184,7 @@ useEffect(() => {
     if (window.localStorage.getItem('george_open_live_chooser_after_home') === '1') {
       window.localStorage.removeItem('george_open_live_chooser_after_home')
       setShowSessionPicker(false)
-      setShowLiveChooser(true)
+      startLiveSignalAcquisition()
       return
     }
 
@@ -2254,6 +2254,38 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
 
     window.location.href = '/george/live-entry'
+  }
+
+  const startLiveSignalAcquisition = () => {
+    if (typeof window === 'undefined') return
+
+    setShowSidebar(false)
+    setShowLiveChooser(false)
+    setShowConversationMenu(false)
+    setShowNormalUtilityMenu(null)
+    setActivePromptLabel('LIVE')
+    setActivePromptContext('live_signal_acquisition')
+    setContextTurnCount(0)
+
+    const liveSignalMessage: Message = {
+      role: 'assistant',
+      content:
+        "What are we walking into?\n\nGive me the objective and what is happening. Once I have enough signal, I’ll tell you. I’m ready when you are.",
+    }
+
+    setMessages((prev) => {
+      const visible = prev.filter((message) => String(message.content || '').trim() !== 'GEORGE')
+      const next = [...visible, liveSignalMessage]
+      messagesRef.current = next
+      return next
+    })
+
+    setInput('')
+    setInterimTranscript('')
+    setVoiceError('')
+    setSuggestedPrompts([])
+    setSuggestedSignal(Date.now())
+    setRerouteSignal(0)
   }
 
   const restoreNormalDraft = () => {
@@ -4811,7 +4843,7 @@ useEffect(() => {
   const enterLiveConversation = () => {
     if (liveMode) return
 
-    setShowLiveChooser(true)
+    startLiveSignalAcquisition()
     setShowLiveQuickMenu(false)
   }
 
@@ -5299,7 +5331,7 @@ return (
   }}
   className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
-{showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !hasUserMessageForSurface && (
+{showMobileHero && !(forceLive || liveMode) && !hasUserMessageForSurface && (
   <section
     data-george-normal-hero
     className="pointer-events-none fixed left-0 right-0 top-[112px] z-[30] mx-auto w-full max-w-[760px] px-5 md:top-[138px]"
@@ -6047,7 +6079,7 @@ I am listening now. Speak naturally. I will respond ${
 
                         if (hasLiveGeorgeAccess) {
                           setShowNormalUtilityMenu(null)
-                          setShowLiveChooser(true)
+                          startLiveSignalAcquisition()
                           return
                         }
 
@@ -7794,47 +7826,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         </div>
       )}
       </main>
-
-      <LiveChooser
-        open={showLiveChooser}
-        hasAccess={
-          currentTier === 'intelligent' ||
-          currentTier === 'brilliant'
-        }
-        hasLiveSession={getSessionsForMode('live').some((session) => hasMeaningfulUserMessage(session.messages || []))}
-        onClose={() => setShowLiveChooser(false)}
-        onStartLiveConversation={() => {
-          preserveNormalDraft()
-          setShowLiveChooser(false)
-
-          window.localStorage.setItem('george_fresh_live_entry', '1')
-          window.localStorage.removeItem('GEORGE_LIVE_SETUP')
-          window.localStorage.removeItem('george_live_control_words')
-          window.localStorage.removeItem('george_live_runtime_support')
-          window.localStorage.removeItem('george_live_estimated_cents')
-          window.localStorage.removeItem('george_active_live_session_id')
-          window.localStorage.removeItem('george_active_campaign_session_id')
-          window.localStorage.removeItem('george_active_campaign')
-          window.localStorage.removeItem('george_active_context')
-          window.localStorage.removeItem('george_active_label')
-
-          openLiveEntry()
-        }}
-        onResumeLiveConversation={() => {
-          setShowLiveChooser(false)
-          setSessionPickerClosing(false)
-          setSessionPickerMode('live')
-          setShowSessionPicker(true)
-        }}
-        onUpgrade={() => {
-          setShowLiveChooser(false)
-          setShowUpgradeModal(true)
-        }}
-        onEnterCode={() => {
-          setShowLiveChooser(false)
-          setShowUpgradeModal(true)
-        }}
-      />
 
     </>
   )
