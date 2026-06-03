@@ -388,7 +388,7 @@ return (
 
           <section>
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/30">
-              Workspace
+              GEORGE
             </div>
 
             <div className="mt-2 space-y-0.5">
@@ -402,14 +402,24 @@ return (
               >
                 LIVE
               </button>
+              <a href="/george" className={linkClass('/george', true)}>
+                Workspace
+              </a>
+            </div>
+
+            <div className="mt-4 px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Support
+            </div>
+
+            <div className="mt-2 space-y-0.5">
               <a href="/images" className={linkClass('/images')}>
-                Create Images
+                Visual Context
               </a>
               <a href="/signal" className={linkClass('/signal')}>
-                User Signal
+                Reference
               </a>
               <a href="/help" className={linkClass('/help', true)}>
-                Support
+                Help
               </a>
               <a href="/top-up" className={linkClass('/top-up', true)}>
                 Access
