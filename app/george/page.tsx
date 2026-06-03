@@ -1506,9 +1506,28 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
     normalSessionBootedRef.current = true
 
-    // /george always boots into normal GEORGE.
+    // /george boots into normal GEORGE.
+    // Browser reload means start clean.
+    // Internal site navigation can restore last known workspace.
     setLiveEntryBriefing(null)
     setActiveMode('normal')
+
+    const browserReload =
+      typeof window !== 'undefined' &&
+      performance.getEntriesByType('navigation').some(
+        (entry) => (entry as PerformanceNavigationTiming).type === 'reload'
+      )
+
+    if (browserReload) {
+      window.localStorage.removeItem(GEORGE_LAST_NORMAL_DRAFT)
+      skipNextTypewriterRef.current = true
+      restoredMessagesSignatureRef.current = ''
+      setMessages([])
+      messagesRef.current = []
+      normalSessionWriteReadyRef.current = true
+      return
+    }
+
     const activeSession =
       getActiveSessionForMode('normal') ||
       (subscriberEmail.trim()
