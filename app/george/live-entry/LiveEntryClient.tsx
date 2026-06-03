@@ -335,35 +335,46 @@ export default function LiveEntryClient() {
     relatedSessionId !== 'not_related'
 
   const mandatoryLiveSignals = useMemo(() => {
+    const cleanObjective = objective.trim()
+    const hasObjective = cleanObjective.length > 0
+    const hasGrounding = groundingSignalAvailable
+    const hasPerspective = chairs.length > 0
+    const multiPerspective = chairs.length > 1
+
     const signals = [
       {
         id: 'objective',
         label: "Today's objective",
-        met: objective.trim().length > 0,
+        met: hasObjective,
         helper: 'What should this interaction accomplish?',
       },
       {
         id: 'grounding',
         label: 'Current situation',
-        met: groundingSignalAvailable,
+        met: hasGrounding,
         helper: 'What is happening, or what context should GEORGE use?',
       },
     ]
 
-    if (chairs.length > 1) {
+    if (multiPerspective) {
       signals.push({
         id: 'perspectives',
         label: 'Perspectives',
-        met: chairs.length > 1,
-        helper: 'GEORGE will consider more than one position at once.',
+        met: hasPerspective,
+        helper: 'Which positions should GEORGE consider before responding?',
       })
     }
 
     return signals
   }, [objective, groundingSignalAvailable, chairs.length])
 
+  const completedMandatoryLiveSignalCount = mandatoryLiveSignals.filter((signal) => signal.met).length
   const missingMandatoryLiveSignals = mandatoryLiveSignals.filter((signal) => !signal.met)
-  const hasRequiredLiveSignal = missingMandatoryLiveSignals.length === 0
+  const objectiveSignalMet = objective.trim().length > 0
+  const hasRequiredLiveSignal =
+    objectiveSignalMet &&
+    completedMandatoryLiveSignalCount >= 2 &&
+    missingMandatoryLiveSignals.length === 0
 
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
