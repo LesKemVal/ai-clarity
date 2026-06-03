@@ -1226,7 +1226,7 @@ useEffect(() => {
   return () => window.clearInterval(timer)
 }, [forceLive, liveMode, liveEntryBriefing])
 
-  const [showExitPopup, setShowExitPopup] = useState(false)
+  const [showLeave LIVEPopup, setShowLeave LIVEPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
 
@@ -2234,8 +2234,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setLiveMode(true)
   }
 
-  const requestExitLiveMode = () => {
-    setShowExitPopup(true)
+  const requestLeave LIVELiveMode = () => {
+    setShowLeave LIVEPopup(true)
   }
 
   const exitLiveMode = () => {
@@ -4857,7 +4857,7 @@ return (
             // Route boundary: /george/live must not render normal GEORGE in place.
             // Leaving LIVE must go through the save/stay/exit flow first.
             if (forceLive || liveMode) {
-              requestExitLiveMode()
+              requestLeave LIVELiveMode()
               return
             }
 
@@ -5160,7 +5160,7 @@ return (
             setVoiceOn(nextVoice)
             setInteractionMode(nextVoice ? 'speech' : 'text')
             window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-            setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
+            setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
             setShowToast(true)
           }}
           className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
@@ -5572,11 +5572,11 @@ I am listening now. Speak naturally. I will respond ${
         /say:|exact|line|respond/i.test(m.content || '') ||
         resolvedOutputStyle === 'repeatable_lines'
 
-      const shouldSuppressControls =
+      const shouldSuppressExecution =
         /listening|hold|do not speak|let them finish|silence/i.test(m.content || '') &&
         !/say:|line|respond/i.test(m.content || '')
 
-      const controls = shouldSuppressControls
+      const controls = shouldSuppressExecution
         ? ['Pause']
         : shouldEmphasizePause
           ? ['Pause', 'Line']
@@ -5957,7 +5957,7 @@ I am listening now. Speak naturally. I will respond ${
                     onClick={() => {
                       if (liveMode) {
                         setShowNormalUtilityMenu(null)
-                        requestExitLiveMode()
+                        requestLeave LIVELiveMode()
                         return
                       }
 
@@ -6026,10 +6026,10 @@ I am listening now. Speak naturally. I will respond ${
                             <div className="space-y-1">
                               {[
                                 ['live', 'LIVE'],
-                                ['continuity', 'CONTINUITY'],
+                                ['continuity', 'ACCESS'],
                                 ['memory', 'WORKSPACE'],
-                                ['images', 'Visuals'],
-                                ['signal', 'Signal'],
+                                ['images', 'IMAGES'],
+                                ['signal', 'REFERENCE'],
                               ].map(([id, label]) => (
                                 <button
                                   key={id}
@@ -6053,7 +6053,7 @@ I am listening now. Speak naturally. I will respond ${
                               {activeReferenceTopic === 'continuity' && 'ACCESS'}
                               {activeReferenceTopic === 'memory' && 'WORKSPACE'}
                               {activeReferenceTopic === 'images' && 'IMAGES'}
-                              {activeReferenceTopic === 'signal' && 'SIGNAL'}
+                              {activeReferenceTopic === 'signal' && 'REFERENCE'}
                             </div>
 
                             <p className="text-[13px] leading-5 text-white/48">
@@ -6061,7 +6061,7 @@ I am listening now. Speak naturally. I will respond ${
                               {activeReferenceTopic === 'continuity' && 'Access restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
                               {activeReferenceTopic === 'memory' && 'Workspace keeps useful context available so GEORGE can continue work without starting over.'}
                               {activeReferenceTopic === 'images' && 'Images help GEORGE understand visual context, references, screenshots, and creative direction.'}
-                              {activeReferenceTopic === 'signal' && 'Signal helps GEORGE understand what changed and what matters next.'}
+                              {activeReferenceTopic === 'signal' && 'Reference opens supporting information without interrupting the work.'}
                             </p>
 
                             {activeReferenceTopic === 'signal' && (
@@ -6073,7 +6073,7 @@ I am listening now. Speak naturally. I will respond ${
                                 }}
                                 className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                               >
-                                Open Signal
+                                Open Reference
                               </button>
                             )}
 
@@ -6176,7 +6176,7 @@ I am listening now. Speak naturally. I will respond ${
           type="button"
           onClick={() => {
 if (liveMode) {
-  requestExitLiveMode()
+  requestLeave LIVELiveMode()
 } else {
   enterLiveConversation()
 }
@@ -6498,12 +6498,12 @@ if (liveMode) {
 )}
 
 
-{showExitPopup && typeof document !== 'undefined' && createPortal(
+{showLeave LIVEPopup && typeof document !== 'undefined' && createPortal(
   <>
     <button
       type="button"
       aria-label="Close leave LIVE popup"
-      onClick={() => setShowExitPopup(false)}
+      onClick={() => setShowLeave LIVEPopup(false)}
       className="fixed inset-0 z-[220] bg-black/52 backdrop-blur-[14px]"
     />
 
@@ -6516,7 +6516,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => setShowExitPopup(false)}
+            onClick={() => setShowLeave LIVEPopup(false)}
             className="text-[13px] text-white/28 transition hover:text-white/72"
           >
             ×
@@ -6531,19 +6531,19 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => {
-              setShowExitPopup(false)
+              setShowLeave LIVEPopup(false)
               window.localStorage.setItem('george_start_new_live', '1')
               window.location.href = '/george/live-entry'
             }}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
           >
-            Start New LIVE
+            New LIVE LIVE
           </button>
 
           <button
             type="button"
             onClick={() => {
-              setShowExitPopup(false)
+              setShowLeave LIVEPopup(false)
               recordActiveLiveRuntimeUsage()
               exitLiveMode()
             }}
@@ -6555,7 +6555,7 @@ if (liveMode) {
           <button
             type="button"
             onClick={() => {
-              setShowExitPopup(false)
+              setShowLeave LIVEPopup(false)
               window.localStorage.removeItem('george_active_live_session_id')
               window.localStorage.removeItem('george_active_campaign_session_id')
               exitLiveMode()
@@ -6567,7 +6567,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => setShowExitPopup(false)}
+            onClick={() => setShowLeave LIVEPopup(false)}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
             Continue session
@@ -7010,7 +7010,7 @@ Continue from here, tell me what changed, or start fresh.`
           <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 flex items-center justify-between gap-3">
             <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-              Controls
+              Execution
             </div>
             <button
               type="button"
@@ -7036,12 +7036,12 @@ Continue from here, tell me what changed, or start fresh.`
               setVoiceOn(nextVoice)
               setInteractionMode(nextVoice ? 'speech' : 'text')
               window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-              setToastMessage(nextVoice ? 'Audio active' : 'Audio standby')
+              setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
               setShowToast(true)
             }}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
-            {voiceOn ? 'Audio active' : 'Audio standby'}
+            {voiceOn ? 'Audio on' : 'Audio off'}
           </button>
 
           <div className="border-t border-white/[0.045] pt-2 mt-1">
@@ -7082,18 +7082,18 @@ Continue from here, tell me what changed, or start fresh.`
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
             >
-              Start New
+              New LIVE
             </button>
 
             <button
               type="button"
               onClick={() => {
                 setShowLiveQuickMenu(false)
-                requestExitLiveMode()
+                requestLeave LIVELiveMode()
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/56 transition hover:text-red-100/86 active:scale-[0.98]"
             >
-              Exit
+              Leave LIVE
             </button>
           </div>
         </div>
