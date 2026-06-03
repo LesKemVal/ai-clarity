@@ -478,17 +478,17 @@ return (
           )}
 
           <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/24">
-              Identity
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Access
             </div>
 
             <div className="mt-3 rounded-[0.65rem] border border-white/[0.045] bg-white/[0.012] px-3 py-2">
               <div className="truncate text-[12px] text-white/58">
-                {identityAuthenticated && identityEmail ? maskAccountEmail(identityEmail) : 'Not recognized'}
+                {identityAuthenticated && identityEmail ? maskAccountEmail(identityEmail) : 'Unrecognized'}
               </div>
 
               <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-white/28">
-                {identityAuthenticated ? `${identityTier} access` : 'Access not connected'}
+                {identityAuthenticated ? `${identityTier} continuity` : 'Continuity not connected'}
               </div>
 
               <button
@@ -506,7 +506,7 @@ return (
                 }}
                 className="mt-3 block w-full rounded-[0.5rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/48 transition hover:bg-white/[0.026] hover:text-white/78"
               >
-                {identityAuthenticated ? 'Sign out' : 'Connect access'}
+                {identityAuthenticated ? 'Disconnect' : 'Connect'}
               </button>
             </div>
           </section>
