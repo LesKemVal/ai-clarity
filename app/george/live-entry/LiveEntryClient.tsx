@@ -328,6 +328,43 @@ export default function LiveEntryClient() {
     (relatedSessions.length === 0 || sessionSectionCollapsed) &&
     chairSectionCollapsed
 
+  const groundingSignalAvailable =
+    knownContext.trim().length > 0 ||
+    Boolean(prepDocument) ||
+    Boolean(runtimeMotionContext) ||
+    relatedSessionId !== 'not_related'
+
+  const mandatoryLiveSignals = useMemo(() => {
+    const signals = [
+      {
+        id: 'objective',
+        label: "Today's objective",
+        met: objective.trim().length > 0,
+        helper: 'What should this interaction accomplish?',
+      },
+      {
+        id: 'grounding',
+        label: 'Current situation',
+        met: groundingSignalAvailable,
+        helper: 'What is happening, or what context should GEORGE use?',
+      },
+    ]
+
+    if (chairs.length > 1) {
+      signals.push({
+        id: 'perspectives',
+        label: 'Perspectives',
+        met: chairs.length > 1,
+        helper: 'GEORGE will consider more than one position at once.',
+      })
+    }
+
+    return signals
+  }, [objective, groundingSignalAvailable, chairs.length])
+
+  const missingMandatoryLiveSignals = mandatoryLiveSignals.filter((signal) => !signal.met)
+  const hasRequiredLiveSignal = missingMandatoryLiveSignals.length === 0
+
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority()
     setTier(cached.tier)
@@ -432,7 +469,7 @@ export default function LiveEntryClient() {
   const finalResourceEstimate = useMemo(() => {
     return estimateWithResources(resourceEstimate, editableResources.length ? editableResources : resourceEstimate.resources)
   }, [resourceEstimate, editableResources])
-  const showEstimatedLiveCost = objective.trim().length > 0 && knownContext.trim().length > 0
+  const showEstimatedLiveCost = hasRequiredLiveSignal
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -612,10 +649,12 @@ export default function LiveEntryClient() {
       observedReality: knownContext,
     })
 
-    const hasCoreLiveSignal = objective.trim().length > 0 && knownContext.trim().length > 0
+    if (!hasRequiredLiveSignal) {
+      const missing = missingMandatoryLiveSignals
+        .map((signal) => signal.label)
+        .join(', ')
 
-    if (!hasCoreLiveSignal) {
-      window.alert(roomFormation.confidence.suggestedQuestion || 'Add a desired outcome and observed reality before LIVE.')
+      window.alert(`Add signal before LIVE: ${missing}.`)
       return
     }
 
@@ -958,13 +997,32 @@ export default function LiveEntryClient() {
             />
           </label>
 
+          {!showEstimatedLiveCost && (
+            <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/16 px-3 py-2">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/28">
+                Signal
+              </div>
+              <div className="mt-1 text-[12px] leading-5 text-white/56">
+                Add the remaining signal before LIVE. GEORGE will use it to support execution.
+              </div>
+              <div className="mt-2 grid gap-1">
+                {missingMandatoryLiveSignals.map((signal) => (
+                  <div key={signal.id} className="rounded-[0.6rem] border border-white/[0.03] bg-white/[0.012] px-2.5 py-1.5">
+                    <div className="text-[11px] font-medium text-white/66">{signal.label}</div>
+                    <div className="mt-0.5 text-[10px] leading-4 text-white/32">{signal.helper}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {showEstimatedLiveCost && (
             <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
               <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">
                 Ready
               </div>
               <div className="mt-1 text-[12px] leading-5 text-white/70">
-                You have provided enough signal to confidently begin LIVE.
+                GEORGE has enough signal to begin. Add more signal if you want sharper support.
               </div>
             </div>
           )}
