@@ -308,7 +308,6 @@ a[href*="/george/live"]:active {
   }
 }
 
-/* BRANESx / GEORGE professional utility surface */
 .george-work-surface-box {
   min-height: 104px;
   border-radius: 1.18rem;
@@ -370,7 +369,6 @@ a[href*="/george/live"]:active {
 }
 
 
-/* BRANESx workspace density pass */
 
 .george-normal-surface-box{
   backdrop-filter: blur(20px);
@@ -582,6 +580,8 @@ textarea:focus{
 
 /* GEORGE / BRANESx professional utility surface */
 
+/* GEORGE / BRANESx production surface */
+
 .george-utility-presence {
   position: relative;
   color: white;
@@ -653,7 +653,6 @@ textarea:focus{
 }
 
 
-/* trust layer */
 
 .george-utility-brand{
   opacity:.94;
@@ -698,7 +697,6 @@ textarea:focus{
 }
 
 
-/* instrument presence */
 
 .george-utility-presence{
   animation: georgeFadeIn .55s ease;
@@ -741,7 +739,6 @@ textarea:focus{
 }
 
 
-/* premium utility refinement */
 
 .george-utility-brand{
   margin-bottom:2.5rem;
@@ -779,7 +776,6 @@ textarea:focus{
 }
 
 
-/* institutional utility */
 
 .george-utility-presence{
   position:relative;
@@ -846,7 +842,6 @@ textarea:focus{
 }
 
 
-/* premium confidence layer */
 
 .george-utility-presence{
   max-width:820px;
@@ -921,7 +916,6 @@ textarea:focus{
 }
 
 
-/* utility instrument v2 */
 
 .george-utility-brand{
   opacity:.98;
@@ -986,7 +980,6 @@ textarea:focus{
 }
 
 
-/* premium trust layer */
 
 .george-utility-presence{
   padding-top:8px;
@@ -1065,7 +1058,6 @@ textarea:focus{
 }
 
 
-/* institutional confidence v3 */
 
 .george-utility-presence{
   max-width:900px;
@@ -1242,7 +1234,6 @@ textarea:focus{
 }
 
 
-/* conversation hierarchy */
 
 .message-user{
   border:1px solid rgba(255,255,255,.05);
@@ -1282,7 +1273,6 @@ textarea:focus{
 }
 
 
-/* institutional cleanup */
 
 .george-utility-kicker::after{
   display:none;
@@ -1332,7 +1322,6 @@ textarea::placeholder{
 
 
 
-/* unified instrument controls */
 
 .george-command-surface,
 .george-footer-surface,
@@ -1431,7 +1420,6 @@ textarea::placeholder{
 
 
 
-/* workspace consistency sweep */
 
 .george-command-surface{
   border-radius:1.25rem;
@@ -1483,7 +1471,6 @@ textarea::placeholder{
 }
 
 
-/* hard composer single-layer correction */
 .george-composer-shell{
   box-shadow:none!important;
 }
@@ -1500,7 +1487,6 @@ textarea::placeholder{
 }
 
 
-/* GEORGE surface finalization sweep */
 
 .george-footer-surface{
   background:
