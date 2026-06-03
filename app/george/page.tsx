@@ -2234,7 +2234,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setLiveMode(true)
   }
 
-  const requestLeave LIVELiveMode = () => {
+  const requestExitLiveMode = () => {
     setShowExitPopup(true)
   }
 
@@ -4857,7 +4857,7 @@ return (
             // Route boundary: /george/live must not render normal GEORGE in place.
             // Leaving LIVE must go through the save/stay/exit flow first.
             if (forceLive || liveMode) {
-              requestLeave LIVELiveMode()
+              requestExitLiveMode()
               return
             }
 
@@ -5957,7 +5957,7 @@ I am listening now. Speak naturally. I will respond ${
                     onClick={() => {
                       if (liveMode) {
                         setShowNormalUtilityMenu(null)
-                        requestLeave LIVELiveMode()
+                        requestExitLiveMode()
                         return
                       }
 
@@ -6176,7 +6176,7 @@ I am listening now. Speak naturally. I will respond ${
           type="button"
           onClick={() => {
 if (liveMode) {
-  requestLeave LIVELiveMode()
+  requestExitLiveMode()
 } else {
   enterLiveConversation()
 }
@@ -7089,7 +7089,7 @@ Continue from here, tell me what changed, or start fresh.`
               type="button"
               onClick={() => {
                 setShowLiveQuickMenu(false)
-                requestLeave LIVELiveMode()
+                requestExitLiveMode()
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/56 transition hover:text-red-100/86 active:scale-[0.98]"
             >
