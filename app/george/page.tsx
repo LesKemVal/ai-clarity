@@ -211,7 +211,11 @@ function saveSessionToV2(params: {
       : ''
 
   const now = Date.now()
-  const sessionId = params.id || `session_${now}`
+  const activeSessionId =
+    params.id ||
+    getActiveSessionIdForMode(params.mode)
+
+  const sessionId = activeSessionId || `session_${now}`
 
   upsertSession({
     id: sessionId,
