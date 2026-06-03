@@ -7265,7 +7265,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="GEORGE"
+                        placeholder="State the objective."
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
@@ -7414,7 +7414,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 <input
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
-                  placeholder="GEORGE"
+                  placeholder="State the objective."
                   className="w-full rounded-[1rem] max-w-full border border-white/[0.07] bg-black/40 px-5 py-4 text-sm text-[#D7DBE4] outline-none transition placeholder:text-neutral-500 focus:border-white/[0.09]"
                 />
               </div>
