@@ -5762,7 +5762,7 @@ I am listening now. Speak naturally. I will respond ${
               onClick={() => openLiveEntryFromMessage(m)}
               className="px-1.5 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
             >
-              LIVE
+              Earbuds
             </button>
 
               </>
