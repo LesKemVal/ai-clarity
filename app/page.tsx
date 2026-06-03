@@ -68,7 +68,7 @@ export default function HomePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => router.push('/george?live=1&resume=1')}
+                  onClick={() => router.push('/live?resume=1')}
                   className="mt-1 block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/52 transition hover:bg-white/[0.045] hover:text-white"
                 >
                   Resume LIVE

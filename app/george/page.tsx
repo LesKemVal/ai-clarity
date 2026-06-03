@@ -778,15 +778,17 @@ const [voiceError, setVoiceError] = useState('')
       },
     ]
 
-    setLiveMode(true)
-    setConversationMode('manual_live')
-    setActivePromptContext('manual_live')
+    // Start New LIVE begins in normal GEORGE.
+    // GEORGE collects signal first; LIVE starts only after enough signal exists.
+    setLiveMode(false)
+    setConversationMode(null)
+    setActivePromptContext('pre_live_signal_acquisition')
     setActivePromptLabel('Start New LIVE')
     setInput('')
     setInterimTranscript('')
     setMessages(nextMessages)
     messagesRef.current = nextMessages
-    setActiveMode('live')
+    setActiveMode('normal')
   }, [])
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([])
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null)
