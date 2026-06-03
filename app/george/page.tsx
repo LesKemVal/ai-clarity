@@ -755,13 +755,20 @@ const [voiceError, setVoiceError] = useState('')
     if (liveEntryBootedRef.current) return
 
     const params = new URLSearchParams(window.location.search)
+    const pendingLiveSignal =
+      window.localStorage.getItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION') === 'start'
+
     const shouldStartNewLive =
-      params.get('live') === '1' &&
-      params.get('start') === '1'
+      pendingLiveSignal ||
+      (
+        params.get('live') === '1' &&
+        params.get('start') === '1'
+      )
 
     if (!shouldStartNewLive) return
 
     liveEntryBootedRef.current = true
+    window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
 
     const openers = [
       'What is happening?',

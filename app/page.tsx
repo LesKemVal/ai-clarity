@@ -61,7 +61,10 @@ export default function HomePage() {
               <div className="absolute left-0 top-full z-20 mt-2 w-[210px] rounded-[1rem] border border-white/[0.07] bg-[#070A0F]/95 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
                 <button
                   type="button"
-                  onClick={() => router.push('/george?live=1&start=1')}
+                  onClick={() => {
+                      window.localStorage.setItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION', 'start')
+                      router.push('/george?live=1&start=1')
+                    }}
                   className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/72 transition hover:bg-white/[0.045] hover:text-white"
                 >
                   Start New LIVE
