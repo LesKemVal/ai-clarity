@@ -815,7 +815,7 @@ const [tierSignalPhase, setTierSignalPhase] = useState(0)
 const [showNormalUtilityMenu, setShowNormalUtilityMenu] = useState<'help' | 'language' | null>(null)
 const [showMemoryContinuityPanel, setShowMemoryContinuityPanel] = useState(false)
 const normalUtilityMenuRef = useRef<HTMLDivElement | null>(null)
-const [activeReferenceTopic, setActiveReferenceTopic] = useState<'live' | 'continuity' | 'memory' | 'images' | 'signal'>('live')
+const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | 'memory' | 'images' | 'signal'>('live')
 
 useEffect(() => {
   if (typeof window === 'undefined') return
@@ -2985,14 +2985,14 @@ requestAnimationFrame(() => {
 
       const prompt =
         folder === 'Credit'
-          ? "Reference me tighten my credit situation and show me the strongest path."
+          ? "Help me tighten my credit situation and show me the strongest path."
           : folder === 'Business'
-          ? "Reference me improve the business path in front of me."
+          ? "Help me improve the business path in front of me."
           : folder === 'Legal'
-          ? "Reference me understand the legal issue clearly and cautiously."
+          ? "Help me understand the legal issue clearly and cautiously."
           : folder === 'Funding'
-          ? "Reference me think clearly about funding and show me the strongest path."
-          : "Reference me find the strongest next move." 
+          ? "Help me think clearly about funding and show me the strongest path."
+          : "Help me find the strongest next move." 
 
       setInput(prompt)
 
@@ -4419,7 +4419,7 @@ if (responseTimerRef.current) {
 
             if (personProfile.role === 'authority') {
               if (personProfile.posture === 'pressuring') return 'Authority — pressuring\n\nSay: “I understand. Tell me the exact requirement and the next step.”'
-              return 'Authority — Say: “Reference me understand the exact requirement and the next step.”'
+              return 'Authority — Say: “Help me understand the exact requirement and the next step.”'
             }
 
             if (personProfile.role === 'gatekeeper') {
@@ -5968,13 +5968,13 @@ I am listening now. Speak naturally. I will respond ${
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveReferenceTopic('live')
+                      setActiveHelpTopic('live')
                       setShowLanguageMenu(false)
                       setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
                     }}
                     className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
-                    Reference
+                    Help
                   </button>
 
                   <button
@@ -6047,7 +6047,7 @@ I am listening now. Speak naturally. I will respond ${
                           <div className={`w-[160px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 flex items-center justify-between">
                               <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-                                Reference
+                                Help
                               </div>
 
                               <button
@@ -6065,14 +6065,14 @@ I am listening now. Speak naturally. I will respond ${
                                 ['continuity', 'ACCESS'],
                                 ['memory', 'WORKSPACE'],
                                 ['images', 'IMAGES'],
-                                ['signal', 'REFERENCE'],
+                                ['signal', 'HELP'],
                               ].map(([id, label]) => (
                                 <button
                                   key={id}
                                   type="button"
-                                  onClick={() => setActiveReferenceTopic(id as any)}
+                                  onClick={() => setActiveHelpTopic(id as any)}
                                   className={`block w-full py-1 text-left text-[13px] uppercase tracking-[0.16em] transition ${
-                                    activeReferenceTopic === id
+                                    activeHelpTopic === id
                                       ? 'text-white/82'
                                       : 'text-white/38 hover:text-white/72'
                                   }`}
@@ -6085,22 +6085,22 @@ I am listening now. Speak naturally. I will respond ${
 
                           <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
-                              {activeReferenceTopic === 'live' && 'LIVE'}
-                              {activeReferenceTopic === 'continuity' && 'ACCESS'}
-                              {activeReferenceTopic === 'memory' && 'WORKSPACE'}
-                              {activeReferenceTopic === 'images' && 'IMAGES'}
-                              {activeReferenceTopic === 'signal' && 'REFERENCE'}
+                              {activeHelpTopic === 'live' && 'LIVE'}
+                              {activeHelpTopic === 'continuity' && 'ACCESS'}
+                              {activeHelpTopic === 'memory' && 'WORKSPACE'}
+                              {activeHelpTopic === 'images' && 'IMAGES'}
+                              {activeHelpTopic === 'signal' && 'HELP'}
                             </div>
 
                             <p className="text-[13px] leading-5 text-white/48">
-                              {activeReferenceTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
-                              {activeReferenceTopic === 'continuity' && 'Access restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
-                              {activeReferenceTopic === 'memory' && 'Workspace keeps useful context available so GEORGE can continue work without starting over.'}
-                              {activeReferenceTopic === 'images' && 'Images help GEORGE understand visual context, references, screenshots, and creative direction.'}
-                              {activeReferenceTopic === 'signal' && 'Reference opens supporting information without interrupting the work.'}
+                              {activeHelpTopic === 'live' && 'LIVE helps you operate during real conversations where timing, pressure, and delivery matter.'}
+                              {activeHelpTopic === 'continuity' && 'Access restores recognition, continuity, tier access, and LIVE eligibility across sessions.'}
+                              {activeHelpTopic === 'memory' && 'Workspace keeps useful context available so GEORGE can continue work without starting over.'}
+                              {activeHelpTopic === 'images' && 'Images help GEORGE understand visual context, references, screenshots, and creative direction.'}
+                              {activeHelpTopic === 'signal' && 'Help opens supporting information without interrupting the work.'}
                             </p>
 
-                            {activeReferenceTopic === 'signal' && (
+                            {activeHelpTopic === 'signal' && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -6109,11 +6109,11 @@ I am listening now. Speak naturally. I will respond ${
                                 }}
                                 className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                               >
-                                Open Reference
+                                Open Help
                               </button>
                             )}
 
-                            {activeReferenceTopic === 'memory' && (
+                            {activeHelpTopic === 'memory' && (
                               <button
                                 type="button"
                                 onClick={() => {
@@ -6130,7 +6130,7 @@ I am listening now. Speak naturally. I will respond ${
                               href="/help"
                               className="mt-3 block py-1 text-[13px] uppercase tracking-[0.16em] text-white/36 transition hover:text-white"
                             >
-                              Reference
+                              Help
                             </a>
                           </div>
                         </>
@@ -7012,7 +7012,7 @@ Continue from here, tell me what changed, or start fresh.`
         onClick={() => {
           setShowLiveQuickMenu(false)
           setShowLanguageMenu(false)
-          setActiveReferenceTopic('live')
+          setActiveHelpTopic('live')
           setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
         }}
         className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-red-100/52 hover:text-red-100/82 ${operationalMotion.press}"
@@ -7024,7 +7024,7 @@ Continue from here, tell me what changed, or start fresh.`
         type="button"
         onClick={() => {
           setShowNormalUtilityMenu(null)
-          setActiveReferenceTopic('live')
+          setActiveHelpTopic('live')
           setShowLanguageMenu(false)
           setShowLiveQuickMenu((value) => !value)
         }}
@@ -7188,7 +7188,7 @@ ${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
                                 }
 
                                 setPendingImage(null)
-                                setInput(`I uploaded file: ${data.name || file.name}. Reference me understand and use it.\\n\\n${data.text}`)
+                                setInput(`I uploaded file: ${data.name || file.name}. Help me understand and use it.\\n\\n${data.text}`)
                                 setToastMessage(`${data.name || file.name} loaded into GEORGE.`)
                                 setShowToast(true)
                                 textareaRef.current?.focus()
@@ -7217,7 +7217,7 @@ ${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
                               setInput(`I uploaded text file: ${file.name}.
 
 ${looksLikeResume
-  ? 'This looks like a résumé or career document. Reference me use it for interviews, role positioning, answer framing, and live conversation preparation. Pull out what matters most and what I should be ready to say.'
+  ? 'This looks like a résumé or career document. Help me use it for interviews, role positioning, answer framing, and live conversation preparation. Pull out what matters most and what I should be ready to say.'
   : 'Tell me what this is, what matters most, and how I should use it.'}
 
 ${clipped}`)
