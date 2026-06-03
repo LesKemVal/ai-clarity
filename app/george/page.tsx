@@ -1797,7 +1797,7 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       opportunityCost: 'moderate',
       userPosition: liveRuntimeSupport?.userPosition,
       knownContextAvailable,
-      userHasRequestedReference: Boolean(input.trim()),
+      userHasRequestedGuidance: Boolean(input.trim()),
       roomHasRecentSignal: Boolean(interimTranscript.trim() || stableLiveGuidance),
       missingCriticalSignal: !knownContextAvailable && Boolean(input.trim() || interimTranscript.trim()),
       userPositionAtRisk: false,
