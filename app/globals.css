@@ -1498,3 +1498,92 @@ textarea::placeholder{
   border-radius:0!important;
   box-shadow:none!important;
 }
+
+
+/* GEORGE surface finalization sweep */
+
+.george-footer-surface{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8,10,15,.76),
+      rgba(5,7,11,.88)
+    )!important;
+  border-color:rgba(255,255,255,.055)!important;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+
+.george-footer-surface button{
+  color:rgba(255,255,255,.46)!important;
+}
+
+.george-footer-surface button:hover{
+  color:rgba(255,255,255,.82)!important;
+}
+
+.george-composer-shell{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(11,18,29,.92),
+      rgba(7,12,20,.86)
+    )!important;
+  border-color:rgba(143,182,201,.14)!important;
+}
+
+.george-composer-shell button{
+  transition:
+    border-color .18s ease,
+    background .18s ease,
+    color .18s ease,
+    transform .18s ease;
+}
+
+.george-composer-shell button:hover{
+  transform:translateY(-1px);
+}
+
+.message-user{
+  border-color:rgba(255,255,255,.045)!important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.038),
+      rgba(255,255,255,.014)
+    )!important;
+}
+
+.message-assistant{
+  background:transparent!important;
+}
+
+.message-assistant p{
+  line-height:1.85;
+}
+
+.message-assistant li{
+  margin-top:.55rem;
+}
+
+.message-assistant a{
+  color:rgba(210,216,255,.86);
+  text-decoration:none;
+}
+
+.message-assistant a:hover{
+  color:white;
+}
+
+[data-george-normal-hero]{
+  will-change:transform,opacity;
+}
+
+[data-george-normal-hero] .george-utility-instrument p{
+  color:rgba(255,255,255,.62)!important;
+}
+
+[data-george-normal-hero] .george-utility-line{
+  opacity:.5!important;
+}
