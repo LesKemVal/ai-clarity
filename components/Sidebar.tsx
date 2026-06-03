@@ -418,9 +418,6 @@ return (
               <a href="/help" className={linkClass('/help', true)}>
                 Help
               </a>
-              <a href="/top-up" className={linkClass('/top-up', true)}>
-                Access
-              </a>
             </div>
           </section>
 
