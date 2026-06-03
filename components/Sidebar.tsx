@@ -403,9 +403,6 @@ return (
               >
                 LIVE
               </button>
-              <a href="/george" className={linkClass('/george', true)}>
-                Workspace
-              </a>
             </div>
 
             <div className="mt-4 px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
