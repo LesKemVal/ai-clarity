@@ -815,10 +815,10 @@ export default function LiveEntryClient() {
         <BxPageHeader backLabel="GEORGE" />
 
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE Signal</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE</div>
 
           <h1 className="mt-2 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
-            Help GEORGE understand what is happening.
+            What are we walking into?
           </h1>
 
           {runtimeMotionContext && (
@@ -919,15 +919,15 @@ export default function LiveEntryClient() {
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Position (Optional)</span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Position</span>
                   <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
               </button>
             ) : (
               <>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Position (Optional)</div>
-            <p className="mt-1 text-[11px] leading-5 text-white/36">Use only if your position changes what matters.</p>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Position</div>
+            <p className="mt-1 text-[11px] leading-5 text-white/36">Select the position GEORGE should consider while helping you.</p>
             <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
               {CHAIR_OPTIONS.map((option) => {
                 const active = chairs.includes(option.label)
