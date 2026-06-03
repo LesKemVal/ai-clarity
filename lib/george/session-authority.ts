@@ -122,6 +122,18 @@ async function fetchGeorgeSessionAuthorityUncached(): Promise<GeorgeSessionAutho
       return authority
     }
 
+    if (cached.email && cached.source) {
+      const authority: GeorgeSessionAuthority = {
+        authenticated: true,
+        tier: cached.tier,
+        liveAccess: cached.tier === 'intelligent' || cached.tier === 'brilliant',
+        email: cached.email,
+        source: cached.source,
+      }
+
+      return rememberAuthority(authority)
+    }
+
     clearCachedGeorgeSessionAuthority()
     return rememberAuthority(unauthenticatedAuthority())
   } catch {
