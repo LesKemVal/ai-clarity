@@ -27,18 +27,19 @@ export default function HomePage() {
           </p>
         </section>
 
-        <section className="mt-12 max-w-[940px] rounded-[1.6rem] border border-white/[0.085] bg-[#0D1017]/78 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.055)] backdrop-blur-md md:p-7">
+        <section className="mt-12 max-w-[860px]">
           <p className="text-[20px] leading-8 text-white/86">
             Master GEORGE and maximize the benefit of articulate, mature presentation.
           </p>
 
-          <p className="mt-5 max-w-[820px] text-[15px] leading-8 text-white/62">
-            Presentation is how your ideas, concerns, positions, offers, and intentions are understood by others.
-            Better understanding is useful. Better presentation changes outcomes.
+          <p className="mt-5 text-[15px] leading-8 text-white/62">
+            Better understanding is useful.
+            <br />
+            Better presentation changes outcomes.
           </p>
         </section>
 
-        <div className="mt-8 flex w-full max-w-[520px] flex-row items-stretch gap-3">
+        <div className="mt-9 grid w-full max-w-[520px] grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => router.push('/george')}
@@ -47,7 +48,7 @@ export default function HomePage() {
             Open GEORGE
           </button>
 
-          <div className="relative flex-1">
+          <div className="relative">
             <button
               type="button"
               onClick={() => setShowLiveOptions((value) => !value)}
@@ -81,28 +82,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <section className="mt-20 grid gap-4 md:grid-cols-3">
-          <div className="rounded-[1.2rem] border border-white/[0.045] bg-white/[0.012] p-5">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-white/28">Conversation</div>
-            <p className="mt-4 text-[14px] leading-8 text-white/58">
-              Be thoughtful. Be empathetic. Be skeptical. Be direct. Be intentional.
-            </p>
-          </div>
-
-          <div className="rounded-[1.2rem] border border-white/[0.045] bg-white/[0.012] p-5">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-white/28">Presentation</div>
-            <p className="mt-4 text-[14px] leading-8 text-white/58">
-              Your idea. Your position. Your concern. Your offer. Yourself.
-            </p>
-          </div>
-
-          <div className="rounded-[1.2rem] border border-white/[0.045] bg-white/[0.012] p-5">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-white/28">LIVE</div>
-            <p className="mt-4 text-[14px] leading-8 text-white/58">
-              Put GEORGE in your ear. Stay connected to the conversation.
-            </p>
-          </div>
-        </section>
+        <div className="mt-10 w-full max-w-[760px] overflow-x-auto whitespace-nowrap text-[11px] uppercase tracking-[0.24em] text-white/32 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          Interviews • Meetings • Negotiations • Presentations • Boardrooms • Sales Calls • Difficult Conversations
+        </div>
 
         <footer className="mt-auto pt-16 text-center text-[10px] uppercase tracking-[0.32em] text-white/18">
           Direction → Action → Signal
