@@ -5026,7 +5026,13 @@ useEffect(() => {
 
 return (
     <>
-      <style>{georgeAmbientPulseStyles}
+      <style>{`${georgeAmbientPulseStyles}
+
+@keyframes georgeComposerCursorBlink {
+  0%, 46% { opacity: 0.72; }
+  47%, 100% { opacity: 0; }
+}
+`}
 
 </style>
   
@@ -5466,7 +5472,7 @@ return (
         <div className="george-utility-line" />
         <h1>GEORGE</h1>
         <p>
-          Support for decisions, conversations, opportunities, and the work ahead.
+          Whatever you want to do, be or change — start here.
         </p>
       </div>
     </div>
@@ -7331,7 +7337,7 @@ ${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
   ? '!fixed bottom-[6px]'
   : '!fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 z-[80] bg-transparent px-2 py-0 flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
 
-                    <div className="george-composer-shell relative flex-1 overflow-hidden rounded-[1.12rem] border border-[#8FB6C9]/[0.16] bg-[linear-gradient(180deg,rgba(10,18,30,0.92),rgba(8,14,24,0.82))] shadow-none">
+                    <div className="george-composer-shell relative flex-1 overflow-visible bg-transparent">
 
                       <input
                         ref={fileInputRef}
@@ -7494,7 +7500,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       />
 
                       {!input.trim() && (
-                        <span className="pointer-events-none absolute left-14 top-1/2 h-6 w-[1.5px] -translate-y-1/2 animate-pulse rounded-full bg-[#D7DBE4]/70 shadow-[0_0_12px_rgba(215,219,228,0.16)] md:left-11 md:h-5" />
+                        <span className="pointer-events-none absolute left-14 top-1/2 h-[13px] w-px -translate-y-1/2 [animation:georgeComposerCursorBlink_.58s_steps(1,end)_infinite] rounded-full bg-[#D7DBE4]/70 shadow-[0_0_12px_rgba(215,219,228,0.16)] md:left-11 md:h-5" />
                       )}
 
                       <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-2">
@@ -7639,7 +7645,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 <input
                   value={draftProfileName}
                   onChange={(e) => setDraftProfileName(e.target.value)}
-                  placeholder="State the objective."
+                  placeholder=""
                   className="w-full rounded-[1rem] max-w-full border border-white/[0.07] bg-black/40 px-5 py-4 text-sm text-[#D7DBE4] outline-none transition placeholder:text-neutral-500 focus:border-white/[0.09]"
                 />
               </div>
