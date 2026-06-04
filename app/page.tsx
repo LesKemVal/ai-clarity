@@ -25,17 +25,21 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-6 max-w-[760px] text-[20px] leading-8 text-white/60">
-            Put GEORGE in your ear before walking into an interview, meeting, boardroom, negotiation, or presentation — and better your success ratio.
+            Increase the probability of getting more of what you want by improving your conversation.
           </p>
         </div>
 
         <div className="relative z-10 mt-14 w-full max-w-[920px] rounded-[1.5rem] border border-white/[0.085] bg-[#10131B]/72 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.055)] backdrop-blur-md md:p-7">
           <p className="text-[19px] leading-8 text-white/84">
-            Potential is rarely limited by knowledge.
+            Master GEORGE and maximize the benefit of articulate, mature presentation.
           </p>
 
           <p className="mt-5 text-[15px] leading-8 text-white/72">
-            With GEORGE in your ear, you avoid losing context, misremembering important details, or losing your position as conversations evolve.
+            Presentation is how your ideas, concerns, positions, offers, and intentions are understood by others.
+
+            Better understanding is useful.
+
+            Better presentation changes outcomes.
           </p>
         </div>
 
