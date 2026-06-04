@@ -7465,7 +7465,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-2.5 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.045] bg-black/28 text-[#D7DBE4]/52 transition hover:border-white/[0.08] hover:bg-white/[0.03] hover:text-[#D7DBE4]/88 md:h-7 md:w-7"
+                        className="absolute left-1 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 md:h-8 md:w-8"
                         aria-label="Upload file"
                       >
                         <svg
@@ -7486,14 +7486,18 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleComposerKeyDown}
-                        placeholder="State the objective."
+                        placeholder=""
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className="min-h-[52px] w-full resize-none rounded-[1rem] border-0 bg-transparent pl-14 pr-[92px] py-3 text-[16.5px] leading-[1.5] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-[#D7DBE4]/26 focus:ring-0 md:min-h-[44px] md:pl-11 md:pr-[84px] md:py-2.5 md:text-[15.5px]"
+                        className="min-h-[52px] w-full resize-none border-0 bg-transparent pl-14 pr-[92px] py-3 text-[16.5px] leading-[1.5] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-transparent focus:ring-0 md:min-h-[44px] md:pl-11 md:pr-[84px] md:py-2.5 md:text-[15.5px]"
                       />
 
-                      <div className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                      {!input.trim() && (
+                        <span className="pointer-events-none absolute left-14 top-1/2 h-6 w-[1.5px] -translate-y-1/2 animate-pulse rounded-full bg-[#D7DBE4]/70 shadow-[0_0_12px_rgba(215,219,228,0.16)] md:left-11 md:h-5" />
+                      )}
+
+                      <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-2">
                         {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
                           <>
 
@@ -7511,7 +7515,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                                 }
                               }}
                               disabled={!voiceSupported || isThinking}
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.035] bg-black/24 text-[#D7DBE4]/52 transition hover:border-white/[0.08] hover:bg-white/[0.026] hover:text-[#D7DBE4]/82 disabled:cursor-not-allowed disabled:opacity-40"
+                              className="flex h-8 w-8 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 disabled:cursor-not-allowed disabled:opacity-30"
                               aria-label="Voice"
                             >
                               <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
