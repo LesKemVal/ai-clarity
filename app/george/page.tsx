@@ -5034,6 +5034,11 @@ return (
 }
 `}
 
+
+@keyframes blink {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
 </style>
   
         
@@ -7331,13 +7336,9 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`
+<div className="!fixed top-[57%] md:top-[60%] left-0 right-0 z-[80] -translate-y-1/2 bg-transparent px-2 py-0 flex flex-col items-stretch w-full max-w-[900px] mx-auto">
 
-${(forceLive || liveMode || hasDraftInput || hasVisibleThread)
-  ? '!fixed bottom-[6px]'
-  : '!fixed top-[57%] md:top-[60%] -translate-y-1/2'} left-0 right-0 z-[80] bg-transparent px-2 py-0 flex flex-col items-stretch w-full max-w-[900px] mx-auto transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}>
-
-                    <div className="george-composer-shell relative flex-1 overflow-visible bg-transparent">
+                    <div className="george-composer-shell relative flex-1 overflow-visible bg-transparent border-0 shadow-none">
 
                       <input
                         ref={fileInputRef}
