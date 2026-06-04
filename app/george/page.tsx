@@ -5030,40 +5030,7 @@ return (
 
 </style>
   
-        <style jsx global>{`
-          @keyframes georgeCursorBlink {
-            0%, 48% { opacity: 1; }
-            49%, 100% { opacity: 0; }
-          }
-
-          .george-terminal-cursor::before {
-            content: '';
-            position: absolute;
-            left: 56px;
-            top: 50%;
-            height: 22px;
-            width: 1.5px;
-            transform: translateY(-50%);
-            border-radius: 999px;
-            background: rgba(215, 219, 228, 0.72);
-            box-shadow: 0 0 12px rgba(215, 219, 228, 0.16);
-            animation: georgeCursorBlink 1.04s steps(1, end) infinite;
-            pointer-events: none;
-          }
-
-          @media (min-width: 768px) {
-            .george-terminal-cursor::before {
-              left: 44px;
-              height: 20px;
-            }
-          }
-
-          .george-terminal-cursor:focus-within::before,
-          .george-terminal-cursor:has(textarea:not(:placeholder-shown))::before {
-            opacity: 0;
-            animation: none;
-          }
-        `}</style>
+        
 
     <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
