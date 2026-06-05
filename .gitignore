@@ -22,3 +22,6 @@ data/continuity-tokens.json
 
 .env.vercel
 .env.production.vercel
+
+# Local backup snapshots
+*.bak.*
