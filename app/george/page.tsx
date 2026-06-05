@@ -531,7 +531,7 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
-  const firstTimeGreeting = `Whatever you want to do, be or change — start here.` 
+  const firstTimeGreeting = `An intelligent utility for decisions, preparation, and words that matter.` 
 
   // Normal GEORGE opens with continuity posture.
   // Scope: non-LIVE normal sessions only.
@@ -780,7 +780,7 @@ const [voiceError, setVoiceError] = useState('')
     const nextMessages: Message[] = [
       {
         role: 'assistant',
-        content: 'Bring GEORGE up to speed.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
+        content: 'Give GEORGE signal.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
         source: 'system_override',
       },
     ]
@@ -4272,9 +4272,9 @@ Steering doctrine:
         const constrained = isSmart && isHeavy
 
         let finalContent = firstResponseOverride ?? (constrained
-          ? `We can go further here.
+          ? `I can help with the next useful step.
 
-For deeper step-by-step work, upgrade when you want stronger continuity and execution support.`
+Tell me the outcome you want, and I’ll help you move toward it.`
           : data.message)
 
         if (!constrained && typeof finalContent === 'string') {
@@ -5526,7 +5526,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
 {showMobileHero && !(forceLive || liveMode) && (!hasUserMessageForSurface || showPreLiveSignalSurface) && (
   <section
@@ -5933,7 +5933,7 @@ I am listening now. Speak naturally. I will respond ${
                 <span className="h-1 w-4 rounded-full bg-white " />
               </div>
               <span className="text-xs text-[#D7DBE4]/72">
-                This requires deeper support.
+                Continue from here.
               </span>
             </div>
           )}
@@ -6253,7 +6253,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className="h-[120px] md:h-[140px]" />
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-[150px] md:h-[170px]'}`} />
 
 </div>
 
