@@ -59,6 +59,63 @@ const OUTPUT_OPTIONS: SelectOption[] = [
   { label: 'Repeatable lines', helper: 'responses you can repeat or adapt' },
 ]
 
+const COMMUNICATION_STYLE_OPTIONS: SelectOption[] = [
+  { label: 'Direct', helper: 'clear and firm' },
+  { label: 'Diplomatic', helper: 'careful, tactful, still effective' },
+  { label: 'Conciliatory', helper: 'softens friction while preserving the goal' },
+  { label: 'Executive', helper: 'brief, composed, high-authority' },
+  { label: 'Warm', helper: 'human, reassuring, approachable' },
+  { label: 'Assertive', helper: 'stronger posture without being reckless' },
+  { label: 'Neutral', helper: 'balanced and factual' },
+]
+
+const DEFAULT_ROOM_PHRASES = [
+  'That\'s fair.',
+  'Help me understand that.',
+  'Let\'s think through that.',
+  'What\'s driving that concern?',
+  'What am I missing?',
+  'Can we unpack that?',
+]
+
+function getRoomPhraseExamples(role: string) {
+  const clean = role.toLowerCase()
+
+  if (/patient|doctor|medical/.test(clean)) {
+    return [
+      'E.g. Help me understand that.',
+      'E.g. Can we slow down for a second?',
+      'E.g. What are my options?',
+      'E.g. I want to make sure I understand.',
+    ]
+  }
+
+  if (/candidate|interviewee|interview/.test(clean)) {
+    return [
+      'E.g. Good question.',
+      'E.g. Let me think about that.',
+      'E.g. Could you clarify that?',
+      'E.g. Can I expand on that?',
+    ]
+  }
+
+  if (/ceo|founder|investor|executive/.test(clean)) {
+    return [
+      'E.g. That\'s fair.',
+      'E.g. Help me understand that.',
+      'E.g. What\'s driving that concern?',
+      'E.g. Let\'s think through that.',
+    ]
+  }
+
+  return [
+    'E.g. That\'s fair.',
+    'E.g. Help me understand that.',
+    'E.g. Can we unpack that?',
+    'E.g. What am I missing?',
+  ]
+}
+
 const POSITION_OPTIONS: SelectOption[] = [
   { label: 'Seeking', helper: 'trying to obtain an outcome' },
   { label: 'Evaluating', helper: 'assessing people or opportunities' },
@@ -286,6 +343,7 @@ export default function LiveEntryClient() {
   const [audienceType, setAudienceType] = useState('Executive')
   const [pacing, setPacing] = useState('Balanced')
   const [outputMode, setOutputMode] = useState('Repeatable lines')
+  const [communicationStyle, setCommunicationStyle] = useState('Diplomatic')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
   const [chairs, setChairs] = useState<string[]>([])
@@ -301,13 +359,27 @@ export default function LiveEntryClient() {
   const [roomSectionCollapsed, setRoomSectionCollapsed] = useState(false)
   const [prepDocument, setPrepDocument] = useState<{ name: string; summary: string; kind: string } | null>(null)
   const [prepDocumentReading, setPrepDocumentReading] = useState(false)
-  const [controlWords, setControlWords] = useState('hmm, right, ok, let me think')
+  const [controlWords, setControlWords] = useState(DEFAULT_ROOM_PHRASES.join(', '))
+  const [useRoomPhrases, setUseRoomPhrases] = useState(true)
+  const [customRoomPhrases, setCustomRoomPhrases] = useState('')
+  const [roomPhraseFocused, setRoomPhraseFocused] = useState(false)
+  const [typedRoomPhraseExample, setTypedRoomPhraseExample] = useState('')
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
   const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
+  const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>({})
+  const [optionalSignalStep, setOptionalSignalStep] = useState(0)
+  const [optionalSignalInput, setOptionalSignalInput] = useState('')
+  const [typedOptionalAnswerExample, setTypedOptionalAnswerExample] = useState('')
+  const [optionalSignalInputFocused, setOptionalSignalInputFocused] = useState(false)
+  const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<Record<string, string>>({})
+  const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false)
+  const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] = useState('')
+  const [exampleIndex, setExampleIndex] = useState(0)
+  const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
 
   const toggleChair = (value: string) => {
     setChairs((current) => {
@@ -324,6 +396,29 @@ export default function LiveEntryClient() {
     .map((item) => item === 'Other' && customChair.trim() ? customChair.trim() : item)
     .join(' + ')
 
+  const roomPhraseExamples = getRoomPhraseExamples(chair || String(preLiveSignals.role || ''))
+  const currentRoomPhraseExample = roomPhraseExamples[exampleIndex % roomPhraseExamples.length]
+
+  useEffect(() => {
+    if (!useRoomPhrases || customRoomPhrases.trim() || roomPhraseFocused) {
+      setTypedRoomPhraseExample('')
+      return
+    }
+
+    setTypedRoomPhraseExample('')
+    let index = 0
+    const timer = window.setInterval(() => {
+      index += 1
+      setTypedRoomPhraseExample(currentRoomPhraseExample.slice(0, index))
+
+      if (index >= currentRoomPhraseExample.length) {
+        window.clearInterval(timer)
+      }
+    }, 18)
+
+    return () => window.clearInterval(timer)
+  }, [currentRoomPhraseExample, customRoomPhrases, roomPhraseFocused, useRoomPhrases])
+
   const contextSignalsCollapsed = chairSectionCollapsed
 
   const groundingSignalAvailable =
@@ -331,6 +426,181 @@ export default function LiveEntryClient() {
     Boolean(prepDocument) ||
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== 'not_related'
+
+  const optionalOpenAISignalQuestions = useMemo(() => {
+    const role = String(preLiveSignals.role || '').toLowerCase()
+
+    const base = [
+      {
+        key: 'primaryConcern',
+        kicker: 'Optional OpenAI signal',
+        label: 'Additional signal',
+        question: role.includes('patient')
+          ? 'What must not be missed in this appointment?'
+          : role.includes('interview')
+            ? 'What concern or objection do you want GEORGE ready for?'
+            : role.includes('founder') || role.includes('ceo')
+              ? 'What objection, pressure, or risk do you expect?'
+              : 'What concern should GEORGE be ready for?',
+        examples: 'Answer if useful, or skip.',
+      },
+      {
+        key: 'avoid',
+        kicker: 'Optional OpenAI signal',
+        label: 'Boundary',
+        question: 'Is there anything GEORGE should avoid saying or doing in this conversation?',
+        examples: 'Tone, topics, claims, pressure, promises, or anything sensitive.',
+      },
+      {
+        key: 'successSignal',
+        kicker: 'Optional OpenAI signal',
+        label: 'Success signal',
+        question: 'What would tell you this conversation is going well?',
+        examples: 'A yes, a second meeting, a clearer answer, calmer tone, agreement, or useful information.',
+      },
+    ]
+
+    return base.filter((question) => !preLiveSignals[question.key] && !optionalSignalAnswers[question.key])
+  }, [preLiveSignals, optionalSignalAnswers])
+
+  const currentOptionalSignalQuestion = showOpenAISignalSurface
+    ? optionalOpenAISignalQuestions[optionalSignalStep] || null
+    : null
+
+  const optionalAnswerExamples = [
+    'E.g. They may push back on valuation.',
+    'E.g. I need GEORGE to keep me calm and concise.',
+    'E.g. They may ask for proof, traction, or timing.',
+  ]
+
+  const desiredOutcomeExamples = [
+    'E.g. Secure a second meeting.',
+    'E.g. Get agreement on next steps.',
+    'E.g. Leave with a clear decision.',
+  ]
+
+  const contextExamples = [
+    'E.g. Speaking with an investor. Desired outcome: secure follow-up. Concern: valuation.',
+    'E.g. The room may be tense. I need GEORGE to keep the language calm and useful.',
+    'E.g. They care about timeline, risk, and whether I can defend the ask.',
+  ]
+
+  const positionExamples = [
+    'E.g. CEO',
+    'E.g. Candidate',
+    'E.g. Patient advocate',
+  ]
+
+  const steeringExamples = [
+    'E.g. softer, sharper, line, pause, clarify, plain',
+    'E.g. diplomatic, concise, slow down, repeat line',
+    'E.g. push, soften, explain simply, buy time',
+  ]
+
+  const currentOptionalAnswerExample = optionalAnswerExamples[exampleIndex % optionalAnswerExamples.length]
+
+  useEffect(() => {
+    if (optionalSignalInput.trim() || optionalSignalInputFocused) {
+      setTypedOptionalAnswerExample('')
+      return
+    }
+
+    setTypedOptionalAnswerExample('')
+    let index = 0
+    const timer = window.setInterval(() => {
+      index += 1
+      setTypedOptionalAnswerExample(currentOptionalAnswerExample.slice(0, index))
+
+      if (index >= currentOptionalAnswerExample.length) {
+        window.clearInterval(timer)
+      }
+    }, 18)
+
+    return () => window.clearInterval(timer)
+  }, [currentOptionalAnswerExample, optionalSignalInput, optionalSignalInputFocused])
+
+  const optionalSignalSurfaceComplete =
+    showOpenAISignalSurface && optionalOpenAISignalQuestions.length === 0
+
+  const hasGeorgeSurfaceSignals = Object.keys(preLiveSignals).length > 0
+  const hideAcquiredMandatoryFields = hasGeorgeSurfaceSignals
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setExampleIndex((index) => index + 1)
+    }, 3000)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!currentOptionalSignalQuestion) {
+      setTypedOptionalSignalQuestion('')
+      return
+    }
+
+    const text = currentOptionalSignalQuestion.question
+    setTypedOptionalSignalQuestion('')
+
+    let index = 0
+    const timer = window.setInterval(() => {
+      index += 1
+      setTypedOptionalSignalQuestion(text.slice(0, index))
+
+      if (index >= text.length) {
+        window.clearInterval(timer)
+      }
+    }, 18)
+
+    return () => window.clearInterval(timer)
+  }, [currentOptionalSignalQuestion?.key])
+
+
+  const submitOptionalSignalAnswer = () => {
+    if (!currentOptionalSignalQuestion) return false
+
+    const answer = optionalSignalInput.trim()
+    if (!answer) return false
+
+    const nextAnswers = {
+      ...optionalSignalAnswers,
+      [currentOptionalSignalQuestion.key]: answer,
+    }
+
+    setOptionalSignalAnswers(nextAnswers)
+
+    const enrichedContextLine = `${currentOptionalSignalQuestion.label}: ${answer}`
+    setKnownContext((current) => {
+      const cleanCurrent = current.trim()
+      return cleanCurrent
+        ? `${cleanCurrent}\n${enrichedContextLine}`
+        : enrichedContextLine
+    })
+
+    setOptionalSignalInput('')
+
+    try {
+      window.localStorage.setItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS', JSON.stringify(nextAnswers))
+    } catch {}
+
+    if (optionalSignalStep + 1 >= optionalOpenAISignalQuestions.length) {
+      setShowOpenAISignalSurface(false)
+      setOptionalSignalStep(0)
+      return true
+    }
+
+    setOptionalSignalStep((step) => step + 1)
+    return true
+  }
+
+  const skipOptionalSignalQuestion = () => {
+    if (optionalSignalStep + 1 >= optionalOpenAISignalQuestions.length) {
+      setShowOpenAISignalSurface(false)
+      setOptionalSignalStep(0)
+      return
+    }
+
+    setOptionalSignalStep((step) => step + 1)
+  }
 
   const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim()
@@ -387,6 +657,54 @@ export default function LiveEntryClient() {
       .catch(() => {})
 
     try {
+      const acquiredSignals = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+      setPreLiveSignals(acquiredSignals)
+
+      if (acquiredSignals.role) {
+        const normalizedRole = String(acquiredSignals.role).trim()
+        const knownChair = CHAIR_OPTIONS.some((option) => option.label.toLowerCase() === normalizedRole.toLowerCase())
+        if (knownChair) {
+          const matched = CHAIR_OPTIONS.find((option) => option.label.toLowerCase() === normalizedRole.toLowerCase())
+          setChairs(matched ? [matched.label] : [])
+        } else {
+          setChairs(['Other'])
+          setCustomChair(normalizedRole)
+        }
+        setChairSectionCollapsed(true)
+      }
+
+      if (acquiredSignals.desiredOutcome && !objective.trim()) {
+        setObjective(String(acquiredSignals.desiredOutcome).trim())
+      }
+
+      const acquiredContext = [
+        acquiredSignals.counterparty ? `Speaking with: ${acquiredSignals.counterparty}` : null,
+        acquiredSignals.desiredOutcome ? `Desired outcome: ${acquiredSignals.desiredOutcome}` : null,
+        acquiredSignals.acceptableOutcome ? `Acceptable outcome: ${acquiredSignals.acceptableOutcome}` : null,
+      ].filter(Boolean).join('\n')
+
+      if (acquiredContext && !knownContext.trim()) {
+        setKnownContext(acquiredContext)
+      }
+
+      if (Object.keys(acquiredSignals).length > 0) {
+        setShowOpenAISignalSurface(true)
+      }
+    } catch {}
+
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const acquiredSignalsForAccess = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+
+      const preLiveReady =
+        window.localStorage.getItem('GEORGE_PRE_LIVE_PREVIEW_READY') === '1' ||
+        params.get('devPreview') === '1' ||
+        Object.keys(acquiredSignalsForAccess).length > 0 ||
+        Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
+        Boolean(window.localStorage.getItem('george_live_setup_active'))
+
+      setPreLivePreviewReady(preLiveReady)
+
       const saved = JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null')
       if (saved?.room) {
         const knownRoom = CONVERSATION_TYPES.some((option) => option.label === saved.room)
@@ -398,6 +716,7 @@ export default function LiveEntryClient() {
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
       if (saved?.userPosition) setUserPosition(saved.userPosition)
       if (saved?.controlWords) setControlWords(saved.controlWords)
+      if (saved?.communicationStyle) setCommunicationStyle(saved.communicationStyle)
     } catch {}
 
     try {
@@ -500,6 +819,7 @@ export default function LiveEntryClient() {
       audienceType,
       pacing,
       outputMode,
+      communicationStyle,
       objective,
       userPosition,
       knownContext,
@@ -647,7 +967,7 @@ export default function LiveEntryClient() {
   const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
 
-    if (!sessionEmail.trim()) {
+    if (!sessionEmail.trim() && !preLivePreviewReady) {
       window.alert('Sign in to use LIVE.')
       return
     }
@@ -733,7 +1053,12 @@ export default function LiveEntryClient() {
       objective,
       prepDocument,
       prepDocumentPrompt,
-      controlWords,
+      controlWords: useRoomPhrases
+        ? (customRoomPhrases.trim() || DEFAULT_ROOM_PHRASES.join(', '))
+        : '',
+      useRoomPhrases,
+      customRoomPhrases,
+      communicationStyle,
       liveAssistMode,
       skipPrep,
       runtimeSupport,
@@ -785,7 +1110,7 @@ export default function LiveEntryClient() {
 
   if (!ready) return null
 
-  if (!sessionEmail.trim()) {
+  if (!sessionEmail.trim() && !preLivePreviewReady) {
     return (
       <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
         <div className="w-full max-w-[420px] rounded-[1.25rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.30)]">
@@ -813,11 +1138,15 @@ export default function LiveEntryClient() {
         <BxPageHeader backLabel="GEORGE" />
 
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-white/28">LIVE</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE PREVIEW</div>
 
-          <h1 className="mt-2 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
-            What are we walking into?
+          <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
+            GEORGE has enough signal.
           </h1>
+
+          <p className="mt-3 text-[14px] leading-6 text-white/46">
+            GEORGE has enough signal, but additional signals will sharpen your conversation.
+          </p>
 
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
@@ -826,7 +1155,7 @@ export default function LiveEntryClient() {
             </div>
           )}
 
-          {contextSignalsCollapsed && (
+          {contextSignalsCollapsed && !hideAcquiredMandatoryFields && (
             <div className="mt-2 rounded-[0.72rem] border border-white/[0.035] bg-black/12 px-3 py-2">
               <button
                 type="button"
@@ -847,7 +1176,7 @@ export default function LiveEntryClient() {
             </div>
           )}
 
-          {!contextSignalsCollapsed && (
+          {!contextSignalsCollapsed && !hideAcquiredMandatoryFields && (
           <div className={`${relatedSessions.length > 0 ? 'mt-2' : 'mt-3'} rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2`}>
             {chairSectionCollapsed ? (
               <button
@@ -891,8 +1220,8 @@ export default function LiveEntryClient() {
                 <input
                   value={customChair}
                   onChange={(event) => setCustomChair(event.target.value)}
-                  placeholder="Example: Sponsor, advocate, partner, owner"
-                  className="mt-2 w-full bg-transparent text-[14px] text-white/72 outline-none placeholder:text-white/24"
+                  placeholder={positionExamples[exampleIndex % positionExamples.length]}
+                  className="mt-2 w-full caret-[#D7DCFF] bg-transparent text-[14px] text-white/72 outline-none placeholder:text-white/22"
                 />
               </label>
             )}
@@ -911,141 +1240,213 @@ export default function LiveEntryClient() {
 
 
 
-          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
-            <textarea
-              id="george-desired-outcome"
-              data-live-signal="desired-outcome"
-              value={objective}
-              onChange={(event) => setObjective(event.target.value)}
-              rows={2}
-              placeholder="What outcome are you hoping to achieve?"
-              className="mt-2 w-full resize-none bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/24"
-            />
-          </label>
-
-          <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">What is happening?</span>
-            <textarea
-              id="george-observed-reality"
-              data-live-signal="observed-reality"
-              value={knownContext}
-              onChange={(event) => setKnownContext(event.target.value)}
-              rows={2}
-              placeholder={observedRealityPlaceholder}
-              className="mt-2 w-full resize-none bg-transparent text-[14px] leading-5 text-white/70 outline-none placeholder:text-white/24"
-            />
-          </label>
-
-          {!showEstimatedLiveCost && (
-            <div className="mt-3 rounded-[0.82rem] border border-white/[0.04] bg-black/16 px-3 py-2">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/28">
-                Signal
+          {showOpenAISignalSurface && currentOptionalSignalQuestion && (
+            <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
+              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
+                Optional OpenAI signal
               </div>
-              <div className="mt-1 text-[12px] leading-5 text-white/56">
-                Add the remaining signal before LIVE. GEORGE will use it to support execution.
+
+              <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
+                Answer another signal or start LIVE now
               </div>
-              <div className="mt-2 grid gap-1">
-                {missingMandatoryLiveSignals.map((signal) => (
-                  <div key={signal.id} className="rounded-[0.6rem] border border-white/[0.03] bg-white/[0.012] px-2.5 py-1.5">
-                    <div className="text-[11px] font-medium text-white/66">{signal.label}</div>
-                    <div className="mt-0.5 text-[10px] leading-4 text-white/32">{signal.helper}</div>
-                  </div>
-                ))}
+
+              <div
+                key={currentOptionalSignalQuestion.key}
+                className="mt-4 min-h-[64px] text-[20px] leading-8 tracking-[-0.02em] text-white/78"
+              >
+                {typedOptionalSignalQuestion}
+                <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
               </div>
-            </div>
-          )}
 
-          {showEstimatedLiveCost && (
-            <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.09] bg-black/18 px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/34">
-                Ready
+              <div className="mt-3 text-[13px] leading-6 text-white/38">
+                {currentOptionalSignalQuestion.examples}
               </div>
-              <div className="mt-1 text-[12px] leading-5 text-white/70">
-                GEORGE has enough signal to begin. Add more signal if you want sharper support.
-              </div>
-            </div>
-          )}
 
-          {showEstimatedLiveCost && (
-            <details className="mt-2 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2 animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                <span>
-                  <span className="block text-[34px] font-semibold leading-none tracking-[-0.07em] text-white/92">
-                    {finalResourceEstimate.estimatedCents}¢
-                  </span>
+              <div className="mt-6 flex items-center gap-5">
+                <div className="relative min-h-[38px] flex-1">
+                  {!optionalSignalInput.trim() && !optionalSignalInputFocused && (
+                    <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-[15px] text-white/22">
+                      {typedOptionalAnswerExample}
+                      <span className="ml-1 inline-block h-[16px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/50" />
+                    </div>
+                  )}
 
-                  <span className="mt-2 block text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/34">
-                    Estimated LIVE Cost
-                  </span>
-
-                  <span className="mt-1 block text-[11px] text-white/40">
-                    Typical 30-Minute LIVE Session
-                  </span>
-                </span>
-                <span className="text-[18px] leading-none text-white/32">⌄</span>
-              </summary>
-
-              <div className="mt-3 border-t border-white/[0.05] pt-3">
-                <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/[0.055]">
-                  <div
-                    className="h-full rounded-full bg-[#8FB6C9]/55 transition-[width] duration-300 ease-out"
-                    style={{ width: `${Math.min(100, Math.max(12, finalResourceEstimate.estimatedCents * 2))}%` }}
+                  <input
+                    value={optionalSignalInput}
+                    onFocus={() => setOptionalSignalInputFocused(true)}
+                    onBlur={() => {
+                      if (!optionalSignalInput.trim()) setOptionalSignalInputFocused(false)
+                    }}
+                    onChange={(event) => setOptionalSignalInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        submitOptionalSignalAnswer()
+                      }
+                    }}
+                    placeholder=""
+                    className="min-h-[38px] w-full caret-[#D7DCFF] border-0 bg-transparent text-[15px] text-white/82 outline-none placeholder:text-transparent"
                   />
                 </div>
 
-                <div className="mt-3 border-t border-white/[0.05] pt-3">
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/30">
-                    Bx
-                  </span>
-
-                  <div className="mt-1 text-[12px] text-white/46">
-                    {finalResourceEstimate.resources.slice(0, 5).join(' · ')}
-                  </div>
-                </div>
+                {optionalSignalInput.trim() && (
+                  <button
+                    type="button"
+                    onClick={submitOptionalSignalAnswer}
+                    className="text-[11px] uppercase tracking-[0.22em] text-[#D7DCFF]/62 transition hover:text-white active:scale-[0.98]"
+                  >
+                    Enter
+                  </button>
+                )}
               </div>
-            </details>
+
+              <div className="mt-5 flex items-center gap-6">
+                <button
+                  type="button"
+                  onClick={skipOptionalSignalQuestion}
+                  className="text-[11px] uppercase tracking-[0.22em] text-white/34 transition hover:text-white/70 active:scale-[0.98]"
+                >
+                  Next signal
+                </button>
+              </div>
+            </div>
           )}
 
-          <div className={`mt-2 grid gap-2 ${showEstimatedLiveCost ? 'animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)]' : ''}`}>
-            <button
-              type="button"
-              onClick={() => {
-                setLiveToaAccepted(true)
-                setShowPrepPreview(true)
-              }}
-              className="min-h-[50px] rounded-[0.82rem] border border-[#8FB6C9]/[0.18] bg-[linear-gradient(180deg,rgba(18,28,38,0.92),rgba(5,8,13,0.98))] px-5 py-3 text-[14px] font-semibold tracking-[-0.02em] text-[#D7DCFF]/86 shadow-[0_18px_48px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.045)] transition hover:border-[#8FB6C9]/[0.28] hover:text-white"
-            >
-              Deploy LIVE
-            </button>
-          </div>
+          {optionalSignalSurfaceComplete && (
+            <section className="mt-5 border-l border-[#AEB6FF]/24 pl-5">
+              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/42">
+                Room phrases
+              </div>
 
-          <details className="mt-3 rounded-[0.72rem] border border-white/[0.028] bg-black/12 px-3 py-2 backdrop-blur-md">
-            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.22em] text-white/26">Advanced Controls</summary>
-            <div className="mt-2">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Assist</span>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              {OUTPUT_OPTIONS.map((option) => {
-                const active = outputMode === option.label
+              <div className="mt-3 text-[15px] leading-6 text-white/68">
+                Use natural phrases during LIVE to subtly steer GEORGE without exposing GEORGE.
+              </div>
 
-                return (
-                  <button
-                    key={option.label}
-                    type="button"
-                    onClick={() => setOutputMode(option.label)}
-                    className={`rounded-[0.72rem] border px-3 py-2 text-left transition ${
-                      active
-                        ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.10] text-white'
-                        : 'border-white/[0.04] bg-black/16 text-white/46 hover:text-white/76'
-                    }`}
-                  >
-                    <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Responses' : option.label}</span>
-                    <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
-                  </button>
-                )
-              })}
+              <label className="mt-4 flex items-start gap-3 text-[12px] leading-5 text-white/48">
+                <input
+                  type="checkbox"
+                  checked={useRoomPhrases}
+                  onChange={(event) => setUseRoomPhrases(event.target.checked)}
+                  className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+                />
+                <span>
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
+                    Use room phrases
+                  </span>
+                  If you do not add your own phrases, GEORGE will use quiet defaults you may use or ignore.
+                </span>
+              </label>
+
+              {useRoomPhrases && (
+                <label className="mt-5 block">
+                  <span className="block text-[10px] uppercase tracking-[0.18em] text-white/24">
+                    Phrases you could actually say
+                  </span>
+
+                  <div className="relative mt-2 min-h-[42px]">
+                    {!customRoomPhrases.trim() && !roomPhraseFocused && (
+                      <div className="pointer-events-none absolute inset-x-0 top-2 text-[13px] leading-6 text-white/22">
+                        {typedRoomPhraseExample}
+                        <span className="ml-1 inline-block h-[15px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/50" />
+                      </div>
+                    )}
+
+                    <textarea
+                      value={customRoomPhrases}
+                      onFocus={() => setRoomPhraseFocused(true)}
+                      onBlur={() => {
+                        if (!customRoomPhrases.trim()) setRoomPhraseFocused(false)
+                      }}
+                      onChange={(event) => {
+                        const value = event.target.value
+                        setCustomRoomPhrases(value)
+                        setControlWords(value.trim() || DEFAULT_ROOM_PHRASES.join(', '))
+                      }}
+                      rows={3}
+                      placeholder=""
+                      className="min-h-[92px] w-full resize-none caret-[#D7DCFF] bg-transparent text-[13px] leading-6 text-white/72 outline-none placeholder:text-transparent"
+                    />
+                  </div>
+
+                  <div className="mt-3 text-[11px] leading-5 text-white/34">
+                    Defaults include: {DEFAULT_ROOM_PHRASES.slice(0, 4).join(' · ')}
+                  </div>
+                </label>
+              )}
+            </section>
+          )}
+
+          {!hideAcquiredMandatoryFields && (
+            <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
+              <textarea
+                id="george-desired-outcome"
+                data-live-signal="desired-outcome"
+                value={objective}
+                onChange={(event) => setObjective(event.target.value)}
+                rows={2}
+                placeholder={desiredOutcomeExamples[exampleIndex % desiredOutcomeExamples.length]}
+                className="mt-2 w-full resize-none caret-[#D7DCFF] bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/22"
+              />
+            </label>
+          )}
+
+          <details className="mt-3 border-l border-[#AEB6FF]/20 pl-5">
+            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.22em] text-white/34">
+              Advanced controls
+            </summary>
+
+            <div className="mt-4">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Output</span>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {OUTPUT_OPTIONS.map((option) => {
+                  const active = outputMode === option.label
+
+                  return (
+                    <button
+                      key={option.label}
+                      type="button"
+                      onClick={() => setOutputMode(option.label)}
+                      className={`border-l px-3 py-2 text-left transition ${
+                        active
+                          ? 'border-[#AEB6FF]/42 text-white'
+                          : 'border-white/[0.08] text-white/42 hover:text-white/72'
+                      }`}
+                    >
+                      <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Lines' : option.label}</span>
+                      <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+            <div className="mt-5">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Communication style</span>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {COMMUNICATION_STYLE_OPTIONS.map((option) => {
+                  const active = communicationStyle === option.label
+
+                  return (
+                    <button
+                      key={option.label}
+                      type="button"
+                      onClick={() => setCommunicationStyle(option.label)}
+                      className={`border-l px-3 py-2 text-left transition ${
+                        active
+                          ? 'border-[#AEB6FF]/42 text-white'
+                          : 'border-white/[0.08] text-white/42 hover:text-white/72'
+                      }`}
+                    >
+                      <span className="block text-[12px] font-medium">{option.label}</span>
+                      <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+          </details>
 
           <label className="mt-3 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
             <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
@@ -1102,19 +1503,16 @@ export default function LiveEntryClient() {
             </span>
           </div>
 
-          <label className="mt-3 flex gap-3 rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-3 text-[12px] leading-5 text-white/42">
-            <input
-              type="checkbox"
-              checked={liveToaAccepted}
-              onChange={(event) => setLiveToaAccepted(event.target.checked)}
-              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
-            />
-            <span>
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/28">LIVE Notice</span>
-              GEORGE may misunderstand speech, miss context, provide imperfect guidance, or experience latency. GEORGE assists. You remain responsible for decisions and actions.
-            </span>
-          </label>
-          </details>
+<div className="mt-5">
+            <button
+              type="button"
+              
+              onClick={() => setShowPrepPreview(true)}
+              className="w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:text-white active:scale-[0.98]"
+            >
+              Continue to LIVE
+            </button>
+          </div>
 
           {hasLiveSession && (
             <p className="mt-3 text-[12px] leading-5 text-white/34">
@@ -1135,7 +1533,7 @@ export default function LiveEntryClient() {
         profile={prepRoomProfile}
         room={conversationType}
         relatedSessionTitle={relatedSessionId === 'not_related' ? null : selectedRelatedSession?.title || null}
-        chairs={chairs}
+        chairs={chair ? [chair] : chairs}
         desiredOutcome={objective}
         knownContext={knownContext}
         assistMode={liveAssistMode}

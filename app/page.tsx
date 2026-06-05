@@ -63,7 +63,7 @@ export default function HomePage() {
                   type="button"
                   onClick={() => {
                     window.localStorage.setItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION', 'start')
-                    router.push('/george?live=1&start=1')
+                    router.push('/george?start=1')
                   }}
                   className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/74 transition hover:bg-white/[0.045] hover:text-white"
                 >

@@ -22,51 +22,6 @@ function formatValue(value: string) {
   return value.replace(/_/g, ' ')
 }
 
-function deriveGeorgeInterpretation(chairs: string[], outcome: string, reality: string) {
-  const text = `${chairs.join(' ')} ${outcome} ${reality}`.toLowerCase()
-  const concerns: string[] = []
-
-  const add = (...items: string[]) => {
-    for (const item of items) {
-      if (!concerns.includes(item)) concerns.push(item)
-    }
-  }
-
-  if (/founder|operator|build|launch|product|company|startup/.test(text)) {
-    add('execution', 'adoption', 'operational risk')
-  }
-
-  if (/investor|valuation|return|equity|capital|funding|sell my company|acquire|acquisition/.test(text)) {
-    add('valuation', 'risk', 'future value')
-  }
-
-  if (/sell|seller|buyer|deal|terms|leverage|negotiate|negotiation|offer/.test(text)) {
-    add('negotiating leverage', 'buyer quality', 'downside protection')
-  }
-
-  if (/candidate|interview|job|role|recruiter|hiring/.test(text)) {
-    add('credibility', 'proof', 'positioning')
-  }
-
-  if (/patient|doctor|medical|symptom|diagnosis|treatment/.test(text)) {
-    add('clarification', 'symptom accuracy', 'decision support')
-  }
-
-  if (/parent|family|spouse|child|home/.test(text)) {
-    add('responsibility', 'tone', 'long-term impact')
-  }
-
-  if (/board|governance|oversight/.test(text)) {
-    add('governance', 'oversight', 'capital allocation')
-  }
-
-  if (!concerns.length) {
-    add('the outcome', 'the observed reality', 'the next useful move')
-  }
-
-  return `GEORGE will enter LIVE assuming ${concerns.slice(0, 4).join(', ')} are likely to matter first.`
-}
-
 export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle, chairs = [], desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
   const [noticeAccepted, setNoticeAccepted] = useState(false)
 
@@ -78,7 +33,6 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
   const desiredOutcomeValue = desiredOutcome?.trim() || 'Not specified'
   const knownContextValue = knownContext?.trim() || 'Not specified'
   const assistValue = assistMode?.trim() || formatValue(profile.responseTexture)
-  const summaryLine = deriveGeorgeInterpretation(chairs, desiredOutcomeValue, knownContextValue)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/52 px-3 py-4 backdrop-blur-[14px] transition-opacity duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]">
@@ -98,7 +52,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
         }
       `}</style>
 
-      <div className="relative flex max-h-[min(440px,calc(100dvh-22px))] w-full max-w-[470px] flex-col overflow-hidden rounded-[1rem] border border-white/[0.07] bg-[#05080D]/94 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]">
+      <div className="relative flex max-h-[calc(100dvh-22px)] w-full max-w-[560px] flex-col overflow-hidden rounded-[1rem] border border-white/[0.07] bg-[#05080D]/94 shadow-[0_22px_70px_rgba(0,0,0,0.52)] backdrop-blur-xl transition duration-150 ease-[cubic-bezier(0.22,1,0.36,1)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(143,182,255,0.105),transparent_36%)] opacity-80" />
         <div className="pointer-events-none absolute -inset-y-28 -left-1/2 w-[72%] animate-[prepShimmer_5.2s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[#8FB6FF]/[0.075] to-transparent" />
         <div className="pointer-events-none absolute -inset-x-32 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
@@ -117,7 +71,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            Here's what I believe.
+            Current understanding.
           </p>
         </div>
 
@@ -138,20 +92,6 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
             </div>
           </div>
 
-          <div className="mt-2 rounded-[0.9rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
-            <p className="text-[10px] uppercase tracking-[0.22em] text-white/28">GEORGE is considering</p>
-            <p className="mt-2 text-[12px] leading-5 text-white/48">
-              {summaryLine}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              <span className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
-                {roomValue}
-              </span>
-              <span className="rounded-full border border-white/[0.055] bg-black/20 px-2.5 py-1 text-[11px] text-white/48">
-                {assistValue}
-              </span>
-            </div>
-          </div>
         </div>
 
         <div className="relative shrink-0 border-t border-white/10 bg-[#05080D]/94 px-4 py-3">
