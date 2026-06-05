@@ -663,7 +663,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
 
   useEffect(() => {
     // 🚫 NEVER run greeting if LIVE or Conversation Mode is active
-    if (liveMode || isManualLive) return
+    if (forceLive || liveMode || isManualLive) return
 
     const greeting = getInitialGreeting()
 
@@ -746,6 +746,9 @@ const [voiceError, setVoiceError] = useState('')
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
   const [activePromptLabel, setActivePromptLabel] = useState<string | null>(null)
   const [activePromptContext, setActivePromptContext] = useState<string | null>(null)
+  const [showPreLiveSignalSurface, setShowPreLiveSignalSurface] = useState(false)
+  const [preLiveSignalStep, setPreLiveSignalStep] = useState(0)
+  const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>({})
   const isManualLive =
     conversationMode === 'manual_live' ||
     activePromptContext === 'manual_live'
@@ -760,6 +763,7 @@ const [voiceError, setVoiceError] = useState('')
 
     const shouldStartNewLive =
       pendingLiveSignal ||
+      params.get('start') === '1' ||
       (
         params.get('live') === '1' &&
         params.get('start') === '1'
@@ -768,19 +772,15 @@ const [voiceError, setVoiceError] = useState('')
     if (!shouldStartNewLive) return
 
     liveEntryBootedRef.current = true
+    setShowPreLiveSignalSurface(true)
+    setPreLiveSignalStep(0)
+    setPreLiveSignals({})
     window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
 
-    const openers = [
-      'What is happening?',
-      'Bring me up to speed.',
-      'What changed in the room?'
-    ]
-
-    const opener = openers[Math.floor(Date.now() / 60000) % openers.length]
     const nextMessages: Message[] = [
       {
         role: 'assistant',
-        content: opener,
+        content: 'Bring GEORGE up to speed.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
         source: 'system_override',
       },
     ]
@@ -1452,7 +1452,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       const cachedLiveAccess = cachedTier === 'intelligent' || cachedTier === 'brilliant'
       const liveAccessKnown = hasLiveGeorgeAccess || cachedLiveAccess
 
-      if (!liveAccessKnown) {
+      const hasLocalLiveSetup =
+        Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
+        Boolean(window.localStorage.getItem('george_live_setup_active'))
+
+      if (liveAccessKnown === false && hasLocalLiveSetup === false) {
         normalSessionBootedRef.current = true
         window.localStorage.removeItem('george_fresh_live_entry')
         window.localStorage.removeItem('george_start_new_live')
@@ -2358,7 +2362,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     const liveSignalMessage: Message = {
       role: 'assistant',
       content:
-        "What are we walking into?\n\nGive me the objective and what is happening. Once I have enough signal, I’ll tell you. I’m ready when you are.",
+        "Bring GEORGE up to speed.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.",
     }
 
     setMessages((prev) => {
@@ -4925,11 +4929,12 @@ responseTimerRef.current = setTimeout(() => {
   })
 
   const hasDraftInput = input.trim().length > 0
-  const showConversation = hasDraftInput || hasVisibleThread || liveMode
+  const isPreLiveSignalAcquisition = activePromptContext === 'pre_live_signal_acquisition'
+  const showConversation = hasDraftInput || liveMode || (hasVisibleThread && !isPreLiveSignalAcquisition)
   const showMobileHero = !(forceLive || liveMode) && messages.length <= 1
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
-    showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !pendingImage && !hasUserMessageForSurface
+    showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !pendingImage && (!hasUserMessageForSurface || isPreLiveSignalAcquisition)
 
   const showDesktopOperationalSurface =
     !hasUserMessageForSurface
@@ -4949,6 +4954,81 @@ useEffect(() => {
     scrollHostRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   })
 }, [showMobileHero, liveMode])
+
+  const preLiveQuestions = [
+    {
+      key: 'role',
+      kicker: 'Bring GEORGE up to speed',
+      label: 'Question 1',
+      question: 'What is your role in the conversation — your position or title?',
+      examples: 'Examples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
+    },
+    {
+      key: 'counterparty',
+      kicker: 'Room signal',
+      label: 'Question 2',
+      question: 'Who are you speaking with?',
+      examples: 'Examples: investor, hiring manager, doctor, customer, employee, client, board member, etc.',
+    },
+    {
+      key: 'desiredOutcome',
+      kicker: 'Outcome signal',
+      label: 'Question 3',
+      question: 'What do you want from this conversation?',
+      examples: 'Name the result you are trying to move toward.',
+    },
+    {
+      key: 'acceptableOutcome',
+      kicker: 'Settlement signal',
+      label: 'Question 4',
+      question: 'If your ideal outcome is not available, what would you settle for?',
+      examples: 'This helps GEORGE understand the floor, not just the target.',
+    },
+  ]
+
+  const currentPreLiveQuestion = showPreLiveSignalSurface
+    ? preLiveQuestions[preLiveSignalStep]
+    : null
+
+  const isPreLiveEarbudReady =
+    showPreLiveSignalSurface && preLiveSignalStep >= preLiveQuestions.length
+
+  const submitPreLiveSignalAnswer = () => {
+    const answer = input.trim()
+
+    if (!showPreLiveSignalSurface || !answer || !currentPreLiveQuestion) {
+      return false
+    }
+
+    const nextSignals = {
+      ...preLiveSignals,
+      [currentPreLiveQuestion.key]: answer,
+    }
+
+    setPreLiveSignals(nextSignals)
+
+    try {
+      window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(nextSignals))
+      window.localStorage.setItem(`GEORGE_PRE_LIVE_${currentPreLiveQuestion.key.toUpperCase()}`, answer)
+    } catch {}
+
+    setInput('')
+
+    const nextStep = preLiveSignalStep + 1
+
+    if (nextStep >= preLiveQuestions.length) {
+      setPreLiveSignalStep(preLiveQuestions.length)
+      setActivePromptContext('pre_live_signal_ready')
+      setActivePromptLabel('Earbuds Ready')
+      return true
+    }
+
+    setPreLiveSignalStep(nextStep)
+    setActivePromptContext('pre_live_signal_acquisition')
+    setActivePromptLabel(`Question ${nextStep + 1}`)
+
+    return true
+  }
 
   const enterLiveConversation = () => {
     if (liveMode) return
@@ -5032,14 +5112,7 @@ return (
   0%, 46% { opacity: 0.72; }
   47%, 100% { opacity: 0; }
 }
-`}
-
-
-@keyframes blink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0; }
-}
-</style>
+`}</style>
   
         
 
@@ -5369,8 +5442,8 @@ return (
           disabled={!voiceSupported || isThinking}
           className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${isListening ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
-          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">George</span>
-          {liveGeorgeEnabled ? 'on' : 'off'}
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
+          {'active'}
         </button>
         <button
           type="button"
@@ -5390,8 +5463,8 @@ return (
           }}
           className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
-          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Audio</span>
-          {voiceOn ? 'on' : 'off'}
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Chair</span>
+          {'loaded'}
         </button>
         <button
           type="button"
@@ -5403,29 +5476,29 @@ return (
           }}
           className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/46 transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
         >
-          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Pause</span>
-          hold
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Outcome</span>
+          {'loaded'}
         </button>
       </div>
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Cue</span>
-          {liveRoomActive ? 'room active' : 'awaiting room'}
-        </div>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Line</span>
-          {liveRoomActive ? 'ready line' : 'awaiting room'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Phrases</span>
+          default
         </div>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
-          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'monitoring' : 'awaiting room'}
+          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'tracking' : 'waiting'}
+        </div>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Status</span>
+          {liveRoomActive ? 'listening' : 'waiting'}
         </div>
       </div>
 
       <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
-        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveGeorgeEnabled && liveRoomActive ? 'Room active.' : 'GEORGE offline.'}</span>
-        <span>{liveGeorgeEnabled && liveRoomActive ? 'GEORGE is listening for steering language and room signal.' : 'Turn GEORGE on to activate the room.'}</span>
+        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveRoomActive ? 'Room active.' : 'Room waiting.'}</span>
+        <span>{liveRoomActive ? 'GEORGE is tracking pressure, room phrases, signal, and outcome.' : 'GEORGE is waiting for the room to activate.'}</span>
       </div>
     </div>
   </div>
@@ -5453,12 +5526,12 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || hasVisibleThread ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[210px] md:pb-[240px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
-{showMobileHero && !(forceLive || liveMode) && !hasUserMessageForSurface && (
+{showMobileHero && !(forceLive || liveMode) && (!hasUserMessageForSurface || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className="pointer-events-none fixed left-0 right-0 top-[112px] z-[30] mx-auto w-full max-w-[760px] px-5 md:top-[138px]"
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[112px] z-[30] mx-auto w-full max-w-[760px] px-5 md:top-[138px]`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -5479,9 +5552,63 @@ return (
         <p>
           Whatever you want to do, be or change — start here.
         </p>
+
+        {showPreLiveSignalSurface && (
+          <div className="mt-7 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
+            {!isPreLiveEarbudReady && currentPreLiveQuestion && (
+              <>
+                <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
+                  {currentPreLiveQuestion.kicker}
+                </div>
+
+                <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
+                  {currentPreLiveQuestion.label}
+                </div>
+
+                <div className="mt-3 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
+                  {currentPreLiveQuestion.question}
+                </div>
+
+                <div className="mt-3 text-[13px] leading-6 text-white/38">
+                  {currentPreLiveQuestion.examples}
+                </div>
+              </>
+            )}
+
+            {isPreLiveEarbudReady && (
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
+                  GEORGE has enough signal
+                </div>
+
+                <div className="mt-4 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
+                  Connect your earbuds, review the preview, then enter LIVE.
+                </div>              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   </section>
+)}
+
+{isPreLiveEarbudReady && (
+  <button
+    type="button"
+    onClick={() => {
+      window.location.assign('/george/live-entry')
+    }}
+    className="group fixed left-1/2 top-[66%] z-[180] flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border border-[#AEB6FF]/18 bg-[#AEB6FF]/[0.055] shadow-[0_0_34px_rgba(174,182,255,0.18)] transition hover:border-[#AEB6FF]/42 hover:bg-[#AEB6FF]/[0.09] hover:shadow-[0_0_42px_rgba(174,182,255,0.26)] active:scale-[0.98]"
+    aria-label="Open LIVE preview"
+  >
+    <span className="pointer-events-none absolute inset-0 rounded-full border border-white/0 transition group-hover:border-white/20" />
+    <span className="pointer-events-none absolute -inset-8 rotate-45 translate-x-[-130%] bg-gradient-to-r from-transparent via-white/18 to-transparent blur-sm transition duration-700 group-hover:translate-x-[130%]" />
+    <img
+      src="/1earbud.png"
+      alt=""
+      className="relative z-[1] h-14 w-14 object-contain opacity-90"
+    />
+  </button>
 )}
 
 {false && showTypingPrescription && !liveMode && (
@@ -5544,7 +5671,11 @@ return (
       GEORGE is working
     </div>
   )}
-  {(liveMode ? messages : forceLive ? [] : (messages.some((message) => message.role === 'user') ? messages : []))
+  {((forceLive || liveMode) ? messages.filter((message) => {
+  const clean = (message.content || '').trim()
+  if (message.role === 'assistant' && clean === greeting.trim()) return false
+  return true
+}) : (messages.some((message) => message.role === 'user') ? messages : []))
   .filter((m) => m.role !== 'system')
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
@@ -5784,58 +5915,11 @@ I am listening now. Speak naturally. I will respond ${
         }}
         className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-[#D7DBE4]/52 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
       >
-        Style · {resolvedAssistTone}
+        Room phrases · defaults
       </button>
     </div>
 
-    {(() => {
-      const shouldEmphasizePause =
-        /pressure|objection|opportunity|detected|rushing/i.test(adaptiveCueLabel || '') ||
-        /pause|slow|hold|stop explaining/i.test(m.content || '')
-
-      const shouldEmphasizeLine =
-        /say:|exact|line|respond/i.test(m.content || '') ||
-        resolvedOutputStyle === 'repeatable_lines'
-
-      const shouldSuppressExecution =
-        /listening|hold|do not speak|let them finish|silence/i.test(m.content || '') &&
-        !/say:|line|respond/i.test(m.content || '')
-
-      const controls = shouldSuppressExecution
-        ? ['Pause']
-        : shouldEmphasizePause
-          ? ['Pause', 'Line']
-          : shouldEmphasizeLine
-            ? ['Line', 'Shorter']
-            : ['Shorter', 'Line', 'Pause']
-
-      return controls.map((control) => (
-        <button
-          key={control}
-          type="button"
-          onClick={() => {
-            if (control === 'Shorter') {
-              void handleSend(`Make this response shorter. Return only the shorter version.\n\n${m.content}`)
-              return
-            }
-
-            if (control === 'Line') {
-              void handleSend(`Turn this into one exact speakable line. No cue. No backup.\n\n${m.content}`)
-              return
-            }
-
-            void handleSend('Pause. Hold. Do not give another line unless asked.')
-          }}
-          className={`rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 transition hover:bg-white/[0.035] hover:text-[#D7DBE4] ${
-            control === 'Pause' && shouldEmphasizePause
-              ? 'text-[#D7DBE4]/72'
-              : 'text-[#D7DBE4]/52'
-          }`}
-        >
-          {control}
-        </button>
-      ))
-    })()}
+    
 
   </div>
 )}
@@ -6144,7 +6228,26 @@ I am listening now. Speak naturally. I will respond ${
   <div className="mx-auto w-full max-w-[620px] px-3 pt-[18px] md:pt-[22px]">
     <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
-        {typedLiveEntryBriefing || liveEntryBriefing || "I'm listening..."}
+        {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
+      </div>
+
+      <div className="relative mt-2 min-h-6 cursor-text">
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={handleComposerKeyDown}
+          rows={1}
+          spellCheck={false}
+          autoCorrect="off"
+          autoCapitalize="off"
+          placeholder=""
+          className="w-full resize-none appearance-none border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:text-transparent focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+        />
+
+        {!input.trim() && (
+          <span className="pointer-events-none absolute left-0 top-[3px] h-[18px] w-px bg-[#D7DBE4]/60 [animation:georgeComposerCursorBlink_.48s_steps(1,end)_infinite]" />
+        )}
       </div>
     </div>
   </div>
@@ -6157,11 +6260,11 @@ I am listening now. Speak naturally. I will respond ${
 
             
 
-            <div className={`fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 ${"z-50"}`}>
+            <div className={`${(forceLive || liveMode) ? 'contents' : 'fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 z-50'}`}>
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
-                <div className={`pointer-events-auto relative flex items-center justify-center gap-6 px-4 py-2 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none backdrop-blur-0">
                   <button
                     type="button"
                     onClick={() => {
@@ -6670,12 +6773,12 @@ if (liveMode) {
     <div className="flex flex-col items-center gap-3 px-6 text-center animate-[pickerTwistUp_220ms_cubic-bezier(0.22,1,0.36,1)]">
       <div className="relative h-[122px] w-[122px]">
         <img
-          src="/earbudlive500.png"
+          src="/1earbud.png"
           alt=""
           className="absolute inset-0 h-full w-full object-contain opacity-45 blur-[1.2px]"
         />
         <img
-          src="/earbudlive500.png"
+          src="/1earbud.png"
           alt=""
           className="absolute inset-0 h-full w-full object-contain opacity-82 drop-shadow-[0_0_18px_rgba(174,182,255,0.18)] [clip-path:circle(35%_at_50%_50%)]"
         />
@@ -7125,8 +7228,12 @@ Continue from here, tell me what changed, or start fresh.`
 
 
 
-              <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
-              <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
+              {!(forceLive || liveMode) && (
+                <>
+                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
+                  <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
+                </>
+              )}
 
               
 
@@ -7151,7 +7258,7 @@ Continue from here, tell me what changed, or start fresh.`
 `}</style>
 
 {!liveMode && (isThinking || isSpeaking || bridgeThinking) && (
-  <div className="fixed bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none">
+  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[96px] left-0 right-0 z-[140] flex justify-center pointer-events-none`}>
     <div className="text-[10px] text-[#D7DBE4]/24 tracking-[0.16em]">
       <span className="inline-flex items-center gap-[5px]">
       </span>
@@ -7160,7 +7267,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {false && liveMode && stableLiveGuidance && (
-  <div className="fixed bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
+  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
     <div className="w-full max-w-[420px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 backdrop-blur-[10px]">
       {stableLiveGuidance && (
         <>
@@ -7202,7 +7309,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {false && liveMode && (
-  <div className="fixed bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]">
+  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
     <div className="relative flex items-center justify-center gap-6">
       <button
         type="button"
@@ -7336,9 +7443,9 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className="!fixed top-[57%] md:top-[60%] left-0 right-0 z-[80] -translate-y-1/2 bg-transparent px-2 py-0 flex flex-col items-stretch w-full max-w-[900px] mx-auto">
+<div className={`${(forceLive || liveMode) ? 'hidden' : `!fixed ${showPreLiveSignalSurface ? 'top-[76%] md:top-[72%]' : 'top-[57%] md:top-[60%]'} left-1/2 -translate-x-1/2 -translate-y-1/2`} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
-                    <div className="george-composer-shell relative flex-1 overflow-visible bg-transparent border-0 shadow-none">
+                    <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
                       <input
                         ref={fileInputRef}
@@ -7472,7 +7579,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="absolute left-1 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 md:h-8 md:w-8"
+                        className={`${(forceLive || liveMode) ? 'hidden' : 'absolute left-1 top-1/2 z-[2] flex'} h-10 w-10 -translate-y-1/2 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/82 md:h-8 md:w-8`}
                         aria-label="Upload file"
                       >
                         <svg
@@ -7491,20 +7598,35 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       <textarea
                         ref={textareaRef}
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleComposerKeyDown}
+                        onChange={(e) => {
+                          setInput(e.target.value)
+                        }}
+                        onKeyDown={(e) => {
+                          if (
+                            showPreLiveSignalSurface &&
+                            input.trim() &&
+                            e.key === 'Enter' &&
+                            !e.shiftKey
+                          ) {
+                            e.preventDefault()
+                            submitPreLiveSignalAnswer()
+                            return
+                          }
+
+                          handleComposerKeyDown(e)
+                        }}
                         placeholder=""
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className="min-h-[52px] w-full resize-none border-0 bg-transparent pl-14 pr-[92px] py-3 text-[16.5px] leading-[1.5] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-transparent focus:ring-0 md:min-h-[44px] md:pl-11 md:pr-[84px] md:py-2.5 md:text-[15.5px]"
+                        className={`${(forceLive || liveMode) ? 'min-h-[22px] pl-14 pr-[92px] py-0 md:min-h-[22px] md:pl-11 md:pr-[84px] md:py-0' : 'min-h-[42px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2'} w-full resize-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-transparent focus:ring-0 md:text-[15px]`}
                       />
 
                       {!input.trim() && (
-                        <span className="pointer-events-none absolute left-14 top-1/2 h-[13px] w-px -translate-y-1/2 [animation:georgeComposerCursorBlink_.58s_steps(1,end)_infinite] rounded-full bg-[#D7DBE4]/70 shadow-[0_0_12px_rgba(215,219,228,0.16)] md:left-11 md:h-5" />
+                        <span className="pointer-events-none absolute left-14 top-1/2 h-[15px] w-px -translate-y-1/2 [animation:georgeComposerCursorBlink_.48s_steps(1,end)_infinite] bg-[#D7DBE4]/58 md:left-11 md:h-[15px]" />
                       )}
 
-                      <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                      <div className={`${(forceLive || liveMode) ? 'hidden' : 'absolute right-1 top-1/2 flex'} -translate-y-1/2 items-center gap-2`}>
                         {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
                           <>
 
@@ -7538,9 +7660,10 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         <button
                           type="button"
                           onClick={() => {
+                            if (submitPreLiveSignalAnswer()) return
                             handleSend()
                           }}
-                          className="flex h-7 w-7 items-center justify-center rounded-full border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] text-[#D7DBE4]/78 shadow-[0_0_18px_rgba(174,182,255,0.055)] transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09] hover:text-white"
+                          className="flex h-8 w-8 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/42 transition hover:text-white"
                           aria-label="Send"
                         >
                           <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
