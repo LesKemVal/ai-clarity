@@ -7,87 +7,111 @@ export default function HomePage() {
   const router = useRouter()
   const [showLiveOptions, setShowLiveOptions] = useState(false)
 
+  const startLive = () => {
+    window.localStorage.setItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION', 'start')
+    router.push('/george?start=1')
+  }
+
   return (
-    <main className="min-h-[100dvh] bg-[#040507] text-white">
-      <div className="mx-auto flex min-h-[100dvh] max-w-[1080px] flex-col px-5 pb-10 pt-8 sm:px-8">
+    <main className="min-h-[100dvh] overflow-hidden bg-[#040507] text-white">
+      <div className="mx-auto flex min-h-[100dvh] max-w-[1120px] flex-col px-5 pb-8 pt-7 sm:px-8">
         <header className="flex items-center justify-between">
-          <img src="/logofav.png" alt="Bx" className="h-9 w-9 object-contain opacity-90" />
-          <div className="text-[10px] uppercase tracking-[0.28em] text-white/24">
-            Intelligent Utility
-          </div>
-        </header>
-
-        <section className="mt-20 max-w-[840px]">
-          <h1 className="text-[56px] font-semibold leading-[0.9] tracking-[-0.065em] text-white md:text-[92px]">
-            GEORGE
-          </h1>
-
-          <p className="mt-7 max-w-[780px] text-[21px] leading-8 text-white/66 md:text-[24px] md:leading-9">
-            Increase the probability of getting more of what you want by improving your conversation.
-          </p>
-        </section>
-
-        <section className="mt-12 max-w-[860px]">
-          <p className="text-[20px] leading-8 text-white/86">
-            Master GEORGE and maximize the benefit of articulate, mature presentation.
-          </p>
-
-          <p className="mt-5 text-[15px] leading-8 text-white/62">
-            Better understanding is useful.
-            <br />
-            Better presentation changes outcomes.
-          </p>
-        </section>
-
-        <div className="mt-9 grid w-full max-w-[520px] grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => router.push('/george')}
-            className="flex h-14 flex-1 items-center justify-center rounded-[1rem] border border-[#AAB4FF]/18 bg-[#AAB4FF]/[0.08] px-5 text-[14px] font-semibold text-[#D7DCFF] transition hover:bg-[#AAB4FF]/[0.12]"
+            className="flex items-center gap-3 text-left"
+            aria-label="Open GEORGE"
           >
-            Open GEORGE
+            <img src="/logofav.png" alt="Bx" className="h-9 w-9 object-contain opacity-90" />
+            <span className="hidden text-[10px] uppercase tracking-[0.28em] text-white/28 sm:block">
+              BRANESx
+            </span>
           </button>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowLiveOptions((value) => !value)}
-              className="flex h-14 w-full items-center justify-center rounded-[1rem] border border-white/[0.07] bg-white/[0.018] px-5 text-[14px] font-semibold text-white/72 transition hover:bg-white/[0.035] hover:text-white"
-            >
-              Enter LIVE
-            </button>
+          <button
+            type="button"
+            onClick={() => router.push('/george')}
+            className="text-[10px] uppercase tracking-[0.28em] text-white/28 transition hover:text-white/58"
+          >
+            Open
+          </button>
+        </header>
 
-            {showLiveOptions && (
-              <div className="absolute left-0 top-full z-20 mt-2 w-full min-w-[210px] rounded-[1rem] border border-white/[0.07] bg-[#070A0F]/96 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+        <section className="flex flex-1 flex-col justify-center pb-8 pt-16">
+          <div className="max-w-[860px]">
+            <div className="mb-5 text-[10px] uppercase tracking-[0.34em] text-[#AEB6FF]/42">
+              Intelligent utility
+            </div>
+
+            <h1 className="text-[58px] font-semibold leading-[0.88] tracking-[-0.07em] text-white md:text-[104px]">
+              GEORGE
+            </h1>
+
+            <p className="mt-8 max-w-[780px] text-[20px] leading-8 tracking-[-0.01em] text-white/72 md:text-[25px] md:leading-9">
+              Ask, prepare, or take GEORGE into the room when words matter.
+            </p>
+
+            <p className="mt-5 max-w-[680px] text-[14px] leading-7 text-white/46 md:text-[15px] md:leading-8">
+              Use GEORGE for decisions, preparation, interviews, negotiations, meetings, presentations, and difficult conversations.
+            </p>
+
+            <div className="mt-10 flex w-full max-w-[560px] flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => router.push('/george')}
+                className="flex h-14 flex-1 items-center justify-center rounded-[1rem] border border-[#AEB6FF]/18 bg-[#AEB6FF]/[0.075] px-5 text-[13px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/86 transition hover:border-[#AEB6FF]/30 hover:bg-[#AEB6FF]/[0.11] hover:text-white"
+              >
+                Ask GEORGE
+              </button>
+
+              <div className="relative flex-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    window.localStorage.setItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION', 'start')
-                    router.push('/george?start=1')
-                  }}
-                  className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/74 transition hover:bg-white/[0.045] hover:text-white"
+                  onClick={() => setShowLiveOptions((value) => !value)}
+                  className="flex h-14 w-full items-center justify-center rounded-[1rem] border border-white/[0.08] bg-transparent px-5 text-[13px] font-semibold uppercase tracking-[0.18em] text-white/68 transition hover:border-white/[0.15] hover:text-white"
                 >
-                  Start New LIVE
+                  LIVE GEORGE
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => router.push('/live?resume=1')}
-                  className="mt-1 block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/52 transition hover:bg-white/[0.045] hover:text-white"
-                >
-                  Resume LIVE
-                </button>
+                {showLiveOptions && (
+                  <div className="absolute left-0 top-full z-20 mt-2 w-full min-w-[230px] rounded-[1rem] border border-white/[0.07] bg-[#070A0F]/96 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl">
+                    <button
+                      type="button"
+                      onClick={startLive}
+                      className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.045] hover:text-white"
+                    >
+                      Start new LIVE
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => router.push('/george/live')}
+                      className="mt-1 block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/48 transition hover:bg-white/[0.045] hover:text-white"
+                    >
+                      Resume LIVE
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            <div className="mt-10 grid max-w-[820px] gap-2 text-[12px] leading-6 text-white/38 sm:grid-cols-3">
+              <div className="border-l border-white/[0.07] pl-4">
+                Prepare what to say.
+              </div>
+              <div className="border-l border-white/[0.07] pl-4">
+                Improve how you present.
+              </div>
+              <div className="border-l border-white/[0.07] pl-4">
+                Stay steady in real time.
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="mt-10 w-full max-w-[760px] overflow-x-auto whitespace-nowrap text-[11px] uppercase tracking-[0.24em] text-white/32 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          Interviews • Meetings • Negotiations • Presentations • Boardrooms • Sales Calls • Difficult Conversations
-        </div>
-
-        <footer className="mt-auto pt-16 text-center text-[10px] uppercase tracking-[0.32em] text-white/18">
-          Direction → Action → Signal
+        <footer className="flex items-center justify-between gap-4 border-t border-white/[0.04] pt-5 text-[10px] uppercase tracking-[0.28em] text-white/20">
+          <span>Direction → Action → Signal</span>
+          <span className="hidden sm:inline">Normal · LIVE · Continuity</span>
         </footer>
       </div>
     </main>
