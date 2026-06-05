@@ -5306,8 +5306,8 @@ return (
                       type="button"
                       onClick={handleShareGeorge}
                       className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
-                      aria-label="Send GEORGE context"
-                      title="Send GEORGE context"
+                      aria-label="Share GEORGE context"
+                      title="Share GEORGE context"
                     >
                       <div className="flex items-center gap-2">
                         <svg
@@ -5324,7 +5324,7 @@ return (
                         </svg>
 
                         <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                          Send
+                          Share
                         </span>
                       </div>
                     </button>
@@ -5335,11 +5335,11 @@ return (
                     type="button"
                     onClick={handleShareGeorge}
                     className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
-                    aria-label="Send GEORGE context"
-                    title="Send GEORGE context"
+                    aria-label="Share GEORGE context"
+                    title="Share GEORGE context"
                   >
                     <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
-                      Send
+                      Share
                     </span>
                   </button>
 
@@ -5410,12 +5410,12 @@ return (
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
           <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
-            LIVE GEORGE
+            GEORGE is {currentTier}
           </span>
         </div>
 
         <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
-          {!liveGeorgeEnabled ? 'offline' : liveRoomReceiving ? 'receiving' : liveRoomActive ? 'listening' : 'ready'}
+          {liveRoomActive ? 'room active' : 'room inactive'}
         </span>
       </div>
 
@@ -7664,7 +7664,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                             handleSend()
                           }}
                           className="flex h-8 w-8 items-center justify-center border-0 bg-transparent text-[#D7DBE4]/42 transition hover:text-white"
-                          aria-label="Send"
+                          aria-label="Share"
                         >
                           <svg viewBox="0 0 24 24" className="h-4.5 w-4.5 fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 19V5"/>
