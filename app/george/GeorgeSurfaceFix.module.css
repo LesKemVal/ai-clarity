@@ -1,0 +1,21 @@
+.georgeSurfaceFixScope :global(button[aria-label="Try LIVE GEORGE"])::after,
+.georgeSurfaceFixScope :global(button[title="Try LIVE GEORGE"])::after {
+  content: "";
+}
+
+@media (max-width: 767px) {
+  .georgeSurfaceFixScope {
+    padding-bottom: 180px;
+  }
+
+  .georgeSurfaceFixScope :global(.fixed.bottom-\[88px\]) {
+    bottom: 108px !important;
+  }
+
+  .georgeSurfaceFixScope :global(textarea) {
+    min-height: 56px;
+    line-height: 1.45 !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+}
