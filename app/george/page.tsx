@@ -4935,6 +4935,7 @@ responseTimerRef.current = setTimeout(() => {
   const showMobileHero = !(forceLive || liveMode) && normalUserTurnCount <= 14
   const showGeorgeHeroTitle = normalUserTurnCount <= 8
   const showGeorgeHeroTagline = normalUserTurnCount <= 3
+  const showGeorgeSupportCopy = normalUserTurnCount === 0
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
 
   const shouldKeepHeroVisible =
@@ -5542,7 +5543,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[112px] z-[30] mx-auto w-full max-w-[760px] px-5 md:top-[138px]`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} relative mx-auto w-full max-w-[760px] px-5 pt-6 md:pt-10`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -5567,12 +5568,16 @@ return (
             ) : (
               <>
                 <span className="block">Start with your desired outcome.</span>
-                <span className="mt-3 block text-[13px] leading-6 text-[#D7DBE4]/42">
-                  Conversation moves trust, money, care, conflict, opportunity, and work.
-                </span>
-                <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58">
-                  GEORGE turns words into movement.
-                </span>
+                {showGeorgeSupportCopy && (
+                  <>
+                    <span className="mt-3 block text-[13px] leading-6 text-[#D7DBE4]/42">
+                      Conversation moves trust, money, care, conflict, opportunity, and work.
+                    </span>
+                    <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58">
+                      GEORGE turns words into movement.
+                    </span>
+                  </>
+                )}
               </>
             )}
           </p>
@@ -5932,20 +5937,6 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-
-          {m.constrained && (
-            <div className="mt-2 flex items-center gap-1.5">
-              <div className="flex items-center gap-1.5 pl-1">
-                <span className="h-1 w-4 rounded-full bg-white " />
-                <span className="h-1 w-4 rounded-full bg-white " />
-                <span className="h-1 w-4 rounded-full bg-white " />
-              </div>
-              <span className="text-xs text-[#D7DBE4]/72">
-                Continue from here.
-              </span>
-            </div>
-          )}
-
           {!liveMode && !isWelcomeAssistant &&
             !liveMode && (
           <div className="flex items-center gap-3 flex-nowrap overflow-x-auto text-[11px] text-[#D7DBE4]/50">
@@ -6263,14 +6254,14 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-[150px] md:h-[170px]'}`} />
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-6 md:h-8'}`} />
 
 </div>
 
 
             
 
-            <div className={`${(forceLive || liveMode) ? 'contents' : 'fixed bottom-0 md:bottom-0 left-0 right-0 w-full xl:pl-[280px] flex-col bg-black flex transition duration-200 z-50'}`}>
+            <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
               <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
@@ -7453,7 +7444,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : `!fixed ${showPreLiveSignalSurface ? 'top-[76%] md:top-[72%]' : 'top-[57%] md:top-[60%]'} left-1/2 -translate-x-1/2 -translate-y-1/2`} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'hidden' : 'relative mx-auto mt-6 mb-[160px]'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
