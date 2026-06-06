@@ -5,17 +5,18 @@
 
 @media (max-width: 767px) {
   .georgeSurfaceFixScope {
-    padding-bottom: 180px;
+    padding-bottom: 260px;
   }
 
+  /* Normal GEORGE has two fixed bottom systems: utility rail and composer.
+     Keep the rail above the composer so it never sits behind the input shell. */
   .georgeSurfaceFixScope :global(.fixed.bottom-\[88px\]) {
-    bottom: 108px !important;
+    bottom: 205px !important;
   }
 
+  /* Do not force the normal composer textarea tall. LIVE's cursor works because
+     its text line is simple; normal mode should not inherit a fake tall textarea. */
   .georgeSurfaceFixScope :global(textarea) {
-    min-height: 56px;
-    line-height: 1.45 !important;
-    padding-top: 14px !important;
-    padding-bottom: 14px !important;
+    line-height: 24px !important;
   }
 }
