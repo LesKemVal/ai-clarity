@@ -6223,38 +6223,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-{!(forceLive || liveMode) && hasUserMessageForSurface && !showPreLiveSignalSurface && (
-  <div className="mx-auto mt-6 flex w-full max-w-[620px] justify-center px-3">
-    <button
-      type="button"
-      onClick={() => {
-        const prompt: Message = {
-          role: 'assistant',
-          content: `Before we move toward LIVE:
-
-What do you want me to do here?
-
-Practice, prepare, or accompany you in the room?`
-        }
-
-        setMessages((prev) => {
-          const next = [...prev, prompt]
-          messagesRef.current = next
-          return next
-        })
-
-        window.setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        }, 80)
-      }}
-      className="group flex h-16 w-16 items-center justify-center rounded-full border border-[#AEB6FF]/16 bg-[#AEB6FF]/[0.045] shadow-[0_0_28px_rgba(174,182,255,0.14)] transition hover:border-[#AEB6FF]/34 hover:bg-[#AEB6FF]/[0.08] active:scale-[0.98]"
-      aria-label="Ask GEORGE about LIVE"
-      title="Ask GEORGE about LIVE"
-    >
-      <img src="/1earbud.png" alt="" className="h-11 w-11 object-contain opacity-88 transition group-hover:opacity-100" />
-    </button>
-  </div>
-)}
+{false && null}
 
 {(forceLive || liveMode) && (forceLive || messages.length === 0) && (
   <div className="mx-auto w-full max-w-[620px] px-3 pt-[18px] md:pt-[22px]">
