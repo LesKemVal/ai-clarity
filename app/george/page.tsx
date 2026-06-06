@@ -4993,8 +4993,7 @@ useEffect(() => {
     ? preLiveQuestions[preLiveSignalStep]
     : null
 
-  const isPreLiveEarbudReady =
-    showPreLiveSignalSurface && preLiveSignalStep >= preLiveQuestions.length
+  const isPreLiveEarbudReady = false
 
   const submitPreLiveSignalAnswer = () => {
     const answer = input.trim()
@@ -5021,8 +5020,8 @@ useEffect(() => {
 
     if (nextStep >= preLiveQuestions.length) {
       setPreLiveSignalStep(preLiveQuestions.length)
-      setActivePromptContext('pre_live_signal_ready')
-      setActivePromptLabel('Earbuds Ready')
+      setActivePromptContext(null)
+      setActivePromptLabel(null)
       return true
     }
 
@@ -5555,7 +5554,7 @@ return (
         {showGeorgeHeroTagline && (
           <p>
             {showPreLiveSignalSurface ? (
-              'Give GEORGE enough signal to enter LIVE.'
+              'Start with your desired outcome.'
             ) : (
               <>
                 <span className="block">Start with your desired outcome.</span>
@@ -5609,24 +5608,7 @@ return (
   </section>
 )}
 
-{isPreLiveEarbudReady && (
-  <button
-    type="button"
-    onClick={() => {
-      window.location.assign('/george/live-entry')
-    }}
-    className="group fixed left-1/2 top-[66%] z-[180] flex h-20 w-20 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border border-[#AEB6FF]/18 bg-[#AEB6FF]/[0.055] shadow-[0_0_34px_rgba(174,182,255,0.18)] transition hover:border-[#AEB6FF]/42 hover:bg-[#AEB6FF]/[0.09] hover:shadow-[0_0_42px_rgba(174,182,255,0.26)] active:scale-[0.98]"
-    aria-label="Open LIVE preview"
-  >
-    <span className="pointer-events-none absolute inset-0 rounded-full border border-white/0 transition group-hover:border-white/20" />
-    <span className="pointer-events-none absolute -inset-8 rotate-45 translate-x-[-130%] bg-gradient-to-r from-transparent via-white/18 to-transparent blur-sm transition duration-700 group-hover:translate-x-[130%]" />
-    <img
-      src="/1earbud.png"
-      alt=""
-      className="relative z-[1] h-14 w-14 object-contain opacity-90"
-    />
-  </button>
-)}
+{false && null}
 
 {false && showTypingPrescription && !liveMode && (
     <TypingPrescriptionSurface />
