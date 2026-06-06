@@ -5283,7 +5283,7 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y">
-          <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[98px] xl:pl-[280px] xl:pr-12">
+          <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[78px] xl:pl-[280px] xl:pr-12">
             <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 {!showSidebar && (
@@ -5543,7 +5543,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} relative mx-auto w-full max-w-[760px] px-5 pt-6 md:pt-10`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} relative mx-auto w-full max-w-[760px] px-5 pt-1 md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -6254,7 +6254,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-6 md:h-8'}`} />
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-2 md:h-3'}`} />
 
 </div>
 
@@ -7444,7 +7444,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : 'relative mx-auto mt-6 mb-[160px]'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'hidden' : 'relative mx-auto mt-3 mb-[112px]'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
