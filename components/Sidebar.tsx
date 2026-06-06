@@ -404,18 +404,12 @@ return (
               </button>
             </div>
 
-            <div className="mt-4 px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+            <div className="mt-4 px-3 text-[11px] uppercase tracking-[0.2em] text-white/28">
               Support
             </div>
 
-            <div className="mt-2 space-y-0.5">
-              <a href="/images" className={linkClass('/images')}>
-                Visual Context
-              </a>
-              <a href="/signal" className={linkClass('/signal')}>
-                Reference
-              </a>
-              <a href="/help" className={linkClass('/help', true)}>
+            <div className="mt-2 space-y-1">
+              <a href="/help" className={linkClass('/help')}>
                 Help
               </a>
             </div>
