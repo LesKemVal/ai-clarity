@@ -4931,7 +4931,10 @@ responseTimerRef.current = setTimeout(() => {
   const hasDraftInput = input.trim().length > 0
   const isPreLiveSignalAcquisition = activePromptContext === 'pre_live_signal_acquisition'
   const showConversation = hasDraftInput || liveMode || (hasVisibleThread && !isPreLiveSignalAcquisition)
-  const showMobileHero = !(forceLive || liveMode) && messages.length <= 1
+  const normalUserTurnCount = messages.filter((message) => message.role === 'user').length
+  const showMobileHero = !(forceLive || liveMode) && normalUserTurnCount <= 14
+  const showGeorgeHeroTitle = normalUserTurnCount <= 8
+  const showGeorgeHeroTagline = normalUserTurnCount <= 3
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
   const showIdleGeorgeSurface =
     showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !pendingImage && (!hasUserMessageForSurface || isPreLiveSignalAcquisition)
@@ -5548,10 +5551,24 @@ return (
 
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
-        <h1>GEORGE</h1>
-        <p>
-          Whatever you want to do, be or change — start here.
-        </p>
+        {showGeorgeHeroTitle && <h1>GEORGE</h1>}
+        {showGeorgeHeroTagline && (
+          <p>
+            {showPreLiveSignalSurface ? (
+              'Give GEORGE enough signal to enter LIVE.'
+            ) : (
+              <>
+                <span className="block">Start with your desired outcome.</span>
+                <span className="mt-3 block text-[13px] leading-6 text-[#D7DBE4]/42">
+                  Conversation moves trust, money, care, conflict, opportunity, and work.
+                </span>
+                <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58">
+                  GEORGE turns words into movement.
+                </span>
+              </>
+            )}
+          </p>
+        )}
 
         {showPreLiveSignalSurface && (
           <div className="mt-7 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
@@ -6221,6 +6238,39 @@ I am listening now. Speak naturally. I will respond ${
       </button>
 
     </div>
+  </div>
+)}
+
+{!(forceLive || liveMode) && hasUserMessageForSurface && !showPreLiveSignalSurface && (
+  <div className="mx-auto mt-6 flex w-full max-w-[620px] justify-center px-3">
+    <button
+      type="button"
+      onClick={() => {
+        const prompt: Message = {
+          role: 'assistant',
+          content: `Before we move toward LIVE:
+
+What do you want me to do here?
+
+Practice, prepare, or accompany you in the room?`
+        }
+
+        setMessages((prev) => {
+          const next = [...prev, prompt]
+          messagesRef.current = next
+          return next
+        })
+
+        window.setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        }, 80)
+      }}
+      className="group flex h-16 w-16 items-center justify-center rounded-full border border-[#AEB6FF]/16 bg-[#AEB6FF]/[0.045] shadow-[0_0_28px_rgba(174,182,255,0.14)] transition hover:border-[#AEB6FF]/34 hover:bg-[#AEB6FF]/[0.08] active:scale-[0.98]"
+      aria-label="Ask GEORGE about LIVE"
+      title="Ask GEORGE about LIVE"
+    >
+      <img src="/1earbud.png" alt="" className="h-11 w-11 object-contain opacity-88 transition group-hover:opacity-100" />
+    </button>
   </div>
 )}
 

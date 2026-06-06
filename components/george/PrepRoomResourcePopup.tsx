@@ -119,7 +119,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
               <button
                 onClick={() => {
                   window.localStorage.setItem('george_deploy_live_source', 'prep-room')
-                  window.location.href = '/george/deploy-live'
+                  window.location.href = '/george/live-entry'
                 }}
                 className="px-1 py-1 text-[11px] uppercase tracking-[0.18em] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF]"
               >
