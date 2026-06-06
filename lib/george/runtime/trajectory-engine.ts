@@ -1,0 +1,72 @@
+export type TrajectoryAssessment = {
+  currentMove: string
+  likelyNextMoves: string[]
+  potentialFutureNeeds: string[]
+  confidence: number
+}
+
+export function assessTrajectory(input: {
+  latestUserText: string
+  objectiveKnown?: boolean
+  signalUsable?: boolean
+}): TrajectoryAssessment {
+  const text = String(input.latestUserText || '').toLowerCase()
+  const moves: string[] = []
+  const needs: string[] = []
+
+  let currentMove = input.objectiveKnown
+    ? 'advance the stated outcome'
+    : 'acquire the desired outcome'
+
+  if (/founder|startup|business|company|product/.test(text)) {
+    currentMove = 'shape the business path'
+    moves.push('clarify positioning', 'prepare proof', 'identify the next audience')
+    needs.push('brief', 'visual', 'deck')
+  }
+
+  if (/investor|capital|funding|raise|pitch/.test(text)) {
+    currentMove = 'prepare capital movement'
+    moves.push('tighten the story', 'prepare investor material', 'prepare the conversation')
+    needs.push('deck', 'visual', 'brief', 'live')
+  }
+
+  if (/meeting|call|interview|negotiation|client|board|doctor/.test(text)) {
+    moves.push('prepare the room', 'define the desired outcome', 'prepare usable language')
+    needs.push('live', 'brief')
+  }
+
+  if (/visual|diagram|slide|deck|website|hero|explain|show/.test(text)) {
+    moves.push('turn the idea into a visual explanation')
+    needs.push('visual', 'diagram', 'presentation')
+  }
+
+  if (/timeline|deadline|roadmap|milestone|schedule/.test(text)) {
+    moves.push('sequence the work')
+    needs.push('timeline')
+  }
+
+  if (/numbers|budget|forecast|model|price|cost/.test(text)) {
+    moves.push('model the numbers')
+    needs.push('spreadsheet')
+  }
+
+  return {
+    currentMove,
+    likelyNextMoves: Array.from(new Set(moves)).slice(0, 3),
+    potentialFutureNeeds: Array.from(new Set(needs)).slice(0, 5),
+    confidence: input.objectiveKnown && input.signalUsable ? 0.68 : 0.28,
+  }
+}
+
+export function buildTrajectoryNote(assessment: TrajectoryAssessment) {
+  return `
+TRAJECTORY ENGINE
+- Current move: ${assessment.currentMove}
+- Likely next moves: ${assessment.likelyNextMoves.join('; ') || 'unknown'}
+- Potential future needs: ${assessment.potentialFutureNeeds.join('; ') || 'unknown'}
+- Confidence: ${assessment.confidence.toFixed(2)}
+- Advisory only. Do not override the active task, current runtime, or explicit user direction.
+- GEORGE should stay a couple moves ahead and may surface a few likely next moves because the user may not have shared everything.
+- Use trajectory across LIVE, visuals, documents, decks, diagrams, timelines, spreadsheets, briefs, presentations, and taglines.
+`.trim()
+}

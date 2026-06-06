@@ -64,6 +64,7 @@ import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-lear
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
+import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -835,6 +836,14 @@ LANGUAGE MODE: SPANISH
 
     const liveRecommendationNote = buildLiveRecommendationNote(liveRecommendation)
 
+    const trajectoryAssessment = assessTrajectory({
+      latestUserText: latestUserRaw,
+      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
+      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
+    })
+
+    const trajectoryNote = buildTrajectoryNote(trajectoryAssessment)
+
 
 
     const responseShape = getCurrentResponseShape({
@@ -893,6 +902,7 @@ LANGUAGE MODE: SPANISH
       (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
       (judgmentSurfaceNote ? `\n\n${judgmentSurfaceNote}\n\n` : '') +
       (liveRecommendationNote ? `\n\n${liveRecommendationNote}\n\n` : '') +
+      (trajectoryNote ? `\n\n${trajectoryNote}\n\n` : '') +
       (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
       (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
       (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
