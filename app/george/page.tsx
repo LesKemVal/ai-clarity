@@ -4936,15 +4936,24 @@ responseTimerRef.current = setTimeout(() => {
   const showGeorgeHeroTitle = normalUserTurnCount <= 8
   const showGeorgeHeroTagline = normalUserTurnCount <= 3
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
+
+  const shouldKeepHeroVisible =
+    normalUserTurnCount < 4
+
   const showIdleGeorgeSurface =
-    showMobileHero && !(forceLive || liveMode) && !hasDraftInput && !pendingImage && (!hasUserMessageForSurface || isPreLiveSignalAcquisition)
+    showMobileHero &&
+    !(forceLive || liveMode) &&
+    !hasDraftInput &&
+    !pendingImage &&
+    (shouldKeepHeroVisible || isPreLiveSignalAcquisition)
 
   const showDesktopOperationalSurface =
     !hasUserMessageForSurface
 
-
   const showTypingPrescription =
-    hasDraftInput && !pendingImage && !hasUserMessageForSurface
+    hasDraftInput &&
+    !pendingImage &&
+    shouldKeepHeroVisible
 
   const isRuntimeTransitioning =
     hasVisibleThread ||
@@ -5530,7 +5539,7 @@ return (
   }}
   className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
-{showMobileHero && !(forceLive || liveMode) && (!hasUserMessageForSurface || showPreLiveSignalSurface) && (
+{showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
     className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[112px] z-[30] mx-auto w-full max-w-[760px] px-5 md:top-[138px]`}
