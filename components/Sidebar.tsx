@@ -326,7 +326,7 @@ export default function Sidebar({
   }
 
   const linkClass = (path: string, compact = false) =>
-    `block rounded-[0.45rem] px-3 py-0.5 text-[11px] leading-4 transition ${
+    `block rounded-[0.45rem] px-3 py-0.5 text-[13px] leading-5 transition ${
       `${compact ? 'px-3 py-0.5 text-[10px] leading-4' : ''} ${pathname === path ? 'bg-white/[0.026] text-white/82' : 'text-white/48 hover:bg-white/[0.012] hover:text-white/68'}`
     }`
 
@@ -435,7 +435,7 @@ return (
                 <button
                   type="button"
                   onClick={createGoalCheck}
-                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[12px] text-white/58 transition hover:bg-white/[0.014] hover:text-white/78"
+                  className="block w-full rounded-[0.55rem] px-3 py-2 text-left text-[13px] text-white/62 transition hover:bg-white/[0.014] hover:text-white/78"
                 >
                   + New Objective
                 </button>
@@ -488,7 +488,7 @@ return (
                       onClick={() => openNormalSession(session)}
                       className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/56 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -622,7 +622,7 @@ return (
                       onClick={() => openLiveSession(session)}
                       className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-[0.45rem] py-1 pl-2 pr-8 text-left transition"
                     >
-                      <span className="min-w-0 flex-1 truncate text-[12px] leading-5 text-white/46 group-hover:text-white/68">
+                      <span className="min-w-0 flex-1 truncate text-[13px] leading-5 text-white/56 group-hover:text-white/68">
                         {getSessionTitle(session)}
                       </span>
                     </button>
@@ -733,7 +733,7 @@ return (
                           {todo.text}
                         </span>
                         {todo.done && todo.completionNote && (
-                          <span className="mt-1 block text-[11px] leading-4 text-white/32">
+                          <span className="mt-1 block text-[13px] leading-5 text-white/32">
                             Proof: {todo.completionNote}
                           </span>
                         )}
