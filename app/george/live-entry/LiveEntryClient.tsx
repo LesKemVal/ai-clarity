@@ -1105,7 +1105,7 @@ export default function LiveEntryClient() {
 
     window.localStorage.setItem('george_live_prep_inputs_cleared', '1')
 
-    window.location.href = '/george/live'
+    window.location.href = '/george/live?ready=1'
   }
 
   if (!ready) return null
