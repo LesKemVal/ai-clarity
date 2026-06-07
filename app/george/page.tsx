@@ -2384,6 +2384,14 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     if (typeof window === 'undefined') return
 
     const params = new URLSearchParams(window.location.search)
+
+    if (params.get('start') === '1') {
+      window.history.replaceState({}, '', '/george')
+      window.localStorage.setItem('george_start_new_live', '1')
+      window.location.href = '/george/live-entry?source=start'
+      return
+    }
+
     if (params.get('live') !== '1') return
 
     const shouldResume = params.get('resume') === '1'
@@ -4932,14 +4940,14 @@ responseTimerRef.current = setTimeout(() => {
   const isPreLiveSignalAcquisition = activePromptContext === 'pre_live_signal_acquisition'
   const showConversation = hasDraftInput || liveMode || (hasVisibleThread && !isPreLiveSignalAcquisition)
   const normalUserTurnCount = messages.filter((message) => message.role === 'user').length
-  const showMobileHero = !(forceLive || liveMode) && normalUserTurnCount <= 14
-  const showGeorgeHeroTitle = normalUserTurnCount <= 8
-  const showGeorgeHeroTagline = normalUserTurnCount <= 3
+  const showMobileHero = !(forceLive || liveMode) && normalUserTurnCount === 0
+  const showGeorgeHeroTitle = true
+  const showGeorgeHeroTagline = normalUserTurnCount === 0
   const showGeorgeSupportCopy = normalUserTurnCount === 0
   const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
 
   const shouldKeepHeroVisible =
-    normalUserTurnCount < 4
+    normalUserTurnCount === 0
 
   const showIdleGeorgeSurface =
     showMobileHero &&
@@ -5406,12 +5414,15 @@ return (
 
             
 
-{!showMobileHero && (
-  <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 md:hidden">
+{!showMobileHero && !(forceLive || liveMode) && (
+  <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 md:hidden">
+    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#D7DBE4]/62">
+      GEORGE
+    </span>
   </div>
 )}
-{false && !(forceLive || liveMode) && hasVisibleThread && (
-  <></>
+{false && !(forceLive || liveMode) && (
+  <div className="pointer-events-none fixed left-0 right-0 top-[168px] z-[34] h-[96px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/92 to-transparent" />
 )}
 {(forceLive || liveMode) && (
   <>
@@ -5538,12 +5549,12 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 overflow-hidden overflow-x-hidden touch-pan-y px-3 md:min-h-0 md:overflow-y-auto md:overscroll-y-contain md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[252px] md:pt-[264px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} relative mx-auto w-full max-w-[760px] px-5 pt-1 md:pt-4`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -5711,10 +5722,6 @@ return (
               ? 'max-w-full text-left rounded-[1.15rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
               : 'message-assistant max-w-full text-left px-1 py-2')
 
-        } ${
-          !expandedMessages[i] && (m.content || '').length > 420
-            ? 'max-h-[220px] overflow-hidden'
-            : ''
         }`}
       >
         {m.role === 'assistant' ? (
@@ -5736,7 +5743,7 @@ return (
         )}
       </div>
 
-      {(m.content || '').length > 420 && (
+      {false && (m.content || '').length > 420 && (
         <button
           type="button"
           onClick={() =>
@@ -6264,7 +6271,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[88px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
+              <div className={`fixed bottom-[42px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
                 <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none backdrop-blur-0">
                   <button
                     type="button"
@@ -7231,8 +7238,8 @@ Continue from here, tell me what changed, or start fresh.`
 
               {!(forceLive || liveMode) && (
                 <>
-                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[88px] bg-[#0B0D12]" />
-                  <div className="pointer-events-none fixed bottom-[112px] left-0 right-0 xl:left-[280px] z-[55] h-[48px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
+                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[212px] bg-[#0B0D12]" />
+                  <div className="pointer-events-none fixed bottom-[196px] left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
                 </>
               )}
 
@@ -7444,7 +7451,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : 'relative mx-auto mt-3 mb-[112px]'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[132px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
