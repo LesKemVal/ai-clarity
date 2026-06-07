@@ -380,6 +380,7 @@ export default function LiveEntryClient() {
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] = useState('')
   const [exampleIndex, setExampleIndex] = useState(0)
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
+  const [founderAccessReady, setFounderAccessReady] = useState(false)
 
   const toggleChair = (value: string) => {
     setChairs((current) => {
@@ -648,11 +649,13 @@ export default function LiveEntryClient() {
     const cached = readCachedGeorgeSessionAuthority()
     setTier(cached.tier)
     setSessionEmail(cached.email || '')
+    setFounderAccessReady(Boolean(cached.authenticated && cached.liveAccess && cached.source === 'founder'))
 
     fetchGeorgeSessionAuthority()
       .then((authority) => {
         setTier(authority.tier)
         setSessionEmail(authority.email || '')
+        setFounderAccessReady(Boolean(authority.authenticated && authority.liveAccess && authority.source === 'founder'))
       })
       .catch(() => {})
 
@@ -696,12 +699,20 @@ export default function LiveEntryClient() {
       const params = new URLSearchParams(window.location.search)
       const acquiredSignalsForAccess = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
 
+      const isFreshLiveStart =
+        window.localStorage.getItem('george_start_new_live') === '1' ||
+        params.get('source') === 'home' ||
+        params.get('source') === 'start' ||
+        params.get('source') === 'founder'
+
       const preLiveReady =
-        window.localStorage.getItem('GEORGE_PRE_LIVE_PREVIEW_READY') === '1' ||
-        params.get('devPreview') === '1' ||
-        Object.keys(acquiredSignalsForAccess).length > 0 ||
-        Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
-        Boolean(window.localStorage.getItem('george_live_setup_active'))
+        !isFreshLiveStart && (
+          window.localStorage.getItem('GEORGE_PRE_LIVE_PREVIEW_READY') === '1' ||
+          params.get('devPreview') === '1' ||
+          Object.keys(acquiredSignalsForAccess).length > 0 ||
+          Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
+          Boolean(window.localStorage.getItem('george_live_setup_active'))
+        )
 
       setPreLivePreviewReady(preLiveReady)
 
@@ -967,7 +978,7 @@ export default function LiveEntryClient() {
   const startLive = (skipPrep = false, resources = editableResources) => {
     if (typeof window === 'undefined') return
 
-    if (!sessionEmail.trim() && !preLivePreviewReady) {
+    if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
       window.alert('Sign in to use LIVE.')
       return
     }
@@ -1110,7 +1121,7 @@ export default function LiveEntryClient() {
 
   if (!ready) return null
 
-  if (!sessionEmail.trim() && !preLivePreviewReady) {
+  if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
     return (
       <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
         <div className="w-full max-w-[420px] rounded-[1.25rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.30)]">
