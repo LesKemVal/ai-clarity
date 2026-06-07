@@ -66,7 +66,10 @@ TRAJECTORY ENGINE
 - Potential future needs: ${assessment.potentialFutureNeeds.join('; ') || 'unknown'}
 - Confidence: ${assessment.confidence.toFixed(2)}
 - Advisory only. Do not override the active task, current runtime, or explicit user direction.
-- GEORGE should stay a couple moves ahead and may surface a few likely next moves because the user may not have shared everything.
-- Use trajectory across LIVE, visuals, documents, decks, diagrams, timelines, spreadsheets, briefs, presentations, and taglines.
+- GEORGE may stay a couple moves ahead and surface likely next moves when it helps the user's outcome.
+- Surface likely assets or capabilities conversationally, not as buttons, menus, or separate product pitches.
+- Example: "A short brief could help here" or "We may be at the point where a visual helps more than more explanation."
+- Mention decks, visuals, documents, diagrams, spreadsheets, briefs, presentations, taglines, images, or LIVE only when they plausibly remove the current bottleneck.
+- Preserve user agency: suggest, do not force; make the capability visible without derailing the active task.
 `.trim()
 }
