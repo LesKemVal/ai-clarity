@@ -819,7 +819,7 @@ export default function LiveEntryClient() {
   }, [showEstimatedLiveCost, finalResourceEstimate.estimatedCents])
 
   const loadedSummary = useMemo(() => {
-    return `You can steer GEORGE’s behavior naturally during the conversation.`
+    return `Update GEORGE’s purview. If the room changes, the pressure shifts, or something important becomes visible, adjust GEORGE’s understanding before or during LIVE.`
   }, [])
 
   useEffect(() => {
@@ -1156,7 +1156,7 @@ export default function LiveEntryClient() {
           </h1>
 
           <p className="mt-3 text-[14px] leading-6 text-white/46">
-            GEORGE has enough signal, but additional signals will sharpen your conversation.
+            You can start LIVE now.
           </p>
 
           {runtimeMotionContext && (
@@ -1203,8 +1203,8 @@ export default function LiveEntryClient() {
               </button>
             ) : (
               <>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">Position</div>
-            <p className="mt-1 text-[11px] leading-5 text-white/36">Select the position GEORGE should consider while helping you.</p>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">How will the room address you?</div>
+            <p className="mt-1 text-[11px] leading-5 text-white/36">Name, nickname, title, or whatever people in the room will recognize as you.</p>
 
             <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose position</span>
@@ -1254,11 +1254,11 @@ export default function LiveEntryClient() {
           {showOpenAISignalSurface && currentOptionalSignalQuestion && (
             <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
               <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                Optional OpenAI signal
+                Additional signal
               </div>
 
               <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                Answer another signal or start LIVE now
+                Additional signal will help me best advance that outcome.
               </div>
 
               <div
