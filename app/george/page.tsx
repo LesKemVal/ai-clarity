@@ -6029,23 +6029,6 @@ I am listening now. Speak naturally. I will respond ${
               <>
             <button
               type="button"
-              onClick={(event) => {
-                const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-                const roomAbove = rect.top
-                const roomBelow = window.innerHeight - rect.bottom
-                setSavePopupUpward(roomAbove > 260 || roomAbove > roomBelow)
-                setShowPromptMenu(false)
-      setShowRecentFolders(false)
-      setActiveSaveIndex((prev) => (prev === i ? null : i))
-                setActiveMemoryFolder(null)
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
-            >
-              
-            </button>
-
-            <button
-              type="button"
               onClick={async () => {
                 try {
                   await navigator.clipboard?.writeText(m.content)
