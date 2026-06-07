@@ -43,13 +43,13 @@ export default function PageShell({
   const handleInstallGeorge = () => {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
     const isiPhone = /iPhone|iPad|iPod/i.test(ua)
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/george` : '/george'
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/` : '/'
 
     if (isiPhone) {
       if (typeof navigator !== 'undefined' && navigator.share) {
         navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'Want to get something done? GEORGE is your guide.',
+          text: 'Some conversations change everything, so be...  More knowledgeable.  More centered.  More persuasive.  More expansive.  with GEORGE in any room.',
           url,
         }).catch(() => {})
         return
@@ -71,7 +71,7 @@ export default function PageShell({
     }
 
     if (typeof navigator !== 'undefined' && navigator.share) {
-      navigator.share({ title: 'GEORGE by BRANESx', text: 'Want to get something done? GEORGE is your guide.', url }).catch(() => {})
+      navigator.share({ title: 'GEORGE by BRANESx', text: 'Some conversations change everything, so be...  More knowledgeable.  More centered.  More persuasive.  More expansive.  with GEORGE in any room.', url }).catch(() => {})
       return
     }
 

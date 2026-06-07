@@ -578,14 +578,14 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   async function handleShareGeorge() {
     const url =
       typeof window !== 'undefined'
-        ? `${window.location.origin}/george`
-        : '/george'
+        ? `${window.location.origin}/`
+        : '/'
 
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: 'GEORGE by BRANESx',
-          text: 'GEORGE',
+          text: 'Some conversations change everything, so be...\n\nMore knowledgeable.\n\nMore centered.\n\nMore persuasive.\n\nMore expansive.\n\nwith GEORGE in any room.',
           url,
         })
 
@@ -6067,7 +6067,7 @@ I am listening now. Speak naturally. I will respond ${
                     await navigator.share({
                       title: 'GEORGE by BRANESx',
                       text: `GEORGE\n\n${shareText}`,
-                      url: window.location.origin + '/george',
+                      url: window.location.origin + '/',
                     })
                   } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(shareText)
