@@ -749,6 +749,7 @@ const [voiceError, setVoiceError] = useState('')
   const [showPreLiveSignalSurface, setShowPreLiveSignalSurface] = useState(false)
   const [preLiveSignalStep, setPreLiveSignalStep] = useState(0)
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>({})
+  const [preLiveSignalComplete, setPreLiveSignalComplete] = useState(false)
   const isManualLive =
     conversationMode === 'manual_live' ||
     activePromptContext === 'manual_live'
@@ -775,6 +776,7 @@ const [voiceError, setVoiceError] = useState('')
     setShowPreLiveSignalSurface(true)
     setPreLiveSignalStep(0)
     setPreLiveSignals({})
+    setPreLiveSignalComplete(false)
     window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
 
     const nextMessages: Message[] = [
@@ -1153,7 +1155,7 @@ function detectLiveInterruption(interim: string) {
 }
 
 const [isListening, setIsListening] = useState(false)
-const liveRoomActive = forceLive || liveMode
+const liveRoomActive = Boolean(forceLive || liveMode) && liveGeorgeEnabled
 const liveRoomReceiving =
   liveRoomActive &&
   (voiceOn || isListening || Boolean(interimTranscript.trim()))
@@ -1229,6 +1231,14 @@ useEffect(() => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    if (window.localStorage.getItem('george_open_live_access_after_home') === '1') {
+      window.localStorage.removeItem('george_open_live_access_after_home')
+      window.localStorage.setItem('george_pending_live_after_access', '1')
+      setShowSidebar(false)
+      openLiveEntry()
+      return
+    }
 
     if (window.localStorage.getItem('george_open_live_chooser_after_home') === '1') {
       window.localStorage.removeItem('george_open_live_chooser_after_home')
@@ -2019,6 +2029,15 @@ const redeemFounderCode = async () => {
     })
     window.localStorage.setItem('george_founder_access', 'server-verified')
     setToastMessage(`Founder ${data.tier === 'brilliant' ? 'Brilliant' : 'Intelligent'} access activated.`)
+
+    if (window.localStorage.getItem('george_pending_live_after_access') === '1') {
+      window.localStorage.removeItem('george_pending_live_after_access')
+      window.localStorage.setItem('george_start_new_live', '1')
+      window.setTimeout(() => {
+        window.location.href = '/george/live-entry?source=founder'
+      }, 250)
+      return
+    }
     setShowToast(true)
     setShowUpgradeModal(false)
   } catch {
@@ -2388,7 +2407,10 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     if (params.get('start') === '1') {
       window.history.replaceState({}, '', '/george')
       window.localStorage.setItem('george_start_new_live', '1')
-      window.location.href = '/george/live-entry?source=start'
+      window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
+      window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+      window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
+      window.setTimeout(() => startLiveSignalAcquisition(), 80)
       return
     }
 
@@ -5011,7 +5033,7 @@ useEffect(() => {
     ? preLiveQuestions[preLiveSignalStep]
     : null
 
-  const isPreLiveEarbudReady = false
+  const isPreLiveEarbudReady = showPreLiveSignalSurface && preLiveSignalComplete
 
   const submitPreLiveSignalAnswer = () => {
     const answer = input.trim()
@@ -5038,8 +5060,20 @@ useEffect(() => {
 
     if (nextStep >= preLiveQuestions.length) {
       setPreLiveSignalStep(preLiveQuestions.length)
-      setActivePromptContext(null)
-      setActivePromptLabel(null)
+      setPreLiveSignalComplete(true)
+      setShowPreLiveSignalSurface(true)
+      setActivePromptContext('pre_live_signal_ready')
+      setActivePromptLabel('LIVE Ready')
+
+      try {
+        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        window.localStorage.setItem('george_start_new_live', '1')
+      } catch {}
+
+      window.setTimeout(() => {
+        window.location.href = '/george/live-entry?source=signal'
+      }, 4500)
+
       return true
     }
 
@@ -5426,12 +5460,12 @@ return (
 )}
 {(forceLive || liveMode) && (
   <>
-    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[250px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${liveGeorgeEnabled && liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
           <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
             GEORGE is {currentTier}
           </span>
@@ -5463,10 +5497,10 @@ return (
             setShowToast(true)
           }}
           disabled={!voiceSupported || isThinking}
-          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${isListening ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
-          {'active'}
+          {liveRoomActive ? 'active' : 'inactive'}
         </button>
         <button
           type="button"
@@ -5505,23 +5539,29 @@ return (
       </div>
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Phrases</span>
           default
         </div>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
           {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'tracking' : 'waiting'}
         </div>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveGeorgeEnabled && liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Status</span>
           {liveRoomActive ? 'listening' : 'waiting'}
         </div>
       </div>
 
       <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
-        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>{liveRoomActive ? 'Room active.' : 'Room waiting.'}</span>
-        <span>{liveRoomActive ? 'GEORGE is tracking pressure, room phrases, signal, and outcome.' : 'GEORGE is waiting for the room to activate.'}</span>
+        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>
+          {liveRoomActive ? 'Room active.' : 'Room inactive.'}
+        </span>
+        <span>
+          {liveRoomActive
+            ? 'GEORGE is listening for pressure, room phrases, signal, and outcome.'
+            : 'GEORGE is off for this room. Turn Room on to resume listening.'}
+        </span>
       </div>
     </div>
   </div>
@@ -5549,8 +5589,9 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[118px] md:pb-[140px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[260px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
   
+
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
@@ -5595,9 +5636,46 @@ return (
         )}
 
         {showPreLiveSignalSurface && (
-          <div className="mt-7 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
+          <div className="mt-7 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
             {!isPreLiveEarbudReady && currentPreLiveQuestion && (
               <>
+                <div className="mb-5 flex items-center justify-between border-b border-white/[0.06] pb-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (preLiveSignalStep > 0) {
+                        setPreLiveSignalStep((step) => Math.max(0, step - 1))
+                        setActivePromptContext('pre_live_signal_acquisition')
+                        setActivePromptLabel(`Question ${Math.max(1, preLiveSignalStep)}`)
+                        return
+                      }
+
+                      try {
+                        window.localStorage.removeItem('george_start_new_live')
+                        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
+                        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+                        window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
+                      } catch {}
+
+                      setShowPreLiveSignalSurface(false)
+                      setPreLiveSignalStep(0)
+                      setPreLiveSignals({})
+                      setPreLiveSignalComplete(false)
+                      setActivePromptContext(null)
+                      setActivePromptLabel(null)
+                      setMessages([])
+                      messagesRef.current = []
+                      window.location.href = '/'
+                    }}
+                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DBE4]/42 transition hover:text-white"
+                  >
+                    {preLiveSignalStep > 0 ? 'Previous signal' : 'Exit setup'}
+                  </button>
+
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/24">
+                    {preLiveSignalStep + 1}/{preLiveQuestions.length}
+                  </div>
+                </div>
                 <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
                   {currentPreLiveQuestion.kicker}
                 </div>
@@ -6233,7 +6311,7 @@ I am listening now. Speak naturally. I will respond ${
 {false && null}
 
 {(forceLive || liveMode) && (forceLive || messages.length === 0) && (
-  <div className="mx-auto w-full max-w-[620px] px-3 pt-[18px] md:pt-[22px]">
+  <div className="mx-auto w-full max-w-[430px] md:max-w-[780px] xl:max-w-[980px] px-4 pt-[95px] md:pt-[105px] xl:pt-[115px]">
     <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
         {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
@@ -6271,7 +6349,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[42px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-none leading-none`}>
+              <div className={`fixed bottom-[42px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
                 <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none backdrop-blur-0">
                   <button
                     type="button"
@@ -6352,7 +6430,7 @@ I am listening now. Speak naturally. I will respond ${
                       <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
                         <>
-                          <div className={`w-[160px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                          <div className={`w-[160px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 flex items-center justify-between">
                               <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
                                 Help
@@ -6391,7 +6469,7 @@ I am listening now. Speak naturally. I will respond ${
                             </div>
                           </div>
 
-                          <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                          <div className={`w-[220px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
                               {activeHelpTopic === 'live' && 'LIVE'}
                               {activeHelpTopic === 'continuity' && 'ACCESS'}
@@ -6445,7 +6523,7 @@ I am listening now. Speak naturally. I will respond ${
                       )}
 
                       {showNormalUtilityMenu === 'language' && (
-                        <div className={`w-[220px] px-3 py-2.5 ${operationalMotion.anchorPanel}`}>
+                        <div className={`w-[220px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                           <div className="mb-2 flex items-center justify-between">
                             <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
                               Language
@@ -6852,7 +6930,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className={`relative w-[min(360px,calc(100vw-32px))] px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+      <div className={`relative w-[min(360px,calc(100vw-32px))] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
         <div className="mb-2 flex items-center justify-between">
           <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
             Leave LIVE
@@ -7276,7 +7354,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 {false && liveMode && stableLiveGuidance && (
   <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
-    <div className="w-full max-w-[420px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 backdrop-blur-[10px]">
+    <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 backdrop-blur-[10px]">
       {stableLiveGuidance && (
         <>
           <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
@@ -7293,7 +7371,7 @@ Continue from here, tell me what changed, or start fresh.`
           <div className="text-[9px] uppercase tracking-[0.22em] text-white/22">
             GOVERNOR
           </div>
-          <div className="mt-1 grid grid-cols-2 gap-2 text-[10px] leading-4 text-white/42">
+          <div className="mt-1 grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3 md:grid-cols-3 md:gap-3 text-[10px] leading-4 text-white/42">
             <div>
               <span className="block text-white/24">Move</span>
               {outcomeGovernorSnapshot?.move}
@@ -7355,7 +7433,7 @@ Continue from here, tell me what changed, or start fresh.`
             className="fixed inset-0 z-[80] cursor-default bg-transparent"
           />
 
-          <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+          <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 flex items-center justify-between gap-3">
             <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
               Execution
@@ -7731,7 +7809,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
-            className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+            className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] max-h-[90vh] overflow-y-auto rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6 text-center">
@@ -7744,7 +7822,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             <div className="space-y-5">
               <div>
                 <p className="mb-2 text-xs uppercase tracking-[0.18em] text-neutral-500">Voice</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-3 md:grid-cols-3 md:gap-3">
                   {[
                     { label: 'Ash', value: 'ash' },
                     { label: 'Onyx', value: 'onyx' },
@@ -7988,7 +8066,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {false && showCampaignUpgradeGate && (
         <div className="fixed inset-x-0 bottom-[96px] transition-all duration-150 ease-out z-[95] flex justify-center px-4">
-          <div className="w-full max-w-[420px] rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
+          <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88 px-5 py-4 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
             <div className="mb-2 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72 mb-2">Structured LIVE</p>

@@ -8,9 +8,8 @@ export default function HomePage() {
   const [showLiveOptions, setShowLiveOptions] = useState(false)
 
   const startLive = () => {
-    window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
     window.localStorage.setItem('george_start_new_live', '1')
-    router.push('/george/live-entry?source=home')
+    router.push('/george?start=1')
   }
 
   return (
