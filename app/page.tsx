@@ -1,11 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const router = useRouter()
   const [showLiveOptions, setShowLiveOptions] = useState(false)
+  const liveSituations = ['interviews', 'boardrooms', 'meetings', 'everyday conversations']
+  const [situationIndex, setSituationIndex] = useState(0)
+  const [typedSituation, setTypedSituation] = useState('')
+
+  useEffect(() => {
+    const word = liveSituations[situationIndex]
+    let i = 0
+    setTypedSituation('')
+
+    const typing = window.setInterval(() => {
+      i += 1
+      setTypedSituation(word.slice(0, i))
+
+      if (i >= word.length) {
+        window.clearInterval(typing)
+        window.setTimeout(() => {
+          setSituationIndex((index) => (index + 1) % liveSituations.length)
+        }, word === 'everyday conversations' ? 1800 : 950)
+      }
+    }, 42)
+
+    return () => window.clearInterval(typing)
+  }, [situationIndex])
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
@@ -13,7 +36,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-hidden bg-[#030406] text-white">
+    <main className="george-home-depth relative min-h-[100dvh] overflow-hidden bg-[#030406] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(174,182,255,0.105),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(143,182,201,0.045),transparent_28%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/28 to-transparent" />
 
@@ -22,10 +45,10 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => router.push('/george')}
-            className="flex h-[64px] w-[64px] items-center justify-center"
+            className="flex h-[76px] w-[76px] items-center justify-center"
             aria-label="Open GEORGE"
           >
-            <img src="/logofav.png" alt="Bx" className="h-[56px] w-[56px] object-contain opacity-95" />
+            <img src="/logofav.png" alt="Bx" className="h-[68px] w-[68px] object-contain opacity-95" />
           </button>
 
           <div className="text-[9px] uppercase tracking-[0.3em] text-white/20">
@@ -33,19 +56,18 @@ export default function HomePage() {
           </div>
         </header>
 
-        <section className="flex flex-1 flex-col justify-center text-left">
+        <section className="flex flex-1 flex-col justify-start pt-8 text-left sm:pt-10">
           <div className="mx-auto w-full max-w-[720px]">
             <h1 className="text-[48px] font-semibold leading-[0.9] tracking-[-0.074em] text-white sm:text-[82px]">
               Ask GEORGE.
             </h1>
 
-            <p className="mt-4 text-[18px] leading-7 tracking-[-0.02em] text-white/78 sm:text-[25px] sm:leading-9">
-              Start with your desired outcome.
-            </p>
-
-            <p className="mt-4 max-w-[640px] text-[13px] leading-6 text-white/48 sm:text-[15px] sm:leading-8">
+            <p className="mt-5 max-w-[720px] font-mono text-[14px] leading-7 tracking-[0.01em] text-white/54 sm:text-[17px] sm:leading-8">
               Conversation moves trust, money, care, conflict, opportunity, and work.
-              <span className="block text-white/66">GEORGE turns words into movement.</span>
+              <span className="block text-white/62">
+                Bring GEORGE into <span className="text-white/82">{typedSituation}</span>
+                <span className="ml-0.5 inline-block h-[1em] w-px translate-y-[2px] bg-white/54 [animation:georgeComposerCursorBlink_.75s_steps(1,end)_infinite]" />
+              </span>
             </p>
 
             <div className="mx-auto mt-7 flex h-[178px] w-full max-w-[390px] items-center justify-center sm:h-[260px] sm:max-w-[560px]">

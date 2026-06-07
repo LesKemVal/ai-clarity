@@ -1657,3 +1657,50 @@ textarea::placeholder{
 .message-assistant li::marker{
   color:rgba(174,182,255,.62);
 }
+
+
+/* GEORGE homepage atmospheric depth */
+.george-home-depth {
+  position: relative;
+  isolation: isolate;
+}
+
+.george-home-depth::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 22% 24%, rgba(126, 142, 190, 0.105), transparent 31%),
+    radial-gradient(circle at 68% 18%, rgba(85, 98, 132, 0.075), transparent 34%),
+    linear-gradient(180deg, rgba(8, 10, 15, 0.96), rgba(3, 5, 9, 1));
+}
+
+.george-home-depth::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(90deg, rgba(215,219,228,0.025) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(215,219,228,0.018) 1px, transparent 1px);
+  background-size: 86px 86px;
+  mask-image: radial-gradient(circle at 42% 42%, black 0%, transparent 68%);
+}
+
+
+/* GEORGE utility typography normalization */
+html,
+body {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}

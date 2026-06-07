@@ -6314,7 +6314,7 @@ I am listening now. Speak naturally. I will respond ${
   <div className="mx-auto w-full max-w-[430px] md:max-w-[780px] xl:max-w-[980px] px-4 pt-[95px] md:pt-[105px] xl:pt-[115px]">
     <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
-        {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
+        {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nGEORGE turns words into movement.\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
       </div>
 
       <div className="relative mt-2 min-h-6 cursor-text">
