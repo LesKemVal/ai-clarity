@@ -5827,7 +5827,7 @@ return (
                 <span className="block">Start with your desired outcome.</span>
                 {showGeorgeSupportCopy && (
                   <>
-                    <span className="mt-3 block text-[13px] leading-6 text-[#D7DBE4]/42">
+                    <span className="mt-3 block hidden text-[13px] leading-6 text-[#D7DBE4]/42 sm:block">
                       Conversation moves trust, money, care, conflict, opportunity, and work.
                     </span>
                     <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58">
@@ -5893,7 +5893,7 @@ return (
                   {currentPreLiveQuestion.question}
                 </div>
 
-                <div className="mt-3 text-[13px] leading-6 text-white/38">
+                <div className="mt-3 hidden text-[13px] leading-6 text-white/38 sm:block">
                   {currentPreLiveQuestion.examples}
                 </div>
               </>
