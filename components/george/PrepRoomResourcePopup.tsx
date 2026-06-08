@@ -137,13 +137,15 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
 
   useEffect(() => {
     if (!popupReady || introSpokenRef.current) return
+
     introSpokenRef.current = true
+    speakPrepRoom("The room has taken shape. Now we turn words into movement. Review the notice, fasten your earbud, and I'll see you in the room.")
   }, [open, profile])
 
   const handleNoticeAccepted = async (accepted: boolean) => {
     setNoticeAccepted(accepted)
     if (accepted) {
-      await speakPrepRoom("The room has taken shape. Now we turn words into movement. Fasten your earbud. I'm right here with you.")
+      await speakPrepRoom('Good.')
     }
   }
 
