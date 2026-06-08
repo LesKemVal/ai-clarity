@@ -1168,7 +1168,7 @@ export default function LiveEntryClient() {
 
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Loaded context</div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Inherited context</div>
               <div className="mt-1 text-[14px] font-medium text-white/78">{runtimeMotionContext.title}</div>
             </div>
           )}
