@@ -1144,9 +1144,15 @@ export default function LiveEntryClient() {
   return (
     <main className="relative min-h-[100dvh] overflow-y-auto bg-[#06070A] px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,140,255,0.04),transparent_28%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(180deg,#06070A_0%,rgba(6,7,10,0.96)_42%,rgba(6,7,10,0.72)_68%,rgba(6,7,10,0)_100%)]" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
-      <div className="relative z-10 mx-auto w-full max-w-[640px]">
+      <div className="relative z-30 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
+
+      </div>
+
+      <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
 
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE PREVIEW</div>
@@ -1156,15 +1162,8 @@ export default function LiveEntryClient() {
           </h1>
 
           <p className="mt-3 text-[14px] leading-6 text-white/46">
-            You can start LIVE now.
+            You can start LIVE now, but more signal betters your experience.
           </p>
-
-          {objective.trim() && (
-            <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-2">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Current Direction</div>
-              <div className="mt-1 text-[14px] font-medium leading-5 text-white/78">{objective.trim()}</div>
-            </div>
-          )}
 
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
@@ -1414,14 +1413,14 @@ export default function LiveEntryClient() {
             </label>
           )}
 
-          <details className="mt-3 border-l border-[#AEB6FF]/20 pl-5">
+          <details className="mt-5 rounded-[0.82rem] border border-white/[0.035] bg-black/12 px-3 py-2">
             <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.22em] text-white/34">
-              Advanced controls
+              Room controls
             </summary>
 
-            <div className="mt-4">
+            <div className="mt-3 border-t border-white/[0.04] pt-3">
               <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Output</span>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {OUTPUT_OPTIONS.map((option) => {
                   const active = outputMode === option.label
 
@@ -1430,23 +1429,22 @@ export default function LiveEntryClient() {
                       key={option.label}
                       type="button"
                       onClick={() => setOutputMode(option.label)}
-                      className={`border-l px-3 py-2 text-left transition ${
+                      className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
                         active
-                          ? 'border-[#AEB6FF]/42 text-white'
-                          : 'border-white/[0.08] text-white/42 hover:text-white/72'
+                          ? 'border-[#AEB6FF]/38 bg-[#AEB6FF]/[0.08] text-white'
+                          : 'border-white/[0.06] bg-white/[0.015] text-white/44 hover:text-white/72'
                       }`}
                     >
-                      <span className="block text-[12px] font-medium">{option.label === 'Repeatable lines' ? 'Lines' : option.label}</span>
-                      <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                      {option.label === 'Repeatable lines' ? 'Lines' : option.label}
                     </button>
                   )
                 })}
               </div>
             </div>
 
-            <div className="mt-5">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Communication style</span>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-4 border-t border-white/[0.04] pt-3">
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Style</span>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {COMMUNICATION_STYLE_OPTIONS.map((option) => {
                   const active = communicationStyle === option.label
 
@@ -1455,14 +1453,13 @@ export default function LiveEntryClient() {
                       key={option.label}
                       type="button"
                       onClick={() => setCommunicationStyle(option.label)}
-                      className={`border-l px-3 py-2 text-left transition ${
+                      className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
                         active
-                          ? 'border-[#AEB6FF]/42 text-white'
-                          : 'border-white/[0.08] text-white/42 hover:text-white/72'
+                          ? 'border-[#AEB6FF]/38 bg-[#AEB6FF]/[0.08] text-white'
+                          : 'border-white/[0.06] bg-white/[0.015] text-white/44 hover:text-white/72'
                       }`}
                     >
-                      <span className="block text-[12px] font-medium">{option.label}</span>
-                      <span className="mt-1 block text-[10px] leading-4 text-white/34">{option.helper}</span>
+                      {option.label}
                     </button>
                   )
                 })}
