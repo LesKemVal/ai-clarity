@@ -3608,26 +3608,34 @@ if (activePromptContext || activePromptLabel) {
             reject(new Error('Audio playback failed'))
           }
 
-          audio.oncanplaythrough = () => {
+          const startPlayback = () => {
             revealPendingAssistantMessage()
 
-            setTimeout(() => {
+            if (stopSpeechRef.current) {
+              resolve()
+              return
+            }
+
+            audio.play().catch((err) => {
               if (stopSpeechRef.current) {
                 resolve()
                 return
               }
 
-              audio.play().catch((err) => {
-                if (stopSpeechRef.current) {
-                  resolve()
-                  return
-                }
-
-                console.error('audio.play() failed', err)
-                reject(err)
-              })
-            }, 120)
+              console.error('audio.play() failed', err)
+              reject(err)
+            })
           }
+
+          audio.oncanplay = startPlayback
+          audio.onloadedmetadata = startPlayback
+          audio.load()
+
+          setTimeout(() => {
+            if (audioRef.current === audio && audio.paused && !stopSpeechRef.current) {
+              startPlayback()
+            }
+          }, 350)
         })
 
         if (!stopSpeechRef.current) {
