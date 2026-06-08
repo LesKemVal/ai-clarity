@@ -6,9 +6,9 @@ import BxPageHeader from '@/components/BxPageHeader'
 type HelpSection =
   | 'george'
   | 'live'
-  | 'continuity'
+  | 'room'
   | 'signal'
-  | 'context'
+  | 'continuity'
   | 'voice'
   | null
 
@@ -25,49 +25,49 @@ const HELP_ITEMS: Array<{
     id: 'george',
     index: '01',
     label: 'GEORGE',
-    title: 'Direction and action.',
-    body: 'Use GEORGE to clarify the situation, narrow the strongest next move, work through documents, decisions, plans, and pressure.',
-    utility: 'Ask. Decide. Move.',
+    title: 'Brilliant operational awareness.',
+    body: 'GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be. Start with your desired outcome.',
+    utility: 'Where you are → where you want to be.',
+    accent: true,
   },
   {
     id: 'live',
     index: '02',
     label: 'LIVE',
-    title: 'Timing under pressure.',
-    body: 'Use LIVE for interviews, negotiations, calls, meetings, presentations, conflict, or moments where words matter.',
-    utility: 'Timing. Pressure. Execution.',
-    accent: true,
+    title: 'Bring GEORGE into the room.',
+    body: 'LIVE supports active conversations where timing, pressure, language, and delivery matter: interviews, negotiations, meetings, doctor visits, sales calls, fundraising, conflict, and other moments where words move outcomes.',
+    utility: 'Timing. Pressure. Movement.',
   },
   {
-    id: 'continuity',
+    id: 'room',
     index: '03',
-    label: 'CONTINUITY',
-    title: 'Return without restarting.',
-    body: 'GEORGE can preserve sessions, goals, and working context so useful work continues instead of beginning from zero every time.',
-    utility: 'Remember the work.',
+    label: 'ROOM',
+    title: 'Active means present.',
+    body: 'The Room represents the active LIVE environment. When Room is active, GEORGE may listen, adapt, and provide guidance. When Room is off, GEORGE is inactive for that room.',
+    utility: 'Room on: present. Room off: quiet.',
   },
   {
     id: 'signal',
     index: '04',
-    label: 'WHAT GEORGE NOTICES',
-    title: 'Pressure, timing, and changes.',
-    body: 'GEORGE watches for pressure, hesitation, confusion, timing, and changes in the room so support stays useful and practical.',
-    utility: 'Notice what matters.',
+    label: 'SIGNAL',
+    title: 'Better signal creates better movement.',
+    body: 'GEORGE asks questions and watches context so support is based on the user’s real situation, not generic assumptions. Signal can come from words, goals, documents, screenshots, room setup, pressure, hesitation, or changing conditions.',
+    utility: 'Give GEORGE what matters.',
   },
   {
-    id: 'context',
+    id: 'continuity',
     index: '05',
-    label: 'CONTEXT',
-    title: 'Show GEORGE what matters.',
-    body: 'Use documents, screenshots, images, room setup, and user-provided details to give GEORGE better operating context.',
-    utility: 'Give GEORGE context.',
+    label: 'CONTINUITY',
+    title: 'Return without restarting.',
+    body: 'Continuity helps GEORGE preserve useful context, restore access, maintain sessions, and support longer-term objectives. Signing in helps GEORGE know what belongs to the user.',
+    utility: 'Preserve the work.',
   },
   {
     id: 'voice',
     index: '06',
     label: 'VOICE',
-    title: 'Hands-free utility.',
-    body: 'Voice and earbud support are for moments where low-friction help, timing, and short cues matter more than long explanations.',
+    title: 'Low-friction support.',
+    body: 'Voice and earbud support are for moments where short cues, timing, and hands-free guidance are more useful than long explanations.',
     utility: 'Useful when moving.',
   },
 ]
@@ -81,17 +81,17 @@ export default function HelpPage() {
       <div className="mx-auto flex min-h-[calc(100dvh-40px)] w-full max-w-[920px] flex-col">
         <BxPageHeader backLabel="GEORGE" />
 
-        <section className="mb-6 max-w-[660px]">
+        <section className="mb-6 max-w-[700px]">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">
             OPERATIONAL HELP
           </div>
 
           <h1 className="mt-3 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
-            Utility, not feature list.
+            Start with your desired outcome.
           </h1>
 
-          <p className="mt-3 max-w-[560px] text-[14px] leading-6 text-white/44">
-            GEORGE is built for direction, preparation, conversation, and continuity. Open only what you need.
+          <p className="mt-3 max-w-[610px] text-[14px] leading-6 text-white/44">
+            GEORGE is not defined by a subject, industry, or task. GEORGE is defined by the outcome the user is trying to reach.
           </p>
         </section>
 
@@ -105,7 +105,7 @@ export default function HelpPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setOpen(selected ? null : item.id)}
-                  className={`min-h-[88px] rounded-[0.9rem] border px-4 py-4 text-left transition-all duration-200 ${
+                  className={`min-h-[88px] rounded-[0.9rem] border px-4 py-4 text-left transition-all duration-200 active:scale-[0.985] ${
                     selected
                       ? item.accent
                         ? 'border-[#8FB6C9]/[0.18] bg-[#8FB6C9]/[0.045] text-[#E0EDF4] shadow-[0_12px_30px_rgba(4,10,18,0.22)]'

@@ -10,9 +10,9 @@ export default function ActivatePage() {
   const [tier, setTier] = useState<CheckoutTier>('brilliant')
 
   const copy = useMemo(() => {
-    if (tier === 'intelligent') return 'Intelligent activation.'
-    if (tier === 'brilliant_day') return 'Brilliant Day activation.'
-    return 'Brilliant activation.'
+    if (tier === 'intelligent') return 'Activate Intelligent operational support.'
+    if (tier === 'brilliant_day') return 'Activate Brilliant for today.'
+    return 'Activate Brilliant operational awareness.'
   }, [tier])
 
   function legacyCheckout(nextTier: CheckoutTier) {
@@ -27,20 +27,20 @@ export default function ActivatePage() {
             GEORGE
           </Link>
 
-          <Link href="/top-up" className="text-[11px] uppercase tracking-[0.22em] text-[#C9D0FF]/48 hover:text-[#D7DCFF]">
-            Access
+          <Link href="/help" className="text-[11px] uppercase tracking-[0.22em] text-[#C9D0FF]/48 hover:text-[#D7DCFF]">
+            Help
           </Link>
         </div>
 
         <section className="rounded-[1rem] border border-white/[0.035] bg-white/[0.008] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
-          <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">Runtime Activation</p>
+          <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">Access Activation</p>
 
           <h1 className="mt-4 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
             {copy}
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/46">
-            Activate GEORGE with a dark, focused Stripe form built for continuity, LIVE access, and runtime support.
+            Activate or restore access to GEORGE. Continuity, LIVE access, and operational support are connected to verified identity.
           </p>
 
           <div className="mt-5 grid gap-2 sm:grid-cols-3">
