@@ -1159,6 +1159,20 @@ export default function LiveEntryClient() {
             You can start LIVE now.
           </p>
 
+          {objective.trim() && (
+            <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-2">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Current Direction</div>
+              <div className="mt-1 text-[14px] font-medium leading-5 text-white/78">{objective.trim()}</div>
+            </div>
+          )}
+
+          {objective.trim() && (
+            <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-2">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Current Direction</div>
+              <div className="mt-1 text-[14px] font-medium leading-5 text-white/78">{objective.trim()}</div>
+            </div>
+          )}
+
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
               <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Loaded context</div>
@@ -1389,7 +1403,7 @@ export default function LiveEntryClient() {
 
           {!hideAcquiredMandatoryFields && (
             <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Desired Outcome</span>
+              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Direction</span>
               <textarea
                 id="george-desired-outcome"
                 data-live-signal="desired-outcome"
