@@ -1147,6 +1147,13 @@ export default function LiveEntryClient() {
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(180deg,#06070A_0%,rgba(6,7,10,0.96)_42%,rgba(6,7,10,0.72)_68%,rgba(6,7,10,0)_100%)]" />
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
+      <img
+        src="/frontviewstick.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none fixed left-[-170px] top-[86px] z-0 hidden w-[560px] select-none opacity-[0.075] blur-[0.4px] lg:block xl:left-[-120px] xl:w-[620px]"
+      />
+
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
 
