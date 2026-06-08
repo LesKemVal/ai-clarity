@@ -58,7 +58,7 @@ function normalizeComposition(record: RuntimeRecord) {
 
   if (parts.length > 0) return parts.join(' · ')
 
-  return 'LIVE runtime minutes · speech processing · adaptive reasoning · response shaping · continuity active'
+  return 'LIVE minutes · speech processing · adaptive reasoning · response shaping · continuity active'
 }
 
 function formatCost(value?: number | null) {
@@ -166,15 +166,15 @@ export default function RuntimePage() {
   const visibleRecords = records.slice(0, 6)
 
   return (
-    <PageShell backToGeorge withSidebar={false} eyebrow="LIVE Bx" title="Prescriptions">
+    <PageShell backToGeorge withSidebar={false} eyebrow="GEORGE" title="Operational Record">
       <section className="rounded-[1.1rem] border border-white/[0.045] bg-white/[0.010] p-5 md:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl space-y-3">
             <p className="text-[10px] uppercase tracking-[0.26em] text-[#C9D0FF]/42">
-              LIVE Bx Prescriptions
+              LIVE Operational Record
             </p>
             <p className="text-sm leading-7 text-white/52">
-              Runtime receipts for LIVE rooms. Costs stay quantified; resources read like ingredients.
+              Review recent LIVE rooms, continuity state, and the operating support GEORGE used during active conversations.
             </p>
           </div>
 
@@ -207,13 +207,13 @@ export default function RuntimePage() {
 
       {!authenticated && (
         <section className="rounded-[1rem] border border-[#AAB4FF]/12 bg-[#AAB4FF]/[0.035] p-5">
-          <p className="text-sm font-medium text-[#D7DCFF]">Login to view LIVE Bx Prescriptions.</p>
+          <p className="text-sm font-medium text-[#D7DCFF]">Login to view LIVE Operational Record.</p>
           <p className="mt-2 text-sm leading-6 text-white/45">
-            Runtime receipts are tied to recognized GEORGE continuity on this device.
+            LIVE records are tied to recognized GEORGE continuity on this device.
           </p>
           <button
             type="button"
-            onClick={() => (window.location.href = '/top-up')}
+            onClick={() => (window.location.href = '/activate')}
             className="mt-4 rounded-[0.8rem] border border-white/[0.08] bg-white/[0.024] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/64 transition hover:bg-white/[0.045] hover:text-white/84"
           >
             Login
@@ -223,7 +223,7 @@ export default function RuntimePage() {
 
       <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.008] p-5">
         <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
-          Best tier use vs expected next month use
+          Recommended support based on recent LIVE use
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <div className="rounded-[0.9rem] border border-white/[0.04] bg-black/20 p-4">
@@ -244,13 +244,13 @@ export default function RuntimePage() {
 
       <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.008] p-5">
         <p className="text-[10px] uppercase tracking-[0.24em] text-white/32">
-          Recent runtime receipts
+          Recent LIVE records
         </p>
 
         <div className="mt-4 space-y-3">
           {visibleRecords.length === 0 ? (
             <div className="rounded-[0.9rem] border border-white/[0.035] bg-black/20 p-4 text-sm leading-6 text-white/42">
-              No LIVE runtime receipts yet. Start LIVE from GEORGE to begin recording estimated room use.
+              No LIVE records yet. Start LIVE from GEORGE to begin recording room activity.
             </div>
           ) : (
             visibleRecords.map((record, index) => (
@@ -272,7 +272,7 @@ export default function RuntimePage() {
                 </div>
                 {record.durationMinutes && (
                   <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/24">
-                    {record.durationMinutes} runtime minutes
+                    {record.durationMinutes} LIVE minutes
                   </div>
                 )}
               </div>
