@@ -5662,7 +5662,7 @@ return (
   <div className="pointer-events-none fixed left-0 right-0 top-[168px] z-[34] h-[96px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/92 to-transparent" />
 )}
 {(forceLive || liveMode) && (
-  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#05060A] via-[#05060A]/96 via-[66%] to-transparent xl:left-[280px]" />
+  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[300px] bg-gradient-to-t from-[#05060A] via-[#05060A]/96 via-[66%] to-transparent xl:left-[280px]" />
 )}
 {(forceLive || liveMode) && (
   <>
@@ -5685,8 +5685,7 @@ return (
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
         <button
           type="button"
-          onTouchStart={(event) => {
-            event.preventDefault()
+          onPointerDown={(event) => {
             event.stopPropagation()
           }}
           onClick={(event) => {
@@ -5700,16 +5699,16 @@ return (
             if (!nextEnabled) {
               stopListening()
               setInterimTranscript('')
-              setToastMessage('GEORGE offline')
+              setToastMessage('Room quiet')
             } else {
               startListening()
-              setToastMessage('GEORGE online')
+              setToastMessage('Room listening')
             }
 
             setShowToast(true)
           }}
-          disabled={!voiceSupported || isThinking}
-          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          disabled={isThinking}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-150 active:scale-[0.985] active:border-[#8FF0C7]/[0.28] active:bg-[#8FF0C7]/[0.105] hover:border-[#8FF0C7]/[0.22] hover:bg-[#8FF0C7]/[0.085] disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/72 shadow-[0_0_26px_rgba(143,240,199,0.055),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.026] text-[#DCEBFF]/36'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
           <span className="mt-1 flex items-center justify-between gap-2">
@@ -5806,7 +5805,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[430px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -6549,7 +6548,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[calc(104px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
+              <div className={`fixed bottom-[calc(34px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
                 <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none -0">
                   <button
                     type="button"
