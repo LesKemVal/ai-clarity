@@ -1576,6 +1576,7 @@ export default function LiveEntryClient() {
         ].filter(Boolean)}
         onClose={() => setShowPrepPreview(false)}
         onEditResource={editPrepRoomResource}
+        sessionEmail={sessionEmail}
         onEnterLive={() => startLive(false, editableResources)}
       />
     </main>

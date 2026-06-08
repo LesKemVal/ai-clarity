@@ -15,6 +15,7 @@ type Props = {
   signals?: string[]
   onClose: () => void
   onEnterLive?: () => void
+  sessionEmail?: string
   onEditResource?: <K extends keyof PrepRoomResourceProfile>(key: K, value: PrepRoomResourceProfile[K]) => void
 }
 
@@ -22,7 +23,7 @@ function formatValue(value: string) {
   return value.replace(/_/g, ' ')
 }
 
-export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle, chairs = [], desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive }: Props) {
+export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle, chairs = [], desiredOutcome, knownContext, assistMode, signals = [], onClose, onEnterLive, sessionEmail }: Props) {
   const [noticeAccepted, setNoticeAccepted] = useState(false)
   const [voiceBusy, setVoiceBusy] = useState(false)
   const introSpokenRef = useRef(false)
@@ -37,7 +38,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
       const res = await fetch('/api/george/live/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: clean }),
+        body: JSON.stringify({ text: clean, email: sessionEmail?.trim() || undefined }),
       })
 
       if (!res.ok) return
