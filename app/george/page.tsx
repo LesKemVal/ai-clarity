@@ -1613,7 +1613,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setLiveEntryBriefing(liveBriefing)
       setMessages([])
       messagesRef.current = []
-      hasUserInteractedRef.current = true
+      void unlockMobileAudio()
       setVoiceOn(true)
       setInteractionMode('speech')
       setShowEarbudOverlay(true)
@@ -2228,7 +2228,7 @@ const savedContext = window.localStorage.getItem('george_active_context')
     }
 
     if (savedVoice === 'on') {
-      hasUserInteractedRef.current = true
+      void unlockMobileAudio()
       setVoiceOn(true)
       setInteractionMode('speech')
       setTimeout(() => startListening(), 900)
@@ -2871,6 +2871,7 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   }, [input, interimTranscript, autoResizeTextarea])
   const promptMenuRef = useRef<HTMLDivElement | null>(null)
   const hasUserInteractedRef = useRef(false)
+  const mobileAudioUnlockedRef = useRef(false)
 
   const getExistingFolders = () => {
     if (typeof window === 'undefined') return [] as string[]
@@ -3485,6 +3486,33 @@ requestAnimationFrame(() => {
     speakingRef.current = false
     isSpeakingRef.current = false
     setIsSpeaking(false)
+  }
+
+  async function unlockMobileAudio() {
+    if (typeof window === 'undefined') return
+
+    hasUserInteractedRef.current = true
+    if (mobileAudioUnlockedRef.current) return
+
+    try {
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (AudioContextClass) {
+        const ctx = new AudioContextClass()
+        if (ctx.state === 'suspended') await ctx.resume()
+
+        const oscillator = ctx.createOscillator()
+        const gain = ctx.createGain()
+        gain.gain.value = 0.00001
+        oscillator.connect(gain)
+        gain.connect(ctx.destination)
+        oscillator.start()
+        oscillator.stop(ctx.currentTime + 0.03)
+      }
+
+      mobileAudioUnlockedRef.current = true
+    } catch {
+      void unlockMobileAudio()
+    }
   }
 
   async function fetchSpeech(text: string) {
@@ -4124,7 +4152,7 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         setIsThinking(false)
       }
 
-      hasUserInteractedRef.current = true
+      void unlockMobileAudio()
 
       await stopSpeech()
       stopListening()
@@ -5720,7 +5748,7 @@ return (
               return
             }
             const nextVoice = !voiceOn
-            hasUserInteractedRef.current = true
+            void unlockMobileAudio()
             setVoiceOn(nextVoice)
             setInteractionMode(nextVoice ? 'speech' : 'text')
             window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
@@ -6971,7 +6999,7 @@ if (liveMode) {
                   return
                 }
                 const nextVoice = !voiceOn
-                hasUserInteractedRef.current = true
+                void unlockMobileAudio()
                 setVoiceOn(nextVoice)
                 setInteractionMode(nextVoice ? 'speech' : 'text')
                 window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
@@ -7650,7 +7678,7 @@ Continue from here, tell me what changed, or start fresh.`
               }
 
               const nextVoice = !voiceOn
-              hasUserInteractedRef.current = true
+              void unlockMobileAudio()
               setVoiceOn(nextVoice)
               setInteractionMode(nextVoice ? 'speech' : 'text')
               window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
