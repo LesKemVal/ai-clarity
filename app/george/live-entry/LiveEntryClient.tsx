@@ -1210,9 +1210,14 @@ export default function LiveEntryClient() {
               </button>
             ) : (
               <>
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/24">How will the room address you?</div>
             <p className="mt-1 text-[11px] leading-5 text-white/36">Name, nickname, title, or whatever people in the room will recognize as you.</p>
-
+<div className="text-[10px] uppercase tracking-[0.22em] text-white/24">How will the room address you?</div>
+<p className="mt-1 text-[11px] leading-5 text-white/36">
+  How shall I address you?
+  <br />
+  <br />
+  Name, title, nickname, or moniker you'll use in the room.
+</p>
             <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
               <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose position</span>
               <select
