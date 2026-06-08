@@ -1613,6 +1613,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setLiveEntryBriefing(liveBriefing)
       setMessages([])
       messagesRef.current = []
+      hasUserInteractedRef.current = true
       setVoiceOn(true)
       setInteractionMode('speech')
       setShowEarbudOverlay(true)
@@ -2227,6 +2228,7 @@ const savedContext = window.localStorage.getItem('george_active_context')
     }
 
     if (savedVoice === 'on') {
+      hasUserInteractedRef.current = true
       setVoiceOn(true)
       setInteractionMode('speech')
       setTimeout(() => startListening(), 900)
@@ -3517,18 +3519,8 @@ requestAnimationFrame(() => {
       throw new Error('TTS returned empty audio')
     }
 
-    const bytes = new Uint8Array(buffer)
-    let binary = ''
-    const chunkSize = 0x8000
-
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize)
-      binary += String.fromCharCode(...chunk)
-    }
-
-    const base64 = btoa(binary)
-    const dataUrl = `data:audio/mpeg;base64,${base64}`
-    return dataUrl
+    const blob = new Blob([buffer], { type: 'audio/mpeg' })
+    return URL.createObjectURL(blob)
   }
 
   function revealPendingAssistantMessage() {
@@ -3637,6 +3629,10 @@ if (activePromptContext || activePromptLabel) {
             }
           }, 350)
         })
+
+        try {
+          if (url.startsWith('blob:')) URL.revokeObjectURL(url)
+        } catch {}
 
         if (!stopSpeechRef.current) {
           await wait(pauseMs(chunk))
