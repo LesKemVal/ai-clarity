@@ -34,6 +34,9 @@ export type LivePurview = {
 }
 
 export type LiveRuntimeSupport = {
+  room?: string
+  objective?: string
+  chair?: string
   selectedCapacityCents?: number | null
   selectedCapabilityIds?: string[]
   selectedCapabilities?: Array<{ label?: string; description?: string }>
@@ -263,8 +266,13 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
     window.localStorage.removeItem(LIVE_ASSIST_MODE_KEY)
   }
 
-  if (setup?.runtimeSupport) {
-    const serializedSupport = JSON.stringify(setup.runtimeSupport)
+  if (setup?.runtimeSupport || setup?.room || setup?.objective) {
+    const serializedSupport = JSON.stringify({
+      ...(setup.runtimeSupport || {}),
+      room: setup.room,
+      objective: setup.objective,
+      chair: (setup as any).chair,
+    })
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY, serializedSupport)
   } else {

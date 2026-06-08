@@ -5690,7 +5690,7 @@ return (
           className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
-          {liveRoomActive ? 'active' : 'inactive'}
+          {liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE room' : 'inactive')}
         </button>
         <button
           type="button"
@@ -5711,7 +5711,7 @@ return (
           className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Chair</span>
-          {'loaded'}
+          {liveRuntimeSupport?.chair || 'User'}
         </button>
         <button
           type="button"
@@ -5724,33 +5724,33 @@ return (
           className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/46 transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Outcome</span>
-          {'loaded'}
+          {liveRuntimeSupport?.objective || 'Outcome pending'}
         </button>
       </div>
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Phrases</span>
-          default
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Approach</span>
+          {liveRoomActive ? 'ready' : 'idle'}
         </div>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Signal</span>
-          {liveRoomReceiving ? 'receiving' : liveRoomActive ? 'tracking' : 'waiting'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Momentum</span>
+          {liveRoomReceiving ? 'building' : liveRoomActive ? 'steady' : 'idle'}
         </div>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Status</span>
-          {liveRoomActive ? 'listening' : 'waiting'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Trust</span>
+          {liveRoomActive ? 'forming' : 'idle'}
         </div>
       </div>
 
       <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
         <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>
-          {liveRoomActive ? 'Room active.' : 'Room inactive.'}
+          {liveRoomActive ? 'LIVE active.' : 'LIVE inactive.'}
         </span>
         <span>
           {liveRoomActive
-            ? 'GEORGE is listening for pressure, room phrases, signal, and outcome.'
-            : 'GEORGE is off for this room. Turn Room on to resume listening.'}
+            ? 'GEORGE is helping you navigate the room and move toward the outcome.'
+            : "Turn Room on when you're ready to begin."}
         </span>
       </div>
     </div>
