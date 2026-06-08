@@ -96,6 +96,19 @@ const OPERATIONAL_SIGNALS = [
   'LIVE works best with one earbud.',
 ]
 
+function getLiveRuntimeSteeringLabels(room?: string | null) {
+  const clean = String(room || '').trim().toLowerCase()
+
+  if (clean.includes('interview')) return ['Answer', 'Example', 'Redirect']
+  if (clean.includes('negotiation')) return ['Probe', 'Anchor', 'Protect']
+  if (clean.includes('doctor') || clean.includes('medical')) return ['Clarify', 'Challenge', 'Escalate']
+  if (clean.includes('investor') || clean.includes('capital') || clean.includes('fundraising')) return ['Explore', 'Position', 'Close']
+  if (clean.includes('sales')) return ['Trust', 'Objection', 'Close']
+  if (clean.includes('board') || clean.includes('executive')) return ['Frame', 'Evidence', 'Decision']
+
+  return ['Approach', 'Momentum', 'Trust']
+}
+
 function getLiveRoomSignal(room: string) {
   if (room === 'Interview') {
     return 'Interview loaded. GEORGE is watching credibility, proof, pacing, pressure, and answer clarity.'
@@ -5730,16 +5743,16 @@ return (
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Approach</span>
-          {liveRoomActive ? 'ready' : 'idle'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Move</span>
+          {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[0] : 'idle'}
         </div>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Momentum</span>
-          {liveRoomReceiving ? 'building' : liveRoomActive ? 'steady' : 'idle'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Angle</span>
+          {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[1] : 'idle'}
         </div>
         <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
-          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Trust</span>
-          {liveRoomActive ? 'forming' : 'idle'}
+          <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Pressure</span>
+          {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[2] : 'idle'}
         </div>
       </div>
 
@@ -5779,7 +5792,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[260px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[260px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showSidebar || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -6522,7 +6535,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[42px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
+              <div className={`fixed bottom-[42px] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
                 <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none -0">
                   <button
                     type="button"
@@ -6588,7 +6601,7 @@ I am listening now. Speak naturally. I will respond ${
                       type="button"
                       aria-label="Close GEORGE popup"
                       onClick={() => setShowNormalUtilityMenu(null)}
-                      className="fixed inset-0 z-[70] cursor-default bg-transparent"
+                      className="fixed inset-0 z-[300] cursor-default bg-transparent [backdrop-filter:blur(14px)] [-webkit-backdrop-filter:blur(14px)] transition-opacity duration-200"
                     />
                   )}
 
@@ -6598,9 +6611,9 @@ I am listening now. Speak naturally. I will respond ${
                         type="button"
                         aria-label="Close GEORGE utility menu"
                         onClick={() => setShowNormalUtilityMenu(null)}
-                        className="fixed inset-0 z-[80] cursor-default bg-transparent"
+                        className="fixed inset-0 z-[300] cursor-default bg-transparent [backdrop-filter:blur(14px)] [-webkit-backdrop-filter:blur(14px)] transition-opacity duration-200"
                       />
-                      <div ref={normalUtilityMenuRef} className={`fixed bottom-[112px] left-1/2 z-[120] flex max-w-[calc(100vw-32px)] -translate-x-1/2 gap-2 ${operationalMotion.surface}`}>
+                      <div ref={normalUtilityMenuRef} className={`fixed bottom-[112px] left-1/2 z-[320] flex max-w-[calc(100vw-32px)] -translate-x-1/2 gap-2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
                         <>
                           <div className={`w-[136px] px-3 py-2.5 md:w-[160px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
@@ -7603,7 +7616,7 @@ Continue from here, tell me what changed, or start fresh.`
             type="button"
             aria-label="Close LIVE controls"
             onClick={() => setShowLiveQuickMenu(false)}
-            className="fixed inset-0 z-[80] cursor-default bg-transparent"
+            className="fixed inset-0 z-[310] cursor-default bg-transparent [backdrop-filter:blur(14px)] [-webkit-backdrop-filter:blur(14px)] transition-opacity duration-200"
           />
 
           <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
