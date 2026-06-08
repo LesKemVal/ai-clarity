@@ -5528,8 +5528,8 @@ return (
         />
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y">
-          <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[78px] xl:pl-[280px] xl:pr-12">
-            <header className={`fixed top-0 left-0 right-0 xl:pl-[280px] flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
+          <div className="flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 pt-[68px] md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 md:pt-[78px] xl:px-12">
+            <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
               <div className="relative flex w-full max-w-6xl items-center justify-between">
                 {!showSidebar && (
 <button
@@ -5662,10 +5662,13 @@ return (
   <div className="pointer-events-none fixed left-0 right-0 top-[168px] z-[34] h-[96px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/92 to-transparent" />
 )}
 {(forceLive || liveMode) && (
+  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#05060A] via-[#05060A]/96 via-[66%] to-transparent xl:left-[280px]" />
+)}
+{(forceLive || liveMode) && (
   <>
-    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
-    <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border border-white/[0.055] bg-[#05070B]/82 px-4 py-3 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)] ">
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 pointer-events-none">
+    <div className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5682,6 +5685,10 @@ return (
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
         <button
           type="button"
+          onTouchStart={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+          }}
           onClick={(event) => {
             event.preventDefault()
             event.stopPropagation()
@@ -5705,7 +5712,12 @@ return (
           className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
-          {liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE room' : 'inactive')}
+          <span className="mt-1 flex items-center justify-between gap-2">
+            <span>{liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE room' : 'inactive')}</span>
+            <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[12px] transition ${liveRoomActive ? 'border-[#8FF0C7]/24 bg-[#8FF0C7]/18 text-[#8FF0C7]' : 'border-white/[0.06] bg-white/[0.025] text-white/30'}`}>
+              {liveRoomActive ? '◉' : '○'}
+            </span>
+          </span>
         </button>
         <button
           type="button"
@@ -5765,7 +5777,7 @@ return (
         <span>
           {liveRoomActive
             ? 'GEORGE is helping you navigate the room and move toward the outcome.'
-            : "Turn Room on when you're ready to begin."}
+            : "Room is quiet. Tap Room when you want GEORGE listening again."}
         </span>
       </div>
     </div>
@@ -5794,7 +5806,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[260px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showSidebar || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -6537,7 +6549,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[42px] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
+              <div className={`fixed bottom-[calc(104px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
                 <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none -0">
                   <button
                     type="button"
@@ -7541,7 +7553,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {false && liveMode && stableLiveGuidance && (
-  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
+  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4`}>
     <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 -[10px]">
       {stableLiveGuidance && (
         <>
@@ -7583,7 +7595,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {false && liveMode && (
-  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
+  <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[72px] left-0 right-0 z-[90] mx-auto flex w-full max-w-[900px] justify-center px-4`}>
     <div className="relative flex items-center justify-center gap-6">
       <button
         type="button"

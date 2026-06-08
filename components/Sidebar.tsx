@@ -338,10 +338,15 @@ return (
   <>
     {!showSidebar && null}
 
+    {/* Enterprise overlay rule:
+        Sidebar must never participate in page layout or force desktop reflow.
+        Closed state intentionally glides out while GEORGE content remains stable.
+        Reuse this overlay pattern across future GEORGE pages. */}
     <aside
+      data-george-sidebar-overlay="true"
       className={`fixed left-0 top-0 z-[120] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
-      } xl:fixed xl:top-0 xl:z-[95] xl:flex xl:translate-x-0 xl:pointer-events-auto`}
+      } xl:fixed xl:top-0 xl:z-[95] xl:flex`}
     >
       <div className="border-b border-white/[0.035] px-4 pb-4 pt-3">
         <div className="relative flex items-start justify-between opacity-90">
