@@ -1166,13 +1166,6 @@ export default function LiveEntryClient() {
             </div>
           )}
 
-          {objective.trim() && (
-            <div className="mt-3 rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.045] px-3 py-2">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Current Direction</div>
-              <div className="mt-1 text-[14px] font-medium leading-5 text-white/78">{objective.trim()}</div>
-            </div>
-          )}
-
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
               <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Loaded context</div>
@@ -1272,7 +1265,7 @@ export default function LiveEntryClient() {
               </div>
 
               <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                Additional signal will help me best advance that outcome.
+                Optional.
               </div>
 
               <div
