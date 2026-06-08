@@ -1147,12 +1147,17 @@ export default function LiveEntryClient() {
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(180deg,#06070A_0%,rgba(6,7,10,0.96)_42%,rgba(6,7,10,0.72)_68%,rgba(6,7,10,0)_100%)]" />
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
-      <img
-        src="/frontviewstick.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none fixed left-[-170px] top-[86px] z-0 hidden w-[560px] select-none opacity-[0.075] blur-[0.4px] lg:block xl:left-[-120px] xl:w-[620px]"
-      />
+      <div className="pointer-events-none fixed inset-y-0 left-0 z-0 hidden w-[52vw] max-w-[760px] overflow-hidden lg:block">
+        <img
+          src="/frontviewstick.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-[-150px] top-[72px] w-[620px] select-none opacity-[0.105] blur-[0.25px] saturate-[0.82] xl:left-[-90px] xl:w-[700px]"
+        />
+        <div className="absolute left-[120px] top-[132px] h-[62vh] w-px bg-gradient-to-b from-transparent via-[#AEB6FF]/[0.13] to-transparent" />
+        <div className="absolute left-[120px] top-[50vh] h-px w-[34vw] bg-gradient-to-r from-[#AEB6FF]/[0.13] to-transparent" />
+        <div className="absolute left-[118px] top-[50vh] h-1.5 w-1.5 rounded-full bg-[#AEB6FF]/24 shadow-[0_0_22px_rgba(174,182,255,0.20)]" />
+      </div>
 
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
