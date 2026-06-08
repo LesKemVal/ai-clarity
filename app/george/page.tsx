@@ -5365,7 +5365,7 @@ return (
         {showSidebar && (
           <div
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-black/48 backdrop-blur-[10px] xl:hidden"
+            className="fixed inset-0 z-[40] bg-black/48 -[10px] xl:hidden"
           />
         )}
 
@@ -5606,7 +5606,7 @@ return (
                         className="fixed inset-0 z-[85] cursor-default bg-transparent"
                       />
 
-                      <div className="absolute right-0 top-full z-[90] mt-2 w-[150px] rounded-[0.9rem] border border-white/[0.065] bg-[#05080D]/94 p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.42)] backdrop-blur-[14px]">
+                      <div className="absolute right-0 top-full z-[90] mt-2 w-[150px] rounded-[0.9rem] border border-white/[0.065] bg-[#05080D]/94 p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.42)] -[14px]">
                         {subscriberEmail ? (
                           <button
                             type="button"
@@ -5652,7 +5652,7 @@ return (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] ">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5911,7 +5911,7 @@ return (
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[96px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
-      <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] backdrop-blur-[16px]">
+      <div className="rounded-[1.15rem] border border-[#AEB6FF]/[0.08] bg-[#07090E]/72 px-3.5 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.34)] ">
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[#AEB6FF]/70 shadow-[0_0_12px_rgba(174,182,255,0.52)]" />
@@ -6158,7 +6158,7 @@ I am listening now. Speak naturally. I will respond ${
     <div className="relative bx-command-shimmer">
       {tonePopupIndex === i && (
         <div
-          className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute left-0 z-[80] w-48 rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 text-[11px] text-[#D7DBE4]/66 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             tonePopupUpward ? 'bottom-[34px]' : 'top-[30px]'
           }`}
         >
@@ -6336,7 +6336,7 @@ I am listening now. Speak naturally. I will respond ${
           {activeSaveIndex === i && (
             <div
               ref={savePickerRef}
-              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
+              className={`absolute z-30 w-[230px] max-w-[82vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 p-2 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  animate-[pickerTwistUp_180ms_cubic-bezier(0.22,1,0.36,1)] ${savePopupUpward ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom' : 'top-full left-1/2 -translate-x-1/2 mt-2 origin-top'}` }
             >
               <div className="space-y-1.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48">
@@ -6457,7 +6457,7 @@ I am listening now. Speak naturally. I will respond ${
 {showScrollHint && (
   <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center opacity-70 transition hover:opacity-100`}>
 
-    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/68 backdrop-blur-[10px] shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
+    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/68 -[10px] shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
 
     <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
 
@@ -6523,7 +6523,7 @@ I am listening now. Speak naturally. I will respond ${
               
 
               <div className={`fixed bottom-[42px] left-0 right-0 z-[70] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
-                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none backdrop-blur-0">
+                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none -0">
                   <button
                     type="button"
                     onClick={() => {
@@ -6600,10 +6600,10 @@ I am listening now. Speak naturally. I will respond ${
                         onClick={() => setShowNormalUtilityMenu(null)}
                         className="fixed inset-0 z-[80] cursor-default bg-transparent"
                       />
-                      <div ref={normalUtilityMenuRef} className={`absolute bottom-full left-1/2 mb-3 flex gap-2 -translate-x-1/2 ${operationalMotion.surface}`}>
+                      <div ref={normalUtilityMenuRef} className={`fixed bottom-[112px] left-1/2 z-[120] flex max-w-[calc(100vw-32px)] -translate-x-1/2 gap-2 ${operationalMotion.surface}`}>
                       {showNormalUtilityMenu === 'help' && (
                         <>
-                          <div className={`w-[160px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
+                          <div className={`w-[136px] px-3 py-2.5 md:w-[160px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 flex items-center justify-between">
                               <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
                                 Help
@@ -6642,7 +6642,7 @@ I am listening now. Speak naturally. I will respond ${
                             </div>
                           </div>
 
-                          <div className={`w-[220px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
+                          <div className={`w-[190px] px-3 py-2.5 md:w-[220px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                             <div className="mb-2 text-[9px] uppercase tracking-[0.22em] text-white/24">
                               {activeHelpTopic === 'live' && 'LIVE'}
                               {activeHelpTopic === 'continuity' && 'ACCESS'}
@@ -6696,7 +6696,7 @@ I am listening now. Speak naturally. I will respond ${
                       )}
 
                       {showNormalUtilityMenu === 'language' && (
-                        <div className={`w-[220px] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
+                        <div className={`w-[190px] px-3 py-2.5 md:w-[220px] md:px-5 md:py-4 ${operationalMotion.anchorPanel}`}>
                           <div className="mb-2 flex items-center justify-between">
                             <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
                               Language
@@ -6924,7 +6924,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-2.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-2.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -7062,7 +7062,7 @@ if (liveMode) {
       type="button"
       aria-label="Close structured LIVE notice"
       onClick={() => setShowProLiveComingSoon(false)}
-      className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
+      className="fixed inset-0 z-[240] bg-black/68 -[10px]"
     />
 
     <div className="fixed inset-0 z-[141] flex items-center justify-center px-4">
@@ -7099,7 +7099,7 @@ if (liveMode) {
       type="button"
       aria-label="Close leave LIVE popup"
       onClick={() => setShowExitPopup(false)}
-      className="fixed inset-0 z-[220] bg-black/52 backdrop-blur-[14px]"
+      className="fixed inset-0 z-[220] bg-black/52 -[14px]"
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
@@ -7239,7 +7239,7 @@ if (liveMode) {
                 setSessionPickerClosing(false)
               }, 170)
             }}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/72 backdrop-blur-[10px] text-[#D7DBE4]/70 transition hover:border-white/[0.09] hover:text-[#D7DBE4]"
+            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/72 -[10px] text-[#D7DBE4]/70 transition hover:border-white/[0.09] hover:text-[#D7DBE4]"
           >
             ×
           </button>
@@ -7398,7 +7398,7 @@ Continue from here, tell me what changed, or start fresh.`
 
               
 {showOutcomeBar && (
-  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/72 backdrop-blur-[10px] px-5 py-4 ">
+  <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/72 -[10px] px-5 py-4 ">
 
     <div className="text-[11px] text-[#D7DBE4]/60 mb-2">
       What happened here?
@@ -7481,7 +7481,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 {liveMode && showLiveQuickMenu && (
-                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 backdrop-blur-[10px]" />
+                <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 -[10px]" />
               )}
 
 
@@ -7527,7 +7527,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 {false && liveMode && stableLiveGuidance && (
   <div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed'} bottom-[118px] left-0 right-0 z-[88] mx-auto flex w-full max-w-[900px] justify-center px-4 xl:pl-[280px]`}>
-    <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 backdrop-blur-[10px]">
+    <div className="w-full max-w-[420px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[720px] xl:max-w-[920px] md:max-w-[420px] md:max-w-[720px] xl:max-w-[920px] xl:max-w-[760px] rounded-[0.9rem] border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 -[10px]">
       {stableLiveGuidance && (
         <>
           <div className="mb-1 text-[9px] uppercase tracking-[0.22em] text-[#AEB6FF]/52">
@@ -7941,7 +7941,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 
 {showWalkthrough && (
-        <div className="fixed inset-0 z-[95] bg-black/72 backdrop-blur-[10px]  flex items-center justify-center px-4 ">
+        <div className="fixed inset-0 z-[95] bg-black/72 -[10px]  flex items-center justify-center px-4 ">
           <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
             <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">Runtime</p>
 
@@ -7978,7 +7978,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
 {showPersonalizeModal && (
         <div
-          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 px-4 backdrop-blur-[10px] pb-4 "
+          className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 px-4 -[10px] pb-4 "
           onClick={() => setShowPersonalizeModal(false)}
         >
           <div
@@ -8090,12 +8090,12 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           setShowUpgradeModal(false)
         }
       }}
-      className="pointer-events-auto fixed inset-0 z-[200] bg-black/24 backdrop-blur-[8px]"
+      className="pointer-events-auto fixed inset-0 z-[200] bg-black/24 -[8px]"
     />
 
     <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
       <div
-        className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/42 p-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.14)] ring-1 ring-white/[0.018] backdrop-blur-[14px]"
+        className="pointer-events-auto w-full max-w-[360px] rounded-[1.35rem] border border-white/[0.055] bg-[#05070B]/42 p-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.14)] ring-1 ring-white/[0.018] -[14px]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4">
@@ -8284,7 +8284,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
             type="button"
             aria-label="Close activation"
             onClick={() => setActiveCheckout(null)}
-            className="fixed inset-0 z-[240] bg-black/68 backdrop-blur-[10px]"
+            className="fixed inset-0 z-[240] bg-black/68 -[10px]"
           />
 
           <div className="fixed inset-0 z-[141] flex items-center justify-center px-4 py-6">
@@ -8326,7 +8326,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
       {showToast && (
         <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[80] flex justify-center px-4">
-          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-[#D7DBE4] shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-xl">
+          <div className="rounded-full border border-white/[0.05] bg-white/[0.018]/95 px-4 py-1.5 text-sm text-[#D7DBE4] shadow-[0_24px_72px_rgba(0,0,0,0.46)] ">
             {toastMessage}
           </div>
         </div>
