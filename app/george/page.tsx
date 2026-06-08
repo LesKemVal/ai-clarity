@@ -5665,7 +5665,7 @@ return (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
     <div className="pointer-events-none fixed left-0 right-0 top-[70px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
-    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1rem] border border-white/[0.045] bg-[#070A0F]/78 px-4 py-3 shadow-[0_18px_58px_rgba(0,0,0,0.34)] ">
+    <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border border-white/[0.055] bg-[#05070B]/82 px-4 py-3 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)] ">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
@@ -5700,7 +5700,7 @@ return (
             setShowToast(true)
           }}
           disabled={!voiceSupported || isThinking}
-          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
           {liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE room' : 'inactive')}
@@ -5721,7 +5721,7 @@ return (
             setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
             setShowToast(true)
           }}
-          className={`rounded-[0.95rem] border px-4 py-3 text-left transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Chair</span>
           {liveRuntimeSupport?.chair || 'User'}
@@ -5734,7 +5734,7 @@ return (
             setToastMessage('LIVE paused')
             setShowToast(true)
           }}
-          className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/46 transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
+          className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/52 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Outcome</span>
           {liveRuntimeSupport?.objective || 'Outcome pending'}
@@ -5742,15 +5742,15 @@ return (
       </div>
 
       <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Move</span>
           {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[0] : 'idle'}
         </div>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Angle</span>
           {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[1] : 'idle'}
         </div>
-        <div className={`rounded-[0.95rem] border px-4 py-3 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
+        <div className={`rounded-[0.95rem] border px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}>
           <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>Pressure</span>
           {liveRoomActive ? getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[2] : 'idle'}
         </div>
