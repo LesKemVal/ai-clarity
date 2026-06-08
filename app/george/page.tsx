@@ -5664,7 +5664,7 @@ return (
 {(forceLive || liveMode) && (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0 xl:pl-[280px]" />
-    <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[38] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
+    <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 xl:pl-[280px] pointer-events-none">
     <div className="pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border border-white/[0.055] bg-[#05070B]/82 px-4 py-3 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)] ">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -5682,7 +5682,9 @@ return (
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
         <button
           type="button"
-          onClick={() => {
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
             if (isThinking) return
 
             const nextEnabled = !liveGeorgeEnabled
