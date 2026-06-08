@@ -37,11 +37,11 @@ const tiers: TierCard[] = [
     id: 'intelligent',
     name: 'Intelligent',
     price: '$10',
-    tone: 'LIVE runtime',
-    promise: 'Structured execution with LIVE runtime support and contextual recall by default.',
+    tone: 'LIVE support',
+    promise: 'Structured operational support with continuity, contextual awareness, and LIVE access.',
     label: 'Explain Intelligent',
     details: [
-      'LIVE runtime support, contextual recall by default, continuity-aware execution, adaptive response shaping, operational memory carry, active conversational support, persistent objective tracking.',
+      'LIVE support, contextual recall by default, continuity-aware execution, adaptive response shaping, operational memory carry, active conversational support, persistent objective tracking.',
     ],
     action: 'Activate Intelligent',
     checkout: 'intelligent',
@@ -50,11 +50,11 @@ const tiers: TierCard[] = [
     id: 'brilliant',
     name: 'Brilliant',
     price: '$25',
-    tone: 'Persistent runtime',
-    promise: 'Persistent LIVE runtime with deeper continuity, stronger contextual awareness, and real-time operational support.',
+    tone: 'Persistent continuity',
+    promise: 'Persistent operational support with deeper continuity, stronger awareness, and ongoing LIVE access.',
     label: 'Explain Brilliant',
     details: [
-      'Persistent LIVE runtime, deeper contextual carry, adaptive pressure handling, continuity-linked operational memory, real-time conversational guidance, runtime-aware support escalation, stronger execution persistence.',
+      'Persistent LIVE support, deeper contextual carry, adaptive pressure handling, continuity-linked operational memory, real-time conversational guidance, support escalation, stronger execution persistence.',
     ],
     action: 'Activate Brilliant',
     checkout: 'brilliant',
@@ -63,11 +63,11 @@ const tiers: TierCard[] = [
     id: 'brilliant_day',
     name: 'Brilliant Day',
     price: '$5',
-    tone: 'Temporary runtime',
-    promise: 'Temporary access to GEORGE’s LIVE runtime and operational support layer.',
+    tone: 'Temporary access',
+    promise: 'Temporary access to GEORGE’s LIVE support layer.',
     label: 'Explain Day Access',
     details: [
-      'Temporary LIVE runtime access, contextual carry enabled, real-time operational guidance, adaptive conversational support, pressure-aware assistance, continuity-linked execution support.',
+      'Temporary LIVE access, contextual carry enabled, real-time operational guidance, adaptive conversational support, pressure-aware assistance, continuity-linked execution support.',
     ],
     action: 'Activate Day Access',
     checkout: 'brilliant_day',
@@ -81,6 +81,7 @@ export default function TopUpPage() {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
   const [activeCheckout, setActiveCheckout] = useState<CheckoutTier | null>(null)
+  const [currentTier, setCurrentTier] = useState<TierId>('smart')
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -111,6 +112,11 @@ export default function TopUpPage() {
 
     const params = new URLSearchParams(window.location.search)
     setIntent(params.get('intent'))
+
+    const storedTier = window.localStorage.getItem('george_tier')
+    if (storedTier === 'intelligent' || storedTier === 'brilliant') {
+      setCurrentTier(storedTier)
+    }
 
     const checkout = params.get('checkout')
     if (checkout === 'intelligent' || checkout === 'brilliant' || checkout === 'brilliant_day') {
@@ -332,7 +338,7 @@ export default function TopUpPage() {
         <section className="rounded-[0.9rem] border border-white/[0.028] bg-white/[0.006] p-5 md:p-6">
           <div className="max-w-6xl space-y-5">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">
-              ACCESS LEVELS
+              ACCESS & CONTINUITY
             </p>
 
             <h1 className="text-4xl font-semibold tracking-[-0.045em] text-white md:text-5xl">
@@ -344,7 +350,15 @@ export default function TopUpPage() {
             </p>
 
             <div className="rounded-[0.8rem] border border-white/[0.028] bg-black/20 px-4 py-3 text-sm text-white/64">
-              Pay for the level of recall, support, and LIVE access you actually need.
+              <div>
+                Choose the level of continuity, operational support, and LIVE access that fits how you work.
+              </div>
+
+              <div className="mt-2 text-white/78">
+                {currentTier === 'brilliant'
+                  ? 'For the highest level of continuity, awareness, and LIVE support, stay Brilliant.'
+                  : 'For the highest level of continuity, awareness, and LIVE support, go Brilliant.'}
+              </div>
             </div>
 
             <div className="rounded-[0.8rem] border border-[#AAB4FF]/10 bg-[linear-gradient(180deg,rgba(111,132,255,0.045),rgba(255,255,255,0.012))] px-4 py-3">
@@ -367,7 +381,7 @@ export default function TopUpPage() {
               </button>
 
               <span className="text-[11px] tracking-[0.08em] text-white/30">
-                Founder access restores local continuity access.
+                Founder access restores verified GEORGE continuity and entitlement.
               </span>
             </div>
 
@@ -441,7 +455,7 @@ export default function TopUpPage() {
                           <div className="lg:col-span-4">
                             <div className="rounded-[1rem] border border-white/[0.05] bg-black/20 p-5">
                               <p className="text-sm text-white/60">
-                                Runtime activation has moved to the dedicated activation page.
+                                Activation and continuity restoration have moved to the dedicated activation page.
                               </p>
 
                               <button
