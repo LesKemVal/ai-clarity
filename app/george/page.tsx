@@ -5805,7 +5805,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[230px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -7728,7 +7728,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[132px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[156px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
