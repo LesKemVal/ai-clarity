@@ -63,7 +63,10 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-5 max-w-[720px] font-mono text-[14px] leading-7 tracking-[0.01em] text-white/54 sm:text-[17px] sm:leading-8">
-              Conversation moves trust, money, care, conflict, opportunity, and work.
+              GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be.
+              <span className="mt-2 block text-white/62">
+                Conversation moves trust, money, care, conflict, opportunity, and work.
+              </span>
               <span className="block text-white/62">
                 Bring GEORGE into <span className="text-white/82">{typedSituation}</span>
                 <span className="ml-0.5 inline-block h-[1em] w-px translate-y-[2px] bg-white/54 [animation:georgeComposerCursorBlink_.75s_steps(1,end)_infinite]" />
