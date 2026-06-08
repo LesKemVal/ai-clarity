@@ -613,7 +613,7 @@ export default function LiveEntryClient() {
     const signals = [
       {
         id: 'objective',
-        label: "Today's objective",
+        label: "Current direction",
         met: hasObjective,
         helper: 'What should this interaction accomplish?',
       },
@@ -1184,9 +1184,9 @@ export default function LiveEntryClient() {
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/24">Context Signals</span>
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/24">Room signals</span>
                   <span className="mt-0.5 block truncate text-[12px] text-white/48">
-                    {chair || 'Position not selected'}
+                    {chair || 'Identity not selected'}
                   </span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
@@ -1203,7 +1203,7 @@ export default function LiveEntryClient() {
                 className="flex w-full items-center justify-between gap-3 text-left"
               >
                 <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Position</span>
+                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Role / position</span>
                   <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
@@ -1219,7 +1219,7 @@ export default function LiveEntryClient() {
   Name, title, nickname, or moniker you'll use in the room.
 </p>
             <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
-              <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose position</span>
+              <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose role or position</span>
               <select
                 value={chairs[0] || ''}
                 onChange={(event) => {
