@@ -18,7 +18,7 @@ export default function CancelPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              Nothing was submitted. You can return to GEORGE now or continue setting up subscriber continuity when you are ready.
+              Nothing was submitted. You can return to GEORGE now or restore access and continuity when you are ready.
             </p>
           </div>
         </section>
@@ -34,10 +34,10 @@ export default function CancelPage() {
 
           <button
             type="button"
-            onClick={() => (window.open('/top-up','_blank','noopener,noreferrer'))}
+            onClick={() => (window.location.href = '/activate')}
             className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-white/[0.18] hover:text-white"
           >
-            Back to continuity options
+            Restore access
           </button>
         </section>
       </div>

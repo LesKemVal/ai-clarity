@@ -18,11 +18,11 @@ export default function SuccessPage() {
             </p>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              Your access is active. GEORGE can now restore subscriber continuity on this device and support the tier you selected.
+              Your access is active. GEORGE can now restore continuity on this device and support the level of operational awareness you selected.
             </p>
 
             <p className="text-sm text-white">
-              Continue now, or personalize GEORGE when you are ready.
+              Continue now, or bring GEORGE closer to the way you work.
             </p>
           </div>
         </section>
@@ -41,7 +41,7 @@ export default function SuccessPage() {
             onClick={() => (window.location.href = '/george?intent=make-george-yours')}
             className="rounded-full border border-neutral-700 px-6 py-3 text-sm font-medium text-neutral-200 transition button-press hover:border-white/[0.18] hover:text-white"
           >
-            Make GEORGE Yours
+            Shape GEORGE
           </button>
         </section>
       </div>
