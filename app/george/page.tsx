@@ -1614,11 +1614,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setMessages([])
       messagesRef.current = []
       void unlockMobileAudio()
-      setVoiceOn(true)
-      setInteractionMode('speech')
-      setShowEarbudOverlay(true)
-      window.setTimeout(() => setShowEarbudOverlay(false), 5200)
-      setTimeout(() => startListening(), 120)
+      setVoiceOn(false)
+      setLiveGeorgeEnabled(false)
+      setInteractionMode('text')
+      setShowEarbudOverlay(false)
       return
     }
 
@@ -1996,6 +1995,8 @@ const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 const [loginEmailInput, setLoginEmailInput] = useState('')
 const [showIdentityMenu, setShowIdentityMenu] = useState(false)
+const [showFounderCodeModal, setShowFounderCodeModal] = useState(false)
+const [founderCodeInput, setFounderCodeInput] = useState('')
 
 const handleIdentitySignOut = () => {
   setShowIdentityMenu(false)
@@ -2011,9 +2012,13 @@ const [loginLinkSent, setLoginLinkSent] = useState(false)
 const [loginSending, setLoginSending] = useState(false)
 const [activeCheckout, setActiveCheckout] = useState<'intelligent' | 'brilliant' | 'brilliant_day' | null>(null)
 const redeemFounderCode = async () => {
-  const code = window.prompt('Enter founder access code')
+  const code = founderCodeInput.trim()
 
-  if (!code) return
+  if (!code) {
+    setToastMessage('Founder code required.')
+    setShowToast(true)
+    return
+  }
 
   try {
     const response = await fetch('/api/founder-code', {
@@ -2054,6 +2059,8 @@ const redeemFounderCode = async () => {
     }
     setShowToast(true)
     setShowUpgradeModal(false)
+    setShowFounderCodeModal(false)
+    setFounderCodeInput('')
   } catch {
     setToastMessage('Founder code check failed.')
     setShowToast(true)
@@ -3511,7 +3518,7 @@ requestAnimationFrame(() => {
 
       mobileAudioUnlockedRef.current = true
     } catch {
-      void unlockMobileAudio()
+      hasUserInteractedRef.current = true
     }
   }
 
@@ -5832,7 +5839,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:pt-4`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[74px] z-[35] mx-auto w-full max-w-[760px] px-5 pt-0 md:px-8 md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -5873,10 +5880,10 @@ return (
         )}
 
         {showPreLiveSignalSurface && (
-          <div className="mt-7 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
+          <div className="mt-4 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
             {!isPreLiveEarbudReady && currentPreLiveQuestion && (
               <>
-                <div className="mb-5 flex items-center justify-between border-b border-white/[0.06] pb-3">
+                <div className="mb-3 flex items-center justify-between border-b border-white/[0.06] pb-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -5902,7 +5909,7 @@ return (
                       setActivePromptLabel(null)
                       setMessages([])
                       messagesRef.current = []
-                      window.location.href = '/'
+                      window.location.href = '/george'
                     }}
                     className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DBE4]/42 transition hover:text-white"
                   >
@@ -5917,11 +5924,11 @@ return (
                   {currentPreLiveQuestion.kicker}
                 </div>
 
-                <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
+                <div className="mt-2 text-[11px] uppercase tracking-[0.18em] text-white/30">
                   {currentPreLiveQuestion.label}
                 </div>
 
-                <div className="mt-3 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
+                <div className="mt-2 text-[16px] leading-6 tracking-[-0.02em] text-white/76 md:text-[19px] md:leading-8">
                   {currentPreLiveQuestion.question}
                 </div>
 
@@ -8125,7 +8132,43 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       )}
 
 
-      {showUpgradeModal && typeof document !== 'undefined' && createPortal(
+      {showFounderCodeModal && typeof document !== 'undefined' && createPortal(
+  <div className="fixed inset-0 z-[260] flex items-center justify-center bg-black/62 px-4 backdrop-blur-[12px]">
+    <div className="w-full max-w-[360px] rounded-[1rem] border border-white/[0.07] bg-[#05070B]/96 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.52)]">
+      <div className="text-[10px] uppercase tracking-[0.24em] text-[#D7DBE4]/32">Founder access</div>
+      <h2 className="mt-2 text-[20px] font-semibold tracking-[-0.04em] text-white/88">Enter founder code.</h2>
+      <input
+        value={founderCodeInput}
+        onChange={(event) => setFounderCodeInput(event.target.value)}
+        autoFocus
+        placeholder="Founder code"
+        className="mt-4 w-full rounded-[0.8rem] border border-white/[0.08] bg-black/30 px-3 py-3 text-[13px] uppercase tracking-[0.08em] text-white outline-none placeholder:text-white/22"
+      />
+      <div className="mt-4 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => {
+            setShowFounderCodeModal(false)
+            setFounderCodeInput('')
+          }}
+          className="text-[11px] uppercase tracking-[0.16em] text-white/38 transition hover:text-white/72"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={redeemFounderCode}
+          className="rounded-full border border-white/[0.08] bg-white/88 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-black transition hover:bg-white"
+        >
+          Activate
+        </button>
+      </div>
+    </div>
+  </div>,
+  document.body
+)}
+
+{showUpgradeModal && typeof document !== 'undefined' && createPortal(
   <>
     <div
       role="button"
@@ -8135,6 +8178,8 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
       onKeyDown={(event) => {
         if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
           setShowUpgradeModal(false)
+    setShowFounderCodeModal(false)
+    setFounderCodeInput('')
         }
       }}
       className="pointer-events-auto fixed inset-0 z-[200] bg-black/24 -[8px]"
