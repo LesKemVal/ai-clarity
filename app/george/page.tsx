@@ -6492,29 +6492,20 @@ I am listening now. Speak naturally. I will respond ${
   })}
   
 {showScrollHint && (
-  <div className={`fixed bottom-[190px] left-1/2 z-[90] -translate-x-1/2 flex items-center justify-center opacity-70 transition hover:opacity-100`}>
-
-    <div className="absolute h-10 w-10 rounded-full border border-white/[0.06] bg-black/68 -[10px] shadow-[0_14px_34px_rgba(0,0,0,0.34)] " />
-
-    <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-black/36 shadow-[inset_0_0_14px_rgba(255,255,255,0.02)]">
-
-      <button
-        type="button"
-        onClick={() => {
-          userPinnedBottomRef.current = true
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-          setShowScrollHint(false)
-        }}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_24px_rgba(0,0,0,0.24)] transition hover:bg-white/90 hover:scale-[1.03]"
-        aria-label="Scroll to latest message"
-      >
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 5v13" />
-          <path d="m6 12 6 6 6-6" />
-        </svg>
-      </button>
-
-    </div>
+  <div className="fixed bottom-[calc(188px+env(safe-area-inset-bottom))] left-1/2 z-[90] -translate-x-1/2 opacity-90 transition-opacity duration-200">
+    <button
+      type="button"
+      onClick={() => {
+        userPinnedBottomRef.current = true
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        setShowScrollHint(false)
+      }}
+      className="group relative overflow-hidden rounded-full border border-white/[0.08] bg-black/72 px-5 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/58 shadow-[0_18px_46px_rgba(0,0,0,0.42)] backdrop-blur-xl transition hover:border-white/[0.14] hover:text-[#D7DBE4]/82"
+      aria-label="Show further interpretation"
+    >
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/24 to-transparent" />
+      Further interpretation
+    </button>
   </div>
 )}
 
