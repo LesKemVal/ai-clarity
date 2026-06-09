@@ -381,7 +381,8 @@ export default function LiveEntryClient() {
     key: string
     label: string
     question: string
-    examples: string
+    why: string
+    example: string
   } | null>(null)
   const [optionalSignalLoading, setOptionalSignalLoading] = useState(false)
   const [optionalSignalComplete, setOptionalSignalComplete] = useState(false)
@@ -471,25 +472,29 @@ export default function LiveEntryClient() {
         key: String(data.key || `signal_${Date.now()}`),
         label: String(data.label || 'Additional signal'),
         question: String(data.question || ''),
-        examples: String(data.helper || 'Answer if useful, or skip.'),
+        why: String(data.why || data.helper || 'This may improve GEORGE’s context, timing, and support.'),
+        example: String(data.example || 'Answer if useful, or skip.'),
       })
     } catch {
       setCurrentOptionalSignalQuestion({
         key: `fallback_${Date.now()}`,
         label: 'Additional signal',
         question: 'What should GEORGE be especially ready for in this room?',
-        examples: 'Answer if useful, or skip.',
+        why: 'This may improve GEORGE’s context, timing, and support.',
+        example: 'Answer if useful, or skip.',
       })
     } finally {
       setOptionalSignalLoading(false)
     }
   }
 
-  const optionalAnswerExamples = [
-    'E.g. They may push back on valuation.',
-    'E.g. I need GEORGE to keep me calm and concise.',
-    'E.g. They may ask for proof, traction, or timing.',
-  ]
+  const optionalAnswerExamples = currentOptionalSignalQuestion?.example
+    ? [currentOptionalSignalQuestion.example]
+    : [
+      'E.g. They may push back on valuation.',
+      'E.g. I need GEORGE to keep me calm and concise.',
+      'E.g. They may ask for proof, traction, or timing.',
+    ]
 
   const desiredOutcomeExamples = [
     'E.g. Secure a second meeting.',
@@ -1320,7 +1325,7 @@ export default function LiveEntryClient() {
               </div>
 
               <div className="mt-3 text-[13px] leading-6 text-white/38">
-                {currentOptionalSignalQuestion.examples}
+                {currentOptionalSignalQuestion.why}
               </div>
 
               <div className="mt-6 flex items-center gap-5">

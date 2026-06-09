@@ -87,6 +87,8 @@ Return strict JSON only:
   "status": "question" | "sufficient",
   "question": string,
   "label": string,
+  "why": string,
+  "example": string,
   "helper": string,
   "key": string
 }
@@ -102,7 +104,9 @@ Rules:
 - Do not ask medical/legal/financial diagnostic questions; ask operational preparation questions.
 - The question should increase probable success in the room.
 - label must be short, 1 to 3 words.
-- helper must be short and practical.
+- why must explain why answering this question may improve context, timing, support, or probability of achieving the desired outcome.
+- example must be a short example answer tied directly to the question.
+- helper may mirror why for backward compatibility.
 - key must be snake_case and should not duplicate prior answer keys.
           `.trim(),
         },
@@ -119,7 +123,9 @@ Rules:
     const status = parsed?.status === 'sufficient' ? 'sufficient' : 'question'
     const question = clean(parsed?.question)
     const label = clean(parsed?.label) || (status === 'sufficient' ? 'Signal sufficient' : 'Additional signal')
-    const helper = clean(parsed?.helper) || (status === 'sufficient' ? 'GEORGE has enough signal for LIVE support.' : 'Answer if useful, or skip.')
+    const why = clean(parsed?.why) || clean(parsed?.helper) || (status === 'sufficient' ? 'Additional signal is unlikely to materially improve context, timing, or support.' : 'This may improve GEORGE’s context, timing, and support.')
+    const example = clean(parsed?.example) || 'Answer if useful, or skip.'
+    const helper = clean(parsed?.helper) || why
     const key = clean(parsed?.key) || `signal_${Date.now()}`
 
     if (status === 'sufficient' || !question) {
@@ -127,6 +133,8 @@ Rules:
         status: 'sufficient',
         question: '',
         label,
+        why,
+        example,
         helper,
         key,
       })
@@ -136,6 +144,8 @@ Rules:
       status: 'question',
       question,
       label,
+      why,
+      example,
       helper,
       key,
     })
