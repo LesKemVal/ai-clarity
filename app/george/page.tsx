@@ -7905,10 +7905,6 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         className={`${(forceLive || liveMode) ? 'min-h-[22px] pl-14 pr-[92px] py-0 md:min-h-[22px] md:pl-11 md:pr-[84px] md:py-0' : 'min-h-[42px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2'} w-full resize-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-transparent focus:ring-0 md:text-[15px]`}
                       />
 
-                      {!input.trim() && (
-                        <span className="pointer-events-none absolute left-14 top-1/2 h-[15px] w-px -translate-y-1/2 [animation:georgeComposerCursorBlink_.48s_steps(1,end)_infinite] bg-[#D7DBE4]/58 md:left-11 md:h-[15px]" />
-                      )}
-
                       <div className={`${(forceLive || liveMode) ? 'hidden' : 'absolute right-1 top-1/2 flex'} -translate-y-1/2 items-center gap-2`}>
                         {(currentTier === 'smart' || currentTier === 'intelligent' || currentTier === 'brilliant') && (
                           <>
