@@ -5852,10 +5852,7 @@ return (
           alt=""
           className="h-11 w-11 object-contain opacity-95"
         />
-        <div>
-          <div className="george-utility-kicker">BRANESx</div>
-          <div className="george-utility-label"></div>
-        </div>
+        <div className="sr-only">BRANESx</div>
       </div>
 
       <div className="george-utility-instrument">
