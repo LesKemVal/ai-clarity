@@ -140,13 +140,13 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
     if (!popupReady || introSpokenRef.current) return
 
     introSpokenRef.current = true
-    speakPrepRoom("The room has taken shape. Now we turn words into movement. Review the notice, fasten your earbud, and I'll see you in the room.")
+    // GEORGE remains silent until the user accepts responsibility.
   }, [open, profile])
 
   const handleNoticeAccepted = async (accepted: boolean) => {
     setNoticeAccepted(accepted)
     if (accepted) {
-      await speakPrepRoom('Good.')
+      // Consent acknowledged silently.
     }
   }
 
@@ -228,7 +228,11 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
             />
             <span>
               <span className="block text-[10px] uppercase tracking-[0.22em] text-white/30">LIVE Notice</span>
-              GEORGE may misunderstand speech, miss context, provide imperfect guidance, or experience latency. GEORGE assists. You remain responsible for decisions and actions.
+              I understand that I retain final judgment, responsibility, and control over all decisions and actions.
+
+              I may choose to accept, reject, modify, or temporarily delegate execution of conversational strategies and recommendations.
+
+              Use at your own risk.
             </span>
           </label>
 
