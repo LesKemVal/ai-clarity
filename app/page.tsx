@@ -36,8 +36,8 @@ export default function HomePage() {
   }
 
   return (
-    <main className="george-home-depth relative min-h-[100dvh] overflow-hidden bg-[#030406] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(174,182,255,0.105),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(143,182,201,0.045),transparent_28%)]" />
+    <main className="george-home-depth relative min-h-[100dvh] overflow-hidden bg-black text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(174,182,255,0.055),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(143,182,201,0.025),transparent_28%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/28 to-transparent" />
 
       <div className="relative mx-auto flex min-h-[100dvh] max-w-[1120px] flex-col px-5 pb-4 pt-4 sm:px-8">
@@ -63,7 +63,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-5 max-w-[720px] font-mono text-[14px] leading-7 tracking-[0.01em] text-white/54 sm:text-[17px] sm:leading-8">
-              GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be. Use GEORGE to plan, prepare, build, decide, write, negotiate, learn, or work—or bring GEORGE into interviews, meetings, negotiations, and other rooms where success is tied to presentation.
+              Use GEORGE to plan, prepare, build, decide, write, negotiate, learn, or work—or bring GEORGE into interviews and other rooms where success is tied to presentation.
             </p>
 
             <div className="mx-auto mt-7 flex h-[178px] w-full max-w-[390px] items-center justify-center sm:h-[260px] sm:max-w-[560px]">
