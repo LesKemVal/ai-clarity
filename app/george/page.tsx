@@ -332,20 +332,68 @@ function TypewriterText({
 }
 
 function renderAssistantContent(text: string, liveMode: boolean) {
-  if (!liveMode) return text
+  const cleaned = String(text || '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/^###\s+/gm, '')
+    .replace(/^##\s+/gm, '')
+    .replace(/^#\s+/gm, '')
+    .trim()
 
-  const paragraphs = text
+  const paragraphs = cleaned
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean)
 
   return (
-    <div className="flex flex-col gap-7">
-      {paragraphs.map((paragraph, index) => (
-        <div key={index} className="block">
-          {paragraph}
-        </div>
-      ))}
+    <div className={`flex flex-col ${liveMode ? 'gap-7' : 'gap-5'}`}>
+      {paragraphs.map((paragraph, index) => {
+        const lines = paragraph
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+
+        const bulletLines = lines.filter((line) =>
+          /^[-•*]\s+/.test(line)
+        )
+
+        const numberedLines = lines.filter((line) =>
+          /^\d+[.)]\s+/.test(line)
+        )
+
+        if (
+          lines.length > 1 &&
+          (bulletLines.length === lines.length ||
+            numberedLines.length === lines.length)
+        ) {
+          return (
+            <div key={index}>
+              {bulletLines.length === lines.length ? (
+                <ul className="space-y-3">
+                  {lines.map((line, i) => (
+                    <li key={i}>
+                      {line.replace(/^[-•*]\s+/, '• ')}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ol className="space-y-3">
+                  {lines.map((line, i) => (
+                    <li key={i}>
+                      {line}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )
+        }
+
+        return (
+          <div key={index} className="block">
+            {paragraph}
+          </div>
+        )
+      })}
     </div>
   )
 }
