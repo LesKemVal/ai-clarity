@@ -5295,30 +5295,37 @@ useEffect(() => {
 
   const preLiveQuestions = [
     {
-      key: 'role',
+      key: 'name',
       kicker: 'Bring GEORGE up to speed',
       label: 'Question 1',
+      question: 'What should I call you in this room?',
+      examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel, Alex, etc.',
+    },
+    {
+      key: 'role',
+      kicker: 'Position signal',
+      label: 'Question 2',
       question: 'What is your role in the conversation — your position or title?',
       examples: 'Examples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
     },
     {
       key: 'counterparty',
       kicker: 'Room signal',
-      label: 'Question 2',
+      label: 'Question 3',
       question: 'Who are you speaking with?',
       examples: 'Examples: investor, hiring manager, doctor, customer, employee, client, board member, etc.',
     },
     {
       key: 'desiredOutcome',
       kicker: 'Outcome signal',
-      label: 'Question 3',
+      label: 'Question 4',
       question: 'What do you want from this conversation?',
       examples: 'Name the result you are trying to move toward.',
     },
     {
       key: 'acceptableOutcome',
       kicker: 'Settlement signal',
-      label: 'Question 4',
+      label: 'Question 5',
       question: 'If your ideal outcome is not available, what would you settle for?',
       examples: 'This helps GEORGE understand the floor, not just the target.',
     },
