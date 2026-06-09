@@ -913,6 +913,37 @@ useEffect(() => {
 }, [])
 
 const hasLiveGeorgeAccess = currentTier === 'intelligent' || currentTier === 'brilliant'
+const tierUpgradeAction =
+  currentTier === 'smart'
+    ? {
+        label: 'BE INTELLIGENT',
+        headline: 'Current Access',
+        currentLabel: 'Smart',
+        currentIncludes: ['Ask GEORGE', 'Limited continuity', 'Limited LIVE capacity', 'Basic restoration'],
+        nextCopy: 'Intelligent includes everything in Smart, plus stronger continuity, contextual awareness, expanded LIVE resources, and operational support.',
+        cta: 'Understand More',
+        href: '/activate?tier=intelligent&intent=be-intelligent',
+      }
+    : currentTier === 'intelligent'
+      ? {
+          label: 'BE BRILLIANT',
+          headline: 'Current Access',
+          currentLabel: 'Intelligent',
+          currentIncludes: ['Expanded continuity', 'Contextual awareness', 'Operational support', 'Expanded LIVE capacity'],
+          nextCopy: 'Brilliant includes everything in Intelligent, plus deeper continuity, stronger awareness, persistent operational support, and the highest LIVE capacity.',
+          cta: 'Understand More',
+          href: '/activate?tier=brilliant&intent=be-brilliant',
+        }
+      : {
+          label: 'STAY BRILLIANT',
+          headline: 'Current Access',
+          currentLabel: 'Brilliant',
+          currentIncludes: ['Maximum continuity', 'Deep contextual awareness', 'Persistent operational support', 'Highest LIVE capacity'],
+          nextCopy: 'Highest Access Active. Based on recent usage, Intelligent may also be sufficient.',
+          cta: 'Manage Access',
+          href: '/activate?tier=brilliant&intent=stay-brilliant',
+        }
+
 const tierPrimarySignal =
   currentTier === 'smart'
     ? 'Go Intelligent'
@@ -1993,6 +2024,7 @@ const [showOutcomeBar, setShowOutcomeBar] = useState(false)
 const [lastOutcomeContext, setLastOutcomeContext] = useState<string | null>(null)
 
 const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+const [showTierModal, setShowTierModal] = useState(false)
 const [loginEmailInput, setLoginEmailInput] = useState('')
 const [showIdentityMenu, setShowIdentityMenu] = useState(false)
 
@@ -5805,7 +5837,7 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) ? "pb-[390px] md:pb-[280px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -6582,31 +6614,15 @@ I am listening now. Speak naturally. I will respond ${
                         return
                       }
 
-                      if (liveEntryBlinking) return
-
-                      setLiveEntryBlinking(true)
-
-                      window.setTimeout(() => {
-                        setLiveEntryBlinking(false)
-
-                        if (hasLiveGeorgeAccess) {
-                          setShowNormalUtilityMenu(null)
-                          startLiveSignalAcquisition()
-                          return
-                        }
-
-                        setShowNormalUtilityMenu(null)
-                        setLoginEmailInput('')
-                        setLoginLinkSent(false)
-                        setShowUpgradeModal(true)
-                      }, 520)
+                      setShowNormalUtilityMenu(null)
+                      setShowTierModal(true)
                     }}
-                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/42'} ${operationalMotion.hoverText} ${operationalMotion.press} ${liveEntryBlinking ? 'animate-[georgeLiveEntryPulse_260ms_cubic-bezier(0.22,1,0.36,1)_2]' : ''}`}
-                    aria-label="Try LIVE GEORGE"
-                    title="Try LIVE GEORGE"
+                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/42'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
+                    aria-label={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
+                    title={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
                   >
                     <span className={liveMode ? "h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.20)]" : "h-1.5 w-1.5 rounded-full bg-white/24"} />
-                    {liveMode ? 'EXIT' : 'LIVE'}
+                    {liveMode ? 'EXIT' : tierUpgradeAction.label}
                   </button>
 
                   {showNormalUtilityMenu && (
@@ -8102,6 +8118,93 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
           </div>
         </div>
       )}
+
+
+
+      {showTierModal && typeof document !== 'undefined' && createPortal(
+  <>
+    <button
+      type="button"
+      aria-label="Close access panel"
+      onClick={() => setShowTierModal(false)}
+      className="fixed inset-0 z-[200] cursor-default bg-black/45 backdrop-blur-[14px]"
+    />
+
+    <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center overflow-y-auto px-4 py-6">
+      <div
+        className="pointer-events-auto w-full max-w-[390px] rounded-[1.35rem] border border-white/[0.07] bg-[#05070B]/86 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.52)] ring-1 ring-white/[0.025] backdrop-blur-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4">
+          <div className="inline-flex rounded-full border border-white/[0.055] bg-black/28 px-3 py-1 text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/58">
+            GEORGE Access
+          </div>
+
+          <p className="mt-4 text-[12px] uppercase tracking-[0.22em] text-[#D7DBE4]/38">
+            {tierUpgradeAction.headline}
+          </p>
+
+          <p className="mt-1 text-[20px] font-semibold tracking-[-0.04em] text-[#F4F6FA]/94">
+            {tierUpgradeAction.currentLabel}
+          </p>
+        </div>
+
+        <div className="rounded-[1rem] border border-white/[0.05] bg-white/[0.018] px-3.5 py-3.5">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/32">
+            Includes
+          </div>
+
+          <div className="mt-3 grid gap-2">
+            {tierUpgradeAction.currentIncludes.map((item) => (
+              <div key={item} className="flex items-center gap-2 text-[12px] leading-5 text-[#D7DBE4]/58">
+                <span className="h-1 w-1 rounded-full bg-[#AEB6FF]/54" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="mt-3 rounded-[1rem] border border-[#AEB6FF]/[0.08] bg-[#AEB6FF]/[0.035] px-3.5 py-3 text-[12px] leading-5 text-[#D7DBE4]/52">
+          {tierUpgradeAction.nextCopy}
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = tierUpgradeAction.href
+          }}
+          className="mt-4 w-full rounded-full border border-white/[0.07] bg-[#D7DBE4]/88 px-4 py-2.5 text-[12px] font-medium tracking-[0.06em] text-[#05070B] transition hover:bg-white active:scale-[0.985]"
+        >
+          {tierUpgradeAction.cta}
+        </button>
+
+        <div className="mt-3 flex items-center justify-between border-t border-white/[0.03] pt-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              setShowTierModal(false)
+              setLoginEmailInput('')
+              setLoginLinkSent(false)
+              setShowUpgradeModal(true)
+            }}
+            className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
+          >
+            Restore access
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowTierModal(false)}
+            className="text-[11px] text-[#D7DBE4]/46 transition hover:text-[#D7DBE4]/80"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
 
 
       {showUpgradeModal && typeof document !== 'undefined' && createPortal(
