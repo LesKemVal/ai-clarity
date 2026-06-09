@@ -1539,7 +1539,18 @@ export default function LiveEntryClient() {
             <button
               type="button"
               
-              onClick={() => setShowPrepPreview(true)}
+              onClick={() => {
+                if (!hasRequiredLiveSignal) {
+                  const missing = missingMandatoryLiveSignals
+                    .map((signal) => signal.label)
+                    .join(', ')
+
+                  window.alert(`Add signal before LIVE: ${missing}.`)
+                  return
+                }
+
+                setShowPrepPreview(true)
+              }}
               className="w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:text-white active:scale-[0.98]"
             >
               Continue to LIVE
