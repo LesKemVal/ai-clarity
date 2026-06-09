@@ -5843,7 +5843,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[220px] overflow-y-auto overscroll-contain pb-10' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[188px] overflow-y-auto overscroll-contain pb-10' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -7726,7 +7726,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[140px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
