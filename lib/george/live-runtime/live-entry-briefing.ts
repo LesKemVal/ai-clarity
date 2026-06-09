@@ -1,5 +1,4 @@
 import type { LivePrepSetup } from './prep-runtime'
-import { deriveRoomFormation } from '@/lib/george/live/prep-room'
 
 type LiveBriefingMode = 'cues' | 'lines'
 
@@ -17,7 +16,7 @@ function clean(value: unknown) {
   return String(value || '').trim()
 }
 
-function normalizeRoom(value: unknown, fallback = 'Adaptive LIVE') {
+function normalizeRoom(value: unknown, fallback = 'this room') {
   const room = clean(value)
   return room || fallback
 }
@@ -26,97 +25,144 @@ function normalizeAssistMode(setup: LivePrepSetup | null): LiveBriefingMode {
   return setup?.liveAssistMode === 'lines' ? 'lines' : 'cues'
 }
 
-function buildPositionLine(setup: LivePrepSetup | null) {
-  const position = clean((setup as any)?.userPosition)
-
-  if (!position) return null
-
-  return `Position signal: ${position}`
+function getName(setup: LivePrepSetup | null) {
+  return (
+    clean((setup as any)?.name) ||
+    clean((setup as any)?.alias) ||
+    clean((setup as any)?.profileName) ||
+    clean((setup as any)?.userName) ||
+    clean((setup as any)?.chair) ||
+    'You'
+  )
 }
 
-function buildAssistLine(mode: LiveBriefingMode) {
-  if (mode === 'lines') {
-    return 'Give repeatable lines only when they help execution.'
-  }
-
-  return 'Keep cues short unless the moment needs a repeatable line.'
+function getSecondaryPosition(setup: LivePrepSetup | null) {
+  return (
+    clean((setup as any)?.secondaryObjective) ||
+    clean((setup as any)?.acceptableOutcome) ||
+    clean((setup as any)?.fallbackOutcome) ||
+    clean((setup as any)?.floor)
+  )
 }
 
 function buildSignalLine(setup: LivePrepSetup | null) {
   const signals = (setup as any)?.roomSignals as SignalSummary[] | undefined
 
-  if (!signals || signals.length === 0) return null
+  if (!signals || signals.length === 0) {
+    return 'Remember your steering phrases.'
+  }
 
   const first = signals[0]
 
   if (!first?.phrase || !first?.meaningLabel) {
-    return 'Steering signals are loaded.'
+    return 'Remember your steering phrases.'
   }
 
-  return `Steering signal: “${first.phrase}” means “${first.meaningLabel}”.`
+  return `Remember your steering phrases. “${first.phrase}” tells me ${first.meaningLabel.toLowerCase()}.`
+}
+
+function buildAssistLine(mode: LiveBriefingMode) {
+  if (mode === 'lines') {
+    return 'When precision matters, I’ll give you repeatable language.'
+  }
+
+  return 'I’ll use cues by default, and I’ll give you lines when precision matters.'
+}
+
+function buildRoomObservation(setup: LivePrepSetup | null, room: string, desiredOutcome: string, observedReality: string) {
+  const signal = `${room} ${desiredOutcome} ${observedReality}`.toLowerCase()
+
+  if (/interview|candidate|hiring|job/.test(signal)) {
+    return 'I suspect they may be listening for how you think, not just whether you have perfect answers.'
+  }
+
+  if (/investor|capital|fundraising|raise|fund/.test(signal)) {
+    return 'I suspect credibility may matter before persuasion here.'
+  }
+
+  if (/doctor|medical|patient|treatment|symptom/.test(signal)) {
+    return 'I think clarity may matter more than speed in this room.'
+  }
+
+  if (/negotiat|offer|terms|deal|price|counter/.test(signal)) {
+    return 'I think precision may matter here, especially when pressure starts shaping the language.'
+  }
+
+  if (/sales|customer|client|buyer/.test(signal)) {
+    return 'I suspect trust may move this further than pressure.'
+  }
+
+  if (/conflict|argument|apology|repair|relationship/.test(signal)) {
+    return 'I think being understood may matter, but reducing threat may matter first.'
+  }
+
+  if (/board|ceo|executive|leadership|strategy/.test(signal)) {
+    return 'I’ll treat this as executive awareness: interpretation first, lines only when precision matters.'
+  }
+
+  return ''
 }
 
 export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
   const setup = input.setup
-  const room = normalizeRoom(setup?.room, input.defaultRoom || 'Adaptive LIVE')
+  const name = getName(setup)
+  const room = normalizeRoom(setup?.room, input.defaultRoom || 'this room')
   const mode = normalizeAssistMode(setup)
-  const signalLine = buildSignalLine(setup)
-  const positionLine = buildPositionLine(setup)
-  const desiredOutcome = clean(setup?.objective)
+  const desiredOutcome = clean(setup?.objective) || 'your desired outcome'
   const observedReality =
     clean((setup as any)?.observedReality) ||
     clean((setup as any)?.reality) ||
     clean((setup as any)?.currentReality) ||
     clean((setup as any)?.knownContext)
 
-  const chairs = [
-    clean((setup as any)?.userPosition),
-    clean((setup as any)?.chair),
-  ].filter(Boolean)
-
-  const formation = deriveRoomFormation({
-    chairs: chairs.length ? chairs : ['User'],
-    desiredOutcome,
-    observedReality,
-  })
+  const secondaryPosition = getSecondaryPosition(setup)
+  const signalLine = buildSignalLine(setup)
+  const observation = buildRoomObservation(setup, room, desiredOutcome, observedReality)
 
   return [
-    'LIVE ENTRY SIGNALS',
+    `${name}.`,
     '',
-    `Chair: ${formation.humanEntry.chairLabel}`,
-    formation.humanEntry.recognition,
-    formation.humanEntry.trustDirective,
-    formation.humanEntry.signalAcquisitionDirective,
+    'You made it.',
     '',
-    `Objective: ${desiredOutcome || 'Not yet provided.'}`,
-    `Observed reality: ${observedReality || 'Not yet provided.'}`,
-    positionLine,
-    `Room formed from signal: ${room}`,
+    'Check the box and we can get started.',
     '',
-    `Confidence: ${formation.confidence.level}`,
-    formation.nextMandatorySignal
-      ? `Next mandatory signal: ${formation.nextMandatorySignal.question}`
-      : 'Next mandatory signal: none.',
-    formation.nextMandatorySignal
-      ? `Reason: ${formation.nextMandatorySignal.reason}`
+    'Good.',
+    '',
+    'Before we go LIVE, I want to make sure we are working from accurate assumptions.',
+    '',
+    'Double-check the facts that matter here, then review the Terms of Assistance.',
+    '',
+    "We can't enter the room without them.",
+    '',
+    'Okay.',
+    '',
+    `Let’s work together to frame this conversation in a way that produces the right room signal and moves you closer to ${desiredOutcome}.`,
+    secondaryPosition
+      ? `I’m also aware of your secondary position, but that is secondary.`
       : null,
-    formation.interpretation,
-    formation.entryDirective,
+    '',
+    'If there is anything I should understand before we begin, tell me now.',
+    '',
+    'One more thing.',
+    '',
+    'The more we work together, the more useful I become.',
+    '',
+    'I’ll learn how you present, where you prefer support, when you want direction, and when you would rather lead.',
+    '',
+    'Use your phone if you need to adjust tone or support.',
+    '',
+    'Trust the process.',
     '',
     signalLine,
-    '',
-    'Chair creates recognition. Recognition creates trust. Trust reduces apprehension. Cooperation produces signal.',
-    'Next best signal is mandatory. All other signals are optional.',
-    'Preview is complete. LIVE is execution.',
-    'Do not repeat preview work.',
-    'Do not create profession brains, modes, or separate expertise layers.',
-    'Use the chair only to judge relevance and signal requirements.',
-    'Treat the room as formed from signal, not selected as a static mode.',
-    'Listen for new signals at all times.',
-    'If documents are uploaded during LIVE, treat them as immediately available signal.',
-    'If context is interrupted, restore from the objective, observed reality, repeated details, and user-provided signals.',
-    'Open briefly, confidently, and in the natural language of the objective and observed reality.',
+    observation ? '' : null,
+    observation || null,
     '',
     buildAssistLine(mode),
+    '',
+    'Proceed naturally.',
+    '',
+    'I’ll help guide the trajectory as it develops.',
+    '',
+    "Remember your earbuds—or your phone screen if earbuds aren't available.",
   ].filter(Boolean).join('\n')
 }
