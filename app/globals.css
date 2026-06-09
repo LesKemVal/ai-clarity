@@ -1704,3 +1704,25 @@ textarea,
 select {
   font-family: inherit;
 }
+
+/* GEORGE mobile composer surface separation */
+.george-composer-shell{
+  background:rgba(7,12,20,.94)!important;
+  border-color:rgba(255,255,255,.07)!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.34)!important;
+}
+
+.george-composer-shell::before,
+.george-composer-shell::after{
+  display:none!important;
+  content:none!important;
+  background:none!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+@media (max-width: 640px){
+  [data-george-normal-hero]{
+    padding-bottom:220px!important;
+  }
+}

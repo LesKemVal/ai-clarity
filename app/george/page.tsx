@@ -5843,7 +5843,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:pt-4`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[236px] overflow-y-auto pb-6' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
