@@ -5887,40 +5887,22 @@ return (
           <div className="mt-7 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
             {!isPreLiveEarbudReady && currentPreLiveQuestion && (
               <>
-                <div className="mb-5 flex items-center justify-between border-b border-white/[0.06] pb-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (preLiveSignalStep > 0) {
+                <div className="mb-5 flex items-center justify-end border-b border-white/[0.06] pb-3">
+                  {preLiveSignalStep > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
                         setPreLiveSignalStep((step) => Math.max(0, step - 1))
                         setActivePromptContext('pre_live_signal_acquisition')
                         setActivePromptLabel(`Question ${Math.max(1, preLiveSignalStep)}`)
-                        return
-                      }
+                      }}
+                      className="mr-auto text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D7DBE4]/38 transition hover:text-white"
+                    >
+                      Previous signal
+                    </button>
+                  )}
 
-                      try {
-                        window.localStorage.removeItem('george_start_new_live')
-                        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
-                        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
-                        window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
-                      } catch {}
-
-                      setShowPreLiveSignalSurface(false)
-                      setPreLiveSignalStep(0)
-                      setPreLiveSignals({})
-                      setPreLiveSignalComplete(false)
-                      setActivePromptContext(null)
-                      setActivePromptLabel(null)
-                      setMessages([])
-                      messagesRef.current = []
-                      window.location.href = '/'
-                    }}
-                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DBE4]/42 transition hover:text-white"
-                  >
-                    {preLiveSignalStep > 0 ? 'Previous signal' : 'Exit setup'}
-                  </button>
-
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/24">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/24">
                     {preLiveSignalStep + 1}/{preLiveQuestions.length}
                   </div>
                 </div>
@@ -6580,8 +6562,8 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[calc(104px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
-                <div className="pointer-events-auto relative flex items-center justify-center gap-6 rounded-full border border-white/[0.14] bg-transparent px-6 py-2 shadow-none -0">
+              <div className={`fixed bottom-[calc(78px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
+                <div className="pointer-events-auto relative flex items-center justify-center gap-5 rounded-full border border-white/[0.08] bg-transparent px-5 py-1.5 shadow-none">
                   <button
                     type="button"
                     onClick={() => {
@@ -6589,7 +6571,7 @@ I am listening now. Speak naturally. I will respond ${
                       setShowLanguageMenu(false)
                       setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
                     }}
-                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
+                    className="px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/36 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
                     Help
                   </button>
@@ -6600,7 +6582,7 @@ I am listening now. Speak naturally. I will respond ${
                       e.stopPropagation()
                                     setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
                     }}
-                    className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 ${operationalMotion.hoverText} ${operationalMotion.press}"
+                    className="px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/36 ${operationalMotion.hoverText} ${operationalMotion.press}"
                   >
                     {language}
                   </button>
@@ -6617,12 +6599,12 @@ I am listening now. Speak naturally. I will respond ${
                       setShowNormalUtilityMenu(null)
                       setShowTierModal(true)
                     }}
-                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/42'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
+                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/36'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
                     aria-label={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
                     title={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
                   >
                     <span className={liveMode ? "h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.20)]" : "h-1.5 w-1.5 rounded-full bg-white/24"} />
-                    {liveMode ? 'EXIT' : tierUpgradeAction.label}
+                    {liveMode ? 'EXIT' : tierUpgradeAction.currentLabel}
                   </button>
 
                   {showNormalUtilityMenu && (
