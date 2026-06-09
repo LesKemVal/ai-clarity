@@ -1688,18 +1688,9 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       const liveContext = String((liveSetup as any)?.observedReality || (liveSetup as any)?.knownContext || '').trim()
       const liveChair = String((liveSetup as any)?.chair || '').trim()
 
-      const liveBriefing = liveSetup
-        ? [
-            liveRoom ? `${liveRoom} active.` : 'LIVE active.',
-            liveChair ? `Chair: ${liveChair}` : '',
-            liveBRANESx ? `Desired outcome:\n${liveBRANESx}` : '',
-            liveContext ? `Observed reality:\n${liveContext}` : '',
-            'I’m listening for what changes next.',
-          ].filter(Boolean).join('\n\n')
-        : [
-            'LIVE active.',
-            'I’m listening for what changes next.',
-          ].join('\n\n')
+      const liveBriefing = buildLiveEntryBriefing({
+        setup: liveSetup,
+      })
 
       const liveIntro: Message = {
         role: 'assistant',
