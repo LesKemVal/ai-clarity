@@ -371,13 +371,21 @@ export default function LiveEntryClient() {
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
   const [prepRoomProfile, setPrepRoomProfile] = useState<PrepRoomResourceProfile | null>(null)
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>({})
-  const [optionalSignalStep, setOptionalSignalStep] = useState(0)
   const [optionalSignalInput, setOptionalSignalInput] = useState('')
   const [typedOptionalAnswerExample, setTypedOptionalAnswerExample] = useState('')
   const [optionalSignalInputFocused, setOptionalSignalInputFocused] = useState(false)
   const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<Record<string, string>>({})
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false)
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] = useState('')
+  const [currentOptionalSignalQuestion, setCurrentOptionalSignalQuestion] = useState<{
+    key: string
+    label: string
+    question: string
+    examples: string
+  } | null>(null)
+  const [optionalSignalLoading, setOptionalSignalLoading] = useState(false)
+  const [optionalSignalComplete, setOptionalSignalComplete] = useState(false)
+  const [skippedOptionalSignalKeys, setSkippedOptionalSignalKeys] = useState<string[]>([])
   const [exampleIndex, setExampleIndex] = useState(0)
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
   const [founderAccessReady, setFounderAccessReady] = useState(false)
@@ -428,45 +436,54 @@ export default function LiveEntryClient() {
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== 'not_related'
 
-  const optionalOpenAISignalQuestions = useMemo(() => {
-    const role = String(preLiveSignals.role || '').toLowerCase()
+  const requestNextOptionalSignalQuestion = async (answers = optionalSignalAnswers, skipped = skippedOptionalSignalKeys) => {
+    if (!showOpenAISignalSurface) return
 
-    const base = [
-      {
-        key: 'primaryConcern',
-        kicker: 'Optional OpenAI signal',
+    try {
+      setOptionalSignalLoading(true)
+      setOptionalSignalComplete(false)
+
+      const response = await fetch('/api/george/live/signal-question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: preLiveSignals.role || chairs.join(', ') || customChair || userPosition,
+          desiredOutcome: preLiveSignals.desiredOutcome || objective,
+          acceptableOutcome: preLiveSignals.acceptableOutcome || '',
+          audience: preLiveSignals.counterparty || audienceType,
+          room: conversationType === 'Other' ? customConversationType : conversationType,
+          knownContext,
+          documentSummary: prepDocument?.summary || '',
+          priorAnswers: answers,
+          skippedQuestions: skipped,
+        }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok || data?.status === 'sufficient' || !data?.question) {
+        setCurrentOptionalSignalQuestion(null)
+        setOptionalSignalComplete(true)
+        return
+      }
+
+      setCurrentOptionalSignalQuestion({
+        key: String(data.key || `signal_${Date.now()}`),
+        label: String(data.label || 'Additional signal'),
+        question: String(data.question || ''),
+        examples: String(data.helper || 'Answer if useful, or skip.'),
+      })
+    } catch {
+      setCurrentOptionalSignalQuestion({
+        key: `fallback_${Date.now()}`,
         label: 'Additional signal',
-        question: role.includes('patient')
-          ? 'What must not be missed in this appointment?'
-          : role.includes('interview')
-            ? 'What concern or objection do you want GEORGE ready for?'
-            : role.includes('founder') || role.includes('ceo')
-              ? 'What objection, pressure, or risk do you expect?'
-              : 'What concern should GEORGE be ready for?',
+        question: 'What should GEORGE be especially ready for in this room?',
         examples: 'Answer if useful, or skip.',
-      },
-      {
-        key: 'avoid',
-        kicker: 'Optional OpenAI signal',
-        label: 'Boundary',
-        question: 'Is there anything GEORGE should avoid saying or doing in this conversation?',
-        examples: 'Tone, topics, claims, pressure, promises, or anything sensitive.',
-      },
-      {
-        key: 'successSignal',
-        kicker: 'Optional OpenAI signal',
-        label: 'Success signal',
-        question: 'What would tell you this conversation is going well?',
-        examples: 'A yes, a second meeting, a clearer answer, calmer tone, agreement, or useful information.',
-      },
-    ]
-
-    return base.filter((question) => !preLiveSignals[question.key] && !optionalSignalAnswers[question.key])
-  }, [preLiveSignals, optionalSignalAnswers])
-
-  const currentOptionalSignalQuestion = showOpenAISignalSurface
-    ? optionalOpenAISignalQuestions[optionalSignalStep] || null
-    : null
+      })
+    } finally {
+      setOptionalSignalLoading(false)
+    }
+  }
 
   const optionalAnswerExamples = [
     'E.g. They may push back on valuation.',
@@ -521,7 +538,7 @@ export default function LiveEntryClient() {
   }, [currentOptionalAnswerExample, optionalSignalInput, optionalSignalInputFocused])
 
   const optionalSignalSurfaceComplete =
-    showOpenAISignalSurface && optionalOpenAISignalQuestions.length === 0
+    showOpenAISignalSurface && optionalSignalComplete
 
   const hasGeorgeSurfaceSignals = Object.keys(preLiveSignals).length > 0
   const hideAcquiredMandatoryFields = hasGeorgeSurfaceSignals
@@ -532,6 +549,11 @@ export default function LiveEntryClient() {
 
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    if (!showOpenAISignalSurface || currentOptionalSignalQuestion || optionalSignalLoading || optionalSignalComplete) return
+    void requestNextOptionalSignalQuestion()
+  }, [showOpenAISignalSurface, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
 
   useEffect(() => {
     if (!currentOptionalSignalQuestion) {
@@ -583,24 +605,18 @@ export default function LiveEntryClient() {
       window.localStorage.setItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS', JSON.stringify(nextAnswers))
     } catch {}
 
-    if (optionalSignalStep + 1 >= optionalOpenAISignalQuestions.length) {
-      setShowOpenAISignalSurface(false)
-      setOptionalSignalStep(0)
-      return true
-    }
-
-    setOptionalSignalStep((step) => step + 1)
+    setCurrentOptionalSignalQuestion(null)
+    void requestNextOptionalSignalQuestion(nextAnswers, skippedOptionalSignalKeys)
     return true
   }
 
   const skipOptionalSignalQuestion = () => {
-    if (optionalSignalStep + 1 >= optionalOpenAISignalQuestions.length) {
-      setShowOpenAISignalSurface(false)
-      setOptionalSignalStep(0)
-      return
-    }
+    if (!currentOptionalSignalQuestion) return
 
-    setOptionalSignalStep((step) => step + 1)
+    const nextSkipped = [...skippedOptionalSignalKeys, currentOptionalSignalQuestion.key]
+    setSkippedOptionalSignalKeys(nextSkipped)
+    setCurrentOptionalSignalQuestion(null)
+    void requestNextOptionalSignalQuestion(optionalSignalAnswers, nextSkipped)
   }
 
   const mandatoryLiveSignals = useMemo(() => {
@@ -1274,6 +1290,17 @@ export default function LiveEntryClient() {
 
 
 
+          {showOpenAISignalSurface && optionalSignalLoading && (
+            <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
+              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
+                Additional signal
+              </div>
+              <div className="mt-4 text-[16px] leading-7 text-white/54">
+                GEORGE is determining the next useful signal…
+              </div>
+            </div>
+          )}
+
           {showOpenAISignalSurface && currentOptionalSignalQuestion && (
             <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
               <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
@@ -1281,7 +1308,7 @@ export default function LiveEntryClient() {
               </div>
 
               <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                Optional.
+                Optional. OpenAI determines the next useful signal.
               </div>
 
               <div
@@ -1340,7 +1367,7 @@ export default function LiveEntryClient() {
                   onClick={skipOptionalSignalQuestion}
                   className="text-[11px] uppercase tracking-[0.22em] text-white/34 transition hover:text-white/70 active:scale-[0.98]"
                 >
-                  Next signal
+                  Skip
                 </button>
               </div>
             </div>
