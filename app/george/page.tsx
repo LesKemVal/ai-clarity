@@ -6540,7 +6540,7 @@ I am listening now. Speak naturally. I will respond ${
   })}
   
 {showScrollHint && (
-  <div className="fixed bottom-[calc(188px+env(safe-area-inset-bottom))] left-1/2 z-[90] -translate-x-1/2 opacity-90 transition-opacity duration-200">
+  <div className="fixed bottom-[calc(184px+env(safe-area-inset-bottom))] left-1/2 z-[90] -translate-x-1/2 transition-opacity duration-200">
     <button
       type="button"
       onClick={() => {
@@ -6548,11 +6548,10 @@ I am listening now. Speak naturally. I will respond ${
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
         setShowScrollHint(false)
       }}
-      className="group relative overflow-hidden rounded-full border border-white/[0.08] bg-black/72 px-5 py-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/58 shadow-[0_18px_46px_rgba(0,0,0,0.42)] backdrop-blur-xl transition hover:border-white/[0.14] hover:text-[#D7DBE4]/82"
-      aria-label="Show further interpretation"
+      className="text-[14px] font-medium tracking-[0.06em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/72"
+      aria-label="Continue"
     >
-      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/24 to-transparent" />
-      Further interpretation
+      Continue ↓
     </button>
   </div>
 )}
