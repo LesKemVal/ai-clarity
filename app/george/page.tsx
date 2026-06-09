@@ -1406,7 +1406,6 @@ useEffect(() => {
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
-
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
 
