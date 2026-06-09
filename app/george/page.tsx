@@ -389,8 +389,30 @@ function renderAssistantContent(text: string, liveMode: boolean) {
         }
 
         return (
-          <div key={index} className="block">
-            {paragraph}
+          <div key={index} className="flex flex-col gap-3">
+            {lines.map((line, lineIndex) => {
+              if (/^[-•*]\s+/.test(line)) {
+                return (
+                  <div key={lineIndex} className="pl-5 -indent-5">
+                    {line.replace(/^[-•*]\s+/, '• ')}
+                  </div>
+                )
+              }
+
+              if (/^\d+[.)]\s+/.test(line)) {
+                return (
+                  <div key={lineIndex} className="pl-5 -indent-5">
+                    {line}
+                  </div>
+                )
+              }
+
+              return (
+                <div key={lineIndex}>
+                  {line}
+                </div>
+              )
+            })}
           </div>
         )
       })}
