@@ -152,8 +152,30 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
 
   const handleStartLive = async () => {
     if (!noticeAccepted || voiceBusy) return
-    await speakPrepRoom(buildRoomBriefing())
-    onEnterLive?.()
+
+    try {
+      const res = await fetch('/api/george/live/preview-briefing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          identity: chairValue,
+          room: roomValue,
+          role: chairValue,
+          primaryObjective: desiredOutcomeValue,
+          secondaryObjective: assistValue,
+          observedReality: knownContextValue,
+          knownContext: knownContextValue,
+          signals,
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        await speakPrepRoom(data?.briefing || '')
+      }
+    } finally {
+      onEnterLive?.()
+    }
   }
 
   if (!popupReady) return null
