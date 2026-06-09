@@ -63,7 +63,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-5 max-w-[720px] font-mono text-[14px] leading-7 tracking-[0.01em] text-white/54 sm:text-[17px] sm:leading-8">
-              GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be. Use GEORGE to plan, prepare, build, decide, write, negotiate, learn, or work—or bring GEORGE into interviews, meetings, negotiations, and other rooms where your success is tied to how your case, ideas, plans, or concerns are presented.
+              GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be. Use GEORGE to plan, prepare, build, decide, write, negotiate, learn, or work—or bring GEORGE into interviews, meetings, negotiations, and other rooms where success is tied to presentation.
             </p>
 
             <div className="mx-auto mt-7 flex h-[178px] w-full max-w-[390px] items-center justify-center sm:h-[260px] sm:max-w-[560px]">
