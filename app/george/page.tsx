@@ -5963,8 +5963,14 @@ return (
                   {currentPreLiveQuestion.question}
                 </div>
 
-                <div className="mt-3 hidden text-[13px] leading-6 text-white/38 sm:block">
-                  {currentPreLiveQuestion.examples}
+                <div className="mt-4 max-w-[34rem] rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
+                  <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/24">
+                    Example
+                  </div>
+
+                  <div className="mt-2 break-words text-[12.5px] leading-6 text-white/44">
+                    {currentPreLiveQuestion.examples}
+                  </div>
                 </div>
               </>
             )}
