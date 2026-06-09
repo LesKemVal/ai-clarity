@@ -35,6 +35,56 @@ import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outc
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
+const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
+const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
+
+function getLiveEntryCheckpointState(
+  briefing: string | null,
+  responsibilityConfirmed: boolean,
+  toaConfirmed: boolean
+) {
+  const source = String(briefing || '')
+
+  const responsibilityIndex = source.indexOf(LIVE_ENTRY_RESPONSIBILITY_MARKER)
+  const toaIndex = source.indexOf(LIVE_ENTRY_TOA_MARKER)
+
+  if (!source || responsibilityIndex < 0 || toaIndex < 0) {
+    return {
+      text: source,
+      showResponsibility: false,
+      showToa: false,
+    }
+  }
+
+  const beforeResponsibility = source.slice(0, responsibilityIndex).trim()
+  const afterResponsibility = source
+    .slice(responsibilityIndex + LIVE_ENTRY_RESPONSIBILITY_MARKER.length, toaIndex)
+    .trim()
+  const afterToa = source.slice(toaIndex + LIVE_ENTRY_TOA_MARKER.length).trim()
+
+  if (!responsibilityConfirmed) {
+    return {
+      text: beforeResponsibility,
+      showResponsibility: true,
+      showToa: false,
+    }
+  }
+
+  if (!toaConfirmed) {
+    return {
+      text: [beforeResponsibility, afterResponsibility].filter(Boolean).join('\n\n'),
+      showResponsibility: false,
+      showToa: true,
+    }
+  }
+
+  return {
+    text: [beforeResponsibility, afterResponsibility, afterToa].filter(Boolean).join('\n\n'),
+    showResponsibility: false,
+    showToa: false,
+  }
+}
+
 function deriveSessionTitle(
   desiredOutcome?: string | null,
   fallback?: string | null
@@ -1381,9 +1431,28 @@ useEffect(() => {
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
   const [liveEntryBriefing, setLiveEntryBriefing] = useState<string | null>(null)
 const [typedLiveEntryBriefing, setTypedLiveEntryBriefing] = useState('')
+const [liveEntryResponsibilityConfirmed, setLiveEntryResponsibilityConfirmed] = useState(false)
+const [liveEntryToaConfirmed, setLiveEntryToaConfirmed] = useState(false)
+
+const liveEntryCheckpointState = useMemo(
+  () =>
+    getLiveEntryCheckpointState(
+      liveEntryBriefing,
+      liveEntryResponsibilityConfirmed,
+      liveEntryToaConfirmed
+    ),
+  [liveEntryBriefing, liveEntryResponsibilityConfirmed, liveEntryToaConfirmed]
+)
 
 useEffect(() => {
-  if (!(forceLive || liveMode) || !liveEntryBriefing) {
+  setLiveEntryResponsibilityConfirmed(false)
+  setLiveEntryToaConfirmed(false)
+}, [liveEntryBriefing])
+
+useEffect(() => {
+  const briefingText = liveEntryCheckpointState.text
+
+  if (!(forceLive || liveMode) || !briefingText) {
     setTypedLiveEntryBriefing('')
     return
   }
@@ -1393,15 +1462,15 @@ useEffect(() => {
 
   const timer = window.setInterval(() => {
     index += 1
-    setTypedLiveEntryBriefing(liveEntryBriefing.slice(0, index))
+    setTypedLiveEntryBriefing(briefingText.slice(0, index))
 
-    if (index >= liveEntryBriefing.length) {
+    if (index >= briefingText.length) {
       window.clearInterval(timer)
     }
   }, 18)
 
   return () => window.clearInterval(timer)
-}, [forceLive, liveMode, liveEntryBriefing])
+}, [forceLive, liveMode, liveEntryCheckpointState.text])
 
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
@@ -6593,6 +6662,36 @@ I am listening now. Speak naturally. I will respond ${
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
         {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nGEORGE turns words into movement.\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
       </div>
+
+      {liveEntryCheckpointState.showResponsibility && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+        <button
+          type="button"
+          onClick={() => setLiveEntryResponsibilityConfirmed(true)}
+          className="mt-6 w-full rounded-[1rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.14] hover:bg-white/[0.035]"
+        >
+          <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-white/28">
+            Responsibility
+          </span>
+          <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/68">
+            I understand GEORGE can support the conversation, but I remain responsible for what I say, decide, and do.
+          </span>
+        </button>
+      )}
+
+      {liveEntryCheckpointState.showToa && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+        <button
+          type="button"
+          onClick={() => setLiveEntryToaConfirmed(true)}
+          className="mt-6 w-full rounded-[1rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-white/[0.14] hover:bg-white/[0.035]"
+        >
+          <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-white/28">
+            Terms of Assistance
+          </span>
+          <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/68">
+            I have reviewed the facts that matter here and understand the Terms of Assistance before entering LIVE.
+          </span>
+        </button>
+      )}
 
       <div className="relative mt-2 min-h-6 cursor-text">
         <textarea
