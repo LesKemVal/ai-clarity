@@ -1429,9 +1429,10 @@ useEffect(() => {
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
-  const [showLiveEntrySequence, setShowLiveEntrySequence] = useState(false)
+  const [showLiveEntrySequence, setShowLiveEntrySequence] = useState(Boolean(forceLive || liveMode))
   const [liveEntryBriefing, setLiveEntryBriefing] = useState<string | null>(null)
 const [typedLiveEntryBriefing, setTypedLiveEntryBriefing] = useState('')
+const [liveEntryTypingComplete, setLiveEntryTypingComplete] = useState(false)
 const [liveEntryResponsibilityConfirmed, setLiveEntryResponsibilityConfirmed] = useState(false)
 const [liveEntryToaConfirmed, setLiveEntryToaConfirmed] = useState(false)
 const [liveEntryOptionalSignalComplete, setLiveEntryOptionalSignalComplete] = useState(false)
@@ -1458,10 +1459,12 @@ useEffect(() => {
 
   if (!(forceLive || liveMode) || !briefingText) {
     setTypedLiveEntryBriefing('')
+    setLiveEntryTypingComplete(false)
     return
   }
 
   let index = 0
+  setLiveEntryTypingComplete(false)
   setTypedLiveEntryBriefing('')
 
   const timer = window.setInterval(() => {
@@ -1470,6 +1473,7 @@ useEffect(() => {
 
     if (index >= briefingText.length) {
       window.clearInterval(timer)
+      setLiveEntryTypingComplete(true)
     }
   }, 18)
 
@@ -1483,7 +1487,7 @@ const liveEntryReadyForOptionalSignal =
   !liveEntryCheckpointState.showResponsibility &&
   !liveEntryCheckpointState.showToa &&
   !liveEntryOptionalSignalComplete &&
-  typedLiveEntryBriefing === liveEntryCheckpointState.text
+  liveEntryTypingComplete
 
 const captureLiveEntryOptionalSignal = () => {
   const finalSignal = input.trim()
@@ -1503,6 +1507,7 @@ const captureLiveEntryOptionalSignal = () => {
   setLiveEntryOptionalSignalComplete(true)
 
   window.setTimeout(() => {
+    setLiveEntryBriefing(null)
     setShowLiveEntrySequence(false)
   }, 500)
 
@@ -1794,20 +1799,13 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       const liveContext = String((liveSetup as any)?.observedReality || (liveSetup as any)?.knownContext || '').trim()
       const liveChair = String((liveSetup as any)?.chair || '').trim()
 
-      const liveBriefing = buildLiveEntryBriefing({
-        setup: liveSetup,
-      })
-
-      const liveIntro: Message = {
-        role: 'assistant',
-        content: liveBriefing,
-      }
-
       const subscriberMetadata = getSubscriberSessionMetadata()
       if (subscriberMetadata) {
         liveSessionWriteReadyRef.current = true
       }
-      setLiveEntryBriefing(liveBriefing)
+
+      setLiveEntryBriefing(null)
+      setShowLiveEntrySequence(false)
       setMessages([])
       messagesRef.current = []
       setVoiceOn(true)
@@ -6706,7 +6704,7 @@ I am listening now. Speak naturally. I will respond ${
         {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nGEORGE turns words into movement.\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
       </div>
 
-      {showLiveEntrySequence && liveEntryCheckpointState.showResponsibility && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+      {showLiveEntrySequence && liveEntryCheckpointState.showResponsibility && liveEntryTypingComplete && (
         <button
           type="button"
           onClick={() => setLiveEntryResponsibilityConfirmed(true)}
@@ -6721,7 +6719,7 @@ I am listening now. Speak naturally. I will respond ${
         </button>
       )}
 
-      {showLiveEntrySequence && liveEntryCheckpointState.showToa && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+      {showLiveEntrySequence && liveEntryCheckpointState.showToa && liveEntryTypingComplete && (
         <button
           type="button"
           onClick={() => setLiveEntryToaConfirmed(true)}
