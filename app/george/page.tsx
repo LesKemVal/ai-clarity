@@ -1429,10 +1429,12 @@ useEffect(() => {
   const [sessionPickerClosing, setSessionPickerClosing] = useState(false)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
   const [preLiveMessages, setPreLiveMessages] = useState<Message[] | null>(null)
+  const [showLiveEntrySequence, setShowLiveEntrySequence] = useState(false)
   const [liveEntryBriefing, setLiveEntryBriefing] = useState<string | null>(null)
 const [typedLiveEntryBriefing, setTypedLiveEntryBriefing] = useState('')
 const [liveEntryResponsibilityConfirmed, setLiveEntryResponsibilityConfirmed] = useState(false)
 const [liveEntryToaConfirmed, setLiveEntryToaConfirmed] = useState(false)
+const [liveEntryOptionalSignalComplete, setLiveEntryOptionalSignalComplete] = useState(false)
 
 const liveEntryCheckpointState = useMemo(
   () =>
@@ -1447,6 +1449,8 @@ const liveEntryCheckpointState = useMemo(
 useEffect(() => {
   setLiveEntryResponsibilityConfirmed(false)
   setLiveEntryToaConfirmed(false)
+  setLiveEntryOptionalSignalComplete(false)
+  setShowLiveEntrySequence(Boolean(liveEntryBriefing))
 }, [liveEntryBriefing])
 
 useEffect(() => {
@@ -1471,6 +1475,39 @@ useEffect(() => {
 
   return () => window.clearInterval(timer)
 }, [forceLive, liveMode, liveEntryCheckpointState.text])
+
+const liveEntryReadyForOptionalSignal =
+  showLiveEntrySequence &&
+  Boolean(forceLive || liveMode) &&
+  liveEntryToaConfirmed &&
+  !liveEntryCheckpointState.showResponsibility &&
+  !liveEntryCheckpointState.showToa &&
+  !liveEntryOptionalSignalComplete &&
+  typedLiveEntryBriefing === liveEntryCheckpointState.text
+
+const captureLiveEntryOptionalSignal = () => {
+  const finalSignal = input.trim()
+
+  if (finalSignal) {
+    try {
+      window.localStorage.setItem('GEORGE_LIVE_FINAL_SIGNAL', finalSignal)
+    } catch {}
+
+    liveContextBufferRef.current = [...liveContextBufferRef.current, finalSignal].slice(-12)
+    setTypedLiveEntryBriefing((current) => `${current}\n\nI'll account for that.`)
+  } else {
+    setTypedLiveEntryBriefing((current) => `${current}\n\nUnderstood.`)
+  }
+
+  setInput('')
+  setLiveEntryOptionalSignalComplete(true)
+
+  window.setTimeout(() => {
+    setShowLiveEntrySequence(false)
+  }, 500)
+
+  textareaRef.current?.focus()
+}
 
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
@@ -4812,6 +4849,12 @@ return true
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
       if (isThinking) return
+
+      if (liveEntryReadyForOptionalSignal) {
+        captureLiveEntryOptionalSignal()
+        return
+      }
+
       if (!input.trim()) return
       handleSend()
     }
@@ -6656,14 +6699,14 @@ I am listening now. Speak naturally. I will respond ${
 
 {false && null}
 
-{(forceLive || liveMode) && (forceLive || messages.length === 0) && (
+{showLiveEntrySequence && (forceLive || liveMode) && (forceLive || messages.length === 0) && (
   <div className="mx-auto w-full max-w-[430px] md:max-w-[780px] xl:max-w-[980px] px-4 pt-[95px] md:pt-[105px] xl:pt-[115px]">
     <div className="min-h-[190px] overflow-visible">
       <div className="font-mono whitespace-pre-line text-left text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/68">
         {typedLiveEntryBriefing || "LIVE · Room phrases default\n\nGEORGE turns words into movement.\n\nI have the room.\n\nSpeak clearly. Remember your room phrases."}
       </div>
 
-      {liveEntryCheckpointState.showResponsibility && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+      {showLiveEntrySequence && liveEntryCheckpointState.showResponsibility && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
         <button
           type="button"
           onClick={() => setLiveEntryResponsibilityConfirmed(true)}
@@ -6673,12 +6716,12 @@ I am listening now. Speak naturally. I will respond ${
             Responsibility
           </span>
           <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/68">
-            I understand GEORGE can support the conversation, but I remain responsible for what I say, decide, and do.
+            Responsibility remains with you. GEORGE assists. You decide.
           </span>
         </button>
       )}
 
-      {liveEntryCheckpointState.showToa && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
+      {showLiveEntrySequence && liveEntryCheckpointState.showToa && typedLiveEntryBriefing === liveEntryCheckpointState.text && (
         <button
           type="button"
           onClick={() => setLiveEntryToaConfirmed(true)}
@@ -6688,9 +6731,29 @@ I am listening now. Speak naturally. I will respond ${
             Terms of Assistance
           </span>
           <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/68">
-            I have reviewed the facts that matter here and understand the Terms of Assistance before entering LIVE.
+            Make sure the important facts are accurate. GEORGE can only work from the signal available.
           </span>
         </button>
+      )}
+
+      {liveEntryReadyForOptionalSignal && (
+        <div className="mt-6 rounded-[1rem] border border-white/[0.06] bg-white/[0.014] px-4 py-3">
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/26">
+            Final signal
+          </div>
+
+          <div className="mt-2 text-[13px] leading-6 text-[#D7DBE4]/64">
+            Add pressure, constraints, hidden dynamics, timing, or anything that changes the room.
+          </div>
+
+          <button
+            type="button"
+            onClick={captureLiveEntryOptionalSignal}
+            className="mt-4 text-[12px] font-medium tracking-[0.08em] text-[#D7DBE4]/52 transition hover:text-[#D7DBE4]/78"
+          >
+            Continue →
+          </button>
+        </div>
       )}
 
       <div className="relative mt-2 min-h-6 cursor-text">
@@ -6715,14 +6778,14 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) ? 'h-[120px] md:h-[140px]' : 'h-2 md:h-3'}`} />
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[120px] md:h-[140px]' : 'h-2 md:h-3'}`} />
 
 </div>
 
 
             
 
-            <div className={`${(forceLive || liveMode) ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
+            <div className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
               <div className={`fixed bottom-[calc(18px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
