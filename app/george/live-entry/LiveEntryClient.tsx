@@ -8,8 +8,57 @@ import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtim
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 import { deriveRoomFormation } from '@/lib/george/live/prep-room'
+import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
+
+const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
+const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
+
+function getBriefingCheckpointState(
+  briefing: string,
+  responsibilityConfirmed: boolean,
+  toaConfirmed: boolean
+) {
+  const responsibilityIndex = briefing.indexOf(LIVE_ENTRY_RESPONSIBILITY_MARKER)
+  const toaIndex = briefing.indexOf(LIVE_ENTRY_TOA_MARKER)
+
+  if (!briefing || responsibilityIndex < 0 || toaIndex < 0) {
+    return {
+      text: briefing,
+      showResponsibility: false,
+      showToa: false,
+    }
+  }
+
+  const beforeResponsibility = briefing.slice(0, responsibilityIndex).trim()
+  const afterResponsibility = briefing
+    .slice(responsibilityIndex + LIVE_ENTRY_RESPONSIBILITY_MARKER.length, toaIndex)
+    .trim()
+  const afterToa = briefing.slice(toaIndex + LIVE_ENTRY_TOA_MARKER.length).trim()
+
+  if (!responsibilityConfirmed) {
+    return {
+      text: beforeResponsibility,
+      showResponsibility: true,
+      showToa: false,
+    }
+  }
+
+  if (!toaConfirmed) {
+    return {
+      text: [beforeResponsibility, afterResponsibility].filter(Boolean).join('\n\n'),
+      showResponsibility: false,
+      showToa: true,
+    }
+  }
+
+  return {
+    text: [beforeResponsibility, afterResponsibility, afterToa].filter(Boolean).join('\n\n'),
+    showResponsibility: false,
+    showToa: false,
+  }
+}
 
 type SelectOption = {
   label: string
@@ -366,6 +415,10 @@ export default function LiveEntryClient() {
   const [typedRoomPhraseExample, setTypedRoomPhraseExample] = useState('')
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
+  const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false)
+  const [liveBriefingText, setLiveBriefingText] = useState('')
+  const [liveBriefingResponsibilityConfirmed, setLiveBriefingResponsibilityConfirmed] = useState(false)
+  const [liveBriefingToaConfirmed, setLiveBriefingToaConfirmed] = useState(false)
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
@@ -996,7 +1049,17 @@ export default function LiveEntryClient() {
     })
   }
 
-  const startLive = (skipPrep = false, resources = editableResources) => {
+  const liveBriefingCheckpointState = useMemo(
+    () =>
+      getBriefingCheckpointState(
+        liveBriefingText,
+        liveBriefingResponsibilityConfirmed,
+        liveBriefingToaConfirmed
+      ),
+    [liveBriefingText, liveBriefingResponsibilityConfirmed, liveBriefingToaConfirmed]
+  )
+
+  const startLive = (skipPrep = false, resources = editableResources, bypassBriefing = false) => {
     if (typeof window === 'undefined') return
 
     if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
@@ -1102,6 +1165,18 @@ export default function LiveEntryClient() {
       createdAt: Date.now(),
     }
 
+    if (!bypassBriefing) {
+      setLiveBriefingText(buildLiveEntryBriefing({
+        setup: liveSetup as any,
+        estimatedCents: finalEstimate.estimatedCents,
+      }))
+      setLiveBriefingResponsibilityConfirmed(false)
+      setLiveBriefingToaConfirmed(false)
+      setShowPrepPreview(false)
+      setShowLiveBriefingRoom(true)
+      return
+    }
+
     window.localStorage.setItem('george_start_new_live', '1')
     window.localStorage.removeItem('george_active_live_session_id')
     window.localStorage.removeItem('george_active_campaign_session_id')
@@ -1158,6 +1233,68 @@ export default function LiveEntryClient() {
             Return to GEORGE
           </a>
         </div>
+      </main>
+    )
+  }
+
+  if (showLiveBriefingRoom) {
+    const briefingComplete =
+      liveBriefingResponsibilityConfirmed &&
+      liveBriefingToaConfirmed &&
+      !liveBriefingCheckpointState.showResponsibility &&
+      !liveBriefingCheckpointState.showToa
+
+    return (
+      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.08),transparent_30%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
+
+        <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-white/[0.055] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
+          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">LIVE BRIEFING</div>
+
+          <div className="mt-5 whitespace-pre-line font-mono text-[13px] leading-6 text-[#D7DBE4]/74">
+            {liveBriefingCheckpointState.text}
+          </div>
+
+          {liveBriefingCheckpointState.showResponsibility && (
+            <button
+              type="button"
+              onClick={() => setLiveBriefingResponsibilityConfirmed(true)}
+              className="mt-6 w-full rounded-[1rem] border border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.06] px-4 py-3 text-left shadow-[0_0_24px_rgba(143,182,201,0.18)] transition hover:border-[#8FB6C9]/70 hover:bg-[#8FB6C9]/[0.10]"
+            >
+              <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/62">
+                Responsibility
+              </span>
+              <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/72">
+                I understand GEORGE can support the conversation, but I remain responsible for what I say, decide, and do.
+              </span>
+            </button>
+          )}
+
+          {liveBriefingCheckpointState.showToa && (
+            <button
+              type="button"
+              onClick={() => setLiveBriefingToaConfirmed(true)}
+              className="mt-6 w-full rounded-[1rem] border border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.06] px-4 py-3 text-left shadow-[0_0_24px_rgba(143,182,201,0.18)] transition hover:border-[#8FB6C9]/70 hover:bg-[#8FB6C9]/[0.10]"
+            >
+              <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/62">
+                Terms of Assistance
+              </span>
+              <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/72">
+                I understand GEORGE works from the facts and signals available, and I can correct or adjust support as needed.
+              </span>
+            </button>
+          )}
+
+          {briefingComplete && (
+            <button
+              type="button"
+              onClick={() => startLive(false, editableResources, true)}
+              className="mt-7 w-full rounded-[1rem] border border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:bg-[#D7DCFF]/[0.13] hover:text-white active:scale-[0.98]"
+            >
+              Enter LIVE
+            </button>
+          )}
+        </section>
       </main>
     )
   }
