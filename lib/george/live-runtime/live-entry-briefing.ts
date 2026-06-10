@@ -140,22 +140,18 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     '',
     'Okay.',
     '',
-    `Let’s work together to frame this conversation in a way that produces the right room signal and moves you closer to ${desiredOutcome}.`,
+    `My job is to help you: ${desiredOutcome}.`,
+    '',
     secondaryPosition
-      ? `I’m also aware of your secondary position, but that is secondary.`
+      ? `I also understand your secondary outcome: ${secondaryPosition}.`
+      : null,
+    secondaryPosition
+      ? 'But that is only secondary.'
       : null,
     '',
     'If there is anything I should understand before we begin, tell me now.',
     '',
-    'One more thing.',
-    '',
-    'The more we work together, the more useful I become.',
-    '',
-    'I’ll learn how you present, where you prefer support, when you want direction, and when you would rather lead.',
-    '',
-    'Use your phone if you need to adjust tone or support.',
-    '',
-    'Trust the process.',
+    'Based on what you’ve shared, I’ll help you notice what matters, keep important details organized, communicate with greater precision when useful, and adapt as the room reveals itself — while preserving your agency and your voice.',
     '',
     signalLine,
     observation ? '' : null,
@@ -163,10 +159,14 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     '',
     buildAssistLine(mode),
     '',
-    'Proceed naturally.',
+    `Okay, then. Please proceed, ${name}.`,
     '',
-    'I’ll help guide the trajectory as it develops.',
+    'I’ll help guide your conversation as it develops.',
     '',
-    "Remember your earbuds—or your phone screen if earbuds aren't available.",
+    'Don’t forget to use your steering phrases or phone screen if you’d like to adjust support, delivery style, or tone.',
+    '',
+    'Questions?',
+    '',
+    'Then let’s go to work.',
   ].filter(Boolean).join('\n')
 }
