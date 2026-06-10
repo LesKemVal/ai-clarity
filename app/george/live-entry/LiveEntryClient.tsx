@@ -11,6 +11,44 @@ import { deriveRoomFormation } from '@/lib/george/live/prep-room'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
+type BriefingSpeechRecognitionResultLike = {
+  isFinal: boolean
+  0: {
+    transcript: string
+  }
+}
+
+type BriefingSpeechRecognitionEventLike = {
+  resultIndex: number
+  results: ArrayLike<BriefingSpeechRecognitionResultLike>
+}
+
+type BriefingSpeechRecognitionErrorLike = {
+  error?: string
+}
+
+type BriefingSpeechRecognitionInstance = {
+  lang: string
+  continuous: boolean
+  interimResults: boolean
+  maxAlternatives: number
+  start: () => void
+  stop: () => void
+  onstart: (() => void) | null
+  onresult: ((event: BriefingSpeechRecognitionEventLike) => void) | null
+  onerror: ((event: BriefingSpeechRecognitionErrorLike) => void) | null
+  onend: (() => void) | null
+}
+
+type BriefingSpeechRecognitionConstructor = new () => BriefingSpeechRecognitionInstance
+
+declare global {
+  interface Window {
+    webkitSpeechRecognition?: BriefingSpeechRecognitionConstructor
+    SpeechRecognition?: BriefingSpeechRecognitionConstructor
+  }
+}
+
 type SelectOption = {
   label: string
   helper?: string
@@ -485,8 +523,8 @@ export default function LiveEntryClient() {
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false)
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
-  const [liveBriefingProofInput, setLiveBriefingProofInput] = useState('')
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
+  const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
@@ -511,6 +549,18 @@ export default function LiveEntryClient() {
   const [exampleIndex, setExampleIndex] = useState(0)
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
   const [founderAccessReady, setFounderAccessReady] = useState(false)
+
+  const [proofTranscript, setProofTranscript] = useState<Array<{ speaker: 'george' | 'user'; text: string }>>([
+    { speaker: 'george', text: 'Before we begin…' },
+  ])
+  const [proofInProgress, setProofInProgress] = useState(false)
+  const [proofComplete, setProofComplete] = useState(false)
+  const [spokenLiveBriefingStep, setSpokenLiveBriefingStep] = useState<1 | 2 | 3 | null>(null)
+  const [liveEntryReasoning, setLiveEntryReasoning] = useState({
+    roomObservation: '',
+    supportSummary: '',
+    commitmentStatement: '',
+  })
 
   const toggleChair = (value: string) => {
     setChairs((current) => {
@@ -1227,8 +1277,9 @@ export default function LiveEntryClient() {
       setLiveBriefingStep(1)
       setLiveBriefingToaAccepted(false)
       setLiveBriefingSupportAccepted(false)
-      setLiveBriefingProofInput('')
       setLiveBriefingProofReply('')
+      setLiveBriefingSttError('')
+      setSpokenLiveBriefingStep(null)
       setShowPrepPreview(false)
       setShowLiveBriefingRoom(true)
       return
@@ -1271,6 +1322,195 @@ export default function LiveEntryClient() {
 
     window.location.href = '/george/live?ready=1'
   }
+
+
+  const appendProofTranscript = (speaker: 'george' | 'user', message: string) => {
+    setProofTranscript((current) => [...current, { speaker, text: message }])
+  }
+
+  const speakProofLine = (message: string) => {
+    appendProofTranscript('george', message)
+
+    try {
+      fetch('/api/george/live/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: message }),
+      })
+        .then((response) => {
+          if (!response.ok) return null
+          return response.blob()
+        })
+        .then((blob) => {
+          if (!blob) return
+          const audioUrl = URL.createObjectURL(blob)
+          const audio = new Audio(audioUrl)
+          audio.onended = () => URL.revokeObjectURL(audioUrl)
+          audio.onerror = () => URL.revokeObjectURL(audioUrl)
+          void audio.play().catch(() => {})
+        })
+        .catch(() => {})
+    } catch {}
+  }
+
+  const beginProofOfAwareness = async () => {
+    if (proofInProgress) return
+    if (proofComplete) {
+      startLive(false, editableResources, true)
+      return
+    }
+
+    setProofInProgress(true)
+    setProofTranscript([{ speaker: 'george', text: 'Listening…' }])
+    console.log('[GEORGE LIVE ENTRY] proof sequence started')
+
+    const SpeechRecognition =
+      typeof window !== 'undefined'
+        ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+        : null
+
+    let heardUser = false
+    let recognition: any = null
+
+    const listenOnce = (timeoutMs = 6200) =>
+      new Promise<string>((resolve) => {
+        if (!SpeechRecognition) {
+          console.log('[GEORGE LIVE ENTRY] SpeechRecognition unavailable')
+          setLiveBriefingSttError('Voice capture is unavailable in this browser. Continuing.')
+          window.setTimeout(() => resolve(''), timeoutMs)
+          return
+        }
+
+        recognition = new SpeechRecognition()
+        recognition.lang = 'en-US'
+        recognition.continuous = false
+        recognition.interimResults = false
+
+        const timer = window.setTimeout(() => {
+          try { recognition.stop() } catch {}
+          resolve('')
+        }, timeoutMs)
+
+        recognition.onresult = (event: any) => {
+          const transcript = String(event?.results?.[0]?.[0]?.transcript || '').trim()
+          window.clearTimeout(timer)
+          resolve(transcript)
+        }
+
+        recognition.onerror = (event: any) => {
+          console.log('[GEORGE LIVE ENTRY] SpeechRecognition error', event?.error || event)
+          setLiveBriefingSttError('I could not hear that clearly. Continuing.')
+          window.clearTimeout(timer)
+          resolve('')
+        }
+
+        recognition.onend = () => {}
+
+        try {
+          recognition.start()
+        } catch {
+          window.clearTimeout(timer)
+          resolve('')
+        }
+      })
+
+    const askAndListen = async (line: string) => {
+      speakProofLine(line)
+      const heard = await listenOnce()
+      if (heard) {
+        heardUser = true
+        appendProofTranscript('user', heard)
+      }
+      return heard
+    }
+
+    const first = await askAndListen('Before we begin… Tell me something I should know.')
+    if (!first) {
+      const second = await askAndListen('Anything?')
+      if (!second) {
+        const third = await askAndListen('Come on. I can hear you.')
+        if (!third) {
+          speakProofLine('Okay. Let’s go to work.')
+        }
+      }
+    }
+
+    if (heardUser) {
+      speakProofLine(`Understood. ${liveEntryReasoning.commitmentStatement || 'I’ll keep that in mind.'} Let’s go to work.`)
+    }
+
+    setProofComplete(true)
+    setProofInProgress(false)
+    console.log('[GEORGE LIVE ENTRY] proof sequence complete; ready for final handoff')
+    undefined
+  }
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+
+    fetch('/api/george/live/entry-reasoning', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        objective,
+        position: chair || userPosition,
+        audience: audienceType,
+        roomSignal: knownContext,
+        secondaryPosition: userPosition,
+        userName: sessionEmail ? sessionEmail.split('@')[0] : 'Lester',
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLiveEntryReasoning({
+          roomObservation: String(data?.roomObservation || ''),
+          supportSummary: String(data?.supportSummary || ''),
+          commitmentStatement: String(data?.commitmentStatement || ''),
+        })
+      })
+      .catch(() => {})
+  }, [showLiveBriefingRoom, objective, chair, userPosition, audienceType, knownContext, sessionEmail])
+
+
+  const speakLiveEntryLine = (message: string) => {
+    try {
+      fetch('/api/george/live/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: message }),
+      })
+        .then((response) => {
+          if (!response.ok) return null
+          return response.blob()
+        })
+        .then((blob) => {
+          if (!blob) return
+          const audioUrl = URL.createObjectURL(blob)
+          const audio = new Audio(audioUrl)
+          audio.onended = () => URL.revokeObjectURL(audioUrl)
+          audio.onerror = () => URL.revokeObjectURL(audioUrl)
+          void audio.play().catch(() => {})
+        })
+        .catch(() => {})
+    } catch {}
+  }
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+    if (spokenLiveBriefingStep === liveBriefingStep) return
+
+    setSpokenLiveBriefingStep(liveBriefingStep)
+
+    const name = sessionEmail ? sessionEmail.split('@')[0] : 'Lester'
+
+    if (liveBriefingStep === 1) {
+      speakLiveEntryLine(`${name}. You made it. Your objective, position, and audience are noted. ${liveEntryReasoning.roomObservation || 'There may be more happening in this room than what is said directly.'} I'm aware of your secondary position as well, but for now, it remains secondary. Good.`)
+    }
+
+    if (liveBriefingStep === 2) {
+      speakLiveEntryLine(`Based on what you've shared, I'll adapt support to this room. ${liveEntryReasoning.supportSummary || "I'll adapt support while preserving your agency and your voice."} You're doing fine, ${name}. Good.`)
+    }
+  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail, liveEntryReasoning.roomObservation, liveEntryReasoning.supportSummary])
 
   if (!ready) return null
 
@@ -1315,21 +1555,66 @@ export default function LiveEntryClient() {
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
 
-    const PanelShell = ({ label, title, children }: { label: string; title: string; children: React.ReactNode }) => (
-      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.08),transparent_30%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
+    const PanelShell = ({ label, title, stage, children }: { label: string; title: string; stage: 1 | 2 | 3; children: React.ReactNode }) => {
+      const stageGlow =
+        stage === 1
+          ? 'rgba(143,182,201,0.08)'
+          : stage === 2
+            ? 'rgba(143,182,201,0.12)'
+            : 'rgba(174,182,255,0.16)'
 
-        <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-white/[0.055] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">{label}</div>
-          <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">{title}</h1>
-          {children}
-        </section>
-      </main>
+      const stageBorder =
+        stage === 1
+          ? 'border-white/[0.055]'
+          : stage === 2
+            ? 'border-[#8FB6C9]/[0.12]'
+            : 'border-[#AEB6FF]/[0.18]'
+
+      return (
+        <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 32%), linear-gradient(180deg,#06070A 0%,#080A0F 52%,#06070A 100%)`,
+            }}
+          />
+
+          <section className={`relative z-10 w-full max-w-[560px] rounded-[1.25rem] border ${stageBorder} bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]`}>
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">{label}</div>
+            <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">{title}</h1>
+            {children}
+          </section>
+        </main>
+      )
+    }
+
+    const AwakeButton = ({
+      active,
+      children,
+      onClick,
+    }: {
+      active: boolean
+      children: React.ReactNode
+      onClick: () => void
+    }) => (
+      <button
+        type="button"
+        disabled={!active}
+        onClick={onClick}
+        className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+          active
+            ? 'border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]'
+            : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
+        }`}
+      >
+        {children}
+      </button>
     )
+
 
     if (liveBriefingStep === 1) {
       return (
-        <PanelShell label="LIVE BRIEFING · 1" title="The room has taken shape.">
+        <PanelShell label="LIVE BRIEFING · 1" title="The room has taken shape." stage={1}>
           <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
             <div>
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Objective</div>
@@ -1385,25 +1670,20 @@ export default function LiveEntryClient() {
             </span>
           </label>
 
-          {liveBriefingToaAccepted && (
-            <>
-              <div className="mt-4 text-[13px] text-[#D7DBE4]/62">Good.</div>
-              <button
-                type="button"
-                onClick={() => setLiveBriefingStep(2)}
-                className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
-              >
-                Continue
-              </button>
-            </>
-          )}
+          <div className={`mt-4 text-[13px] text-[#D7DBE4]/62 transition-opacity ${liveBriefingToaAccepted ? 'opacity-100' : 'opacity-0'}`}>
+            Good.
+          </div>
+
+          <AwakeButton active={liveBriefingToaAccepted} onClick={() => setLiveBriefingStep(2)}>
+            Continue
+          </AwakeButton>
         </PanelShell>
       )
     }
 
     if (liveBriefingStep === 2) {
       return (
-        <PanelShell label="LIVE BRIEFING · 2" title="How I’ll help.">
+        <PanelShell label="LIVE BRIEFING · 2" title="How I’ll help." stage={2}>
           <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
             Based on what you shared, I’ll adapt support to this room while preserving your agency and your voice.
           </div>
@@ -1433,62 +1713,65 @@ export default function LiveEntryClient() {
             </span>
           </label>
 
-          {liveBriefingSupportAccepted && (
-            <>
-              <div className="mt-4 text-[13px] text-[#D7DBE4]/62">Good. You&apos;re doing fine, {displayName}.</div>
-              <button
-                type="button"
-                onClick={() => setLiveBriefingStep(3)}
-                className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
-              >
-                Continue
-              </button>
-            </>
-          )}
+          <div className={`mt-4 text-[13px] text-[#D7DBE4]/62 transition-opacity ${liveBriefingSupportAccepted ? 'opacity-100' : 'opacity-0'}`}>
+            Good. You&apos;re doing fine, {displayName}.
+          </div>
+
+          <AwakeButton active={liveBriefingSupportAccepted} onClick={() => setLiveBriefingStep(3)}>
+            Continue
+          </AwakeButton>
         </PanelShell>
       )
     }
 
     return (
-      <PanelShell label="LIVE BRIEFING · 3" title="Proof of awareness.">
+      <PanelShell label="LIVE BRIEFING · 3" title="Proof of awareness." stage={3}>
         <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
-          Before we begin, tell me what would make this conversation worthwhile for you.
+          Before we begin…
         </div>
 
-        <textarea
-          value={liveBriefingProofInput}
-          onChange={(event) => setLiveBriefingProofInput(event.target.value)}
-          placeholder="E.g. I want them to continue without lowering valuation."
-          className="mt-5 min-h-[110px] w-full resize-none rounded-[1rem] border border-white/[0.055] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/78 outline-none placeholder:text-white/24 focus:border-[#8FB6C9]/42"
-        />
+        <button
+          type="button"
+          onClick={proofComplete ? () => startLive(false, editableResources, true) : beginProofOfAwareness}
+          disabled={proofInProgress}
+          className={`w-full rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+            proofInProgress
+              ? 'border-white/[0.07] bg-white/[0.025] text-[#D7DCFF]/36'
+              : 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12]'
+          }`}
+        >
+          {proofInProgress ? "Listening…" : proofComplete ? "LET'S GO TO WORK" : "LET'S GO TO WORK"}
+        </button>
 
-        {!proofReady && liveBriefingProofInput.trim() && (
-          <button
-            type="button"
-            onClick={() => setLiveBriefingProofReply(buildProofReply(liveBriefingProofInput, objectiveLabel, roomLabel))}
-            className="mt-4 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/70 transition hover:text-white"
-          >
-            Send signal
-          </button>
+        {proofTranscript.length > 0 && (
+          <div className="mt-5 space-y-3 rounded-[0.95rem] border border-white/[0.06] bg-black/20 p-4">
+            {proofTranscript.map((line, index) => (
+              <div key={`${line.speaker}-${index}`} className="text-[13px] leading-6">
+                <div className="text-[9px] uppercase tracking-[0.22em] text-white/28">
+                  {line.speaker === 'george' ? 'GEORGE' : 'YOU'}
+                </div>
+                <div className={line.speaker === 'george' ? 'mt-1 text-[#D7DCFF]/72' : 'mt-1 text-white/76'}>
+                  {line.text}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
-        {proofReady && (
-          <>
-            <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/20 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/74">
-              {liveBriefingProofReply}
-            </div>
-            <div className="mt-4 text-[13px] text-[#D7DBE4]/62">
-              Good. I have what I need.
-            </div>
-            <button
-              type="button"
-              onClick={() => startLive(false, editableResources, true)}
-              className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
-            >
-              Let&apos;s go to work
-            </button>
-          </>
+        {liveBriefingSttError && (
+          <div className="mt-4 text-[13px] leading-5 text-[#D7DBE4]/52">
+            {liveBriefingSttError}
+          </div>
         )}
+
+        <div className={`transition-opacity ${proofReady ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/20 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/74">
+            {liveBriefingProofReply || ' '}
+          </div>
+          <div className="mt-4 text-[13px] text-[#D7DBE4]/62">
+            Good. I have what I need.
+          </div>
+        </div>
       </PanelShell>
     )
   }
