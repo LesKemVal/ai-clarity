@@ -5,6 +5,7 @@ type LiveBriefingMode = 'cues' | 'lines'
 type LiveEntryBriefingInput = {
   setup: LivePrepSetup | null
   defaultRoom?: string
+  estimatedCents?: number | null
 }
 
 type SignalSummary = {
@@ -63,10 +64,10 @@ function buildSignalLine(setup: LivePrepSetup | null) {
 
 function buildAssistLine(mode: LiveBriefingMode) {
   if (mode === 'lines') {
-    return 'When precision matters, I’ll give you repeatable language.'
+    return 'If useful, I can help frame the opening or formulate important moments when greater precision would improve the outcome.'
   }
 
-  return 'I’ll use cues by default, and I’ll give you lines when precision matters.'
+  return 'I will default to brief observations, useful details, and support that preserves your voice. If useful, I can also help frame the opening or formulate important moments when greater precision would improve the outcome.'
 }
 
 function buildRoomObservation(setup: LivePrepSetup | null, room: string, desiredOutcome: string, observedReality: string) {
@@ -118,54 +119,60 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
   const secondaryPosition = getSecondaryPosition(setup)
   const signalLine = buildSignalLine(setup)
   const observation = buildRoomObservation(setup, room, desiredOutcome, observedReality)
+  const estimatedCents =
+    typeof input.estimatedCents === 'number' && Number.isFinite(input.estimatedCents)
+      ? Math.max(0, Math.round(input.estimatedCents))
+      : null
 
   return [
     `${name}.`,
     '',
     'You made it.',
     '',
-    'Check the box and we can get started.',
+    `Your primary objective is: ${desiredOutcome}.`,
+    '',
+    observation ? `Observed facts and signals suggest: ${observation}` : null,
+    '',
+    estimatedCents !== null ? `Estimated LIVE support: ${estimatedCents}¢.` : null,
+    '',
+    'Check the box.',
+    '',
+    "We can't continue until you do.",
     '',
     '[RESPONSIBILITY_CHECKPOINT]',
     '',
     'Good.',
     '',
-    'Before we go LIVE, I want to make sure we are working from accurate assumptions.',
+    secondaryPosition
+      ? 'I also understand your secondary outcome.'
+      : null,
+    secondaryPosition
+      ? `But that's secondary.`
+      : null,
+    secondaryPosition ? '' : null,
+    'Before we go LIVE, double-check facts and signals.',
     '',
-    'Double-check the facts that matter here, then review the Terms of Assistance.',
+    'Based on what you’ve shared, I’ll help you notice what matters, keep important details organized, communicate with greater precision when useful, and adapt as the room reveals itself — while preserving your agency and your voice.',
     '',
-    "We can't enter the room without them.",
+    buildAssistLine(mode),
+    '',
+    'Repeated use sharpens support.',
+    '',
+    'Check the next box.',
     '',
     '[TOA_CHECKPOINT]',
     '',
     'Okay.',
     '',
-    `My job is to help you: ${desiredOutcome}.`,
-    '',
-    secondaryPosition
-      ? `I also understand your secondary outcome: ${secondaryPosition}.`
-      : null,
-    secondaryPosition
-      ? 'But that is only secondary.'
-      : null,
-    '',
-    'If there is anything I should understand before we begin, tell me now.',
-    '',
-    'Based on what you’ve shared, I’ll help you notice what matters, keep important details organized, communicate with greater precision when useful, and adapt as the room reveals itself — while preserving your agency and your voice.',
-    '',
     signalLine,
-    observation ? '' : null,
-    observation || null,
     '',
-    buildAssistLine(mode),
+    'Use your steering language or phone screen, according to availability, to adjust support, delivery style, or tone.',
+    '',
+    'Questions?',
     '',
     `Okay, then. Please proceed, ${name}.`,
     '',
     'I’ll help guide your conversation as it develops.',
-    '',
-    'Don’t forget to use your steering phrases or phone screen if you’d like to adjust support, delivery style, or tone.',
-    '',
-    'Questions?',
     '',
     'Then let’s go to work.',
   ].filter(Boolean).join('\n')
