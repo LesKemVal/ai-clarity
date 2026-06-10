@@ -8,57 +8,8 @@ import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtim
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 import { deriveRoomFormation } from '@/lib/george/live/prep-room'
-import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
-
-const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
-const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
-
-function getBriefingCheckpointState(
-  briefing: string,
-  responsibilityConfirmed: boolean,
-  toaConfirmed: boolean
-) {
-  const responsibilityIndex = briefing.indexOf(LIVE_ENTRY_RESPONSIBILITY_MARKER)
-  const toaIndex = briefing.indexOf(LIVE_ENTRY_TOA_MARKER)
-
-  if (!briefing || responsibilityIndex < 0 || toaIndex < 0) {
-    return {
-      text: briefing,
-      showResponsibility: false,
-      showToa: false,
-    }
-  }
-
-  const beforeResponsibility = briefing.slice(0, responsibilityIndex).trim()
-  const afterResponsibility = briefing
-    .slice(responsibilityIndex + LIVE_ENTRY_RESPONSIBILITY_MARKER.length, toaIndex)
-    .trim()
-  const afterToa = briefing.slice(toaIndex + LIVE_ENTRY_TOA_MARKER.length).trim()
-
-  if (!responsibilityConfirmed) {
-    return {
-      text: beforeResponsibility,
-      showResponsibility: true,
-      showToa: false,
-    }
-  }
-
-  if (!toaConfirmed) {
-    return {
-      text: [beforeResponsibility, afterResponsibility].filter(Boolean).join('\n\n'),
-      showResponsibility: false,
-      showToa: true,
-    }
-  }
-
-  return {
-    text: [beforeResponsibility, afterResponsibility, afterToa].filter(Boolean).join('\n\n'),
-    showResponsibility: false,
-    showToa: false,
-  }
-}
 
 type SelectOption = {
   label: string
@@ -352,6 +303,121 @@ function estimateWithResources(base: ResourceEstimate, resources: string[]): Res
   }
 }
 
+
+function cleanBriefingValue(value: unknown) {
+  return String(value || '').trim()
+}
+
+function titleBriefingValue(value: unknown, fallback = 'this room') {
+  const clean = cleanBriefingValue(value)
+  if (!clean) return fallback
+  return clean
+}
+
+function buildBriefingObservation(room: string, audience: string, objective: string, context: string) {
+  const signal = `${room} ${audience} ${objective} ${context}`.toLowerCase()
+
+  if (/investor|capital|fundraising|raise|fund/.test(signal)) {
+    return 'I am aware that credibility may matter before persuasion in this room.'
+  }
+
+  if (/ceo|board|executive|acquisition|strategy/.test(signal)) {
+    return 'I am aware that precision, timing, and what stays unresolved may matter here.'
+  }
+
+  if (/interview|candidate|hiring|job/.test(signal)) {
+    return 'I am aware that how you think may matter as much as the answer itself.'
+  }
+
+  if (/sales|client|customer|buyer/.test(signal)) {
+    return 'I am aware that trust and signal may matter before pressure.'
+  }
+
+  if (/doctor|medical|patient|treatment|symptom/.test(signal)) {
+    return 'I am aware that clarity and follow-through may matter more than speed.'
+  }
+
+  if (/negotiat|offer|terms|deal|price|counter/.test(signal)) {
+    return 'I am aware that pressure may start shaping the language.'
+  }
+
+  return 'I am aware that the room may reveal more once the conversation begins.'
+}
+
+function buildBriefingSupport(room: string, audience: string, objective: string, mode: string) {
+  const signal = `${room} ${audience} ${objective}`.toLowerCase()
+
+  if (/ceo|board|executive|acquisition|investor|capital|fundraising/.test(signal)) {
+    return [
+      'help you keep important details organized',
+      'surface facts, numbers, or contradictions when they matter',
+      'notice shifts in pressure, leverage, or credibility',
+      'support precision without replacing your voice',
+    ]
+  }
+
+  if (/interview|candidate|hiring|job/.test(signal)) {
+    return [
+      'help you organize your thinking under pressure',
+      'notice what the interviewer may actually be testing',
+      'support stronger examples when useful',
+      mode === 'lines'
+        ? 'help formulate important answers when precision matters'
+        : 'keep support concise unless you ask for more',
+    ]
+  }
+
+  if (/sales|client|customer|buyer/.test(signal)) {
+    return [
+      'notice buying signals and resistance',
+      'track what the other side seems to value',
+      'help you ask better questions',
+      'support clarity without making you sound scripted',
+    ]
+  }
+
+  if (/doctor|medical|patient|treatment|symptom/.test(signal)) {
+    return [
+      'help track symptoms, timelines, and unanswered questions',
+      'surface details you may want to revisit',
+      'support advocacy without taking over the conversation',
+      'help organize decisions as information changes',
+    ]
+  }
+
+  return [
+    'help you notice what matters',
+    'keep important details organized',
+    'support precision when useful',
+    'adapt as the room reveals itself',
+  ]
+}
+
+function buildProofReply(input: string, objective: string, room: string) {
+  const clean = cleanBriefingValue(input)
+  const signal = `${clean} ${objective} ${room}`.toLowerCase()
+
+  if (!clean) return ''
+
+  if (/valuation|price|terms|leverage|capital|investor|fund/.test(signal)) {
+    return 'Understood. Preserving momentum without losing leverage appears important here.'
+  }
+
+  if (/freeze|nervous|pressure|stumble|anxious/.test(signal)) {
+    return 'Understood. Helping you organize your thinking under pressure may matter more than perfect wording.'
+  }
+
+  if (/answer|clarity|understand|doctor|medical|symptom/.test(signal)) {
+    return 'Understood. Clarity, follow-through, and unanswered questions should stay visible.'
+  }
+
+  if (/trust|relationship|conflict|apology|repair/.test(signal)) {
+    return 'Understood. Reducing threat and protecting trust may matter before trying to resolve everything.'
+  }
+
+  return 'Understood. I will keep that outcome visible as the conversation develops.'
+}
+
 function CompactSelect({
   label,
   value,
@@ -416,9 +482,11 @@ export default function LiveEntryClient() {
   const [hasLiveSession, setHasLiveSession] = useState(false)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false)
-  const [liveBriefingText, setLiveBriefingText] = useState('')
-  const [liveBriefingResponsibilityConfirmed, setLiveBriefingResponsibilityConfirmed] = useState(false)
-  const [liveBriefingToaConfirmed, setLiveBriefingToaConfirmed] = useState(false)
+  const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
+  const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false)
+  const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
+  const [liveBriefingProofInput, setLiveBriefingProofInput] = useState('')
+  const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
   const [customResource, setCustomResource] = useState('')
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null)
@@ -1049,16 +1117,6 @@ export default function LiveEntryClient() {
     })
   }
 
-  const liveBriefingCheckpointState = useMemo(
-    () =>
-      getBriefingCheckpointState(
-        liveBriefingText,
-        liveBriefingResponsibilityConfirmed,
-        liveBriefingToaConfirmed
-      ),
-    [liveBriefingText, liveBriefingResponsibilityConfirmed, liveBriefingToaConfirmed]
-  )
-
   const startLive = (skipPrep = false, resources = editableResources, bypassBriefing = false) => {
     if (typeof window === 'undefined') return
 
@@ -1166,12 +1224,11 @@ export default function LiveEntryClient() {
     }
 
     if (!bypassBriefing) {
-      setLiveBriefingText(buildLiveEntryBriefing({
-        setup: liveSetup as any,
-        estimatedCents: finalEstimate.estimatedCents,
-      }))
-      setLiveBriefingResponsibilityConfirmed(false)
-      setLiveBriefingToaConfirmed(false)
+      setLiveBriefingStep(1)
+      setLiveBriefingToaAccepted(false)
+      setLiveBriefingSupportAccepted(false)
+      setLiveBriefingProofInput('')
+      setLiveBriefingProofReply('')
       setShowPrepPreview(false)
       setShowLiveBriefingRoom(true)
       return
@@ -1238,64 +1295,201 @@ export default function LiveEntryClient() {
   }
 
   if (showLiveBriefingRoom) {
-    const briefingComplete =
-      liveBriefingResponsibilityConfirmed &&
-      liveBriefingToaConfirmed &&
-      !liveBriefingCheckpointState.showResponsibility &&
-      !liveBriefingCheckpointState.showToa
+    const displayName =
+      cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
+      'You'
 
-    return (
+    const objectiveLabel = cleanBriefingValue(objective) || 'the desired outcome'
+    const positionLabel = titleBriefingValue(userPosition || chair, 'your position')
+    const audienceLabel = titleBriefingValue(audienceType, 'the audience')
+    const roomLabel = titleBriefingValue(resolvedConversationType, 'this room')
+    const secondaryPosition =
+      cleanBriefingValue((optionalSignalAnswers as any).fallbackOutcome) ||
+      cleanBriefingValue((optionalSignalAnswers as any).secondaryOutcome) ||
+      cleanBriefingValue((preLiveSignals as any).fallbackOutcome) ||
+      cleanBriefingValue((preLiveSignals as any).secondaryOutcome)
+
+    const observation = buildBriefingObservation(roomLabel, audienceLabel, objectiveLabel, knownContext)
+    const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, liveAssistMode)
+    const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
+    const proofReady = Boolean(liveBriefingProofReply.trim())
+
+    const PanelShell = ({ label, title, children }: { label: string; title: string; children: React.ReactNode }) => (
       <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.08),transparent_30%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
 
         <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-white/[0.055] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">LIVE BRIEFING</div>
+          <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">{label}</div>
+          <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">{title}</h1>
+          {children}
+        </section>
+      </main>
+    )
 
-          <div className="mt-5 whitespace-pre-line font-mono text-[13px] leading-6 text-[#D7DBE4]/74">
-            {liveBriefingCheckpointState.text}
+    if (liveBriefingStep === 1) {
+      return (
+        <PanelShell label="LIVE BRIEFING · 1" title="The room has taken shape.">
+          <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Objective</div>
+              <div className="mt-1 text-[15px] leading-6 text-white/78">{objectiveLabel}</div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Position</div>
+                <div className="mt-1 text-[14px] text-white/70">{positionLabel}</div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Audience</div>
+                <div className="mt-1 text-[14px] text-white/70">{audienceLabel}</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Room signal</div>
+              <div className="mt-1 text-[14px] leading-6 text-[#D7DBE4]/68">{observation}</div>
+            </div>
+            {secondaryPosition && (
+              <div className="text-[13px] leading-6 text-white/50">
+                I&apos;m aware of your secondary position as well, but for now, it remains secondary.
+              </div>
+            )}
+            <div className="text-[12px] leading-5 text-[#8FB6C9]/70">
+              Estimated LIVE support: {estimatedCents}¢
+            </div>
           </div>
 
-          {liveBriefingCheckpointState.showResponsibility && (
-            <button
-              type="button"
-              onClick={() => setLiveBriefingResponsibilityConfirmed(true)}
-              className="mt-6 w-full rounded-[1rem] border border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.06] px-4 py-3 text-left shadow-[0_0_24px_rgba(143,182,201,0.18)] transition hover:border-[#8FB6C9]/70 hover:bg-[#8FB6C9]/[0.10]"
-            >
-              <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/62">
-                Responsibility
-              </span>
-              <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/72">
-                I understand GEORGE can support the conversation, but I remain responsible for what I say, decide, and do.
-              </span>
-            </button>
-          )}
+          <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
+            liveBriefingToaAccepted
+              ? 'border-[#8FB6C9]/65 bg-[#8FB6C9]/[0.08]'
+              : 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.045] shadow-[0_0_24px_rgba(143,182,201,0.16)]'
+          }`}>
+            <input
+              type="checkbox"
+              checked={liveBriefingToaAccepted}
+              onChange={(event) => setLiveBriefingToaAccepted(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+            />
+            <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
+              I agree to the Terms of Assistance.{' '}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault()
+                  window.open('/legal/toa', '_blank')
+                }}
+                className="text-[#D7DCFF]/72 underline underline-offset-4"
+              >
+                Read terms
+              </button>
+            </span>
+          </label>
 
-          {liveBriefingCheckpointState.showToa && (
-            <button
-              type="button"
-              onClick={() => setLiveBriefingToaConfirmed(true)}
-              className="mt-6 w-full rounded-[1rem] border border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.06] px-4 py-3 text-left shadow-[0_0_24px_rgba(143,182,201,0.18)] transition hover:border-[#8FB6C9]/70 hover:bg-[#8FB6C9]/[0.10]"
-            >
-              <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/62">
-                Terms of Assistance
-              </span>
-              <span className="mt-2 block text-[13px] leading-6 text-[#D7DBE4]/72">
-                I understand GEORGE works from the facts and signals available, and I can correct or adjust support as needed.
-              </span>
-            </button>
+          {liveBriefingToaAccepted && (
+            <>
+              <div className="mt-4 text-[13px] text-[#D7DBE4]/62">Good.</div>
+              <button
+                type="button"
+                onClick={() => setLiveBriefingStep(2)}
+                className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
+              >
+                Continue
+              </button>
+            </>
           )}
+        </PanelShell>
+      )
+    }
 
-          {briefingComplete && (
+    if (liveBriefingStep === 2) {
+      return (
+        <PanelShell label="LIVE BRIEFING · 2" title="How I’ll help.">
+          <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
+            Based on what you shared, I’ll adapt support to this room while preserving your agency and your voice.
+          </div>
+
+          <div className="mt-5 space-y-2 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
+            {supportItems.map((item) => (
+              <div key={item} className="flex gap-3 text-[13px] leading-6 text-white/64">
+                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8FB6C9]/70 shadow-[0_0_10px_rgba(143,182,201,0.40)]" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
+            liveBriefingSupportAccepted
+              ? 'border-[#8FB6C9]/65 bg-[#8FB6C9]/[0.08]'
+              : 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.045] shadow-[0_0_24px_rgba(143,182,201,0.16)]'
+          }`}>
+            <input
+              type="checkbox"
+              checked={liveBriefingSupportAccepted}
+              onChange={(event) => setLiveBriefingSupportAccepted(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+            />
+            <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
+              I understand I can accept, reject, modify, or ignore GEORGE&apos;s support.
+            </span>
+          </label>
+
+          {liveBriefingSupportAccepted && (
+            <>
+              <div className="mt-4 text-[13px] text-[#D7DBE4]/62">Good. You&apos;re doing fine, {displayName}.</div>
+              <button
+                type="button"
+                onClick={() => setLiveBriefingStep(3)}
+                className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
+              >
+                Continue
+              </button>
+            </>
+          )}
+        </PanelShell>
+      )
+    }
+
+    return (
+      <PanelShell label="LIVE BRIEFING · 3" title="Proof of awareness.">
+        <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
+          Before we begin, tell me what would make this conversation worthwhile for you.
+        </div>
+
+        <textarea
+          value={liveBriefingProofInput}
+          onChange={(event) => setLiveBriefingProofInput(event.target.value)}
+          placeholder="E.g. I want them to continue without lowering valuation."
+          className="mt-5 min-h-[110px] w-full resize-none rounded-[1rem] border border-white/[0.055] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white/78 outline-none placeholder:text-white/24 focus:border-[#8FB6C9]/42"
+        />
+
+        {!proofReady && liveBriefingProofInput.trim() && (
+          <button
+            type="button"
+            onClick={() => setLiveBriefingProofReply(buildProofReply(liveBriefingProofInput, objectiveLabel, roomLabel))}
+            className="mt-4 text-[12px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/70 transition hover:text-white"
+          >
+            Send signal
+          </button>
+        )}
+
+        {proofReady && (
+          <>
+            <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/20 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/74">
+              {liveBriefingProofReply}
+            </div>
+            <div className="mt-4 text-[13px] text-[#D7DBE4]/62">
+              Good. I have what I need.
+            </div>
             <button
               type="button"
               onClick={() => startLive(false, editableResources, true)}
-              className="mt-7 w-full rounded-[1rem] border border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:bg-[#D7DCFF]/[0.13] hover:text-white active:scale-[0.98]"
+              className="mt-5 w-full rounded-[1rem] border border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] transition hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]"
             >
-              Enter LIVE
+              Let&apos;s go to work
             </button>
-          )}
-        </section>
-      </main>
+          </>
+        )}
+      </PanelShell>
     )
   }
 
@@ -1718,7 +1912,7 @@ export default function LiveEntryClient() {
                   return
                 }
 
-                setShowPrepPreview(true)
+                startLive(false, editableResources)
               }}
               className="w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:text-white active:scale-[0.98]"
             >
