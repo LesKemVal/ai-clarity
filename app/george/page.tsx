@@ -2686,7 +2686,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     const liveSignalMessage: Message = {
       role: 'assistant',
       content:
-        "Bring GEORGE up to speed.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.",
+        "LIVE Entry.\n\nFirst, give me the signal I need to understand the room.\n\nWhat is your role in the conversation — your position or title?\n\nExamples: founder, candidate, patient, manager, investor, customer, or decision maker.",
     }
 
     setMessages((prev) => {
@@ -5557,7 +5557,7 @@ useEffect(() => {
 
       window.setTimeout(() => {
         window.location.href = '/george/live-entry?source=signal'
-      }, 4500)
+      }, 900)
 
       return true
     }
@@ -6184,11 +6184,11 @@ return (
             {isPreLiveEarbudReady && (
               <div>
                 <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                  GEORGE has enough signal
+                  LIVE Entry ready
                 </div>
 
                 <div className="mt-4 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
-                  Connect your earbuds, review the preview, then enter LIVE.
+                  Opening Brief Room.
                 </div>              </div>
             )}
           </div>
