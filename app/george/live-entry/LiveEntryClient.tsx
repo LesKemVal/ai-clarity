@@ -1855,7 +1855,7 @@ Your voice remains yours.`)
 
     if (liveBriefingStep === 2) {
       return (
-        <PanelShell label="LIVE BRIEFING · 2" title="How I’ll help." stage={2}>
+        <PanelShell label="BRIEF ROOM · SUPPORT" title="Support calibration." stage={2}>
           <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
             Based on what you shared, I’ll adapt support to this room while preserving your agency and your voice.
           </div>
@@ -1894,7 +1894,7 @@ Your voice remains yours.`)
     }
 
     return (
-      <PanelShell label="LIVE BRIEFING · 3" title="Proof of awareness." stage={3}>
+      <PanelShell label="BRIEF ROOM · AWARENESS" title="Awareness check." stage={3}>
         <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
           Proof of concept.
         </div>
@@ -2363,9 +2363,13 @@ Your voice remains yours.`)
 
                 startLive(false, editableResources)
               }}
-              className="w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/86 transition hover:text-white active:scale-[0.98]"
+              className={`w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
+                hasRequiredLiveSignal
+                  ? 'text-[#D7DCFF]/92 hover:text-white'
+                  : 'text-white/24'
+              }`}
             >
-              Continue to LIVE
+              {hasRequiredLiveSignal ? 'Begin LIVE' : 'Add signal for LIVE'}
             </button>
           </div>
 
