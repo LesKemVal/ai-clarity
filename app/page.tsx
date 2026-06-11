@@ -32,7 +32,7 @@ export default function HomePage() {
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
-    router.push('/george?start=1')
+    router.push('/george/live-entry?source=start')
   }
 
   return (

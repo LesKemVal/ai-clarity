@@ -2710,12 +2710,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     const params = new URLSearchParams(window.location.search)
 
     if (params.get('start') === '1') {
-      window.history.replaceState({}, '', '/george')
-      window.localStorage.setItem('george_start_new_live', '1')
-      window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
-      window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
-      window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
-      window.setTimeout(() => startLiveSignalAcquisition(), 80)
+      window.location.href = '/george/live-entry?source=start'
       return
     }
 
