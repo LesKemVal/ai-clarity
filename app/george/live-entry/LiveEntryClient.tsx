@@ -1726,29 +1726,60 @@ Your voice remains yours.`)
       return (
         <PanelShell label="LIVE BRIEFING · 1" title="The room has taken shape." stage={1}>
           <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
-            <div>
+            <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
+              Is my understanding of the room still accurate?
+            </div>
+
+            <label className="block">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Objective</div>
-              <div className="mt-1 text-[15px] leading-6 text-white/78">{objectiveLabel}</div>
-            </div>
+              <textarea
+                value={objective}
+                onChange={(event) => setObjective(event.target.value)}
+                rows={2}
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] leading-6 text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                placeholder={objectiveLabel}
+              />
+            </label>
+
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              <label className="block">
                 <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Position</div>
-                <div className="mt-1 text-[14px] text-white/70">{positionLabel}</div>
-              </div>
-              <div>
+                <input
+                  value={userPosition}
+                  onChange={(event) => setUserPosition(event.target.value)}
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] text-white/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                  placeholder={positionLabel}
+                />
+              </label>
+
+              <label className="block">
                 <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Audience</div>
-                <div className="mt-1 text-[14px] text-white/70">{audienceLabel}</div>
-              </div>
+                <input
+                  value={audienceType}
+                  onChange={(event) => setAudienceType(event.target.value)}
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] text-white/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                  placeholder={audienceLabel}
+                />
+              </label>
             </div>
-            <div>
+
+            <label className="block">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Room signal</div>
-              <div className="mt-1 text-[14px] leading-6 text-[#D7DBE4]/68">{observation}</div>
-            </div>
+              <textarea
+                value={knownContext}
+                onChange={(event) => setKnownContext(event.target.value)}
+                rows={3}
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                placeholder={observation}
+              />
+            </label>
+
             {secondaryPosition && (
               <div className="text-[13px] leading-6 text-white/50">
                 I&apos;m aware of your secondary position as well, but for now, it remains secondary.
               </div>
             )}
+
             <div className="text-[12px] leading-5 text-[#8FB6C9]/70">
               Estimated LIVE support: {estimatedCents}¢
             </div>

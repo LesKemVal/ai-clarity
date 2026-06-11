@@ -2625,47 +2625,36 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setActivePromptContext('live_intent_bridge')
     setContextTurnCount(0)
 
-    let liveBridge =
-      "If the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+    const liveBridge = (() => {
+      try {
+        const lowered = content.toLowerCase()
 
-    try {
-      const lowered = content.toLowerCase()
+        const hasAny = (signals: string[]) =>
+          signals.some((signal) => lowered.includes(signal))
 
-      if (
-        lowered.includes('investor') ||
-        lowered.includes('pitch') ||
-        lowered.includes('raise') ||
-        lowered.includes('capital') ||
-        lowered.includes('fundraising')
-      ) {
-        liveBridge =
-          "Later, you may decide to meet with investors.\n\nBesides you, who knows this opportunity better?\n\nI've helped shape the positioning, challenge assumptions, and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-      } else if (
-        lowered.includes('interview') ||
-        lowered.includes('candidate') ||
-        lowered.includes('resume') ||
-        lowered.includes('hiring')
-      ) {
-        liveBridge =
-          "Eventually, preparation becomes the interview itself.\n\nBesides you, who better understands the work you've done to get here?\n\nI've helped organize your thinking and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-      } else if (
-        lowered.includes('doctor') ||
-        lowered.includes('appointment') ||
-        lowered.includes('symptom') ||
-        lowered.includes('medical')
-      ) {
-        liveBridge =
-          "We've already organized your concerns and prepared the questions you wanted answered.\n\nBesides you, who has followed this situation more closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-      } else if (
-        lowered.includes('negotiat') ||
-        lowered.includes('offer') ||
-        lowered.includes('counteroffer') ||
-        lowered.includes('contract')
-      ) {
-        liveBridge =
-          "We've already explored the tradeoffs.\n\nBesides you, who better understands what matters most?\n\nI've helped clarify priorities and prepare for difficult moments.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-      }
-    } catch {}
+        if (hasAny(['investor', 'pitch', 'raise', 'capital', 'fundraising', 'funding', 'deck', 'market', 'mass market'])) {
+          return "Later, you may decide to meet with investors.\n\nBesides you, who knows this opportunity better?\n\nI've helped shape the positioning, challenge assumptions, and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+        }
+
+        if (hasAny(['interview', 'candidate', 'resume', 'hiring', 'recruiter', 'job offer'])) {
+          return "Eventually, preparation becomes the interview itself.\n\nBesides you, who better understands the work you've done to get here?\n\nI've helped organize your thinking and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+        }
+
+        if (hasAny(['doctor', 'appointment', 'symptom', 'medical', 'diagnosis', 'treatment', 'clinic'])) {
+          return "We've already organized your concerns and prepared the questions you wanted answered.\n\nBesides you, who has followed this situation more closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+        }
+
+        if (hasAny(['negotiat', 'offer', 'counteroffer', 'contract', 'terms', 'deal', 'leverage'])) {
+          return "We've already explored the tradeoffs.\n\nBesides you, who better understands what matters most?\n\nI've helped clarify priorities and prepare for difficult moments.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+        }
+
+        if (hasAny(['meeting', 'client', 'customer', 'board', 'presentation', 'sales call', 'call', 'conversation'])) {
+          return "This may eventually move from preparation into a real conversation.\n\nBesides you, who has followed the work this closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+        }
+      } catch {}
+
+      return "If this work moves into a live conversation, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+    })()
 
     const bridgeMessage: Message = {
       role: 'assistant',
