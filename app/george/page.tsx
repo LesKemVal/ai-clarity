@@ -759,6 +759,19 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     }
   }, [])
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem('GEORGE_FEEDBACK_STATE') || '{}'
+      )
+
+      if (saved && typeof saved === 'object') {
+        setFeedback(saved)
+      }
+    } catch {}
+  }, [])
+
+
   const dismissTrajectory = (id: string) => {
     setDismissedTrajectoryIds((prev) => {
       const next = Array.from(new Set([...prev, id]))
@@ -835,10 +848,25 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   }, [])
 
   function handleFeedback(index: number, type: 'up' | 'down') {
-    setFeedback((prev) => ({
-      ...prev,
-      [index]: type,
-    }))
+    setFeedback((prev) => {
+      const current = prev[index]
+
+      const next = {
+        ...prev,
+      }
+
+      if (current === type) {
+        delete next[index]
+      } else {
+        next[index] = type
+      }
+
+      try {
+        localStorage.setItem('GEORGE_FEEDBACK_STATE', JSON.stringify(next))
+      } catch {}
+
+      return next
+    })
 
     const pulseKey = `${index}-${type}`
     setFeedbackPulse((prev) => ({
@@ -851,12 +879,6 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
         ...prev,
         [pulseKey]: false,
       }))
-
-      setFeedback((prev) => {
-        const next = { ...prev }
-        delete next[index]
-        return next
-      })
     }, 520)
 
     const msg = messagesRef.current[index]
@@ -2582,10 +2604,51 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setActivePromptContext('live_intent_bridge')
     setContextTurnCount(0)
 
+    let liveBridge =
+      "If the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+
+    try {
+      const lowered = content.toLowerCase()
+
+      if (
+        lowered.includes('investor') ||
+        lowered.includes('pitch') ||
+        lowered.includes('raise') ||
+        lowered.includes('capital') ||
+        lowered.includes('fundraising')
+      ) {
+        liveBridge =
+          "Later, you may decide to meet with investors.\n\nBesides you, who knows this opportunity better?\n\nI've helped shape the positioning, challenge assumptions, and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+      } else if (
+        lowered.includes('interview') ||
+        lowered.includes('candidate') ||
+        lowered.includes('resume') ||
+        lowered.includes('hiring')
+      ) {
+        liveBridge =
+          "Eventually, preparation becomes the interview itself.\n\nBesides you, who better understands the work you've done to get here?\n\nI've helped organize your thinking and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+      } else if (
+        lowered.includes('doctor') ||
+        lowered.includes('appointment') ||
+        lowered.includes('symptom') ||
+        lowered.includes('medical')
+      ) {
+        liveBridge =
+          "We've already organized your concerns and prepared the questions you wanted answered.\n\nBesides you, who has followed this situation more closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+      } else if (
+        lowered.includes('negotiat') ||
+        lowered.includes('offer') ||
+        lowered.includes('counteroffer') ||
+        lowered.includes('contract')
+      ) {
+        liveBridge =
+          "We've already explored the tradeoffs.\n\nBesides you, who better understands what matters most?\n\nI've helped clarify priorities and prepare for difficult moments.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+      }
+    } catch {}
+
     const bridgeMessage: Message = {
       role: 'assistant',
-      content:
-        "LIVE lets GEORGE listen with you in real time and give you short cues, lines, or adjustments as the room unfolds.\n\nWould LIVE help here?",
+      content: liveBridge,
     }
 
     setMessages((prev) => {
@@ -6024,7 +6087,7 @@ return (
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[188px] overflow-y-auto overscroll-contain pb-10' : 'pointer-events-none'} fixed left-0 right-0 top-[104px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
+    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[188px] overflow-y-auto overscroll-contain pb-10' : 'pointer-events-none'} fixed left-0 right-0 top-[92px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -6038,7 +6101,7 @@ return (
 
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
-        {showGeorgeHeroTitle && <h1>GEORGE</h1>}
+        {showGeorgeHeroTitle && <h1 className='mb-4'>GEORGE</h1>}
         {showGeorgeHeroTagline && (
           <p>
             {showPreLiveSignalSurface ? (
@@ -6436,10 +6499,10 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-          {!liveMode && !isWelcomeAssistant &&
+          {!liveMode &&
             !liveMode && (
           <div className="flex items-center gap-3 flex-nowrap overflow-x-auto text-[11px] text-[#D7DBE4]/50">
-            {!isWelcomeAssistant && (
+            {(
               <>
             <button
               type="button"
@@ -6764,8 +6827,8 @@ I am listening now. Speak naturally. I will respond ${
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
-          placeholder=""
-          className="w-full resize-none appearance-none border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:text-transparent focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+          placeholder="say it here..."
+          className="w-full resize-none appearance-none border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
         />
 
         {!input.trim() && (
@@ -6776,7 +6839,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[120px] md:h-[140px]' : 'h-2 md:h-3'}`} />
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[70px] md:h-[90px]' : 'h-2 md:h-3'}`} />
 
 </div>
 
@@ -8122,11 +8185,11 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                           handleComposerKeyDown(e)
                         }}
-                        placeholder=""
+                        placeholder="say it here..."
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className={`${(forceLive || liveMode) ? 'min-h-[22px] pl-14 pr-[92px] py-0 md:min-h-[22px] md:pl-11 md:pr-[84px] md:py-0' : 'min-h-[42px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2'} w-full resize-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:text-transparent focus:ring-0 md:text-[15px]`}
+                        className={`${(forceLive || liveMode) ? 'min-h-[22px] pl-14 pr-[92px] py-0 md:min-h-[22px] md:pl-11 md:pr-[84px] md:py-0' : 'min-h-[42px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2'} w-full resize-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:ring-0 md:text-[15px]`}
                       />
 
                       <div className={`${(forceLive || liveMode) ? 'hidden' : 'absolute right-1 top-1/2 flex'} -translate-y-1/2 items-center gap-2`}>
