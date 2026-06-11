@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import BxPageHeader from '@/components/BxPageHeader'
 import { getActiveSessionForMode } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
@@ -551,10 +551,11 @@ export default function LiveEntryClient() {
   const [founderAccessReady, setFounderAccessReady] = useState(false)
 
   const [proofTranscript, setProofTranscript] = useState<Array<{ speaker: 'george' | 'user'; text: string }>>([
-    { speaker: 'george', text: 'Before we begin…' },
+    { speaker: 'george', text: 'Proof of concept.' },
   ])
   const [proofInProgress, setProofInProgress] = useState(false)
   const [proofComplete, setProofComplete] = useState(false)
+  const currentProofAudioRef = useRef<HTMLAudioElement | null>(null)
   const [spokenLiveBriefingStep, setSpokenLiveBriefingStep] = useState<1 | 2 | 3 | null>(null)
   const [liveEntryReasoning, setLiveEntryReasoning] = useState({
     roomObservation: '',
@@ -855,20 +856,39 @@ export default function LiveEntryClient() {
       const acquiredSignals = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
       setPreLiveSignals(acquiredSignals)
 
+      if (acquiredSignals.name) {
+        const normalizedName = String(acquiredSignals.name).trim()
+        window.localStorage.setItem('george_name', normalizedName)
+        window.localStorage.setItem('george_profile_name', normalizedName)
+        window.localStorage.setItem('george_user_name', normalizedName)
+      }
+
       if (acquiredSignals.role) {
         const normalizedRole = String(acquiredSignals.role).trim()
         const knownChair = CHAIR_OPTIONS.some((option) => option.label.toLowerCase() === normalizedRole.toLowerCase())
         if (knownChair) {
           const matched = CHAIR_OPTIONS.find((option) => option.label.toLowerCase() === normalizedRole.toLowerCase())
           setChairs(matched ? [matched.label] : [])
+          setUserPosition(matched?.label || normalizedRole)
         } else {
           setChairs(['Other'])
           setCustomChair(normalizedRole)
+          setUserPosition(normalizedRole)
         }
         setChairSectionCollapsed(true)
       }
 
-      if (acquiredSignals.desiredOutcome && !objective.trim()) {
+      if (acquiredSignals.counterparty) {
+        const normalizedAudience = String(acquiredSignals.counterparty).trim()
+        const matchedAudience = AUDIENCE_TYPES.find((option) =>
+          option.label.toLowerCase() === normalizedAudience.toLowerCase() ||
+          option.label.toLowerCase() === normalizedAudience.toLowerCase().replace(/s$/, '')
+        )
+
+        setAudienceType(matchedAudience?.label || normalizedAudience)
+      }
+
+      if (acquiredSignals.desiredOutcome) {
         setObjective(String(acquiredSignals.desiredOutcome).trim())
       }
 
@@ -893,6 +913,7 @@ export default function LiveEntryClient() {
 
       const isFreshLiveStart =
         window.localStorage.getItem('george_start_new_live') === '1' ||
+        params.get('source') === 'signal' ||
         params.get('source') === 'home' ||
         params.get('source') === 'start' ||
         params.get('source') === 'founder'
@@ -909,15 +930,19 @@ export default function LiveEntryClient() {
       setPreLivePreviewReady(preLiveReady)
 
       const saved = JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null')
-      if (saved?.room) {
-        const knownRoom = CONVERSATION_TYPES.some((option) => option.label === saved.room)
-        setConversationType(knownRoom ? saved.room : 'Other')
-        if (!knownRoom) setCustomConversationType(saved.room)
+
+      if (!isFreshLiveStart) {
+        if (saved?.room) {
+          const knownRoom = CONVERSATION_TYPES.some((option) => option.label === saved.room)
+          setConversationType(knownRoom ? saved.room : 'Other')
+          if (!knownRoom) setCustomConversationType(saved.room)
+        }
+        if (saved?.audienceType) setAudienceType(saved.audienceType)
+        if (saved?.userPosition) setUserPosition(saved.userPosition)
       }
-      if (saved?.audienceType) setAudienceType(saved.audienceType)
+
       if (saved?.cadence) setPacing(saved.cadence)
       if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
-      if (saved?.userPosition) setUserPosition(saved.userPosition)
       if (saved?.controlWords) setControlWords(saved.controlWords)
       if (saved?.communicationStyle) setCommunicationStyle(saved.communicationStyle)
     } catch {}
@@ -1279,6 +1304,7 @@ export default function LiveEntryClient() {
       setLiveBriefingSupportAccepted(false)
       setLiveBriefingProofReply('')
       setLiveBriefingSttError('')
+      if (typeof window !== 'undefined') window.sessionStorage.removeItem('george_panel3_proof_started')
       setSpokenLiveBriefingStep(null)
       setShowPrepPreview(false)
       setShowLiveBriefingRoom(true)
@@ -1328,33 +1354,55 @@ export default function LiveEntryClient() {
     setProofTranscript((current) => [...current, { speaker, text: message }])
   }
 
-  const speakProofLine = (message: string) => {
+  const stopCurrentProofAudio = () => {
+    try {
+      if (currentProofAudioRef.current) {
+        currentProofAudioRef.current.pause()
+        currentProofAudioRef.current.currentTime = 0
+        currentProofAudioRef.current = null
+      }
+    } catch {}
+  }
+
+  const speakProofLine = async (message: string) => {
     appendProofTranscript('george', message)
 
     try {
-      fetch('/api/george/live/tts', {
+      const response = await fetch('/api/george/live/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: message }),
       })
-        .then((response) => {
-          if (!response.ok) return null
-          return response.blob()
-        })
-        .then((blob) => {
-          if (!blob) return
-          const audioUrl = URL.createObjectURL(blob)
-          const audio = new Audio(audioUrl)
-          audio.onended = () => URL.revokeObjectURL(audioUrl)
-          audio.onerror = () => URL.revokeObjectURL(audioUrl)
-          void audio.play().catch(() => {})
-        })
-        .catch(() => {})
+
+      if (!response.ok) return
+
+      const blob = await response.blob()
+      const audioUrl = URL.createObjectURL(blob)
+      const audio = new Audio(audioUrl)
+      currentProofAudioRef.current = audio
+
+      await new Promise<void>((resolve) => {
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl)
+          if (currentProofAudioRef.current === audio) currentProofAudioRef.current = null
+          resolve()
+        }
+
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl)
+          if (currentProofAudioRef.current === audio) currentProofAudioRef.current = null
+          resolve()
+        }
+
+        void audio.play().catch(() => resolve())
+      })
     } catch {}
   }
 
   const beginProofOfAwareness = async () => {
     if (proofInProgress) return
+    if (typeof window !== 'undefined' && window.sessionStorage.getItem('george_panel3_proof_started') === '1') return
+    if (typeof window !== 'undefined') window.sessionStorage.setItem('george_panel3_proof_started', '1')
     if (proofComplete) {
       startLive(false, editableResources, true)
       return
@@ -1372,7 +1420,7 @@ export default function LiveEntryClient() {
     let heardUser = false
     let recognition: any = null
 
-    const listenOnce = (timeoutMs = 6200) =>
+    const listenOnce = (timeoutMs = 3200) =>
       new Promise<string>((resolve) => {
         if (!SpeechRecognition) {
           console.log('[GEORGE LIVE ENTRY] SpeechRecognition unavailable')
@@ -1414,9 +1462,9 @@ export default function LiveEntryClient() {
         }
       })
 
-    const askAndListen = async (line: string) => {
-      speakProofLine(line)
-      const heard = await listenOnce()
+    const askAndListen = async (line: string, timeoutMs = 3200) => {
+      await speakProofLine(line)
+      const heard = await listenOnce(timeoutMs)
       if (heard) {
         heardUser = true
         appendProofTranscript('user', heard)
@@ -1424,19 +1472,41 @@ export default function LiveEntryClient() {
       return heard
     }
 
-    const first = await askAndListen('Before we begin… Tell me something I should know.')
+    const first = await askAndListen("Okay. Before we get started, is there anything you'd like me to know?")
     if (!first) {
-      const second = await askAndListen('Anything?')
+      const second = await askAndListen('Anything at all? I can hear you.', 5000)
       if (!second) {
-        const third = await askAndListen('Come on. I can hear you.')
-        if (!third) {
-          speakProofLine('Okay. Let’s go to work.')
-        }
+        speakProofLine("Then let's go to work.")
       }
     }
 
     if (heardUser) {
-      speakProofLine(`Understood. ${liveEntryReasoning.commitmentStatement || 'I’ll keep that in mind.'} Let’s go to work.`)
+      let commitmentStatement = liveEntryReasoning.commitmentStatement || 'I’ll keep that in mind.'
+
+      try {
+        const response = await fetch('/api/george/live/entry-reasoning', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            objective,
+            position: chair || userPosition,
+            audience: audienceType,
+            roomSignal: knownContext,
+            secondaryPosition: (optionalSignalAnswers as any).fallbackOutcome || (optionalSignalAnswers as any).secondaryOutcome || '',
+            userName:
+              cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
+              cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
+              cleanBriefingValue(window.localStorage.getItem('george_name')) ||
+              'there',
+            proofTranscript: first || '',
+          }),
+        })
+
+        const data = await response.json().catch(() => ({}))
+        commitmentStatement = String(data?.commitmentStatement || commitmentStatement).trim()
+      } catch {}
+
+      await speakProofLine(`Understood. ${commitmentStatement || 'I’ll keep that in mind.'}`)
     }
 
     setProofComplete(true)
@@ -1472,26 +1542,35 @@ export default function LiveEntryClient() {
   }, [showLiveBriefingRoom, objective, chair, userPosition, audienceType, knownContext, sessionEmail])
 
 
-  const speakLiveEntryLine = (message: string) => {
+  const waitForLiveEntryVoice = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
+
+  const speakLiveEntryLine = async (message: string) => {
     try {
-      fetch('/api/george/live/tts', {
+      const response = await fetch('/api/george/live/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: message }),
       })
-        .then((response) => {
-          if (!response.ok) return null
-          return response.blob()
-        })
-        .then((blob) => {
-          if (!blob) return
-          const audioUrl = URL.createObjectURL(blob)
-          const audio = new Audio(audioUrl)
-          audio.onended = () => URL.revokeObjectURL(audioUrl)
-          audio.onerror = () => URL.revokeObjectURL(audioUrl)
-          void audio.play().catch(() => {})
-        })
-        .catch(() => {})
+
+      if (!response.ok) return
+
+      const blob = await response.blob()
+      const audioUrl = URL.createObjectURL(blob)
+      const audio = new Audio(audioUrl)
+
+      await new Promise<void>((resolve) => {
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl)
+          resolve()
+        }
+
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl)
+          resolve()
+        }
+
+        void audio.play().catch(() => resolve())
+      })
     } catch {}
   }
 
@@ -1501,16 +1580,46 @@ export default function LiveEntryClient() {
 
     setSpokenLiveBriefingStep(liveBriefingStep)
 
-    const name = sessionEmail ? sessionEmail.split('@')[0] : 'Lester'
+    const name =
+      cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_name')) ||
+      'Lester'
 
     if (liveBriefingStep === 1) {
-      speakLiveEntryLine(`${name}. You made it. Your objective, position, and audience are noted. ${liveEntryReasoning.roomObservation || 'There may be more happening in this room than what is said directly.'} I'm aware of your secondary position as well, but for now, it remains secondary. Good.`)
+      speakLiveEntryLine(`${name}.
+
+You've made it here with enough signal for us to enter the room together.
+
+Review what we've gathered. Edit or confirm by checking the Terms.
+
+We don't move on without it.
+
+I'll wait.`)
     }
 
     if (liveBriefingStep === 2) {
-      speakLiveEntryLine(`Based on what you've shared, I'll adapt support to this room. ${liveEntryReasoning.supportSummary || "I'll adapt support while preserving your agency and your voice."} You're doing fine, ${name}. Good.`)
+      speakLiveEntryLine(`Based on what we've gathered, I'll adapt my support to what appears most useful here.
+
+I'll tighten responses when useful, and surface important details quickly.
+
+If needed, use phrases like "That's interesting" or "Let me think" to adjust my support while we're in the room.
+
+Your voice remains yours.`)
     }
-  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail, liveEntryReasoning.roomObservation, liveEntryReasoning.supportSummary])
+  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, liveEntryReasoning.roomObservation, liveEntryReasoning.supportSummary])
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+    if (liveBriefingStep !== 3) return
+    if (proofInProgress || proofComplete) return
+
+    const timer = window.setTimeout(() => {
+      void beginProofOfAwareness()
+    }, 700)
+
+    return () => window.clearTimeout(timer)
+  }, [showLiveBriefingRoom, liveBriefingStep, proofInProgress, proofComplete])
 
   if (!ready) return null
 
@@ -1538,6 +1647,7 @@ export default function LiveEntryClient() {
     const displayName =
       cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
       cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_name')) ||
       'You'
 
     const objectiveLabel = cleanBriefingValue(objective) || 'the desired outcome'
@@ -1652,7 +1762,16 @@ export default function LiveEntryClient() {
             <input
               type="checkbox"
               checked={liveBriefingToaAccepted}
-              onChange={(event) => setLiveBriefingToaAccepted(event.target.checked)}
+              onChange={(event) => {
+                    setLiveBriefingToaAccepted(event.target.checked)
+                    if (event.target.checked) {
+                      void (async () => {
+                        speakLiveEntryLine("That's it.")
+                        await waitForLiveEntryVoice(1400)
+                        speakLiveEntryLine("Let's move on.")
+                      })()
+                    }
+                  }}
               className="mt-1 h-4 w-4 accent-[#8FB6C9]"
             />
             <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
@@ -1670,13 +1789,35 @@ export default function LiveEntryClient() {
             </span>
           </label>
 
-          <div className={`mt-4 text-[13px] text-[#D7DBE4]/62 transition-opacity ${liveBriefingToaAccepted ? 'opacity-100' : 'opacity-0'}`}>
-            Good.
-          </div>
-
           <AwakeButton active={liveBriefingToaAccepted} onClick={() => setLiveBriefingStep(2)}>
             Continue
           </AwakeButton>
+
+          {liveBriefingToaAccepted && (
+            <div className="mt-4 border-t border-white/[0.05] pt-4">
+              <div className="text-[10px] uppercase tracking-[0.24em] text-white/24">
+                Need less today?
+              </div>
+
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setLiveBriefingStep(3)}
+                  className="rounded-[0.82rem] border border-white/[0.07] bg-white/[0.018] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                >
+                  Skip to Proof
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => startLive(false, editableResources, true)}
+                  className="rounded-[0.82rem] border border-white/[0.07] bg-white/[0.018] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                >
+                  Begin LIVE
+                </button>
+              </div>
+            </div>
+          )}
         </PanelShell>
       )
     }
@@ -1713,9 +1854,6 @@ export default function LiveEntryClient() {
             </span>
           </label>
 
-          <div className={`mt-4 text-[13px] text-[#D7DBE4]/62 transition-opacity ${liveBriefingSupportAccepted ? 'opacity-100' : 'opacity-0'}`}>
-            Good. You&apos;re doing fine, {displayName}.
-          </div>
 
           <AwakeButton active={liveBriefingSupportAccepted} onClick={() => setLiveBriefingStep(3)}>
             Continue
@@ -1727,20 +1865,20 @@ export default function LiveEntryClient() {
     return (
       <PanelShell label="LIVE BRIEFING · 3" title="Proof of awareness." stage={3}>
         <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
-          Before we begin…
+          Proof of concept.
         </div>
 
         <button
           type="button"
-          onClick={proofComplete ? () => startLive(false, editableResources, true) : beginProofOfAwareness}
-          disabled={proofInProgress}
+          onClick={proofComplete ? () => startLive(false, editableResources, true) : undefined}
+          disabled={!proofComplete || proofInProgress}
           className={`w-full rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
             proofInProgress
               ? 'border-white/[0.07] bg-white/[0.025] text-[#D7DCFF]/36'
               : 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12]'
           }`}
         >
-          {proofInProgress ? "Listening…" : proofComplete ? "LET'S GO TO WORK" : "LET'S GO TO WORK"}
+          {proofInProgress ? "Listening…" : proofComplete ? "LET'S GO TO WORK" : "STANDING BY"}
         </button>
 
         {proofTranscript.length > 0 && (
@@ -1767,9 +1905,6 @@ export default function LiveEntryClient() {
         <div className={`transition-opacity ${proofReady ? 'opacity-100' : 'opacity-0'}`}>
           <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/20 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/74">
             {liveBriefingProofReply || ' '}
-          </div>
-          <div className="mt-4 text-[13px] text-[#D7DBE4]/62">
-            Good. I have what I need.
           </div>
         </div>
       </PanelShell>
