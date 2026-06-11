@@ -639,6 +639,7 @@ const georgeAmbientPulseStyles = `
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
+  const [composerPlaceholder, setComposerPlaceholder] = useState('say it here...')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
 
@@ -732,6 +733,26 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
       }
     } catch {}
   }
+
+  useEffect(() => {
+    if (input.trim()) return
+
+    let mounted = true
+    const phrases = ['say it here...', 'ask it here...']
+    let phraseIndex = phrases.indexOf(composerPlaceholder)
+    if (phraseIndex < 0) phraseIndex = 0
+
+    const timer = window.setInterval(() => {
+      if (!mounted) return
+      phraseIndex = (phraseIndex + 1) % phrases.length
+      setComposerPlaceholder(phrases[phraseIndex])
+    }, 5000)
+
+    return () => {
+      mounted = false
+      window.clearInterval(timer)
+    }
+  }, [input, composerPlaceholder])
 
 const [messages, setMessages] = useState<Message[]>([])
 const normalSessionBootedRef = useRef(false)
@@ -6827,7 +6848,7 @@ I am listening now. Speak naturally. I will respond ${
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
-          placeholder="say it here..."
+          placeholder={composerPlaceholder}
           className="w-full resize-none appearance-none border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
         />
 
@@ -8185,7 +8206,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                           handleComposerKeyDown(e)
                         }}
-                        placeholder="say it here..."
+                        placeholder={composerPlaceholder}
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
