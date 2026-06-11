@@ -1724,10 +1724,10 @@ Your voice remains yours.`)
 
     if (liveBriefingStep === 1) {
       return (
-        <PanelShell label="LIVE BRIEFING · 1" title="The room has taken shape." stage={1}>
-          <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
+        <PanelShell label="BRIEF ROOM · EDITABLE" title="The room has taken shape." stage={1}>
+          <div className="mt-5 space-y-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
             <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
-              Is my understanding of the room still accurate?
+              Is my understanding of the room still accurate? Edit anything that changed.
             </div>
 
             <label className="block">
@@ -1736,7 +1736,7 @@ Your voice remains yours.`)
                 value={objective}
                 onChange={(event) => setObjective(event.target.value)}
                 rows={2}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] leading-6 text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-white/82 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={objectiveLabel}
               />
             </label>
@@ -1747,7 +1747,7 @@ Your voice remains yours.`)
                 <input
                   value={userPosition}
                   onChange={(event) => setUserPosition(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] text-white/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={positionLabel}
                 />
               </label>
@@ -1757,7 +1757,7 @@ Your voice remains yours.`)
                 <input
                   value={audienceType}
                   onChange={(event) => setAudienceType(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] text-white/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={audienceLabel}
                 />
               </label>
@@ -1769,7 +1769,7 @@ Your voice remains yours.`)
                 value={knownContext}
                 onChange={(event) => setKnownContext(event.target.value)}
                 rows={3}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.05] bg-white/[0.018] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/72 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/30"
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={observation}
               />
             </label>
