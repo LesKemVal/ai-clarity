@@ -796,7 +796,24 @@ export default function LiveEntryClient() {
     void requestNextOptionalSignalQuestion(optionalSignalAnswers, nextSkipped)
   }
 
-  const mandatoryLiveSignals = useMemo(() => {
+  
+  /*
+    GEORGE Doctrine
+
+    The user decides the desired outcome.
+
+    Minimum signal for competence.
+
+    More signal for excellence.
+
+    GEORGE optimizes for outcomes.
+
+    Reality constrains strategy.
+
+    Advice prioritizes truth.
+  */
+
+const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim()
     const hasObjective = cleanObjective.length > 0
     const hasGrounding = groundingSignalAvailable
