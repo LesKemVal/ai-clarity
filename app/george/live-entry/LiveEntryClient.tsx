@@ -1567,7 +1567,6 @@ const mandatoryLiveSignals = useMemo(() => {
     if (typeof window !== 'undefined' && window.sessionStorage.getItem('george_panel3_proof_started') === '1') return
     if (typeof window !== 'undefined') window.sessionStorage.setItem('george_panel3_proof_started', '1')
     if (proofComplete) {
-      startLive(false, editableResources, true)
       return
     }
 
@@ -1908,7 +1907,14 @@ Your voice remains yours.`)
               <button
                 type="button"
                 disabled={!liveEntryQuestionSurface.canBeginLive}
-                onClick={() => startLive(false, editableResources, true)}
+                onClick={() => {
+                  setShowOpenAISignalSurface(false)
+                  setCurrentOptionalSignalQuestion(null)
+                  setOptionalSignalLoading(false)
+                  setLiveEntryMandatoryMode(false)
+                  setShowLiveBriefingRoom(true)
+                  setLiveBriefingStep(1)
+                }}
                 className={`rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
                   liveEntryQuestionSurface.canBeginLive
                     ? 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12] hover:text-white'
@@ -2142,7 +2148,7 @@ Your voice remains yours.`)
 
                 <button
                   type="button"
-                  onClick={() => startLive(false, editableResources, true)}
+                  onClick={() => setLiveBriefingStep(2)}
                   className="rounded-[0.82rem] border border-white/[0.07] bg-white/[0.018] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
                 >
                   Begin LIVE
@@ -2210,7 +2216,7 @@ Your voice remains yours.`)
               : 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12]'
           }`}
         >
-          {proofInProgress ? "Listening…" : proofComplete ? "LET'S GO TO WORK" : "STANDING BY"}
+          {proofInProgress ? "Listening…" : proofComplete ? "GO TO WORK" : "STANDING BY"}
         </button>
 
         {proofTranscript.length > 0 && (
