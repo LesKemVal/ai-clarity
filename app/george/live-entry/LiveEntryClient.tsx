@@ -8,6 +8,14 @@ import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtim
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 import { deriveRoomFormation } from '@/lib/george/live/prep-room'
+import {
+  DEFAULT_LIVE_RECOVERY_SELECTION,
+  GEORGE_LIVE_RECOVERY_STORAGE_KEY,
+  LIVE_ENTRY_RECOVERY_QUESTION,
+  LIVE_RECOVERY_OPTIONS,
+  normalizeLiveRecoverySelection,
+  type LiveRecoveryOptionId,
+} from '@/lib/george/live-voice/runtime/recovery-options'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -523,6 +531,8 @@ export default function LiveEntryClient() {
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false)
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
+  const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<LiveRecoveryOptionId[]>(DEFAULT_LIVE_RECOVERY_SELECTION)
+  const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
@@ -555,7 +565,7 @@ export default function LiveEntryClient() {
   const [founderAccessReady, setFounderAccessReady] = useState(false)
 
   const [proofTranscript, setProofTranscript] = useState<Array<{ speaker: 'george' | 'user'; text: string }>>([
-    { speaker: 'george', text: 'Proof of concept.' },
+    { speaker: 'george', text: 'Are you satisfied?' },
   ])
   const [proofInProgress, setProofInProgress] = useState(false)
   const [proofComplete, setProofComplete] = useState(false)
@@ -575,6 +585,24 @@ export default function LiveEntryClient() {
       }
 
       return [...current, value]
+    })
+  }
+
+
+  const toggleLiveRecoveryOption = (option: LiveRecoveryOptionId) => {
+    setLiveRecoveryAcknowledged(false)
+    setLiveRecoveryOptions((current) => {
+      if (option === 'none_realistic') {
+        return current.includes('none_realistic') ? [] : ['none_realistic']
+      }
+
+      const withoutNone = current.filter((item) => item !== 'none_realistic')
+      if (withoutNone.includes(option)) {
+        const next = withoutNone.filter((item) => item !== option)
+        return next.length ? next : DEFAULT_LIVE_RECOVERY_SELECTION
+      }
+
+      return Array.from(new Set([...withoutNone, option]))
     })
   }
 
@@ -604,6 +632,17 @@ export default function LiveEntryClient() {
 
     return () => window.clearInterval(timer)
   }, [currentRoomPhraseExample, customRoomPhrases, roomPhraseFocused, useRoomPhrases])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(GEORGE_LIVE_RECOVERY_STORAGE_KEY) || 'null')
+      setLiveRecoveryOptions(normalizeLiveRecoverySelection(stored?.selected))
+    } catch {
+      setLiveRecoveryOptions(DEFAULT_LIVE_RECOVERY_SELECTION)
+    }
+  }, [])
 
   const contextSignalsCollapsed = chairSectionCollapsed
 
@@ -1369,6 +1408,10 @@ const mandatoryLiveSignals = useMemo(() => {
       observedReality: knownContext,
     })
 
+    const liveRecoveryConstraints = {
+      selected: normalizeLiveRecoverySelection(liveRecoveryOptions),
+    }
+
     if (!hasRequiredLiveSignal) {
       const missing = missingMandatoryLiveSignals
         .map((signal) => signal.label)
@@ -1392,6 +1435,7 @@ const mandatoryLiveSignals = useMemo(() => {
       observedReality: knownContext.trim(),
       continuityPackage,
       roomFormation,
+      recoveryConstraints: liveRecoveryConstraints,
       internalInstruction: [
         'Use the selected chair as a relevance signal, not as a separate brain or profession mode.',
         'User outcome is highest authority.',
@@ -1427,6 +1471,7 @@ const mandatoryLiveSignals = useMemo(() => {
       compactPrep: true,
       editedByUser: !skipPrep,
       prepRoomProfile,
+      recoveryConstraints: liveRecoveryConstraints,
     }
 
     const liveSetup = {
@@ -1458,6 +1503,7 @@ const mandatoryLiveSignals = useMemo(() => {
       estimatedCents: finalEstimate.estimatedCents,
       compactPrep: true,
       prepRoomProfile,
+      recoveryConstraints: liveRecoveryConstraints,
       createdAt: Date.now(),
     }
 
@@ -1465,6 +1511,7 @@ const mandatoryLiveSignals = useMemo(() => {
       setLiveBriefingStep(1)
       setLiveBriefingToaAccepted(false)
       setLiveBriefingSupportAccepted(false)
+      setLiveRecoveryAcknowledged(false)
       setLiveBriefingProofReply('')
       setLiveBriefingSttError('')
       if (typeof window !== 'undefined') window.sessionStorage.removeItem('george_panel3_proof_started')
@@ -1498,6 +1545,7 @@ const mandatoryLiveSignals = useMemo(() => {
     window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
     window.localStorage.setItem('george_live_runtime_support', JSON.stringify(runtimeSupport))
+    window.localStorage.setItem(GEORGE_LIVE_RECOVERY_STORAGE_KEY, JSON.stringify(liveRecoveryConstraints))
     window.localStorage.setItem('george_live_estimated_cents', String(finalEstimate.estimatedCents))
 
     setObjective('')
@@ -2104,9 +2152,9 @@ Your voice remains yours.`)
                     setLiveBriefingToaAccepted(event.target.checked)
                     if (event.target.checked) {
                       void (async () => {
-                        speakLiveEntryLine("That's it.")
-                        await waitForLiveEntryVoice(1400)
-                        speakLiveEntryLine("Let's move on.")
+                        speakLiveEntryLine("Good.")
+                        await waitForLiveEntryVoice(900)
+                        speakLiveEntryLine("I recognize your updates.")
                       })()
                     }
                   }}
@@ -2161,39 +2209,91 @@ Your voice remains yours.`)
     }
 
     if (liveBriefingStep === 2) {
+      const constraintsReady = liveRecoveryOptions.length > 0
+
       return (
-        <PanelShell label="BRIEF ROOM · SUPPORT" title="Support calibration." stage={2}>
-          <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
-            Based on what you shared, I’ll adapt support to this room while preserving your agency and your voice.
+        <PanelShell label="BRIEF ROOM · CONSTRAINTS" title="Room constraints." stage={2}>
+          <div className="mt-5 border-l border-[#AEB6FF]/24 pl-5 text-left">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/32">
+              {LIVE_ENTRY_RECOVERY_QUESTION.label}
+            </div>
+
+            <div className="mt-4 min-h-[72px] text-[21px] leading-8 tracking-[-0.02em] text-white/82">
+              {LIVE_ENTRY_RECOVERY_QUESTION.question}
+              <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
+            </div>
+
+            <div className="mt-3 text-[13px] leading-6 text-white/42">
+              {LIVE_ENTRY_RECOVERY_QUESTION.helper}
+            </div>
           </div>
 
           <div className="mt-5 space-y-2 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
-            {supportItems.map((item) => (
-              <div key={item} className="flex gap-3 text-[13px] leading-6 text-white/64">
-                <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#8FB6C9]/70 shadow-[0_0_10px_rgba(143,182,201,0.40)]" />
-                <span>{item}</span>
-              </div>
-            ))}
+            {LIVE_RECOVERY_OPTIONS.map((option) => {
+              const checked = liveRecoveryOptions.includes(option.id)
+
+              return (
+                <label
+                  key={option.id}
+                  className={`flex cursor-pointer items-start gap-3 rounded-[0.78rem] border px-3 py-3 transition ${
+                    checked
+                      ? 'border-[#8FB6C9]/38 bg-[#8FB6C9]/[0.07]'
+                      : 'border-white/[0.045] bg-white/[0.012] hover:border-[#8FB6C9]/20 hover:bg-[#8FB6C9]/[0.035]'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleLiveRecoveryOption(option.id)}
+                    className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+                  />
+                  <span>
+                    <span className="block text-[13px] leading-5 text-[#D7DBE4]/74">
+                      {option.label}
+                    </span>
+                    <span className="mt-1 block text-[11.5px] leading-5 text-white/34">
+                      {option.helper}
+                    </span>
+                  </span>
+                </label>
+              )
+            })}
           </div>
 
-          <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
-            liveBriefingSupportAccepted
-              ? 'border-[#8FB6C9]/65 bg-[#8FB6C9]/[0.08]'
-              : 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.045] shadow-[0_0_24px_rgba(143,182,201,0.16)]'
-          }`}>
-            <input
-              type="checkbox"
-              checked={liveBriefingSupportAccepted}
-              onChange={(event) => setLiveBriefingSupportAccepted(event.target.checked)}
-              className="mt-1 h-4 w-4 accent-[#8FB6C9]"
-            />
-            <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
-              I understand I can accept, reject, modify, or ignore GEORGE&apos;s support.
-            </span>
-          </label>
+          <button
+            type="button"
+            disabled={!constraintsReady}
+            onClick={() => {
+              setLiveRecoveryAcknowledged(true)
+              try {
+                window.localStorage.setItem(
+                  GEORGE_LIVE_RECOVERY_STORAGE_KEY,
+                  JSON.stringify({ selected: normalizeLiveRecoverySelection(liveRecoveryOptions) })
+                )
+              } catch {}
 
+              void (async () => {
+                speakLiveEntryLine('Ok.')
+                await waitForLiveEntryVoice(750)
+                speakLiveEntryLine('I recognize the constraints of this room.')
+              })()
+            }}
+            className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+              constraintsReady
+                ? 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.075] text-[#D7DCFF]/86 hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98]'
+                : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
+            }`}
+          >
+            Confirm constraints
+          </button>
 
-          <AwakeButton active={liveBriefingSupportAccepted} onClick={() => setLiveBriefingStep(3)}>
+          {liveRecoveryAcknowledged && (
+            <div className="mt-4 rounded-[0.95rem] border border-[#8FB6C9]/18 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/72">
+              Ok. I recognize the constraints of this room.
+            </div>
+          )}
+
+          <AwakeButton active={liveRecoveryAcknowledged} onClick={() => setLiveBriefingStep(3)}>
             Continue
           </AwakeButton>
         </PanelShell>
@@ -2201,9 +2301,14 @@ Your voice remains yours.`)
     }
 
     return (
-      <PanelShell label="BRIEF ROOM · AWARENESS" title="Awareness check." stage={3}>
-        <div className="mt-5 text-[14px] leading-6 text-[#D7DBE4]/70">
-          Proof of concept.
+      <PanelShell label="BRIEF ROOM · READY" title="Ready Room." stage={3}>
+        <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4 text-[14px] leading-6 text-[#D7DBE4]/72">
+          <p>Remember your earbuds.</p>
+          <p>Speak normally, but clearly.</p>
+          <p>I have your voice print as well.</p>
+          <p>If I need additional signal, I’ll let you know discreetly.</p>
+          <p>If the room changes, adapt. I’ll adapt with you.</p>
+          <p>Now we go to work.</p>
         </div>
 
         <button
