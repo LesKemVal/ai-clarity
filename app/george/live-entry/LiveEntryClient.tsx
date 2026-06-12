@@ -548,6 +548,10 @@ export default function LiveEntryClient() {
   const [skippedOptionalSignalKeys, setSkippedOptionalSignalKeys] = useState<string[]>([])
   const [exampleIndex, setExampleIndex] = useState(0)
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
+  const [liveEntryMandatoryMode, setLiveEntryMandatoryMode] = useState(false)
+  const [mandatorySignalStep, setMandatorySignalStep] = useState(0)
+  const [mandatorySignalInput, setMandatorySignalInput] = useState('')
+  const [typedMandatorySignalQuestion, setTypedMandatorySignalQuestion] = useState('')
   const [founderAccessReady, setFounderAccessReady] = useState(false)
 
   const [proofTranscript, setProofTranscript] = useState<Array<{ speaker: 'george' | 'user'; text: string }>>([
@@ -608,6 +612,122 @@ export default function LiveEntryClient() {
     Boolean(prepDocument) ||
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== 'not_related'
+
+  const liveEntryMandatoryQuestions = useMemo(() => [
+    {
+      key: 'name',
+      kicker: 'LIVE ENTRY',
+      label: 'Signal 1',
+      question: 'What should I call you in this room?',
+      helper: 'Name, title, nickname, or whatever people in the room will recognize.',
+      example: 'Lester, Mr. Sawyer, founder, Dr. Patel, Alex.',
+    },
+    {
+      key: 'role',
+      kicker: 'POSITION SIGNAL',
+      label: 'Signal 2',
+      question: 'What is your role in this conversation?',
+      helper: 'This tells GEORGE where you stand in the room.',
+      example: 'Founder, candidate, patient, manager, investor, customer.',
+    },
+    {
+      key: 'desiredOutcome',
+      kicker: 'OUTCOME SIGNAL',
+      label: 'Signal 3',
+      question: 'What outcome do you want from this conversation?',
+      helper: 'Minimum signal for competence. More signal for excellence.',
+      example: 'Secure a second meeting. Leave with a treatment plan. Get agreement on next steps.',
+    },
+  ], [])
+
+  const currentMandatorySignalQuestion = liveEntryMandatoryMode
+    ? liveEntryMandatoryQuestions[mandatorySignalStep]
+    : null
+
+  useEffect(() => {
+    if (!currentMandatorySignalQuestion?.question) {
+      setTypedMandatorySignalQuestion('')
+      return
+    }
+
+    let index = 0
+    setTypedMandatorySignalQuestion('')
+
+    const timer = window.setInterval(() => {
+      index += 1
+      setTypedMandatorySignalQuestion(currentMandatorySignalQuestion.question.slice(0, index))
+
+      if (index >= currentMandatorySignalQuestion.question.length) {
+        window.clearInterval(timer)
+      }
+    }, 26)
+
+    return () => window.clearInterval(timer)
+  }, [currentMandatorySignalQuestion?.key])
+
+  const submitMandatoryLiveEntrySignal = () => {
+    if (!currentMandatorySignalQuestion) return false
+
+    const answer = mandatorySignalInput.trim()
+    if (!answer) return false
+
+    const key = currentMandatorySignalQuestion.key
+    const nextSignals = {
+      ...preLiveSignals,
+      [key]: answer,
+    }
+
+    setPreLiveSignals(nextSignals)
+
+    if (key === 'name') {
+      try {
+        window.localStorage.setItem('george_name', answer)
+        window.localStorage.setItem('george_profile_name', answer)
+        window.localStorage.setItem('george_user_name', answer)
+      } catch {}
+    }
+
+    if (key === 'role') {
+      setUserPosition(answer)
+      setChairs(['Other'])
+      setCustomChair(answer)
+    }
+
+    if (key === 'desiredOutcome') {
+      setObjective(answer)
+      setKnownContext((current) => {
+        const existing = current.trim()
+        const line = `Desired outcome: ${answer}`
+        return existing ? `${existing}\n${line}` : line
+      })
+    }
+
+    try {
+      window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(nextSignals))
+      window.localStorage.setItem(`GEORGE_PRE_LIVE_${key.toUpperCase()}`, answer)
+    } catch {}
+
+    setMandatorySignalInput('')
+
+    const nextStep = mandatorySignalStep + 1
+
+    if (nextStep >= liveEntryMandatoryQuestions.length) {
+      setLiveEntryMandatoryMode(false)
+      setMandatorySignalStep(0)
+      setPreLivePreviewReady(true)
+      setShowOpenAISignalSurface(true)
+
+      try {
+        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        window.localStorage.setItem('george_start_new_live', '1')
+      } catch {}
+
+      return true
+    }
+
+    setMandatorySignalStep(nextStep)
+    return true
+  }
 
   const requestNextOptionalSignalQuestion = async (answers = optionalSignalAnswers, skipped = skippedOptionalSignalKeys) => {
     if (!showOpenAISignalSurface) return
@@ -926,13 +1046,39 @@ const mandatoryLiveSignals = useMemo(() => {
 
     try {
       const params = new URLSearchParams(window.location.search)
-      const acquiredSignalsForAccess = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+      const source = params.get('source')
+      const isStartSource = source === 'start'
+
+      if (isStartSource) {
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
+        window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
+        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+        window.localStorage.removeItem('george_live_setup_active')
+
+        setPreLiveSignals({})
+        setShowOpenAISignalSurface(false)
+        setShowPrepPreview(false)
+        setShowLiveBriefingRoom(false)
+        setLiveEntryMandatoryMode(true)
+        setMandatorySignalStep(0)
+        setMandatorySignalInput('')
+        setObjective('')
+        setKnownContext('')
+        setChairs([])
+        setCustomChair('')
+      }
+
+      const acquiredSignalsForAccess = isStartSource
+        ? {}
+        : JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
 
       const isFreshLiveStart =
         window.localStorage.getItem('george_start_new_live') === '1' ||
         params.get('source') === 'signal' ||
         params.get('source') === 'home' ||
-        params.get('source') === 'start' ||
+        false ||
         params.get('source') === 'founder'
 
       const preLiveReady =
@@ -1639,6 +1785,144 @@ Your voice remains yours.`)
   }, [showLiveBriefingRoom, liveBriefingStep, proofInProgress, proofComplete])
 
   if (!ready) return null
+
+  const liveEntryQuestionSurface = liveEntryMandatoryMode && currentMandatorySignalQuestion
+    ? {
+        kicker: currentMandatorySignalQuestion.kicker,
+        label: currentMandatorySignalQuestion.label,
+        question: typedMandatorySignalQuestion,
+        helper: currentMandatorySignalQuestion.helper,
+        example: currentMandatorySignalQuestion.example,
+        inputValue: mandatorySignalInput,
+        setInputValue: setMandatorySignalInput,
+        submit: submitMandatoryLiveEntrySignal,
+        loading: false,
+        step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
+        primaryAction: 'Continue',
+        canBeginLive: false,
+      }
+    : showOpenAISignalSurface && currentOptionalSignalQuestion
+      ? {
+          kicker: 'ADDITIONAL SIGNAL',
+          label: currentOptionalSignalQuestion.label || 'Optional signal',
+          question: typedOptionalSignalQuestion,
+          helper: currentOptionalSignalQuestion.why,
+          example: currentOptionalSignalQuestion.example,
+          inputValue: optionalSignalInput,
+          setInputValue: setOptionalSignalInput,
+          submit: submitOptionalSignalAnswer,
+          loading: false,
+          step: 'Optional',
+          primaryAction: 'Continue preparing',
+          canBeginLive: hasRequiredLiveSignal,
+        }
+      : showOpenAISignalSurface && optionalSignalLoading
+        ? {
+            kicker: 'ADDITIONAL SIGNAL',
+            label: 'GEORGE is determining the next useful signal',
+            question: 'One moment.',
+            helper: 'OpenAI is reasoning over the room signal to sharpen GEORGE\'s support.',
+            example: '',
+            inputValue: '',
+            setInputValue: () => {},
+            submit: () => false,
+            loading: true,
+            step: 'Optional',
+            primaryAction: 'Continue',
+            canBeginLive: hasRequiredLiveSignal,
+          }
+        : null
+
+  if (liveEntryQuestionSurface) {
+    return (
+      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.075),transparent_32%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
+
+        <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-[#8FB6C9]/[0.11] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">
+              {liveEntryQuestionSurface.kicker}
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
+              {liveEntryQuestionSurface.step}
+            </div>
+          </div>
+
+          <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
+            Bring GEORGE up to speed.
+          </h1>
+
+          <div className="mt-6 border-l border-[#AEB6FF]/24 pl-5 text-left">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-white/34">
+              {liveEntryQuestionSurface.label}
+            </div>
+
+            <div className="mt-4 min-h-[72px] text-[22px] leading-8 tracking-[-0.02em] text-white/82">
+              {liveEntryQuestionSurface.question}
+              {!liveEntryQuestionSurface.loading && (
+                <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
+              )}
+            </div>
+
+            <div className="mt-3 text-[13px] leading-6 text-white/42">
+              {liveEntryQuestionSurface.helper}
+            </div>
+
+            {liveEntryQuestionSurface.example && (
+              <div className="mt-5 rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
+                <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
+                  Example
+                </div>
+                <div className="mt-2 text-[12.5px] leading-6 text-white/44">
+                  {liveEntryQuestionSurface.example}
+                </div>
+              </div>
+            )}
+
+            {!liveEntryQuestionSurface.loading && (
+              <input
+                value={liveEntryQuestionSurface.inputValue}
+                onChange={(event) => liveEntryQuestionSurface.setInputValue(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    liveEntryQuestionSurface.submit()
+                  }
+                }}
+                autoFocus
+                className="mt-6 w-full border-0 border-b border-[#8FB6C9]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#8FB6C9]/46"
+                placeholder="say it here..."
+              />
+            )}
+
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                disabled={liveEntryQuestionSurface.loading}
+                onClick={() => liveEntryQuestionSurface.submit()}
+                className="rounded-[0.95rem] border border-[#8FB6C9]/35 bg-[#8FB6C9]/[0.075] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
+              >
+                {liveEntryQuestionSurface.primaryAction}
+              </button>
+
+              <button
+                type="button"
+                disabled={!liveEntryQuestionSurface.canBeginLive}
+                onClick={() => startLive(false, editableResources, true)}
+                className={`rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
+                  liveEntryQuestionSurface.canBeginLive
+                    ? 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12] hover:text-white'
+                    : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
+                }`}
+              >
+                {liveEntryQuestionSurface.canBeginLive ? 'Begin LIVE' : 'Add signal for LIVE'}
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    )
+  }
 
   if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
     return (
