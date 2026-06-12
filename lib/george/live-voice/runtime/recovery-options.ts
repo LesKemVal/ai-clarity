@@ -43,6 +43,8 @@ export type LiveRecoveryRecommendation = {
   requiresBreak: boolean
 }
 
+export const GEORGE_LIVE_RECOVERY_STORAGE_KEY = 'george_live_recovery_constraints'
+
 export const LIVE_RECOVERY_OPTIONS: LiveRecoveryOption[] = [
   {
     id: 'repeat_last_question',
@@ -105,6 +107,30 @@ export const LIVE_RECOVERY_OPTIONS: LiveRecoveryOption[] = [
     safetyRank: 9,
   },
 ]
+
+export const LIVE_ENTRY_RECOVERY_QUESTION = {
+  kicker: 'Room constraints',
+  label: 'Recovery options',
+  question: 'If something changes unexpectedly in this room, what options are available to you?',
+  helper: 'Choose what is actually possible. GEORGE will not recommend impossible recovery moves.',
+  acknowledgement: 'Ok. I recognize the constraints of this room.',
+  readyRoomLine: 'If I need additional signal, I’ll let you know discreetly. You decide the safest recovery path.',
+} as const
+
+export const DEFAULT_LIVE_RECOVERY_SELECTION: LiveRecoveryOptionId[] = [
+  'repeat_last_question',
+  'paraphrase_understanding',
+  'buy_time',
+  'ignore_signal',
+]
+
+export function normalizeLiveRecoverySelection(value: unknown): LiveRecoveryOptionId[] {
+  const valid = new Set(LIVE_RECOVERY_OPTIONS.map((option) => option.id))
+  const source = Array.isArray(value) ? value : DEFAULT_LIVE_RECOVERY_SELECTION
+  const selected = source.filter((item): item is LiveRecoveryOptionId => typeof item === 'string' && valid.has(item as LiveRecoveryOptionId))
+
+  return selected.length ? Array.from(new Set(selected)) : DEFAULT_LIVE_RECOVERY_SELECTION
+}
 
 function has(constraints: LiveRecoveryConstraints, option: LiveRecoveryOptionId) {
   return constraints.selected.includes(option)
@@ -223,7 +249,7 @@ export function recommendLiveRecovery(input: LiveRecoveryRecommendationInput): L
 }
 
 export const GEORGE_LIVE_RECOVERY_DOCTRINE = {
-  liveEntryQuestion: 'If something changes unexpectedly in this room, what options are available to you?',
+  liveEntryQuestion: LIVE_ENTRY_RECOVERY_QUESTION.question,
   principle: 'GEORGE should not recommend impossible recovery moves. It should reason from what the user can actually do in the room.',
   clarificationSignal: 'If GEORGE needs more signal, it should use a discreet nonverbal signal rather than speaking unrelated instructions into the user’s ear.',
   userAuthority: 'The user determines the safest recovery path. GEORGE adapts to the selected room constraints.',
