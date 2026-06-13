@@ -464,6 +464,7 @@ function buildProofReply(input: string, objective: string, room: string) {
   return 'Understood. I will keep that outcome visible as the conversation develops.'
 }
 
+
 function CompactSelect({
   label,
   value,
@@ -478,23 +479,336 @@ function CompactSelect({
   return (
     <label className="block rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-3 py-2">
       <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">{label}</span>
+
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className="mt-2 w-full appearance-none bg-transparent text-[15px] font-medium text-white/78 outline-none"
       >
         {options.map((option) => (
-          <option key={option.label} value={option.label} className="bg-[#090B10] text-white">
+          <option
+            key={option.label}
+            value={option.label}
+            className="bg-[#090B10] text-white"
+          >
             {option.label}
           </option>
         ))}
       </select>
+
       <span className="mt-1 block text-[12px] leading-5 text-white/34">
         {options.find((option) => option.label === value)?.helper}
       </span>
     </label>
   )
 }
+
+function PanelShell({
+  label,
+  title,
+  stage,
+  children,
+}: {
+  label: string
+  title: string
+  stage: 1 | 2 | 3
+  children: React.ReactNode
+}) {
+  const stageGlow =
+    stage === 1
+      ? 'rgba(143,182,201,0.08)'
+      : stage === 2
+        ? 'rgba(143,182,201,0.12)'
+        : 'rgba(174,182,255,0.16)'
+
+  const stageBorder =
+    stage === 1
+      ? 'border-white/[0.055]'
+      : stage === 2
+        ? 'border-[#8FB6C9]/[0.12]'
+        : 'border-[#AEB6FF]/[0.18]'
+
+  return (
+    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 32%), linear-gradient(180deg,#06070A 0%,#080A0F 52%,#06070A 100%)`,
+        }}
+      />
+
+      <section
+        className={`relative z-10 w-full max-w-[560px] rounded-[1.25rem] border ${stageBorder} bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]`}
+      >
+        <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">
+          {label}
+        </div>
+
+        <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
+          {title}
+        </h1>
+
+        {children}
+      </section>
+    </main>
+  )
+}
+
+function AwakeButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean
+  children: React.ReactNode
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      disabled={!active}
+      onClick={onClick}
+      className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+        active
+          ? 'border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]'
+          : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+
+
+type LiveBriefingSupportPanelId = 'advice' | 'completion' | 'steering'
+
+type LiveBriefingSupportPanel = {
+  id: LiveBriefingSupportPanelId
+  label: string
+  defaultLine: string
+  body: string
+  examples: string[]
+  why: string
+}
+
+function buildLiveBriefingSupportPanels({
+  room,
+  audience,
+  objective,
+  position,
+}: {
+  room: string
+  audience: string
+  objective: string
+  position: string
+}): LiveBriefingSupportPanel[] {
+  const signal = `${room} ${audience} ${objective} ${position}`.toLowerCase()
+
+  if (/investor|capital|fundraising|raise|fund|terms|valuation/.test(signal)) {
+    return [
+      {
+        id: 'advice',
+        label: 'Advice',
+        defaultLine: 'Default: observational advice.',
+        body: 'In this room, I may help you notice objections, timing pressure, hesitation, leverage, or movement toward terms.',
+        examples: [
+          'They do not sound convinced by that yet.',
+          'I think I would ask what specifically concerns them.',
+          'They seem to be moving toward terms.',
+        ],
+        why: 'Capital conversations often turn on credibility, timing, and what the other side is really testing.',
+      },
+      {
+        id: 'completion',
+        label: 'Sentence Completion',
+        defaultLine: 'Default: concise completion.',
+        body: 'If you begin a thought and pause, I may offer a continuation that keeps the answer moving without inventing facts.',
+        examples: [
+          'You: “Here is what we need…”',
+          'GEORGE: “…before we can move forward responsibly.”',
+          'You can use it, reword it, or ignore it.',
+        ],
+        why: 'Investor rooms reward clear sequencing and controlled answers.',
+      },
+      {
+        id: 'steering',
+        label: 'Advanced Steering',
+        defaultLine: 'Optional: natural phrases.',
+        body: 'You do not need steering phrases. If you use phrases like “let me think” or “one second,” I can treat them as signal to slow down, clarify, or hold position.',
+        examples: [
+          '“Let me think” can signal: buy time.',
+          '“Right” can signal: keep listening.',
+          '“One second” can signal: hold support unless needed.',
+        ],
+        why: 'Natural phrases let you adjust support without exposing GEORGE.',
+      },
+    ]
+  }
+
+  if (/interview|candidate|hiring|job|recruiter/.test(signal)) {
+    return [
+      {
+        id: 'advice',
+        label: 'Advice',
+        defaultLine: 'Default: answer-shaping advice.',
+        body: 'In this room, I may help you notice when the interviewer wants an example, when an answer is too broad, or when to return to the question.',
+        examples: [
+          'I think I would answer that more directly.',
+          'They seem interested in the example.',
+          'I would probably bring this back to what you actually did.',
+        ],
+        why: 'Interviews often shift quickly from prepared answers to proof under pressure.',
+      },
+      {
+        id: 'completion',
+        label: 'Sentence Completion',
+        defaultLine: 'Default: recovery completion.',
+        body: 'If you begin an answer and pause, I may offer a continuation that helps you finish the thought cleanly.',
+        examples: [
+          'You: “The reason that mattered was…”',
+          'GEORGE: “…because it showed I could make a decision under pressure.”',
+          'Use it exactly, adjust it, or ignore it.',
+        ],
+        why: 'Unexpected questions can interrupt momentum; completion preserves continuity.',
+      },
+      {
+        id: 'steering',
+        label: 'Advanced Steering',
+        defaultLine: 'Optional: natural phrases.',
+        body: 'You do not need steering phrases. If you use phrases like “good question” or “let me think,” I can treat them as signal to organize the answer.',
+        examples: [
+          '“Good question” can signal: prepare a structured answer.',
+          '“Let me think” can signal: slow down.',
+          '“Can I clarify?” can signal: protect accuracy.',
+        ],
+        why: 'Natural phrases create time without making the room feel mechanical.',
+      },
+    ]
+  }
+
+  if (/doctor|medical|patient|symptom|treatment|physician/.test(signal)) {
+    return [
+      {
+        id: 'advice',
+        label: 'Advice',
+        defaultLine: 'Default: clarification advice.',
+        body: 'In this room, I may help you notice when a question remains unanswered, when the next step is unclear, or when details should be repeated.',
+        examples: [
+          'I do not think they answered your concern yet.',
+          'I would ask what happens next.',
+          'I think I would repeat the timeline clearly.',
+        ],
+        why: 'Medical conversations require accuracy, sequence, and follow-through.',
+      },
+      {
+        id: 'completion',
+        label: 'Sentence Completion',
+        defaultLine: 'Default: factual completion.',
+        body: 'If you begin explaining symptoms or concerns and pause, I may offer a continuation that preserves the structure without inventing details.',
+        examples: [
+          'You: “What I want to understand is…”',
+          'GEORGE: “…what changes after today and what I should watch for.”',
+          'You remain responsible for the facts.',
+        ],
+        why: 'Completion should help organize facts, not create them.',
+      },
+      {
+        id: 'steering',
+        label: 'Advanced Steering',
+        defaultLine: 'Optional: natural phrases.',
+        body: 'You do not need steering phrases. If you use phrases like “I want to make sure I understand,” I can prioritize clarity and unanswered questions.',
+        examples: [
+          '“Can we slow down?” can signal: clarify.',
+          '“What are my options?” can signal: compare choices.',
+          '“I want to understand” can signal: plain language.',
+        ],
+        why: 'Natural phrases help you advocate without losing the room.',
+      },
+    ]
+  }
+
+  if (/negotiat|offer|deal|price|counter|buyer|seller/.test(signal)) {
+    return [
+      {
+        id: 'advice',
+        label: 'Advice',
+        defaultLine: 'Default: leverage advice.',
+        body: 'In this room, I may help you notice pressure, concessions, unclear terms, or moments where asking another question is stronger than answering.',
+        examples: [
+          'They seem to be trying to speed this up.',
+          'I would probably ask what flexibility exists.',
+          'I do not think I would agree yet.',
+        ],
+        why: 'Negotiation depends on timing, control, and knowing when not to fill silence.',
+      },
+      {
+        id: 'completion',
+        label: 'Sentence Completion',
+        defaultLine: 'Default: controlled completion.',
+        body: 'If you begin a position and pause, I may offer a continuation that protects the outcome without escalating unnecessarily.',
+        examples: [
+          'You: “Here is what I need…”',
+          'GEORGE: “…before I can make a decision.”',
+          'Use it, reshape it, or ignore it.',
+        ],
+        why: 'A clean next sentence can prevent rushed concessions.',
+      },
+      {
+        id: 'steering',
+        label: 'Advanced Steering',
+        defaultLine: 'Optional: natural phrases.',
+        body: 'You do not need steering phrases. If you use phrases like “let me think” or “walk me through that,” I can treat them as signal to slow pressure or clarify terms.',
+        examples: [
+          '“Let me think” can signal: buy time.',
+          '“Walk me through that” can signal: make them explain.',
+          '“I am not rushing this” can signal: hold position.',
+        ],
+        why: 'Natural phrases let you control pace without exposing support.',
+      },
+    ]
+  }
+
+  return [
+    {
+      id: 'advice',
+      label: 'Advice',
+      defaultLine: 'Default: observational advice.',
+      body: 'In this room, I may help you notice confusion, pressure, drift, unanswered questions, or moments where the conversation should return to the objective.',
+      examples: [
+        'I think I would ask another question.',
+        'They seem unsure about that.',
+        'I would probably bring this back to the main point.',
+      ],
+      why: 'Most rooms change through timing, pressure, and what people leave unsaid.',
+    },
+    {
+      id: 'completion',
+      label: 'Sentence Completion',
+      defaultLine: 'Default: sentence completion.',
+      body: 'If you begin a thought and naturally pause, I may offer a continuation that keeps the conversation moving.',
+      examples: [
+        'You: “What matters most here…”',
+        'GEORGE: “…is making sure we are solving the right problem.”',
+        'Use it exactly, adjust it, or ignore it.',
+      ],
+      why: 'Completion gives you access to the next useful sentence without taking control.',
+    },
+    {
+      id: 'steering',
+      label: 'Advanced Steering',
+      defaultLine: 'Optional: natural phrases.',
+      body: 'You do not need steering phrases. Over time, phrases like “hmm,” “right,” “let me think,” or “one second” can help GEORGE adapt more precisely.',
+      examples: [
+        '“Let me think” can signal: slow down.',
+        '“Right” can signal: keep listening.',
+        '“One second” can signal: hold support.',
+      ],
+      why: 'Steering phrases are optional. GEORGE works without them.',
+    },
+  ]
+}
+
 
 export default function LiveEntryClient() {
   const [ready, setReady] = useState(false)
@@ -515,6 +829,22 @@ export default function LiveEntryClient() {
   const [relatedSessionId, setRelatedSessionId] = useState('not_related')
   const [relatedSessions, setRelatedSessions] = useState<any[]>([])
   const [liveToaAccepted, setLiveToaAccepted] = useState(false)
+  const [liveBriefingReadyToContinue, setLiveBriefingReadyToContinue] = useState(false)
+  const liveBriefingTermsPreviouslyAcceptedRef = useRef(false)
+  const liveBriefingHasReopenedEditsRef = useRef(false)
+  const liveBriefingConfirmSequenceRef = useRef(0)
+  const liveEntryAudioRef = useRef<HTMLAudioElement | null>(null)
+  const liveEntryAudioUrlRef = useRef<string | null>(null)
+  const liveEntrySpeechRequestRef = useRef(0)
+  const liveBriefingRoomSignalEditedRef = useRef(false)
+  const generatedBriefingRoomSignalRef = useRef('')
+  const [liveBriefingEditAcknowledged, setLiveBriefingEditAcknowledged] = useState(false)
+  const liveBriefingOriginalSignalRef = useRef({
+    objective: '',
+    userPosition: '',
+    audienceType: '',
+    knownContext: '',
+  })
   const [contextSectionCollapsed, setContextSectionCollapsed] = useState(true)
   const [chairSectionCollapsed, setChairSectionCollapsed] = useState(true)
   const [roomSectionCollapsed, setRoomSectionCollapsed] = useState(false)
@@ -533,6 +863,9 @@ export default function LiveEntryClient() {
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<LiveRecoveryOptionId[]>(DEFAULT_LIVE_RECOVERY_SELECTION)
   const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
+  const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
+  const [liveBriefingSupportPanel, setLiveBriefingSupportPanel] = useState<'advice' | 'completion' | 'steering' | null>('advice')
+  const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
@@ -1512,6 +1845,7 @@ const mandatoryLiveSignals = useMemo(() => {
       setLiveBriefingToaAccepted(false)
       setLiveBriefingSupportAccepted(false)
       setLiveRecoveryAcknowledged(false)
+      setLiveReadyAccepted(false)
       setLiveBriefingProofReply('')
       setLiveBriefingSttError('')
       if (typeof window !== 'undefined') window.sessionStorage.removeItem('george_panel3_proof_started')
@@ -1728,6 +2062,19 @@ const mandatoryLiveSignals = useMemo(() => {
   useEffect(() => {
     if (!showLiveBriefingRoom) return
 
+    liveBriefingOriginalSignalRef.current = {
+      objective: cleanBriefingValue(objective),
+      userPosition: cleanBriefingValue(userPosition),
+      audienceType: cleanBriefingValue(audienceType),
+      knownContext: cleanBriefingValue(knownContext),
+    }
+
+    setLiveBriefingEditAcknowledged(false)
+  }, [showLiveBriefingRoom])
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+
     fetch('/api/george/live/entry-reasoning', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1754,7 +2101,27 @@ const mandatoryLiveSignals = useMemo(() => {
 
   const waitForLiveEntryVoice = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
+  const stopLiveEntryVoice = () => {
+    try {
+      if (liveEntryAudioRef.current) {
+        liveEntryAudioRef.current.pause()
+        liveEntryAudioRef.current.currentTime = 0
+        liveEntryAudioRef.current = null
+      }
+
+      if (liveEntryAudioUrlRef.current) {
+        URL.revokeObjectURL(liveEntryAudioUrlRef.current)
+        liveEntryAudioUrlRef.current = null
+      }
+    } catch {}
+  }
+
   const speakLiveEntryLine = async (message: string) => {
+    const speechRequestId = liveEntrySpeechRequestRef.current + 1
+    liveEntrySpeechRequestRef.current = speechRequestId
+
+    stopLiveEntryVoice()
+
     try {
       const response = await fetch('/api/george/live/tts', {
         method: 'POST',
@@ -1763,26 +2130,106 @@ const mandatoryLiveSignals = useMemo(() => {
       })
 
       if (!response.ok) return
+      if (liveEntrySpeechRequestRef.current !== speechRequestId) return
 
       const blob = await response.blob()
+      if (liveEntrySpeechRequestRef.current !== speechRequestId) return
+
       const audioUrl = URL.createObjectURL(blob)
+
+      if (liveEntrySpeechRequestRef.current !== speechRequestId) {
+        URL.revokeObjectURL(audioUrl)
+        return
+      }
+
       const audio = new Audio(audioUrl)
 
+      liveEntryAudioRef.current = audio
+      liveEntryAudioUrlRef.current = audioUrl
+
       await new Promise<void>((resolve) => {
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl)
+        const finish = () => {
+          if (liveEntryAudioRef.current === audio) {
+            liveEntryAudioRef.current = null
+          }
+
+          if (liveEntryAudioUrlRef.current === audioUrl) {
+            URL.revokeObjectURL(audioUrl)
+            liveEntryAudioUrlRef.current = null
+          }
+
           resolve()
         }
 
-        audio.onerror = () => {
-          URL.revokeObjectURL(audioUrl)
-          resolve()
-        }
+        audio.onended = finish
+        audio.onerror = finish
 
-        void audio.play().catch(() => resolve())
+        void audio.play().catch(finish)
       })
     } catch {}
   }
+
+  useEffect(() => {
+    return () => {
+      liveEntrySpeechRequestRef.current += 1
+      stopLiveEntryVoice()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+    if (liveBriefingStep !== 1) return
+
+    liveBriefingConfirmSequenceRef.current += 1
+    const sequence = liveBriefingConfirmSequenceRef.current
+
+    if (!liveBriefingToaAccepted) {
+      setLiveBriefingReadyToContinue(false)
+
+      if (!cleanBriefingValue(knownContext)) {
+        liveBriefingRoomSignalEditedRef.current = false
+      }
+
+      if (liveBriefingTermsPreviouslyAcceptedRef.current) {
+        liveBriefingTermsPreviouslyAcceptedRef.current = false
+        liveBriefingHasReopenedEditsRef.current = true
+        void speakLiveEntryLine('More edits? Take your time.')
+      }
+
+      return
+    }
+
+    liveBriefingTermsPreviouslyAcceptedRef.current = true
+    setLiveBriefingReadyToContinue(false)
+
+    void (async () => {
+      const isRecheck = liveBriefingHasReopenedEditsRef.current
+
+      if (!isRecheck) {
+        await speakLiveEntryLine('Good. Any questions?')
+        await waitForLiveEntryVoice(5000)
+
+        if (liveBriefingConfirmSequenceRef.current !== sequence) return
+
+        setLiveBriefingReadyToContinue(true)
+        await speakLiveEntryLine("Let's continue.")
+        return
+      }
+
+      await speakLiveEntryLine('Alright. Any questions?')
+      await waitForLiveEntryVoice(4000)
+
+      if (liveBriefingConfirmSequenceRef.current !== sequence) return
+
+      await speakLiveEntryLine('You sure?')
+      await waitForLiveEntryVoice(3000)
+
+      if (liveBriefingConfirmSequenceRef.current !== sequence) return
+
+      setLiveBriefingReadyToContinue(true)
+      await speakLiveEntryLine("I'm ready when you are.")
+    })()
+  }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted])
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return
@@ -1809,15 +2256,44 @@ I'll wait.`)
     }
 
     if (liveBriefingStep === 2) {
-      speakLiveEntryLine(`Based on what we've gathered, I'll adapt my support to what appears most useful here.
+      speakLiveEntryLine(`This part is about room constraints.
 
-I'll tighten responses when useful, and surface important details quickly.
+If circumstances change, GEORGE may adapt quietly in service of your desired outcome.
 
-If needed, use phrases like "That's interesting" or "Let me think" to adjust my support while we're in the room.
+Adaptation does not always require intervention.`)
+    }
 
-Your voice remains yours.`)
+    if (liveBriefingStep === 3) {
+      speakLiveEntryLine("Read this room and we'll read the next one, together.")
     }
   }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, liveEntryReasoning.roomObservation, liveEntryReasoning.supportSummary])
+
+  useEffect(() => {
+    if (!showLiveBriefingRoom) return
+    if (!liveBriefingToaAccepted) return
+    if (liveBriefingEditAcknowledged) return
+
+    const original = liveBriefingOriginalSignalRef.current
+
+    const actualEditOccurred =
+      cleanBriefingValue(objective) !== original.objective ||
+      cleanBriefingValue(userPosition) !== original.userPosition ||
+      cleanBriefingValue(audienceType) !== original.audienceType ||
+      cleanBriefingValue(knownContext) !== original.knownContext
+
+    if (!actualEditOccurred) return
+
+    setLiveBriefingEditAcknowledged(true)
+    void speakLiveEntryLine('I recognize your updates. I will account for them as we prepare the room.')
+  }, [
+    showLiveBriefingRoom,
+    liveBriefingToaAccepted,
+    liveBriefingEditAcknowledged,
+    objective,
+    userPosition,
+    audienceType,
+    knownContext,
+  ])
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return
@@ -1896,7 +2372,7 @@ Your voice remains yours.`)
           </div>
 
           <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
-            Bring GEORGE up to speed.
+            {liveEntryQuestionSurface.canBeginLive ? 'GEORGE has enough signal.' : 'Bring GEORGE up to speed.'}
           </h1>
 
           <div className="mt-6 border-l border-[#AEB6FF]/24 pl-5 text-left">
@@ -1904,7 +2380,7 @@ Your voice remains yours.`)
               {liveEntryQuestionSurface.label}
             </div>
 
-            <div className="mt-4 min-h-[72px] text-[22px] leading-8 tracking-[-0.02em] text-white/82">
+            <div className="mt-4 min-h-[72px] text-[22px] leading-8 tracking-[-0.02em] text-[#F2F4FF]/86">
               {liveEntryQuestionSurface.question}
               {!liveEntryQuestionSurface.loading && (
                 <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
@@ -1969,7 +2445,7 @@ Your voice remains yours.`)
                     : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
                 }`}
               >
-                {liveEntryQuestionSurface.canBeginLive ? 'Begin LIVE' : 'Add signal for LIVE'}
+                {liveEntryQuestionSurface.canBeginLive ? 'Continue to Brief Room' : 'Add signal for LIVE'}
               </button>
             </div>
           </div>
@@ -2015,83 +2491,97 @@ Your voice remains yours.`)
       cleanBriefingValue((preLiveSignals as any).fallbackOutcome) ||
       cleanBriefingValue((preLiveSignals as any).secondaryOutcome)
 
+    const setBriefingSecondaryOutcome = (value: string) => {
+      setOptionalSignalAnswers((previous: any) => ({
+        ...previous,
+        secondaryOutcome: value,
+        fallbackOutcome: value,
+      }))
+
+      setPreLiveSignals((previous: any) => ({
+        ...previous,
+        secondaryOutcome: value,
+        fallbackOutcome: value,
+      }))
+    }
+
+    const briefingInputsLocked = liveBriefingToaAccepted
+
     const observation = buildBriefingObservation(roomLabel, audienceLabel, objectiveLabel, knownContext)
+
+    if (!generatedBriefingRoomSignalRef.current) {
+      generatedBriefingRoomSignalRef.current = observation
+    }
+
+    const updateBriefingObjective = (value: string) => {
+      const nextObjectiveLabel = cleanBriefingValue(value) || 'the desired outcome'
+      const nextObservation = buildBriefingObservation(roomLabel, audienceLabel, nextObjectiveLabel, '')
+
+      setObjective(value)
+
+      if (!liveBriefingRoomSignalEditedRef.current) {
+        generatedBriefingRoomSignalRef.current = nextObservation
+        setKnownContext(nextObservation)
+      }
+    }
+
+    const updateBriefingRoomSignal = (value: string) => {
+      liveBriefingRoomSignalEditedRef.current = true
+      setKnownContext(value)
+    }
+
+    const previousLiveUserRecognized = Boolean(
+      cleanBriefingValue(sessionEmail) ||
+      cleanBriefingValue(relatedSessionId && relatedSessionId !== 'not_related' ? relatedSessionId : '') ||
+      cleanBriefingValue(typeof window !== 'undefined' ? window.localStorage.getItem('george_live_previous_user') : '')
+    )
+
+    const hasSeenLiveSteering = Boolean(
+      cleanBriefingValue(typeof window !== 'undefined' ? window.localStorage.getItem('george_live_steering_seen') : '') ||
+      cleanBriefingValue(typeof window !== 'undefined' ? window.localStorage.getItem('george_live_entry_steering_seen') : '') ||
+      cleanBriefingValue(typeof window !== 'undefined' ? window.localStorage.getItem(GEORGE_LIVE_RECOVERY_STORAGE_KEY) : '')
+    )
+
+    const canBeginLiveFromBriefing = liveBriefingReadyToContinue && previousLiveUserRecognized && hasSeenLiveSteering
+
     const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, liveAssistMode)
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
 
-    const PanelShell = ({ label, title, stage, children }: { label: string; title: string; stage: 1 | 2 | 3; children: React.ReactNode }) => {
-      const stageGlow =
-        stage === 1
-          ? 'rgba(143,182,201,0.08)'
-          : stage === 2
-            ? 'rgba(143,182,201,0.12)'
-            : 'rgba(174,182,255,0.16)'
+    const skipLiveRecoveryConstraints = () => {
+      const selected = normalizeLiveRecoverySelection(DEFAULT_LIVE_RECOVERY_SELECTION)
+      setLiveRecoveryOptions(selected)
+      setLiveRecoveryAcknowledged(true)
 
-      const stageBorder =
-        stage === 1
-          ? 'border-white/[0.055]'
-          : stage === 2
-            ? 'border-[#8FB6C9]/[0.12]'
-            : 'border-[#AEB6FF]/[0.18]'
-
-      return (
-        <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 32%), linear-gradient(180deg,#06070A 0%,#080A0F 52%,#06070A 100%)`,
-            }}
-          />
-
-          <section className={`relative z-10 w-full max-w-[560px] rounded-[1.25rem] border ${stageBorder} bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]`}>
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">{label}</div>
-            <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">{title}</h1>
-            {children}
-          </section>
-        </main>
-      )
+      try {
+        window.localStorage.setItem(
+          GEORGE_LIVE_RECOVERY_STORAGE_KEY,
+          JSON.stringify({ selected })
+        )
+      } catch {}
     }
-
-    const AwakeButton = ({
-      active,
-      children,
-      onClick,
-    }: {
-      active: boolean
-      children: React.ReactNode
-      onClick: () => void
-    }) => (
-      <button
-        type="button"
-        disabled={!active}
-        onClick={onClick}
-        className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
-          active
-            ? 'border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]'
-            : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
-        }`}
-      >
-        {children}
-      </button>
-    )
 
 
     if (liveBriefingStep === 1) {
       return (
-        <PanelShell label="BRIEF ROOM · EDITABLE" title="The room has taken shape." stage={1}>
+        <PanelShell
+          label="BRIEF ROOM · EDITABLE"
+          title={liveBriefingToaAccepted ? 'The room has now taken shape.' : 'The room is taking shape.'}
+          stage={1}
+        >
           <div className="mt-5 space-y-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
             <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
-              Is my understanding of the room still accurate? Edit anything that changed.
+              Review the room. Edit anything that changed.
             </div>
 
             <label className="block">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Objective</div>
               <textarea
                 value={objective}
-                onChange={(event) => setObjective(event.target.value)}
+                disabled={briefingInputsLocked}
+                onChange={(event) => updateBriefingObjective(event.target.value)}
                 rows={2}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-white/82 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={objectiveLabel}
               />
             </label>
@@ -2101,8 +2591,9 @@ Your voice remains yours.`)
                 <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Position</div>
                 <input
                   value={userPosition}
+                  disabled={briefingInputsLocked}
                   onChange={(event) => setUserPosition(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={positionLabel}
                 />
               </label>
@@ -2111,8 +2602,9 @@ Your voice remains yours.`)
                 <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Audience</div>
                 <input
                   value={audienceType}
+                  disabled={briefingInputsLocked}
                   onChange={(event) => setAudienceType(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={audienceLabel}
                 />
               </label>
@@ -2122,18 +2614,25 @@ Your voice remains yours.`)
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Room signal</div>
               <textarea
                 value={knownContext}
-                onChange={(event) => setKnownContext(event.target.value)}
+                disabled={briefingInputsLocked}
+                onChange={(event) => updateBriefingRoomSignal(event.target.value)}
                 rows={3}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={observation}
               />
             </label>
 
-            {secondaryPosition && (
-              <div className="text-[13px] leading-6 text-white/50">
-                I&apos;m aware of your secondary position as well, but for now, it remains secondary.
-              </div>
-            )}
+            <label className="block">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Secondary outcome</div>
+              <textarea
+                disabled={briefingInputsLocked}
+                value={secondaryPosition}
+                onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
+                rows={2}
+                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                placeholder="What should remain visible if the room shifts?"
+              />
+            </label>
 
             <div className="text-[12px] leading-5 text-[#8FB6C9]/70">
               Estimated LIVE support: {estimatedCents}¢
@@ -2142,22 +2641,13 @@ Your voice remains yours.`)
 
           <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
             liveBriefingToaAccepted
-              ? 'border-[#8FB6C9]/65 bg-[#8FB6C9]/[0.08]'
-              : 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.045] shadow-[0_0_24px_rgba(143,182,201,0.16)]'
+              ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(143,182,201,0.24)]'
+              : 'border-[#8FB6C9]/36 bg-[#8FB6C9]/[0.035]'
           }`}>
             <input
               type="checkbox"
               checked={liveBriefingToaAccepted}
-              onChange={(event) => {
-                    setLiveBriefingToaAccepted(event.target.checked)
-                    if (event.target.checked) {
-                      void (async () => {
-                        speakLiveEntryLine("Good.")
-                        await waitForLiveEntryVoice(900)
-                        speakLiveEntryLine("I recognize your updates.")
-                      })()
-                    }
-                  }}
+              onChange={(event) => setLiveBriefingToaAccepted(event.target.checked)}
               className="mt-1 h-4 w-4 accent-[#8FB6C9]"
             />
             <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
@@ -2175,14 +2665,14 @@ Your voice remains yours.`)
             </span>
           </label>
 
-          <AwakeButton active={liveBriefingToaAccepted} onClick={() => setLiveBriefingStep(2)}>
+          <AwakeButton active={liveBriefingReadyToContinue} onClick={() => setLiveBriefingStep(2)}>
             Continue
           </AwakeButton>
 
-          {liveBriefingToaAccepted && (
+          {liveBriefingReadyToContinue && (
             <div className="mt-4 border-t border-white/[0.05] pt-4">
               <div className="text-[10px] uppercase tracking-[0.24em] text-white/24">
-                Need less today?
+                Qualified shortcut
               </div>
 
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -2194,13 +2684,15 @@ Your voice remains yours.`)
                   Skip to Proof
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setLiveBriefingStep(2)}
-                  className="rounded-[0.82rem] border border-white/[0.07] bg-white/[0.018] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
-                >
-                  Begin LIVE
-                </button>
+                {canBeginLiveFromBriefing && (
+                  <button
+                    type="button"
+                    onClick={() => startLive(false, editableResources, true)}
+                    className="rounded-[0.82rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.055] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/78 transition hover:border-[#8FB6C9]/42 hover:bg-[#8FB6C9]/[0.09] hover:text-white active:scale-[0.98]"
+                  >
+                    Begin LIVE
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -2209,96 +2701,170 @@ Your voice remains yours.`)
     }
 
     if (liveBriefingStep === 2) {
-      const constraintsReady = liveRecoveryOptions.length > 0
+      const supportPanels = buildLiveBriefingSupportPanels({
+        room: roomLabel,
+        audience: audienceLabel,
+        objective: objectiveLabel,
+        position: positionLabel,
+      })
+
+      const activeSupportPanel =
+        supportPanels.find((panel) => panel.id === liveBriefingSupportPanel) || supportPanels[0]
+
+      const confirmPrivacyAndContinue = () => {
+        setLiveRecoveryAcknowledged(true)
+        setLiveBriefingCapabilitiesConfirmed(true)
+
+        try {
+          window.localStorage.setItem('george_live_entry_steering_seen', '1')
+          window.localStorage.setItem('george_live_entry_privacy_acknowledged', '1')
+          window.localStorage.setItem(
+            'george_live_entry_support_default',
+            activeSupportPanel.id
+          )
+        } catch {}
+      }
 
       return (
         <PanelShell label="BRIEF ROOM · CONSTRAINTS" title="Room constraints." stage={2}>
-          <div className="mt-5 border-l border-[#AEB6FF]/24 pl-5 text-left">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-white/32">
-              {LIVE_ENTRY_RECOVERY_QUESTION.label}
+          <div className="mt-4 space-y-4">
+            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
+              <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
+                How GEORGE supports you in the room
+              </div>
+
+              <p className="mt-3 text-[13px] leading-6 text-[#D7DBE4]/62">
+                GEORGE sets a default before LIVE starts. You can change it, or trust the default.
+              </p>
+
+              <div className="mt-5 divide-y divide-white/[0.06] border-t border-white/[0.06]">
+                {supportPanels.map((panel) => {
+                  const open = activeSupportPanel.id === panel.id
+
+                  return (
+                    <div key={panel.id} className="py-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLiveBriefingSupportPanel(open ? null : panel.id)
+                        }
+                        className="flex w-full items-center justify-between gap-4 text-left"
+                      >
+                        <span>
+                          <span className="block text-[13px] font-semibold text-[#F2F4FF]/84">
+                            {panel.label}
+                          </span>
+                          <span className="mt-0.5 block text-[11px] leading-4 text-[#D7DBE4]/38">
+                            {panel.defaultLine}
+                          </span>
+                        </span>
+
+                        <span className="text-[14px] text-[#D7DCFF]/42">
+                          {open ? '−' : '+'}
+                        </span>
+                      </button>
+
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ${
+                          open ? 'mt-3 max-h-[360px] opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                      >
+                        <div className="space-y-3 border-l border-white/[0.07] pl-3">
+                          <p className="text-[12px] leading-5 text-[#D7DBE4]/54">
+                            {panel.body}
+                          </p>
+
+                          <div className="space-y-1.5">
+                            {panel.examples.map((example) => (
+                              <div
+                                key={example}
+                                className="text-[11px] leading-5 text-[#D7DBE4]/40"
+                              >
+                                {example}
+                              </div>
+                            ))}
+                          </div>
+
+                          <details className="group">
+                            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
+                              Why this
+                            </summary>
+                            <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/38">
+                              {panel.why}
+                            </p>
+                          </details>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
-            <div className="mt-4 min-h-[72px] text-[21px] leading-8 tracking-[-0.02em] text-white/82">
-              {LIVE_ENTRY_RECOVERY_QUESTION.question}
-              <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
-            </div>
+            <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
+              liveRecoveryAcknowledged
+                ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
+                : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
+            }`}>
+              <input
+                type="checkbox"
+                checked={liveRecoveryAcknowledged}
+                onChange={(event) => {
+                  if (event.target.checked) {
+                    confirmPrivacyAndContinue()
+                    void speakLiveEntryLine('Good. We take your privacy very seriously.')
+                    return
+                  }
 
-            <div className="mt-3 text-[13px] leading-6 text-white/42">
-              {LIVE_ENTRY_RECOVERY_QUESTION.helper}
-            </div>
-          </div>
+                  setLiveRecoveryAcknowledged(false)
+                  setLiveBriefingCapabilitiesConfirmed(false)
+                }}
+                className="mt-1 h-4 w-4 accent-[#D7DCFF]"
+              />
 
-          <div className="mt-5 space-y-2 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4">
-            {LIVE_RECOVERY_OPTIONS.map((option) => {
-              const checked = liveRecoveryOptions.includes(option.id)
-
-              return (
-                <label
-                  key={option.id}
-                  className={`flex cursor-pointer items-start gap-3 rounded-[0.78rem] border px-3 py-3 transition ${
-                    checked
-                      ? 'border-[#8FB6C9]/38 bg-[#8FB6C9]/[0.07]'
-                      : 'border-white/[0.045] bg-white/[0.012] hover:border-[#8FB6C9]/20 hover:bg-[#8FB6C9]/[0.035]'
-                  }`}
+              <span className="text-[12px] leading-5">
+                I understand GEORGE should operate discreetly, and I remain responsible for the room.{' '}
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    window.open('/privacy', '_blank')
+                  }}
+                  className="text-[#D7DCFF]/72 underline underline-offset-4"
                 >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleLiveRecoveryOption(option.id)}
-                    className="mt-1 h-4 w-4 accent-[#8FB6C9]"
-                  />
-                  <span>
-                    <span className="block text-[13px] leading-5 text-[#D7DBE4]/74">
-                      {option.label}
-                    </span>
-                    <span className="mt-1 block text-[11.5px] leading-5 text-white/34">
-                      {option.helper}
-                    </span>
-                  </span>
-                </label>
-              )
-            })}
-          </div>
+                  Privacy
+                </button>
+              </span>
+            </label>
 
-          <button
-            type="button"
-            disabled={!constraintsReady}
-            onClick={() => {
-              setLiveRecoveryAcknowledged(true)
-              try {
-                window.localStorage.setItem(
-                  GEORGE_LIVE_RECOVERY_STORAGE_KEY,
-                  JSON.stringify({ selected: normalizeLiveRecoverySelection(liveRecoveryOptions) })
-                )
-              } catch {}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                disabled={!liveRecoveryAcknowledged}
+                onClick={() => setLiveBriefingStep(3)}
+                className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
+                  liveRecoveryAcknowledged
+                    ? 'border-[#D7DCFF]/24 bg-[#D7DCFF]/[0.055] text-[#F2F4FF]/84 hover:bg-[#D7DCFF]/[0.08]'
+                    : 'cursor-default border-white/[0.05] bg-transparent text-white/20'
+                }`}
+              >
+                Continue
+              </button>
 
-              void (async () => {
-                speakLiveEntryLine('Ok.')
-                await waitForLiveEntryVoice(750)
-                speakLiveEntryLine('I recognize the constraints of this room.')
-              })()
-            }}
-            className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
-              constraintsReady
-                ? 'border-[#8FB6C9]/45 bg-[#8FB6C9]/[0.075] text-[#D7DCFF]/86 hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98]'
-                : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
-            }`}
-          >
-            Confirm constraints
-          </button>
-
-          {liveRecoveryAcknowledged && (
-            <div className="mt-4 rounded-[0.95rem] border border-[#8FB6C9]/18 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/72">
-              Ok. I recognize the constraints of this room.
+              <button
+                type="button"
+                onClick={() => startLive(false, editableResources, true)}
+                className="rounded-[0.75rem] border border-white/[0.06] bg-transparent px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/36 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/72"
+              >
+                Begin LIVE
+              </button>
             </div>
-          )}
-
-          <AwakeButton active={liveRecoveryAcknowledged} onClick={() => setLiveBriefingStep(3)}>
-            Continue
-          </AwakeButton>
+          </div>
         </PanelShell>
       )
     }
+
+
 
     return (
       <PanelShell label="BRIEF ROOM · READY" title="Ready Room." stage={3}>
@@ -2311,45 +2877,25 @@ Your voice remains yours.`)
           <p>Now we go to work.</p>
         </div>
 
-        <button
-          type="button"
-          onClick={proofComplete ? () => startLive(false, editableResources, true) : undefined}
-          disabled={!proofComplete || proofInProgress}
-          className={`w-full rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
-            proofInProgress
-              ? 'border-white/[0.07] bg-white/[0.025] text-[#D7DCFF]/36'
-              : 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12]'
-          }`}
-        >
-          {proofInProgress ? "Listening…" : proofComplete ? "GO TO WORK" : "STANDING BY"}
-        </button>
+        <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
+          liveReadyAccepted
+            ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(143,182,201,0.24)]'
+            : 'border-[#8FB6C9]/36 bg-[#8FB6C9]/[0.035]'
+        }`}>
+          <input
+            type="checkbox"
+            checked={liveReadyAccepted}
+            onChange={(event) => setLiveReadyAccepted(event.target.checked)}
+            className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+          />
+          <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
+            I understand GEORGE will assist discreetly, and I remain responsible for what I say in the room.
+          </span>
+        </label>
 
-        {proofTranscript.length > 0 && (
-          <div className="mt-5 space-y-3 rounded-[0.95rem] border border-white/[0.06] bg-black/20 p-4">
-            {proofTranscript.map((line, index) => (
-              <div key={`${line.speaker}-${index}`} className="text-[13px] leading-6">
-                <div className="text-[9px] uppercase tracking-[0.22em] text-white/28">
-                  {line.speaker === 'george' ? 'GEORGE' : 'YOU'}
-                </div>
-                <div className={line.speaker === 'george' ? 'mt-1 text-[#D7DCFF]/72' : 'mt-1 text-white/76'}>
-                  {line.text}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {liveBriefingSttError && (
-          <div className="mt-4 text-[13px] leading-5 text-[#D7DBE4]/52">
-            {liveBriefingSttError}
-          </div>
-        )}
-
-        <div className={`transition-opacity ${proofReady ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/20 bg-[#8FB6C9]/[0.045] p-4 text-[14px] leading-6 text-[#D7DBE4]/74">
-            {liveBriefingProofReply || ' '}
-          </div>
-        </div>
+        <AwakeButton active={liveReadyAccepted} onClick={() => startLive(false, editableResources, true)}>
+          Now we go to work
+        </AwakeButton>
       </PanelShell>
     )
   }
@@ -2516,7 +3062,7 @@ Your voice remains yours.`)
                 <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
               </div>
 
-              <div className="mt-3 text-[13px] leading-6 text-white/38">
+              <div className="mt-3 text-[13px] leading-6 text-[#D7DBE4]/46">
                 {currentOptionalSignalQuestion.why}
               </div>
 
@@ -2543,7 +3089,7 @@ Your voice remains yours.`)
                       }
                     }}
                     placeholder=""
-                    className="min-h-[38px] w-full caret-[#D7DCFF] border-0 bg-transparent text-[15px] text-white/82 outline-none placeholder:text-transparent"
+                    className="min-h-[38px] w-full caret-[#D7DCFF] border-0 bg-transparent text-[15px] text-[#F2F4FF]/86 outline-none placeholder:text-transparent"
                   />
                 </div>
 
@@ -2793,7 +3339,7 @@ Your voice remains yours.`)
         </section>
 
         {tier === 'smart' && (
-          <p className="mt-2 text-center text-[12px] leading-5 text-white/32">
+          <p className="mt-2 text-center text-[12px] leading-5 text-[#D7DBE4]/36">
             LIVE access may require Intelligent or Brilliant depending on account state.
           </p>
         )}
