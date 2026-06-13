@@ -26,7 +26,6 @@ import { georgeLiveRuntimeEvents } from './runtime-events'
 import { transcriptBuffer } from './transcript-buffer'
 import { georgeSilenceDetector } from './silence-detector'
 import { determineOpportunityState } from './opportunity-state'
-import { decideUtteranceCompletion } from './utterance-completion'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -417,39 +416,6 @@ export function orchestrateLiveTurn(
 
   if (salvageObjective.id !== 'none') {
     nextPacket.cue = `${salvageObjective.cue} ${nextPacket.cue || ''}`.trim()
-  }
-
-  const utteranceCompletion = decideUtteranceCompletion({
-    speaker: nextPacket.speaker,
-    partialTranscript: text,
-    cue: nextPacket.cue,
-    activeObjective: activeObjective.label,
-    roomSignal: nextPacket.status,
-    msSinceUserSpeech: georgeSilenceDetector.msSinceSpeech(),
-    minTriggerWords: 3,
-    maxTriggerWords: 5,
-    pauseThresholdMs: 650,
-  })
-
-  if (!silence.shouldHold && utteranceCompletion.shouldSurface) {
-    nextPacket.volley = utteranceCompletion.completion
-    nextPacket.responseMode = 'completion'
-    nextPacket.responseTone = 'natural'
-    nextPacket.responseCompression = 'short'
-    nextPacket.deliveryStyle = 'direct'
-    nextPacket.intervention = 'speak'
-    nextPacket.status = `${nextPacket.status} Utterance completion: ${utteranceCompletion.reason}; boundary: ${utteranceCompletion.factBoundary}; words: ${utteranceCompletion.wordCount}.`.trim()
-
-    georgeLiveRuntimeEvents.emit('cue_ready', {
-      reason: `utterance_completion:${utteranceCompletion.reason}; boundary:${utteranceCompletion.factBoundary}; words:${utteranceCompletion.wordCount}`,
-      cue: nextPacket.cue,
-      nextMove: utteranceCompletion.completion,
-      responseMode: nextPacket.responseMode,
-      deliveryStyle: nextPacket.deliveryStyle,
-      intervention: nextPacket.intervention,
-      confidence: nextPacket.confidence,
-      silence: silence.silenceType,
-    })
   }
 
   if (silence.shouldHold) {
