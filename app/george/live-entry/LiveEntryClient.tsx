@@ -834,6 +834,7 @@ export default function LiveEntryClient() {
   const liveBriefingTermsPreviouslyAcceptedRef = useRef(false)
   const liveBriefingHasReopenedEditsRef = useRef(false)
   const liveBriefingConfirmSequenceRef = useRef(0)
+  const liveReadyConfirmSequenceRef = useRef(0)
   const liveEntryAudioRef = useRef<HTMLAudioElement | null>(null)
   const liveEntryAudioUrlRef = useRef<string | null>(null)
   const liveEntrySpeechRequestRef = useRef(0)
@@ -868,6 +869,7 @@ export default function LiveEntryClient() {
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
+  const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
@@ -2946,34 +2948,65 @@ Adaptation does not always require intervention.`)
 
 
 
+    const confirmReadyRoomAcknowledgement = (checked: boolean) => {
+      liveReadyConfirmSequenceRef.current += 1
+      const sequence = liveReadyConfirmSequenceRef.current
+
+      setLiveReadyAccepted(checked)
+      setLiveReadinessComplete(false)
+
+      if (!checked) return
+
+      const name =
+        cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
+        cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
+        cleanBriefingValue(window.localStorage.getItem('george_name')) ||
+        'Lester'
+
+      void (async () => {
+        await speakLiveEntryLine('Good. Any questions?')
+        await waitForLiveEntryVoice(4500)
+
+        if (liveReadyConfirmSequenceRef.current !== sequence) return
+
+        await speakLiveEntryLine(`Are you sure, ${name}?`)
+        await waitForLiveEntryVoice(3000)
+
+        if (liveReadyConfirmSequenceRef.current !== sequence) return
+
+        setLiveReadinessComplete(true)
+        await speakLiveEntryLine("Okay. Let's get it!")
+      })()
+    }
+
     return (
-      <PanelShell label="BRIEF ROOM · READY" title="Ready Room." stage={3}>
-        <div className="mt-5 space-y-3 rounded-[1rem] border border-white/[0.045] bg-black/18 p-4 text-[14px] leading-6 text-[#D7DBE4]/72">
+      <PanelShell label="BRIEF ROOM · READINESS" title="Ready Room." stage={3}>
+        <div className="mt-5 space-y-3 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 text-[13px] leading-6 text-[#D7DBE4]/68 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
           <p>Remember your earbuds.</p>
-          <p>Speak normally, but clearly.</p>
-          <p>I have your voice print as well.</p>
-          <p>If I need additional signal, I’ll let you know discreetly.</p>
-          <p>If the room changes, adapt. I’ll adapt with you.</p>
-          <p>Now we go to work.</p>
+          <p>Speak normally. Be clear.</p>
+          <p>Your voice I know.<br />The room I understand.</p>
+          <p>If I need additional signal, I&apos;ll let you know.</p>
+          <p>If the room changes, we adapt.</p>
         </div>
 
-        <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
+        <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
           liveReadyAccepted
-            ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(143,182,201,0.24)]'
-            : 'border-[#8FB6C9]/36 bg-[#8FB6C9]/[0.035]'
+            ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
+            : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
         }`}>
           <input
             type="checkbox"
             checked={liveReadyAccepted}
-            onChange={(event) => setLiveReadyAccepted(event.target.checked)}
-            className="mt-1 h-4 w-4 accent-[#8FB6C9]"
+            onChange={(event) => confirmReadyRoomAcknowledgement(event.target.checked)}
+            className="mt-1 h-4 w-4 accent-[#D7DCFF]"
           />
-          <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
+
+          <span className="text-[12px] leading-5">
             I understand GEORGE will assist discreetly, and I remain responsible for what I say in the room.
           </span>
         </label>
 
-        <AwakeButton active={liveReadyAccepted} onClick={() => startLive(false, editableResources, true)}>
+        <AwakeButton active={liveReadinessComplete} onClick={() => startLive(false, editableResources, true)}>
           Now we go to work
         </AwakeButton>
       </PanelShell>
