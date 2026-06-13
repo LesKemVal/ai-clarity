@@ -865,7 +865,8 @@ export default function LiveEntryClient() {
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<LiveRecoveryOptionId[]>(DEFAULT_LIVE_RECOVERY_SELECTION)
   const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
-  const [liveBriefingSupportPanel, setLiveBriefingSupportPanel] = useState<'advice' | 'completion' | 'steering' | null>('advice')
+  const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
+  const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
@@ -2709,17 +2710,48 @@ Adaptation does not always require intervention.`)
         position: positionLabel,
       })
 
+      const recommendedSupportPanel =
+        supportPanels.find((panel) => panel.id === 'completion') || supportPanels[0]
+
+      const storedSupportPreference =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem('george_live_entry_support_preference')
+          : null
+
+      const validStoredSupportPreference =
+        storedSupportPreference === 'advice' ||
+        storedSupportPreference === 'completion' ||
+        storedSupportPreference === 'steering'
+          ? storedSupportPreference
+          : null
+
+      const activeSupportStyle =
+        liveBriefingActiveSupportStyle ||
+        validStoredSupportPreference ||
+        recommendedSupportPanel.id
+
       const activeSupportPanel =
-        supportPanels.find((panel) => panel.id === liveBriefingSupportPanel) || supportPanels[0]
+        supportPanels.find((panel) => panel.id === activeSupportStyle) || recommendedSupportPanel
+
+      const setActiveSupportStyle = (style: LiveBriefingSupportPanelId) => {
+        setLiveBriefingActiveSupportStyle(style)
+
+        try {
+          window.localStorage.setItem('george_live_entry_support_preference', style)
+          window.localStorage.setItem('george_live_entry_support_default', style)
+        } catch {}
+      }
 
       const confirmPrivacyAndContinue = () => {
         setLiveRecoveryAcknowledged(true)
         setLiveBriefingCapabilitiesConfirmed(true)
+        setLiveBriefingExpandedSupportPanel(null)
 
         try {
           window.localStorage.setItem('george_live_entry_steering_seen', '1')
           window.localStorage.setItem('george_live_entry_privacy_acknowledged', '1')
           window.localStorage.setItem('george_live_entry_support_default', activeSupportPanel.id)
+          window.localStorage.setItem('george_live_entry_support_preference', activeSupportPanel.id)
         } catch {}
       }
 
@@ -2732,37 +2764,86 @@ Adaptation does not always require intervention.`)
               </div>
 
               <p className="mt-3 text-[13px] leading-6 text-[#D7DBE4]/62">
-                GEORGE sets a default before LIVE starts. You can change it, or trust the default.
+                GEORGE sets a default before LIVE starts. You can change it, or trust GEORGE.
               </p>
 
-              <div className="mt-5 divide-y divide-white/[0.06] border-t border-white/[0.06]">
+              <div className="mt-4 rounded-[0.7rem] border border-white/[0.06] bg-black/[0.16] px-3 py-3">
+                <div className="text-[9px] uppercase tracking-[0.22em] text-[#D7DCFF]/42">
+                  Recommended for this room.
+                </div>
+
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <div className="text-[13px] font-semibold text-[#F2F4FF]/82">
+                    {recommendedSupportPanel.label}
+                  </div>
+
+                  {activeSupportPanel.id === recommendedSupportPanel.id && (
+                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-emerald-300/55">
+                      <span className="relative flex h-3 w-3">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-35" />
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.55)]" />
+                      </span>
+                      Active
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
                 {supportPanels.map((panel) => {
-                  const open = activeSupportPanel.id === panel.id
+                  const active = activeSupportPanel.id === panel.id
+                  const open = liveBriefingExpandedSupportPanel === panel.id
 
                   return (
                     <div key={panel.id} className="py-3">
-                      <button
-                        type="button"
-                        onClick={() => setLiveBriefingSupportPanel(open ? null : panel.id)}
-                        className="flex w-full items-center justify-between gap-4 text-left"
-                      >
-                        <span>
-                          <span className="block text-[13px] font-semibold text-[#F2F4FF]/84">
+                      <div className="flex items-start gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setActiveSupportStyle(panel.id)}
+                          className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center"
+                          aria-label={`Use ${panel.label}`}
+                        >
+                          {active ? (
+                            <span className="relative flex h-3.5 w-3.5">
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-35" />
+                              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.55)]" />
+                            </span>
+                          ) : (
+                            <span className="h-3.5 w-3.5 rounded-full border border-white/[0.18]" />
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveSupportStyle(panel.id)}
+                          className="min-w-0 flex-1 text-left"
+                        >
+                          <span className={`block text-[13px] font-semibold ${
+                            active ? 'text-[#F2F4FF]/88' : 'text-[#D7DBE4]/58'
+                          }`}>
                             {panel.label}
                           </span>
-                          <span className="mt-0.5 block text-[11px] leading-4 text-[#D7DBE4]/38">
+
+                          <span className="mt-0.5 block text-[11px] leading-4 text-[#D7DBE4]/36">
                             {panel.defaultLine}
                           </span>
-                        </span>
+                        </button>
 
-                        <span className="text-[14px] text-[#D7DCFF]/42">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLiveBriefingExpandedSupportPanel(open ? null : panel.id)
+                          }
+                          className="shrink-0 px-1 text-[15px] leading-5 text-[#D7DCFF]/42"
+                          aria-label={open ? `Collapse ${panel.label}` : `Expand ${panel.label}`}
+                        >
                           {open ? '−' : '+'}
-                        </span>
-                      </button>
+                        </button>
+                      </div>
 
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
-                          open ? 'mt-3 max-h-[380px] opacity-100' : 'max-h-0 opacity-0'
+                          open ? 'mt-3 max-h-[340px] opacity-100' : 'max-h-0 opacity-0'
                         }`}
                       >
                         <div className="space-y-3 border-l border-white/[0.07] pl-3">
@@ -2792,6 +2873,10 @@ Adaptation does not always require intervention.`)
                   )
                 })}
               </div>
+            </div>
+
+            <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/42">
+              Your choice becomes the default for future LIVE conversations until you change it.
             </div>
 
             <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
@@ -2856,6 +2941,7 @@ Adaptation does not always require intervention.`)
         </PanelShell>
       )
     }
+
 
 
 
