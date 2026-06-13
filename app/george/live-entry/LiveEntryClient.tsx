@@ -810,6 +810,7 @@ function buildLiveBriefingSupportPanels({
 }
 
 
+
 export default function LiveEntryClient() {
   const [ready, setReady] = useState(false)
   const [tier, setTier] = useState<Tier>('smart')
@@ -2718,10 +2719,7 @@ Adaptation does not always require intervention.`)
         try {
           window.localStorage.setItem('george_live_entry_steering_seen', '1')
           window.localStorage.setItem('george_live_entry_privacy_acknowledged', '1')
-          window.localStorage.setItem(
-            'george_live_entry_support_default',
-            activeSupportPanel.id
-          )
+          window.localStorage.setItem('george_live_entry_support_default', activeSupportPanel.id)
         } catch {}
       }
 
@@ -2745,9 +2743,7 @@ Adaptation does not always require intervention.`)
                     <div key={panel.id} className="py-3">
                       <button
                         type="button"
-                        onClick={() =>
-                          setLiveBriefingSupportPanel(open ? null : panel.id)
-                        }
+                        onClick={() => setLiveBriefingSupportPanel(open ? null : panel.id)}
                         className="flex w-full items-center justify-between gap-4 text-left"
                       >
                         <span>
@@ -2766,7 +2762,7 @@ Adaptation does not always require intervention.`)
 
                       <div
                         className={`overflow-hidden transition-all duration-300 ${
-                          open ? 'mt-3 max-h-[360px] opacity-100' : 'max-h-0 opacity-0'
+                          open ? 'mt-3 max-h-[380px] opacity-100' : 'max-h-0 opacity-0'
                         }`}
                       >
                         <div className="space-y-3 border-l border-white/[0.07] pl-3">
@@ -2776,16 +2772,13 @@ Adaptation does not always require intervention.`)
 
                           <div className="space-y-1.5">
                             {panel.examples.map((example) => (
-                              <div
-                                key={example}
-                                className="text-[11px] leading-5 text-[#D7DBE4]/40"
-                              >
+                              <div key={example} className="text-[11px] leading-5 text-[#D7DBE4]/40">
                                 {example}
                               </div>
                             ))}
                           </div>
 
-                          <details className="group">
+                          <details>
                             <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
                               Why this
                             </summary>
@@ -2863,6 +2856,7 @@ Adaptation does not always require intervention.`)
         </PanelShell>
       )
     }
+
 
 
 
