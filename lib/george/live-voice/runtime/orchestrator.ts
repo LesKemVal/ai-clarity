@@ -332,13 +332,18 @@ export function orchestrateLiveTurn(
     movementState: trajectoryState.recommendedAction === 'close' ? 'closing' : trajectoryState.trajectory,
     roomPressure: nextPacket.roomPressure,
     confidence: nextPacket.confidence,
+    primaryOutcome: activeObjective.label,
+    secondaryOutcome:
+      (activeObjective as unknown as { secondaryOutcome?: string }).secondaryOutcome ||
+      (activeObjective as unknown as { fallbackOutcome?: string }).fallbackOutcome ||
+      '',
   })
 
   if (opportunityState.state !== 'open_now') {
     nextPacket.cue = `${opportunityState.cue} ${nextPacket.cue || ''}`.trim()
   }
 
-  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Salvage objective: ${salvageObjective.label} (${salvageObjective.reason}). Perception: ${perceivedPositioning.perception} (${perceivedPositioning.reason}). Forecast bias: ${forecastBias}. Opportunity: ${opportunityState.state} (${opportunityState.reason}). Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
+  nextPacket.status = `${nextPacket.status} Objective: ${activeObjective.label}. Salvage objective: ${salvageObjective.label} (${salvageObjective.reason}). Perception: ${perceivedPositioning.perception} (${perceivedPositioning.reason}). Forecast bias: ${forecastBias}. Opportunity: ${opportunityState.state} (${opportunityState.reason}). Primary: ${opportunityState.primaryOutcome}. Secondary: ${opportunityState.secondaryOutcome || 'not supplied'}. Trust doctrine: user retains agency and responsibility. Normalized pressure: ${normalizedRoomPressure}/${Number(normalizedInterruptionRisk || 0).toFixed(2)} (${normalizedPressureReasons.join(', ') || 'stable'}). ${loadDecision.reason} ${velocityState.reason} ${postureDecision.reason} ${powerState.reason} ${trajectoryState.reason} ${recoveryState.reason} ${decisionWindow.reason} ${pressureMemory.summary} Control: ${controlSnapshot.owner}. ${controlSnapshot.reason} Leverage: ${leverageState}. Dominant role: ${dominantRoleState.role ?? 'neutral'} (${dominantRoleState.score}). Role pressure: ${strongestRolePressure[0]} (${Number(strongestRolePressure[1]).toFixed(2)}). Forecast: ${partialForecast} (${Number(partialForecastConfidence).toFixed(2)}). Escalation: ${escalationLikelihood}. Urgency: ${interventionUrgency}. Response shaping: ${shapedResponse.reason}.`.trim()
 
   nextPacket.shouldSpeak =
     georgeConfidenceEngine.shouldSpeak(nextPacket.confidence)
