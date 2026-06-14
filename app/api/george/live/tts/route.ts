@@ -27,7 +27,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const access = await verifyLiveAccessFromRequest(req, body?.email)
 
-    if (!access.ok) {
+    const localFounderBypass =
+      process.env.NODE_ENV !== 'production' &&
+      Boolean(process.env.FOUNDER_OVERRIDE_CODE || process.env.BRILLIANT_FOUNDER_CODE)
+
+    if (!access.ok && !localFounderBypass) {
       console.warn('[LIVE][tts][auth-failed]', {
         status: access.status,
         reason: access.error,
