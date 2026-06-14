@@ -32,6 +32,7 @@ import {
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
+import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1855,7 +1856,37 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setInteractionMode('speech')
       setShowEarbudOverlay(true)
       window.setTimeout(() => setShowEarbudOverlay(false), 5200)
-      setTimeout(() => startListening(), 120)
+
+      liveAudioRuntimeRef.current?.stop()
+      liveAudioRuntimeRef.current = createLiveAudioRuntime({
+        onStatus: (status) => {
+          setIsListening(status === 'listening' || status === 'starting')
+          if (status === 'error') setVoiceError('LIVE speech connection failed.')
+        },
+        onPartialTranscript: (text) => {
+          setVoiceError('')
+          setInterimTranscript(text)
+          liveLastSignalRef.current = Date.now()
+          lastSpeechTsRef.current = Date.now()
+          liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
+        },
+        onFinalTranscript: (text) => {
+          const clean = String(text || '').trim()
+          if (!clean) return
+          setInterimTranscript('')
+          liveLastSignalRef.current = Date.now()
+          lastSpeechTsRef.current = Date.now()
+          liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
+          setInput(clean)
+        },
+        onError: (error) => {
+          console.warn('[GEORGE LIVE AUDIO]', error)
+          setVoiceError('LIVE speech connection failed.')
+          setIsListening(false)
+        },
+      })
+
+      void liveAudioRuntimeRef.current.start()
       return
     }
 
@@ -2533,6 +2564,7 @@ const responseTimerRef = useRef<any>(null)
 const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const liveAudioRuntimeRef = useRef<LiveAudioRuntime | null>(null)
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
