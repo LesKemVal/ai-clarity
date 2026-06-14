@@ -1877,7 +1877,8 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
           liveLastSignalRef.current = Date.now()
           lastSpeechTsRef.current = Date.now()
           liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
-          setInput(clean)
+          setInput('')
+          void handleSend(clean, { source: 'live_transcript' })
         },
         onError: (error) => {
           console.warn('[GEORGE LIVE AUDIO]', error)
@@ -2573,6 +2574,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  useEffect(() => {
+    if (forceLive || liveMode) return
+
+    liveAudioRuntimeRef.current?.stop()
+    liveAudioRuntimeRef.current = null
+  }, [forceLive, liveMode])
+
   const interruptAndListen = () => {
     try {
       stopSpeechRef.current = true
@@ -2818,6 +2826,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   const exitLiveMode = () => {
     try {
+      liveAudioRuntimeRef.current?.stop()
+      liveAudioRuntimeRef.current = null
       stopListening()
       window.speechSynthesis.cancel()
     } catch {}
@@ -3940,7 +3950,8 @@ if (activePromptContext || activePromptLabel) {
 
   const speakText = useCallback(
     async (text: string) => {      if (typeof window === 'undefined') return
-      if (isIOS || !voiceOn || !hasUserInteractedRef.current) {        return
+      if (isIOS || !voiceOn || (!hasUserInteractedRef.current && !liveMode)) {
+        return
       }
 
       try {
@@ -4767,7 +4778,7 @@ Steering doctrine:
                 }
               ]
             : updatedMessages,
-            voiceMode: false,
+            voiceMode: liveMode ? voiceOn : false,
             isFirstSession: updatedMessages.length <= 2,
             promptContext: activePromptContext,
             promptLabel: activePromptLabel,
