@@ -8061,7 +8061,7 @@ Continue from here, tell me what changed, or start fresh.`
   </div>
 )}
 
-<div className={`${(forceLive || liveMode) ? 'hidden' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode) ? 'fixed bottom-[96px] left-0 right-0 mx-auto' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
