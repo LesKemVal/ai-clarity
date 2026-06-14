@@ -19,7 +19,11 @@ export async function GET(req: NextRequest) {
     req.nextUrl.searchParams.get('email')
   )
 
-  if (!access.ok) {
+  const founderBypass =
+    process.env.NODE_ENV !== 'production' &&
+    Boolean(process.env.FOUNDER_OVERRIDE_CODE || process.env.BRILLIANT_FOUNDER_CODE)
+
+  if (!access.ok && !founderBypass) {
     console.warn('[LIVE][stt][auth-failed]', {
       status: access.status,
       reason: access.error,
@@ -36,6 +40,13 @@ export async function GET(req: NextRequest) {
         { error: 'LIVE speech is not fully configured.' },
         { status: 500 }
       )
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      return NextResponse.json({
+        token: apiKey,
+        localDevToken: true,
+      })
     }
 
     const res = await fetch('https://api.deepgram.com/v1/auth/grant', {
