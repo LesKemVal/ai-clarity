@@ -1958,7 +1958,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
           lastSpeechTsRef.current = Date.now()
           liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
           setInput('')
-          void handleSend(clean, { source: 'live_transcript' })
+          liveTranscriptSubmitRef.current(clean)
         },
         onError: (error) => {
           console.warn('[GEORGE LIVE AUDIO]', error)
