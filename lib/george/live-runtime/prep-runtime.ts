@@ -271,14 +271,29 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
 
   if (setup?.runtimeSupport || setup?.room || setup?.objective) {
     const runtimeSupport = setup.runtimeSupport || {}
-    const setupChair = String((setup as any).chair || '').trim()
-    const runtimeChair = String((runtimeSupport as any).chair || '').trim()
-    const chair = setupChair || runtimeChair || undefined
+
+    const clean = (value: unknown) => String(value || '').trim()
+
+    const room =
+      clean(setup.room) ||
+      clean((runtimeSupport as any).room) ||
+      clean((runtimeSupport as any).purview?.label)
+
+    const objective =
+      clean(setup.objective) ||
+      clean((runtimeSupport as any).objective) ||
+      clean((runtimeSupport as any).purview?.line) ||
+      clean((runtimeSupport as any).purview?.body)
+
+    const chair =
+      clean((setup as any).chair) ||
+      clean((runtimeSupport as any).chair) ||
+      clean((runtimeSupport as any).userPosition)
 
     const serializedSupport = JSON.stringify({
       ...runtimeSupport,
-      room: setup.room || (runtimeSupport as any).room,
-      objective: setup.objective || (runtimeSupport as any).objective,
+      ...(room ? { room } : {}),
+      ...(objective ? { objective } : {}),
       ...(chair ? { chair } : {}),
     })
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
