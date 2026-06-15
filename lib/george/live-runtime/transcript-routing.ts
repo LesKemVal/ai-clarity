@@ -23,6 +23,19 @@ const STANDALONE_FILLER_TOKENS = new Set([
   'um',
 ])
 
+function isCompressLineSteeringPhrase(text: string) {
+  const normalized = String(text || '').trim().toLowerCase()
+
+  return [
+    'shorter',
+    'make it shorter',
+    'tighten it',
+    'keep it tight',
+    "let's keep this tight",
+    'lets keep this tight',
+  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+}
+
 function isRepeatLineSteeringPhrase(text: string) {
   const normalized = String(text || '').trim().toLowerCase()
 
@@ -161,6 +174,16 @@ export function routeLiveTranscript(params: {
       decision: {
         type: 'local',
         content: 'repeat_last_line',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
+  if (isCompressLineSteeringPhrase(text)) {
+    return {
+      decision: {
+        type: 'local',
+        content: 'compress_last_line',
       },
       nextFinalTranscript: last,
     }
