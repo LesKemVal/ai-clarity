@@ -2610,6 +2610,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
+  const liveBuyTimeUntilRef = useRef<number>(0)
 
   const processLivePartialTranscript = useCallback((text: string) => {
     setVoiceError('')
@@ -5037,6 +5038,7 @@ return true
         isThinking,
         isSpeaking: isSpeakingRef.current,
         liveMode,
+        buyTimeUntil: liveBuyTimeUntilRef.current,
       },
     })
 
@@ -5057,6 +5059,11 @@ return true
 
     if (decision.type === 'local') {
       console.info('[GEORGE LIVE LOCAL]', decision.content)
+
+      if (decision.content === 'buy_time') {
+        liveBuyTimeUntilRef.current = Date.now() + 2500
+      }
+
       return
     }
 

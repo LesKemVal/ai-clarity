@@ -74,6 +74,7 @@ export type LiveTranscriptRoutingContext = {
   isThinking?: boolean
   isSpeaking?: boolean
   liveMode?: boolean
+  buyTimeUntil?: number
 }
 
 export function routeLiveTranscript(params: {
@@ -104,6 +105,16 @@ export function routeLiveTranscript(params: {
       decision: {
         type: 'ignore',
         reason: 'george_is_speaking',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
+  if (params.context?.buyTimeUntil && now < params.context.buyTimeUntil) {
+    return {
+      decision: {
+        type: 'ignore',
+        reason: 'buy_time_window_active',
       },
       nextFinalTranscript: last,
     }
