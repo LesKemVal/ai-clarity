@@ -33,6 +33,7 @@ import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-bri
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
+import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
@@ -7174,76 +7175,50 @@ I am listening now. Speak naturally. I will respond ${
               
 
               <div className={`fixed bottom-[calc(18px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
-                <div className="pointer-events-auto relative flex items-center justify-center gap-5 rounded-full border border-white/[0.08] bg-transparent px-5 py-1.5 shadow-none">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveHelpTopic('live')
-                      setShowLanguageMenu(false)
-                      setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
-                    }}
-                    className="px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/36 ${operationalMotion.hoverText} ${operationalMotion.press}"
-                  >
-                    Help
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                                    setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
-                    }}
-                    className="px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] text-[#D7DBE4]/36 ${operationalMotion.hoverText} ${operationalMotion.press}"
-                  >
-                    {language}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (liveMode) {
-                        setShowNormalUtilityMenu(null)
-                        requestExitLiveMode()
-                        return
-                      }
-
+                <LiveFooterControls
+                  language={language}
+                  liveMode={liveMode}
+                  voiceOn={voiceOn}
+                  currentTier={currentTier}
+                  tierLabel={tierUpgradeAction.currentLabel}
+                  tierActionLabel={tierUpgradeAction.label}
+                  motionHoverText={operationalMotion.hoverText}
+                  motionPress={operationalMotion.press}
+                  onHelp={() => {
+                    setActiveHelpTopic('live')
+                    setShowLanguageMenu(false)
+                    setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
+                  }}
+                  onLanguage={(e) => {
+                    e.stopPropagation()
+                    setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
+                  }}
+                  onExitOrTier={() => {
+                    if (liveMode) {
                       setShowNormalUtilityMenu(null)
-                      setShowTierModal(true)
-                    }}
-                    className={`inline-flex items-center gap-1.5 px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] ${liveMode ? 'text-red-100/58 hover:text-red-100/86' : 'text-[#D7DBE4]/36'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
-                    aria-label={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
-                    title={liveMode ? 'Exit LIVE' : tierUpgradeAction.label}
-                  >
-                    <span className={liveMode ? "h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.20)]" : "h-1.5 w-1.5 rounded-full bg-white/24"} />
-                    {liveMode ? 'EXIT' : tierUpgradeAction.currentLabel}
-                  </button>
+                      requestExitLiveMode()
+                      return
+                    }
 
-                  {liveMode && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (currentTier === 'smart') {
-                          setToastMessage('Voice replies unlock above Smart.')
-                          setShowToast(true)
-                          return
-                        }
+                    setShowNormalUtilityMenu(null)
+                    setShowTierModal(true)
+                  }}
+                  onVoiceToggle={() => {
+                    if (currentTier === 'smart') {
+                      setToastMessage('Voice replies unlock above Smart.')
+                      setShowToast(true)
+                      return
+                    }
 
-                        const nextVoice = !voiceOn
-                        hasUserInteractedRef.current = true
-                        setVoiceOn(nextVoice)
-                        setInteractionMode(nextVoice ? 'speech' : 'text')
-                        window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-                        setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
-                        setShowToast(true)
-                      }}
-                      className={`inline-flex items-center gap-1.5 px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] ${voiceOn ? 'text-emerald-100/70 hover:text-emerald-100' : 'text-[#D7DBE4]/34 hover:text-[#D7DBE4]/72'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
-                      aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
-                      title={voiceOn ? 'Audio on' : 'Audio off'}
-                    >
-                      <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/60 shadow-[0_0_10px_rgba(110,231,183,0.24)]' : 'bg-white/22'}`} />
-                      {voiceOn ? 'MUTE' : 'UNMUTE'}
-                    </button>
-                  )}
+                    const nextVoice = !voiceOn
+                    hasUserInteractedRef.current = true
+                    setVoiceOn(nextVoice)
+                    setInteractionMode(nextVoice ? 'speech' : 'text')
+                    window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+                    setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
+                    setShowToast(true)
+                  }}
+                />
 
                   {showNormalUtilityMenu && (
                     <button
