@@ -26,6 +26,7 @@ import {
   markLiveRuntimeStarted,
   persistActiveLiveRuntimeSupport,
   readActiveLiveRuntimeSupport,
+  consumePreparedLiveSetup,
   reconcileActiveLiveRuntimeUsage,
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
@@ -1877,15 +1878,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       // Resume will return later only after it is scoped to verified LIVE sessions.
       const existingLive = null
 
-      let liveSetup: LivePrepSetup | null = null
-
-      try {
-        const rawLiveSetup = window.localStorage.getItem('GEORGE_LIVE_SETUP')
-        liveSetup = rawLiveSetup ? JSON.parse(rawLiveSetup) : null
-        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
-      } catch {
-        liveSetup = null
-      }
+      const liveSetup: LivePrepSetup | null = consumePreparedLiveSetup()
 
       markLiveRuntimeStarted()
       persistActiveLiveRuntimeSupport(liveSetup)
