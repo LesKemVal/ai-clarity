@@ -32,6 +32,7 @@ import {
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
+import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -143,7 +144,7 @@ const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
   'Say “shorter” if you want compressed responses.',
   'Say “line” if you want exact wording.',
-  'Say “pause” if you want GEORGE to hold.',
+  'Use your outcome-shift phrase when the room may be changing direction.',
   'LIVE works best with one earbud.',
 ]
 
@@ -4723,6 +4724,7 @@ Choose the smallest useful intervention:
 
 If GEORGE is wrong, the user may ignore, interrupt, redirect, or override without penalty.
 Steering phrases: ${liveRuntimeSetup?.controlWords || 'none'}
+Outcome reassessment trigger: ${liveRuntimeSetup?.outcomeShiftPhrase || liveRuntimeSetup?.outcomeReassessmentPhrase || 'user-defined natural transition phrase'}
 Estimated runtime cost: ${liveRuntimeSetup?.estimatedCents ? `${liveRuntimeSetup.estimatedCents} cents` : 'not estimated'}
 
 Runtime support selected:
@@ -4753,9 +4755,13 @@ Steering doctrine:
 - The user has agency and may see room context GEORGE cannot see.
 - Steering phrases are human runtime overrides, not normal conversation content.
 - Treat steering phrases as both signal and possible sentence-starter.
-- If the user says “hmm,” “right,” “one second,” “let me think,” “OK,” “shorter,” “line,” or “pause,” infer the adjustment and continue from that social opening when useful.
+- If the user says “hmm,” “right,” “one second,” “let me think,” “OK,” “shorter,” or “line,” infer the adjustment and continue from that social opening when useful.
+- Do not treat “pause” as the primary outcome-shift command. It is too fragile for live rooms.
+- If the user uses their outcome-shift phrase, enter Outcome Reassessment Mode. Listen for the new possible destination, preserve the active outcome until confirmed, and continue in a way that surfaces or tests the shift.
 - Keep commands, labels, pricing, and debug signals internal.
-- Visible output must remain one operational deliverable: either one cue or one repeatable line.`
+- Visible output must remain one operational deliverable: either one cue or one repeatable line.${buildOutcomeReassessmentRuntimeBlock({
+  triggerPhrase: liveRuntimeSetup?.outcomeShiftPhrase || liveRuntimeSetup?.outcomeReassessmentPhrase || liveRuntimeSetup?.controlWords || null,
+})}`
           : ''
 
       const updatedMessages = [

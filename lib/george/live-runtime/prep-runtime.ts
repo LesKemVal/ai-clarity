@@ -57,6 +57,9 @@ export type LivePrepSetup = {
   cadence?: string
   objective?: string
   controlWords?: string
+  outcomeShiftPhrase?: string
+  toneAdjustment?: 'softer' | 'balanced' | 'sharper'
+  supportDensity?: 'minimal' | 'balanced' | 'supportive'
   liveAssistMode?: LiveAssistMode
   purview?: LivePurview | null
   deliveryOverlay?: LiveDeliveryOverlay | null
