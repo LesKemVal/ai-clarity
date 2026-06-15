@@ -34,6 +34,7 @@ import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-g
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
+import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -6769,6 +6770,10 @@ I am listening now. Speak naturally. I will respond ${
           type="button"
           onClick={() => {
             handleFeedback(i, 'up')
+            recordLiveSupportPreference({
+              tags: getLiveResponseServingTags(m, null),
+              value: 'up',
+            })
             setToastMessage('Support type saved')
             setShowToast(true)
           }}
@@ -6790,6 +6795,10 @@ I am listening now. Speak naturally. I will respond ${
           type="button"
           onClick={() => {
             handleFeedback(i, 'down')
+            recordLiveSupportPreference({
+              tags: getLiveResponseServingTags(m, null),
+              value: 'down',
+            })
             setToastMessage('Support type saved')
             setShowToast(true)
           }}

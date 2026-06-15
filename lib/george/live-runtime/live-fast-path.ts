@@ -1,3 +1,5 @@
+import { rankLiveSupportTags } from './live-support-preferences'
+
 export type LiveFastPathResult =
   | {
       handled: true
@@ -15,6 +17,7 @@ export function tryLiveFastPath(params: {
   chair?: string | null
   objective?: string | null
   recentAssistant?: string | null
+  preferredServingTags?: string[] | null
 }): LiveFastPathResult {
   const input = String(params.input || '').trim()
   const lower = input.toLowerCase()
@@ -24,11 +27,13 @@ export function tryLiveFastPath(params: {
 
   if (!input) return { handled: false }
 
+  const serve = (tags: string[]) => rankLiveSupportTags(tags)
+
   if (/^(can you hear me|are you listening|you there)[?.!\s]*$/i.test(input)) {
     return {
       handled: true,
       content: "Yes. I’m listening.",
-      serving: ['Cues'],
+      serving: serve(['Cues']),
       source: 'live_fast_path',
     }
   }
@@ -39,7 +44,7 @@ export function tryLiveFastPath(params: {
     return {
       handled: true,
       content: `Your desired outcome is ${objective}.`,
-      serving: ['Outcome'],
+      serving: serve(['Outcome']),
       source: 'live_fast_path',
     }
   }
@@ -51,7 +56,7 @@ export function tryLiveFastPath(params: {
     return {
       handled: true,
       content: recent,
-      serving: ['Continuation'],
+      serving: serve(['Continuation']),
       source: 'live_fast_path',
     }
   }
@@ -62,7 +67,7 @@ export function tryLiveFastPath(params: {
       content: objective
         ? `Keep it tight: bring this back to ${objective}, then ask for the next clear step.`
         : "Keep it tight: make one point, ask one question, and stop.",
-      serving: ['Cues', 'Advise'],
+      serving: serve(['Cues', 'Advise']),
       source: 'live_fast_path',
     }
   }
@@ -75,7 +80,7 @@ export function tryLiveFastPath(params: {
       content: context
         ? `Start here: “I want to frame this clearly from my position as ${context}. The outcome I’m trying to move toward is ${target}.”`
         : `Start here: “I want to frame this clearly. The outcome I’m trying to move toward is ${target}.”`,
-      serving: ['Continuation', 'Advise'],
+      serving: serve(['Continuation', 'Advise']),
       source: 'live_fast_path',
     }
   }
@@ -84,7 +89,7 @@ export function tryLiveFastPath(params: {
     return {
       handled: true,
       content: "Close with the next step, who owns it, and when it happens.",
-      serving: ['Close', 'Cues'],
+      serving: serve(['Close', 'Cues']),
       source: 'live_fast_path',
     }
   }
