@@ -1,0 +1,125 @@
+'use client'
+
+type LiveRoomStatusPanelProps = {
+  isListening: boolean
+  liveRoomActive: boolean
+  voiceOn: boolean
+  isThinking: boolean
+  roomLabel: string
+  chairLabel: string
+  objectiveLabel: string
+  steeringLabels: [string, string, string]
+  onRoomToggle: () => void
+  onVoiceToggle: () => void
+  onPauseLive: () => void
+}
+
+export function LiveRoomStatusPanel({
+  isListening,
+  liveRoomActive,
+  voiceOn,
+  isThinking,
+  roomLabel,
+  chairLabel,
+  objectiveLabel,
+  steeringLabels,
+  onRoomToggle,
+  onVoiceToggle,
+  onPauseLive,
+}: LiveRoomStatusPanelProps) {
+  return (
+    <div className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${isListening ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
+            {isListening ? 'GEORGE IS LISTENING' : 'GEORGE READY'}
+          </span>
+        </div>
+
+        <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
+          {liveRoomActive ? 'ROOM ACTIVE' : 'ROOM INACTIVE'}
+        </span>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${isListening ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.07] text-[#8FF0C7]' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/42'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">GEORGE</span>
+          {isListening ? 'LISTENING' : 'READY'}
+        </div>
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${liveRoomActive ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.055] text-[#DCEBFF]/68' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">LIVE</span>
+          {liveRoomActive ? 'ROOM ACTIVE' : 'ROOM INACTIVE'}
+        </div>
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${voiceOn ? 'border-emerald-200/[0.16] bg-emerald-200/[0.055] text-emerald-100/72' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">AUDIO</span>
+          {voiceOn ? 'AUDIO ON' : 'MUTE'}
+        </div>
+      </div>
+
+      <div className="mt-2 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.stopPropagation()
+          }}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            if (isThinking) return
+            onRoomToggle()
+          }}
+          disabled={isThinking}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-150 active:scale-[0.985] active:border-[#8FF0C7]/[0.28] active:bg-[#8FF0C7]/[0.105] hover:border-[#8FF0C7]/[0.22] hover:bg-[#8FF0C7]/[0.085] disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/72 shadow-[0_0_26px_rgba(143,240,199,0.055),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.026] text-[#DCEBFF]/36'}`}
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Room</span>
+          <span className="mt-1 flex items-center justify-between gap-2">
+            <span>{roomLabel}</span>
+            <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[12px] transition ${liveRoomActive ? 'border-[#8FF0C7]/24 bg-[#8FF0C7]/18 text-[#8FF0C7]' : 'border-white/[0.06] bg-white/[0.025] text-white/30'}`}>
+              {liveRoomActive ? '◉' : '○'}
+            </span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onVoiceToggle}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Chair</span>
+          {chairLabel}
+        </button>
+
+        <button
+          type="button"
+          onClick={onPauseLive}
+          className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/52 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
+        >
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Outcome</span>
+          {objectiveLabel}
+        </button>
+      </div>
+
+      <div className={`mt-2 grid grid-cols-3 gap-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'text-[#DCEBFF]/60' : 'text-[#D7DBE4]/42'}`}>
+        {['Move', 'Angle', 'Pressure'].map((label, index) => (
+          <div
+            key={label}
+            className={`rounded-[0.95rem] border px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.065]' : 'border-white/[0.035] bg-white/[0.018]'}`}
+          >
+            <span className={`block uppercase tracking-[0.16em] ${liveRoomActive ? 'text-[#BFD9FF]/38' : 'text-[#D7DBE4]/20'}`}>{label}</span>
+            {liveRoomActive ? steeringLabels[index] : 'idle'}
+          </div>
+        ))}
+      </div>
+
+      <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
+        <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>
+          {liveRoomActive ? 'LIVE active.' : 'LIVE inactive.'}
+        </span>
+        {!liveRoomActive && (
+          <span>Room is quiet. Tap Room when you want GEORGE listening again.</span>
+        )}
+      </div>
+    </div>
+  )
+}
