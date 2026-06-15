@@ -23,6 +23,18 @@ const STANDALONE_FILLER_TOKENS = new Set([
   'um',
 ])
 
+function isBuyTimeSteeringPhrase(text: string) {
+  const normalized = String(text || '').trim().toLowerCase()
+
+  return [
+    'one second',
+    'hold on',
+    'give me a second',
+    'give me a moment',
+    'let me think',
+  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+}
+
 export function isLiveSteeringPhrase(text: string) {
   const normalized = String(text || '').trim().toLowerCase()
   if (!normalized) return false
@@ -102,6 +114,16 @@ export function routeLiveTranscript(params: {
       decision: {
         type: 'ignore',
         reason: 'george_is_thinking',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
+  if (isBuyTimeSteeringPhrase(text)) {
+    return {
+      decision: {
+        type: 'local',
+        content: 'buy_time',
       },
       nextFinalTranscript: last,
     }
