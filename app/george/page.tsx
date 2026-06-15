@@ -816,7 +816,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     } catch {
       setDismissedTrajectoryIds([])
     }
-  }, [])
+  }, [isThinking, liveMode])
 
   useEffect(() => {
     try {
@@ -5033,6 +5033,11 @@ return true
     const result = routeLiveTranscript({
       text,
       lastFinalTranscript: lastLiveFinalTranscriptRef.current,
+      context: {
+        isThinking,
+        isSpeaking: isSpeakingRef.current,
+        liveMode,
+      },
     })
 
     lastLiveFinalTranscriptRef.current = result.nextFinalTranscript

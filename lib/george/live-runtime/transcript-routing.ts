@@ -17,9 +17,16 @@ export type LastLiveFinalTranscript = {
   at: number
 } | null
 
+export type LiveTranscriptRoutingContext = {
+  isThinking?: boolean
+  isSpeaking?: boolean
+  liveMode?: boolean
+}
+
 export function routeLiveTranscript(params: {
   text: string
   lastFinalTranscript: LastLiveFinalTranscript
+  context?: LiveTranscriptRoutingContext
   now?: number
 }): {
   decision: LiveTranscriptDecision
