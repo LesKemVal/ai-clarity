@@ -1531,9 +1531,6 @@ useEffect(() => {
   liveRoomActive,
   isListening,
   voiceOn,
-  liveRuntimeSupport?.room,
-  liveRuntimeSupport?.chair,
-  liveRuntimeSupport?.objective,
 ])
 
 
