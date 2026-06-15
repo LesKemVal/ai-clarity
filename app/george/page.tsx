@@ -2608,30 +2608,37 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
 
+  const processLivePartialTranscript = useCallback((text: string) => {
+    setVoiceError('')
+    setInterimTranscript(text)
+    liveLastSignalRef.current = Date.now()
+    lastSpeechTsRef.current = Date.now()
+    liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
+  }, [])
+
+  const processLiveFinalTranscript = useCallback((text: string) => {
+    const clean = String(text || '').trim()
+    if (!clean) return
+
+    setInterimTranscript('')
+    liveLastSignalRef.current = Date.now()
+    lastSpeechTsRef.current = Date.now()
+    liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
+    setInput('')
+    liveTranscriptSubmitRef.current(clean)
+  }, [])
+
+  const processLiveAudioError = useCallback((error: unknown) => {
+    console.warn('[GEORGE LIVE AUDIO]', error)
+    setVoiceError('LIVE speech connection failed.')
+    setIsListening(false)
+  }, [])
+
   const liveAudioRuntime = useLiveAudioRuntime({
     enabled: Boolean(forceLive || liveMode),
-    onPartialTranscript: (text) => {
-      setVoiceError('')
-      setInterimTranscript(text)
-      liveLastSignalRef.current = Date.now()
-      lastSpeechTsRef.current = Date.now()
-      liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
-    },
-    onFinalTranscript: (text) => {
-      const clean = String(text || '').trim()
-      if (!clean) return
-      setInterimTranscript('')
-      liveLastSignalRef.current = Date.now()
-      lastSpeechTsRef.current = Date.now()
-      liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
-      setInput('')
-      liveTranscriptSubmitRef.current(clean)
-    },
-    onError: (error) => {
-      console.warn('[GEORGE LIVE AUDIO]', error)
-      setVoiceError('LIVE speech connection failed.')
-      setIsListening(false)
-    },
+    onPartialTranscript: processLivePartialTranscript,
+    onFinalTranscript: processLiveFinalTranscript,
+    onError: processLiveAudioError,
   })
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
