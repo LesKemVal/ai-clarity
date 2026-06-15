@@ -2614,6 +2614,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
   const liveBuyTimeUntilRef = useRef<number>(0)
   const liveLastSpokenUtteranceRef = useRef<string>('')
+  const liveRecentSpokenUtterancesRef = useRef<string[]>([])
 
   const appendLiveContextSignal = useCallback((text: string) => {
     liveContextBufferRef.current = appendLiveContextSignalValue(
@@ -4081,6 +4082,10 @@ if (activePromptContext || activePromptLabel) {
 
         if (liveMode) {
           liveLastSpokenUtteranceRef.current = cleaned
+          liveRecentSpokenUtterancesRef.current = [
+            ...liveRecentSpokenUtterancesRef.current,
+            cleaned,
+          ].slice(-8)
         }
 
         speechQueueRef.current = chunks
