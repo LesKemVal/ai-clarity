@@ -33,6 +33,7 @@ import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-bri
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
+import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -4923,6 +4924,46 @@ Steering doctrine:
             activePromptContext?.includes('professional') ||
             activePromptContext?.includes('brilliant_live')
           )
+
+        const liveFastPath = liveMode
+          ? tryLiveFastPath({
+              input: text,
+              room: liveRuntimeSupport?.room || liveRuntimeSetup?.room || null,
+              chair: liveRuntimeSupport?.chair || null,
+              objective: liveRuntimeSupport?.objective || liveRuntimeSetup?.objective || null,
+              recentAssistant: messagesRef.current
+                .slice()
+                .reverse()
+                .find((message) => message.role === 'assistant')?.content || null,
+            })
+          : { handled: false as const }
+
+        if (liveFastPath.handled) {
+          stopBridgeSpeech()
+
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: liveFastPath.content,
+            constrained: false,
+          }
+
+          assistantRevealedRef.current = false
+
+          setMessages((prev) => {
+            const next = [...prev, assistantMessage]
+            messagesRef.current = next
+            return next
+          })
+
+          setPendingAssistantMessage(null)
+
+          if (activePromptContext) {
+            setContextTurnCount((prev) => prev + 1)
+          }
+
+          speakText(assistantMessage.content)
+          return
+        }
 
         const res = await fetch('/api/chat', {
           method: 'POST',
