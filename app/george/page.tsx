@@ -41,6 +41,7 @@ import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { getBuyTimeDurationMs, routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
