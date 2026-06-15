@@ -22,8 +22,17 @@ export function useLiveAudioRuntime({
   onError,
 }: UseLiveAudioRuntimeParams) {
   const runtimeRef = useRef<LiveAudioRuntime | null>(null)
+  const onPartialTranscriptRef = useRef(onPartialTranscript)
+  const onFinalTranscriptRef = useRef(onFinalTranscript)
+  const onErrorRef = useRef(onError)
   const [status, setStatus] = useState<LiveAudioStatus>('idle')
   const [interimTranscript, setInterimTranscript] = useState('')
+
+  useEffect(() => {
+    onPartialTranscriptRef.current = onPartialTranscript
+    onFinalTranscriptRef.current = onFinalTranscript
+    onErrorRef.current = onError
+  }, [onError, onFinalTranscript, onPartialTranscript])
 
   const stop = useCallback(() => {
     runtimeRef.current?.stop()
@@ -55,22 +64,22 @@ export function useLiveAudioRuntime({
       },
       onPartialTranscript: (text) => {
         setInterimTranscript(text)
-        onPartialTranscript?.(text)
+        onPartialTranscriptRef.current?.(text)
       },
       onFinalTranscript: (text) => {
         const clean = String(text || '').trim()
         if (!clean) return
         setInterimTranscript('')
-        onFinalTranscript?.(clean)
+        onFinalTranscriptRef.current?.(clean)
       },
       onError: (error) => {
         setStatus('error')
-        onError?.(error)
+        onErrorRef.current?.(error)
       },
     })
 
     void runtimeRef.current.start()
-  }, [enabled, onError, onFinalTranscript, onPartialTranscript])
+  }, [enabled])
 
   useEffect(() => {
     if (!enabled) {
