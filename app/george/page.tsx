@@ -5061,7 +5061,14 @@ return true
       console.info('[GEORGE LIVE LOCAL]', decision.content)
 
       if (decision.content === 'buy_time') {
-        liveBuyTimeUntilRef.current = Date.now() + 2500
+        const buyTimeUntil = Date.now() + 2500
+        liveBuyTimeUntilRef.current = buyTimeUntil
+
+        window.setTimeout(() => {
+          if (liveBuyTimeUntilRef.current === buyTimeUntil) {
+            console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
+          }
+        }, 2500)
       }
 
       return
