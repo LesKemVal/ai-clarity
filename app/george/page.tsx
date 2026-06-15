@@ -39,7 +39,7 @@ import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-supp
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
-import { createLiveAudioRuntime, type LiveAudioRuntime } from '@/lib/george/live-voice/audio/live-audio-runtime'
+import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1924,48 +1924,11 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       stopLiveAudioRuntime()
       ;(window as any).__GEORGE_STOP_LIVE_MIC__ = () => {
-        try {
-          const stoppers = (window as any).__GEORGE_DEEPGRAM_STOPPERS__
-          if (Array.isArray(stoppers)) {
-            stoppers.slice().forEach((stopper: unknown) => {
-              if (typeof stopper === 'function') stopper()
-            })
-          }
-        } catch {}
-
-        stopLiveAudioRuntime()
+        liveAudioRuntime.emergencyStop()
+        setIsListening(false)
       }
 
-      liveAudioRuntimeRef.current = createLiveAudioRuntime({
-        onStatus: (status) => {
-          setIsListening(status === 'listening' || status === 'starting')
-          if (status === 'error') setVoiceError('LIVE speech connection failed.')
-        },
-        onPartialTranscript: (text) => {
-          setVoiceError('')
-          setInterimTranscript(text)
-          liveLastSignalRef.current = Date.now()
-          lastSpeechTsRef.current = Date.now()
-          liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
-        },
-        onFinalTranscript: (text) => {
-          const clean = String(text || '').trim()
-          if (!clean) return
-          setInterimTranscript('')
-          liveLastSignalRef.current = Date.now()
-          lastSpeechTsRef.current = Date.now()
-          liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
-          setInput('')
-          liveTranscriptSubmitRef.current(clean)
-        },
-        onError: (error) => {
-          console.warn('[GEORGE LIVE AUDIO]', error)
-          setVoiceError('LIVE speech connection failed.')
-          setIsListening(false)
-        },
-      })
-
-      void liveAudioRuntimeRef.current.start()
+      liveAudioRuntime.start()
       return
     }
 
@@ -2643,8 +2606,33 @@ const responseTimerRef = useRef<any>(null)
 const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const liveAudioRuntimeRef = useRef<LiveAudioRuntime | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
+
+  const liveAudioRuntime = useLiveAudioRuntime({
+    enabled: Boolean(forceLive || liveMode),
+    onPartialTranscript: (text) => {
+      setVoiceError('')
+      setInterimTranscript(text)
+      liveLastSignalRef.current = Date.now()
+      lastSpeechTsRef.current = Date.now()
+      liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
+    },
+    onFinalTranscript: (text) => {
+      const clean = String(text || '').trim()
+      if (!clean) return
+      setInterimTranscript('')
+      liveLastSignalRef.current = Date.now()
+      lastSpeechTsRef.current = Date.now()
+      liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
+      setInput('')
+      liveTranscriptSubmitRef.current(clean)
+    },
+    onError: (error) => {
+      console.warn('[GEORGE LIVE AUDIO]', error)
+      setVoiceError('LIVE speech connection failed.')
+      setIsListening(false)
+    },
+  })
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
@@ -2654,17 +2642,15 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const stopLiveAudioRuntime = useCallback(() => {
-    liveAudioRuntimeRef.current?.stop()
-    liveAudioRuntimeRef.current = null
+    liveAudioRuntime.stop()
     setIsListening(false)
-  }, [])
+  }, [liveAudioRuntime])
 
 
   useEffect(() => {
     if ((forceLive || liveMode) && voiceOn) return
 
-    liveAudioRuntimeRef.current?.stop()
-    liveAudioRuntimeRef.current = null
+    stopLiveAudioRuntime()
   }, [forceLive, liveMode, voiceOn])
 
   const interruptAndListen = () => {
