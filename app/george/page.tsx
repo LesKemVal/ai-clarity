@@ -163,6 +163,10 @@ function getLiveRuntimeSteeringLabels(room?: string | null) {
 }
 
 function getLiveResponseServingTags(message: Message, liveAssistMode?: string | null) {
+  if (Array.isArray(message.servingTags) && message.servingTags.length > 0) {
+    return message.servingTags.slice(0, 3)
+  }
+
   const content = String(message.content || '').toLowerCase()
   const tags: string[] = []
 
@@ -232,6 +236,7 @@ type Message = {
   imageDataUrl?: string | null
   simplifiedFromIndex?: number
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
+  servingTags?: string[]
 }
 
 type PromptSelection = {
@@ -4945,6 +4950,8 @@ Steering doctrine:
             role: 'assistant',
             content: liveFastPath.content,
             constrained: false,
+            servingTags: liveFastPath.serving,
+            source: 'system_override',
           }
 
           assistantRevealedRef.current = false
@@ -6643,7 +6650,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      {m.role === 'user' && (
+      {m.role === 'user' && !liveMode && (
         <div className="flex items-center gap-1.5 text-[#D7DBE4]/72">
           <button
             type="button"
@@ -6757,6 +6764,48 @@ I am listening now. Speak naturally. I will respond ${
             {tag}
           </span>
         ))}
+
+        <button
+          type="button"
+          onClick={() => {
+            handleFeedback(i, 'up')
+            setToastMessage('Support type saved')
+            setShowToast(true)
+          }}
+          className={`ml-1 flex items-center justify-center rounded-full px-1.5 py-1 transition ${
+            feedback[i] === 'up'
+              ? 'text-[#8FF0C7]/82'
+              : 'text-[#D7DBE4]/42 hover:text-[#D7DBE4]/78'
+          }`}
+          aria-label="This GEORGE support type helped"
+          title="This support type helped"
+        >
+          <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill={feedback[i] === 'up' ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M14 10V5.8c0-1 .3-2 .9-2.8L16 1.5l2 1.9c.7.7 1 1.6 1 2.6v3h1.5c1.1 0 1.9 1 1.7 2.1l-1.1 6.4A2 2 0 0 1 19.1 19H8a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h6Z" />
+            <path d="M6 10H3v9h3" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            handleFeedback(i, 'down')
+            setToastMessage('Support type saved')
+            setShowToast(true)
+          }}
+          className={`flex items-center justify-center rounded-full px-1.5 py-1 transition ${
+            feedback[i] === 'down'
+              ? 'text-red-100/82'
+              : 'text-[#D7DBE4]/42 hover:text-[#D7DBE4]/78'
+          }`}
+          aria-label="This GEORGE support type did not help"
+          title="This support type did not help"
+        >
+          <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]" fill={feedback[i] === 'down' ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 14v4.2c0 1-.3 2-.9 2.8L8 22.5l-2-1.9c-.7-.7-1-1.6-1-2.6v-3H3.5c-1.1 0-1.9-1-1.7-2.1l1.1-6.4A2 2 0 0 1 4.9 5H16a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-6Z" />
+            <path d="M18 14h3V5h-3" />
+          </svg>
+        </button>
       </div>
     </div>
 
