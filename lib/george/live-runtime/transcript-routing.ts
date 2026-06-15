@@ -23,6 +23,18 @@ const STANDALONE_FILLER_TOKENS = new Set([
   'um',
 ])
 
+function isRepeatLineSteeringPhrase(text: string) {
+  const normalized = String(text || '').trim().toLowerCase()
+
+  return [
+    'line',
+    'give me the line',
+    'say that again',
+    'repeat that',
+    'repeat it',
+  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+}
+
 export function getBuyTimeDurationMs(text: string) {
   const normalized = String(text || '').trim().toLowerCase()
 
@@ -139,6 +151,16 @@ export function routeLiveTranscript(params: {
       decision: {
         type: 'local',
         content: 'buy_time',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
+  if (isRepeatLineSteeringPhrase(text)) {
+    return {
+      decision: {
+        type: 'local',
+        content: 'repeat_last_line',
       },
       nextFinalTranscript: last,
     }
