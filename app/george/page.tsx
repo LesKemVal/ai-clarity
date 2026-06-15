@@ -5056,6 +5056,7 @@ return true
     }
 
     if (decision.type === 'local') {
+      console.info('[GEORGE LIVE LOCAL]', decision.content)
       return
     }
 
