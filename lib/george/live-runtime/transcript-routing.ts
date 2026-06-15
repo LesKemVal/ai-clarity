@@ -46,6 +46,16 @@ export function routeLiveTranscript(params: {
     }
   }
 
+  if (params.context?.isSpeaking) {
+    return {
+      decision: {
+        type: 'ignore',
+        reason: 'george_is_speaking',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
   if (last && last.text === text && now - last.at < 1800) {
     return {
       decision: {

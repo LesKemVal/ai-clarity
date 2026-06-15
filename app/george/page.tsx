@@ -816,7 +816,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
     } catch {
       setDismissedTrajectoryIds([])
     }
-  }, [isThinking, liveMode])
+  }, [])
 
   useEffect(() => {
     try {
