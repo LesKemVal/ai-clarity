@@ -1365,10 +1365,6 @@ function detectLiveInterruption(interim: string) {
 
 const [isListening, setIsListening] = useState(false)
 const liveRoomActive = Boolean(forceLive || liveMode) && liveGeorgeEnabled
-const liveRoomReceiving =
-  liveRoomActive &&
-  (voiceOn || isListening || Boolean(interimTranscript.trim()))
-
 const liveStatusStackRef = useRef<HTMLDivElement | null>(null)
 const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
 
