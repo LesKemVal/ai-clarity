@@ -42,6 +42,7 @@ import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPane
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { getBuyTimeDurationMs, routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
+import { compressLiveLine } from '@/lib/george/live-runtime/line-transforms'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -5094,6 +5095,13 @@ return true
         const lastLine = liveLastSpokenUtteranceRef.current.trim()
         if (lastLine) {
           void speakText(lastLine)
+        }
+      }
+
+      if (decision.content === 'compress_last_line') {
+        const compressedLine = compressLiveLine(liveLastSpokenUtteranceRef.current)
+        if (compressedLine) {
+          void speakText(compressedLine)
         }
       }
 
