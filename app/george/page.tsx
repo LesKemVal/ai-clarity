@@ -5029,11 +5029,16 @@ return true
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
 
-  useEffect(() => {
-    liveTranscriptSubmitRef.current = (text: string) => {
-      void handleSend(text, { source: 'live_transcript' })
-    }
+  const handleLiveFinalTranscript = useCallback((text: string) => {
+    const clean = String(text || '').trim()
+    if (!clean) return
+
+    void handleSend(clean, { source: 'live_transcript' })
   }, [handleSend])
+
+  useEffect(() => {
+    liveTranscriptSubmitRef.current = handleLiveFinalTranscript
+  }, [handleLiveFinalTranscript])
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget
