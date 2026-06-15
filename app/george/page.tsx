@@ -5026,12 +5026,23 @@ return true
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
 
+  const routeLiveTranscript = useCallback((text: string) => {
+    return {
+      type: 'send' as const,
+      text,
+    }
+  }, [])
+
   const handleLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
     if (!clean) return
 
-    void handleSend(clean, { source: 'live_transcript' })
-  }, [handleSend])
+    const decision = routeLiveTranscript(clean)
+
+    if (decision.type === 'send') {
+      void handleSend(decision.text, { source: 'live_transcript' })
+    }
+  }, [handleSend, routeLiveTranscript])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript
