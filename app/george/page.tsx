@@ -1500,7 +1500,7 @@ useEffect(() => {
     const node = liveStatusStackRef.current
     if (!node) return
     const rect = node.getBoundingClientRect()
-    setLiveStatusStackClearance(Math.ceil(rect.bottom + 18))
+    setLiveStatusStackClearance(Math.ceil(rect.bottom + 48))
   }
 
   measure()
@@ -6128,7 +6128,7 @@ return (
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
   <>
-    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[340px] bg-gradient-to-b from-[#05060A] via-[#05060A]/100 via-[82%] to-[#05060A]/0" />
     <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 pointer-events-none">
     <div ref={liveStatusStackRef} className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
       <div className="flex items-center justify-between gap-3">
@@ -6250,11 +6250,9 @@ return (
         <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>
           {liveRoomActive ? 'LIVE active.' : 'LIVE inactive.'}
         </span>
-        <span>
-          {liveRoomActive
-            ? 'GEORGE is helping you navigate the room and move toward the outcome.'
-            : "Room is quiet. Tap Room when you want GEORGE listening again."}
-        </span>
+        {!liveRoomActive && (
+          <span>Room is quiet. Tap Room when you want GEORGE listening again.</span>
+        )}
       </div>
     </div>
   </div>
