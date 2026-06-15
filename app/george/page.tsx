@@ -2612,13 +2612,17 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
   const liveBuyTimeUntilRef = useRef<number>(0)
 
+  const appendLiveContextSignal = useCallback((text: string) => {
+    appendLiveContextSignal(text)
+  }, [])
+
   const processLivePartialTranscript = useCallback((text: string) => {
     setVoiceError('')
     setInterimTranscript(text)
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
     liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
-  }, [])
+  }, [appendLiveContextSignal])
 
   const processLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
@@ -2632,10 +2636,10 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setInterimTranscript('')
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
-    liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
+    appendLiveContextSignal(clean)
     setInput('')
     liveTranscriptSubmitRef.current(clean)
-  }, [])
+  }, [appendLiveContextSignal])
 
   const processLiveAudioError = useCallback((error: unknown) => {
     console.warn('[GEORGE LIVE AUDIO]', error)
