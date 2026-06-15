@@ -2624,6 +2624,11 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     const clean = String(text || '').trim()
     if (!clean) return
 
+    if (liveBuyTimeUntilRef.current > Date.now()) {
+      liveBuyTimeUntilRef.current = 0
+      console.info('[GEORGE LIVE LOCAL]', 'buy_time_cancelled')
+    }
+
     setInterimTranscript('')
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
