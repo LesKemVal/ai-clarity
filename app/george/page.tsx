@@ -161,6 +161,29 @@ function getLiveRuntimeSteeringLabels(room?: string | null) {
   return ['Approach', 'Momentum', 'Trust']
 }
 
+function getLiveResponseServingTags(message: Message, liveAssistMode?: string | null) {
+  const content = String(message.content || '').toLowerCase()
+  const tags: string[] = []
+
+  const add = (tag: string) => {
+    if (!tags.includes(tag)) tags.push(tag)
+  }
+
+  if (/outcome|objective|goal|shift|pivot|reframe/.test(content)) add('Outcome')
+  if (/say|tell them|open with|close with|ask them|respond/.test(content)) add('Continuation')
+  if (/cue|watch|listen|notice|pressure|timing|signal/.test(content)) add('Cues')
+  if (/should|best move|recommend|i would|next step|let's/.test(content)) add('Advise')
+  if (/confirm|commit|owner|when|next step/.test(content)) add('Close')
+
+  if (tags.length === 0) {
+    if (liveAssistMode === 'lines') add('Continuation')
+    else add('Cues')
+    add('Advise')
+  }
+
+  return tags.slice(0, 3)
+}
+
 function getLiveRoomSignal(room: string) {
   if (room === 'Interview') {
     return 'Interview loaded. GEORGE is watching credibility, proof, pacing, pressure, and answer clarity.'
@@ -6684,19 +6707,16 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={(event) => {
-          const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-          const roomAbove = rect.top
-          const roomBelow = window.innerHeight - rect.bottom
-          setTonePopupUpward(roomAbove > 180 || roomAbove > roomBelow)
-          setTonePopupIndex((prev) => (prev === i ? null : i))
-        }}
-        className="rounded-full border border-white/[0.06] bg-white/[0.018] px-2.5 py-1 text-[#D7DBE4]/52 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]"
-      >
-        Room phrases · defaults
-      </button>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {getLiveResponseServingTags(m, liveRuntimeSetup?.liveAssistMode).map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-white/[0.055] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/48"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
     </div>
 
     
