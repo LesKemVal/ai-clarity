@@ -2607,6 +2607,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
+  const lastLiveFinalTranscriptRef = useRef<{ text: string; at: number } | null>(null)
 
   const processLivePartialTranscript = useCallback((text: string) => {
     setVoiceError('')
@@ -5027,6 +5028,18 @@ return true
 )
 
   const routeLiveTranscript = useCallback((text: string) => {
+    const now = Date.now()
+    const last = lastLiveFinalTranscriptRef.current
+
+    if (last && last.text === text && now - last.at < 1800) {
+      return {
+        type: 'ignore' as const,
+        reason: 'duplicate_final_transcript',
+      }
+    }
+
+    lastLiveFinalTranscriptRef.current = { text, at: now }
+
     return {
       type: 'send' as const,
       text,
@@ -5038,6 +5051,10 @@ return true
     if (!clean) return
 
     const decision = routeLiveTranscript(clean)
+
+    if (decision.type === 'ignore') {
+      return
+    }
 
     if (decision.type === 'send') {
       void handleSend(decision.text, { source: 'live_transcript' })
