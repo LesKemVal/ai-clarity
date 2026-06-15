@@ -267,11 +267,16 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
   }
 
   if (setup?.runtimeSupport || setup?.room || setup?.objective) {
+    const runtimeSupport = setup.runtimeSupport || {}
+    const setupChair = String((setup as any).chair || '').trim()
+    const runtimeChair = String((runtimeSupport as any).chair || '').trim()
+    const chair = setupChair || runtimeChair || undefined
+
     const serializedSupport = JSON.stringify({
-      ...(setup.runtimeSupport || {}),
-      room: setup.room,
-      objective: setup.objective,
-      chair: (setup as any).chair,
+      ...runtimeSupport,
+      room: setup.room || (runtimeSupport as any).room,
+      objective: setup.objective || (runtimeSupport as any).objective,
+      ...(chair ? { chair } : {}),
     })
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY, serializedSupport)
