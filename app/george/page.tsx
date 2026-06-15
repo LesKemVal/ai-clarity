@@ -2612,9 +2612,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
   const liveBuyTimeUntilRef = useRef<number>(0)
+  const liveLastSpokenUtteranceRef = useRef<string>('')
 
   const appendLiveContextSignal = useCallback((text: string) => {
-    appendLiveContextSignal(text)
+    liveContextBufferRef.current = appendLiveContextSignalValue(
+      liveContextBufferRef.current,
+      text
+    )
   }, [])
 
   const processLivePartialTranscript = useCallback((text: string) => {
@@ -4074,6 +4078,10 @@ if (activePromptContext || activePromptLabel) {
         if (!chunks.length) {          return
         }
 
+        if (liveMode) {
+          liveLastSpokenUtteranceRef.current = cleaned
+        }
+
         speechQueueRef.current = chunks
         await playQueue()
       } catch {
@@ -4084,7 +4092,7 @@ if (activePromptContext || activePromptLabel) {
         setVoiceError('Voice reply failed.')
       }
     },
-    [interactionMode, isIOS, voiceOn, voiceSpeed, currentTier]
+    [interactionMode, isIOS, voiceOn, voiceSpeed, currentTier, liveMode]
   )
 
   const generateReroutePrompt = (input: string, response: string, messages: any[]) => {
@@ -5082,13 +5090,20 @@ return true
         }, buyTimeDurationMs)
       }
 
+      if (decision.content === 'repeat_last_line') {
+        const lastLine = liveLastSpokenUtteranceRef.current.trim()
+        if (lastLine) {
+          void speakText(lastLine)
+        }
+      }
+
       return
     }
 
     if (decision.type === 'send') {
       void handleSend(decision.text, { source: 'live_transcript' })
     }
-  }, [handleSend, routeCurrentLiveTranscript])
+  }, [handleSend, routeCurrentLiveTranscript, speakText])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript
