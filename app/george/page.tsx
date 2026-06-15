@@ -2646,6 +2646,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const liveAudioRuntimeRef = useRef<LiveAudioRuntime | null>(null)
+  const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
@@ -5027,6 +5028,12 @@ return true
   },
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
+
+  useEffect(() => {
+    liveTranscriptSubmitRef.current = (text: string) => {
+      void handleSend(text, { source: 'live_transcript' })
+    }
+  }, [handleSend])
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = event.currentTarget
