@@ -40,23 +40,9 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
+import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
-
-
-type LiveTranscriptDecision =
-  | {
-      type: 'ignore'
-      reason: string
-    }
-  | {
-      type: 'local'
-      content: string
-    }
-  | {
-      type: 'send'
-      text: string
-    }
 
 
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
@@ -2623,7 +2609,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
-  const lastLiveFinalTranscriptRef = useRef<{ text: string; at: number } | null>(null)
+  const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
 
   const processLivePartialTranscript = useCallback((text: string) => {
     setVoiceError('')
@@ -5043,30 +5029,22 @@ return true
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
 
-  const routeLiveTranscript = useCallback((text: string): LiveTranscriptDecision => {
-    const now = Date.now()
-    const last = lastLiveFinalTranscriptRef.current
-
-    if (last && last.text === text && now - last.at < 1800) {
-      return {
-        type: 'ignore' as const,
-        reason: 'duplicate_final_transcript',
-      }
-    }
-
-    lastLiveFinalTranscriptRef.current = { text, at: now }
-
-    return {
-      type: 'send' as const,
+  const routeCurrentLiveTranscript = useCallback((text: string) => {
+    const result = routeLiveTranscript({
       text,
-    }
+      lastFinalTranscript: lastLiveFinalTranscriptRef.current,
+    })
+
+    lastLiveFinalTranscriptRef.current = result.nextFinalTranscript
+
+    return result.decision
   }, [])
 
   const handleLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
     if (!clean) return
 
-    const decision = routeLiveTranscript(clean)
+    const decision = routeCurrentLiveTranscript(clean)
 
     if (decision.type === 'ignore') {
       return
@@ -5079,7 +5057,7 @@ return true
     if (decision.type === 'send') {
       void handleSend(decision.text, { source: 'live_transcript' })
     }
-  }, [handleSend, routeLiveTranscript])
+  }, [handleSend, routeCurrentLiveTranscript])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript
