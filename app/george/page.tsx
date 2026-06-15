@@ -7244,6 +7244,7 @@ I am listening now. Speak naturally. I will respond ${
                       {voiceOn ? 'MUTE' : 'UNMUTE'}
                     </button>
                   )}
+                </div>
 
                   {showNormalUtilityMenu && (
                     <button
@@ -7399,7 +7400,6 @@ I am listening now. Speak naturally. I will respond ${
                     </div>
                     </>
                   )}
-                </div>
               </div>
 
               <div className="hidden">
