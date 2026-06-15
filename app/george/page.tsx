@@ -1922,7 +1922,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       setShowEarbudOverlay(true)
       window.setTimeout(() => setShowEarbudOverlay(false), 5200)
 
-      liveAudioRuntimeRef.current?.stop()
+      stopLiveAudioRuntime()
       ;(window as any).__GEORGE_STOP_LIVE_MIC__ = () => {
         try {
           const stoppers = (window as any).__GEORGE_DEEPGRAM_STOPPERS__
@@ -1933,9 +1933,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
           }
         } catch {}
 
-        liveAudioRuntimeRef.current?.stop()
-        liveAudioRuntimeRef.current = null
-        setIsListening(false)
+        stopLiveAudioRuntime()
       }
 
       liveAudioRuntimeRef.current = createLiveAudioRuntime({
@@ -2655,6 +2653,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const stopLiveAudioRuntime = useCallback(() => {
+    liveAudioRuntimeRef.current?.stop()
+    liveAudioRuntimeRef.current = null
+    setIsListening(false)
+  }, [])
+
+
   useEffect(() => {
     if ((forceLive || liveMode) && voiceOn) return
 
@@ -2907,8 +2912,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   const exitLiveMode = () => {
     try {
-      liveAudioRuntimeRef.current?.stop()
-      liveAudioRuntimeRef.current = null
+      stopLiveAudioRuntime()
       stopListening()
       window.speechSynthesis.cancel()
     } catch {}
