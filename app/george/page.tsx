@@ -7232,7 +7232,7 @@ I am listening now. Speak naturally. I will respond ${
                       title={voiceOn ? 'Audio on' : 'Audio off'}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/60 shadow-[0_0_10px_rgba(110,231,183,0.24)]' : 'bg-white/22'}`} />
-                      {voiceOn ? 'AUDIO ON' : 'MUTE'}
+                      {voiceOn ? 'MUTE' : 'UNMUTE'}
                     </button>
                   )}
 
@@ -7463,7 +7463,7 @@ if (liveMode) {
             }`}
             aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
           >
-            {voiceOn ? 'AUDIO ON' : 'MUTE'}
+            {voiceOn ? 'MUTE' : 'UNMUTE'}
           </button>
         )}
 
@@ -8300,7 +8300,7 @@ Continue from here, tell me what changed, or start fresh.`
         aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
       >
         <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/70 shadow-[0_0_10px_rgba(110,231,183,0.28)]' : 'bg-white/24'}`} />
-        {voiceOn ? 'AUDIO ON' : 'MUTE'}
+        {voiceOn ? 'MUTE' : 'UNMUTE'}
       </button>
 
       {showLiveQuickMenu && (
