@@ -1858,6 +1858,21 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       window.setTimeout(() => setShowEarbudOverlay(false), 5200)
 
       liveAudioRuntimeRef.current?.stop()
+      ;(window as any).__GEORGE_STOP_LIVE_MIC__ = () => {
+        try {
+          const stoppers = (window as any).__GEORGE_DEEPGRAM_STOPPERS__
+          if (Array.isArray(stoppers)) {
+            stoppers.slice().forEach((stopper: unknown) => {
+              if (typeof stopper === 'function') stopper()
+            })
+          }
+        } catch {}
+
+        liveAudioRuntimeRef.current?.stop()
+        liveAudioRuntimeRef.current = null
+        setIsListening(false)
+      }
+
       liveAudioRuntimeRef.current = createLiveAudioRuntime({
         onStatus: (status) => {
           setIsListening(status === 'listening' || status === 'starting')
@@ -2575,11 +2590,11 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const bridgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (forceLive || liveMode) return
+    if ((forceLive || liveMode) && voiceOn) return
 
     liveAudioRuntimeRef.current?.stop()
     liveAudioRuntimeRef.current = null
-  }, [forceLive, liveMode])
+  }, [forceLive, liveMode, voiceOn])
 
   const interruptAndListen = () => {
     try {
@@ -3914,7 +3929,12 @@ if (activePromptContext || activePromptLabel) {
             reject(new Error('Audio playback failed'))
           }
 
-          audio.oncanplaythrough = () => {
+          let playStarted = false
+
+          const startAudioPlayback = () => {
+            if (playStarted) return
+            playStarted = true
+
             revealPendingAssistantMessage()
 
             setTimeout(() => {
@@ -3932,8 +3952,15 @@ if (activePromptContext || activePromptLabel) {
                 console.error('audio.play() failed', err)
                 reject(err)
               })
-            }, 120)
+            }, 80)
           }
+
+          audio.oncanplaythrough = startAudioPlayback
+          audio.oncanplay = startAudioPlayback
+          audio.onloadeddata = startAudioPlayback
+
+          audio.load()
+          setTimeout(startAudioPlayback, 450)
         })
 
         if (!stopSpeechRef.current) {
@@ -4622,13 +4649,79 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
 
       const liveRuntimePrefix =
         liveMode
-          ? `LIVE RUNTIME SETUP — internal only.
+          ? `LIVE RUNTIME AUTHORITY
 
-Room: ${liveRuntimeSetup?.room || 'not specified'}
-BRANESx: ${liveRuntimeSetup?.objective || 'not specified'}
+The following information has already been established.
+
+Do not ask the user to restate, redefine, rediscover, or clarify these items unless the user explicitly says they have changed.
+
+Room: ${liveRuntimeSupport?.room || liveRuntimeSetup?.room || 'not specified'}
+Chair: ${liveRuntimeSupport?.chair || 'User'}
+Outcome: ${liveRuntimeSupport?.objective || liveRuntimeSetup?.objective || 'not specified'}
+Move: ${getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[0]}
+Angle: ${getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[1]}
+Pressure: ${getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room)[2]}
 Language: ${liveRuntimeSetup?.language || 'English'}
 Cadence: ${liveRuntimeSetup?.cadence || 'Balanced'}
 Assist mode: ${liveRuntimeSetup?.liveAssistMode || 'cues'}
+
+Treat these as current operational reality.
+
+Your responsibility is execution, adaptation, timing, and movement toward the outcome.
+
+Do not revert into intake behavior.
+Do not ask broad discovery questions.
+Protect trajectory.
+
+LIVE CONTINUATION + STEERING DOCTRINE
+
+Desired outcome is the destination.
+Secondary outcome is used only when the primary objective has clearly failed or become unreachable.
+Continuation is always available by default.
+
+When the user speaks a partial thought and pauses, GEORGE may continue the sentence according to the established conversational trajectory.
+
+The user owns the voice.
+GEORGE protects the trajectory.
+
+Steering phrases do not change the destination unless the user explicitly changes the objective.
+Steering phrases change execution behavior: tone, compression, firmness, leverage protection, cue density, exact wording, timing, or closure style.
+
+If the user says “Negotiation mode,” keep the same trajectory but adjust behavior:
+- stronger anchoring
+- increased leverage protection
+- more precise language
+- slower concession behavior
+- heightened detection of pressure tactics
+- earlier identification of BATNAs
+- more deliberate closure language
+- stronger boundary preservation
+- more intentional silence
+
+If the user says “Let’s keep this tight,” compress.
+If the user says “Say it this way,” provide exact repeatable wording.
+If the user says “Hold the line here,” preserve position and reduce concession.
+If the user says “Bring it back to,” restore trajectory.
+If the user says “Close with,” move toward commitment, ownership, timing, or next action.
+
+Do not output blank templates in LIVE.
+Never say: “Target: __. First step: __. Owner: __. Due: __.”
+Convert structures into speakable continuation sentences.
+
+Bad:
+Target: __. First step: __. Owner: __. Due: __.
+
+Good:
+Before we leave, confirm the target, the first move, who owns it, and when it happens.
+
+Choose the smallest useful intervention:
+- sentence completion
+- cue
+- exact line
+- warning
+- silence
+
+If GEORGE is wrong, the user may ignore, interrupt, redirect, or override without penalty.
 Steering phrases: ${liveRuntimeSetup?.controlWords || 'none'}
 Estimated runtime cost: ${liveRuntimeSetup?.estimatedCents ? `${liveRuntimeSetup.estimatedCents} cents` : 'not estimated'}
 
@@ -4779,8 +4872,9 @@ Steering doctrine:
               ]
             : updatedMessages,
             voiceMode: liveMode ? voiceOn : false,
+            liveRuntimeContext: liveRuntimePrefix || null,
             isFirstSession: updatedMessages.length <= 2,
-            promptContext: activePromptContext,
+            promptContext: liveMode ? (activePromptContext || 'manual_live') : activePromptContext,
             promptLabel: activePromptLabel,
             activeCampaign: activeCampaign && campaignContextActive
               ? {
@@ -6942,6 +7036,33 @@ I am listening now. Speak naturally. I will respond ${
                     {liveMode ? 'EXIT' : tierUpgradeAction.currentLabel}
                   </button>
 
+                  {liveMode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (currentTier === 'smart') {
+                          setToastMessage('Voice replies unlock above Smart.')
+                          setShowToast(true)
+                          return
+                        }
+
+                        const nextVoice = !voiceOn
+                        hasUserInteractedRef.current = true
+                        setVoiceOn(nextVoice)
+                        setInteractionMode(nextVoice ? 'speech' : 'text')
+                        window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+                        setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
+                        setShowToast(true)
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-1 py-1 text-[9px] font-medium uppercase tracking-[0.14em] ${voiceOn ? 'text-emerald-100/70 hover:text-emerald-100' : 'text-[#D7DBE4]/34 hover:text-[#D7DBE4]/72'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
+                      aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
+                      title={voiceOn ? 'Audio on' : 'Audio off'}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/60 shadow-[0_0_10px_rgba(110,231,183,0.24)]' : 'bg-white/22'}`} />
+                      {voiceOn ? 'AUDIO' : 'MUTE'}
+                    </button>
+                  )}
+
                   {showNormalUtilityMenu && (
                     <button
                       type="button"
@@ -7143,6 +7264,35 @@ if (liveMode) {
         >
           {liveMode ? 'EXIT' : 'LIVE'}
         </button>
+
+        {liveMode && (
+          <button
+            type="button"
+            onClick={() => {
+              if (currentTier === 'smart') {
+                setToastMessage('Voice replies unlock above Smart.')
+                setShowToast(true)
+                return
+              }
+
+              const nextVoice = !voiceOn
+              hasUserInteractedRef.current = true
+              setVoiceOn(nextVoice)
+              setInteractionMode(nextVoice ? 'speech' : 'text')
+              window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+              setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
+              setShowToast(true)
+            }}
+            className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
+              voiceOn
+                ? 'text-emerald-100/72 hover:text-emerald-100'
+                : 'text-[#D7DBE4]/46 hover:text-[#D7DBE4]/78'
+            }`}
+            aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
+          >
+            {voiceOn ? 'AUDIO ON' : 'AUDIO OFF'}
+          </button>
+        )}
 
         
         </>
@@ -7954,6 +8104,30 @@ Continue from here, tell me what changed, or start fresh.`
       >
         <span className="h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.18)]" />
         EXIT
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          if (currentTier === 'smart') {
+            setToastMessage('Voice replies unlock above Smart.')
+            setShowToast(true)
+            return
+          }
+
+          const nextVoice = !voiceOn
+          hasUserInteractedRef.current = true
+          setVoiceOn(nextVoice)
+          setInteractionMode(nextVoice ? 'speech' : 'text')
+          window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+          setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
+          setShowToast(true)
+        }}
+        className={`inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${voiceOn ? 'text-[#D7DBE4]/72' : 'text-[#D7DBE4]/38'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
+        aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
+      >
+        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/70 shadow-[0_0_10px_rgba(110,231,183,0.28)]' : 'bg-white/24'}`} />
+        {voiceOn ? 'AUDIO ON' : 'AUDIO OFF'}
       </button>
 
       {showLiveQuickMenu && (

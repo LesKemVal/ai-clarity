@@ -19,8 +19,33 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
   let audioMeterTimer: ReturnType<typeof setInterval> | null = null
   let stopped = false
 
+  const globalStopKey = '__GEORGE_DEEPGRAM_STOPPERS__'
+
+  function registerGlobalStopper() {
+    if (typeof window === 'undefined') return
+
+    const store = window as any
+    if (!Array.isArray(store[globalStopKey])) {
+      store[globalStopKey] = []
+    }
+
+    if (!store[globalStopKey].includes(stop)) {
+      store[globalStopKey].push(stop)
+    }
+  }
+
+  function unregisterGlobalStopper() {
+    if (typeof window === 'undefined') return
+
+    const store = window as any
+    if (Array.isArray(store[globalStopKey])) {
+      store[globalStopKey] = store[globalStopKey].filter((fn: unknown) => fn !== stop)
+    }
+  }
+
   async function start() {
     stopped = false
+    registerGlobalStopper()
 
     const tokenRes = await fetch('/api/george/live/stt-token')
     const tokenData = await tokenRes.json()
@@ -36,6 +61,12 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         autoGainControl: true,
       },
     })
+
+    if (stopped) {
+      stream.getTracks().forEach((track) => track.stop())
+      stream = null
+      return
+    }
 
     const url =
       'wss://api.deepgram.com/v1/listen' +
@@ -62,6 +93,12 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       const data = new Uint8Array(analyser.fftSize)
 
       audioMeterTimer = setInterval(() => {
+        if (stopped) {
+          if (audioMeterTimer) clearInterval(audioMeterTimer)
+          audioMeterTimer = null
+          return
+        }
+
         analyser.getByteTimeDomainData(data)
         let sum = 0
         for (const value of data) {
@@ -75,9 +112,16 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       console.log('[GEORGE DEEPGRAM] mic meter failed', error)
     }
 
+    if (stopped) return
+
     socket = new WebSocket(url, ['token', tokenData.token])
 
     socket.onopen = () => {
+      if (stopped) {
+        try { socket?.close() } catch {}
+        return
+      }
+
       console.log('[GEORGE DEEPGRAM] websocket open')
       handlers.onOpen?.()
 
@@ -90,6 +134,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       console.log('[GEORGE DEEPGRAM] mime', recorder.mimeType)
 
       recorder.ondataavailable = (event) => {
+        if (stopped) return
         if (!event.data?.size) return
         if (!socket || socket.readyState !== WebSocket.OPEN) return
         console.log('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
@@ -136,11 +181,20 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
     stopped = true
 
     try {
-      recorder?.stop()
+      if (recorder) {
+        recorder.ondataavailable = null
+        recorder.stop()
+      }
     } catch {}
 
     try {
-      socket?.close()
+      if (socket) {
+        socket.onmessage = null
+        socket.onopen = null
+        socket.onerror = null
+        socket.onclose = null
+        socket.close()
+      }
     } catch {}
 
     try {
@@ -160,6 +214,8 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
     socket = null
     stream = null
     audioContext = null
+
+    unregisterGlobalStopper()
   }
 
   return { start, stop }

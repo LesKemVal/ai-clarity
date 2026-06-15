@@ -582,6 +582,10 @@ export async function POST(req: Request) {
       ? body.messages
       : []
     const voiceMode = Boolean(body?.voiceMode)
+    const liveRuntimeContext =
+      typeof body?.liveRuntimeContext === 'string' && body.liveRuntimeContext.trim()
+        ? body.liveRuntimeContext.trim()
+        : ''
     const isFirstSession = Boolean(body?.isFirstSession)
     const promptContext =
       typeof body?.promptContext === 'string' && body.promptContext.trim()
@@ -890,6 +894,7 @@ LANGUAGE MODE: SPANISH
     })
 
     const systemContent = languageRule + modeBlock +
+      (liveRuntimeContext ? `\n\n${liveRuntimeContext}\n\n` : '') +
       (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
       (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
       (runtimeAdapterNote ? `\n\n${runtimeAdapterNote}\n\n` : '') +
