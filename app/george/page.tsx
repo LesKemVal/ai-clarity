@@ -1369,6 +1369,51 @@ const liveRoomReceiving =
   liveRoomActive &&
   (voiceOn || isListening || Boolean(interimTranscript.trim()))
 
+const liveStatusStackRef = useRef<HTMLDivElement | null>(null)
+const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
+
+useEffect(() => {
+  if (!(forceLive || liveMode) || showLiveEntrySequence) {
+    setLiveStatusStackClearance(0)
+    return
+  }
+
+  const measure = () => {
+    const node = liveStatusStackRef.current
+    if (!node) return
+    const rect = node.getBoundingClientRect()
+    setLiveStatusStackClearance(Math.ceil(rect.bottom + 18))
+  }
+
+  measure()
+
+  const resizeObserver =
+    typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(measure)
+      : null
+
+  if (resizeObserver && liveStatusStackRef.current) {
+    resizeObserver.observe(liveStatusStackRef.current)
+  }
+
+  window.addEventListener('resize', measure)
+
+  return () => {
+    resizeObserver?.disconnect()
+    window.removeEventListener('resize', measure)
+  }
+}, [
+  forceLive,
+  liveMode,
+  showLiveEntrySequence,
+  liveRoomActive,
+  isListening,
+  voiceOn,
+  liveRuntimeSupport?.room,
+  liveRuntimeSupport?.chair,
+  liveRuntimeSupport?.objective,
+])
+
 
     const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
@@ -6092,21 +6137,36 @@ return (
   <>
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[285px] bg-gradient-to-b from-[#05060A] via-[#05060A]/98 via-[72%] to-[#05060A]/0" />
     <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 pointer-events-none">
-    <div className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
+    <div ref={liveStatusStackRef} className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${liveRoomActive ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
+          <span className={`h-2 w-2 rounded-full ${isListening ? 'bg-[#8FF0C7] shadow-[0_0_14px_rgba(143,240,199,0.65)]' : 'bg-[#D7DBE4]/22'}`} />
           <span className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#D7DBE4]/58">
-            GEORGE is {currentTier}
+            {isListening ? 'GEORGE IS LISTENING' : 'GEORGE READY'}
           </span>
         </div>
 
         <span className="text-[9px] uppercase tracking-[0.18em] text-[#D7DBE4]/26">
-          {liveRoomActive ? 'room active' : 'room inactive'}
+          {liveRoomActive ? 'ROOM ACTIVE' : 'ROOM INACTIVE'}
         </span>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${isListening ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.07] text-[#8FF0C7]' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/42'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">GEORGE</span>
+          {isListening ? 'LISTENING' : 'READY'}
+        </div>
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${liveRoomActive ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.055] text-[#DCEBFF]/68' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">LIVE</span>
+          {liveRoomActive ? 'ROOM ACTIVE' : 'ROOM INACTIVE'}
+        </div>
+        <div className={`rounded-[0.8rem] border px-3 py-2 ${voiceOn ? 'border-emerald-200/[0.16] bg-emerald-200/[0.055] text-emerald-100/72' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">AUDIO</span>
+          {voiceOn ? 'AUDIO ON' : 'MUTE'}
+        </div>
+      </div>
+
+      <div className="mt-2 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
         <button
           type="button"
           onPointerDown={(event) => {
@@ -6229,7 +6289,13 @@ return (
       el.scrollBy({ top: -96, behavior: 'smooth' })
     }
   }}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) && !showLiveEntrySequence || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "pt-[178px] md:pt-[190px]" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  style={(forceLive || liveMode) && !showLiveEntrySequence && liveStatusStackClearance
+    ? {
+        paddingTop: liveStatusStackClearance,
+        scrollPaddingTop: liveStatusStackClearance,
+      }
+    : undefined}
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) && !showLiveEntrySequence || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -7065,7 +7131,7 @@ I am listening now. Speak naturally. I will respond ${
                       title={voiceOn ? 'Audio on' : 'Audio off'}
                     >
                       <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/60 shadow-[0_0_10px_rgba(110,231,183,0.24)]' : 'bg-white/22'}`} />
-                      {voiceOn ? 'AUDIO' : 'MUTE'}
+                      {voiceOn ? 'AUDIO ON' : 'MUTE'}
                     </button>
                   )}
 
@@ -7296,7 +7362,7 @@ if (liveMode) {
             }`}
             aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
           >
-            {voiceOn ? 'AUDIO ON' : 'AUDIO OFF'}
+            {voiceOn ? 'AUDIO ON' : 'MUTE'}
           </button>
         )}
 
@@ -8133,7 +8199,7 @@ Continue from here, tell me what changed, or start fresh.`
         aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
       >
         <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/70 shadow-[0_0_10px_rgba(110,231,183,0.28)]' : 'bg-white/24'}`} />
-        {voiceOn ? 'AUDIO ON' : 'AUDIO OFF'}
+        {voiceOn ? 'AUDIO ON' : 'MUTE'}
       </button>
 
       {showLiveQuickMenu && (
