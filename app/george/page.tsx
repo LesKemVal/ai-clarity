@@ -1372,49 +1372,6 @@ const liveRoomReceiving =
 const liveStatusStackRef = useRef<HTMLDivElement | null>(null)
 const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
 
-useEffect(() => {
-  if (!(forceLive || liveMode) || showLiveEntrySequence) {
-    setLiveStatusStackClearance(0)
-    return
-  }
-
-  const measure = () => {
-    const node = liveStatusStackRef.current
-    if (!node) return
-    const rect = node.getBoundingClientRect()
-    setLiveStatusStackClearance(Math.ceil(rect.bottom + 18))
-  }
-
-  measure()
-
-  const resizeObserver =
-    typeof ResizeObserver !== 'undefined'
-      ? new ResizeObserver(measure)
-      : null
-
-  if (resizeObserver && liveStatusStackRef.current) {
-    resizeObserver.observe(liveStatusStackRef.current)
-  }
-
-  window.addEventListener('resize', measure)
-
-  return () => {
-    resizeObserver?.disconnect()
-    window.removeEventListener('resize', measure)
-  }
-}, [
-  forceLive,
-  liveMode,
-  showLiveEntrySequence,
-  liveRoomActive,
-  isListening,
-  voiceOn,
-  liveRuntimeSupport?.room,
-  liveRuntimeSupport?.chair,
-  liveRuntimeSupport?.objective,
-])
-
-
     const [stableLiveGuidance, setStableLiveGuidance] = useState<{ signal: string; say: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -1536,6 +1493,49 @@ const liveEntryCheckpointState = useMemo(
     ),
   [liveEntryBriefing, liveEntryResponsibilityConfirmed, liveEntryToaConfirmed]
 )
+
+useEffect(() => {
+  if (!(forceLive || liveMode) || showLiveEntrySequence) {
+    setLiveStatusStackClearance(0)
+    return
+  }
+
+  const measure = () => {
+    const node = liveStatusStackRef.current
+    if (!node) return
+    const rect = node.getBoundingClientRect()
+    setLiveStatusStackClearance(Math.ceil(rect.bottom + 18))
+  }
+
+  measure()
+
+  const resizeObserver =
+    typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(measure)
+      : null
+
+  if (resizeObserver && liveStatusStackRef.current) {
+    resizeObserver.observe(liveStatusStackRef.current)
+  }
+
+  window.addEventListener('resize', measure)
+
+  return () => {
+    resizeObserver?.disconnect()
+    window.removeEventListener('resize', measure)
+  }
+}, [
+  forceLive,
+  liveMode,
+  showLiveEntrySequence,
+  liveRoomActive,
+  isListening,
+  voiceOn,
+  liveRuntimeSupport?.room,
+  liveRuntimeSupport?.chair,
+  liveRuntimeSupport?.objective,
+])
+
 
 useEffect(() => {
   setLiveEntryResponsibilityConfirmed(false)
