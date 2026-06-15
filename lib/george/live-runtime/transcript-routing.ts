@@ -1,3 +1,44 @@
+const LIVE_STEERING_PHRASES = [
+  'one second',
+  'hold on',
+  'give me a second',
+  'give me a moment',
+  'let me think',
+  'say it this way',
+  'say this',
+  'shorter',
+  'line',
+  'bring it back',
+  'hold the line',
+  'close with',
+]
+
+const STANDALONE_FILLER_TOKENS = new Set([
+  'yeah',
+  'okay',
+  'ok',
+  'right',
+  'mm',
+  'uh',
+  'um',
+])
+
+export function isLiveSteeringPhrase(text: string) {
+  const normalized = String(text || '').trim().toLowerCase()
+  if (!normalized) return false
+
+  return LIVE_STEERING_PHRASES.some((phrase) => normalized.includes(phrase))
+}
+
+export function isStandaloneFillerTranscript(text: string) {
+  const normalized = String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"'’“”()[\]{}]/g, '')
+
+  return STANDALONE_FILLER_TOKENS.has(normalized)
+}
+
 export type LiveTranscriptDecision =
   | {
       type: 'ignore'
