@@ -1,3 +1,5 @@
+import { resolveLiveRuntimeAuthority } from './live-runtime-authority'
+
 export type LiveAssistMode = 'cues' | 'lines'
 
 export type LiveRuntimeCostBreakdownItem = {
@@ -270,32 +272,12 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
   }
 
   if (setup?.runtimeSupport || setup?.room || setup?.objective) {
-    const runtimeSupport = setup.runtimeSupport || {}
-
-    const clean = (value: unknown) => String(value || '').trim()
-
-    const room =
-      clean(setup.room) ||
-      clean((runtimeSupport as any).room) ||
-      clean((runtimeSupport as any).purview?.label)
-
-    const objective =
-      clean(setup.objective) ||
-      clean((runtimeSupport as any).objective) ||
-      clean((runtimeSupport as any).purview?.line) ||
-      clean((runtimeSupport as any).purview?.body)
-
-    const chair =
-      clean((setup as any).chair) ||
-      clean((runtimeSupport as any).chair) ||
-      clean((runtimeSupport as any).userPosition)
-
-    const serializedSupport = JSON.stringify({
-      ...runtimeSupport,
-      ...(room ? { room } : {}),
-      ...(objective ? { objective } : {}),
-      ...(chair ? { chair } : {}),
+    const activeRuntimeSupport = resolveLiveRuntimeAuthority({
+      preparedSetup: setup,
+      existingSupport: readActiveLiveRuntimeSupport(),
     })
+
+    const serializedSupport = JSON.stringify(activeRuntimeSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY, serializedSupport)
   } else {
