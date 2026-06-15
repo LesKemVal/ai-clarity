@@ -23,16 +23,20 @@ const STANDALONE_FILLER_TOKENS = new Set([
   'um',
 ])
 
-function isBuyTimeSteeringPhrase(text: string) {
+export function getBuyTimeDurationMs(text: string) {
   const normalized = String(text || '').trim().toLowerCase()
 
-  return [
-    'one second',
-    'hold on',
-    'give me a second',
-    'give me a moment',
-    'let me think',
-  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+  if (normalized === 'one second' || normalized.startsWith('one second ')) return 2500
+  if (normalized === 'hold on' || normalized.startsWith('hold on ')) return 4000
+  if (normalized === 'give me a second' || normalized.startsWith('give me a second ')) return 3500
+  if (normalized === 'give me a moment' || normalized.startsWith('give me a moment ')) return 6000
+  if (normalized === 'let me think' || normalized.startsWith('let me think ')) return 5000
+
+  return 0
+}
+
+function isBuyTimeSteeringPhrase(text: string) {
+  return getBuyTimeDurationMs(text) > 0
 }
 
 export function isLiveSteeringPhrase(text: string) {

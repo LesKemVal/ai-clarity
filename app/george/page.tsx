@@ -40,7 +40,7 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
-import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { getBuyTimeDurationMs, routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -5061,14 +5061,15 @@ return true
       console.info('[GEORGE LIVE LOCAL]', decision.content)
 
       if (decision.content === 'buy_time') {
-        const buyTimeUntil = Date.now() + 2500
+        const buyTimeDurationMs = getBuyTimeDurationMs(text)
+        const buyTimeUntil = Date.now() + buyTimeDurationMs
         liveBuyTimeUntilRef.current = buyTimeUntil
 
         window.setTimeout(() => {
           if (liveBuyTimeUntilRef.current === buyTimeUntil) {
             console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
           }
-        }, 2500)
+        }, buyTimeDurationMs)
       }
 
       return
