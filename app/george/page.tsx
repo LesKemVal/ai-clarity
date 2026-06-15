@@ -4279,8 +4279,7 @@ const handleSend = useCallback(
 
         try {
           const raw =
-            window.localStorage.getItem('GEORGE_LIVE_SETUP') ||
-            window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP')
+            window.localStorage.getItem('george_live_setup_active')
 
           return raw ? JSON.parse(raw) : null
         } catch {
