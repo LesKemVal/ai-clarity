@@ -50,6 +50,10 @@ type LiveTranscriptDecision =
       reason: string
     }
   | {
+      type: 'local'
+      content: string
+    }
+  | {
       type: 'send'
       text: string
     }
@@ -5065,6 +5069,10 @@ return true
     const decision = routeLiveTranscript(clean)
 
     if (decision.type === 'ignore') {
+      return
+    }
+
+    if (decision.type === 'local') {
       return
     }
 
