@@ -43,6 +43,18 @@ import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
+
+type LiveTranscriptDecision =
+  | {
+      type: 'ignore'
+      reason: string
+    }
+  | {
+      type: 'send'
+      text: string
+    }
+
+
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
 const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
 
@@ -5027,7 +5039,7 @@ return true
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
 
-  const routeLiveTranscript = useCallback((text: string) => {
+  const routeLiveTranscript = useCallback((text: string): LiveTranscriptDecision => {
     const now = Date.now()
     const last = lastLiveFinalTranscriptRef.current
 
