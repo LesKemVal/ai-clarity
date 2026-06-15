@@ -22,6 +22,7 @@ export function useLiveAudioRuntime({
   onError,
 }: UseLiveAudioRuntimeParams) {
   const runtimeRef = useRef<LiveAudioRuntime | null>(null)
+  const enabledRef = useRef(enabled)
   const onPartialTranscriptRef = useRef(onPartialTranscript)
   const onFinalTranscriptRef = useRef(onFinalTranscript)
   const onErrorRef = useRef(onError)
@@ -29,10 +30,11 @@ export function useLiveAudioRuntime({
   const [interimTranscript, setInterimTranscript] = useState('')
 
   useEffect(() => {
+    enabledRef.current = enabled
     onPartialTranscriptRef.current = onPartialTranscript
     onFinalTranscriptRef.current = onFinalTranscript
     onErrorRef.current = onError
-  }, [onError, onFinalTranscript, onPartialTranscript])
+  }, [enabled, onError, onFinalTranscript, onPartialTranscript])
 
   const stop = useCallback(() => {
     runtimeRef.current?.stop()
@@ -54,7 +56,7 @@ export function useLiveAudioRuntime({
   }, [stop])
 
   const start = useCallback(() => {
-    if (!enabled) return
+    if (!enabledRef.current) return
 
     runtimeRef.current?.stop()
 
@@ -79,7 +81,7 @@ export function useLiveAudioRuntime({
     })
 
     void runtimeRef.current.start()
-  }, [enabled])
+  }, [])
 
   useEffect(() => {
     if (!enabled) {
