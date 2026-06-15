@@ -1,17 +1,65 @@
-const LIVE_STEERING_PHRASES = [
-  'one second',
-  'hold on',
-  'give me a second',
-  'give me a moment',
-  'let me think',
-  'say it this way',
-  'say this',
-  'shorter',
-  'line',
-  'bring it back',
-  'hold the line',
-  'close with',
-]
+export type LiveSteeringAction =
+  | 'buy_time'
+  | 'repeat_last_line'
+  | 'compress_last_line'
+  | 'say_it_this_way'
+  | 'bring_it_back'
+  | 'hold_the_line'
+  | 'close_with'
+
+export type LiveSteeringPhraseMap = Partial<Record<LiveSteeringAction, string[]>>
+
+export const DEFAULT_LIVE_STEERING_PHRASES: LiveSteeringPhraseMap = {
+  buy_time: [
+    'one second',
+    'hold on',
+    'give me a second',
+    'give me a moment',
+    'let me think',
+  ],
+  repeat_last_line: [
+    'line',
+    'give me the line',
+    'say that again',
+    'repeat that',
+    'repeat it',
+  ],
+  compress_last_line: [
+    'shorter',
+    'make it shorter',
+    'tighten it',
+    'keep it tight',
+    "let's keep this tight",
+    'lets keep this tight',
+  ],
+  say_it_this_way: [
+    'say it this way',
+    'say this',
+  ],
+  bring_it_back: [
+    'bring it back',
+  ],
+  hold_the_line: [
+    'hold the line',
+  ],
+  close_with: [
+    'close with',
+  ],
+}
+
+function normalizeLiveSteeringText(text: string) {
+  return String(text || '').trim().toLowerCase()
+}
+
+function matchesLiveSteeringPhrase(text: string, phrases: string[] = []) {
+  const normalized = normalizeLiveSteeringText(text)
+
+  return phrases.some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+}
+
+function getDefaultSteeringPhrases(action: LiveSteeringAction) {
+  return DEFAULT_LIVE_STEERING_PHRASES[action] || []
+}
 
 const STANDALONE_FILLER_TOKENS = new Set([
   'yeah',
@@ -24,38 +72,21 @@ const STANDALONE_FILLER_TOKENS = new Set([
 ])
 
 function isCompressLineSteeringPhrase(text: string) {
-  const normalized = String(text || '').trim().toLowerCase()
-
-  return [
-    'shorter',
-    'make it shorter',
-    'tighten it',
-    'keep it tight',
-    "let's keep this tight",
-    'lets keep this tight',
-  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+  return matchesLiveSteeringPhrase(text, getDefaultSteeringPhrases('compress_last_line'))
 }
 
 function isRepeatLineSteeringPhrase(text: string) {
-  const normalized = String(text || '').trim().toLowerCase()
-
-  return [
-    'line',
-    'give me the line',
-    'say that again',
-    'repeat that',
-    'repeat it',
-  ].some((phrase) => normalized === phrase || normalized.startsWith(`${phrase} `))
+  return matchesLiveSteeringPhrase(text, getDefaultSteeringPhrases('repeat_last_line'))
 }
 
 export function getBuyTimeDurationMs(text: string) {
-  const normalized = String(text || '').trim().toLowerCase()
+  const normalized = normalizeLiveSteeringText(text)
 
-  if (normalized === 'one second' || normalized.startsWith('one second ')) return 2500
-  if (normalized === 'hold on' || normalized.startsWith('hold on ')) return 4000
-  if (normalized === 'give me a second' || normalized.startsWith('give me a second ')) return 3500
-  if (normalized === 'give me a moment' || normalized.startsWith('give me a moment ')) return 6000
-  if (normalized === 'let me think' || normalized.startsWith('let me think ')) return 5000
+  if (matchesLiveSteeringPhrase(normalized, ['one second'])) return 2500
+  if (matchesLiveSteeringPhrase(normalized, ['hold on'])) return 4000
+  if (matchesLiveSteeringPhrase(normalized, ['give me a second'])) return 3500
+  if (matchesLiveSteeringPhrase(normalized, ['give me a moment'])) return 6000
+  if (matchesLiveSteeringPhrase(normalized, ['let me think'])) return 5000
 
   return 0
 }
@@ -65,10 +96,12 @@ function isBuyTimeSteeringPhrase(text: string) {
 }
 
 export function isLiveSteeringPhrase(text: string) {
-  const normalized = String(text || '').trim().toLowerCase()
+  const normalized = normalizeLiveSteeringText(text)
   if (!normalized) return false
 
-  return LIVE_STEERING_PHRASES.some((phrase) => normalized.includes(phrase))
+  return Object.values(DEFAULT_LIVE_STEERING_PHRASES)
+    .flat()
+    .some((phrase) => normalized.includes(phrase))
 }
 
 export function isStandaloneFillerTranscript(text: string) {
