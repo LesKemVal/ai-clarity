@@ -6708,7 +6708,7 @@ I am listening now. Speak naturally. I will respond ${
       )}
 
       <div className="flex flex-wrap items-center gap-1.5">
-        {getLiveResponseServingTags(m, liveRuntimeSetup?.liveAssistMode).map((tag) => (
+        {getLiveResponseServingTags(m, null).map((tag) => (
           <span
             key={tag}
             className="rounded-full border border-white/[0.055] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/48"
