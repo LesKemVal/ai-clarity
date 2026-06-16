@@ -20,10 +20,10 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => router.push('/george')}
-              className="text-[28px] font-semibold tracking-[-0.08em] text-white/92"
+              className="flex h-[46px] w-[46px] items-center justify-center"
               aria-label="Open GEORGE"
             >
-              Bx
+              <img src="/logofav.png" alt="Bx" className="h-[42px] w-[42px] object-contain opacity-95" />
             </button>
             <div className="text-[13px] uppercase tracking-[0.42em] text-white/76">
               BRANESx
@@ -50,10 +50,12 @@ export default function HomePage() {
               <span className="text-[#BFC7FF]">GEORGE.</span>
             </h1>
 
-            <p className="mt-7 text-[18px] uppercase leading-[1.8] tracking-[0.34em] text-white/86">
-              Plan. Decide.<br />
-              Prepare. Build.
-            </p>
+            <div className="mt-7 inline-block rounded-[18px] border border-white/[0.08] bg-black/35 px-4 py-3 shadow-[0_18px_55px_rgba(0,0,0,0.28)] backdrop-blur-sm">
+              <p className="text-[18px] uppercase leading-[1.8] tracking-[0.34em] text-white/90">
+                Plan. Decide.<br />
+                Prepare. Build.
+              </p>
+            </div>
           </div>
 
           <div className="relative mx-auto my-8 h-[300px] w-full max-w-[520px] sm:h-[360px]">
@@ -96,7 +98,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="-mt-8 border-t border-white/[0.105] pt-5">
+          <div className="-mt-16 border-t border-white/[0.105] pt-5 sm:-mt-20">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"

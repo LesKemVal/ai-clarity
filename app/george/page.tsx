@@ -7670,13 +7670,22 @@ if (liveMode) {
 )}
 
 
+{showExitPopup && (
+  <style>{`
+    .george-live-route {
+      filter: blur(14px);
+      transition: filter 180ms ease;
+    }
+  `}</style>
+)}
+
 {showExitPopup && typeof document !== 'undefined' && createPortal(
   <>
     <button
       type="button"
       aria-label="Close leave LIVE popup"
       onClick={() => setShowExitPopup(false)}
-      className="fixed inset-0 z-[220] bg-black/52 -[14px]"
+      className="fixed inset-0 z-[220] bg-black/58 backdrop-blur-[14px]"
     />
 
     <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">

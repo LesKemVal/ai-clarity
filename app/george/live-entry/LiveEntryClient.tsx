@@ -530,27 +530,46 @@ function PanelShell({
         : 'border-[#AEB6FF]/[0.18]'
 
   return (
-    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
+    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-[#030405] px-4 py-5 text-white">
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 32%), linear-gradient(180deg,#06070A 0%,#080A0F 52%,#06070A 100%)`,
+          background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 30%), linear-gradient(180deg,#030405 0%,#07090E 48%,#030405 100%)`,
         }}
       />
 
-      <section
-        className={`relative z-10 w-full max-w-[560px] rounded-[1.25rem] border ${stageBorder} bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]`}
-      >
-        <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">
-          {label}
+      <div className="relative z-10 w-full max-w-[560px]">
+        <div className="mb-3 flex items-center justify-between px-1">
+          <div className="flex items-center gap-3">
+            <img src="/logofav.png" alt="Bx" className="h-8 w-8 object-contain opacity-95" />
+            <div className="text-[9px] uppercase tracking-[0.34em] text-white/38">
+              BRANESx
+            </div>
+          </div>
         </div>
 
-        <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
-          {title}
-        </h1>
+        <section
+          className={`relative w-full overflow-hidden rounded-[1.45rem] border ${stageBorder} bg-[#080A0E]/[0.92] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.48)]`}
+        >
+          <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/22 to-transparent" />
 
-        {children}
-      </section>
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-[9px] uppercase tracking-[0.32em] text-[#8FB6C9]/58">
+              {label}
+            </div>
+
+            <div className="rounded-full border border-white/[0.07] bg-white/[0.025] px-2.5 py-1 text-[9px] uppercase tracking-[0.18em] text-white/32">
+              Step {stage}
+            </div>
+          </div>
+
+          <h1 className="mt-5 max-w-[460px] text-[28px] font-semibold leading-[1.03] tracking-[-0.055em] text-white/92 sm:text-[32px]">
+            {title}
+          </h1>
+
+          {children}
+        </section>
+      </div>
     </main>
   )
 }
