@@ -2295,36 +2295,11 @@ const mandatoryLiveSignals = useMemo(() => {
 
     setSpokenLiveBriefingStep(liveBriefingStep)
 
-    const name =
-      cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
-      cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
-      cleanBriefingValue(window.localStorage.getItem('george_name')) ||
-      'Lester'
-
     if (liveBriefingStep === 1) {
-      speakLiveEntryLine(`${name}.
-
-You've made it here with enough signal for us to enter the room together.
-
-Review what we've gathered. Edit or confirm by checking the Terms.
-
-We don't move on without it.
-
-I'll wait.`)
+      const name = cleanBriefingValue(sessionEmail).split('@')[0] || 'You'
+      void speakLiveEntryLine(`${name}, you’re here. Edit anything that changed, then check the required box. After that, we move on.`)
     }
-
-    if (liveBriefingStep === 2) {
-      speakLiveEntryLine(`This part is about room constraints.
-
-If circumstances change, GEORGE may adapt quietly in service of your desired outcome.
-
-Adaptation does not always require intervention.`)
-    }
-
-    if (liveBriefingStep === 3) {
-      speakLiveEntryLine("Read this room and we'll read the next one, together.")
-    }
-  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, liveEntryReasoning.roomObservation, liveEntryReasoning.supportSummary])
+  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail])
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return

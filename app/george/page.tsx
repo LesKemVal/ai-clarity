@@ -2772,7 +2772,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setShowConversationMenu(false)
     setShowNormalUtilityMenu(null)
     setShowPromptMenu(false)
-    setActivePromptLabel('Earbuds')
+    setActivePromptLabel('LIVE')
     setActivePromptContext('live_intent_bridge')
     setContextTurnCount(0)
 
@@ -2804,7 +2804,9 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
         }
       } catch {}
 
-      return "If this work moves into a live conversation, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
+      return `If this work becomes a consequential conversation, LIVE may help GEORGE stay with the room in real time.
+
+[LIVE]`
     })()
 
     const bridgeMessage: Message = {
