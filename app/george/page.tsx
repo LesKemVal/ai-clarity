@@ -6088,15 +6088,24 @@ return (
               : 'pt-[68px] md:pt-[78px]'
           } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 xl:px-12`}>
             <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
-              <div className="relative flex w-full max-w-6xl items-center justify-between">
+              
+              {!(forceLive || liveMode) && !showMobileHero && (
+                <div
+                  data-mobile-george-center
+                  className="pointer-events-none absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#D7DBE4]/62 md:hidden"
+                >
+                  GEORGE
+                </div>
+              )}
+<div className="relative flex w-full max-w-6xl items-center justify-between">
                 {!showSidebar && (
 <button
                   type="button"
                   onClick={() => setShowSidebar(true)}
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden"
+                  className="inline-flex h-16 w-16 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden"
                   aria-label="Open GEORGE sidebar"
                 >
-                  <img src="/logofav.png" alt="GEORGE" className="h-10 w-10 object-contain opacity-95" />
+                  <img src="/logofav.png" alt="GEORGE" className="h-16 w-16 object-contain opacity-95" />
                 </button>
 )}
 
@@ -6120,7 +6129,7 @@ return (
                     <button
                       type="button"
                       onClick={handleShareGeorge}
-                      className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                      className="inline-flex h-5 items-center justify-center px-1 text-[6px] font-medium uppercase tracking-[0.08em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/62"
                       aria-label="Share GEORGE context"
                       title="Share GEORGE context"
                     >
@@ -6131,14 +6140,14 @@ return (
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="1.9"
-                          className="h-[14px] w-[14px] text-[#D7DBE4]/54"
+                          className="h-[9px] w-[9px] text-[#D7DBE4]/42"
                         >
                           <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
                           <path d="M12 3v12" />
                           <path d="M8 7l4-4 4 4" />
                         </svg>
 
-                        <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
+                        <span className="tracking-[0.08em] uppercase text-[#D7DBE4]/58">
                           Share
                         </span>
                       </div>
@@ -6149,11 +6158,11 @@ return (
                   <button
                     type="button"
                     onClick={handleShareGeorge}
-                    className="inline-flex h-9 items-center justify-center px-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[#D7DBE4]/42 transition hover:text-[#D7DBE4]/72"
+                    className="inline-flex h-5 items-center justify-center px-1 text-[6px] font-medium uppercase tracking-[0.08em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/62"
                     aria-label="Share GEORGE context"
                     title="Share GEORGE context"
                   >
-                    <span className="tracking-[0.16em] uppercase text-[#D7DBE4]/78">
+                    <span className="tracking-[0.08em] uppercase text-[#D7DBE4]/58">
                       Share
                     </span>
                   </button>
@@ -6209,15 +6218,8 @@ return (
 
             
 
-{!showMobileHero && !(forceLive || liveMode) && (
-  <div className="fixed top-[72px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 md:hidden">
-    <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#D7DBE4]/62">
-      GEORGE
-    </span>
-  </div>
-)}
-{false && !(forceLive || liveMode) && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[168px] z-[34] h-[96px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/92 to-transparent" />
+{!(forceLive || liveMode) && !showMobileHero && (
+  <div className="pointer-events-none fixed left-0 right-0 top-[52px] z-[34] h-[132px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/96 via-[72%] to-transparent md:hidden" />
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
   <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#05060A] via-[#05060A]/96 via-[66%] to-transparent xl:left-[280px]" />
@@ -6332,15 +6334,18 @@ return (
               'Start with your desired outcome.'
             ) : (
               <>
-                <span className="block">Start with your desired outcome.</span>
+                <span className="block text-[15px] leading-[1.3] text-[#D7DBE4]/72">
+                  Start with your desired outcome.
+                </span>
+                <span className="mt-1 block text-[15px] leading-[1.3] text-[#D7DBE4]/72">
+                  Your words create motion.
+                </span>
                 {showGeorgeSupportCopy && (
                   <>
                     <span className="mt-3 block hidden text-[13px] leading-6 text-[#D7DBE4]/42 sm:block">
                       Conversation moves trust, money, care, conflict, opportunity, and work.
                     </span>
-                    <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58">
-                      GEORGE turns words into movement.
-                    </span>
+                    <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58" />
                   </>
                 )}
               </>
@@ -6694,7 +6699,7 @@ I am listening now. Speak naturally. I will respond ${
                   setToastMessage(`Style: ${tone}`)
                   setShowToast(true)
                 }}
-                className="block w-full rounded-lg px-2 py-1.5 text-left text-[11px] text-[#D7DBE4]/70 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
+                className="block w-full rounded-lg px-1.5 py-1.5 text-left text-[11px] text-[#D7DBE4]/70 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
               >
                 More {tone}
               </button>
@@ -6707,7 +6712,7 @@ I am listening now. Speak naturally. I will respond ${
         {getLiveResponseServingTags(m, null).map((tag) => (
           <span
             key={tag}
-            className="rounded-full border border-white/[0.055] bg-white/[0.018] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/48"
+            className="rounded-full border border-white/[0.055] bg-white/[0.018] px-1.5.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/48"
           >
             {tag}
           </span>
@@ -6724,7 +6729,7 @@ I am listening now. Speak naturally. I will respond ${
             setToastMessage('Support type saved')
             setShowToast(true)
           }}
-          className={`ml-1 flex items-center justify-center rounded-full px-1.5 py-1 transition ${
+          className={`ml-1 flex items-center justify-center rounded-full px-1 py-1 transition ${
             feedback[i] === 'up'
               ? 'text-[#8FF0C7]/82'
               : 'text-[#D7DBE4]/42 hover:text-[#D7DBE4]/78'
@@ -6749,7 +6754,7 @@ I am listening now. Speak naturally. I will respond ${
             setToastMessage('Support type saved')
             setShowToast(true)
           }}
-          className={`flex items-center justify-center rounded-full px-1.5 py-1 transition ${
+          className={`flex items-center justify-center rounded-full px-1 py-1 transition ${
             feedback[i] === 'down'
               ? 'text-red-100/82'
               : 'text-[#D7DBE4]/42 hover:text-[#D7DBE4]/78'
@@ -6784,7 +6789,7 @@ I am listening now. Speak naturally. I will respond ${
                   setShowToast(true)
                 } catch {}
               }}
-              className="px-1.5 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
+              className="px-1 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
             >
               Copy
             </button>
@@ -6807,7 +6812,7 @@ I am listening now. Speak naturally. I will respond ${
                   }
                 } catch {}
               }}
-              className="px-1.5 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
+              className="px-1 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
             >
               Share
             </button>
@@ -6815,7 +6820,7 @@ I am listening now. Speak naturally. I will respond ${
             <button
               type="button"
               onClick={() => openLiveEntryFromMessage(m)}
-              className="px-1.5 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
+              className="px-1 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
             >
               Earbuds
             </button>
@@ -6908,7 +6913,7 @@ I am listening now. Speak naturally. I will respond ${
                       setActiveMemoryFolder('Sessions')
                       saveMemory(m, i, 'Sessions')
                     }}
-                    className="rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[10px] font-medium leading-4 text-[#D7DBE4]/76 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
+                    className="rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5.5 py-2 text-[10px] font-medium leading-4 text-[#D7DBE4]/76 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                   >
                     Conversation
                   </button>
@@ -6916,7 +6921,7 @@ I am listening now. Speak naturally. I will respond ${
                   <button
                     type="button"
                     onClick={() => saveGoal(m, i)}
-                    className="rounded-lg border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] px-2.5 py-2 text-[10px] font-medium leading-4 text-[#D7DCFF]/82 transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09]"
+                    className="rounded-lg border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.055] px-1.5.5 py-2 text-[10px] font-medium leading-4 text-[#D7DCFF]/82 transition hover:border-[#AEB6FF]/[0.22] hover:bg-[#AEB6FF]/[0.09]"
                   >
                     Goal
                   </button>
@@ -6931,7 +6936,7 @@ I am listening now. Speak naturally. I will respond ${
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.018] px-2 py-1.5 text-[10px] font-medium text-[#D7DBE4]/76 transition hover:border-white/[0.09] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
+                      className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5 py-1.5 text-[10px] font-medium text-[#D7DBE4]/76 transition hover:border-white/[0.09] hover:bg-white/[0.04] hover:text-[#D7DBE4]"
                     >
                       {folder}
                     </button>
@@ -6945,7 +6950,7 @@ I am listening now. Speak naturally. I will respond ${
                     setActiveMemoryFolder(folder)
                     saveMemory(m, i, folder)
                   }}
-                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-2.5 py-2 text-[11px] font-medium leading-4 text-[#D7DBE4]/86 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
+                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.018] px-1.5.5 py-2 text-[11px] font-medium leading-4 text-[#D7DBE4]/86 transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                 >
                   Remember in {getDefaultFolder()}
                 </button>
@@ -6962,7 +6967,7 @@ I am listening now. Speak naturally. I will respond ${
                             setActiveMemoryFolder(folder)
                             saveMemory(m, i, folder)
                           }}
-                          className={`max-w-full break-words rounded-full border px-2 py-1 text-[10px] leading-4 transition ${
+                          className={`max-w-full break-words rounded-full border px-1.5 py-1 text-[10px] leading-4 transition ${
                             activeMemoryFolder === folder
                               ? 'border-white/[0.09] bg-white/[0.026] text-[#D7DBE4]'
                               : 'border-white/[0.08] text-neutral-300 hover:border-white/[0.12] hover:text-[#D7DBE4]'
@@ -6988,7 +6993,7 @@ I am listening now. Speak naturally. I will respond ${
                       value={newFolderName}
                       onChange={(e) => setNewFolderName(e.target.value)}
                       placeholder="New folder"
-                      className="w-full rounded-xl border border-white/[0.06] bg-black/24 px-2.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] outline-none placeholder:text-neutral-500"
+                      className="w-full rounded-xl border border-white/[0.06] bg-black/24 px-1.5.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] outline-none placeholder:text-neutral-500"
                     />
                     <button
                       type="button"
@@ -6997,7 +7002,7 @@ I am listening now. Speak naturally. I will respond ${
                         setActiveMemoryFolder(folder)
                         saveMemory(m, i, folder)
                       }}
-                      className="w-full rounded-xl border border-white/[0.05] px-2.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] transition hover:border-white/[0.12] hover:bg-white/[0.04]"
+                      className="w-full rounded-xl border border-white/[0.05] px-1.5.5 py-1.5 text-[11px] leading-4 text-[#D7DBE4] transition hover:border-white/[0.12] hover:bg-white/[0.04]"
                     >
                       Remember
                     </button>
@@ -7088,7 +7093,7 @@ I am listening now. Speak naturally. I will respond ${
         </div>
       )}
 
-      <div className="relative mt-2 min-h-6 cursor-text">
+      <div className="relative mt-2 min-h-5 cursor-text">
         <textarea
           ref={textareaRef}
           value={input}
@@ -7357,7 +7362,7 @@ if (liveMode) {
   enterLiveConversation()
 }
 }}
-          className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
+          className={`flex h-9 items-center justify-center px-1.5 text-[12px] font-medium tracking-[0.12em] transition ${
             liveMode
               ? 'border border-red-200/[0.14] bg-red-200/[0.035] text-red-100/62 hover:text-red-100/86'
               : 'text-[#D7DBE4]/80 hover:text-[#D7DBE4]'
@@ -7384,7 +7389,7 @@ if (liveMode) {
               setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
               setShowToast(true)
             }}
-            className={`flex h-9 items-center justify-center px-2 text-[12px] font-medium tracking-[0.12em] transition ${
+            className={`flex h-9 items-center justify-center px-1.5 text-[12px] font-medium tracking-[0.12em] transition ${
               voiceOn
                 ? 'text-emerald-100/72 hover:text-emerald-100'
                 : 'text-[#D7DBE4]/46 hover:text-[#D7DBE4]/78'
@@ -7490,7 +7495,7 @@ if (liveMode) {
                             {item.preview || (item.content || '').slice(0, 80)}
                           </span>
                           {isLatest && (
-                            <span className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[9px] uppercase tracking-[0.16em] text-[#D7DBE4]/45">
+                            <span className="rounded-full bg-white/[0.05] px-1.5 py-0.5 text-[9px] uppercase tracking-[0.16em] text-[#D7DBE4]/45">
                               recent
                             </span>
                           )}
@@ -7534,7 +7539,7 @@ if (liveMode) {
       {showPromptMenu && (
         <div
           ref={promptMenuRef}
-          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-2.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
+          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-1.5.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]">
           <div className="space-y-1">
             <button
               type="button"
@@ -7951,7 +7956,7 @@ Continue from here, tell me what changed, or start fresh.`
                     {session.title || session.label || session.name || 'Conversation'}
                   </div>
 
-                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-[0.14em] ${
+                  <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold tracking-[0.14em] ${
                     sessionPickerMode === 'campaign'
                       ? 'bg-white/[0.026] text-[#D7DBE4]/72'
                       : 'bg-white/[0.022] text-[#D7DBE4]/52'
@@ -7983,7 +7988,7 @@ Continue from here, tell me what changed, or start fresh.`
                       setToastMessage('Session deleted.')
                       setShowToast(true)
                     }}
-                    className="rounded-full bg-red-400/[0.045] px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-red-100/82 transition hover:bg-red-400/[0.08]"
+                    className="rounded-full bg-red-400/[0.045] px-1.5.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-red-100/82 transition hover:bg-red-400/[0.08]"
                   >
                     CONFIRM
                   </button>
@@ -7993,7 +7998,7 @@ Continue from here, tell me what changed, or start fresh.`
                     onClick={() => {
                       setPendingDeleteSessionId(session.id)
                     }}
-                    className="rounded-full px-2 py-1 text-[14px] text-[#D7DBE4]/38 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
+                    className="rounded-full px-1.5 py-1 text-[14px] text-[#D7DBE4]/38 transition hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
                   >
                     ⋯
                   </button>
@@ -8197,7 +8202,7 @@ Continue from here, tell me what changed, or start fresh.`
           setActiveHelpTopic('live')
           setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
         }}
-        className="px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-red-100/52 hover:text-red-100/82 ${operationalMotion.press}"
+        className="px-1 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-red-100/52 hover:text-red-100/82 ${operationalMotion.press}"
       >
         HELP
       </button>
@@ -8210,7 +8215,7 @@ Continue from here, tell me what changed, or start fresh.`
           setShowLanguageMenu(false)
           setShowLiveQuickMenu((value) => !value)
         }}
-        className="inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
+        className="inline-flex items-center gap-2 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#D7DBE4]/52 ${operationalMotion.hoverText} ${operationalMotion.press}"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-red-200/36 shadow-[0_0_10px_rgba(248,113,113,0.18)]" />
         EXIT
@@ -8233,7 +8238,7 @@ Continue from here, tell me what changed, or start fresh.`
           setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
           setShowToast(true)
         }}
-        className={`inline-flex items-center gap-2 px-1.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${voiceOn ? 'text-[#D7DBE4]/72' : 'text-[#D7DBE4]/38'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
+        className={`inline-flex items-center gap-2 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${voiceOn ? 'text-[#D7DBE4]/72' : 'text-[#D7DBE4]/38'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
         aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
       >
         <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/70 shadow-[0_0_10px_rgba(110,231,183,0.28)]' : 'bg-white/24'}`} />
@@ -8258,7 +8263,7 @@ Continue from here, tell me what changed, or start fresh.`
               type="button"
               aria-label="Close LIVE controls"
               onClick={() => setShowLiveQuickMenu(false)}
-              className="rounded-full border border-white/[0.06] px-2 py-0.5 text-[12px] leading-none text-white/44 transition hover:bg-white/[0.04] hover:text-white"
+              className="rounded-full border border-white/[0.06] px-1.5 py-0.5 text-[12px] leading-none text-white/44 transition hover:bg-white/[0.04] hover:text-white"
             >
               ×
             </button>
@@ -8459,7 +8464,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         }}
                       />
                       {pendingImage && (
-                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#05080D]/88 px-2 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
+                        <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#05080D]/88 px-1.5 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
                           <div className="relative h-10 w-10 shrink-0">
                             <img
                               src={pendingImage.dataUrl}
@@ -8975,7 +8980,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
               <button
                 type="button"
                 onClick={() => setShowCampaignUpgradeGate(false)}
-                className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
+                className="rounded-full border border-white/[0.06] bg-white/[0.03] px-1.5.5 py-1 text-[11px] text-neutral-500 transition hover:border-white/25 hover:bg-white/[0.022] hover:text-[#D7DBE4]/92"
               >
                 Close
               </button>

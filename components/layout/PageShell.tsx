@@ -37,6 +37,18 @@ export default function PageShell({
   }
 
   const handleBack = () => {
+    if (typeof window === 'undefined') return
+
+    try {
+      window.localStorage.removeItem('george_restore_normal_session_id')
+      window.localStorage.removeItem('george_return_to_last_active_session')
+    } catch {}
+
+    if (window.history.length > 1) {
+      window.history.back()
+      return
+    }
+
     window.location.href = '/george'
   }
 
@@ -145,7 +157,7 @@ export default function PageShell({
                 <button
                   type="button"
                   onClick={handleInstallGeorge}
-                  className="inline-flex h-8 shrink-0 items-center justify-center rounded-[0.65rem] border border-white/[0.06] bg-white/[0.014] px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/[0.12] hover:bg-white/[0.03] hover:text-white/82"
+                  className="inline-flex h-5 shrink-0 items-center justify-center rounded-[0.5rem] border border-white/[0.04] bg-white/[0.01] px-1.5 text-[6px] font-semibold uppercase tracking-[0.08em] text-white/38 transition hover:border-white/[0.08] hover:bg-white/[0.02] hover:text-white/62"
                   aria-label="Share G."
                   title="Share G."
                 >
@@ -157,7 +169,7 @@ export default function PageShell({
             {(eyebrow || title) && (
               <div className="mb-6 space-y-1.5 md:mb-7">
                 {eyebrow && (
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/30">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-white/30">
                     {eyebrow}
                   </p>
                 )}

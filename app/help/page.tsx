@@ -26,7 +26,7 @@ const HELP_ITEMS: Array<{
     index: '01',
     label: 'GEORGE',
     title: 'Brilliant operational awareness.',
-    body: 'GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be. Start with your desired outcome.',
+    body: 'GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be.',
     utility: 'Where you are → where you want to be.',
     accent: true,
   },
