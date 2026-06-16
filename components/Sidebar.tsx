@@ -315,7 +315,7 @@ export default function Sidebar({
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     Runtime: true,
     Access: true,
-    Sessions: false,
+    Sessions: true,
   })
 
   const toggleGroup = (title: string) => {
@@ -403,21 +403,12 @@ return (
                   setShowSidebar?.(false)
                   onOpenLiveGate()
                 }}
-                className={linkClass('/george')}
+                className="inline-flex rounded-[0.7rem] border border-[#8FB6C9]/[0.28] bg-[#8FB6C9]/[0.16] px-5 py-2 text-[13px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/88 shadow-[0_0_24px_rgba(143,182,201,0.10)] transition hover:border-[#8FB6C9]/[0.42] hover:bg-[#8FB6C9]/[0.22] hover:text-white active:scale-[0.98]"
               >
                 LIVE
               </button>
             </div>
 
-            <div className="mt-4 px-3 text-[11px] uppercase tracking-[0.2em] text-white/28">
-              Support
-            </div>
-
-            <div className="mt-2 space-y-1">
-              <a href="/help" className={linkClass('/help')}>
-                Help
-              </a>
-            </div>
           </section>
 
           {!isLiveRoute && (
@@ -425,7 +416,7 @@ return (
             <button
               type="button"
               onClick={() => toggleGroup('Progress')}
-              className="flex w-full items-center justify-between text-left"
+              className="flex w-full items-center justify-between px-3 text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/34">
                 Objectives
@@ -469,23 +460,28 @@ return (
           </section>
           )}
 
+          <section className="border-t border-white/[0.035] pt-4">
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
+              Governance
+            </div>
+
+            <div className="mt-2 space-y-0.5">
+              <a href="/help" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+                Help
+              </a>
+              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+                Terms
+              </a>
+            </div>
+          </section>
+
           {!isLiveRoute && normalSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
-            <button
-              type="button"
-              onClick={() => toggleGroup('Sessions')}
-              className="flex w-full items-center justify-between text-left"
-            >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                Sessions
-              </span>
-              <span className="text-[11px] text-white/20">
-                {openGroups.Sessions ? '▾' : '▸'}
-              </span>
-            </button>
+            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/26">
+              Sessions
+            </div>
 
-            {openGroups.Sessions && normalSessions.length > 0 && (
-              <div className="mt-3 space-y-1">
+            <div className="mt-3 space-y-1">
                 {normalSessions.map((session) => (
                   <div key={session.id} className="group relative flex items-center rounded-[0.55rem] hover:bg-white/[0.014]">
                     <button
@@ -563,45 +559,11 @@ return (
                   </div>
                 ))}
               </div>
-            )}
           </section>
           )}
 
-          <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Governance
-            </div>
 
-            <div className="mt-2 space-y-0.5">
-              <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
-                Terms
-              </a>
-            </div>
-          </section>
 
-          <section className="border-t border-white/[0.035] pt-4">
-            <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/22">
-              Resources
-            </div>
-
-            <div className="mt-3 grid gap-1.5 px-3 text-[11px] leading-5">
-              <a target="_blank" rel="noopener noreferrer" href="https://988lifeline.org" className="text-white/30 transition hover:text-white/56">
-                988 Lifeline
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.stopbullying.gov" className="text-white/30 transition hover:text-white/56">
-                StopBullying.gov
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.rainn.org" className="text-white/30 transition hover:text-white/56">
-                RAINN
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://www.lsc.gov" className="text-white/30 transition hover:text-white/56">
-                Legal Aid
-              </a>
-              <a target="_blank" rel="noopener noreferrer" href="https://brokercheck.finra.org" className="text-white/30 transition hover:text-white/56">
-                BrokerCheck
-              </a>
-            </div>
-          </section>
 
           {isLiveRoute && liveSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">

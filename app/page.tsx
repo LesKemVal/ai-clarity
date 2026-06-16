@@ -55,6 +55,10 @@ export default function HomePage() {
                 Plan. Decide.<br />
                 Prepare. Build.
               </p>
+
+              <p className="mt-4 max-w-[520px] text-[12px] uppercase leading-6 tracking-[0.22em] text-white/54">
+                Use GEORGE LIVE during interviews, negotiations, presentations, board meetings, doctor visits, and everyday conversations.
+              </p>
             </div>
           </div>
 
@@ -98,7 +102,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="-mt-16 border-t border-white/[0.105] pt-5 sm:-mt-20">
+          <div className="-mt-24 border-t border-white/[0.105] pt-5 sm:-mt-28">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
