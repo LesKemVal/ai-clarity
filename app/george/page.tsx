@@ -4471,6 +4471,7 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
         setVoiceError('')
         setConversationSignal('LIVE identity')
         setIsThinking(false)
+        void speakText(assistantMessage.content)
         return
       }
 
@@ -5120,6 +5121,7 @@ return true
     if (!clean) return
 
     const decision = routeCurrentLiveTranscript(clean)
+    console.info('[GEORGE LIVE TRANSCRIPT]', { clean, decision })
 
     if (decision.type === 'ignore') {
       return
@@ -5130,6 +5132,8 @@ return true
       transcript: text,
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
     })
+
+    console.info('[GEORGE LIVE ACTION]', action)
 
     if (action.type === 'ignore') {
       return
