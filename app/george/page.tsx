@@ -40,9 +40,9 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
-import { getBuyTimeDurationMs, routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
-import { compressLiveLine } from '@/lib/george/live-runtime/line-transforms'
+import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -5125,40 +5125,39 @@ return true
       return
     }
 
-    if (decision.type === 'local') {
-      console.info('[GEORGE LIVE LOCAL]', decision.content)
+    const action = resolveLiveTranscriptDecision({
+      decision,
+      transcript: text,
+      lastSpokenLine: liveLastSpokenUtteranceRef.current,
+    })
 
-      if (decision.content === 'buy_time') {
-        const buyTimeDurationMs = getBuyTimeDurationMs(text)
-        const buyTimeUntil = Date.now() + buyTimeDurationMs
-        liveBuyTimeUntilRef.current = buyTimeUntil
+    if (action.type === 'ignore') {
+      return
+    }
 
-        window.setTimeout(() => {
-          if (liveBuyTimeUntilRef.current === buyTimeUntil) {
-            console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
-          }
-        }, buyTimeDurationMs)
-      }
+    if (action.type === 'start_buy_time') {
+      console.info('[GEORGE LIVE LOCAL]', 'buy_time')
 
-      if (decision.content === 'repeat_last_line') {
-        const lastLine = liveLastSpokenUtteranceRef.current.trim()
-        if (lastLine) {
-          void speakText(lastLine)
+      const buyTimeUntil = Date.now() + action.durationMs
+      liveBuyTimeUntilRef.current = buyTimeUntil
+
+      window.setTimeout(() => {
+        if (liveBuyTimeUntilRef.current === buyTimeUntil) {
+          console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
         }
-      }
-
-      if (decision.content === 'compress_last_line') {
-        const compressedLine = compressLiveLine(liveLastSpokenUtteranceRef.current)
-        if (compressedLine) {
-          void speakText(compressedLine)
-        }
-      }
+      }, action.durationMs)
 
       return
     }
 
-    if (decision.type === 'send') {
-      void handleSend(decision.text, { source: 'live_transcript' })
+    if (action.type === 'speak') {
+      console.info('[GEORGE LIVE LOCAL]', 'speak')
+      void speakText(action.text)
+      return
+    }
+
+    if (action.type === 'send') {
+      void handleSend(action.text, { source: 'live_transcript' })
     }
   }, [handleSend, routeCurrentLiveTranscript, speakText])
 
