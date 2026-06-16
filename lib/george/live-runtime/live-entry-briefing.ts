@@ -187,3 +187,128 @@ export function buildLiveEntryBriefing(input: LiveEntryBriefingInput) {
     'Then let’s go to work.',
   ].filter(Boolean).join('\n')
 }
+
+
+export type OutcomeTestedBriefingSupportKind = 'risk' | 'opportunity' | 'previousPattern'
+
+export type OutcomeTestedBriefingSupportItem = {
+  id: OutcomeTestedBriefingSupportKind
+  label: string
+  line: string
+  detail: string
+  why: string
+}
+
+export function buildOutcomeTestedBriefingSupport({
+  room,
+  audience,
+  objective,
+  observedReality,
+  previousPattern,
+}: {
+  room: string
+  audience: string
+  objective: string
+  observedReality: string
+  previousPattern?: string
+}): OutcomeTestedBriefingSupportItem[] {
+  const outcome = clean(objective)
+  const reality = clean(observedReality)
+  const prior = clean(previousPattern)
+  const signal = `${room} ${audience} ${outcome} ${reality} ${prior}`.toLowerCase()
+
+  if (!outcome || outcome === 'the desired outcome' || !reality) {
+    return []
+  }
+
+  const items: OutcomeTestedBriefingSupportItem[] = []
+
+  if (/investor|capital|fundraising|raise|fund|valuation|terms/.test(signal)) {
+    items.push({
+      id: 'risk',
+      label: 'Risk',
+      line: 'Credibility, traction, terms, or risk control may decide whether the room moves forward.',
+      detail: `Because the stated outcome is “${outcome},” GEORGE should watch for hesitation around proof, control, valuation, or next steps.`,
+      why: 'Capital rooms usually turn on confidence in execution and whether the next step feels justified.',
+    })
+    items.push({
+      id: 'opportunity',
+      label: 'Opportunity',
+      line: 'A clear next step may matter more than a longer explanation.',
+      detail: 'If the room shows interest, GEORGE should help preserve momentum and move toward a specific next action.',
+      why: 'Investor interest can fade when the conversation becomes broad instead of actionable.',
+    })
+  } else if (/interview|candidate|hiring|job|recruiter/.test(signal)) {
+    items.push({
+      id: 'risk',
+      label: 'Risk',
+      line: 'Broad answers may weaken proof.',
+      detail: `Because the stated outcome is “${outcome},” GEORGE should help return answers to specific examples, judgment, and fit.`,
+      why: 'Interview rooms often reward evidence more than polish.',
+    })
+    items.push({
+      id: 'opportunity',
+      label: 'Opportunity',
+      line: 'A strong example can shift the room from evaluation to confidence.',
+      detail: 'GEORGE should help identify moments where a concrete story or result would improve the answer.',
+      why: 'Examples make capability easier for the other side to trust.',
+    })
+  } else if (/doctor|medical|patient|symptom|treatment|physician/.test(signal)) {
+    items.push({
+      id: 'risk',
+      label: 'Risk',
+      line: 'Important facts or next steps may remain unclear.',
+      detail: `Because the stated outcome is “${outcome},” GEORGE should watch for unanswered questions, missing timelines, and unclear follow-up.`,
+      why: 'Medical conversations depend on accuracy, sequence, and usable next steps.',
+    })
+    items.push({
+      id: 'opportunity',
+      label: 'Opportunity',
+      line: 'Clear questions can improve the usefulness of the visit.',
+      detail: 'GEORGE should help organize symptoms, concerns, options, and follow-up questions without inventing facts.',
+      why: 'Prepared questions help the user advocate while preserving responsibility.',
+    })
+  } else if (/negotiat|offer|deal|price|counter|buyer|seller|terms/.test(signal)) {
+    items.push({
+      id: 'risk',
+      label: 'Risk',
+      line: 'Pressure may create premature concession.',
+      detail: `Because the stated outcome is “${outcome},” GEORGE should watch pace, leverage, unclear terms, and moments where silence is stronger than filling space.`,
+      why: 'Negotiation outcomes often change through timing and restraint.',
+    })
+    items.push({
+      id: 'opportunity',
+      label: 'Opportunity',
+      line: 'A precise question may create more leverage than an immediate answer.',
+      detail: 'GEORGE should help slow the room, clarify terms, and protect the user from accepting ambiguity too early.',
+      why: 'Questions can reveal flexibility, pressure, or hidden constraints.',
+    })
+  } else {
+    items.push({
+      id: 'risk',
+      label: 'Risk',
+      line: 'The conversation may drift away from the desired outcome.',
+      detail: `Because the stated outcome is “${outcome},” GEORGE should watch for confusion, pressure, unanswered questions, or loss of direction.`,
+      why: 'Most consequential rooms change when attention moves away from the real objective.',
+    })
+    items.push({
+      id: 'opportunity',
+      label: 'Opportunity',
+      line: 'Returning to the objective may improve the probability of success.',
+      detail: 'GEORGE should help identify moments where a clarifying question, summary, or next step would restore movement.',
+      why: 'Outcome-centered language keeps the room from becoming generic conversation.',
+    })
+  }
+
+  if (prior) {
+    items.push({
+      id: 'previousPattern',
+      label: 'Previous Pattern',
+      line: prior,
+      detail: 'GEORGE should treat this as historical signal only if it improves the probability of reaching the current desired outcome.',
+      why: 'Past patterns are useful only when they change preparation, timing, risk, or opportunity in the current room.',
+    })
+  }
+
+  return items.slice(0, 3)
+}

@@ -8,6 +8,7 @@ import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtim
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 import { deriveRoomFormation } from '@/lib/george/live/prep-room'
+import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/live-entry-briefing'
 import {
   DEFAULT_LIVE_RECOVERY_SELECTION,
   GEORGE_LIVE_RECOVERY_STORAGE_KEY,
@@ -861,6 +862,8 @@ export default function LiveEntryClient() {
   const [showResumeConversationList, setShowResumeConversationList] = useState(false)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false)
+  const [outcomeSupportDismissedIds, setOutcomeSupportDismissedIds] = useState<string[]>([])
+  const [outcomeSupportEdits, setOutcomeSupportEdits] = useState<Record<string, string>>({})
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false)
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
@@ -2637,6 +2640,16 @@ Adaptation does not always require intervention.`)
     const canBeginLiveFromBriefing = liveBriefingReadyToContinue && previousLiveUserRecognized && hasSeenLiveSteering
 
     const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, liveAssistMode)
+    const outcomeTestedSupportItems = buildOutcomeTestedBriefingSupport({
+      room: roomLabel,
+      audience: audienceLabel,
+      objective: objectiveLabel,
+      observedReality: knownContext,
+      previousPattern:
+        cleanBriefingValue((preLiveSignals as any).lastSummary) ||
+        cleanBriefingValue((preLiveSignals as any).previousPattern) ||
+        cleanBriefingValue((optionalSignalAnswers as any).previousPattern),
+    }).filter((item) => !outcomeSupportDismissedIds.includes(item.id))
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
 
@@ -2968,6 +2981,76 @@ Adaptation does not always require intervention.`)
             <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/42">
               Your choice becomes the default for future LIVE conversations until you change it.
             </div>
+
+            {outcomeTestedSupportItems.length > 0 && (
+              <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.12] bg-[#080A10]/[0.62] px-4 py-4">
+                <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
+                  GEORGE Support · Optional
+                </div>
+
+                <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/50">
+                  Outcome-tested support. Use it, dismiss it, or edit it before LIVE.
+                </p>
+
+                <div className="mt-4 space-y-3">
+                  {outcomeTestedSupportItems.map((item) => {
+                    const editedLine = outcomeSupportEdits[item.id] ?? item.line
+
+                    return (
+                      <div key={item.id} className="rounded-[0.72rem] border border-white/[0.06] bg-black/[0.18] p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-[10px] uppercase tracking-[0.22em] text-[#8FB6C9]/70">
+                              {item.label}
+                            </div>
+                            <div className="mt-1 text-[13px] font-semibold leading-5 text-[#F2F4FF]/82">
+                              {editedLine}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOutcomeSupportDismissedIds((previous) =>
+                                previous.includes(item.id) ? previous : [...previous, item.id]
+                              )
+                            }
+                            className="text-[10px] uppercase tracking-[0.18em] text-white/28 transition hover:text-white/60"
+                          >
+                            Dismiss
+                          </button>
+                        </div>
+
+                        <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/48">
+                          {item.detail}
+                        </p>
+
+                        <textarea
+                          value={editedLine}
+                          onChange={(event) =>
+                            setOutcomeSupportEdits((previous) => ({
+                              ...previous,
+                              [item.id]: event.target.value,
+                            }))
+                          }
+                          rows={2}
+                          className="mt-3 w-full resize-none rounded-[0.65rem] border border-white/[0.06] bg-white/[0.026] px-3 py-2 text-[12px] leading-5 text-[#D7DBE4]/74 outline-none transition placeholder:text-white/18 focus:border-[#8FB6C9]/36 focus:bg-[#8FB6C9]/[0.035]"
+                        />
+
+                        <details className="mt-2">
+                          <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
+                            Why this
+                          </summary>
+                          <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/38">
+                            {item.why}
+                          </p>
+                        </details>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
