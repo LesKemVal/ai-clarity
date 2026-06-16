@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import BxPageHeader from '@/components/BxPageHeader'
-import { getActiveSessionForMode } from '@/lib/george/session/store'
+import { getActiveSessionForMode, getSessionsForMode, setActiveSessionIdForMode } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
@@ -858,6 +858,7 @@ export default function LiveEntryClient() {
   const [roomPhraseFocused, setRoomPhraseFocused] = useState(false)
   const [typedRoomPhraseExample, setTypedRoomPhraseExample] = useState('')
   const [hasLiveSession, setHasLiveSession] = useState(false)
+  const [showResumeConversationList, setShowResumeConversationList] = useState(false)
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false)
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
@@ -1716,6 +1717,40 @@ const mandatoryLiveSignals = useMemo(() => {
     }
   }
 
+  const resumeLiveConversation = (session: any) => {
+    if (!session) return
+
+    const metadata = session.metadata || {}
+    const restoredOutcome = String(metadata.desiredOutcome || session.userGoal || session.currentGoal || '').trim()
+    const restoredAudience = String(metadata.audience || metadata.audienceType || metadata.targetAudience || '').trim()
+    const restoredChair = String(metadata.chair || metadata.userPosition || '').trim()
+    const restoredContext = String(metadata.observedReality || metadata.knownContext || session.lastKnownState || session.summary || '').trim()
+
+    setRelatedSessionId(session.id)
+    setObjective(restoredOutcome)
+    setAudienceType(restoredAudience)
+    setUserPosition(restoredChair || 'Seeking')
+    setChairs(restoredChair ? [restoredChair] : [])
+    setKnownContext(restoredContext)
+    setActiveSessionIdForMode('live', session.id)
+
+    setShowResumeConversationList(false)
+    setShowPrepPreview(false)
+    setShowOpenAISignalSurface(false)
+    setCurrentOptionalSignalQuestion(null)
+    setOptionalSignalLoading(false)
+    setLiveEntryMandatoryMode(false)
+    setLiveBriefingStep(1)
+    setLiveBriefingToaAccepted(false)
+    setLiveBriefingSupportAccepted(false)
+    setLiveRecoveryAcknowledged(false)
+    setLiveReadyAccepted(false)
+    setLiveBriefingProofReply('')
+    setLiveBriefingSttError('')
+    setSpokenLiveBriefingStep(null)
+    setShowLiveBriefingRoom(true)
+  }
+
   const editPrepRoomResource = <K extends keyof PrepRoomResourceProfile>(
     key: K,
     value: PrepRoomResourceProfile[K]
@@ -2458,6 +2493,59 @@ Adaptation does not always require intervention.`)
     )
   }
 
+  if (showResumeConversationList) {
+    const liveSessions = getSessionsForMode('live').filter((session: any) => !session.archived)
+
+    return (
+      <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
+        <div className="w-full max-w-[440px] rounded-[1.25rem] border border-white/[0.07] bg-[#05080D]/92 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.48)]">
+          <div className="flex items-center justify-between gap-4 border-b border-white/[0.06] pb-3">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.26em] text-white/30">Resume Conversation</div>
+              <div className="mt-1 text-[14px] text-white/70">Choose the room to brief before LIVE.</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowResumeConversationList(false)}
+              className="rounded-full border border-white/[0.08] px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-white/44 hover:border-white/[0.18] hover:text-white/72"
+            >
+              Back
+            </button>
+          </div>
+
+          <div className="mt-3 max-h-[58dvh] space-y-2 overflow-y-auto pr-1">
+            {liveSessions.length === 0 ? (
+              <div className="rounded-[1rem] border border-white/[0.06] bg-white/[0.02] p-4 text-[13px] leading-6 text-white/42">
+                No saved LIVE conversations yet.
+              </div>
+            ) : (
+              liveSessions.slice(0, 12).map((session: any) => {
+                const metadata = session.metadata || {}
+                const outcome = metadata.desiredOutcome || session.userGoal || session.currentGoal || 'Outcome not set'
+                const audience = metadata.audience || metadata.audienceType || metadata.targetAudience || 'Audience not set'
+                const updated = session.updatedAt ? new Date(session.updatedAt).toLocaleDateString() : 'Recent'
+
+                return (
+                  <button
+                    key={session.id}
+                    type="button"
+                    onClick={() => resumeLiveConversation(session)}
+                    className="block w-full rounded-[1rem] border border-white/[0.065] bg-white/[0.018] p-4 text-left transition hover:border-[#BFC7FF]/28 hover:bg-[#BFC7FF]/[0.055]"
+                  >
+                    <div className="text-[14px] font-medium text-white/78">{session.title || 'LIVE Conversation'}</div>
+                    <div className="mt-2 text-[12px] leading-5 text-white/44">Outcome: {String(outcome)}</div>
+                    <div className="text-[12px] leading-5 text-white/34">Audience: {String(audience)}</div>
+                    <div className="mt-2 text-[10px] uppercase tracking-[0.2em] text-white/22">Last active: {updated}</div>
+                  </button>
+                )
+              })
+            )}
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
     return (
       <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
@@ -3048,6 +3136,16 @@ Adaptation does not always require intervention.`)
           <p className="mt-3 text-[14px] leading-6 text-white/46">
             You can start LIVE now, but more signal betters your experience.
           </p>
+
+          {hasLiveSession && (
+            <button
+              type="button"
+              onClick={() => setShowResumeConversationList(true)}
+              className="mt-3 w-full rounded-[0.82rem] border border-[#D7DCFF]/[0.16] bg-[#D7DCFF]/[0.055] px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/76 transition hover:border-[#D7DCFF]/30 hover:bg-[#D7DCFF]/[0.10] hover:text-white"
+            >
+              Resume Conversation
+            </button>
+          )}
 
           {runtimeMotionContext && (
             <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
