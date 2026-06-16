@@ -1,13 +1,50 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const router = useRouter()
+  const liveSituations = ['interviews', 'negotiations', 'presentations', 'board meetings', 'Everyday conversations!']
+  const [typedSituation, setTypedSituation] = useState('')
+
+  useEffect(() => {
+    let situationIndex = 0
+    let characterIndex = 0
+    let timer: number | undefined
+
+    const typeNext = () => {
+      const currentSituation = liveSituations[situationIndex]
+
+      characterIndex += 1
+      setTypedSituation(currentSituation.slice(0, characterIndex))
+
+      if (characterIndex < currentSituation.length) {
+        timer = window.setTimeout(typeNext, 75)
+        return
+      }
+
+      const isLast = situationIndex === liveSituations.length - 1
+
+      timer = window.setTimeout(() => {
+        characterIndex = 0
+        situationIndex = isLast ? 0 : situationIndex + 1
+        setTypedSituation('')
+        timer = window.setTimeout(typeNext, 160)
+      }, isLast ? 2000 : 250)
+    }
+
+    setTypedSituation('')
+    timer = window.setTimeout(typeNext, 250)
+
+    return () => {
+      if (timer) window.clearTimeout(timer)
+    }
+  }, [])
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
-    router.push('/george/live-entry?source=start')
+    window.location.assign('/george/live-entry?source=start')
   }
 
   return (
@@ -57,7 +94,11 @@ export default function HomePage() {
               </p>
 
               <p className="mt-4 max-w-[520px] text-[12px] uppercase leading-6 tracking-[0.22em] text-white/54">
-                Use GEORGE LIVE during interviews, negotiations, presentations, board meetings, doctor visits, and everyday conversations.
+                Use GEORGE LIVE during{' '}
+                <span className="inline-block min-w-[210px] text-left text-[#D7DCFF]/78">
+                  {typedSituation}
+                  <span className="ml-0.5 inline-block h-[14px] w-px translate-y-[2px] animate-pulse bg-[#D7DCFF]/70" />
+                </span>
               </p>
             </div>
           </div>
@@ -106,8 +147,8 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => router.push('/george')}
-                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_16px_44px_rgba(255,255,255,0.18)] active:translate-y-0"
+                onClick={() => window.location.assign('/george')}
+                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:-translate-y-[1px] hover:shadow-[0_12px_34px_rgba(255,255,255,0.16)] active:opacity-90"
               >
                 <span>Ask GEORGE</span>
                 <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1">→</span>
@@ -116,7 +157,7 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={startLive}
-                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-300 hover:bg-[#D2D7FF] hover:shadow-[0_16px_48px_rgba(191,199,255,0.30)] active:scale-[0.985]"
+                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:bg-[#D2D7FF] hover:shadow-[0_12px_36px_rgba(191,199,255,0.26)] active:opacity-90"
               >
                 <span>Go LIVE</span>
                 <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-6">→</span>

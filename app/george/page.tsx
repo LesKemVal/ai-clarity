@@ -43,6 +43,7 @@ import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { getBuyTimeDurationMs, routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { compressLiveLine } from '@/lib/george/live-runtime/line-transforms'
+import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -4440,6 +4441,30 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
       }
 
 
+
+      if ((forceLive || liveMode) && isLiveIdentityQuestion(text)) {
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: buildLiveSelfDescription(),
+          source: 'system_override',
+        }
+
+        const nextMessages: Message[] = [
+          ...messagesRef.current,
+          ...(userMessage ? [userMessage] : []),
+          assistantMessage,
+        ]
+
+        setMessages(nextMessages)
+        messagesRef.current = nextMessages
+        setInput('')
+        setPendingImage(null)
+        setInterimTranscript('')
+        setVoiceError('')
+        setConversationSignal('LIVE identity')
+        setIsThinking(false)
+        return
+      }
 
       if (!firstResponseOverride && activeDomain === 'credit') {
         const t = text.toLowerCase()
