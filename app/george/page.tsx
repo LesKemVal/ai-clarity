@@ -6104,10 +6104,11 @@ return (
                     if (!showSidebar) setShowSidebar(true)
                   }}
                   disabled={showSidebar}
-                  className={`inline-flex h-16 w-16 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-[18px] text-[#D7DBE4]/58 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/90 active:scale-[0.96] xl:hidden ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
                   aria-label="Open GEORGE sidebar"
+                  title="Open"
                 >
-                  <img src="/logofav.png" alt="GEORGE" className="h-16 w-16 object-contain opacity-95" />
+                  ←
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">

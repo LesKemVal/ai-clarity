@@ -16,7 +16,7 @@ export default function BxPageHeader({
   return (
     <header className="relative mb-5 flex items-center justify-between">
       <div className="flex min-w-0 items-center gap-3">
-        <Link href="/george" aria-label="Go to GEORGE" className="group flex h-10 w-10 shrink-0 items-center justify-center">
+        <Link href="/" aria-label="Go to BRANESx home" className="group flex h-10 w-10 shrink-0 items-center justify-center">
           <img src="/logofav.png" alt="Bx" className="h-9 w-9 object-contain opacity-[0.92] transition group-hover:opacity-100" />
         </Link>
 
