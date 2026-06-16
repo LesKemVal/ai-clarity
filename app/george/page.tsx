@@ -6098,16 +6098,17 @@ return (
                 </div>
               )}
 <div className="relative flex w-full max-w-6xl items-center justify-between">
-                {!showSidebar && (
-<button
+                <button
                   type="button"
-                  onClick={() => setShowSidebar(true)}
-                  className="inline-flex h-16 w-16 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden"
+                  onClick={() => {
+                    if (!showSidebar) setShowSidebar(true)
+                  }}
+                  disabled={showSidebar}
+                  className={`inline-flex h-16 w-16 items-center justify-center rounded-[1rem] transition hover:bg-white/[0.025] xl:hidden ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
                   aria-label="Open GEORGE sidebar"
                 >
                   <img src="/logofav.png" alt="GEORGE" className="h-16 w-16 object-contain opacity-95" />
                 </button>
-)}
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
 

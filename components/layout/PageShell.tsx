@@ -149,7 +149,7 @@ export default function PageShell({
                       className="ml-1 inline-flex items-center gap-1 text-[12px] uppercase tracking-[0.14em] text-white/34 transition hover:text-white/64"
                     >
                       <span>←</span>
-                      <span>GEORGE</span>
+                      <span>Back</span>
                     </button>
                   )}
                 </div>

@@ -74,7 +74,7 @@ export default function HomePage() {
                 navigator.share({ title: 'GEORGE by BRANESx', url: window.location.href }).catch(() => {})
               }
             }}
-            className="text-[10px] uppercase tracking-[0.32em] text-white/62"
+            className="text-[8px] uppercase tracking-[0.18em] text-white/42 transition hover:text-white/68"
           >
             Share
           </button>
