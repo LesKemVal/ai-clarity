@@ -1,34 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
   const router = useRouter()
-  const [showLiveOptions, setShowLiveOptions] = useState(false)
-  const liveSituations = ['interviews', 'boardrooms', 'meetings', 'everyday conversations']
-  const [situationIndex, setSituationIndex] = useState(0)
-  const [typedSituation, setTypedSituation] = useState('')
-
-  useEffect(() => {
-    const word = liveSituations[situationIndex]
-    let i = 0
-    setTypedSituation('')
-
-    const typing = window.setInterval(() => {
-      i += 1
-      setTypedSituation(word.slice(0, i))
-
-      if (i >= word.length) {
-        window.clearInterval(typing)
-        window.setTimeout(() => {
-          setSituationIndex((index) => (index + 1) % liveSituations.length)
-        }, word === 'everyday conversations' ? 1800 : 950)
-      }
-    }, 42)
-
-    return () => window.clearInterval(typing)
-  }, [situationIndex])
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
@@ -36,99 +11,116 @@ export default function HomePage() {
   }
 
   return (
-    <main className="george-home-depth relative min-h-[100dvh] overflow-hidden bg-black text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(174,182,255,0.055),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(143,182,201,0.025),transparent_28%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/28 to-transparent" />
+    <main className="relative min-h-[100dvh] overflow-hidden bg-[#030405] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_34%,rgba(174,182,255,0.075),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_18%,rgba(255,255,255,0.018))]" />
 
-      <div className="relative mx-auto flex min-h-[100dvh] max-w-[1120px] flex-col px-5 pb-4 pt-4 sm:px-8">
-        <header className="flex items-center justify-between">
+      <div className="relative mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-5">
+        <header className="flex items-center justify-between border-b border-white/[0.11] pb-5">
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              onClick={() => router.push('/george')}
+              className="text-[28px] font-semibold tracking-[-0.08em] text-white/92"
+              aria-label="Open GEORGE"
+            >
+              Bx
+            </button>
+            <div className="text-[13px] uppercase tracking-[0.42em] text-white/76">
+              BRANESx
+            </div>
+          </div>
+
           <button
             type="button"
-            onClick={() => router.push('/george')}
-            className="flex h-[76px] w-[76px] items-center justify-center"
-            aria-label="Open GEORGE"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: 'GEORGE by BRANESx', url: window.location.href }).catch(() => {})
+              }
+            }}
+            className="text-[10px] uppercase tracking-[0.32em] text-white/62"
           >
-            <img src="/logofav.png" alt="Bx" className="h-[68px] w-[68px] object-contain opacity-95" />
+            Share
           </button>
-
-          <div className="text-[9px] uppercase tracking-[0.3em] text-white/20">
-            BRANESx
-          </div>
         </header>
 
-        <section className="flex flex-1 flex-col justify-start pt-8 text-left sm:pt-10">
-          <div className="mx-auto w-full max-w-[720px]">
-            <h1 className="text-[48px] font-semibold leading-[0.9] tracking-[-0.074em] text-white sm:text-[82px]">
-              Ask GEORGE.
+        <section className="flex flex-1 flex-col justify-between">
+          <div className="pt-10">
+            <h1 className="text-[72px] font-semibold leading-[0.88] tracking-[-0.078em] text-white sm:text-[104px]">
+              Ask<br />
+              <span className="text-[#BFC7FF]">GEORGE.</span>
             </h1>
 
-            <p className="mt-5 max-w-[720px] font-mono text-[14px] leading-7 tracking-[0.01em] text-white/54 sm:text-[17px] sm:leading-8">
-              Use GEORGE to plan, prepare, build, decide, write, negotiate, learn, or work—or bring GEORGE into interviews and other rooms where success is tied to presentation.
+            <p className="mt-7 text-[18px] uppercase leading-[1.8] tracking-[0.34em] text-white/86">
+              Plan. Decide.<br />
+              Prepare. Build.
             </p>
+          </div>
 
-            <div className="mx-auto mt-7 flex h-[178px] w-full max-w-[390px] items-center justify-center sm:h-[260px] sm:max-w-[560px]">
-              <img
-                src="/interviewstick.png"
-                alt=""
-                className="max-h-[165px] w-auto object-contain opacity-95 sm:max-h-[245px]"
-              />
+          <div className="relative mx-auto my-8 h-[300px] w-full max-w-[520px] sm:h-[360px]">
+            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 520 360" aria-hidden="true">
+              <defs>
+                <filter id="earGlow" x="-80%" y="-80%" width="260%" height="260%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* Head anchor */}
+              <line x1="255" y1="192" x2="135" y2="58" stroke="rgba(191,199,255,0.38)" strokeWidth="1" />
+              <line x1="255" y1="192" x2="255" y2="70" stroke="rgba(191,199,255,0.34)" strokeWidth="1" />
+              <line x1="255" y1="192" x2="378" y2="78" stroke="rgba(191,199,255,0.34)" strokeWidth="1" />
+
+              <circle cx="135" cy="58" r="3" fill="#BFC7FF" />
+              <circle cx="255" cy="70" r="3" fill="#BFC7FF" />
+              <circle cx="378" cy="78" r="3" fill="#BFC7FF" />
+
+              {/* Stick figure */}
+              <circle cx="244" cy="196" r="27" fill="transparent" stroke="rgba(255,255,255,0.86)" strokeWidth="2" />
+              <circle cx="260" cy="200" r="5" fill="#BFC7FF" filter="url(#earGlow)" />
+              <line x1="244" y1="223" x2="244" y2="286" stroke="rgba(255,255,255,0.82)" strokeWidth="2" />
+              <line x1="244" y1="238" x2="222" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
+              <line x1="244" y1="238" x2="266" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
+            </svg>
+
+            <div className="absolute left-[9%] top-[8%] text-[12px] uppercase tracking-[0.34em] text-white/86">
+              Investor
             </div>
+            <div className="absolute left-[46%] top-[13%] text-[12px] uppercase tracking-[0.34em] text-white/86">
+              CEO
+            </div>
+            <div className="absolute right-[12%] top-[15%] text-[12px] uppercase tracking-[0.34em] text-white/86">
+              Teacher
+            </div>
+          </div>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="-mt-8 border-t border-white/[0.105] pt-5">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => router.push('/george')}
-                className="group relative min-h-[76px] overflow-hidden rounded-[1.05rem] border border-[#AEB6FF]/24 bg-[#AEB6FF]/[0.075] px-5 py-3 text-left shadow-[0_0_32px_rgba(174,182,255,0.075)] transition hover:border-[#AEB6FF]/42 hover:bg-[#AEB6FF]/[0.115]"
+                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-300 hover:-translate-y-[2px] hover:shadow-[0_16px_44px_rgba(255,255,255,0.18)] active:translate-y-0"
               >
-                <span className="absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/26 to-transparent" />
-                <span className="block text-[12px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/90">
-                  Ask GEORGE
-                </span>
-                <span className="mt-2 block text-[12px] leading-5 text-white/46">
-                  Think. Write. Decide. Prepare. Build.
-                </span>
+                <span>Ask GEORGE</span>
+                <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
 
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowLiveOptions((value) => !value)}
-                  className="min-h-[76px] w-full rounded-[1.05rem] border border-white/[0.09] bg-white/[0.012] px-5 py-3 text-left transition hover:border-white/[0.18] hover:bg-white/[0.026]"
-                >
-                  <span className="block text-[12px] font-semibold uppercase tracking-[0.22em] text-white/74">
-                    LIVE Mode
-                  </span>
-                  <span className="mt-2 block text-[12px] leading-5 text-white/42">
-                    Bring GEORGE into the room.
-                  </span>
-                </button>
-
-                {showLiveOptions && (
-                  <div className="absolute left-0 top-full z-20 mt-2 w-full min-w-[250px] rounded-[1rem] border border-white/[0.07] bg-[#070A0F]/96 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-                    <button
-                      type="button"
-                      onClick={startLive}
-                      className="block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/76 transition hover:bg-white/[0.045] hover:text-white"
-                    >
-                      Start new LIVE
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => router.push('/george/live')}
-                      className="mt-1 block w-full rounded-[0.8rem] px-3 py-2.5 text-left text-[13px] text-white/48 transition hover:bg-white/[0.045] hover:text-white"
-                    >
-                      Resume LIVE
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={startLive}
+                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-300 hover:bg-[#D2D7FF] hover:shadow-[0_16px_48px_rgba(191,199,255,0.30)] active:scale-[0.985]"
+              >
+                <span>Go LIVE</span>
+                <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-6">→</span>
+              </button>
             </div>
           </div>
         </section>
 
-        <footer className="mt-6 flex items-center justify-between gap-4 border-t border-white/[0.045] pt-4 pb-5 text-[8px] uppercase tracking-[0.16em] text-white/20 sm:text-[9px]">
-          <span>BRANESx by R. Block Share Holdings, LLC</span>
+        <footer className="flex items-center justify-between pt-5 text-[10px] uppercase tracking-[0.36em] text-white/56">
+          <span>BRANESx</span>
           <span>2026</span>
         </footer>
       </div>
