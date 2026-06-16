@@ -4443,6 +4443,12 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
 
 
       if ((forceLive || liveMode) && isLiveIdentityQuestion(text)) {
+        const identityUserMessage: Message = {
+          role: 'user',
+          content: text,
+          source: options?.source || 'user_input',
+        }
+
         const assistantMessage: Message = {
           role: 'assistant',
           content: buildLiveSelfDescription(),
@@ -4451,7 +4457,7 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
 
         const nextMessages: Message[] = [
           ...messagesRef.current,
-          ...(userMessage ? [userMessage] : []),
+          ...(options?.hidden ? [] : [identityUserMessage]),
           assistantMessage,
         ]
 
