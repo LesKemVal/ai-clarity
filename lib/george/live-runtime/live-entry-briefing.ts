@@ -71,34 +71,44 @@ function buildAssistLine(mode: LiveBriefingMode) {
 }
 
 function buildRoomObservation(setup: LivePrepSetup | null, room: string, desiredOutcome: string, observedReality: string) {
-  const signal = `${room} ${desiredOutcome} ${observedReality}`.toLowerCase()
+  const outcome = clean(desiredOutcome)
+  const reality = clean(observedReality)
+  const signal = `${room} ${outcome} ${reality}`.toLowerCase()
+
+  if (!outcome || outcome === 'your desired outcome') {
+    return ''
+  }
+
+  if (!reality) {
+    return ''
+  }
 
   if (/interview|candidate|hiring|job/.test(signal)) {
-    return 'I suspect they may be listening for how you think, not just whether you have perfect answers.'
+    return `For the outcome “${outcome},” examples that show judgment, fit, and how you think are likely more useful than trying to sound perfect.`
   }
 
   if (/investor|capital|fundraising|raise|fund/.test(signal)) {
-    return 'I suspect credibility may matter before persuasion here.'
+    return `For the outcome “${outcome},” credibility, traction, risk control, and a clear next step are likely to affect whether the room moves forward.`
   }
 
   if (/doctor|medical|patient|treatment|symptom/.test(signal)) {
-    return 'I think clarity may matter more than speed in this room.'
+    return `For the outcome “${outcome},” a clear timeline, specific symptoms, and prepared questions are likely to improve the usefulness of the visit.`
   }
 
   if (/negotiat|offer|terms|deal|price|counter/.test(signal)) {
-    return 'I think precision may matter here, especially when pressure starts shaping the language.'
+    return `For the outcome “${outcome},” precision, timing, alternatives, and avoiding premature concessions are likely to affect leverage.`
   }
 
   if (/sales|customer|client|buyer/.test(signal)) {
-    return 'I suspect trust may move this further than pressure.'
+    return `For the outcome “${outcome},” trust, fit, urgency, and a clear next step are likely to matter more than pressure.`
   }
 
   if (/conflict|argument|apology|repair|relationship/.test(signal)) {
-    return 'I think being understood may matter, but reducing threat may matter first.'
+    return `For the outcome “${outcome},” reducing threat, being understood, and keeping the next step realistic are likely to affect whether repair remains possible.`
   }
 
   if (/board|ceo|executive|leadership|strategy/.test(signal)) {
-    return 'I’ll treat this as executive awareness: interpretation first, lines only when precision matters.'
+    return `For the outcome “${outcome},” concise interpretation, risk awareness, and decision-ready language are likely to matter more than explanation volume.`
   }
 
   return ''
