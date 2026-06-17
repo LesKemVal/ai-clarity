@@ -18,7 +18,7 @@ import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
-import { findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
+import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
@@ -1952,14 +1952,18 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       return
     }
 
-    if (activeSession?.mode === 'normal' && Array.isArray(activeSession.messages) && activeSession.messages.length > 0) {
+    const sessionRestoreState = buildGeorgeSessionRestoreState(activeSession)
+
+    if (sessionRestoreState.restored) {
+      const restoredMessages = sessionRestoreState.messages as Message[]
+
       // Normal GEORGE restores the user's active workspace on refresh.
       // Sessions remain user-owned continuity, not assistant-first startup messages.
       skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = getMessagesSignature(activeSession.messages)
+      restoredMessagesSignatureRef.current = getMessagesSignature(restoredMessages)
 
-      setMessages(activeSession.messages)
-      messagesRef.current = activeSession.messages
+      setMessages(restoredMessages)
+      messagesRef.current = restoredMessages
       normalSessionWriteReadyRef.current = true
       return
     }

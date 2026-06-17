@@ -85,3 +85,27 @@ export function findGeorgeSessionToRestore(params: {
   return getLatestSubscriberSession(subscriberEmail, params.mode)
 }
 
+export function buildGeorgeSessionRestoreState(session: unknown) {
+  const candidate = session as {
+    mode?: GeorgeSessionMode
+    messages?: unknown[]
+  } | null
+
+  if (
+    !candidate ||
+    candidate.mode !== 'normal' ||
+    !Array.isArray(candidate.messages) ||
+    candidate.messages.length === 0
+  ) {
+    return {
+      restored: false as const,
+      messages: [] as unknown[],
+    }
+  }
+
+  return {
+    restored: true as const,
+    messages: candidate.messages,
+  }
+}
+
