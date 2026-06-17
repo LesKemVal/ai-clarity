@@ -32,7 +32,7 @@ You are speaking with someone, not presenting to them.
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const input = typeof body?.input === 'string' ? body.input.trim() : ''
+    const input = typeof body?.input === 'string' ? normalizeTextForSpeech(body.input.trim()) : ''
     const speed = typeof body?.speed === 'number' ? body.speed : 1
     const tier = typeof body?.tier === 'string' ? body.tier : 'smart'
     const requestedVoice = typeof body?.voice === 'string' ? body.voice : 'ash'

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: access.error }, { status: access.status })
     }
 
-    const text = String(body?.text || '').trim()
+    const text = normalizeTextForSpeech(String(body?.text || '').trim())
 
     if (!text) {
       return NextResponse.json({ error: 'Missing text' }, { status: 400 })
