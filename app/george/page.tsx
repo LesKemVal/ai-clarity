@@ -58,6 +58,8 @@ const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
 const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
+const LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED = false
+
 
 function getLiveEntryCheckpointState(
   briefing: string | null,
@@ -5288,7 +5290,7 @@ if (responseTimerRef.current) {
 }
 
       // ⚡ proactive conversational guidance
-      if (liveMode && liveTranscript) {
+      if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && liveTranscript) {
         const state = liveConversationStateRef.current
         if (!state.activeDirection) {
           state.activeDirection = activeCampaign?.desiredOutcome || 'clarity'
@@ -5383,7 +5385,7 @@ if (responseTimerRef.current) {
       }
 
 //  live sales signal detection
-      if (liveMode && liveTranscript) {
+      if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && liveTranscript) {
 
         const intent = detectTriggerIntent(liveTranscript)
 
@@ -5638,7 +5640,7 @@ responseTimerRef.current = setTimeout(() => {
     lower.includes("maybe") ||
     lower.includes("what do you think")
 
-  if (liveMode && strongSignal) {
+  if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && strongSignal) {
     stopListening()
     void injectGovernedLiveCue(livePrompt, 'Say: “Let me make this simple…”').then((injected) => {
       if (!injected) return
@@ -5657,7 +5659,7 @@ responseTimerRef.current = setTimeout(() => {
   const interventionNow = Date.now()
   const canIntervene = interventionNow - liveInterventionRef.current > 8000
 
-  if (liveMode && canIntervene && score >= 3) {
+  if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && canIntervene && score >= 3) {
     stopListening()
 
     if (score >= 5) {
