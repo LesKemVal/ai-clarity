@@ -2069,6 +2069,10 @@ const detectTriggerIntent = (text: string) => {
 
 
 
+// LEGACY LIVE GOVERNOR BRIDGE.
+// This powers the older injectGovernedLiveCue() path through /api/george/live/govern.
+// It is not part of the active Deepgram transcript -> router -> controller -> action-authority path.
+// Preserve until Pro LIVE / legacy cue governance is fully classified.
 async function canGovernorInjectLiveCue(transcript: string) {
   if (!transcript.trim()) return false
 
