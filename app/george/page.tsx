@@ -56,6 +56,7 @@ import { deriveLiveAttentionState } from '@/lib/george/live-runtime/live-attenti
 import { deriveLiveSpeakerPersistence } from '@/lib/george/live-runtime/live-speaker-persistence'
 import { deriveLiveInfluenceState } from '@/lib/george/live-runtime/live-influence-map'
 import { deriveLiveOutcomeDrift } from '@/lib/george/live-runtime/live-outcome-drift'
+import { composeLiveRuntimeState } from '@/lib/george/live-runtime/live-runtime-state'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2647,6 +2648,17 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       influenceState,
     })
 
+    const liveOutcomeRuntimeState = composeLiveRuntimeState({
+      awarenessState,
+      overlapRecovery,
+      roomState,
+      roomPriorities,
+      attentionState,
+      speakerPersistence,
+      influenceState,
+      outcomeDrift,
+    })
+
     if (
       awarenessState.overlapDetected ||
       overlapRecovery.requiresAttention ||
@@ -2654,7 +2666,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       roomPriorities.highestPriority !== 'continue_listening' ||
       attentionState.mode !== 'monitor' ||
       speakerPersistence.shouldTrackRole ||
-      influenceState.influence !== 'unknown'
+      influenceState.influence !== 'unknown' ||
+      liveOutcomeRuntimeState.recommendedBehavior !== 'listen'
     ) {
       console.info('[GEORGE LIVE AWARENESS]', {
         awarenessState,
@@ -2665,6 +2678,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
         speakerPersistence,
         influenceState,
         outcomeDrift,
+        liveOutcomeRuntimeState,
       })
     }
 
