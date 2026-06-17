@@ -53,6 +53,7 @@ import { recoverLiveOverlapContext } from '@/lib/george/live-runtime/live-overla
 import { deriveLiveRoomState } from '@/lib/george/live-runtime/live-room-state'
 import { deriveLiveRoomPriorities } from '@/lib/george/live-runtime/live-room-priorities'
 import { deriveLiveAttentionState } from '@/lib/george/live-runtime/live-attention-manager'
+import { deriveLiveSpeakerPersistence } from '@/lib/george/live-runtime/live-speaker-persistence'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2625,13 +2626,20 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       roomState,
       roomPriorities,
     })
+    const speakerPersistence = deriveLiveSpeakerPersistence({
+      text: clean,
+      attentionState,
+      roomPriorities,
+      roomState,
+    })
 
     if (
       awarenessState.overlapDetected ||
       overlapRecovery.requiresAttention ||
       roomState.state !== 'stable' ||
       roomPriorities.highestPriority !== 'continue_listening' ||
-      attentionState.mode !== 'monitor'
+      attentionState.mode !== 'monitor' ||
+      speakerPersistence.shouldTrackRole
     ) {
       console.info('[GEORGE LIVE AWARENESS]', {
         awarenessState,
@@ -2639,6 +2647,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
         roomState,
         roomPriorities,
         attentionState,
+        speakerPersistence,
       })
     }
 
