@@ -50,15 +50,6 @@ import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
 import { recoverLiveOverlapContext } from '@/lib/george/live-runtime/live-overlap-recovery'
-import { deriveLiveRoomState } from '@/lib/george/live-runtime/live-room-state'
-import { deriveLiveRoomPriorities } from '@/lib/george/live-runtime/live-room-priorities'
-import { deriveLiveAttentionState } from '@/lib/george/live-runtime/live-attention-manager'
-import { deriveLiveSpeakerPersistence } from '@/lib/george/live-runtime/live-speaker-persistence'
-import { deriveLiveInfluenceState } from '@/lib/george/live-runtime/live-influence-map'
-import { deriveLiveOutcomeDrift } from '@/lib/george/live-runtime/live-outcome-drift'
-import { composeLiveRuntimeState } from '@/lib/george/live-runtime/live-runtime-state'
-import { deriveLiveBehaviorDecision } from '@/lib/george/live-runtime/live-behavior-engine'
-import { planLiveBehaviorExecution } from '@/lib/george/live-runtime/live-behavior-executor'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2615,78 +2606,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
     const awarenessState = reconcileLiveAwareness(liveAwarenessBufferRef.current)
     const overlapRecovery = recoverLiveOverlapContext(awarenessState)
-    const roomState = deriveLiveRoomState({
-      overlapRecovery,
-      recentSignals: awarenessState.recentSignals,
-    })
-    const roomPriorities = deriveLiveRoomPriorities({
-      roomState,
-      overlapRecovery,
-      recentSignals: awarenessState.recentSignals,
-      desiredOutcome: liveRuntimeSupport?.objective || '',
-    })
-    const attentionState = deriveLiveAttentionState({
-      awarenessState,
-      overlapRecovery,
-      roomState,
-      roomPriorities,
-    })
-    const speakerPersistence = deriveLiveSpeakerPersistence({
-      text: clean,
-      attentionState,
-      roomPriorities,
-      roomState,
-    })
-    const influenceState = deriveLiveInfluenceState({
-      speakerPersistence,
-      roomPriorities,
-      attentionState,
-    })
-
-    const outcomeDrift = deriveLiveOutcomeDrift({
-      desiredOutcome: liveRuntimeSupport?.objective || '',
-      roomState,
-      roomPriorities,
-      influenceState,
-    })
-
-    const liveOutcomeRuntimeState = composeLiveRuntimeState({
-      awarenessState,
-      overlapRecovery,
-      roomState,
-      roomPriorities,
-      attentionState,
-      speakerPersistence,
-      influenceState,
-      outcomeDrift,
-    })
-    const liveBehaviorDecision = deriveLiveBehaviorDecision(liveOutcomeRuntimeState)
-    const liveBehaviorExecutionPlan = planLiveBehaviorExecution(liveBehaviorDecision)
-
     if (
       awarenessState.overlapDetected ||
-      overlapRecovery.requiresAttention ||
-      roomState.state !== 'stable' ||
-      roomPriorities.highestPriority !== 'continue_listening' ||
-      attentionState.mode !== 'monitor' ||
-      speakerPersistence.shouldTrackRole ||
-      influenceState.influence !== 'unknown' ||
-      liveOutcomeRuntimeState.recommendedBehavior !== 'listen' ||
-      liveBehaviorDecision.recommendedAction !== 'none' ||
-      liveBehaviorExecutionPlan.intent !== 'no_op'
+      overlapRecovery.requiresAttention
     ) {
       console.info('[GEORGE LIVE AWARENESS]', {
         awarenessState,
         overlapRecovery,
-        roomState,
-        roomPriorities,
-        attentionState,
-        speakerPersistence,
-        influenceState,
-        outcomeDrift,
-        liveOutcomeRuntimeState,
-        liveBehaviorDecision,
-        liveBehaviorExecutionPlan,
       })
     }
 
