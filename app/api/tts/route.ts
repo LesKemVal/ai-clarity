@@ -1,3 +1,4 @@
+import { normalizeTextForSpeech } from '@/lib/george/live-voice/spoken-text'
 import OpenAI from 'openai'
 import { NextResponse } from 'next/server'
 
