@@ -16,6 +16,7 @@ import {
   normalizeLiveRecoverySelection,
   type LiveRecoveryOptionId,
 } from '@/lib/george/live-voice/runtime/recovery-options'
+import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/live-entry-briefing'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -2830,6 +2831,14 @@ const mandatoryLiveSignals = useMemo(() => {
         } catch {}
       }
 
+      const georgeSupportItems = buildOutcomeTestedBriefingSupport({
+        room: roomLabel,
+        audience: audienceLabel,
+        objective: objectiveLabel,
+        observedReality: knownContext,
+        previousPattern: '',
+      })
+
       const confirmPrivacyAndContinue = () => {
         setLiveRecoveryAcknowledged(true)
         setLiveBriefingCapabilitiesConfirmed(true)
@@ -2966,6 +2975,39 @@ const mandatoryLiveSignals = useMemo(() => {
             <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/42">
               Your choice becomes the default for future LIVE conversations until you change it.
             </div>
+
+            {georgeSupportItems.length > 0 && (
+              <div className="rounded-[0.82rem] border border-[#D7DCFF]/[0.09] bg-[#080A10]/[0.50] px-4 py-4">
+                <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
+                  GEORGE Support · Optional
+                </div>
+
+                <p className="mt-3 text-[12px] leading-5 text-[#D7DBE4]/48">
+                  These are outcome-tested signals GEORGE may watch for in the room.
+                </p>
+
+                <div className="mt-4 space-y-3">
+                  {georgeSupportItems.map((item) => (
+                    <div key={item.id} className="rounded-[0.7rem] border border-white/[0.055] bg-black/[0.16] px-3 py-3">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/70">
+                        {item.label}
+                      </div>
+                      <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/60">
+                        {item.line}
+                      </div>
+                      <details className="mt-2">
+                        <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
+                          Why this matters
+                        </summary>
+                        <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/38">
+                          {item.why}
+                        </p>
+                      </details>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
 
 
