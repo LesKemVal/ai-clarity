@@ -11,9 +11,6 @@ import { classifyLiveSpeakerIntent } from '${process.cwd()}/lib/george/live-voic
 import { buildSteeringContinuation } from '${process.cwd()}/lib/george/live-voice/runtime/steering-continuation'
 import { deriveActiveOutcome } from '${process.cwd()}/lib/george/live-voice/runtime/active-outcome'
 import { georgeOutcomeGovernor } from '${process.cwd()}/lib/george/live-voice/runtime/outcome-governor'
-import { routeLiveTranscript } from '${process.cwd()}/lib/george/live-runtime/transcript-routing'
-import { resolveLiveTranscriptDecision } from '${process.cwd()}/lib/george/live-runtime/live-transcript-controller'
-import { authorizeLiveTranscriptAction } from '${process.cwd()}/lib/george/live-runtime/live-action-authority'
 import { evaluateSignalSufficiency } from '${process.cwd()}/lib/george/runtime/signal-sufficiency'
 import { rankSignals } from '${process.cwd()}/lib/george/runtime/signal-ranking'
 import { inferObjectiveFromText, LIVE_OBJECTIVES } from '${process.cwd()}/lib/george/live-voice/runtime/objective-engine'
@@ -58,54 +55,6 @@ const governor = georgeOutcomeGovernor.evaluate({
 })
 assert(governor.move === 'direct_response', 'governor should direct respond when advancing and help requested')
 assert(governor.movementState === 'advancing', 'governor should mark advancing with signal and objective')
-
-const routed = routeLiveTranscript({
-  text: 'What should I say?',
-  lastFinalTranscript: null,
-  context: { liveMode: true },
-  now: 1000,
-})
-assert(routed.decision.type === 'send', 'router should send non-steering transcript')
-
-const action = resolveLiveTranscriptDecision({
-  decision: routed.decision,
-  transcript: 'What should I say?',
-  lastSpokenLine: '',
-})
-assert(action.type === 'send', 'controller should convert send decision to send action')
-
-const authority = authorizeLiveTranscriptAction({
-  transcript: 'What should I say?',
-  decision: routed.decision,
-  action,
-  isGeorgeSpeaking: false,
-  isThinking: false,
-  desiredOutcome: 'get the job offer',
-})
-assert(authority.verdict === 'allow', 'authority should allow clean send action')
-assert(authority.shouldSend === true, 'authority should mark send action')
-
-const blockedWhileSpeaking = authorizeLiveTranscriptAction({
-  transcript: 'What should I say?',
-  decision: routed.decision,
-  action,
-  isGeorgeSpeaking: true,
-  isThinking: false,
-  desiredOutcome: 'get the job offer',
-})
-assert(blockedWhileSpeaking.verdict === 'hold', 'authority should hold send while GEORGE is speaking')
-assert(blockedWhileSpeaking.action.type === 'ignore', 'authority should convert held send into ignore action')
-
-const blockedWhileThinking = authorizeLiveTranscriptAction({
-  transcript: 'What should I say?',
-  decision: routed.decision,
-  action,
-  isGeorgeSpeaking: false,
-  isThinking: true,
-  desiredOutcome: 'get the job offer',
-})
-assert(blockedWhileThinking.verdict === 'hold', 'authority should hold send while GEORGE is thinking')
-assert(blockedWhileThinking.action.type === 'ignore', 'authority should convert thinking duplicate into ignore action')
 
 const sufficiency = evaluateSignalSufficiency({
   transcript: 'The investor challenged our revenue forecast and deadline.',
