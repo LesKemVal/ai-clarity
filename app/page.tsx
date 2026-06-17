@@ -66,8 +66,8 @@ export default function HomePage() {
     <main className="relative min-h-[100dvh] overflow-hidden bg-[#030405] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_34%,rgba(174,182,255,0.075),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_18%,rgba(255,255,255,0.018))]" />
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-5">
-        <header className="flex items-center justify-between border-b border-white/[0.11] pb-5">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-4">
+        <header className="flex items-center justify-between border-b border-white/[0.11] pb-3">
           <div className="flex items-center gap-5">
             <button
               type="button"
@@ -96,19 +96,19 @@ export default function HomePage() {
         </header>
 
         <section className="flex flex-1 flex-col justify-between">
-          <div className="pt-10">
-            <h1 className="text-[72px] font-semibold leading-[0.88] tracking-[-0.078em] text-white sm:text-[104px]">
+          <div className="pt-6">
+            <h1 className="text-[66px] font-semibold leading-[0.88] tracking-[-0.078em] text-white sm:text-[96px]">
               Ask<br />
               <span className="text-[#BFC7FF]">GEORGE.</span>
             </h1>
 
-            <div className="mt-7 inline-block rounded-[18px] border border-white/[0.08] bg-black/35 px-4 py-3 shadow-[0_18px_55px_rgba(0,0,0,0.28)] backdrop-blur-sm">
-              <p className="text-[18px] uppercase leading-[1.8] tracking-[0.34em] text-white/90">
+            <div className="mt-5 inline-block rounded-[18px] border border-white/[0.08] bg-black/35 px-4 py-2.5 shadow-[0_18px_55px_rgba(0,0,0,0.28)] backdrop-blur-sm">
+              <p className="text-[16px] uppercase leading-[1.65] tracking-[0.34em] text-white/90">
                 Plan. Decide.<br />
                 Prepare. Build.
               </p>
 
-              <p className="mt-4 max-w-[520px] text-[12px] uppercase leading-6 tracking-[0.22em] text-white/54">
+              <p className="mt-3 max-w-[520px] text-[12px] uppercase leading-6 tracking-[0.22em] text-white/54">
                 Use GEORGE LIVE during{' '}
                 <span className="inline-block min-w-[210px] text-left text-[#D7DCFF]/78">
                   {typedSituation}
@@ -118,7 +118,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="relative mx-auto my-8 h-[300px] w-full max-w-[520px] sm:h-[360px]">
+          <div className="relative mx-auto my-4 h-[230px] w-full max-w-[520px] sm:h-[300px]">
             <svg className="absolute inset-0 h-full w-full" viewBox="0 0 520 360" aria-hidden="true">
               <defs>
                 <filter id="earGlow" x="-80%" y="-80%" width="260%" height="260%">
@@ -141,7 +141,7 @@ export default function HomePage() {
 
               {/* Stick figure */}
               <circle cx="244" cy="196" r="27" fill="transparent" stroke="rgba(255,255,255,0.86)" strokeWidth="2" />
-              <circle cx="260" cy="200" r="5" fill="#BFC7FF" filter="url(#earGlow)" />
+              <circle cx="271" cy="203" r="5" fill="#BFC7FF" filter="url(#earGlow)" />
               <line x1="244" y1="223" x2="244" y2="286" stroke="rgba(255,255,255,0.82)" strokeWidth="2" />
               <line x1="244" y1="238" x2="222" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
               <line x1="244" y1="238" x2="266" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
@@ -158,30 +158,30 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="-mt-24 border-t border-white/[0.105] pt-5 sm:-mt-28">
+          <div className="-mt-16 border-t border-white/[0.105] pt-5 sm:-mt-20">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => router.push('/george')}
-                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:-translate-y-[1px] hover:shadow-[0_12px_34px_rgba(255,255,255,0.16)] active:opacity-90"
+                className="group flex h-[60px] items-center justify-between rounded-[18px] bg-white px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:-translate-y-[1px] hover:shadow-[0_12px_34px_rgba(255,255,255,0.16)] active:opacity-90"
               >
                 <span>Ask GEORGE</span>
-                <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1">→</span>
+                <span className="text-[22px] transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
 
               <button
                 type="button"
                 onClick={startLive}
-                className="group flex h-[72px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:bg-[#D2D7FF] hover:shadow-[0_12px_36px_rgba(191,199,255,0.26)] active:opacity-90"
+                className="group flex h-[60px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:bg-[#D2D7FF] hover:shadow-[0_12px_36px_rgba(191,199,255,0.26)] active:opacity-90"
               >
                 <span>Go LIVE</span>
-                <span className="text-[24px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-6">→</span>
+                <span className="text-[22px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-6">→</span>
               </button>
             </div>
           </div>
         </section>
 
-        <footer className="flex items-center justify-between pt-5 text-[10px] uppercase tracking-[0.36em] text-white/56">
+        <footer className="flex items-center justify-between pt-3 text-[10px] uppercase tracking-[0.36em] text-white/56">
           <span>BRANESx</span>
           <span>2026</span>
         </footer>
