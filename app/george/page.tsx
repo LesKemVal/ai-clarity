@@ -3278,6 +3278,15 @@ Start by giving the user one strong opening line, one backup line, and one cue.`
   }, [input])
   const userPinnedBottomRef = useRef(true)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+useEffect(() => {
+  const el = textareaRef.current
+  if (!el) return
+
+  el.style.height = '0px'
+  const nextHeight = Math.min(Math.max(el.scrollHeight, 24), 144)
+  el.style.height = `${nextHeight}px`
+}, [input])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const autoResizeTextarea = useCallback(() => {
@@ -7110,7 +7119,7 @@ I am listening now. Speak naturally. I will respond ${
           autoCorrect="off"
           autoCapitalize="off"
           placeholder={composerPlaceholder}
-          className="w-full resize-none appearance-none border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+          className="max-h-36 min-h-6 w-full resize-none appearance-none overflow-y-auto border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
         />
 
         {!input.trim() && (
@@ -7121,7 +7130,7 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[70px] md:h-[90px]' : 'h-2 md:h-3'}`} />
+<div className="pointer-events-none fixed inset-x-0 bottom-0 z-[25] h-[128px] bg-gradient-to-t from-[#030405] via-[#030405]/86 to-transparent md:h-[156px]" />\n\n<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[120px] md:h-[150px]' : 'h-[86px] md:h-[110px]'}`} />
 
 </div>
 
