@@ -44,14 +44,29 @@ export default function HomePage() {
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
-    window.location.assign('/george/live-entry?source=start')
+    router.push('/george/live-entry?source=start')
   }
+
+  useEffect(() => {
+    const restoreInteractivity = () => {
+      document.body.style.pointerEvents = ''
+      document.documentElement.style.pointerEvents = ''
+    }
+
+    window.addEventListener('pageshow', restoreInteractivity)
+    window.addEventListener('focus', restoreInteractivity)
+
+    return () => {
+      window.removeEventListener('pageshow', restoreInteractivity)
+      window.removeEventListener('focus', restoreInteractivity)
+    }
+  }, [])
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden bg-[#030405] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_34%,rgba(174,182,255,0.075),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_18%,rgba(255,255,255,0.018))]" />
 
-      <div className="relative mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-5">
+      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-5">
         <header className="flex items-center justify-between border-b border-white/[0.11] pb-5">
           <div className="flex items-center gap-5">
             <button
@@ -147,7 +162,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => window.location.assign('/george')}
+                onClick={() => router.push('/george')}
                 className="group flex h-[72px] items-center justify-between rounded-[18px] bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:-translate-y-[1px] hover:shadow-[0_12px_34px_rgba(255,255,255,0.16)] active:opacity-90"
               >
                 <span>Ask GEORGE</span>
