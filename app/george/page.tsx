@@ -33,8 +33,7 @@ import {
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
-import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
-import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
+import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
@@ -2192,29 +2191,16 @@ const liveRuntimeSupport = readActiveLiveRuntimeSupport()
       input.trim() ||
       ''
 
-    const activeOutcome = deriveActiveOutcome({
-      desiredOutcome,
-      room: liveRuntimeSupport?.knownContext,
+    const interpretation = buildGeorgeCoreInterpretation({
       transcript: interimTranscript.trim() || stableLiveGuidance?.signal || '',
-      userPosition: liveRuntimeSupport?.userPosition,
+      room: liveRuntimeSupport?.room || liveRuntimeSupport?.knownContext,
+      desiredOutcome,
       knownContext,
+      userPosition: liveRuntimeSupport?.userPosition,
+      knownUserSpeaking: true,
     })
 
-    return georgeOutcomeGovernor.evaluate({
-      objectiveKnown,
-      desiredOutcome,
-      activeOutcome,
-      objectivePressure: liveMode ? 'high' : 'moderate',
-      confidence: stableLiveGuidance ? 0.64 : 0.52,
-      consequence: 'moderate',
-      opportunityCost: 'moderate',
-      userPosition: liveRuntimeSupport?.userPosition,
-      knownContextAvailable,
-      roomHasRecentSignal: Boolean(interimTranscript.trim() || stableLiveGuidance),
-      missingCriticalSignal: !knownContextAvailable && Boolean(input.trim() || interimTranscript.trim()),
-      userPositionAtRisk: false,
-      canAcquireContextNaturally: Boolean(input.trim() || interimTranscript.trim()),
-    })
+    return interpretation.outcomeGovernor
   }, [
     liveMode,
     input,
