@@ -16,6 +16,8 @@ import { resolveLiveTranscriptDecision } from '${process.cwd()}/lib/george/live-
 import { authorizeLiveTranscriptAction } from '${process.cwd()}/lib/george/live-runtime/live-action-authority'
 import { evaluateSignalSufficiency } from '${process.cwd()}/lib/george/runtime/signal-sufficiency'
 import { rankSignals } from '${process.cwd()}/lib/george/runtime/signal-ranking'
+import { inferObjectiveFromText, LIVE_OBJECTIVES } from '${process.cwd()}/lib/george/live-voice/runtime/objective-engine'
+import { georgeTrajectoryEngine } from '${process.cwd()}/lib/george/live-voice/runtime/trajectory-engine'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -81,6 +83,28 @@ const authority = authorizeLiveTranscriptAction({
 assert(authority.verdict === 'allow', 'authority should allow clean send action')
 assert(authority.shouldSend === true, 'authority should mark send action')
 
+const blockedWhileSpeaking = authorizeLiveTranscriptAction({
+  transcript: 'What should I say?',
+  decision: routed.decision,
+  action,
+  isGeorgeSpeaking: true,
+  isThinking: false,
+  desiredOutcome: 'get the job offer',
+})
+assert(blockedWhileSpeaking.verdict === 'hold', 'authority should hold send while GEORGE is speaking')
+assert(blockedWhileSpeaking.action.type === 'ignore', 'authority should convert held send into ignore action')
+
+const blockedWhileThinking = authorizeLiveTranscriptAction({
+  transcript: 'What should I say?',
+  decision: routed.decision,
+  action,
+  isGeorgeSpeaking: false,
+  isThinking: true,
+  desiredOutcome: 'get the job offer',
+})
+assert(blockedWhileThinking.verdict === 'hold', 'authority should hold send while GEORGE is thinking')
+assert(blockedWhileThinking.action.type === 'ignore', 'authority should convert thinking duplicate into ignore action')
+
 const sufficiency = evaluateSignalSufficiency({
   transcript: 'The investor challenged our revenue forecast and deadline.',
   outcome: 'raise capital',
@@ -89,6 +113,20 @@ assert(sufficiency.sufficient === true, 'signal sufficiency should detect enough
 
 const ranked = rankSignals('The board challenged revenue and deadline risk.')
 assert(ranked.length > 0, 'signal ranking should identify ranked signals')
+
+const objectiveId = inferObjectiveFromText('The manager challenged my raise and compensation value.')
+assert(objectiveId === 'secure_raise', 'objective engine should infer compensation objective')
+assert(LIVE_OBJECTIVES[objectiveId].label === 'Secure Raise', 'objective engine should expose objective definition')
+
+const trajectory = georgeTrajectoryEngine.evaluate({
+  text: 'Sounds good, send me the next step and we can follow up.',
+  objectiveId,
+  roomPressure: 'low',
+  interruptionRisk: 0.1,
+  emotionalVelocity: 'stable',
+})
+assert(trajectory.trajectory === 'decision_ready', 'trajectory engine should detect decision-ready movement')
+assert(trajectory.recommendedAction === 'close', 'trajectory engine should recommend close on decision-ready movement')
 
 console.log('GEORGE core smoke passed')
 `)
