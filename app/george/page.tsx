@@ -19,6 +19,7 @@ import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, 
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
+import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
@@ -1929,39 +1930,22 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         ? getLatestSubscriberSession(subscriberEmail, 'normal')
         : null)
 
-    let transientDraft: {
-      messages?: Message[]
-      conversationMode?: string
-      activePromptContext?: string
-    } | null = null
+    const transientDraft = readGeorgeNormalDraft(GEORGE_LAST_NORMAL_DRAFT)
 
-    if (typeof window !== 'undefined') {
-      try {
-        const rawDraft = window.localStorage.getItem(GEORGE_LAST_NORMAL_DRAFT)
-        transientDraft = rawDraft ? JSON.parse(rawDraft) : null
-      } catch {
-        transientDraft = null
-      }
-    }
-
-    if (
-      transientDraft &&
-      Array.isArray(transientDraft.messages) &&
-      transientDraft.messages.length > 0
-    ) {
-      window.localStorage.removeItem(GEORGE_LAST_NORMAL_DRAFT)
+    if (transientDraft.restored) {
+      const draftMessages = transientDraft.messages as Message[]
 
       skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = getMessagesSignature(transientDraft.messages)
+      restoredMessagesSignatureRef.current = getMessagesSignature(draftMessages)
 
-      setMessages(transientDraft.messages)
-      messagesRef.current = transientDraft.messages
+      setMessages(draftMessages)
+      messagesRef.current = draftMessages
 
-      if (typeof transientDraft.conversationMode === 'string') {
+      if (transientDraft.conversationMode) {
         setConversationMode(transientDraft.conversationMode as typeof conversationMode)
       }
 
-      if (typeof transientDraft.activePromptContext === 'string') {
+      if (transientDraft.activePromptContext) {
         setActivePromptContext(transientDraft.activePromptContext)
       }
 
