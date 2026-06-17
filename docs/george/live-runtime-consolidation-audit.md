@@ -191,3 +191,58 @@ Classification:
 - Valuable reasoning reference.
 - Potential future advisor behind current `authorizeLiveTranscriptAction` path.
 - Not current execution authority.
+
+## GEORGE Brain Lease-Ready Classification
+
+### PORTABLE_BRAIN
+
+- lib/george/live-voice/runtime/speaker-intent.ts
+- lib/george/live-voice/runtime/steering-continuation.ts
+- lib/george/runtime/signal-sufficiency.ts
+- lib/george/runtime/signal-ranking.ts
+- lib/george/live-voice/runtime/outcome-governor.ts
+- lib/george/live-voice/runtime/active-outcome.ts
+- lib/george/live-runtime/live-action-authority.ts
+- lib/george/live-runtime/transcript-routing.ts
+- lib/george/live-runtime/live-transcript-controller.ts
+
+Reason:
+These modules express GEORGE’s portable runtime intelligence: speaker intent, steering phrases, signal sufficiency, signal ranking, active outcome, outcome governance, transcript routing, action control, and authority gating. They are not app UI.
+
+### PORTABLE_BRAIN_CANDIDATE
+
+- lib/george/live-voice/runtime/room-analyzer.ts
+- lib/george/live-voice/runtime/conversation-signals.ts
+- lib/george/live-voice/runtime/response-policy.ts
+- lib/george/conversation-engine.ts
+- lib/george/live-voice/governor.ts
+- lib/george/live-voice/live-reasoning.ts
+- lib/george/live-runtime/live-fast-path.ts
+
+Reason:
+These modules contain valuable GEORGE reasoning or heuristics, but need review before being promoted into the clean leasable brain package.
+
+### APP_CLIENT_ONLY
+
+- app/george/page.tsx
+- components/george/live/*
+- Prep Room UI
+- billing/subscription UI
+- session restoration UI
+
+Reason:
+These belong to the BRANESx app client, not the portable GEORGE brain.
+
+### DELETE_CANDIDATE
+
+- app/api/chat/route.ts.tmp
+
+Reason:
+Legacy artifact; not routable; not imported; appears to be abandoned patch output.
+
+### UNKNOWN
+
+- lib/george/conversation-engine.ts.bak-chair-aware
+
+Reason:
+Backup file may contain chair/role intelligence. Inspect diff before deletion.
