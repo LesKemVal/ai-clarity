@@ -280,3 +280,67 @@ Assessment:
 - Strong candidate for GEORGE Brain core.
 - Current weakness is not the governor itself; it is that upstream signals are fragmented.
 - To become lease-ready, the signal layer feeding it must be unified and tested.
+
+## Runtime Authority Naming Audit
+
+### lib/george/live-runtime/live-runtime-authority.ts
+
+Classification: ACTIVE_SUPPORT_RESOLVER.
+
+Finding:
+- Called by prep-runtime.
+- Resolves authoritative LIVE setup/support data from prepared, active, last, and existing support.
+- Does not decide whether GEORGE speaks.
+- Does not execute speech.
+- Name is confusing because it uses "authority", but it is context/support authority, not action authority.
+
+### lib/george/live-voice/runtime/runtime-authority.ts
+
+Classification: DORMANT_DELIVERY_WINDOW_AUTHORITY.
+
+Finding:
+- Produces a runtime delivery/silence/window snapshot.
+- Not called by app/page.
+- Only direct dependency found is runtime-decision-engine.
+- Does not execute speech.
+- Not the primary LIVE action authority.
+
+### lib/george/live-voice/runtime/runtime-decision-engine.ts
+
+Classification: DORMANT_DELIVERY_DECISION_ENGINE.
+
+Finding:
+- Converts runtime-authority snapshot into speak/whisper/interrupt/suppress/hold/yield/queue.
+- No active app/page caller found.
+- Should not be treated as production authority unless explicitly wired later.
+- Potential future delivery-policy module.
+
+### lib/george/live-voice/runtime/signal-authority.ts
+
+Classification: DORMANT_SIGNAL_POSTURE_AUTHORITY.
+
+Finding:
+- Produces signal priority, dominant signal, suggested posture, reveal mode.
+- No active caller found.
+- Does not execute speech.
+- Useful GEORGE Core candidate for posture/continuity intelligence.
+
+### lib/george/live-voice/runtime/orchestrator.ts
+
+Classification: LEGACY_RUNTIME_SYNTHESIS / PORTABLE_BRAIN_CANDIDATE.
+
+Finding:
+- Synthesizes confidence, power dynamics, trajectory, recovery, salvage objective, perceived positioning, pressure memory, load, posture, silence, opportunity state, runtime events, and queue text.
+- Emits runtime events.
+- Returns packet/snapshot/silence/queueText.
+- No active caller found in app/lib/hooks/components search except its export.
+- Valuable intelligence, but not current production authority.
+
+### lib/george/live-voice/runtime/runtime-doctrine.ts
+
+Classification: DOCTRINE_REFERENCE.
+
+Finding:
+- Constant string doctrine.
+- Non-executing.
+- Useful as product/behavior reference.
