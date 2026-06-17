@@ -16,8 +16,9 @@ import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, upsertSession, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
+import { saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
@@ -310,42 +311,7 @@ function saveSessionToV2(params: {
   suggestedRestart?: string
   metadata?: Record<string, unknown>
 }) {
-  const subscriberEmail =
-    typeof window !== 'undefined'
-      ? readCachedGeorgeSessionAuthority().email
-      : ''
-
-  const now = Date.now()
-  const activeSessionId =
-    params.id ||
-    getActiveSessionIdForMode(params.mode)
-
-  const sessionId = activeSessionId || `session_${now}`
-
-  upsertSession({
-    id: sessionId,
-    type: 'session',
-    mode: params.mode,
-    title: params.title,
-    createdAt: now,
-    updatedAt: now,
-    messages: params.messages,
-    summary: params.summary,
-    userGoal: params.userGoal,
-    lastKnownState: params.lastKnownState,
-    suggestedRestart: params.suggestedRestart,
-    metadata: {
-      source:
-        params.mode === 'live'
-          ? 'live_conversation'
-          : 'normal',
-      ...(subscriberEmail ? { subscriberEmail } : { localOnly: true }),
-      ...params.metadata,
-    },
-  })
-
-  setActiveSessionIdForMode(params.mode, sessionId)
-  setActiveMode(params.mode)
+  return saveGeorgeSession(params)
 }
 
 
