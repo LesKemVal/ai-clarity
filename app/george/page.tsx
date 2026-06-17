@@ -42,10 +42,9 @@ import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
-import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
-import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
-import { authorizeLiveTranscriptAction } from '@/lib/george/live-runtime/live-action-authority'
+import { resolveGeorgeCoreLiveExecution } from '@/lib/george/core/live-execution'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
@@ -5109,53 +5108,32 @@ return true
   [input, isThinking, speakText, stopListening, startListening, pendingImage, activePromptContext]
 )
 
-  const routeCurrentLiveTranscript = useCallback((text: string) => {
-    const result = routeLiveTranscript({
-      text,
+  const handleLiveFinalTranscript = useCallback((text: string) => {
+    const clean = String(text || '').trim()
+    if (!clean) return
+
+    const execution = resolveGeorgeCoreLiveExecution({
+      transcript: clean,
       lastFinalTranscript: lastLiveFinalTranscriptRef.current,
-      context: {
+      routingContext: {
         isThinking,
         isSpeaking: isSpeakingRef.current,
         liveMode,
         buyTimeUntil: liveBuyTimeUntilRef.current,
       },
-    })
-
-    lastLiveFinalTranscriptRef.current = result.nextFinalTranscript
-
-    return result.decision
-  }, [])
-
-  const handleLiveFinalTranscript = useCallback((text: string) => {
-    const clean = String(text || '').trim()
-    if (!clean) return
-
-    const decision = routeCurrentLiveTranscript(clean)
-    console.info('[GEORGE LIVE TRANSCRIPT]', { clean, decision })
-
-    if (decision.type === 'ignore') {
-      return
-    }
-
-    const action = resolveLiveTranscriptDecision({
-      decision,
-      transcript: text,
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
-    })
-
-    const authority = authorizeLiveTranscriptAction({
-      transcript: clean,
-      decision,
-      action,
       isGeorgeSpeaking: isSpeakingRef.current,
       isThinking,
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
       overlapRequiresAttention: false,
-      lastSpokenLine: liveLastSpokenUtteranceRef.current,
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
     })
 
-    console.info('[GEORGE LIVE ACTION]', { action, authority })
+    lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
+
+    const authority = execution.authority
+
+    console.info('[GEORGE LIVE ACTION]', { authority })
 
     if (authority.action.type === 'ignore') {
       return
@@ -5185,7 +5163,7 @@ return true
     if (authority.action.type === 'send') {
       void handleSend(authority.action.text, { source: 'live_transcript' })
     }
-  }, [handleSend, routeCurrentLiveTranscript, speakText])
+  }, [handleSend, isThinking, liveMode, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript
