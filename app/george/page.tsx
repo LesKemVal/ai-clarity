@@ -51,6 +51,7 @@ import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/g
 import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
 import { recoverLiveOverlapContext } from '@/lib/george/live-runtime/live-overlap-recovery'
 import { deriveLiveRoomState } from '@/lib/george/live-runtime/live-room-state'
+import { deriveLiveRoomPriorities } from '@/lib/george/live-runtime/live-room-priorities'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2611,12 +2612,24 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       overlapRecovery,
       recentSignals: awarenessState.recentSignals,
     })
+    const roomPriorities = deriveLiveRoomPriorities({
+      roomState,
+      overlapRecovery,
+      recentSignals: awarenessState.recentSignals,
+      desiredOutcome: liveRuntimeSupport?.objective || '',
+    })
 
-    if (awarenessState.overlapDetected || overlapRecovery.requiresAttention || roomState.state !== 'stable') {
+    if (
+      awarenessState.overlapDetected ||
+      overlapRecovery.requiresAttention ||
+      roomState.state !== 'stable' ||
+      roomPriorities.highestPriority !== 'continue_listening'
+    ) {
       console.info('[GEORGE LIVE AWARENESS]', {
         awarenessState,
         overlapRecovery,
         roomState,
+        roomPriorities,
       })
     }
 
