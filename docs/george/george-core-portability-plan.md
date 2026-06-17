@@ -157,3 +157,51 @@ Transcript
 → Authority Layer
 → Policy/Delivery Layer
 → Execution Adapter
+
+## Current Core Ownership Boundary
+
+As of this branch, `app/george/page.tsx` no longer owns LIVE outcome interpretation or final transcript execution composition.
+
+### Interpretation Ownership
+
+`lib/george/core/build-interpretation.ts` owns composition of:
+
+- deriveActiveOutcome
+- georgeOutcomeGovernor
+- conversation signals
+- speaker intent
+- room analysis
+- objective inference
+- trajectory inference
+
+The app may consume the resulting interpretation object, but should not recreate the interpretation chain directly.
+
+### Execution Ownership
+
+`lib/george/core/live-execution.ts` owns composition of:
+
+- routeLiveTranscript
+- resolveLiveTranscriptDecision
+- authorizeLiveTranscriptAction
+
+The app may execute the returned action through app bridges such as `speakText()` and `handleSend()`, but should not recreate the transcript execution chain directly.
+
+### App Ownership
+
+`app/george/page.tsx` may own:
+
+- UI state
+- refs
+- rendering
+- user input
+- provider hooks
+- session persistence wiring
+- bridges to speech/audio/send functions
+
+`app/george/page.tsx` should not own:
+
+- outcome interpretation
+- governor composition
+- transcript routing composition
+- action authority composition
+- portable room intelligence
