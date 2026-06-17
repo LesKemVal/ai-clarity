@@ -97,28 +97,28 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
     const isNegotiation = /negotiat|deal|offer|terms|price/.test(roomLower)
 
     if (isMedical) {
-      return `You're here for clarity, and that's enough. We'll make sure the important questions get answered. The room is loaded. I'm right here with you. I'm listening.`
+      return `I have the room. Keep your attention on what you need answered. I’ll help you stay organized, clear, and steady.`
     }
 
     if (isInvestor) {
       const target = outcome !== 'Not specified' ? `We're aiming for ${outcome},` : `We're looking for commitment,`
-      return `You're walking in as ${chair !== 'Not specified' ? chair : 'the lead'} today, and the investors are probably looking for reasons to believe. ${target} but the real work is getting them comfortable with the opportunity and the path. Remember, they may challenge assumptions before they challenge the opportunity. The room is loaded. I'm listening.`
+      return `I have the investor room. You’re entering as ${chair !== 'Not specified' ? chair : 'the lead'}. ${target} but trust will move through evidence, timing, and the next clean step.`
     }
 
     if (isNegotiation) {
       const target = outcome !== 'Not specified' ? `We're moving toward ${outcome},` : `We're moving toward your target,`
-      return `You're walking into a negotiation, and the other side may test conviction before they reveal their real position. ${target} but patience will give us information. Remember, the first number isn't always the real number. The room is loaded. I'm listening.`
+      return `I have the negotiation. ${target} and the first job is to protect your position while we learn what the other side is really holding.`
     }
 
     if (isInterview) {
-      return `You're walking into an interview, and they're trying to understand how you think as much as what you know. We're looking for a strong outcome, but the conversation matters too. Remember, they're evaluating judgment, not just answers. The room is loaded. I'm listening.`
+      return `I have the interview. They’re listening for judgment, fit, and how you think under pressure. Keep your answers clear. I’ll help protect your timing and direction.`
     }
 
     if (context !== 'Not specified' || outcome !== 'Not specified') {
-      return `The room is clear enough. ${context !== 'Not specified' ? `The situation is ${context}.` : ''} ${outcome !== 'Not specified' ? `We're moving toward ${outcome}.` : ''} Stay with the objective, and let the room tell us what matters. The room is loaded. I'm listening.`
+      return `I have enough to enter with you. ${context !== 'Not specified' ? `The situation is ${context}.` : ''} ${outcome !== 'Not specified' ? `We’re moving toward ${outcome}.` : ''} Stay close to the objective. I’ll help read what changes.`
     }
 
-    return `The room is loaded. I'm listening.`
+    return `I’m with you. Start with the room as it is, and I’ll help you keep direction.`
   }
 
   const buildRoomBriefing = () => {
@@ -130,7 +130,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
 
     if (firstDeviceBriefing) {
       window.localStorage.setItem('george_live_first_room_controls_briefed_v1', '1')
-      lines.push('Oh... use your steering phrases, language settings, or the top card whenever the room changes.')
+      lines.push('Use your steering phrases or the top card if the room changes. I’ll adjust with you.')
     }
 
     return lines.join(' ')
@@ -186,7 +186,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/52">LIVE Preview</p>
               <h2 className="mt-1.5 text-[22px] font-semibold tracking-[-0.045em] text-white">
-                The room has taken shape.
+                GEORGE is ready for the room.
               </h2>
             </div>
             <div className="rounded-full border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.055] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/68">
@@ -195,7 +195,7 @@ export function PrepRoomResourcePopup({ open, profile, room, relatedSessionTitle
           </div>
 
           <p className="mt-2 text-[12px] leading-5 text-white/50">
-            Now we turn words into movement.
+            Review the setup, accept responsibility, then enter LIVE.
           </p>
         </div>
 
