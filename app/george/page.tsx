@@ -47,6 +47,7 @@ import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
+import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2564,6 +2565,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const liveBuyTimeUntilRef = useRef<number>(0)
   const liveLastSpokenUtteranceRef = useRef<string>('')
   const liveRecentSpokenUtterancesRef = useRef<string[]>([])
+  const liveAwarenessBufferRef = useRef<LiveAwarenessFragment[]>([])
 
   const appendLiveContextSignal = useCallback((text: string) => {
     liveContextBufferRef.current = appendLiveContextSignalValue(
@@ -2593,6 +2595,12 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
     appendLiveContextSignal(clean)
+    liveAwarenessBufferRef.current = appendLiveAwarenessFragment({
+      buffer: liveAwarenessBufferRef.current,
+      kind: 'final',
+      text: clean,
+      whileGeorgeSpeaking: isSpeakingRef.current,
+    })
     setInput('')
     liveTranscriptSubmitRef.current(clean)
   }, [appendLiveContextSignal])
