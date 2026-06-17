@@ -46,6 +46,7 @@ import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
+import { authorizeLiveTranscriptAction } from '@/lib/george/live-runtime/live-action-authority'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
@@ -5150,35 +5151,47 @@ return true
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
     })
 
-    console.info('[GEORGE LIVE ACTION]', action)
+    const authority = authorizeLiveTranscriptAction({
+      transcript: clean,
+      decision,
+      action,
+      isGeorgeSpeaking: isSpeakingRef.current,
+      isThinking,
+      overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
+      overlapRequiresAttention: false,
+      lastSpokenLine: liveLastSpokenUtteranceRef.current,
+      desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+    })
 
-    if (action.type === 'ignore') {
+    console.info('[GEORGE LIVE ACTION]', { action, authority })
+
+    if (authority.action.type === 'ignore') {
       return
     }
 
-    if (action.type === 'start_buy_time') {
+    if (authority.action.type === 'start_buy_time') {
       console.info('[GEORGE LIVE LOCAL]', 'buy_time')
 
-      const buyTimeUntil = Date.now() + action.durationMs
+      const buyTimeUntil = Date.now() + authority.action.durationMs
       liveBuyTimeUntilRef.current = buyTimeUntil
 
       window.setTimeout(() => {
         if (liveBuyTimeUntilRef.current === buyTimeUntil) {
           console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
         }
-      }, action.durationMs)
+      }, authority.action.durationMs)
 
       return
     }
 
-    if (action.type === 'speak') {
+    if (authority.action.type === 'speak') {
       console.info('[GEORGE LIVE LOCAL]', 'speak')
-      void speakText(action.text)
+      void speakText(authority.action.text)
       return
     }
 
-    if (action.type === 'send') {
-      void handleSend(action.text, { source: 'live_transcript' })
+    if (authority.action.type === 'send') {
+      void handleSend(authority.action.text, { source: 'live_transcript' })
     }
   }, [handleSend, routeCurrentLiveTranscript, speakText])
 
