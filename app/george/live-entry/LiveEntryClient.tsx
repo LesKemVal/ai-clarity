@@ -2269,7 +2269,7 @@ const mandatoryLiveSignals = useMemo(() => {
       if (liveBriefingTermsPreviouslyAcceptedRef.current) {
         liveBriefingTermsPreviouslyAcceptedRef.current = false
         liveBriefingHasReopenedEditsRef.current = true
-        void speakLiveEntryLine('More edits? Take your time.')
+        void speakLiveEntryLine('Take your time. I’ll stay with the room while you adjust it.')
       }
 
       return
@@ -2282,28 +2282,28 @@ const mandatoryLiveSignals = useMemo(() => {
       const isRecheck = liveBriefingHasReopenedEditsRef.current
 
       if (!isRecheck) {
-        await speakLiveEntryLine('Good. Any questions?')
+        await speakLiveEntryLine('Good. Pause here if anything still needs to change.')
         await waitForLiveEntryVoice(5000)
 
         if (liveBriefingConfirmSequenceRef.current !== sequence) return
 
         setLiveBriefingReadyToContinue(true)
-        await speakLiveEntryLine("Let's continue.")
+        await speakLiveEntryLine("We can continue.")
         return
       }
 
-      await speakLiveEntryLine('Alright. Any questions?')
+      await speakLiveEntryLine('Alright. Check the room once more if you need to.')
       await waitForLiveEntryVoice(4000)
 
       if (liveBriefingConfirmSequenceRef.current !== sequence) return
 
-      await speakLiveEntryLine('You sure?')
+      await speakLiveEntryLine('Confirm when you’re ready.')
       await waitForLiveEntryVoice(3000)
 
       if (liveBriefingConfirmSequenceRef.current !== sequence) return
 
       setLiveBriefingReadyToContinue(true)
-      await speakLiveEntryLine("I'm ready when you are.")
+      await speakLiveEntryLine("I’m ready when you are.")
     })()
   }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted])
 
@@ -2315,7 +2315,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
     if (liveBriefingStep === 1) {
       const name = cleanBriefingValue(sessionEmail).split('@')[0] || 'You'
-      void speakLiveEntryLine(`${name}, you’re here. Edit anything that changed, then check the required box. After that, we move on.`)
+      void speakLiveEntryLine(`${name}, review the room. Edit anything that changed, then confirm responsibility before we continue.`)
     }
   }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail])
 
@@ -2335,7 +2335,7 @@ const mandatoryLiveSignals = useMemo(() => {
     if (!actualEditOccurred) return
 
     setLiveBriefingEditAcknowledged(true)
-    void speakLiveEntryLine('I recognize your updates. I will account for them as we prepare the room.')
+    void speakLiveEntryLine('I have your updates. I’ll carry them into the room.')
   }, [
     showLiveBriefingRoom,
     liveBriefingToaAccepted,
@@ -2749,7 +2749,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
           <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
             liveBriefingToaAccepted
-              ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(143,182,201,0.24)]'
+              ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.28)]'
               : 'border-[#8FB6C9]/36 bg-[#8FB6C9]/[0.035]'
           }`}>
             <input
@@ -2892,10 +2892,10 @@ const mandatoryLiveSignals = useMemo(() => {
                   </div>
 
                   {activeSupportPanel.id === recommendedSupportPanel.id && (
-                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-emerald-300/55">
+                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-white/46">
                       <span className="relative flex h-3 w-3">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-35" />
-                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.55)]" />
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-30" />
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]" />
                       </span>
                       Active
                     </div>
@@ -2919,8 +2919,8 @@ const mandatoryLiveSignals = useMemo(() => {
                         >
                           {active ? (
                             <span className="relative flex h-3.5 w-3.5">
-                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-35" />
-                              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.55)]" />
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-30" />
+                              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]" />
                             </span>
                           ) : (
                             <span className="h-3.5 w-3.5 rounded-full border border-white/[0.18]" />
@@ -3039,7 +3039,7 @@ const mandatoryLiveSignals = useMemo(() => {
                 onChange={(event) => {
                   if (event.target.checked) {
                     confirmPrivacyAndContinue()
-                    void speakLiveEntryLine('Good. We take your privacy very seriously.')
+                    void speakLiveEntryLine('Good. Your room context stays tied to this session.')
                     return
                   }
 
@@ -3111,18 +3111,18 @@ const mandatoryLiveSignals = useMemo(() => {
         'Lester'
 
       void (async () => {
-        await speakLiveEntryLine('Good. Any questions?')
+        await speakLiveEntryLine('Good. Pause here if anything still needs to change.')
         await waitForLiveEntryVoice(4500)
 
         if (liveReadyConfirmSequenceRef.current !== sequence) return
 
-        await speakLiveEntryLine(`Are you sure, ${name}?`)
+        await speakLiveEntryLine(`${name}, confirm when you’re ready.`)
         await waitForLiveEntryVoice(3000)
 
         if (liveReadyConfirmSequenceRef.current !== sequence) return
 
         setLiveReadinessComplete(true)
-        await speakLiveEntryLine("Okay. Let's get it!")
+        await speakLiveEntryLine("Good. Enter the room when you’re ready.")
       })()
     }
 
