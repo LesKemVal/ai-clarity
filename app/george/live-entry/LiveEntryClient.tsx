@@ -541,7 +541,7 @@ function PanelShell({
       <div className="relative z-10 w-full max-w-[560px]">
         <div className="mb-3 flex items-center justify-between px-1">
           <div className="flex items-center gap-3">
-            <img src="/logofav.png" alt="Bx" className="h-8 w-8 object-contain opacity-95" />
+            <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-[0.94]" />
             <div className="text-[9px] uppercase tracking-[0.34em] text-white/38">
               BRANESx
             </div>
@@ -588,7 +588,7 @@ function AwakeButton({
       type="button"
       disabled={!active}
       onClick={onClick}
-      className={`mt-5 w-full rounded-[1rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+      className={`mt-5 w-full rounded-[1rem] border px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
         active
           ? 'border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]'
           : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
@@ -2282,7 +2282,7 @@ const mandatoryLiveSignals = useMemo(() => {
       const isRecheck = liveBriefingHasReopenedEditsRef.current
 
       if (!isRecheck) {
-        await speakLiveEntryLine('Good. Pause here if anything still needs to change.')
+        await speakLiveEntryLine('Good. Hold here if the room still needs adjustment.')
         await waitForLiveEntryVoice(5000)
 
         if (liveBriefingConfirmSequenceRef.current !== sequence) return
@@ -2297,7 +2297,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
       if (liveBriefingConfirmSequenceRef.current !== sequence) return
 
-      await speakLiveEntryLine('Confirm when you’re ready.')
+      await speakLiveEntryLine('Confirm when the room is ready.')
       await waitForLiveEntryVoice(3000)
 
       if (liveBriefingConfirmSequenceRef.current !== sequence) return
@@ -2442,7 +2442,7 @@ const mandatoryLiveSignals = useMemo(() => {
               )}
             </div>
 
-            <div className="mt-3 text-[13px] leading-6 text-white/42">
+            <div className="mt-2 text-[13px] leading-5 text-white/42">
               {liveEntryQuestionSurface.helper}
             </div>
 
@@ -2473,12 +2473,12 @@ const mandatoryLiveSignals = useMemo(() => {
               />
             )}
 
-            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
                 onClick={() => { unlockLiveEntryVoice(); liveEntryQuestionSurface.submit() }}
-                className="rounded-[0.95rem] border border-[#8FB6C9]/35 bg-[#8FB6C9]/[0.075] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
+                className="rounded-[0.95rem] border border-[#8FB6C9]/35 bg-[#8FB6C9]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
               >
                 {liveEntryQuestionSurface.primaryAction}
               </button>
@@ -2494,7 +2494,7 @@ const mandatoryLiveSignals = useMemo(() => {
                   setShowLiveBriefingRoom(true)
                   setLiveBriefingStep(1)
                 }}
-                className={`rounded-[0.95rem] border px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
+                className={`rounded-[0.95rem] border px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
                   liveEntryQuestionSurface.canBeginLive
                     ? 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12] hover:text-white'
                     : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
@@ -2747,7 +2747,7 @@ const mandatoryLiveSignals = useMemo(() => {
             </div>
           </div>
 
-          <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition ${
+          <label className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-2.5 transition ${
             liveBriefingToaAccepted
               ? 'border-[#D7DCFF]/70 bg-[#8FB6C9]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.28)]'
               : 'border-[#8FB6C9]/36 bg-[#8FB6C9]/[0.035]'
@@ -2758,7 +2758,7 @@ const mandatoryLiveSignals = useMemo(() => {
               onChange={(event) => { unlockLiveEntryVoice(); setLiveBriefingToaAccepted(event.target.checked) }}
               className="mt-1 h-4 w-4 accent-[#8FB6C9]"
             />
-            <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
+            <span className="text-[12.5px] leading-5 text-[#D7DBE4]/72">
               I agree to the Terms of Assistance.{' '}
               <button
                 type="button"
@@ -2870,15 +2870,15 @@ const mandatoryLiveSignals = useMemo(() => {
       }
 
       return (
-        <PanelShell label="BRIEF ROOM · CONSTRAINTS" title="Room constraints." stage={2}>
-          <div className="mt-4 space-y-4">
-            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
+        <PanelShell label="BRIEF ROOM · CONSTRAINTS" title="Set how GEORGE supports the room." stage={2}>
+          <div className="mt-3 space-y-3">
+            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-3 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
-                How GEORGE supports you in the room
+                Support style
               </div>
 
-              <p className="mt-3 text-[13px] leading-6 text-[#D7DBE4]/62">
-                GEORGE sets a default before LIVE starts. You can change it, or trust GEORGE.
+              <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/62">
+                GEORGE will use the support style that best protects the room.
               </p>
 
               <div className="mt-4 rounded-[0.7rem] border border-white/[0.06] bg-black/[0.16] px-3 py-3">
@@ -2894,8 +2894,8 @@ const mandatoryLiveSignals = useMemo(() => {
                   {activeSupportPanel.id === recommendedSupportPanel.id && (
                     <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-white/46">
                       <span className="relative flex h-3 w-3">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-30" />
-                        <span className="relative inline-flex h-3 w-3 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]" />
+                        <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9]' : 'bg-white'} opacity-30`} />
+                        <span className={`relative inline-flex h-3 w-3 rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9] shadow-[0_0_18px_rgba(143,182,201,0.55)]' : 'bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]'}`} />
                       </span>
                       Active
                     </div>
@@ -2919,8 +2919,8 @@ const mandatoryLiveSignals = useMemo(() => {
                         >
                           {active ? (
                             <span className="relative flex h-3.5 w-3.5">
-                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-30" />
-                              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]" />
+                              <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9]' : 'bg-white'} opacity-30`} />
+                              <span className={`relative inline-flex h-3.5 w-3.5 rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9] shadow-[0_0_18px_rgba(143,182,201,0.55)]' : 'bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]'}`} />
                             </span>
                           ) : (
                             <span className="h-3.5 w-3.5 rounded-full border border-white/[0.18]" />
@@ -3039,7 +3039,7 @@ const mandatoryLiveSignals = useMemo(() => {
                 onChange={(event) => {
                   if (event.target.checked) {
                     confirmPrivacyAndContinue()
-                    void speakLiveEntryLine('Good. Your room context stays tied to this session.')
+                    void speakLiveEntryLine('Good. I’ll keep this room tied to this session.')
                     return
                   }
 
@@ -3111,18 +3111,18 @@ const mandatoryLiveSignals = useMemo(() => {
         'Lester'
 
       void (async () => {
-        await speakLiveEntryLine('Good. Pause here if anything still needs to change.')
+        await speakLiveEntryLine('Good. Hold here if the room still needs adjustment.')
         await waitForLiveEntryVoice(4500)
 
         if (liveReadyConfirmSequenceRef.current !== sequence) return
 
-        await speakLiveEntryLine(`${name}, confirm when you’re ready.`)
+        await speakLiveEntryLine(`${name}, confirm when the room is ready.`)
         await waitForLiveEntryVoice(3000)
 
         if (liveReadyConfirmSequenceRef.current !== sequence) return
 
         setLiveReadinessComplete(true)
-        await speakLiveEntryLine("Good. Enter the room when you’re ready.")
+        await speakLiveEntryLine("Good. Enter LIVE when you are ready to carry the room.")
       })()
     }
 
@@ -3332,7 +3332,7 @@ const mandatoryLiveSignals = useMemo(() => {
                 <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
               </div>
 
-              <div className="mt-3 text-[13px] leading-6 text-[#D7DBE4]/46">
+              <div className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/46">
                 {currentOptionalSignalQuestion.why}
               </div>
 
