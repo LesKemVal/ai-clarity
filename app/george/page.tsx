@@ -55,6 +55,7 @@ import { deriveLiveRoomPriorities } from '@/lib/george/live-runtime/live-room-pr
 import { deriveLiveAttentionState } from '@/lib/george/live-runtime/live-attention-manager'
 import { deriveLiveSpeakerPersistence } from '@/lib/george/live-runtime/live-speaker-persistence'
 import { deriveLiveInfluenceState } from '@/lib/george/live-runtime/live-influence-map'
+import { deriveLiveOutcomeDrift } from '@/lib/george/live-runtime/live-outcome-drift'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2639,6 +2640,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       attentionState,
     })
 
+    const outcomeDrift = deriveLiveOutcomeDrift({
+      desiredOutcome: liveRuntimeSupport?.objective || '',
+      roomState,
+      roomPriorities,
+      influenceState,
+    })
+
     if (
       awarenessState.overlapDetected ||
       overlapRecovery.requiresAttention ||
@@ -2656,6 +2664,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
         attentionState,
         speakerPersistence,
         influenceState,
+        outcomeDrift,
       })
     }
 
