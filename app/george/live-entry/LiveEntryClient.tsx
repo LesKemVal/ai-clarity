@@ -2013,7 +2013,6 @@ const mandatoryLiveSignals = useMemo(() => {
 
     setProofInProgress(true)
     setProofTranscript([{ speaker: 'george', text: 'Listening…' }])
-    console.log('[GEORGE LIVE ENTRY] proof sequence started')
 
     const SpeechRecognition =
       typeof window !== 'undefined'
@@ -2026,7 +2025,6 @@ const mandatoryLiveSignals = useMemo(() => {
     const listenOnce = (timeoutMs = 3200) =>
       new Promise<string>((resolve) => {
         if (!SpeechRecognition) {
-          console.log('[GEORGE LIVE ENTRY] SpeechRecognition unavailable')
           setLiveBriefingSttError('Voice capture is unavailable in this browser. Continuing.')
           window.setTimeout(() => resolve(''), timeoutMs)
           return
@@ -2049,7 +2047,6 @@ const mandatoryLiveSignals = useMemo(() => {
         }
 
         recognition.onerror = (event: any) => {
-          console.log('[GEORGE LIVE ENTRY] SpeechRecognition error', event?.error || event)
           setLiveBriefingSttError('I could not hear that clearly. Continuing.')
           window.clearTimeout(timer)
           resolve('')
@@ -2114,7 +2111,6 @@ const mandatoryLiveSignals = useMemo(() => {
 
     setProofComplete(true)
     setProofInProgress(false)
-    console.log('[GEORGE LIVE ENTRY] proof sequence complete; ready for final handoff')
     undefined
   }
 

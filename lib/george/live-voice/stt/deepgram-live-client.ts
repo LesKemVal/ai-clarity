@@ -77,10 +77,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       '&endpointing=350'
 
     try {
-      const devices = await navigator.mediaDevices.enumerateDevices()
-      console.log('[GEORGE DEEPGRAM] audio inputs', devices
-        .filter((device) => device.kind === 'audioinput')
-        .map((device) => ({ label: device.label, deviceId: device.deviceId })))
+      await navigator.mediaDevices.enumerateDevices()
     } catch {}
 
     try {
@@ -106,10 +103,9 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
           sum += centered * centered
         }
         const rms = Math.sqrt(sum / data.length)
-        console.log('[GEORGE DEEPGRAM] mic level', { rms: Number(rms.toFixed(2)) })
       }, 1000)
     } catch (error) {
-      console.log('[GEORGE DEEPGRAM] mic meter failed', error)
+      console.warn('[GEORGE DEEPGRAM] mic meter failed', error)
     }
 
     if (stopped) return
@@ -122,7 +118,6 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         return
       }
 
-      console.log('[GEORGE DEEPGRAM] websocket open')
       handlers.onOpen?.()
 
       recorder = new MediaRecorder(stream as MediaStream, {
@@ -131,22 +126,18 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
           : 'audio/webm',
       })
 
-      console.log('[GEORGE DEEPGRAM] mime', recorder.mimeType)
 
       recorder.ondataavailable = (event) => {
         if (stopped) return
         if (!event.data?.size) return
         if (!socket || socket.readyState !== WebSocket.OPEN) return
-        console.log('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
         socket.send(event.data)
       }
 
-      console.log('[GEORGE DEEPGRAM] recorder start', { mimeType: recorder.mimeType })
       recorder.start(250)
     }
 
     socket.onmessage = (message) => {
-      console.log('[GEORGE DEEPGRAM] message', message.data)
       try {
         const payload = JSON.parse(String(message.data))
         const transcript =
@@ -167,12 +158,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
     }
 
     socket.onerror = (error) => {
-      console.log('[GEORGE DEEPGRAM] websocket error', error)
+      console.warn('[GEORGE DEEPGRAM] websocket error', error)
       handlers.onError?.(error)
     }
 
     socket.onclose = (event) => {
-      console.log('[GEORGE DEEPGRAM] websocket close', { code: event.code, reason: event.reason })
       if (!stopped) handlers.onClose?.()
     }
   }
