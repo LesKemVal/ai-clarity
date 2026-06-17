@@ -127,3 +127,67 @@ Dormant systems may be valuable design assets.
 Active systems may be incomplete.
 
 Promotion requires proof.
+## Backend Artifact Classification
+
+### app/api/chat/route.ts.tmp
+
+Status: legacy artifact.
+
+Finding:
+- Not routable by Next.js because the filename is `route.ts.tmp`, not `route.ts`.
+- Not imported by active code.
+- Much smaller than the active `app/api/chat/route.ts`.
+- Contains shell-substitution artifact text.
+- Appears to be abandoned April 2026 migration/patch output.
+
+Classification:
+- Not active runtime.
+- Not current GEORGE brain.
+- Safe deletion candidate after backend audit completes.
+
+Do not delete until final cleanup pass.
+
+## Legacy LIVE Governor Classification
+
+### app/api/george/live/govern/route.ts
+
+Status: legacy active route, currently quarantined from primary LIVE authority.
+
+Finding:
+- Route is reachable only through `injectGovernedLiveCue()` in `app/george/page.tsx`.
+- `injectGovernedLiveCue()` belongs to the older page-level LIVE cue path.
+- The major browser-STT callers are disabled by `LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED = false`.
+- The route still preserves useful design logic and should not be deleted yet.
+
+Classification:
+- Legacy governor / shelved Pro LIVE candidate.
+- Not the current primary LIVE authority.
+- Preserve until Pro LIVE and delivery architecture are fully classified.
+
+### lib/george/live-voice/governor.ts
+
+Status: legacy reasoning/governance module.
+
+Finding:
+- Performs room analysis, speaker inference, speaker intent, response policy selection, runtime support overlays, memory overlays, agency override, and steering continuation.
+- Returns a `LiveVoicePacket`.
+- Does not directly execute speech or mutate UI.
+
+Classification:
+- Reference architecture / legacy governor logic.
+- Potential migration source for future runtime modules.
+- Not current execution authority.
+
+### lib/george/live-voice/live-reasoning.ts
+
+Status: legacy OpenAI tactical reasoning module.
+
+Finding:
+- Uses OpenAI to reason over transcript, room, outcome, shadow map, signal sufficiency, and carry-turn delegation.
+- Returns a packet.
+- Does not directly execute speech or mutate UI.
+
+Classification:
+- Valuable reasoning reference.
+- Potential future advisor behind current `authorizeLiveTranscriptAction` path.
+- Not current execution authority.
