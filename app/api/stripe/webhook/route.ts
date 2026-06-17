@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET
     )
 
-    console.log('stripe webhook event:', event.type)
+    console.info('[STRIPE webhook]', { type: event.type, id: event.id })
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -55,11 +55,10 @@ export async function POST(req: NextRequest) {
           lastSubscriptionId: session.subscription,
         })
 
-        console.log('checkout.session.completed', {
+        console.info('[STRIPE checkout.session.completed]', {
           id: session.id,
           customer: session.customer,
           subscription: session.subscription,
-          email: session.customer_details?.email || session.metadata?.email || null,
           tier: session.metadata?.tier ?? null,
         })
         break
@@ -93,7 +92,8 @@ export async function POST(req: NextRequest) {
           lastSubscriptionId: subscription.id,
         })
 
-        console.log(event.type, {
+        console.info('[STRIPE subscription]', {
+          type: event.type,
           id: subscription.id,
           customer: subscription.customer,
           status: subscription.status,
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        console.log('unhandled stripe event:', event.type)
+        console.info('[STRIPE unhandled]', { type: event.type, id: event.id })
     }
 
     return NextResponse.json({ received: true })
