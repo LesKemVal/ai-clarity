@@ -42,6 +42,7 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
+import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
@@ -2624,6 +2625,43 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setIsListening(false)
   }, [stopLiveAudioRuntimeDirect])
 
+
+  useLiveReflexListener({
+    enabled: Boolean(forceLive || liveMode),
+    active: Boolean(isSpeaking),
+    onReflex: (event) => {
+      console.info('[GEORGE LIVE REFLEX]', event)
+
+      if (event.intent === 'pause') {
+        stopSpeechRef.current = true
+        void stopSpeech()
+        return
+      }
+
+      if (event.intent === 'repeat_last_line') {
+        const lastLine = liveLastSpokenUtteranceRef.current.trim()
+        if (lastLine) void speakText(lastLine)
+        return
+      }
+
+      if (event.intent === 'compress_last_line') {
+        const action = resolveLiveTranscriptDecision({
+          decision: { type: 'local', content: 'compress_last_line' },
+          transcript: event.transcript,
+          lastSpokenLine: liveLastSpokenUtteranceRef.current,
+        })
+
+        if (action.type === 'speak') {
+          void speakText(action.text)
+        }
+        return
+      }
+
+      if (event.intent === 'buy_time') {
+        liveBuyTimeUntilRef.current = Date.now() + 3500
+      }
+    },
+  })
 
   useEffect(() => {
     if (!(forceLive || liveMode)) return
