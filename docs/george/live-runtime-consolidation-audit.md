@@ -246,3 +246,37 @@ Legacy artifact; not routable; not imported; appears to be abandoned patch outpu
 
 Reason:
 Backup file may contain chair/role intelligence. Inspect diff before deletion.
+
+## Outcome Engine Assessment
+
+### lib/george/live-voice/runtime/active-outcome.ts
+
+Classification: PORTABLE_BRAIN, early heuristic implementation.
+
+Finding:
+- Identifies the active outcome created by the current room signal.
+- Distinguishes desired outcome from active outcome.
+- Independent of UI and browser state.
+- Current implementation is hardcoded pattern matching and is strongest around interview, negotiation, credibility, leadership, board/executive, and objection contexts.
+
+Assessment:
+- Concept is core GEORGE brain.
+- Implementation should mature from keyword mapping into signal-driven outcome inference.
+
+### lib/george/live-voice/runtime/outcome-governor.ts
+
+Classification: PORTABLE_BRAIN.
+
+Finding:
+- Produces movement state, next move, missing signal, reason, and doctrine.
+- Models advancing, stalled, blocked, escalating, and closing states.
+- Models direct response, signal acquisition, context recovery, buy time, protect position, clarify, summarize, observe, and hold moves.
+- Does not generate words.
+- Does not own UI.
+- Does not execute speech.
+- Depends on upstream signal truth.
+
+Assessment:
+- Strong candidate for GEORGE Brain core.
+- Current weakness is not the governor itself; it is that upstream signals are fragmented.
+- To become lease-ready, the signal layer feeding it must be unified and tested.
