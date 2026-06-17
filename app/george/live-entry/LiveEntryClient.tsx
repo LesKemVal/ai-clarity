@@ -1975,7 +1975,7 @@ const mandatoryLiveSignals = useMemo(() => {
       const response = await fetch('/api/george/live/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: message }),
+        body: JSON.stringify({ text: message, email: sessionEmail?.trim() || undefined }),
       })
 
       if (!response.ok) return
@@ -2156,6 +2156,27 @@ const mandatoryLiveSignals = useMemo(() => {
 
   const waitForLiveEntryVoice = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
+  const liveEntryVoiceUnlockedRef = useRef(false)
+
+  const unlockLiveEntryVoice = () => {
+    if (liveEntryVoiceUnlockedRef.current) return
+
+    try {
+      const audio = new Audio()
+      audio.muted = true
+      void audio.play()
+        .then(() => {
+          liveEntryVoiceUnlockedRef.current = true
+          audio.pause()
+        })
+        .catch(() => {
+          liveEntryVoiceUnlockedRef.current = true
+        })
+    } catch {
+      liveEntryVoiceUnlockedRef.current = true
+    }
+  }
+
   const stopLiveEntryVoice = () => {
     try {
       if (liveEntryAudioRef.current) {
@@ -2181,7 +2202,7 @@ const mandatoryLiveSignals = useMemo(() => {
       const response = await fetch('/api/george/live/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: message }),
+        body: JSON.stringify({ text: message, email: sessionEmail?.trim() || undefined }),
       })
 
       if (!response.ok) return
@@ -2391,8 +2412,8 @@ const mandatoryLiveSignals = useMemo(() => {
       <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.075),transparent_32%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
 
-        <div className="absolute left-5 top-5 z-20">
-          <img src="/logofav.png" alt="Bx" className="h-9 w-9 object-contain opacity-[0.94]" />
+        <div className="absolute left-4 top-4 z-20">
+          <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-[0.94]" />
         </div>
 
         <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-[#8FB6C9]/[0.11] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
@@ -2456,7 +2477,7 @@ const mandatoryLiveSignals = useMemo(() => {
               <button
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
-                onClick={() => liveEntryQuestionSurface.submit()}
+                onClick={() => { unlockLiveEntryVoice(); liveEntryQuestionSurface.submit() }}
                 className="rounded-[0.95rem] border border-[#8FB6C9]/35 bg-[#8FB6C9]/[0.075] px-4 py-4 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
               >
                 {liveEntryQuestionSurface.primaryAction}
@@ -2734,7 +2755,7 @@ const mandatoryLiveSignals = useMemo(() => {
             <input
               type="checkbox"
               checked={liveBriefingToaAccepted}
-              onChange={(event) => setLiveBriefingToaAccepted(event.target.checked)}
+              onChange={(event) => { unlockLiveEntryVoice(); setLiveBriefingToaAccepted(event.target.checked) }}
               className="mt-1 h-4 w-4 accent-[#8FB6C9]"
             />
             <span className="text-[13px] leading-6 text-[#D7DBE4]/72">
