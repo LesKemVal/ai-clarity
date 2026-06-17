@@ -48,6 +48,8 @@ import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/g
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
+import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
+import { recoverLiveOverlapContext } from '@/lib/george/live-runtime/live-overlap-recovery'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2601,6 +2603,17 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       text: clean,
       whileGeorgeSpeaking: isSpeakingRef.current,
     })
+
+    const awarenessState = reconcileLiveAwareness(liveAwarenessBufferRef.current)
+    const overlapRecovery = recoverLiveOverlapContext(awarenessState)
+
+    if (awarenessState.overlapDetected || overlapRecovery.requiresAttention) {
+      console.info('[GEORGE LIVE AWARENESS]', {
+        awarenessState,
+        overlapRecovery,
+      })
+    }
+
     setInput('')
     liveTranscriptSubmitRef.current(clean)
   }, [appendLiveContextSignal])
