@@ -1,5 +1,6 @@
 import type { LiveTranscriptControllerAction } from './live-transcript-controller'
 import type { LiveTranscriptDecision } from './transcript-routing'
+import { georgeLiveRuntimeEvents } from '../live-voice/runtime/runtime-events'
 
 export type LiveActionAuthorityVerdict =
   | 'allow'
@@ -62,20 +63,38 @@ export function authorizeLiveTranscriptAction(params: {
     },
   })
 
+  const emit = (result: LiveActionAuthorityResult) => {
+    georgeLiveRuntimeEvents.emit(
+      result.shouldHold || result.verdict === 'block'
+        ? 'silence_required'
+        : result.shouldSend
+          ? 'cue_ready'
+          : 'hold_floor',
+      {
+        reason: result.reason,
+        confidence: result.confidence,
+        intervention: result.verdict,
+        nextMove: result.action.type,
+      }
+    )
+
+    return result
+  }
+
   if (!transcript && action.type !== 'ignore') {
-    return make('block', { type: 'ignore' }, 'No transcript available for LIVE action authority.', 0.9)
+    return emit(make('block', { type: 'ignore' }, 'No transcript available for LIVE action authority.', 0.9))
   }
 
   if (action.type === 'ignore') {
-    return make('allow', action, 'Controller already ignored this LIVE transcript.', 0.96)
+    return emit(make('allow', action, 'Controller already ignored this LIVE transcript.', 0.96))
   }
 
   if (params.isGeorgeSpeaking && action.type === 'send') {
-    return make('hold', { type: 'ignore' }, 'GEORGE is speaking; hold send action to avoid self-overlap.', 0.82)
+    return emit(make('hold', { type: 'ignore' }, 'GEORGE is speaking; hold send action to avoid self-overlap.', 0.82))
   }
 
   if (params.isThinking && action.type === 'send') {
-    return make('hold', { type: 'ignore' }, 'GEORGE is already thinking; hold duplicate send action.', 0.84)
+    return emit(make('hold', { type: 'ignore' }, 'GEORGE is already thinking; hold duplicate send action.', 0.84))
   }
 
   if (
@@ -83,34 +102,34 @@ export function authorizeLiveTranscriptAction(params: {
     params.overlapRequiresAttention &&
     action.type === 'send'
   ) {
-    return make('hold', { type: 'ignore' }, 'Overlap detected; hold send action until room context is clearer.', 0.78)
+    return emit(make('hold', { type: 'ignore' }, 'Overlap detected; hold send action until room context is clearer.', 0.78))
   }
 
   if (
     action.type === 'speak' &&
     !String(params.lastSpokenLine || '').trim()
   ) {
-    return make('block', { type: 'ignore' }, 'Speak action requires a remembered last spoken line.', 0.86)
+    return emit(make('block', { type: 'ignore' }, 'Speak action requires a remembered last spoken line.', 0.86))
   }
 
   if (action.type === 'start_buy_time') {
-    return make('allow', action, 'Local buy-time action approved.', 0.9)
+    return emit(make('allow', action, 'Local buy-time action approved.', 0.9))
   }
 
   if (action.type === 'speak') {
-    return make('allow', action, 'Local repeat/compress action approved.', 0.84)
+    return emit(make('allow', action, 'Local repeat/compress action approved.', 0.84))
   }
 
   if (action.type === 'send') {
-    return make(
+    return emit(make(
       'allow',
       action,
       params.desiredOutcome
         ? 'Send action approved with desired outcome context.'
         : 'Send action approved without desired outcome context.',
       params.desiredOutcome ? 0.78 : 0.68
-    )
+    ))
   }
 
-  return make('block', { type: 'ignore' }, 'Unknown LIVE action authority state.', 0.72)
+  return emit(make('block', { type: 'ignore' }, 'Unknown LIVE action authority state.', 0.72))
 }
