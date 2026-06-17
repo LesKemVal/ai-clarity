@@ -43,6 +43,7 @@ import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { routeLiveTranscript, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
+import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -4095,11 +4096,13 @@ if (activePromptContext || activePromptLabel) {
         }
 
         if (liveMode) {
-          liveLastSpokenUtteranceRef.current = cleaned
-          liveRecentSpokenUtterancesRef.current = [
-            ...liveRecentSpokenUtterancesRef.current,
-            cleaned,
-          ].slice(-8)
+          const spokenMemory = rememberLiveSpokenLine({
+            line: cleaned,
+            previousRecentLines: liveRecentSpokenUtterancesRef.current,
+          })
+
+          liveLastSpokenUtteranceRef.current = spokenMemory.lastSpokenLine
+          liveRecentSpokenUtterancesRef.current = spokenMemory.recentSpokenLines
         }
 
         speechQueueRef.current = chunks
