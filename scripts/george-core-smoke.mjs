@@ -18,6 +18,7 @@ import { evaluateSignalSufficiency } from '${process.cwd()}/lib/george/runtime/s
 import { rankSignals } from '${process.cwd()}/lib/george/runtime/signal-ranking'
 import { inferObjectiveFromText, LIVE_OBJECTIVES } from '${process.cwd()}/lib/george/live-voice/runtime/objective-engine'
 import { georgeTrajectoryEngine } from '${process.cwd()}/lib/george/live-voice/runtime/trajectory-engine'
+import { buildGeorgeCoreInterpretation } from '${process.cwd()}/lib/george/core/build-interpretation'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -127,6 +128,19 @@ const trajectory = georgeTrajectoryEngine.evaluate({
 })
 assert(trajectory.trajectory === 'decision_ready', 'trajectory engine should detect decision-ready movement')
 assert(trajectory.recommendedAction === 'close', 'trajectory engine should recommend close on decision-ready movement')
+
+const interpretation = buildGeorgeCoreInterpretation({
+  transcript: 'George, what should I say? They challenged my leadership experience.',
+  room: 'interview',
+  desiredOutcome: 'get the job offer',
+  knownUserSpeaking: true,
+  knownContext: 'The user is interviewing for an operations role.',
+  userPosition: 'seeking',
+})
+assert(interpretation.source === 'george_core_interpretation', 'core interpretation should identify source')
+assert(interpretation.speakerIntent?.intent === 'addressed_to_george', 'core interpretation should include speaker intent')
+assert(Boolean(interpretation.activeOutcome), 'core interpretation should include active outcome')
+assert(Boolean(interpretation.outcomeGovernor?.move), 'core interpretation should include outcome governor move')
 
 console.log('GEORGE core smoke passed')
 `)
