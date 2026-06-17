@@ -16,9 +16,9 @@ import LiveChooser from '@/components/george/LiveChooser'
 import { getSteering } from '@/lib/george/steering'
 import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, detectConversationProfile, detectConversationPersonProfile, detectVocalState, interpretVoiceState, decideNextMove, detectUserDeliveryLevel } from '@/lib/george/conversation-engine'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, getLatestSubscriberSession, hydrateSessionsFromServer } from '@/lib/george/session/store'
+import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
-import { saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
+import { findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
@@ -1924,11 +1924,10 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       return
     }
 
-    const activeSession =
-      getActiveSessionForMode('normal') ||
-      (subscriberEmail.trim()
-        ? getLatestSubscriberSession(subscriberEmail, 'normal')
-        : null)
+    const activeSession = findGeorgeSessionToRestore({
+      mode: 'normal',
+      subscriberEmail,
+    })
 
     const transientDraft = readGeorgeNormalDraft(GEORGE_LAST_NORMAL_DRAFT)
 

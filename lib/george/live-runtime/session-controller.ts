@@ -1,5 +1,7 @@
 import {
+  getActiveSessionForMode,
   getActiveSessionIdForMode,
+  getLatestSubscriberSession,
   setActiveMode,
   setActiveSessionIdForMode,
   upsertSession,
@@ -63,3 +65,23 @@ export function saveGeorgeSession(params: {
 
   return sessionId
 }
+
+export function findGeorgeSessionToRestore(params: {
+  mode: GeorgeSessionMode
+  subscriberEmail?: string | null
+}) {
+  const activeSession = getActiveSessionForMode(params.mode)
+
+  if (activeSession) {
+    return activeSession
+  }
+
+  const subscriberEmail = String(params.subscriberEmail || '').trim()
+
+  if (!subscriberEmail) {
+    return null
+  }
+
+  return getLatestSubscriberSession(subscriberEmail, params.mode)
+}
+
