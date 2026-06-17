@@ -29,6 +29,8 @@ class GeorgeWhisperPriority {
 
   constructor() {
     georgeLiveRuntimeEvents.subscribe((event) => {
+      if (event.payload?.source === 'live_action_authority') return
+
       const decision = this.mapEventToDecision(event)
 
       this.lastDecision = decision

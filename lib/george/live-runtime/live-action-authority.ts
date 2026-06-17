@@ -75,6 +75,7 @@ export function authorizeLiveTranscriptAction(params: {
         confidence: result.confidence,
         intervention: result.verdict,
         nextMove: result.action.type,
+        source: 'live_action_authority',
       }
     )
 

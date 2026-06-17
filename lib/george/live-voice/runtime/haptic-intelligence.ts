@@ -30,6 +30,8 @@ class GeorgeHapticIntelligence {
 
   constructor() {
     georgeLiveRuntimeEvents.subscribe((event) => {
+      if (event.payload?.source === 'live_action_authority') return
+
       const cue = this.mapEventToCue(event)
 
       if (cue.type === 'none') return
