@@ -7130,7 +7130,9 @@ I am listening now. Speak naturally. I will respond ${
   </div>
 )}
 
-<div className="pointer-events-none fixed inset-x-0 bottom-0 z-[25] h-[128px] bg-gradient-to-t from-[#030405] via-[#030405]/86 to-transparent md:h-[156px]" />\n\n<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[120px] md:h-[150px]' : 'h-[86px] md:h-[110px]'}`} />
+<div className="pointer-events-none fixed inset-x-0 bottom-0 z-[25] h-[128px] bg-gradient-to-t from-[#030405] via-[#030405]/86 to-transparent md:h-[156px]" />
+
+<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[120px] md:h-[150px]' : 'h-[86px] md:h-[110px]'}`} />
 
 </div>
 
