@@ -15,7 +15,7 @@ export function createDeepgramStream(params: {
   let lastCueKey = ''
   let lastCueAt = 0
   let lastCuePriority = 0
-  let lastFinalTranscript = ''
+  let lastFinalTranscriptKey = ''
   let lastFinalAt = 0
   const pendingAudio: ArrayBuffer[] = []
 
@@ -49,11 +49,13 @@ export function createDeepgramStream(params: {
 
     if (isFinal) {
       const now = Date.now()
-      if (transcript === lastFinalTranscript && now - lastFinalAt < 5000) {
+      const transcriptKey = transcript.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+
+      if (transcriptKey === lastFinalTranscriptKey && now - lastFinalAt < 8000) {
         return
       }
 
-      lastFinalTranscript = transcript
+      lastFinalTranscriptKey = transcriptKey
       lastFinalAt = now
     }
 
