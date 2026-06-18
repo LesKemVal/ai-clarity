@@ -41,6 +41,7 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
+import { LiveHubDeliveryBridge } from '@/components/george/live/LiveHubDeliveryBridge'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
@@ -5993,6 +5994,22 @@ return (
         }}
         transcript={liveHubShadowTranscript}
         transcriptFinal={true}
+      />
+
+      <LiveHubDeliveryBridge
+        active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
+        context={{
+          room: String(liveRuntimeSupport?.purview || 'live'),
+          chair: String(liveRuntimeSupport?.userPosition || ''),
+          objective: String(
+            liveRuntimeSupport?.objective ||
+            activeCampaign?.desiredOutcome ||
+            activeCampaign?.currentGoal ||
+            ''
+          ),
+          knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          userPosition: String(liveRuntimeSupport?.userPosition || ''),
+        }}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (

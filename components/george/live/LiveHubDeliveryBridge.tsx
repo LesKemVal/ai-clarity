@@ -57,11 +57,8 @@ export function LiveHubDeliveryBridge({
       onSilentCue?.(resolvedDeliveryCue.text)
     })
 
-    adapter.connect(context)
-
     return () => {
       unsubscribe()
-      adapter.disconnect()
     }
   }, [
     active,
