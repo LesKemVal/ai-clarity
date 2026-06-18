@@ -8,6 +8,7 @@ export type LiveHubContext = {
 
 export type ClientMessage =
   | { type: 'SYNC_CONTEXT'; context: LiveHubContext }
+  | { type: 'TRANSCRIPT_INPUT'; text: string; isFinal?: boolean }
   | { type: 'PING'; at?: number }
 
 export type ServerMessage =
