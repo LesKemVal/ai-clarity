@@ -6,15 +6,15 @@ import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runti
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
-import type { GeorgeDeliveryMode } from '@/lib/george/live-delivery/types'
+import type { GeorgeDeliveryCue, GeorgeDeliveryMode } from '@/lib/george/live-delivery/types'
 
 type LiveHubDeliveryBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   mode?: GeorgeDeliveryMode
-  onVisualCue?: (cue: string) => void
-  onVoiceCue?: (cue: string) => void
-  onSilentCue?: (cue: string) => void
+  onVisualCue?: (cue: GeorgeDeliveryCue) => void
+  onVoiceCue?: (cue: GeorgeDeliveryCue) => void
+  onSilentCue?: (cue: GeorgeDeliveryCue) => void
 }
 
 export function LiveHubDeliveryBridge({
@@ -48,16 +48,16 @@ export function LiveHubDeliveryBridge({
       markRuntimeEvent(resolvedDeliveryCue.text, 'delivery_cue')
 
       if (resolvedDeliveryCue.mode === 'visual') {
-        onVisualCue?.(resolvedDeliveryCue.text)
+        onVisualCue?.(resolvedDeliveryCue)
         return
       }
 
       if (resolvedDeliveryCue.mode === 'voice') {
-        onVoiceCue?.(resolvedDeliveryCue.text)
+        onVoiceCue?.(resolvedDeliveryCue)
         return
       }
 
-      onSilentCue?.(resolvedDeliveryCue.text)
+      onSilentCue?.(resolvedDeliveryCue)
     })
 
     return () => {

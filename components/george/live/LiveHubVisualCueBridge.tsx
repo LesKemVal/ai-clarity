@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
+import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
 
 type LiveHubVisualCueBridgeProps = {
   active: boolean
@@ -11,6 +12,9 @@ type LiveHubVisualCueBridgeProps = {
 
 type VisualCueState = {
   text: string
+  priority: number
+  confidence: number
+  source: GeorgeDeliveryCue['source']
   at: number
 }
 
@@ -21,8 +25,8 @@ export function LiveHubVisualCueBridge({
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
   const lastCueRef = useRef('')
 
-  const handleVisualCue = useCallback((cue: string) => {
-    const clean = String(cue || '').trim()
+  const handleVisualCue = useCallback((cue: GeorgeDeliveryCue) => {
+    const clean = String(cue.text || '').trim()
     if (!clean) return
     if (lastCueRef.current === clean) return
 
@@ -30,6 +34,9 @@ export function LiveHubVisualCueBridge({
 
     setVisualCue({
       text: clean,
+      priority: cue.priority,
+      confidence: cue.confidence,
+      source: cue.source,
       at: Date.now(),
     })
   }, [])
