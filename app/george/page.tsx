@@ -40,6 +40,7 @@ import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-supp
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
+import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
@@ -5973,6 +5974,21 @@ return (
         
 
     <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
+
+      <LiveHubShadowBridge
+        active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
+        context={{
+          room: liveRuntimeSupport?.purview || 'live',
+          chair: liveRuntimeSupport?.userPosition || '',
+          objective:
+            liveRuntimeSupport?.objective ||
+            activeCampaign?.desiredOutcome ||
+            activeCampaign?.currentGoal ||
+            '',
+          knownContext: liveRuntimeSupport?.knownContext || '',
+          userPosition: liveRuntimeSupport?.userPosition || '',
+        }}
+      />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
           <div
