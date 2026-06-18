@@ -4949,10 +4949,12 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           return
         }
 
-        console.info('[GEORGE CHAT REQUEST]', {
-          liveMode,
-          text,
-        })
+        if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
+          console.info('[GEORGE CHAT REQUEST]', {
+            liveMode,
+            text,
+          })
+        }
 
         const res = await fetch('/api/chat', {
           method: 'POST',
@@ -4987,13 +4989,17 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           }),
         })
 
-        console.info('[GEORGE CHAT RESPONSE]', {
-          status: res.status,
-        })
+        if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
+          console.info('[GEORGE CHAT RESPONSE]', {
+            status: res.status,
+          })
+        }
 
         const data = await res.json().catch(() => null)
 
-        console.info('[GEORGE CHAT DATA]', data)
+        if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
+          console.info('[GEORGE CHAT DATA]', data)
+        }
 
         if (!res.ok) {
           console.error('/api/chat failed', { status: res.status, data })
@@ -5161,12 +5167,14 @@ return true
     })
 
     if (authority.action.type === 'ignore') {
-      console.warn('[GEORGE LIVE ACTION IGNORED]', {
-        transcript: clean,
-        reason: authority.reason,
-        verdict: authority.verdict,
-        action: authority.action,
-      })
+      if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
+        console.warn('[GEORGE LIVE ACTION IGNORED]', {
+          transcript: clean,
+          reason: authority.reason,
+          verdict: authority.verdict,
+          action: authority.action,
+        })
+      }
       return
     }
 
