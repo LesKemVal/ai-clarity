@@ -8,6 +8,7 @@ export type GeorgeDeliveryCue = {
   reason: string
   source: GeorgeActionCue['source']
   category: GeorgeActionCue['category']
+  confidence: number
   priority: number
   at: number
 }
