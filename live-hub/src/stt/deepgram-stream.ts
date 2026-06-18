@@ -5,6 +5,7 @@ import { sendJson } from '../transport/json.js'
 import { resolveLocalCue } from '../george/local-cue-engine.js'
 import { buildRuntimePacket } from '../george/runtime-packet.js'
 import { resolveGroqFastCue } from '../llm/groq-fast-lane.js'
+import { markLatency } from '../metrics/latency.js'
 
 export function createDeepgramStream(params: {
   ws: WebSocket
@@ -47,7 +48,10 @@ export function createDeepgramStream(params: {
     const transcript = payload?.channel?.alternatives?.[0]?.transcript?.trim() || ''
     if (!transcript) return
 
+    const turnStartAt = Date.now()
     const isFinal = Boolean(payload?.is_final || payload?.speech_final)
+
+    console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'transcript_received'))
 
     if (isFinal) {
       const now = Date.now()
@@ -105,14 +109,19 @@ export function createDeepgramStream(params: {
       at: now,
     })
 
+    console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'local_cue_sent'))
+
     console.log('[LIVE HUB][groq] queued', {
       signal: packet.signal,
       cue: packet.cue,
     })
 
+    console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_request'))
+
     void resolveGroqFastCue(packet)
       .then((fastCue) => {
         console.log('[LIVE HUB][groq] resolved', fastCue)
+        console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_response'))
         if (!fastCue) return
 
         sendJson(params.ws, {
@@ -123,6 +132,8 @@ export function createDeepgramStream(params: {
           fromLocalCue: cue.cue,
           at: Date.now(),
         })
+
+        console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'fast_cue_sent'))
       })
       .catch((error) => {
         console.warn('[LIVE HUB][groq]', error instanceof Error ? error.message : error)
