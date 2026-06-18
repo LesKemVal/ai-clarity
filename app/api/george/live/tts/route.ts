@@ -15,15 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'LIVE voice is temporarily rate limited.' }, { status: 429 })
     }
 
-    const apiKey = process.env.ELEVENLABS_API_KEY
-    const voiceId = process.env.ELEVENLABS_VOICE_ID
-
-    if (!apiKey || !voiceId) {
-      return NextResponse.json(
-        { error: 'LIVE voice is not fully configured.' },
-        { status: 500 }
-      )
-    }
+    const provider = process.env.LIVE_TTS_PROVIDER || 'elevenlabs'
 
     const body = await req.json()
     const access = await verifyLiveAccessFromRequest(req, body?.email)
@@ -47,27 +39,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing text' }, { status: 400 })
     }
 
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-        Accept: 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text,
-        model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_flash_v2_5',
-        voice_settings: {
-          stability: 0.55,
-          similarity_boost: 0.75,
-          style: 0.15,
-          use_speaker_boost: true,
-        },
-      }),
-    })
+    const res =
+      provider === 'cartesia'
+        ? await fetch('https://api.cartesia.ai/tts/bytes', {
+            method: 'POST',
+            headers: {
+              'X-API-Key': process.env.CARTESIA_API_KEY || '',
+              'Cartesia-Version': '2026-03-01',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model_id: process.env.CARTESIA_MODEL_ID || 'sonic-3.5',
+              transcript: text,
+              voice: {
+                mode: 'id',
+                id: process.env.CARTESIA_VOICE_ID,
+              },
+              output_format: {
+                container: 'mp3',
+                bit_rate: 128000,
+                sample_rate: 44100,
+              },
+            }),
+          })
+        : await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVENLABS_VOICE_ID}`, {
+            method: 'POST',
+            headers: {
+              'xi-api-key': process.env.ELEVENLABS_API_KEY || '',
+              'Content-Type': 'application/json',
+              Accept: 'audio/mpeg',
+            },
+            body: JSON.stringify({
+              text,
+              model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_flash_v2_5',
+              voice_settings: {
+                stability: 0.55,
+                similarity_boost: 0.75,
+                style: 0.15,
+                use_speaker_boost: true,
+              },
+            }),
+          })
 
     if (!res.ok) {
-      console.warn('[LIVE][tts][provider-failed]', { status: res.status })
+      console.warn('[LIVE][tts][provider-failed]', {
+        provider,
+        status: res.status,
+      })
       return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
     }
 
