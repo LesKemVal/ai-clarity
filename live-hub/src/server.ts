@@ -10,6 +10,7 @@ const deepgramApiKey = process.env.DEEPGRAM_API_KEY || ''
 const wss = new WebSocketServer({ port })
 
 wss.on('connection', (ws) => {
+  console.log('[LIVE HUB][client] connected')
   let context: LiveHubContext = {}
 
   sendJson(ws, { type: 'READY', at: Date.now() })
@@ -40,6 +41,7 @@ wss.on('connection', (ws) => {
 
     if (parsed.type === 'SYNC_CONTEXT') {
       context = parsed.context || {}
+      console.log('[LIVE HUB][context]', context)
       return
     }
 
@@ -48,7 +50,10 @@ wss.on('connection', (ws) => {
     }
   })
 
-  ws.on('close', () => stt.close())
+  ws.on('close', () => {
+    console.log('[LIVE HUB][client] closed')
+    stt.close()
+  })
 })
 
 console.log(`[GEORGE LIVE HUB] listening on :${port}`)

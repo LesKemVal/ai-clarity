@@ -11,11 +11,29 @@ export function createDeepgramStream(params: {
 }) {
   const deepgram = createClient(params.apiKey)
 
+  let deepgramOpen = false
+  const pendingAudio: ArrayBuffer[] = []
+
   const dg = deepgram.listen.live({
     model: 'nova-2',
     smart_format: true,
     interim_results: true,
     endpointing: 350,
+  })
+
+  dg.on(LiveTranscriptionEvents.Open, () => {
+    deepgramOpen = true
+    console.log('[LIVE HUB][deepgram] open')
+
+    while (pendingAudio.length) {
+      const chunk = pendingAudio.shift()
+      if (chunk) dg.send(chunk)
+    }
+  })
+
+  dg.on(LiveTranscriptionEvents.Close, () => {
+    deepgramOpen = false
+    console.log('[LIVE HUB][deepgram] close')
   })
 
   dg.on(LiveTranscriptionEvents.Transcript, (payload) => {
@@ -59,6 +77,17 @@ export function createDeepgramStream(params: {
         chunk.byteOffset,
         chunk.byteOffset + chunk.byteLength
       )
+
+      console.log('[LIVE HUB][audio]', {
+        bytes: chunk.byteLength,
+        deepgramOpen,
+      })
+
+      if (!deepgramOpen) {
+        pendingAudio.push(audio)
+        return
+      }
+
       dg.send(audio)
     },
     close() {
