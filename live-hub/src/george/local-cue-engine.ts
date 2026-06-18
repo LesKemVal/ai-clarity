@@ -5,12 +5,17 @@ import { matchCuePattern } from './cue-patterns.js'
 export function resolveLocalCue(input: {
   transcript: string
   context: LiveHubContext
+  isFinal?: boolean
 }): GeorgeLocalCue | null {
   const text = input.transcript.trim()
   if (text.length < 8) return null
 
   const cue = matchCuePattern(text)
   if (!cue) return null
+
+  if (cue.category === 'clarification' && !input.isFinal) {
+    return null
+  }
 
   const objective = String(input.context.objective || '').toLowerCase()
 

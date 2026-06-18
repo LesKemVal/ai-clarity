@@ -54,6 +54,7 @@ export function createDeepgramStream(params: {
     const cue = resolveLocalCue({
       transcript,
       context: params.getContext(),
+      isFinal,
     })
 
     if (cue) {
