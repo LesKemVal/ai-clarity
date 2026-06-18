@@ -51,7 +51,7 @@ export function createDeepgramStream(params: {
       const now = Date.now()
       const transcriptKey = transcript.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 
-      if (transcriptKey === lastFinalTranscriptKey && now - lastFinalAt < 8000) {
+      if (transcriptKey === lastFinalTranscriptKey && now - lastFinalAt < 1500) {
         return
       }
 
