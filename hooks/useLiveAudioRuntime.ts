@@ -94,11 +94,13 @@ export function useLiveAudioRuntime({
     if (!enabled) {
       stop()
     }
+  }, [enabled, stop])
 
+  useEffect(() => {
     return () => {
       stop()
     }
-  }, [enabled, stop])
+  }, [stop])
 
   return {
     status,
