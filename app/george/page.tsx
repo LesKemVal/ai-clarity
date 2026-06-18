@@ -933,6 +933,7 @@ const [walkthroughStep, setWalkthroughStep] = useState(1)
   }
 
   const [interimTranscript, setInterimTranscript] = useState('')
+  const [liveHubShadowTranscript, setLiveHubShadowTranscript] = useState('')
 const [voiceError, setVoiceError] = useState('')
   const [interactionMode, setInteractionMode] = useState<'text' | 'speech'>('text')
   const [pendingAssistantMessage, setPendingAssistantMessage] = useState<Message | null>(null)
@@ -2611,6 +2612,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
 
     setInput('')
+    setLiveHubShadowTranscript(clean)
     liveTranscriptSubmitRef.current(clean)
   }, [appendLiveContextSignal])
 
@@ -5989,6 +5991,8 @@ return (
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
         }}
+        transcript={liveHubShadowTranscript}
+        transcriptFinal={true}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
