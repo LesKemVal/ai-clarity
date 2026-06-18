@@ -13,4 +13,5 @@ export type GeorgeLocalCue = {
   reason: string
   category: GeorgeCueCategory
   confidence: number
+  priority: number
 }

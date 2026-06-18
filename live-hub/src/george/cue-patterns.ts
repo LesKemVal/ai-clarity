@@ -6,6 +6,7 @@ type CuePattern = {
   cue: string
   reason: string
   confidence: number
+  priority: number
 }
 
 export const GEORGE_CUE_PATTERNS: CuePattern[] = [
@@ -15,6 +16,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Anchor value first.',
     reason: 'Money pressure detected.',
     confidence: 0.86,
+    priority: 90,
   },
   {
     category: 'objection',
@@ -22,6 +24,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Ask what changed.',
     reason: 'Objection or resistance detected.',
     confidence: 0.82,
+    priority: 80,
   },
   {
     category: 'clarification',
@@ -29,6 +32,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Clarify before answering.',
     reason: 'Question pressure detected.',
     confidence: 0.74,
+    priority: 50,
   },
   {
     category: 'uncertainty',
@@ -36,6 +40,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Narrow the choice.',
     reason: 'Uncertainty detected.',
     confidence: 0.78,
+    priority: 65,
   },
   {
     category: 'stall',
@@ -43,6 +48,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Slow the room.',
     reason: 'Stall or pacing signal detected.',
     confidence: 0.84,
+    priority: 75,
   },
   {
     category: 'timeline',
@@ -50,6 +56,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Ask for timing.',
     reason: 'Timeline pressure detected.',
     confidence: 0.78,
+    priority: 70,
   },
   {
     category: 'agreement',
@@ -57,6 +64,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Confirm the next step.',
     reason: 'Agreement signal detected.',
     confidence: 0.72,
+    priority: 55,
   },
   {
     category: 'pressure',
@@ -64,6 +72,7 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     cue: 'Control the pace.',
     reason: 'Urgency pressure detected.',
     confidence: 0.8,
+    priority: 85,
   },
 ]
 
@@ -75,6 +84,7 @@ export function matchCuePattern(text: string): GeorgeLocalCue | null {
         cue: item.cue,
         reason: item.reason,
         confidence: item.confidence,
+        priority: item.priority,
       }
     }
   }

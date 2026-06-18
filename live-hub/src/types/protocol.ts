@@ -21,6 +21,7 @@ export type ServerMessage =
       reason: string
       category?: string
       confidence?: number
+      priority?: number
       at: number
     }
   | { type: 'ERROR'; error: string; at: number }

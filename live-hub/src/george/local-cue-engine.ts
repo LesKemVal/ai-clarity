@@ -19,6 +19,7 @@ export function resolveLocalCue(input: {
       ...cue,
       cue: 'Anchor value first.',
       confidence: Math.max(cue.confidence, 0.9),
+      priority: Math.max(cue.priority, 92),
     }
   }
 
