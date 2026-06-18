@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryMode } from '@/lib/george/live-delivery/types'
 
@@ -43,6 +44,8 @@ export function LiveHubDeliveryBridge({
       }
 
       console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
+
+      markRuntimeEvent(resolvedDeliveryCue.text, 'delivery_cue')
 
       if (resolvedDeliveryCue.mode === 'visual') {
         onVisualCue?.(resolvedDeliveryCue.text)
