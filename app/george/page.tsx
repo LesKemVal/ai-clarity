@@ -4998,7 +4998,9 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         const data = await res.json().catch(() => null)
 
         if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
+          if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
           console.info('[GEORGE CHAT DATA]', data)
+        }
         }
 
         if (!res.ok) {
