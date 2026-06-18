@@ -47,7 +47,21 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
     stopped = false
     registerGlobalStopper()
 
-    const tokenRes = await fetch('/api/george/live/stt-token')
+    const storedEmail =
+      typeof window !== 'undefined'
+        ? (
+            window.localStorage.getItem('george_email') ||
+            window.localStorage.getItem('george_user_email') ||
+            window.localStorage.getItem('continuity_email') ||
+            ''
+          ).trim()
+        : ''
+
+    const tokenUrl = storedEmail
+      ? `/api/george/live/stt-token?email=${encodeURIComponent(storedEmail)}`
+      : '/api/george/live/stt-token'
+
+    const tokenRes = await fetch(tokenUrl)
     const tokenData = await tokenRes.json()
 
     if (!tokenRes.ok || !tokenData?.token) {
