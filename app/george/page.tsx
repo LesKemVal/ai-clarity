@@ -3943,7 +3943,7 @@ requestAnimationFrame(() => {
 
     if (!res.ok) {
       const msg = await res.text().catch(() => '')
-      console.error('TTS failed:', res.status, msg)
+      console.error('[GEORGE TTS FAILED]', res.status, msg)
       throw new Error(`TTS failed: ${res.status}`)
     }
 
@@ -4057,7 +4057,9 @@ if (activePromptContext || activePromptLabel) {
                 return
               }
 
-              audio.play().catch((err) => {
+              audio.play().then(() => {
+                console.info('[GEORGE AUDIO PLAYING]')
+              }).catch((err) => {
                 if (stopSpeechRef.current) {
                   resolve()
                   return
@@ -5143,9 +5145,19 @@ return true
 
     const authority = execution.authority
 
-    console.info('[GEORGE LIVE ACTION]', { authority })
+    console.info('[GEORGE LIVE ACTION]', {
+      transcript: clean,
+      nextFinalTranscript: execution.nextFinalTranscript,
+      authority,
+    })
 
     if (authority.action.type === 'ignore') {
+      console.warn('[GEORGE LIVE ACTION IGNORED]', {
+        transcript: clean,
+        reason: authority.reason,
+        verdict: authority.verdict,
+        action: authority.action,
+      })
       return
     }
 
@@ -5165,12 +5177,13 @@ return true
     }
 
     if (authority.action.type === 'speak') {
-      console.info('[GEORGE LIVE LOCAL]', 'speak')
+      console.info('[GEORGE LIVE LOCAL]', 'speak', { text: authority.action.text })
       void speakText(authority.action.text)
       return
     }
 
     if (authority.action.type === 'send') {
+      console.info('[GEORGE LIVE SEND]', { text: authority.action.text })
       void handleSend(authority.action.text, { source: 'live_transcript' })
     }
   }, [handleSend, isThinking, liveMode, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
