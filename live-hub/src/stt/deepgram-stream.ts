@@ -73,28 +73,61 @@ export function createDeepgramStream(params: {
       isFinal,
     })
 
-    if (cue) {
-      const now = Date.now()
-      const cueKey = `${cue.category}:${cue.cue}`
+    if (!cue) return
 
-      const canUpgradeCue = cue.priority > lastCuePriority + 20
+    const now = Date.now()
+    const cueKey = `${cue.category}:${cue.cue}`
+    const canUpgradeCue = cue.priority > lastCuePriority + 20
 
-      if (cueKey !== lastCueKey || canUpgradeCue || now - lastCueAt > 3500) {
-        lastCueKey = cueKey
-        lastCueAt = now
-        lastCuePriority = cue.priority
+    if (cueKey === lastCueKey && !canUpgradeCue && now - lastCueAt <= 3500) {
+      return
+    }
+
+    lastCueKey = cueKey
+    lastCueAt = now
+    lastCuePriority = cue.priority
+
+    const packet = buildRuntimePacket({
+      transcript,
+      isFinal,
+      context: params.getContext(),
+      cue,
+    })
+
+    sendJson(params.ws, {
+      type: 'LOCAL_CUE',
+      cue: cue.cue,
+      reason: cue.reason,
+      category: cue.category,
+      confidence: cue.confidence,
+      priority: cue.priority,
+      packet,
+      at: now,
+    })
+
+    console.log('[LIVE HUB][groq] queued', {
+      signal: packet.signal,
+      cue: packet.cue,
+    })
+
+    void resolveGroqFastCue(packet)
+      .then((fastCue) => {
+        console.log('[LIVE HUB][groq] resolved', fastCue)
+
+        if (!fastCue) return
 
         sendJson(params.ws, {
-          type: 'LOCAL_CUE',
-          cue: cue.cue,
-          reason: cue.reason,
-          category: cue.category,
-          confidence: cue.confidence,
-        priority: cue.priority,
-          at: now,
+          type: 'FAST_CUE',
+          cue: fastCue.cue,
+          source: fastCue.source,
+          model: fastCue.model,
+          fromLocalCue: cue.cue,
+          at: Date.now(),
         })
-      }
-    }
+      })
+      .catch((error) => {
+        console.warn('[LIVE HUB][groq]', error instanceof Error ? error.message : error)
+      })
   })
 
   dg.on(LiveTranscriptionEvents.Error, (error) => {
