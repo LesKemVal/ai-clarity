@@ -3885,17 +3885,6 @@ requestAnimationFrame(() => {
     return new Promise((res) => setTimeout(res, ms))
   }
 
-  function markLiveLatency(label: string, data: Record<string, unknown> = {}) {
-    if (typeof window === 'undefined') return
-    if (!liveMode) return
-
-    console.info('[GEORGE LIVE LATENCY]', {
-      label,
-      at: Math.round(performance.now()),
-      ...data,
-    })
-  }
-
   function stopBridgeSpeech() {
     if (bridgeTimerRef.current) {
       clearTimeout(bridgeTimerRef.current)
@@ -3932,9 +3921,6 @@ requestAnimationFrame(() => {
   }
 
   async function fetchSpeech(text: string) {
-    const speechStart = typeof performance !== 'undefined' ? performance.now() : Date.now()
-    markLiveLatency('tts_request_start', { chars: text.length })
-
     // block TTS for Smart tier
     if (currentTier === 'smart') {
       return null
@@ -3962,11 +3948,6 @@ requestAnimationFrame(() => {
     }
 
     const buffer = await res.arrayBuffer()
-    markLiveLatency('tts_response_buffer_received', {
-      ms: Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - speechStart),
-      bytes: buffer.byteLength,
-    })
-
     if (!buffer.byteLength) {
       throw new Error('TTS returned empty audio')
     }
@@ -3982,9 +3963,6 @@ requestAnimationFrame(() => {
 
     const base64 = btoa(binary)
     const dataUrl = `data:audio/mpeg;base64,${base64}`
-    markLiveLatency('tts_data_url_ready', {
-      ms: Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - speechStart),
-    })
     return dataUrl
   }
 
@@ -4031,10 +4009,8 @@ if (activePromptContext || activePromptLabel) {
         const chunk = speechQueueRef.current.shift()
         if (!chunk) continue
 
-        markLiveLatency('speech_chunk_start', { chars: chunk.length })
         const url = await fetchSpeech(chunk)
         if (!url) continue
-        markLiveLatency('speech_audio_url_ready', { chars: chunk.length })
 
         await new Promise<void>((resolve, reject) => {
           const audio = new Audio()
@@ -4081,7 +4057,6 @@ if (activePromptContext || activePromptLabel) {
                 return
               }
 
-              markLiveLatency('audio_play_called')
               audio.play().catch((err) => {
                 if (stopSpeechRef.current) {
                   resolve()
@@ -4094,18 +4069,9 @@ if (activePromptContext || activePromptLabel) {
             }, 80)
           }
 
-          audio.oncanplaythrough = () => {
-            markLiveLatency('audio_canplaythrough')
-            startAudioPlayback()
-          }
-          audio.oncanplay = () => {
-            markLiveLatency('audio_canplay')
-            startAudioPlayback()
-          }
-          audio.onloadeddata = () => {
-            markLiveLatency('audio_loadeddata')
-            startAudioPlayback()
-          }
+          audio.oncanplaythrough = startAudioPlayback
+          audio.oncanplay = startAudioPlayback
+          audio.onloadeddata = startAudioPlayback
 
           audio.load()
           setTimeout(startAudioPlayback, 450)
@@ -5156,9 +5122,6 @@ return true
     const clean = String(text || '').trim()
     if (!clean) return
 
-    markLiveLatency('final_transcript_received', { chars: clean.length })
-
-    const executionStart = typeof performance !== 'undefined' ? performance.now() : Date.now()
     const execution = resolveGeorgeCoreLiveExecution({
       transcript: clean,
       lastFinalTranscript: lastLiveFinalTranscriptRef.current,
@@ -5174,12 +5137,6 @@ return true
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
       overlapRequiresAttention: false,
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
-    })
-
-    markLiveLatency('core_execution_finished', {
-      ms: Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - executionStart),
-      action: execution.authority.action.type,
-      verdict: execution.authority.verdict,
     })
 
     lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
