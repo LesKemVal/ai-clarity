@@ -63,3 +63,32 @@ Diagnostic events:
 These are useful for testing and observability, but should not drive the final user-facing LIVE cue behavior.
 
 `ACTION_CUE` represents the current winning instruction after local/runtime/Groq arbitration.
+
+## Proven runtime pipeline
+
+Validated on local browser → Fly hub:
+
+Audio input
+→ Deepgram STT
+→ transcript event
+→ GEORGE local cue engine
+→ runtime packet
+→ Groq fast lane
+→ cue arbitration
+→ ACTION_CUE
+→ browser display
+→ browser voice playback
+
+## Measured latency
+
+Observed Fly hub results:
+
+- Local cue after transcript: ~2ms
+- Groq FAST_CUE after transcript: ~82ms–172ms
+- Voice playback test confirmed ACTION_CUE delivery into browser speech synthesis
+
+## Current rule
+
+`ACTION_CUE` is the production-facing output.
+
+`LOCAL_CUE`, `FAST_CUE`, and transcripts remain diagnostics.
