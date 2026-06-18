@@ -12,6 +12,8 @@ export function createDeepgramStream(params: {
   const deepgram = createClient(params.apiKey)
 
   let deepgramOpen = false
+  let lastCueKey = ''
+  let lastCueAt = 0
   const pendingAudio: ArrayBuffer[] = []
 
   const dg = deepgram.listen.live({
@@ -54,14 +56,22 @@ export function createDeepgramStream(params: {
     })
 
     if (cue) {
-      sendJson(params.ws, {
-        type: 'LOCAL_CUE',
-        cue: cue.cue,
-        reason: cue.reason,
-        category: cue.category,
-        confidence: cue.confidence,
-        at: Date.now(),
-      })
+      const now = Date.now()
+      const cueKey = `${cue.category}:${cue.cue}`
+
+      if (cueKey !== lastCueKey || now - lastCueAt > 3500) {
+        lastCueKey = cueKey
+        lastCueAt = now
+
+        sendJson(params.ws, {
+          type: 'LOCAL_CUE',
+          cue: cue.cue,
+          reason: cue.reason,
+          category: cue.category,
+          confidence: cue.confidence,
+          at: now,
+        })
+      }
     }
   })
 
