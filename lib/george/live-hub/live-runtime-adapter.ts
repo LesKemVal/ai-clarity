@@ -75,3 +75,14 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     },
   }
 }
+
+
+let singletonAdapter: GeorgeLiveHubRuntimeAdapter | null = null
+
+export function getGeorgeLiveHubRuntimeAdapter() {
+  if (!singletonAdapter) {
+    singletonAdapter = createGeorgeLiveHubRuntimeAdapter()
+  }
+
+  return singletonAdapter
+}
