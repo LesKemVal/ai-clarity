@@ -61,6 +61,12 @@ export function LiveHubShadowBridge({
     if (lastForwardedTranscriptRef.current === clean) return
 
     lastForwardedTranscriptRef.current = clean
+
+    console.info('[LIVE][hub][shadow] forwarding transcript', {
+      text: clean,
+      isFinal: transcriptFinal,
+    })
+
     getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal)
   }, [active, transcript, transcriptFinal])
 

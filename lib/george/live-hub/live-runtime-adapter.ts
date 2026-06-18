@@ -30,6 +30,11 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       const next = pendingTranscripts.shift()
       if (!next) continue
 
+      console.info('[LIVE][hub][adapter] flush transcript', {
+        text: next.text,
+        isFinal: next.isFinal,
+      })
+
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',
         text: next.text,
@@ -95,9 +100,12 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       if (!clean) return
 
       if (!connected) {
+        console.info('[LIVE][hub][adapter] queue transcript', { text: clean, isFinal })
         pendingTranscripts.push({ text: clean, isFinal })
         return
       }
+
+      console.info('[LIVE][hub][adapter] send transcript', { text: clean, isFinal })
 
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',
