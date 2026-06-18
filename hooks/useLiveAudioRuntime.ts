@@ -27,7 +27,13 @@ export function useLiveAudioRuntime({
   const onFinalTranscriptRef = useRef(onFinalTranscript)
   const onErrorRef = useRef(onError)
   const [status, setStatus] = useState<LiveAudioStatus>('idle')
+  const statusRef = useRef<LiveAudioStatus>('idle')
   const [interimTranscript, setInterimTranscript] = useState('')
+
+  const updateStatus = useCallback((nextStatus: LiveAudioStatus) => {
+    statusRef.current = nextStatus
+    setStatus(nextStatus)
+  }, [updateStatus])
 
   useEffect(() => {
     enabledRef.current = enabled
@@ -39,7 +45,7 @@ export function useLiveAudioRuntime({
   const stop = useCallback(() => {
     runtimeRef.current?.stop()
     runtimeRef.current = null
-    setStatus('idle')
+    updateStatus('idle')
   }, [])
 
   const emergencyStop = useCallback(() => {
@@ -56,10 +62,24 @@ export function useLiveAudioRuntime({
   }, [stop])
 
   const start = useCallback(() => {
-    console.info('[GEORGE LIVE AUDIO HOOK] start called', { enabled: enabledRef.current })
+    console.info('[GEORGE LIVE AUDIO HOOK] start called', {
+      enabled: enabledRef.current,
+      status: statusRef.current,
+      hasRuntime: Boolean(runtimeRef.current),
+    })
 
     if (!enabledRef.current) {
       console.warn('[GEORGE LIVE AUDIO HOOK] start blocked: disabled')
+      return
+    }
+
+    if (
+      runtimeRef.current &&
+      (statusRef.current === 'starting' || statusRef.current === 'listening')
+    ) {
+      console.info('[GEORGE LIVE AUDIO HOOK] start ignored: already active', {
+        status: statusRef.current,
+      })
       return
     }
 
@@ -68,7 +88,7 @@ export function useLiveAudioRuntime({
     runtimeRef.current = createLiveAudioRuntime({
       onStatus: (nextStatus) => {
         console.info('[GEORGE LIVE AUDIO HOOK] status', nextStatus)
-        setStatus(nextStatus === 'starting' || nextStatus === 'listening' ? nextStatus : nextStatus === 'error' ? 'error' : 'idle')
+        updateStatus(nextStatus === 'starting' || nextStatus === 'listening' ? nextStatus : nextStatus === 'error' ? 'error' : 'idle')
       },
       onPartialTranscript: (text) => {
         setInterimTranscript(text)
@@ -82,7 +102,7 @@ export function useLiveAudioRuntime({
       },
       onError: (error) => {
         console.error('[GEORGE LIVE AUDIO HOOK] error', error)
-        setStatus('error')
+        updateStatus('error')
         onErrorRef.current?.(error)
       },
     })
