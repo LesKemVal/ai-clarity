@@ -33,7 +33,7 @@ export function useLiveAudioRuntime({
   const updateStatus = useCallback((nextStatus: LiveAudioStatus) => {
     statusRef.current = nextStatus
     setStatus(nextStatus)
-  }, [updateStatus])
+  }, [])
 
   useEffect(() => {
     enabledRef.current = enabled
@@ -46,7 +46,7 @@ export function useLiveAudioRuntime({
     runtimeRef.current?.stop()
     runtimeRef.current = null
     updateStatus('idle')
-  }, [])
+  }, [updateStatus])
 
   const emergencyStop = useCallback(() => {
     try {
