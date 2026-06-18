@@ -58,6 +58,8 @@ export function createDeepgramStream(params: {
         type: 'LOCAL_CUE',
         cue: cue.cue,
         reason: cue.reason,
+        category: cue.category,
+        confidence: cue.confidence,
         at: Date.now(),
       })
     }

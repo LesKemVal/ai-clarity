@@ -1,35 +1,26 @@
 import type { LiveHubContext } from '../types/protocol.js'
+import type { GeorgeLocalCue } from './cue-types.js'
+import { matchCuePattern } from './cue-patterns.js'
 
 export function resolveLocalCue(input: {
   transcript: string
   context: LiveHubContext
-}): { cue: string; reason: string } | null {
+}): GeorgeLocalCue | null {
   const text = input.transcript.trim()
   if (text.length < 8) return null
 
-  const lower = text.toLowerCase()
+  const cue = matchCuePattern(text)
+  if (!cue) return null
+
   const objective = String(input.context.objective || '').toLowerCase()
 
-  if (/\b(price|cost|budget|expensive|fee|valuation|money)\b/.test(lower)) {
+  if (cue.category === 'pricing' && objective.includes('close')) {
     return {
-      cue: objective.includes('close') ? 'Anchor value first.' : 'Ask for the number.',
-      reason: 'Money pressure detected.',
+      ...cue,
+      cue: 'Anchor value first.',
+      confidence: Math.max(cue.confidence, 0.9),
     }
   }
 
-  if (/\b(why|how|what do you mean|explain|clarify)\b/.test(lower)) {
-    return {
-      cue: 'Clarify before answering.',
-      reason: 'Question pressure detected.',
-    }
-  }
-
-  if (/\b(wait|hold on|not sure|i disagree|concern|problem)\b/.test(lower)) {
-    return {
-      cue: 'Slow the room.',
-      reason: 'Friction detected.',
-    }
-  }
-
-  return null
+  return cue
 }

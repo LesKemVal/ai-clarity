@@ -15,5 +15,12 @@ export type ServerMessage =
   | { type: 'PONG'; at: number }
   | { type: 'TRANSCRIPT_PARTIAL'; text: string; at: number }
   | { type: 'TRANSCRIPT_FINAL'; text: string; at: number }
-  | { type: 'LOCAL_CUE'; cue: string; reason: string; at: number }
+  | {
+      type: 'LOCAL_CUE'
+      cue: string
+      reason: string
+      category?: string
+      confidence?: number
+      at: number
+    }
   | { type: 'ERROR'; error: string; at: number }
