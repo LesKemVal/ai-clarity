@@ -15,9 +15,18 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   source: 'groq'
   model: string
 } | null> {
-  if (!groq) return null
+  if (!groq) {
+    console.warn('[LIVE HUB][groq] missing GROQ_API_KEY')
+    return null
+  }
 
   const model = process.env.GROQ_FAST_MODEL || 'llama-3.1-8b-instant'
+
+  console.log('[LIVE HUB][groq] request', {
+    model,
+    signal: packet.signal,
+    cue: packet.cue,
+  })
 
   const response = await groq.chat.completions.create({
     model,
@@ -44,6 +53,8 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   })
 
   const cue = response.choices[0]?.message?.content?.trim()
+  console.log('[LIVE HUB][groq] response', { cue })
+
   if (!cue) return null
 
   return {
