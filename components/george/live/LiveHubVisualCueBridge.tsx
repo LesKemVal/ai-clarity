@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 
@@ -19,16 +19,27 @@ export function LiveHubVisualCueBridge({
   context,
 }: LiveHubVisualCueBridgeProps) {
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
+  const lastCueRef = useRef('')
 
   const handleVisualCue = useCallback((cue: string) => {
     const clean = String(cue || '').trim()
     if (!clean) return
+    if (lastCueRef.current === clean) return
+
+    lastCueRef.current = clean
 
     setVisualCue({
       text: clean,
       at: Date.now(),
     })
   }, [])
+
+  useEffect(() => {
+    if (!active) {
+      lastCueRef.current = ''
+      setVisualCue(null)
+    }
+  }, [active])
 
   useEffect(() => {
     if (!visualCue) return
