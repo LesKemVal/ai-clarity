@@ -21,6 +21,22 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
 }): GeorgeLiveHubRuntimeAdapter {
   const listeners = new Set<GeorgeLiveHubRuntimeListener>()
   let transport: GeorgeLiveHubTransport | null = null
+  let connected = false
+  const pendingTranscripts: Array<{ text: string; isFinal: boolean }> = []
+
+  const flushPendingTranscripts = () => {
+    if (!connected) return
+    while (pendingTranscripts.length) {
+      const next = pendingTranscripts.shift()
+      if (!next) continue
+
+      transport?.sendJson?.({
+        type: 'TRANSCRIPT_INPUT',
+        text: next.text,
+        isFinal: next.isFinal,
+      })
+    }
+  }
 
   const emit = (event: GeorgeLiveHubRuntimeEvent) => {
     listeners.forEach((listener) => listener(event))
@@ -35,18 +51,23 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
 
       emit({ type: 'STATUS', status: 'connecting', at: Date.now() })
 
+      connected = false
       transport?.close()
 
       transport = createGeorgeLiveHubWebSocketTransport({
         url,
         handlers: {
           onOpen: () => {
+            connected = true
             emit({ type: 'STATUS', status: 'connected', at: Date.now() })
+            flushPendingTranscripts()
           },
           onClose: () => {
+            connected = false
             emit({ type: 'STATUS', status: 'idle', at: Date.now() })
           },
           onError: (error) => {
+            connected = false
             emit({ type: 'ERROR', error, at: Date.now() })
             emit({ type: 'STATUS', status: 'error', at: Date.now() })
           },
@@ -62,6 +83,8 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     },
 
     disconnect() {
+      connected = false
+      pendingTranscripts.length = 0
       transport?.close()
       transport = null
       emit({ type: 'STATUS', status: 'idle', at: Date.now() })
@@ -70,6 +93,11 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     sendTranscript(text: string, isFinal = true) {
       const clean = String(text || '').trim()
       if (!clean) return
+
+      if (!connected) {
+        pendingTranscripts.push({ text: clean, isFinal })
+        return
+      }
 
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',
