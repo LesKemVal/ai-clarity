@@ -1,18 +1,14 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
+import type {
+  GeorgeActionCue,
+  GeorgeLiveHubContext,
+} from '@/lib/george/live-hub/types'
+import type { GeorgeLiveHubTransport } from '@/lib/george/live-hub/transport'
+import { createGeorgeLiveHubWebSocketTransport } from '@/lib/george/live-hub/websocket-transport'
 
-export type GeorgeActionCue = {
-  cue: string
-  reason: string
-  source: 'local' | 'groq'
-  localCue: string
-  fastCue?: string
-  category: string
-  confidence: number
-  priority: number
-  at: number
-}
+export type { GeorgeActionCue }
 
 export type GeorgeLiveHubStatus =
   | 'idle'
@@ -25,7 +21,7 @@ export function useGeorgeLiveHub(params?: {
   url?: string
   onActionCue?: (cue: GeorgeActionCue) => void
 }) {
-  const wsRef = useRef<WebSocket | null>(null)
+  const transportRef = useRef<GeorgeLiveHubTransport | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
@@ -33,7 +29,7 @@ export function useGeorgeLiveHub(params?: {
   const [lastActionCue, setLastActionCue] = useState<GeorgeActionCue | null>(null)
   const [error, setError] = useState('')
 
-  const connect = useCallback((context?: Record<string, unknown>) => {
+  const connect = useCallback((context?: GeorgeLiveHubContext) => {
     setError('')
     setStatus('connecting')
 
@@ -42,43 +38,31 @@ export function useGeorgeLiveHub(params?: {
       process.env.NEXT_PUBLIC_LIVE_HUB_URL ||
       'ws://localhost:8080'
 
-    const ws = new WebSocket(url)
-    ws.binaryType = 'arraybuffer'
+    const transport = createGeorgeLiveHubWebSocketTransport({
+      url,
+      handlers: {
+        onOpen: () => setStatus('connected'),
+        onClose: () => setStatus('idle'),
+        onError: (message) => {
+          setStatus('error')
+          setError(message)
+        },
+        onEvent: (event) => {
+          if (event?.type !== 'ACTION_CUE') return
 
-    ws.onopen = () => {
-      setStatus('connected')
-      ws.send(JSON.stringify({
-        type: 'SYNC_CONTEXT',
-        context: context || {},
-      }))
-    }
-
-    ws.onmessage = (message) => {
-      try {
-        const event = JSON.parse(String(message.data))
-
-        if (event?.type === 'ACTION_CUE') {
           const cue = event as GeorgeActionCue
           setLastActionCue(cue)
           params?.onActionCue?.(cue)
-        }
-      } catch {}
-    }
+        },
+      },
+    })
 
-    ws.onerror = () => {
-      setStatus('error')
-      setError('LIVE hub connection failed.')
-    }
-
-    ws.onclose = () => {
-      setStatus('idle')
-    }
-
-    wsRef.current = ws
+    transportRef.current = transport
+    transport.connect(context)
   }, [params])
 
   const startMic = useCallback(async () => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+    if (!transportRef.current) {
       setError('Connect LIVE hub first.')
       return
     }
@@ -95,9 +79,7 @@ export function useGeorgeLiveHub(params?: {
 
     recorder.ondataavailable = async (event) => {
       if (!event.data?.size) return
-      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
-
-      wsRef.current.send(await event.data.arrayBuffer())
+      transportRef.current?.sendAudio(await event.data.arrayBuffer())
     }
 
     recorder.start(250)
@@ -111,13 +93,13 @@ export function useGeorgeLiveHub(params?: {
     streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
 
-    setStatus(wsRef.current?.readyState === WebSocket.OPEN ? 'connected' : 'idle')
+    setStatus(transportRef.current ? 'connected' : 'idle')
   }, [])
 
   const disconnect = useCallback(() => {
     stopMic()
-    wsRef.current?.close()
-    wsRef.current = null
+    transportRef.current?.close()
+    transportRef.current = null
     setStatus('idle')
   }, [stopMic])
 
