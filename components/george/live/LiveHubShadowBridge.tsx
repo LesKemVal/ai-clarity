@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 
 type LiveHubShadowBridgeProps = {
@@ -66,6 +67,8 @@ export function LiveHubShadowBridge({
       text: clean,
       isFinal: transcriptFinal,
     })
+
+    markRuntimeEvent(clean, 'transcript_input')
 
     getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal)
   }, [active, transcript, transcriptFinal])
