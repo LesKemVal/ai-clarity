@@ -46,10 +46,16 @@ wss.on('connection', (ws) => {
     }
 
     if (parsed.type === 'TRANSCRIPT_INPUT') {
-      stt.handleTranscriptInput(
-        String(parsed.text || ''),
-        typeof parsed.isFinal === 'boolean' ? parsed.isFinal : true
-      )
+      const text = String(parsed.text || '')
+      const isFinal = typeof parsed.isFinal === 'boolean' ? parsed.isFinal : true
+
+      console.log('[LIVE HUB][TRANSCRIPT_INPUT]', {
+        text,
+        isFinal,
+        length: text.length,
+      })
+
+      stt.handleTranscriptInput(text, isFinal)
       return
     }
 
