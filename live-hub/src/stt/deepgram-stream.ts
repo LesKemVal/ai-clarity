@@ -102,6 +102,12 @@ export function createDeepgramStream(params: {
 
     const localActionCue = arbitrateCue({ packet })
 
+    console.log('[LIVE HUB][metric]', {
+      event: 'action_cue',
+      source: localActionCue.source,
+      cue: localActionCue.cue,
+    })
+
     sendJson(params.ws, {
       type: 'ACTION_CUE',
       cue: localActionCue.cue,
@@ -143,6 +149,12 @@ export function createDeepgramStream(params: {
         const actionCue = arbitrateCue({
           packet,
           fastCue: fastCue.cue,
+        })
+
+        console.log('[LIVE HUB][metric]', {
+          event: 'action_cue',
+          source: actionCue.source,
+          cue: actionCue.cue,
         })
 
         sendJson(params.ws, {
