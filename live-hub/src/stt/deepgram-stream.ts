@@ -113,7 +113,6 @@ export function createDeepgramStream(params: {
     void resolveGroqFastCue(packet)
       .then((fastCue) => {
         console.log('[LIVE HUB][groq] resolved', fastCue)
-
         if (!fastCue) return
 
         sendJson(params.ws, {
