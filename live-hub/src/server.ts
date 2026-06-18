@@ -45,6 +45,14 @@ wss.on('connection', (ws) => {
       return
     }
 
+    if (parsed.type === 'TRANSCRIPT_INPUT') {
+      stt.handleTranscriptInput(
+        String(parsed.text || ''),
+        typeof parsed.isFinal === 'boolean' ? parsed.isFinal : true
+      )
+      return
+    }
+
     if (parsed.type === 'PING') {
       sendJson(ws, { type: 'PONG', at: Date.now() })
     }

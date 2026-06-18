@@ -30,27 +30,16 @@ export function createDeepgramStream(params: {
     endpointing: 350,
   })
 
-  dg.on(LiveTranscriptionEvents.Open, () => {
-    deepgramOpen = true
-    console.log('[LIVE HUB][deepgram] open')
-
-    while (pendingAudio.length) {
-      const chunk = pendingAudio.shift()
-      if (chunk) dg.send(chunk)
-    }
-  })
-
-  dg.on(LiveTranscriptionEvents.Close, () => {
-    deepgramOpen = false
-    console.log('[LIVE HUB][deepgram] close')
-  })
-
-  dg.on(LiveTranscriptionEvents.Transcript, (payload) => {
-    const transcript = payload?.channel?.alternatives?.[0]?.transcript?.trim() || ''
+  function processTranscript(input: {
+    transcript: string
+    isFinal: boolean
+    source: 'deepgram' | 'client'
+  }) {
+    const transcript = input.transcript.trim()
     if (!transcript) return
 
     const turnStartAt = Date.now()
-    const isFinal = Boolean(payload?.is_final || payload?.speech_final)
+    const isFinal = input.isFinal
 
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'transcript_received'))
 
@@ -69,6 +58,7 @@ export function createDeepgramStream(params: {
     sendJson(params.ws, {
       type: isFinal ? 'TRANSCRIPT_FINAL' : 'TRANSCRIPT_PARTIAL',
       text: transcript,
+      source: input.source,
       at: Date.now(),
     })
 
@@ -138,6 +128,7 @@ export function createDeepgramStream(params: {
       .then((fastCue) => {
         console.log('[LIVE HUB][groq] resolved', fastCue)
         console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_response'))
+
         if (!fastCue) return
 
         sendJson(params.ws, {
@@ -172,6 +163,32 @@ export function createDeepgramStream(params: {
       .catch((error) => {
         console.warn('[LIVE HUB][groq]', error instanceof Error ? error.message : error)
       })
+  }
+
+  dg.on(LiveTranscriptionEvents.Open, () => {
+    deepgramOpen = true
+    console.log('[LIVE HUB][deepgram] open')
+
+    while (pendingAudio.length) {
+      const chunk = pendingAudio.shift()
+      if (chunk) dg.send(chunk)
+    }
+  })
+
+  dg.on(LiveTranscriptionEvents.Close, () => {
+    deepgramOpen = false
+    console.log('[LIVE HUB][deepgram] close')
+  })
+
+  dg.on(LiveTranscriptionEvents.Transcript, (payload) => {
+    const transcript = payload?.channel?.alternatives?.[0]?.transcript?.trim() || ''
+    const isFinal = Boolean(payload?.is_final || payload?.speech_final)
+
+    processTranscript({
+      transcript,
+      isFinal,
+      source: 'deepgram',
+    })
   })
 
   dg.on(LiveTranscriptionEvents.Error, (error) => {
@@ -196,6 +213,15 @@ export function createDeepgramStream(params: {
 
       dg.send(audio)
     },
+
+    handleTranscriptInput(text: string, isFinal = true) {
+      processTranscript({
+        transcript: text,
+        isFinal,
+        source: 'client',
+      })
+    },
+
     close() {
       try {
         dg.finish()
