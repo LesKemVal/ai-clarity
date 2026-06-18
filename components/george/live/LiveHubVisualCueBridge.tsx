@@ -24,13 +24,16 @@ export function LiveHubVisualCueBridge({
 }: LiveHubVisualCueBridgeProps) {
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
   const lastCueRef = useRef('')
+  const currentPriorityRef = useRef(0)
 
   const handleVisualCue = useCallback((cue: GeorgeDeliveryCue) => {
     const clean = String(cue.text || '').trim()
     if (!clean) return
     if (lastCueRef.current === clean) return
+    if (visualCue && cue.priority < currentPriorityRef.current) return
 
     lastCueRef.current = clean
+    currentPriorityRef.current = cue.priority
 
     setVisualCue({
       text: clean,
@@ -39,11 +42,12 @@ export function LiveHubVisualCueBridge({
       source: cue.source,
       at: Date.now(),
     })
-  }, [])
+  }, [visualCue])
 
   useEffect(() => {
     if (!active) {
       lastCueRef.current = ''
+      currentPriorityRef.current = 0
       setVisualCue(null)
     }
   }, [active])
@@ -52,6 +56,7 @@ export function LiveHubVisualCueBridge({
     if (!visualCue) return
 
     const timeout = window.setTimeout(() => {
+      currentPriorityRef.current = 0
       setVisualCue(null)
     }, 8000)
 
