@@ -13,8 +13,8 @@ export type ClientMessage =
 export type ServerMessage =
   | { type: 'READY'; at: number }
   | { type: 'PONG'; at: number }
-  | { type: 'TRANSCRIPT_PARTIAL'; text: string; at: number }
-  | { type: 'TRANSCRIPT_FINAL'; text: string; at: number }
+  | { type: 'TRANSCRIPT_PARTIAL'; text: string; source?: 'deepgram' | 'client'; at: number }
+  | { type: 'TRANSCRIPT_FINAL'; text: string; source?: 'deepgram' | 'client'; at: number }
   | {
       type: 'LOCAL_CUE'
       cue: string
