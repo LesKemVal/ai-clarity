@@ -4949,6 +4949,12 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           return
         }
 
+        console.info('[GEORGE CHAT REQUEST]', {
+          liveMode,
+          text,
+          source,
+        })
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -4982,7 +4988,13 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
           }),
         })
 
+        console.info('[GEORGE CHAT RESPONSE]', {
+          status: res.status,
+        })
+
         const data = await res.json().catch(() => null)
+
+        console.info('[GEORGE CHAT DATA]', data)
 
         if (!res.ok) {
           console.error('/api/chat failed', { status: res.status, data })
