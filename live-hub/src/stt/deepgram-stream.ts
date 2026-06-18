@@ -76,7 +76,7 @@ export function createDeepgramStream(params: {
       const audio = chunk.buffer.slice(
         chunk.byteOffset,
         chunk.byteOffset + chunk.byteLength
-      )
+      ) as ArrayBuffer
 
       console.log('[LIVE HUB][audio]', {
         bytes: chunk.byteLength,
