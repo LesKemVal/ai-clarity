@@ -41,7 +41,7 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
-import { LiveHubDeliveryBridge } from '@/components/george/live/LiveHubDeliveryBridge'
+import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCueBridge'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
@@ -5996,7 +5996,7 @@ return (
         transcriptFinal={true}
       />
 
-      <LiveHubDeliveryBridge
+      <LiveHubVisualCueBridge
         active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
         context={{
           room: String(liveRuntimeSupport?.purview || 'live'),
