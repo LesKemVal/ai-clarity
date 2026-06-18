@@ -3,6 +3,7 @@ import type { WebSocket } from 'ws'
 import type { LiveHubContext } from '../types/protocol.js'
 import { sendJson } from '../transport/json.js'
 import { resolveLocalCue } from '../george/local-cue-engine.js'
+import { buildRuntimePacket } from '../george/runtime-packet.js'
 
 export function createDeepgramStream(params: {
   ws: WebSocket
