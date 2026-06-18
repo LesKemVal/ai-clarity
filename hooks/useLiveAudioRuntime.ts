@@ -43,6 +43,11 @@ export function useLiveAudioRuntime({
   }, [enabled, onError, onFinalTranscript, onPartialTranscript])
 
   const stop = useCallback(() => {
+    console.warn('[GEORGE LIVE AUDIO HOOK] stop called', {
+      stack: new Error().stack,
+      status: statusRef.current,
+      hasRuntime: Boolean(runtimeRef.current),
+    })
     runtimeRef.current?.stop()
     runtimeRef.current = null
     updateStatus('idle')
