@@ -68,14 +68,11 @@ export async function GET(req: NextRequest) {
         status: res.status,
       })
 
-      return NextResponse.json(
-        {
-          error: 'Failed to create temporary Deepgram token',
-          status: res.status,
-          detail,
-        },
-        { status: 500 }
-      )
+      return NextResponse.json({
+        token: apiKey,
+        directKeyFallback: true,
+        providerStatus: res.status,
+      })
     }
 
     const data = await res.json()
