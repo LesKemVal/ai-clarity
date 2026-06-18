@@ -2581,15 +2581,6 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   const processLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
-
-    console.info('[LIVE][hub][page-proof] final transcript callback', {
-      raw: text,
-      clean,
-      forceLive,
-      liveMode,
-      showLiveEntrySequence,
-    })
-
     if (!clean) return
 
     if (liveBuyTimeUntilRef.current > Date.now()) {
