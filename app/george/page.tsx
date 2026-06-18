@@ -4952,7 +4952,6 @@ Credit type detected: ${creditType || "unknown"}\nUser intent: ${creditIntent ||
         console.info('[GEORGE CHAT REQUEST]', {
           liveMode,
           text,
-          source,
         })
 
         const res = await fetch('/api/chat', {
