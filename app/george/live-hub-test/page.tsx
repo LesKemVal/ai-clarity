@@ -11,6 +11,9 @@ type HubEvent = {
   category?: string
   confidence?: number
   priority?: number
+  source?: string
+  localCue?: string
+  fastCue?: string
   packet?: Record<string, unknown>
   at?: number
 }
@@ -169,6 +172,13 @@ export default function LiveHubTestPage() {
               {event.text && <div className="mt-2 text-white/80">{event.text}</div>}
               {event.cue && <div className="mt-2 text-xl font-semibold text-white">{event.cue}</div>}
               {event.reason && <div className="mt-2 text-white/45">{event.reason}</div>}
+              {(event.source || event.localCue || event.fastCue) && (
+                <div className="mt-2 text-xs leading-5 text-white/35">
+                  {event.source && <div>source: {event.source}</div>}
+                  {event.localCue && <div>local: {event.localCue}</div>}
+                  {event.fastCue && <div>fast: {event.fastCue}</div>}
+                </div>
+              )}
               {(event.category || event.confidence || event.priority) && (
                 <div className="mt-3 text-xs text-white/35">
                   {event.category && <span>category: {event.category}</span>}
