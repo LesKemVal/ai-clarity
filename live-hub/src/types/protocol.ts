@@ -38,4 +38,12 @@ export type ServerMessage =
       }
       at: number
     }
+  | {
+      type: 'FAST_CUE'
+      cue: string
+      source: 'groq'
+      model: string
+      fromLocalCue: string
+      at: number
+    }
   | { type: 'ERROR'; error: string; at: number }
