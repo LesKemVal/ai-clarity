@@ -8,6 +8,10 @@ type HubEvent = {
   cue?: string
   reason?: string
   error?: string
+  category?: string
+  confidence?: number
+  priority?: number
+  packet?: Record<string, unknown>
   at?: number
 }
 
@@ -165,6 +169,18 @@ export default function LiveHubTestPage() {
               {event.text && <div className="mt-2 text-white/80">{event.text}</div>}
               {event.cue && <div className="mt-2 text-xl font-semibold text-white">{event.cue}</div>}
               {event.reason && <div className="mt-2 text-white/45">{event.reason}</div>}
+              {(event.category || event.confidence || event.priority) && (
+                <div className="mt-3 text-xs text-white/35">
+                  {event.category && <span>category: {event.category}</span>}
+                  {typeof event.confidence === 'number' && <span> · confidence: {event.confidence}</span>}
+                  {typeof event.priority === 'number' && <span> · priority: {event.priority}</span>}
+                </div>
+              )}
+              {event.packet && (
+                <pre className="mt-3 overflow-x-auto rounded-xl bg-black/30 p-3 text-[11px] leading-5 text-white/45">
+                  {JSON.stringify(event.packet, null, 2)}
+                </pre>
+              )}
               {event.error && <div className="mt-2 text-red-200">{event.error}</div>}
             </div>
           ))}
