@@ -7,7 +7,7 @@ import { createDeepgramStream } from './stt/deepgram-stream.js'
 const port = Number(process.env.PORT || 8080)
 const deepgramApiKey = process.env.DEEPGRAM_API_KEY || ''
 
-const wss = new WebSocketServer({ port })
+const wss = new WebSocketServer({ host: '0.0.0.0', port })
 
 wss.on('connection', (ws) => {
   console.log('[LIVE HUB][client] connected')
