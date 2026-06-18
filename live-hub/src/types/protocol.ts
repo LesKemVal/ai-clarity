@@ -46,4 +46,16 @@ export type ServerMessage =
       fromLocalCue: string
       at: number
     }
+  | {
+      type: 'ACTION_CUE'
+      cue: string
+      reason: string
+      source: 'local' | 'groq'
+      localCue: string
+      fastCue?: string
+      category: string
+      confidence: number
+      priority: number
+      at: number
+    }
   | { type: 'ERROR'; error: string; at: number }

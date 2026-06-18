@@ -5,6 +5,7 @@ import { sendJson } from '../transport/json.js'
 import { resolveLocalCue } from '../george/local-cue-engine.js'
 import { buildRuntimePacket } from '../george/runtime-packet.js'
 import { resolveGroqFastCue } from '../llm/groq-fast-lane.js'
+import { arbitrateCue } from '../george/cue-arbitrator.js'
 import { markLatency } from '../metrics/latency.js'
 
 export function createDeepgramStream(params: {
@@ -109,6 +110,21 @@ export function createDeepgramStream(params: {
       at: now,
     })
 
+    const localActionCue = arbitrateCue({ packet })
+
+    sendJson(params.ws, {
+      type: 'ACTION_CUE',
+      cue: localActionCue.cue,
+      reason: localActionCue.reason,
+      source: localActionCue.source,
+      localCue: localActionCue.localCue,
+      fastCue: localActionCue.fastCue,
+      category: localActionCue.category,
+      confidence: localActionCue.confidence,
+      priority: localActionCue.priority,
+      at: localActionCue.at,
+    })
+
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'local_cue_sent'))
 
     console.log('[LIVE HUB][groq] queued', {
@@ -131,6 +147,24 @@ export function createDeepgramStream(params: {
           model: fastCue.model,
           fromLocalCue: cue.cue,
           at: Date.now(),
+        })
+
+        const actionCue = arbitrateCue({
+          packet,
+          fastCue: fastCue.cue,
+        })
+
+        sendJson(params.ws, {
+          type: 'ACTION_CUE',
+          cue: actionCue.cue,
+          reason: actionCue.reason,
+          source: actionCue.source,
+          localCue: actionCue.localCue,
+          fastCue: actionCue.fastCue,
+          category: actionCue.category,
+          confidence: actionCue.confidence,
+          priority: actionCue.priority,
+          at: actionCue.at,
         })
 
         console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'fast_cue_sent'))
