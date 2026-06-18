@@ -155,11 +155,6 @@ export function createDeepgramStream(params: {
         chunk.byteOffset + chunk.byteLength
       ) as ArrayBuffer
 
-      console.log('[LIVE HUB][audio]', {
-        bytes: chunk.byteLength,
-        deepgramOpen,
-      })
-
       if (!deepgramOpen) {
         pendingAudio.push(audio)
         return
