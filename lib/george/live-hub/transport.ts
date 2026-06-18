@@ -3,6 +3,7 @@ import type { GeorgeLiveHubContext, GeorgeLiveHubEvent } from './types'
 export type GeorgeLiveHubTransport = {
   connect: (context?: GeorgeLiveHubContext) => void
   sendAudio: (audio: ArrayBuffer) => void
+  sendJson?: (message: Record<string, unknown>) => void
   close: () => void
 }
 

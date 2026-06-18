@@ -12,6 +12,7 @@ export type GeorgeLiveHubRuntimeListener = (event: GeorgeLiveHubRuntimeEvent) =>
 export type GeorgeLiveHubRuntimeAdapter = {
   connect: (context?: GeorgeLiveHubContext) => void
   disconnect: () => void
+  sendTranscript: (text: string, isFinal?: boolean) => void
   subscribe: (listener: GeorgeLiveHubRuntimeListener) => () => void
 }
 
@@ -64,6 +65,17 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       transport?.close()
       transport = null
       emit({ type: 'STATUS', status: 'idle', at: Date.now() })
+    },
+
+    sendTranscript(text: string, isFinal = true) {
+      const clean = String(text || '').trim()
+      if (!clean) return
+
+      transport?.sendJson?.({
+        type: 'TRANSCRIPT_INPUT',
+        text: clean,
+        isFinal,
+      })
     },
 
     subscribe(listener: GeorgeLiveHubRuntimeListener) {

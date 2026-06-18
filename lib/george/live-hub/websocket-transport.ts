@@ -49,6 +49,11 @@ export function createGeorgeLiveHubWebSocketTransport(params: {
       ws.send(audio)
     },
 
+    sendJson(message: Record<string, unknown>) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return
+      ws.send(JSON.stringify(message))
+    },
+
     close() {
       ws?.close()
       ws = null
