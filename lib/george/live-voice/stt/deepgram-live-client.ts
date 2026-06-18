@@ -49,7 +49,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
   }
 
   async function start() {
-    if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] start called')
+    if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] start called')
     stopped = false
     registerGlobalStopper()
 
@@ -67,13 +67,13 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       ? `/api/george/live/stt-token?email=${encodeURIComponent(storedEmail)}`
       : '/api/george/live/stt-token'
 
-    if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] token request', { tokenUrl })
+    if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] token request', { tokenUrl })
 
     const tokenRes = await fetch(tokenUrl)
     const tokenData = await tokenRes.json()
 
     if (liveSttDebug()) {
-      if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] token response', {
+      console.info('[GEORGE DEEPGRAM] token response', {
         ok: tokenRes.ok,
         status: tokenRes.status,
         hasToken: Boolean(tokenData?.token),
@@ -86,7 +86,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       throw new Error(tokenData?.error || 'Deepgram token unavailable')
     }
 
-    if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] requesting mic')
+    if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] requesting mic')
     stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
@@ -143,7 +143,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
 
     if (stopped) return
 
-    if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] opening websocket')
+    if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] opening websocket')
     socket = new WebSocket(url, ['token', tokenData.token])
 
     socket.onopen = () => {
@@ -152,7 +152,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         return
       }
 
-      if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] websocket open')
+      if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] websocket open')
       handlers.onOpen?.()
 
       recorder = new MediaRecorder(stream as MediaStream, {
@@ -166,11 +166,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         if (stopped) return
         if (!event.data?.size) return
         if (!socket || socket.readyState !== WebSocket.OPEN) return
-        if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
+        if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
         socket.send(event.data)
       }
 
-      if (liveSttDebug()) if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] recorder start', { mimeType: recorder.mimeType })
+      if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] recorder start', { mimeType: recorder.mimeType })
       recorder.start(250)
     }
 
