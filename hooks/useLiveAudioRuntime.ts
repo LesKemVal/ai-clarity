@@ -116,12 +116,6 @@ export function useLiveAudioRuntime({
     }
   }, [enabled, stop])
 
-  useEffect(() => {
-    return () => {
-      stop()
-    }
-  }, [stop])
-
   return {
     status,
     isListening: status === 'starting' || status === 'listening',
