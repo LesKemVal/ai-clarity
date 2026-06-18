@@ -15,6 +15,8 @@ export function createDeepgramStream(params: {
   let lastCueKey = ''
   let lastCueAt = 0
   let lastCuePriority = 0
+  let lastFinalTranscript = ''
+  let lastFinalAt = 0
   const pendingAudio: ArrayBuffer[] = []
 
   const dg = deepgram.listen.live({
@@ -44,6 +46,16 @@ export function createDeepgramStream(params: {
     if (!transcript) return
 
     const isFinal = Boolean(payload?.is_final || payload?.speech_final)
+
+    if (isFinal) {
+      const now = Date.now()
+      if (transcript === lastFinalTranscript && now - lastFinalAt < 5000) {
+        return
+      }
+
+      lastFinalTranscript = transcript
+      lastFinalAt = now
+    }
 
     sendJson(params.ws, {
       type: isFinal ? 'TRANSCRIPT_FINAL' : 'TRANSCRIPT_PARTIAL',
