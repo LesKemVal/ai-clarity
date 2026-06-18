@@ -44,6 +44,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
   }
 
   async function start() {
+    console.info('[GEORGE DEEPGRAM] start called')
     stopped = false
     registerGlobalStopper()
 
@@ -61,13 +62,24 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       ? `/api/george/live/stt-token?email=${encodeURIComponent(storedEmail)}`
       : '/api/george/live/stt-token'
 
+    console.info('[GEORGE DEEPGRAM] token request', { tokenUrl })
+
     const tokenRes = await fetch(tokenUrl)
     const tokenData = await tokenRes.json()
+
+    console.info('[GEORGE DEEPGRAM] token response', {
+      ok: tokenRes.ok,
+      status: tokenRes.status,
+      hasToken: Boolean(tokenData?.token),
+      fallback: Boolean(tokenData?.directKeyFallback),
+      error: tokenData?.error || null,
+    })
 
     if (!tokenRes.ok || !tokenData?.token) {
       throw new Error(tokenData?.error || 'Deepgram token unavailable')
     }
 
+    console.info('[GEORGE DEEPGRAM] requesting mic')
     stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
@@ -124,6 +136,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
 
     if (stopped) return
 
+    console.info('[GEORGE DEEPGRAM] opening websocket')
     socket = new WebSocket(url, ['token', tokenData.token])
 
     socket.onopen = () => {
@@ -132,6 +145,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         return
       }
 
+      console.info('[GEORGE DEEPGRAM] websocket open')
       handlers.onOpen?.()
 
       recorder = new MediaRecorder(stream as MediaStream, {
@@ -145,9 +159,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         if (stopped) return
         if (!event.data?.size) return
         if (!socket || socket.readyState !== WebSocket.OPEN) return
+        console.info('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
         socket.send(event.data)
       }
 
+      console.info('[GEORGE DEEPGRAM] recorder start', { mimeType: recorder.mimeType })
       recorder.start(250)
     }
 
@@ -177,6 +193,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
     }
 
     socket.onclose = (event) => {
+      console.warn('[GEORGE DEEPGRAM] websocket close', { code: event.code, reason: event.reason, stopped })
       if (!stopped) handlers.onClose?.()
     }
   }
