@@ -2680,25 +2680,23 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   })
 
   useEffect(() => {
-    if (!(forceLive || liveMode)) return
+    if (!(forceLive || liveMode)) {
+      stopLiveAudioRuntimeDirect()
+      return
+    }
 
     ;(window as any).__GEORGE_STOP_LIVE_MIC__ = () => {
       emergencyStopLiveAudioRuntime()
       setIsListening(false)
     }
 
-    startLiveAudioRuntime()
-
-    return () => {
+    if (voiceOn) {
+      startLiveAudioRuntime()
+    } else {
       stopLiveAudioRuntimeDirect()
+      setIsListening(false)
     }
-  }, [forceLive, liveMode, emergencyStopLiveAudioRuntime, startLiveAudioRuntime, stopLiveAudioRuntimeDirect])
-
-  useEffect(() => {
-    if ((forceLive || liveMode) && voiceOn) return
-
-    stopLiveAudioRuntime()
-  }, [forceLive, liveMode, voiceOn])
+  }, [forceLive, liveMode, voiceOn, emergencyStopLiveAudioRuntime, startLiveAudioRuntime, stopLiveAudioRuntimeDirect])
 
   const interruptAndListen = () => {
     try {
