@@ -5978,15 +5978,16 @@ return (
       <LiveHubShadowBridge
         active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
         context={{
-          room: liveRuntimeSupport?.purview || 'live',
-          chair: liveRuntimeSupport?.userPosition || '',
-          objective:
+          room: String(liveRuntimeSupport?.purview || 'live'),
+          chair: String(liveRuntimeSupport?.userPosition || ''),
+          objective: String(
             liveRuntimeSupport?.objective ||
             activeCampaign?.desiredOutcome ||
             activeCampaign?.currentGoal ||
-            '',
-          knownContext: liveRuntimeSupport?.knownContext || '',
-          userPosition: liveRuntimeSupport?.userPosition || '',
+            ''
+          ),
+          knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          userPosition: String(liveRuntimeSupport?.userPosition || ''),
         }}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
