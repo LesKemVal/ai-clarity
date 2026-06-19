@@ -1,4 +1,8 @@
-import 'dotenv/config'
+import dotenv from 'dotenv'
+
+dotenv.config({ path: new URL('../../.env.local', import.meta.url).pathname })
+dotenv.config()
+
 import { WebSocketServer } from 'ws'
 import type { LiveHubContext } from './types/protocol.js'
 import { parseClientMessage, sendJson } from './transport/json.js'
@@ -15,24 +19,25 @@ wss.on('connection', (ws) => {
 
   sendJson(ws, { type: 'READY', at: Date.now() })
 
+  const stt = deepgramApiKey
+    ? createDeepgramStream({
+        ws,
+        apiKey: deepgramApiKey,
+        getContext: () => context,
+      })
+    : null
+
   if (!deepgramApiKey) {
     sendJson(ws, {
       type: 'ERROR',
-      error: 'Missing DEEPGRAM_API_KEY.',
+      error: 'Missing DEEPGRAM_API_KEY. Manual transcript input remains available.',
       at: Date.now(),
     })
-    return
   }
-
-  const stt = createDeepgramStream({
-    ws,
-    apiKey: deepgramApiKey,
-    getContext: () => context,
-  })
 
   ws.on('message', (message, isBinary) => {
     if (isBinary) {
-      stt.sendAudio(message as Buffer)
+      stt?.sendAudio(message as Buffer)
       return
     }
 
@@ -53,7 +58,14 @@ wss.on('connection', (ws) => {
         text,
         isFinal,
         length: text.length,
+        hasStt: Boolean(stt),
+        hasDeepgramApiKey: Boolean(deepgramApiKey),
       })
+
+      if (!stt) {
+        console.warn('[LIVE HUB][TRANSCRIPT_INPUT] no transcript processor available')
+        return
+      }
 
       stt.handleTranscriptInput(text, isFinal)
       return
@@ -66,7 +78,7 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     console.log('[LIVE HUB][client] closed')
-    stt.close()
+    stt?.close()
   })
 })
 

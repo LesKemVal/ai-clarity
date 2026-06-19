@@ -13,6 +13,7 @@ export default function LiveDeliveryTestPage() {
   const lastSpokenRef = useRef('')
 
   const hub = useGeorgeLiveHub({
+    url: 'ws://localhost:8080',
     onActionCue: (actionCue) => {
       const routed = routeGeorgeDeliveryCue({
         actionCue,
@@ -156,7 +157,19 @@ export default function LiveDeliveryTestPage() {
 
           <button
             type="button"
-            onClick={() => hub.sendTranscript(testTranscript, true)}
+            onClick={() => {
+              hub.connect({
+                room: 'test room',
+                chair: 'founder',
+                objective: 'close interest',
+                knownContext: 'DELIVERY_CUE router test',
+                deliveryStyle,
+              })
+
+              window.setTimeout(() => {
+                hub.sendTranscript(testTranscript, true)
+              }, 150)
+            }}
             className="mt-3 rounded-xl bg-[#AEB6FF] px-4 py-3 text-sm font-semibold text-black"
           >
             Send Test Transcript

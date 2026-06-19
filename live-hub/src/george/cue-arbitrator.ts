@@ -18,7 +18,18 @@ export function arbitrateCue(input: {
 }): ActionCue {
   const fastCue = input.fastCue?.trim()
 
-  if (fastCue && fastCue.length <= 80) {
+  const maxFastCueLength =
+    input.packet.deliveryStyle === 'expandedLine'
+      ? 900
+      : input.packet.deliveryStyle === 'response'
+        ? 520
+        : input.packet.deliveryStyle === 'line'
+          ? 220
+          : input.packet.deliveryStyle === 'continue'
+            ? 220
+            : 80
+
+  if (fastCue && fastCue.length <= maxFastCueLength) {
     return {
       cue: fastCue,
       reason: `Fast cue refined local cue: ${input.packet.cue}`,

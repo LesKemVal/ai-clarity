@@ -113,6 +113,8 @@ export function useGeorgeLiveHub(params?: {
       return
     }
 
+    console.info('[LIVE][hub][hook] send transcript', { text: clean, isFinal })
+
     transportRef.current.sendJson?.({
       type: 'TRANSCRIPT_INPUT',
       text: clean,

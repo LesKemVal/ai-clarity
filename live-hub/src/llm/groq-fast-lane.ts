@@ -1,20 +1,24 @@
 import OpenAI from 'openai'
 import type { GeorgeRuntimePacket } from '../george/runtime-packet.js'
 
-const groqApiKey = process.env.GROQ_API_KEY || ''
+function createGroqClient() {
+  const groqApiKey = process.env.GROQ_API_KEY || ''
 
-const groq = groqApiKey
-  ? new OpenAI({
-      apiKey: groqApiKey,
-      baseURL: 'https://api.groq.com/openai/v1',
-    })
-  : null
+  return groqApiKey
+    ? new OpenAI({
+        apiKey: groqApiKey,
+        baseURL: 'https://api.groq.com/openai/v1',
+      })
+    : null
+}
 
 export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   cue: string
   source: 'groq'
   model: string
 } | null> {
+  const groq = createGroqClient()
+
   if (!groq) {
     console.warn('[LIVE HUB][groq] missing GROQ_API_KEY')
     return null
@@ -26,6 +30,7 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
     model,
     signal: packet.signal,
     cue: packet.cue,
+    deliveryStyle: packet.deliveryStyle,
   })
 
   const deliveryStyle = packet.deliveryStyle || 'cue'
@@ -77,7 +82,11 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   })
 
   const cue = response.choices[0]?.message?.content?.trim()
-  console.log('[LIVE HUB][groq] response', { cue })
+  console.log('[LIVE HUB][groq] response', {
+    deliveryStyle,
+    cue,
+    length: cue?.length || 0,
+  })
 
   if (!cue) return null
 

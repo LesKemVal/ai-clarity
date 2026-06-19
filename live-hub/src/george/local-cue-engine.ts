@@ -11,7 +11,20 @@ export function resolveLocalCue(input: {
   if (text.length < 8) return null
 
   const cue = matchCuePattern(text)
-  if (!cue) return null
+
+  if (!cue) {
+    if (input.isFinal && input.context.deliveryStyle && input.context.deliveryStyle !== 'cue') {
+      return {
+        cue: 'Give a useful response.',
+        reason: 'No local cue matched; final transcript requires delivery-style support.',
+        category: 'clarification',
+        confidence: 0.62,
+        priority: 70,
+      }
+    }
+
+    return null
+  }
 
   if (cue.category === 'clarification' && !input.isFinal) {
     return null
