@@ -6,12 +6,13 @@ import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runti
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
-import type { GeorgeDeliveryCue, GeorgeDeliveryMode } from '@/lib/george/live-delivery/types'
+import type { GeorgeDeliveryCue, GeorgeDeliveryMode, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 type LiveHubDeliveryBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   mode?: GeorgeDeliveryMode
+  deliveryStyle?: GeorgeLiveDeliveryStyle
   onVisualCue?: (cue: GeorgeDeliveryCue) => void
   onVoiceCue?: (cue: GeorgeDeliveryCue) => void
   onSilentCue?: (cue: GeorgeDeliveryCue) => void
@@ -21,6 +22,7 @@ export function LiveHubDeliveryBridge({
   active,
   context,
   mode = 'visual',
+  deliveryStyle = 'advice',
   onVisualCue,
   onVoiceCue,
   onSilentCue,
