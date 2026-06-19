@@ -61,42 +61,6 @@ export default function HomePage() {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.035),transparent_34%),linear-gradient(180deg,rgba(3,4,5,0.18),rgba(3,4,5,0.38)_42%,rgba(3,4,5,0.92))]" />
 
-      <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <div className="relative h-[36vw] min-h-[230px] w-[78vw] max-w-[940px]">
-          <svg viewBox="0 0 1200 520" className="h-full w-full drop-shadow-[0_30px_90px_rgba(0,0,0,0.8)]">
-            <path
-              d="M120 238 C124 132 201 82 333 86 C445 90 503 133 524 221 C545 158 586 132 646 132 C706 132 747 158 768 221 C789 133 847 90 959 86 C1091 82 1168 132 1172 238 C1176 356 1089 423 963 421 C832 419 781 348 768 254 C747 300 706 321 646 321 C586 321 545 300 524 254 C511 348 460 419 329 421 C203 423 116 356 120 238Z"
-              fill="rgba(5,8,12,0.72)"
-              stroke="rgba(255,255,255,0.42)"
-              strokeWidth="10"
-            />
-            <path
-              d="M166 230 C169 156 226 121 331 124 C429 127 486 163 497 245 C508 331 445 383 334 383 C224 383 162 320 166 230Z"
-              fill="rgba(190,215,255,0.055)"
-              stroke="rgba(255,255,255,0.16)"
-              strokeWidth="3"
-            />
-            <path
-              d="M795 245 C806 163 863 127 961 124 C1066 121 1123 156 1126 230 C1130 320 1068 383 958 383 C847 383 784 331 795 245Z"
-              fill="rgba(190,215,255,0.055)"
-              stroke="rgba(255,255,255,0.16)"
-              strokeWidth="3"
-            />
-            <path d="M120 236 L18 178" stroke="rgba(255,255,255,0.36)" strokeWidth="10" strokeLinecap="round" />
-            <path d="M1172 236 L1282 178" stroke="rgba(255,255,255,0.36)" strokeWidth="10" strokeLinecap="round" />
-          </svg>
-
-          <div className="absolute left-[17%] top-[34%] max-w-[280px]">
-            <div className="mb-2 text-[10px] uppercase tracking-[0.34em] text-white/48">
-              GEORGE · {scene.label}
-            </div>
-            <div className="text-[15px] leading-snug text-white/86 sm:text-[18px]">
-              {scene.cue}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="relative z-10 flex min-h-[100dvh] flex-col px-6 py-5">
         <header className="flex items-center justify-between">
           <button
@@ -123,7 +87,7 @@ export default function HomePage() {
         </header>
 
         <section className="flex flex-1 items-end pb-12">
-          <div className="max-w-[780px] rounded-[28px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-md sm:p-7">
+          <div className="max-w-[720px] rounded-[28px] border border-white/10 bg-black/58 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.68)] backdrop-blur-xl sm:p-7">
             <div className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/48">
               Different room. Same GEORGE.
             </div>
@@ -133,7 +97,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/68 sm:text-[17px]">
-              One GEORGE. Preparation when needed. Execution when it matters.
+              One GEORGE. Different rooms. Different outcomes.
             </p>
 
             <div className="mt-8 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
