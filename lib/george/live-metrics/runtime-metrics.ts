@@ -2,6 +2,9 @@ export type GeorgeRuntimeMetricEvent =
   | 'transcript_input'
   | 'action_cue'
   | 'delivery_cue'
+  | 'visual_cue_received'
+  | 'visual_cue_rendered'
+  | 'voice_cue_requested'
 
 const turnStarts = new Map<string, number>()
 

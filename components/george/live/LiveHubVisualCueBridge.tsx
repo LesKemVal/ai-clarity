@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
 
@@ -39,6 +40,8 @@ export function LiveHubVisualCueBridge({
     lastCueRef.current = clean
     currentPriorityRef.current = cue.priority
 
+    markRuntimeEvent(clean, 'visual_cue_received')
+
     setVisualCue({
       text: clean,
       priority: cue.priority,
@@ -48,6 +51,7 @@ export function LiveHubVisualCueBridge({
     })
 
     if (voiceEnabled && cue.source === 'groq') {
+      markRuntimeEvent(clean, 'voice_cue_requested')
       onSpeakCue?.(clean)
     }
   }, [onSpeakCue, visualCue, voiceEnabled])
@@ -62,6 +66,8 @@ export function LiveHubVisualCueBridge({
 
   useEffect(() => {
     if (!visualCue) return
+
+    markRuntimeEvent(visualCue.text, 'visual_cue_rendered')
 
     const timeout = window.setTimeout(() => {
       currentPriorityRef.current = 0
