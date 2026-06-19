@@ -154,6 +154,40 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        <section className="border-t border-white/8 px-6 py-20">
+          <div className="mx-auto max-w-6xl space-y-4">
+
+            <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+              <p className="text-[26px] leading-[1.35] tracking-[-0.03em] text-white/92">
+                GEORGE was created to facilitate human ambition, not replace it.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+              <p className="max-w-5xl text-[18px] leading-8 text-white/72">
+                People build. People learn. People decide.
+                People communicate. People solve problems.
+                People pursue opportunities.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+              <p className="max-w-5xl text-[18px] leading-8 text-white/72">
+                Outcomes improve when people have access to better information,
+                stronger preparation, broader perspective, and support in the
+                moments that matter.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+              <p className="max-w-5xl text-[18px] leading-8 text-white/72">
+                Technology should expand human capability, not compete with it.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
       </div>
     </main>
   )
