@@ -58,10 +58,10 @@ export default function HomePage() {
         />
       ))}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.08),transparent_34%),linear-gradient(90deg,rgba(3,4,5,0.92),rgba(3,4,5,0.52),rgba(3,4,5,0.9)),linear-gradient(180deg,rgba(3,4,5,0.45),rgba(3,4,5,0.92))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.045),transparent_34%),linear-gradient(90deg,rgba(3,4,5,0.82),rgba(3,4,5,0.38),rgba(3,4,5,0.82)),linear-gradient(180deg,rgba(3,4,5,0.28),rgba(3,4,5,0.88))]" />
 
       <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <div className="relative h-[42vw] min-h-[270px] w-[86vw] max-w-[1100px]">
+        <div className="relative h-[36vw] min-h-[230px] w-[78vw] max-w-[940px]">
           <svg viewBox="0 0 1200 520" className="h-full w-full drop-shadow-[0_30px_90px_rgba(0,0,0,0.8)]">
             <path
               d="M120 238 C124 132 201 82 333 86 C445 90 503 133 524 221 C545 158 586 132 646 132 C706 132 747 158 768 221 C789 133 847 90 959 86 C1091 82 1168 132 1172 238 C1176 356 1089 423 963 421 C832 419 781 348 768 254 C747 300 706 321 646 321 C586 321 545 300 524 254 C511 348 460 419 329 421 C203 423 116 356 120 238Z"
@@ -121,14 +121,14 @@ export default function HomePage() {
           </button>
         </header>
 
-        <section className="flex flex-1 items-end pb-8">
+        <section className="flex flex-1 items-end pb-12">
           <div className="max-w-[780px]">
             <div className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/48">
               Different room. Same GEORGE.
             </div>
 
-            <h1 className="max-w-[760px] text-[48px] font-semibold leading-[0.94] tracking-[-0.055em] text-white sm:text-[82px]">
-              Prepare and execute with GEORGE.
+            <h1 className="max-w-[760px] text-[40px] font-semibold leading-[0.94] tracking-[-0.055em] text-white sm:text-[66px]">
+              GEORGE helps you prepare and execute.
             </h1>
 
             <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/68 sm:text-[17px]">
