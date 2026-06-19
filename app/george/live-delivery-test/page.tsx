@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGeorgeLiveHub } from '@/hooks/george/live-hub/useGeorgeLiveHub'
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeDeliveryCue, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 export default function LiveDeliveryTestPage() {
@@ -25,6 +26,7 @@ export default function LiveDeliveryTestPage() {
         },
       })
 
+      markRuntimeEvent(routed.text, 'delivery_cue')
       setDeliveryCue(routed)
 
       if (routed.mode !== 'voice') return
@@ -42,6 +44,12 @@ export default function LiveDeliveryTestPage() {
       } catch {}
     },
   })
+
+  useEffect(() => {
+    if (!deliveryCue?.text) return
+
+    markRuntimeEvent(deliveryCue.text, 'visual_cue_rendered')
+  }, [deliveryCue])
 
   useEffect(() => {
     return () => {
