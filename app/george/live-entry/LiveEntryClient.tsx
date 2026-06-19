@@ -927,7 +927,6 @@ export default function LiveEntryClient() {
   ])
   const [proofInProgress, setProofInProgress] = useState(false)
   const [proofComplete, setProofComplete] = useState(false)
-  const currentProofAudioRef = useRef<HTMLAudioElement | null>(null)
   const [spokenLiveBriefingStep, setSpokenLiveBriefingStep] = useState<1 | 2 | 3 | null>(null)
   const [liveEntryReasoning, setLiveEntryReasoning] = useState({
     roomObservation: '',
@@ -1957,41 +1956,6 @@ const mandatoryLiveSignals = useMemo(() => {
   const appendProofTranscript = (speaker: 'george' | 'user', message: string) => {
     setProofTranscript((current) => [...current, { speaker, text: message }])
   }
-
-  const stopCurrentProofAudio = () => {
-    try {
-      if (currentProofAudioRef.current) {
-        currentProofAudioRef.current.pause()
-        currentProofAudioRef.current.currentTime = 0
-        currentProofAudioRef.current = null
-      }
-    } catch {}
-  }
-
-  const speakProofLine = async (message: string) => {
-    appendProofTranscript('george', message)
-
-    try {
-      const response = await fetch('/api/george/live/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: message, email: sessionEmail?.trim() || undefined }),
-      })
-
-      if (!response.ok) return
-
-      const blob = await response.blob()
-      const audioUrl = URL.createObjectURL(blob)
-      const audio = new Audio(audioUrl)
-      currentProofAudioRef.current = audio
-
-      await new Promise<void>((resolve) => {
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl)
-          if (currentProofAudioRef.current === audio) currentProofAudioRef.current = null
-          resolve()
-        }
-
         audio.onerror = () => {
           URL.revokeObjectURL(audioUrl)
           if (currentProofAudioRef.current === audio) currentProofAudioRef.current = null
