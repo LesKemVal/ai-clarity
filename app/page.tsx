@@ -3,43 +3,38 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const scenes = [
+  {
+    image: '/hero/hero.jpg',
+    hue: 'hue-rotate(205deg) saturate(0.72) brightness(0.68)',
+    cue: 'Lead with the outcome.',
+    label: 'PREPARE',
+  },
+  {
+    image: '/landing/city02.png',
+    hue: 'hue-rotate(180deg) saturate(0.62) brightness(0.58)',
+    cue: 'Anchor value first.',
+    label: 'NEGOTIATE',
+  },
+  {
+    image: '/interviewstick.png',
+    hue: 'hue-rotate(215deg) saturate(0.55) brightness(0.56)',
+    cue: 'Answer the question first.',
+    label: 'INTERVIEW',
+  },
+]
+
 export default function HomePage() {
   const router = useRouter()
-  const liveSituations = ['interviews', 'negotiations', 'presentations', 'board meetings', 'Everyday conversations!']
-  const [typedSituation, setTypedSituation] = useState('')
+  const [sceneIndex, setSceneIndex] = useState(0)
+  const scene = scenes[sceneIndex]
 
   useEffect(() => {
-    let situationIndex = 0
-    let characterIndex = 0
-    let timer: number | undefined
+    const timer = window.setInterval(() => {
+      setSceneIndex((current) => (current + 1) % scenes.length)
+    }, 5200)
 
-    const typeNext = () => {
-      const currentSituation = liveSituations[situationIndex]
-
-      characterIndex += 1
-      setTypedSituation(currentSituation.slice(0, characterIndex))
-
-      if (characterIndex < currentSituation.length) {
-        timer = window.setTimeout(typeNext, 75)
-        return
-      }
-
-      const isLast = situationIndex === liveSituations.length - 1
-
-      timer = window.setTimeout(() => {
-        characterIndex = 0
-        situationIndex = isLast ? 0 : situationIndex + 1
-        setTypedSituation('')
-        timer = window.setTimeout(typeNext, 160)
-      }, isLast ? 2000 : 250)
-    }
-
-    setTypedSituation('')
-    timer = window.setTimeout(typeNext, 250)
-
-    return () => {
-      if (timer) window.clearTimeout(timer)
-    }
+    return () => window.clearInterval(timer)
   }, [])
 
   const startLive = () => {
@@ -47,40 +42,71 @@ export default function HomePage() {
     router.push('/george/live-entry?source=start')
   }
 
-  useEffect(() => {
-    const restoreInteractivity = () => {
-      document.body.style.pointerEvents = ''
-      document.documentElement.style.pointerEvents = ''
-    }
-
-    window.addEventListener('pageshow', restoreInteractivity)
-    window.addEventListener('focus', restoreInteractivity)
-
-    return () => {
-      window.removeEventListener('pageshow', restoreInteractivity)
-      window.removeEventListener('focus', restoreInteractivity)
-    }
-  }, [])
-
   return (
     <main className="relative min-h-[100dvh] overflow-hidden bg-[#030405] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_54%_34%,rgba(174,182,255,0.075),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_18%,rgba(255,255,255,0.018))]" />
+      {scenes.map((item, index) => (
+        <div
+          key={item.image}
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[1400ms] ease-out ${
+            index === sceneIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            backgroundImage: `url(${item.image})`,
+            filter: item.hue,
+            transform: 'scale(1.04)',
+          }}
+        />
+      ))}
 
-      <div className="relative z-10 mx-auto flex min-h-[100dvh] max-w-[760px] flex-col px-6 py-4">
-        <header className="flex items-center justify-between border-b border-white/[0.11] pb-3">
-          <div className="flex items-center gap-5">
-            <button
-              type="button"
-              onClick={() => router.push('/george')}
-              className="flex h-[46px] w-[46px] items-center justify-center"
-              aria-label="Open GEORGE"
-            >
-              <img src="/logofav.png" alt="Bx" className="h-[42px] w-[42px] object-contain opacity-95" />
-            </button>
-            <div className="text-[13px] uppercase tracking-[0.42em] text-white/76">
-              BRANESx
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.08),transparent_34%),linear-gradient(90deg,rgba(3,4,5,0.92),rgba(3,4,5,0.52),rgba(3,4,5,0.9)),linear-gradient(180deg,rgba(3,4,5,0.45),rgba(3,4,5,0.92))]" />
+
+      <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
+        <div className="relative h-[42vw] min-h-[270px] w-[86vw] max-w-[1100px]">
+          <svg viewBox="0 0 1200 520" className="h-full w-full drop-shadow-[0_30px_90px_rgba(0,0,0,0.8)]">
+            <path
+              d="M120 238 C124 132 201 82 333 86 C445 90 503 133 524 221 C545 158 586 132 646 132 C706 132 747 158 768 221 C789 133 847 90 959 86 C1091 82 1168 132 1172 238 C1176 356 1089 423 963 421 C832 419 781 348 768 254 C747 300 706 321 646 321 C586 321 545 300 524 254 C511 348 460 419 329 421 C203 423 116 356 120 238Z"
+              fill="rgba(5,8,12,0.72)"
+              stroke="rgba(255,255,255,0.42)"
+              strokeWidth="10"
+            />
+            <path
+              d="M166 230 C169 156 226 121 331 124 C429 127 486 163 497 245 C508 331 445 383 334 383 C224 383 162 320 166 230Z"
+              fill="rgba(190,215,255,0.055)"
+              stroke="rgba(255,255,255,0.16)"
+              strokeWidth="3"
+            />
+            <path
+              d="M795 245 C806 163 863 127 961 124 C1066 121 1123 156 1126 230 C1130 320 1068 383 958 383 C847 383 784 331 795 245Z"
+              fill="rgba(190,215,255,0.055)"
+              stroke="rgba(255,255,255,0.16)"
+              strokeWidth="3"
+            />
+            <path d="M120 236 L18 178" stroke="rgba(255,255,255,0.36)" strokeWidth="10" strokeLinecap="round" />
+            <path d="M1172 236 L1282 178" stroke="rgba(255,255,255,0.36)" strokeWidth="10" strokeLinecap="round" />
+          </svg>
+
+          <div className="absolute left-[17%] top-[34%] max-w-[280px]">
+            <div className="mb-2 text-[10px] uppercase tracking-[0.34em] text-white/48">
+              GEORGE · {scene.label}
+            </div>
+            <div className="text-[15px] leading-snug text-white/86 sm:text-[18px]">
+              {scene.cue}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex min-h-[100dvh] flex-col px-6 py-5">
+        <header className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => router.push('/george')}
+            className="flex items-center gap-4"
+            aria-label="Open GEORGE"
+          >
+            <img src="/logofav.png" alt="Bx" className="h-10 w-10 object-contain opacity-90" />
+            <span className="text-[12px] uppercase tracking-[0.42em] text-white/62">BRANESx</span>
+          </button>
 
           <button
             type="button"
@@ -89,99 +115,49 @@ export default function HomePage() {
                 navigator.share({ title: 'GEORGE by BRANESx', url: window.location.href }).catch(() => {})
               }
             }}
-            className="text-[8px] uppercase tracking-[0.18em] text-white/42 transition hover:text-white/68"
+            className="text-[9px] uppercase tracking-[0.24em] text-white/42 transition hover:text-white/70"
           >
             Share
           </button>
         </header>
 
-        <section className="flex flex-1 flex-col justify-between">
-          <div className="pt-6">
-            <h1 className="text-[66px] font-semibold leading-[0.88] tracking-[-0.078em] text-white sm:text-[96px]">
-              Ask<br />
-              <span className="text-[#BFC7FF]">GEORGE.</span>
+        <section className="flex flex-1 items-end pb-8">
+          <div className="max-w-[780px]">
+            <div className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/48">
+              Different room. Same GEORGE.
+            </div>
+
+            <h1 className="max-w-[760px] text-[48px] font-semibold leading-[0.94] tracking-[-0.055em] text-white sm:text-[82px]">
+              Prepare and execute with GEORGE.
             </h1>
 
-            <div className="mt-5 inline-block rounded-[18px] border border-white/[0.08] bg-black/35 px-4 py-2.5 shadow-[0_18px_55px_rgba(0,0,0,0.28)] backdrop-blur-sm">
-              <p className="text-[16px] uppercase leading-[1.65] tracking-[0.34em] text-white/90">
-                Plan. Decide.<br />
-                Prepare. Build.
-              </p>
+            <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/68 sm:text-[17px]">
+              GEORGE helps you prepare, communicate, decide, and adapt when outcomes depend on what happens in the room.
+            </p>
 
-              <p className="mt-3 max-w-[520px] text-[12px] uppercase leading-6 tracking-[0.22em] text-white/54">
-                Use GEORGE LIVE during{' '}
-                <span className="inline-block min-w-[210px] text-left text-[#D7DCFF]/78">
-                  {typedSituation}
-                  <span className="ml-0.5 inline-block h-[14px] w-px translate-y-[2px] animate-pulse bg-[#D7DCFF]/70" />
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="relative mx-auto my-4 h-[230px] w-full max-w-[520px] sm:h-[300px]">
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 520 360" aria-hidden="true">
-              <defs>
-                <filter id="earGlow" x="-80%" y="-80%" width="260%" height="260%">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              {/* Head anchor */}
-              <line x1="255" y1="192" x2="135" y2="58" stroke="rgba(191,199,255,0.38)" strokeWidth="1" />
-              <line x1="255" y1="192" x2="255" y2="70" stroke="rgba(191,199,255,0.34)" strokeWidth="1" />
-              <line x1="255" y1="192" x2="378" y2="78" stroke="rgba(191,199,255,0.34)" strokeWidth="1" />
-
-              <circle cx="135" cy="58" r="3" fill="#BFC7FF" />
-              <circle cx="255" cy="70" r="3" fill="#BFC7FF" />
-              <circle cx="378" cy="78" r="3" fill="#BFC7FF" />
-
-              {/* Stick figure */}
-              <circle cx="244" cy="196" r="27" fill="transparent" stroke="rgba(255,255,255,0.86)" strokeWidth="2" />
-              <circle cx="271" cy="203" r="5" fill="#BFC7FF" filter="url(#earGlow)" />
-              <line x1="244" y1="223" x2="244" y2="286" stroke="rgba(255,255,255,0.82)" strokeWidth="2" />
-              <line x1="244" y1="238" x2="222" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
-              <line x1="244" y1="238" x2="266" y2="278" stroke="rgba(255,255,255,0.78)" strokeWidth="2" />
-            </svg>
-
-            <div className="absolute left-[9%] top-[8%] text-[12px] uppercase tracking-[0.34em] text-white/86">
-              Investor
-            </div>
-            <div className="absolute left-[46%] top-[13%] text-[12px] uppercase tracking-[0.34em] text-white/86">
-              CEO
-            </div>
-            <div className="absolute right-[12%] top-[15%] text-[12px] uppercase tracking-[0.34em] text-white/86">
-              Teacher
-            </div>
-          </div>
-
-          <div className="-mt-16 border-t border-white/[0.105] pt-5 sm:-mt-20">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="mt-8 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => router.push('/george')}
-                className="group flex h-[60px] items-center justify-between rounded-[18px] bg-white px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:-translate-y-[1px] hover:shadow-[0_12px_34px_rgba(255,255,255,0.16)] active:opacity-90"
+                className="group flex h-[58px] items-center justify-between rounded-[18px] bg-white px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition hover:-translate-y-[1px]"
               >
                 <span>Ask GEORGE</span>
-                <span className="text-[22px] transition-transform duration-300 group-hover:translate-x-1">→</span>
+                <span className="text-[22px] transition-transform group-hover:translate-x-1">→</span>
               </button>
 
               <button
                 type="button"
                 onClick={startLive}
-                className="group flex h-[60px] items-center justify-between rounded-[18px] bg-[#BFC7FF] px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition-all duration-150 hover:bg-[#D2D7FF] hover:shadow-[0_12px_36px_rgba(191,199,255,0.26)] active:opacity-90"
+                className="group flex h-[58px] items-center justify-between rounded-[18px] border border-white/16 bg-white/8 px-4 text-[12px] font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-md transition hover:-translate-y-[1px] hover:bg-white/12"
               >
-                <span>Go LIVE</span>
-                <span className="text-[22px] transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-6">→</span>
+                <span>Bring GEORGE into the room</span>
+                <span className="text-[22px] transition-transform group-hover:translate-x-1">→</span>
               </button>
             </div>
           </div>
         </section>
 
-        <footer className="flex items-center justify-between pt-3 text-[10px] uppercase tracking-[0.36em] text-white/56">
+        <footer className="flex items-center justify-between text-[10px] uppercase tracking-[0.36em] text-white/42">
           <span>BRANESx</span>
           <span>2026</span>
         </footer>
