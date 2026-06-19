@@ -47,7 +47,7 @@ export function LiveHubVisualCueBridge({
       at: Date.now(),
     })
 
-    if (voiceEnabled) {
+    if (voiceEnabled && cue.source === 'groq') {
       onSpeakCue?.(clean)
     }
   }, [onSpeakCue, visualCue, voiceEnabled])

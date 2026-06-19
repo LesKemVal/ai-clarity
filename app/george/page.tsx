@@ -4106,7 +4106,7 @@ if (activePromptContext || activePromptLabel) {
       }
 
       if (liveMode && options?.source === 'hub') {
-        suppressLegacyLiveVoiceUntilRef.current = Date.now() + 4000
+        suppressLegacyLiveVoiceUntilRef.current = Date.now() + 8000
       }
 
       try {
