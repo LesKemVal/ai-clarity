@@ -1347,7 +1347,7 @@ const [forceClose, setForceClose] = useState(false)
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
-  const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'continue'>('advice')
+  const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue'>('advice')
 const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
     activeCampaign?.deliveryMode ||
@@ -2638,6 +2638,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       stored === 'cue' ||
       stored === 'advice' ||
       stored === 'line' ||
+      stored === 'response' ||
+      stored === 'expandedLine' ||
       stored === 'continue'
     ) {
       setLiveDeliveryStyle(stored)
