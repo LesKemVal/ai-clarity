@@ -5,22 +5,24 @@ import { useRouter } from 'next/navigation'
 
 const scenes = [
   {
-    image: '/hero/hero.jpg',
-    hue: 'hue-rotate(205deg) saturate(0.72) brightness(0.68)',
-    cue: 'Lead with the outcome.',
-    label: 'PREPARE',
+    image: '/hero/foam/foam1.png',
+    cue: 'Room receptive.',
+    label: 'ARRIVAL',
   },
   {
-    image: '/landing/city02.png',
-    hue: 'hue-rotate(180deg) saturate(0.62) brightness(0.58)',
-    cue: 'Anchor value first.',
-    label: 'NEGOTIATE',
+    image: '/hero/foam/foam2.png',
+    cue: 'Alignment possible.',
+    label: 'SCHOOL',
   },
   {
-    image: '/interviewstick.png',
-    hue: 'hue-rotate(215deg) saturate(0.55) brightness(0.56)',
-    cue: 'Answer the question first.',
+    image: '/hero/foam/foam3.png',
+    cue: 'Positive reception.',
     label: 'INTERVIEW',
+  },
+  {
+    image: '/hero/foam/foam4.png',
+    cue: 'Trust forming.',
+    label: 'SOCIAL',
   },
 ]
 
@@ -52,13 +54,12 @@ export default function HomePage() {
           }`}
           style={{
             backgroundImage: `url(${item.image})`,
-            filter: item.hue,
-            transform: 'scale(1.04)',
+            transform: 'scale(1.02)',
           }}
         />
       ))}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.045),transparent_34%),linear-gradient(90deg,rgba(3,4,5,0.82),rgba(3,4,5,0.38),rgba(3,4,5,0.82)),linear-gradient(180deg,rgba(3,4,5,0.28),rgba(3,4,5,0.88))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.035),transparent_34%),linear-gradient(180deg,rgba(3,4,5,0.18),rgba(3,4,5,0.38)_42%,rgba(3,4,5,0.92))]" />
 
       <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
         <div className="relative h-[36vw] min-h-[230px] w-[78vw] max-w-[940px]">
@@ -122,17 +123,17 @@ export default function HomePage() {
         </header>
 
         <section className="flex flex-1 items-end pb-12">
-          <div className="max-w-[780px]">
+          <div className="max-w-[780px] rounded-[28px] border border-white/10 bg-black/42 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-md sm:p-7">
             <div className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/48">
               Different room. Same GEORGE.
             </div>
 
             <h1 className="max-w-[760px] text-[40px] font-semibold leading-[0.94] tracking-[-0.055em] text-white sm:text-[66px]">
-              GEORGE helps you prepare and execute.
+              Prepare. Present. Sell. Negotiate.
             </h1>
 
             <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/68 sm:text-[17px]">
-              GEORGE helps you prepare, communicate, decide, and adapt when outcomes depend on what happens in the room.
+              One GEORGE. Preparation when needed. Execution when it matters.
             </p>
 
             <div className="mt-8 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
