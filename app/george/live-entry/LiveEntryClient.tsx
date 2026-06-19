@@ -1953,21 +1953,12 @@ const mandatoryLiveSignals = useMemo(() => {
   }
 
 
+  
   const appendProofTranscript = (speaker: 'george' | 'user', message: string) => {
     setProofTranscript((current) => [...current, { speaker, text: message }])
   }
-        audio.onerror = () => {
-          URL.revokeObjectURL(audioUrl)
-          if (currentProofAudioRef.current === audio) currentProofAudioRef.current = null
-          resolve()
-        }
 
-        void audio.play().catch(() => resolve())
-      })
-    } catch {}
-  }
-
-  const beginProofOfAwareness = async () => {
+const beginProofOfAwareness = async () => {
     if (proofInProgress) return
     if (typeof window !== 'undefined' && window.sessionStorage.getItem('george_panel3_proof_started') === '1') return
     if (typeof window !== 'undefined') window.sessionStorage.setItem('george_panel3_proof_started', '1')
