@@ -643,7 +643,7 @@ function buildLiveBriefingSupportPanels({
         id: 'completion',
         label: 'Continue',
         defaultLine: 'Default: concise completion.',
-        body: 'If you begin a thought and pause, I may offer a continuation that keeps the answer moving without inventing facts.',
+        body: 'If you want help continuing a thought, I may offer the next useful sentence without inventing facts.',
         examples: [
           'You: “Here is what we need…”',
           'GEORGE: “…before we can move forward responsibly.”',
@@ -684,7 +684,7 @@ function buildLiveBriefingSupportPanels({
         id: 'completion',
         label: 'Continue',
         defaultLine: 'Default: recovery completion.',
-        body: 'If you begin an answer and pause, I may offer a continuation that helps you finish the thought cleanly.',
+        body: 'If you want help continuing an answer, I may offer a next sentence that preserves your meaning and momentum.',
         examples: [
           'You: “The reason that mattered was…”',
           'GEORGE: “…because it showed I could make a decision under pressure.”',
@@ -725,7 +725,7 @@ function buildLiveBriefingSupportPanels({
         id: 'completion',
         label: 'Continue',
         defaultLine: 'Default: factual completion.',
-        body: 'If you begin explaining symptoms or concerns and pause, I may offer a continuation that preserves the structure without inventing details.',
+        body: 'If you want help organizing symptoms, concerns, or questions, I may suggest a next sentence without creating facts.',
         examples: [
           'You: “What I want to understand is…”',
           'GEORGE: “…what changes after today and what I should watch for.”',
@@ -766,7 +766,7 @@ function buildLiveBriefingSupportPanels({
         id: 'completion',
         label: 'Continue',
         defaultLine: 'Default: controlled completion.',
-        body: 'If you begin a position and pause, I may offer a continuation that protects the outcome without escalating unnecessarily.',
+        body: 'If you want help advancing a position, I may suggest a next sentence that protects the outcome without escalating unnecessarily.',
         examples: [
           'You: “Here is what I need…”',
           'GEORGE: “…before I can make a decision.”',
@@ -805,8 +805,8 @@ function buildLiveBriefingSupportPanels({
     {
       id: 'completion',
       label: 'Continue',
-      defaultLine: 'Default: sentence completion.',
-      body: 'If you begin a thought and naturally pause, I may offer a continuation that keeps the conversation moving.',
+      defaultLine: 'Default: conversational continuation.',
+      body: 'If you want help continuing a thought, I may suggest the next useful sentence while keeping you in control.',
       examples: [
         'You: “What matters most here…”',
         'GEORGE: “…is making sure we are solving the right problem.”',
