@@ -227,6 +227,73 @@ export default function HomePage() {
         </section>
 
 
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-6xl">
+
+            <div className="mb-10">
+              <div className="text-[11px] uppercase tracking-[0.32em] text-white/40">
+                Environment
+              </div>
+
+              <h2 className="mt-3 text-[34px] font-semibold tracking-[-0.04em] text-white">
+                GEORGE adapts to your environment.
+              </h2>
+
+              <p className="mt-4 max-w-3xl text-[18px] leading-8 text-white/60">
+                The environment changes. The objective does not.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+
+              <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+                <div className="mb-3 text-[11px] uppercase tracking-[0.28em] text-white/40">
+                  Visible
+                </div>
+
+                <div className="text-[24px] text-white/92">
+                  Visible Interfaces
+                </div>
+
+                <p className="mt-4 text-white/60 leading-7">
+                  Desktop. Mobile. Displays. Surfaces designed for direct interaction.
+                </p>
+              </div>
+
+              <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+                <div className="mb-3 text-[11px] uppercase tracking-[0.28em] text-white/40">
+                  Discreet
+                </div>
+
+                <div className="text-[24px] text-white/92">
+                  Discreet Interfaces
+                </div>
+
+                <p className="mt-4 text-white/60 leading-7">
+                  Technologies capable of accompanying users without becoming the center of attention.
+                </p>
+              </div>
+
+              <div className="rounded-[28px] border border-white/8 bg-white/[0.015] p-7">
+                <div className="mb-3 text-[11px] uppercase tracking-[0.28em] text-white/40">
+                  Future
+                </div>
+
+                <div className="text-[24px] text-white/92">
+                  Future Interfaces
+                </div>
+
+                <p className="mt-4 text-white/60 leading-7">
+                  New ways for human and artificial intelligence to collaborate.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
         <section className="border-t border-white/8 px-6 py-20">
           <div className="mx-auto max-w-6xl space-y-4">
 
