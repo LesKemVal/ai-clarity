@@ -2635,6 +2635,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
+  const suppressLegacyLiveVoiceUntilRef = useRef(0)
   const savePickerRef = useRef<HTMLDivElement | null>(null)
   const folderBrowserRef = useRef<HTMLDivElement | null>(null)
   const bridgeSpeechRef = useRef<SpeechSynthesisUtterance | null>(null)
@@ -4094,9 +4095,18 @@ if (activePromptContext || activePromptLabel) {
   }
 
   const speakText = useCallback(
-    async (text: string) => {      if (typeof window === 'undefined') return
+    async (text: string, options?: { source?: 'hub' | 'legacy' }) => {
+      if (typeof window === 'undefined') return
       if (isIOS || !voiceOn || (!hasUserInteractedRef.current && !liveMode)) {
         return
+      }
+
+      if (liveMode && options?.source !== 'hub' && Date.now() < suppressLegacyLiveVoiceUntilRef.current) {
+        return
+      }
+
+      if (liveMode && options?.source === 'hub') {
+        suppressLegacyLiveVoiceUntilRef.current = Date.now() + 4000
       }
 
       try {
@@ -6011,7 +6021,7 @@ return (
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
         }}
         voiceEnabled={voiceOn}
-        onSpeakCue={speakText}
+        onSpeakCue={(cue) => speakText(cue, { source: 'hub' })}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
