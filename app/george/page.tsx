@@ -1662,15 +1662,7 @@ const captureLiveEntryOptionalSignal = () => {
   }, [])
 
 useEffect(() => {
-  if (typeof window === 'undefined') return
-
-  const syncSidebar = () => {
-    setShowSidebar(window.innerWidth >= 1280)
-  }
-
-  syncSidebar()
-  window.addEventListener('resize', syncSidebar)
-  return () => window.removeEventListener('resize', syncSidebar)
+  setShowSidebar(false)
 }, [])
   const [activeSaveIndex, setActiveSaveIndex] = useState<number | null>(null)
 const [savePopupUpward, setSavePopupUpward] = useState(true)
@@ -6012,7 +6004,7 @@ return (
   
         
 
-    <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
+    <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#000000] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
 
       <LiveHubShadowBridge
         active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
@@ -6053,9 +6045,11 @@ return (
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
-          <div
+          <button
+            type="button"
+            aria-label="Close GEORGE sidebar"
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] bg-black/48 -[10px] xl:hidden"
+            className="fixed inset-0 z-[40] cursor-default bg-black/76 backdrop-blur-md transition"
           />
         )}
 
@@ -6204,13 +6198,13 @@ return (
             }}
         />
 
-        <div className="flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y">
+        <div className={`flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y transition-[filter,transform,opacity] duration-300 ${showSidebar ? 'pointer-events-none scale-[0.995] blur-[8px] opacity-60' : 'scale-100 blur-0 opacity-100'}`}>
           <div className={`flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 ${
             showPreLiveSignalSurface
               ? 'pt-[108px] md:pt-[78px]'
               : 'pt-[68px] md:pt-[78px]'
-          } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-8 md:pb-0 xl:px-12`}>
-            <header className={`fixed top-0 left-0 right-0 flex justify-center border-b border-white/[0.04] bg-[#0F1117]/82  px-4 py-1.5 transition duration-200 ${"z-50"}`}>
+          } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-10 md:pb-0 xl:px-16`}>
+            <header className={`fixed top-0 left-0 right-0 flex justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200 ${"z-50"}`}>
               
               {!(forceLive || liveMode) && !showMobileHero && (
                 <div
@@ -6227,11 +6221,11 @@ return (
                     if (!showSidebar) setShowSidebar(true)
                   }}
                   disabled={showSidebar}
-                  className={`inline-flex h-10 w-10 items-center justify-center rounded-full text-[18px] text-[#D7DBE4]/58 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/90 active:scale-[0.96] xl:hidden ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  className={`inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] text-[22px] text-[#D7DBE4]/72 shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition hover:bg-white/[0.075] hover:text-white active:scale-[0.96] xl:inline-flex ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
                   aria-label="Open GEORGE sidebar"
                   title="Open"
                 >
-                  ←
+                  →
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -6295,7 +6289,7 @@ return (
                   <button
                     type="button"
                     onClick={() => setShowIdentityMenu((value) => !value)}
-                    className="inline-flex h-9 w-8 items-center justify-center rounded-full text-[20px] leading-none text-[#D7DBE4]/52 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/82"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/[0.035] text-[20px] leading-none text-[#D7DBE4]/58 shadow-[0_12px_34px_rgba(0,0,0,0.28)] ring-1 ring-white/[0.05] transition hover:bg-white/[0.065] hover:text-white"
                     aria-label="Identity menu"
                     title="Identity"
                   >
@@ -6311,7 +6305,7 @@ return (
                         className="fixed inset-0 z-[85] cursor-default bg-transparent"
                       />
 
-                      <div className="absolute right-0 top-full z-[90] mt-2 w-[150px] rounded-[0.9rem] border border-white/[0.065] bg-[#05080D]/94 p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.42)] -[14px]">
+                      <div className="absolute right-0 top-full z-[90] mt-3 w-[168px] rounded-[18px] bg-[#07090E]/96 p-2 shadow-[0_24px_70px_rgba(0,0,0,0.5)] ring-1 ring-white/[0.055] backdrop-blur-xl">
                         {subscriberEmail ? (
                           <button
                             type="button"
@@ -6344,14 +6338,14 @@ return (
             
 
 {!(forceLive || liveMode) && !showMobileHero && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[52px] z-[34] h-[132px] bg-gradient-to-b from-[#0B0D12] via-[#0B0D12]/96 via-[72%] to-transparent md:hidden" />
+  <div className="pointer-events-none fixed left-0 right-0 top-[52px] z-[34] h-[132px] bg-gradient-to-b from-[#000000] via-[#000000]/100 via-[72%] to-transparent md:hidden" />
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
-  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#05060A] via-[#05060A]/96 via-[66%] to-transparent xl:left-[280px]" />
+  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#000000] via-[#000000]/100 via-[66%] to-transparent xl:left-[280px]" />
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
   <>
-    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[340px] bg-gradient-to-b from-[#05060A] via-[#05060A]/100 via-[82%] to-[#05060A]/0" />
+    <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[340px] bg-gradient-to-b from-[#000000] via-[#000000]/100 via-[82%] to-[#000000]/0" />
     <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 pointer-events-none">
     <div ref={liveStatusStackRef} className="w-full max-w-[430px] md:max-w-[720px] xl:max-w-[860px]">
       <LiveRoomStatusPanel
@@ -7806,7 +7800,7 @@ if (liveMode) {
     />
 
     <div className="fixed inset-0 z-[141] flex items-center justify-center px-4">
-      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#0B0D12]/94 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
+      <div className="w-full max-w-[360px] rounded-[1.5rem] border border-white/[0.07] bg-[#000000]/94 p-5 shadow-[0_24px_72px_rgba(0,0,0,0.46)]  ">
         <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DBE4]/72">
           LIVE STRUCTURE
         </div>
@@ -8238,8 +8232,8 @@ Continue from here, tell me what changed, or start fresh.`
 
               {!(forceLive || liveMode) && (
                 <>
-                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[212px] bg-[#0B0D12]" />
-                  <div className="pointer-events-none fixed bottom-[196px] left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-gradient-to-t from-[#0B0D12] to-transparent" />
+                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[212px] bg-[#000000]" />
+                  <div className="pointer-events-none fixed bottom-[196px] left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-gradient-to-t from-[#000000] to-transparent" />
                 </>
               )}
 
