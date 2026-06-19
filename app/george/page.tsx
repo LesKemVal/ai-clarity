@@ -1347,6 +1347,7 @@ const [forceClose, setForceClose] = useState(false)
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
+  const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'continue'>('advice')
 const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
     activeCampaign?.deliveryMode ||
@@ -2629,7 +2630,28 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     onFinalTranscript: processLiveFinalTranscript,
     onError: processLiveAudioError,
   })
-  const startLiveAudioRuntime = liveAudioRuntime.start
+  
+  useEffect(() => {
+    const stored = window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE')
+
+    if (
+      stored === 'cue' ||
+      stored === 'advice' ||
+      stored === 'line' ||
+      stored === 'continue'
+    ) {
+      setLiveDeliveryStyle(stored)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      'GEORGE_LIVE_DELIVERY_STYLE',
+      liveDeliveryStyle
+    )
+  }, [liveDeliveryStyle])
+
+const startLiveAudioRuntime = liveAudioRuntime.start
   const stopLiveAudioRuntimeDirect = liveAudioRuntime.stop
   const emergencyStopLiveAudioRuntime = liveAudioRuntime.emergencyStop
   const speechQueueRef = useRef<string[]>([])
@@ -6001,7 +6023,7 @@ return (
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
-          deliveryStyle: 'advice',
+          deliveryStyle: liveDeliveryStyle,
         }}
         transcript={liveHubShadowTranscript}
         transcriptFinal={true}
@@ -6020,7 +6042,7 @@ return (
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
-          deliveryStyle: 'advice',
+          deliveryStyle: liveDeliveryStyle,
         }}
         voiceEnabled={voiceOn}
         onSpeakCue={(cue) => speakText(cue, { source: 'hub' })}
