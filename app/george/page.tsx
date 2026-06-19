@@ -1327,6 +1327,7 @@ const replaceLastLiveGuidance = (guidance: string) => {
 const activateNegotiationPosture = () => {
   setActivePromptContext('live_negotiation')
   setConversationMode('live_negotiation')
+  setLiveDeliveryStyle('line')
 
   setToastMessage('Negotiation guidance active.')
   setShowToast(true)
@@ -1336,6 +1337,7 @@ const activateNegotiationPosture = () => {
 const activateResponsePosture = () => {
   setActivePromptContext('live_response')
   setConversationMode('live_response')
+  setLiveDeliveryStyle('response')
 
   setToastMessage('Response handling active.')
   setShowToast(true)
