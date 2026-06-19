@@ -6001,6 +6001,7 @@ return (
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
+          deliveryStyle: 'advice',
         }}
         transcript={liveHubShadowTranscript}
         transcriptFinal={true}
@@ -6019,6 +6020,7 @@ return (
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
+          deliveryStyle: 'advice',
         }}
         voiceEnabled={voiceOn}
         onSpeakCue={(cue) => speakText(cue, { source: 'hub' })}

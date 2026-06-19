@@ -1,3 +1,5 @@
+import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
+
 export type GeorgeActionCue = {
   cue: string
   reason: string
@@ -16,6 +18,7 @@ export type GeorgeLiveHubContext = {
   objective?: string
   knownContext?: string
   userPosition?: string
+  deliveryStyle?: GeorgeLiveDeliveryStyle
 }
 
 export type GeorgeLiveHubEvent =
