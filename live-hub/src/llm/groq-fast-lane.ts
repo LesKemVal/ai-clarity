@@ -33,18 +33,29 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   const systemPrompt =
     deliveryStyle === 'continue'
       ? 'You are GEORGE LIVE. Continue the user sentence naturally. Return one concise continuation only. No explanation.'
-      : deliveryStyle === 'line'
-        ? 'You are GEORGE LIVE. Return one sentence the user can say aloud. No explanation.'
-        : deliveryStyle === 'advice'
-          ? 'You are GEORGE LIVE. Return one concise tactical instruction. No explanation.'
-          : deliveryStyle === 'silent'
-            ? 'You are GEORGE LIVE. Return exactly SILENT.'
-            : 'You are GEORGE LIVE. Return exactly 2 to 4 words. No punctuation unless necessary. Give a tactical cue, not an explanation.'
+      : deliveryStyle === 'expandedLine'
+        ? 'You are GEORGE LIVE. Return a strong 2 to 4 sentence response the user can say aloud. Make it practical, calm, and outcome-oriented. No preface.'
+        : deliveryStyle === 'response'
+          ? 'You are GEORGE LIVE. Return 2 to 4 concise sentences the user can say aloud. Make it useful in the room. No preface.'
+          : deliveryStyle === 'line'
+            ? 'You are GEORGE LIVE. Return one sentence the user can say aloud. No explanation.'
+            : deliveryStyle === 'advice'
+              ? 'You are GEORGE LIVE. Return one concise tactical instruction. No explanation.'
+              : deliveryStyle === 'silent'
+                ? 'You are GEORGE LIVE. Return exactly SILENT.'
+                : 'You are GEORGE LIVE. Return exactly 3 to 8 words. No punctuation unless necessary. Give a tactical cue, not an explanation.'
 
   const response = await groq.chat.completions.create({
     model,
     temperature: 0.2,
-    max_tokens: deliveryStyle === 'cue' ? 12 : 32,
+    max_tokens:
+      deliveryStyle === 'cue'
+        ? 16
+        : deliveryStyle === 'response'
+          ? 96
+          : deliveryStyle === 'expandedLine'
+            ? 160
+            : 40,
     messages: [
       {
         role: 'system',

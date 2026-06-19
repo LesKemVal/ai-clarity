@@ -3,6 +3,8 @@ export type LiveHubDeliveryStyle =
   | 'cue'
   | 'advice'
   | 'line'
+  | 'response'
+  | 'expandedLine'
   | 'continue'
 
 export type LiveHubContext = {

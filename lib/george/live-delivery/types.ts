@@ -7,6 +7,8 @@ export type GeorgeLiveDeliveryStyle =
   | 'cue'
   | 'advice'
   | 'line'
+  | 'response'
+  | 'expandedLine'
   | 'continue'
 
 export const DEFAULT_GEORGE_LIVE_DELIVERY_STYLE: GeorgeLiveDeliveryStyle = 'advice'
