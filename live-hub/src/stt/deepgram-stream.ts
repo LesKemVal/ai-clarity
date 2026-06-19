@@ -126,6 +126,7 @@ export function createDeepgramStream(params: {
     console.log('[LIVE HUB][groq] queued', {
       signal: packet.signal,
       cue: packet.cue,
+      deliveryStyle: packet.deliveryStyle,
     })
 
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_request'))
