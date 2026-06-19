@@ -38,6 +38,10 @@ export function LiveHubDeliveryBridge({
 
       const deliveryCue = routeGeorgeDeliveryCue({
         actionCue: event,
+        context: {
+          voiceEnabled: mode === 'voice',
+          deliveryStyle,
+        },
       })
 
       const resolvedDeliveryCue = {
@@ -73,6 +77,7 @@ export function LiveHubDeliveryBridge({
     context.objective,
     context.knownContext,
     context.userPosition,
+    deliveryStyle,
     onVisualCue,
     onVoiceCue,
     onSilentCue,
