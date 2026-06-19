@@ -104,12 +104,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="absolute right-[14%] top-[31%] max-w-[220px] text-right">
+          <div className="absolute right-[14%] top-[31%] max-w-[240px] text-right">
             <div className="mb-2 text-[10px] tracking-[0.3em] text-white/50">
-              GEORGE
+              DELIVERY
             </div>
-            <div className="text-[13px] leading-relaxed text-white/82">
-              Adapting to the room.
+            <div className="text-[13px] leading-relaxed text-white/88">
+              Observation · Cue · Line · Silence
             </div>
           </div>
 
