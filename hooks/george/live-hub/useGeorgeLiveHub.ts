@@ -103,6 +103,23 @@ export function useGeorgeLiveHub(params?: {
     setStatus('idle')
   }, [stopMic])
 
+  const sendTranscript = useCallback((text: string, isFinal = true) => {
+    const clean = String(text || '').trim()
+
+    if (!clean) return
+
+    if (!transportRef.current) {
+      setError('Connect LIVE hub first.')
+      return
+    }
+
+    transportRef.current.sendJson?.({
+      type: 'TRANSCRIPT_INPUT',
+      text: clean,
+      isFinal,
+    })
+  }, [])
+
   return {
     status,
     error,
@@ -111,5 +128,6 @@ export function useGeorgeLiveHub(params?: {
     startMic,
     stopMic,
     disconnect,
+    sendTranscript,
   }
 }

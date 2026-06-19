@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGeorgeLiveHub } from '@/hooks/george/live-hub/useGeorgeLiveHub'
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
-import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
+import type { GeorgeDeliveryCue, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 export default function LiveDeliveryTestPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(false)
+  const [deliveryStyle, setDeliveryStyle] = useState<GeorgeLiveDeliveryStyle>('advice')
+  const [testTranscript, setTestTranscript] = useState('I understand your concern about timing, but I want to make sure we separate timeline from cost before I answer.')
   const [deliveryCue, setDeliveryCue] = useState<GeorgeDeliveryCue | null>(null)
   const lastSpokenRef = useRef('')
 
@@ -18,6 +20,7 @@ export default function LiveDeliveryTestPage() {
           voiceEnabled,
           room: 'test room',
           pressure: actionCue.category,
+          deliveryStyle,
         },
       })
 
@@ -93,6 +96,7 @@ export default function LiveDeliveryTestPage() {
                 chair: 'founder',
                 objective: 'close interest',
                 knownContext: 'DELIVERY_CUE router test',
+                deliveryStyle,
               })
             }
             className="rounded-xl border border-[#AEB6FF]/30 px-4 py-3 text-sm font-semibold text-[#D7DBE4]"
@@ -125,8 +129,42 @@ export default function LiveDeliveryTestPage() {
           </button>
         </div>
 
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+          <label className="text-xs uppercase tracking-[0.22em] text-white/45">
+            Delivery style
+          </label>
+
+          <select
+            value={deliveryStyle}
+            onChange={(event) => setDeliveryStyle(event.target.value as GeorgeLiveDeliveryStyle)}
+            className="mt-3 w-full rounded-xl border border-white/12 bg-black px-4 py-3 text-sm text-white"
+          >
+            <option value="cue">Cue</option>
+            <option value="advice">Advice</option>
+            <option value="line">Line</option>
+            <option value="response">Response</option>
+            <option value="expandedLine">Expanded line</option>
+            <option value="continue">Continue</option>
+          </select>
+
+          <textarea
+            value={testTranscript}
+            onChange={(event) => setTestTranscript(event.target.value)}
+            className="mt-4 min-h-[120px] w-full rounded-xl border border-white/12 bg-black px-4 py-3 text-sm leading-6 text-white"
+          />
+
+          <button
+            type="button"
+            onClick={() => hub.sendTranscript(testTranscript, true)}
+            className="mt-3 rounded-xl bg-[#AEB6FF] px-4 py-3 text-sm font-semibold text-black"
+          >
+            Send Test Transcript
+          </button>
+        </div>
+
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.025] p-4 text-sm text-white/60">
-          Status: {hub.status} / voice {voiceEnabled ? 'enabled' : 'disabled'}
+          Status: {hub.status} / voice {voiceEnabled ? 'enabled' : 'disabled'} / style {deliveryStyle}
           {hub.error && <div className="mt-2 text-red-200">{hub.error}</div>}
         </div>
 
