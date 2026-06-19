@@ -77,6 +77,7 @@ export function LiveHubVisualCueBridge({
         active={active}
         context={context}
         mode="visual"
+        deliveryStyle="advice"
         onVisualCue={handleVisualCue}
       />
 
