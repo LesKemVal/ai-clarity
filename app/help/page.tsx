@@ -24,51 +24,51 @@ const HELP_ITEMS: Array<{
   {
     id: 'george',
     index: '01',
-    label: 'GEORGE',
-    title: 'Brilliant operational awareness.',
-    body: 'GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be.',
-    utility: 'Where you are → where you want to be.',
+    label: 'START',
+    title: 'Give GEORGE the outcome.',
+    body: 'Tell GEORGE what you are trying to do: get the job, prepare for a meeting, explain an idea, negotiate, study, decide, or handle pressure. GEORGE works best when he knows what success should look like.',
+    utility: 'Start with the result you want.',
     accent: true,
   },
   {
-    id: 'live',
+    id: 'signal',
     index: '02',
+    label: 'SIGNAL',
+    title: 'Give GEORGE useful material.',
+    body: 'Upload or snap pictures of what matters: a job ad, résumé, offer, agenda, email, deck, notes, screenshots, contract, medical question, or anything else that explains the room. More signal gives GEORGE better judgment.',
+    utility: 'Documents, screenshots, photos, notes, and goals.',
+  },
+  {
+    id: 'live',
+    index: '03',
     label: 'LIVE',
-    title: 'Bring GEORGE into the room.',
-    body: 'LIVE supports active conversations where timing, pressure, language, and delivery matter: interviews, negotiations, meetings, doctor visits, sales calls, fundraising, conflict, and other moments where words move outcomes.',
-    utility: 'Timing. Pressure. Movement.',
+    title: 'Move from prep to the room.',
+    body: 'After GEORGE understands the situation, you can bring him into LIVE. For example, upload a job ad and résumé, prepare the likely questions, then use LIVE for interview support if that is what you want to do.',
+    utility: 'Prepare first. Go LIVE when the room matters.',
   },
   {
     id: 'room',
-    index: '03',
-    label: 'ROOM',
-    title: 'Active means present.',
-    body: 'The Room represents the active LIVE environment. When Room is active, GEORGE may listen, adapt, and provide guidance. When Room is off, GEORGE is inactive for that room.',
-    utility: 'Room on: present. Room off: quiet.',
-  },
-  {
-    id: 'signal',
     index: '04',
-    label: 'SIGNAL',
-    title: 'Better signal creates better movement.',
-    body: 'GEORGE asks questions and watches context so support is based on the user’s real situation, not generic assumptions. Signal can come from words, goals, documents, screenshots, room setup, pressure, hesitation, or changing conditions.',
-    utility: 'Give GEORGE what matters.',
-  },
-  {
-    id: 'continuity',
-    index: '05',
-    label: 'CONTINUITY',
-    title: 'Return without restarting.',
-    body: 'Continuity helps GEORGE preserve useful context, restore access, maintain sessions, and support longer-term objectives. Signing in helps GEORGE know what belongs to the user.',
-    utility: 'Preserve the work.',
+    label: 'SUPPORT',
+    title: 'Choose how much help you want.',
+    body: 'GEORGE can give a cue, a line, a response, a presentation, a continuation, or silence. Cue is the default. You can override GEORGE before LIVE starts or while the room is active.',
+    utility: 'Cue. Line. Response. Presentation. Continue.',
   },
   {
     id: 'voice',
+    index: '05',
+    label: 'STEERING',
+    title: 'Use natural phrases to steer GEORGE.',
+    body: 'Advanced users can attach phrases to actions. A phrase can soften tone, make GEORGE more direct, ask for a line, request a fuller answer, buy time, or shift support without opening settings.',
+    utility: 'Natural language controls for real rooms.',
+  },
+  {
+    id: 'continuity',
     index: '06',
-    label: 'VOICE',
-    title: 'Low-friction support.',
-    body: 'Voice and earbud support are for moments where short cues, timing, and hands-free guidance are more useful than long explanations.',
-    utility: 'Useful when moving.',
+    label: 'CONTROL',
+    title: 'You remain responsible.',
+    body: 'GEORGE supports judgment; GEORGE does not replace it. You decide what to accept, change, ignore, or say. Sign in when you want GEORGE to preserve work and restore useful context later.',
+    utility: 'You decide. GEORGE supports.',
   },
 ]
 
@@ -87,11 +87,11 @@ export default function HelpPage() {
           </div>
 
           <h1 className="mt-3 text-[32px] font-semibold leading-[1.0] tracking-[-0.045em] text-white/92 md:text-[42px]">
-            Start with your desired outcome.
+            Learn how to use GEORGE.
           </h1>
 
           <p className="mt-3 max-w-[610px] text-[14px] leading-6 text-white/44">
-            GEORGE is not defined by a subject, industry, or task. GEORGE is defined by the outcome the user is trying to reach.
+            GEORGE works best when he has your outcome, your context, and the material that explains the room.
           </p>
         </section>
 
