@@ -1,9 +1,17 @@
+export type LiveHubDeliveryStyle =
+  | 'silent'
+  | 'cue'
+  | 'advice'
+  | 'line'
+  | 'continue'
+
 export type LiveHubContext = {
   room?: string
   chair?: string
   objective?: string
   knownContext?: string
   userPosition?: string
+  deliveryStyle?: LiveHubDeliveryStyle
 }
 
 export type ClientMessage =
@@ -29,6 +37,7 @@ export type ServerMessage =
         signal: string
         pressure: string
         objective: string
+        deliveryStyle?: LiveHubDeliveryStyle
         cue: string
         reason: string
         category: string

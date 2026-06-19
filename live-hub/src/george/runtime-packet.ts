@@ -1,5 +1,5 @@
 import type { GeorgeLocalCue } from './cue-types.js'
-import type { LiveHubContext } from '../types/protocol.js'
+import type { LiveHubContext, LiveHubDeliveryStyle } from '../types/protocol.js'
 
 export type GeorgeRuntimePacket = {
   transcript: string
@@ -7,6 +7,7 @@ export type GeorgeRuntimePacket = {
   signal: string
   pressure: string
   objective: string
+  deliveryStyle: LiveHubDeliveryStyle
   cue: string
   reason: string
   category: string
@@ -28,6 +29,7 @@ export function buildRuntimePacket(input: {
     signal: input.cue.category,
     pressure: input.cue.category,
     objective: input.context.objective || '',
+    deliveryStyle: input.context.deliveryStyle || 'cue',
     cue: input.cue.cue,
     reason: input.cue.reason,
     category: input.cue.category,
