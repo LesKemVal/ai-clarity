@@ -629,7 +629,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Advice',
+        label: 'Guidance',
         defaultLine: 'Default: observational advice.',
         body: 'In this room, I may help you notice objections, timing pressure, hesitation, leverage, or movement toward terms.',
         examples: [
@@ -641,7 +641,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'completion',
-        label: 'Sentence Completion',
+        label: 'Continue',
         defaultLine: 'Default: concise completion.',
         body: 'If you begin a thought and pause, I may offer a continuation that keeps the answer moving without inventing facts.',
         examples: [
@@ -653,7 +653,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'steering',
-        label: 'Advanced Steering',
+        label: 'Adjustments',
         defaultLine: 'Optional: natural phrases.',
         body: 'You do not need steering phrases. If you use phrases like “let me think” or “one second,” I can treat them as signal to slow down, clarify, or hold position.',
         examples: [
@@ -670,7 +670,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Advice',
+        label: 'Guidance',
         defaultLine: 'Default: answer-shaping advice.',
         body: 'In this room, I may help you notice when the interviewer wants an example, when an answer is too broad, or when to return to the question.',
         examples: [
@@ -682,7 +682,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'completion',
-        label: 'Sentence Completion',
+        label: 'Continue',
         defaultLine: 'Default: recovery completion.',
         body: 'If you begin an answer and pause, I may offer a continuation that helps you finish the thought cleanly.',
         examples: [
@@ -694,7 +694,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'steering',
-        label: 'Advanced Steering',
+        label: 'Adjustments',
         defaultLine: 'Optional: natural phrases.',
         body: 'You do not need steering phrases. If you use phrases like “good question” or “let me think,” I can treat them as signal to organize the answer.',
         examples: [
@@ -711,7 +711,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Advice',
+        label: 'Guidance',
         defaultLine: 'Default: clarification advice.',
         body: 'In this room, I may help you notice when a question remains unanswered, when the next step is unclear, or when details should be repeated.',
         examples: [
@@ -723,7 +723,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'completion',
-        label: 'Sentence Completion',
+        label: 'Continue',
         defaultLine: 'Default: factual completion.',
         body: 'If you begin explaining symptoms or concerns and pause, I may offer a continuation that preserves the structure without inventing details.',
         examples: [
@@ -735,7 +735,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'steering',
-        label: 'Advanced Steering',
+        label: 'Adjustments',
         defaultLine: 'Optional: natural phrases.',
         body: 'You do not need steering phrases. If you use phrases like “I want to make sure I understand,” I can prioritize clarity and unanswered questions.',
         examples: [
@@ -752,7 +752,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Advice',
+        label: 'Guidance',
         defaultLine: 'Default: leverage advice.',
         body: 'In this room, I may help you notice pressure, concessions, unclear terms, or moments where asking another question is stronger than answering.',
         examples: [
@@ -764,7 +764,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'completion',
-        label: 'Sentence Completion',
+        label: 'Continue',
         defaultLine: 'Default: controlled completion.',
         body: 'If you begin a position and pause, I may offer a continuation that protects the outcome without escalating unnecessarily.',
         examples: [
@@ -776,7 +776,7 @@ function buildLiveBriefingSupportPanels({
       },
       {
         id: 'steering',
-        label: 'Advanced Steering',
+        label: 'Adjustments',
         defaultLine: 'Optional: natural phrases.',
         body: 'You do not need steering phrases. If you use phrases like “let me think” or “walk me through that,” I can treat them as signal to slow pressure or clarify terms.',
         examples: [
@@ -792,7 +792,7 @@ function buildLiveBriefingSupportPanels({
   return [
     {
       id: 'advice',
-      label: 'Advice',
+      label: 'Guidance',
       defaultLine: 'Default: observational advice.',
       body: 'In this room, I may help you notice confusion, pressure, drift, unanswered questions, or moments where the conversation should return to the objective.',
       examples: [
@@ -804,7 +804,7 @@ function buildLiveBriefingSupportPanels({
     },
     {
       id: 'completion',
-      label: 'Sentence Completion',
+      label: 'Continue',
       defaultLine: 'Default: sentence completion.',
       body: 'If you begin a thought and naturally pause, I may offer a continuation that keeps the conversation moving.',
       examples: [
@@ -816,7 +816,7 @@ function buildLiveBriefingSupportPanels({
     },
     {
       id: 'steering',
-      label: 'Advanced Steering',
+      label: 'Adjustments',
       defaultLine: 'Optional: natural phrases.',
       body: 'You do not need steering phrases. Over time, phrases like “hmm,” “right,” “let me think,” or “one second” can help GEORGE adapt more precisely.',
       examples: [
@@ -1016,7 +1016,7 @@ export default function LiveEntryClient() {
       label: 'Signal 1',
       question: 'What should I call you in this room?',
       helper: 'Name, title, nickname, or whatever people in the room will recognize.',
-      example: 'Lester, Mr. Sawyer, founder, Dr. Patel, Alex.',
+      example: 'Lester, Mr. Sawyer, Dr. Patel, Alex, Coach Rivera.',
     },
     {
       key: 'role',
@@ -1326,7 +1326,7 @@ export default function LiveEntryClient() {
 
     Reality constrains strategy.
 
-    Advice prioritizes truth.
+    Guidance prioritizes truth.
   */
 
 const mandatoryLiveSignals = useMemo(() => {
