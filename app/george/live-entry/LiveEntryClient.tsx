@@ -2063,7 +2063,8 @@ const mandatoryLiveSignals = useMemo(() => {
       })
 
     const askAndListen = async (line: string, timeoutMs = 3200) => {
-      await speakProofLine(line)
+      appendProofTranscript('george', line)
+      await speakLiveEntryLine(line)
       const heard = await listenOnce(timeoutMs)
       if (heard) {
         heardUser = true
@@ -2076,7 +2077,8 @@ const mandatoryLiveSignals = useMemo(() => {
     if (!first) {
       const second = await askAndListen('Anything at all? I can hear you.', 5000)
       if (!second) {
-        speakProofLine("Then let's go to work.")
+        appendProofTranscript('george', "Then let's go to work.")
+        await speakLiveEntryLine("Then let's go to work.")
       }
     }
 
@@ -2106,7 +2108,14 @@ const mandatoryLiveSignals = useMemo(() => {
         commitmentStatement = String(data?.commitmentStatement || commitmentStatement).trim()
       } catch {}
 
-      await speakProofLine(`Understood. ${commitmentStatement || 'I’ll keep that in mind.'}`)
+      appendProofTranscript(
+        'george',
+        `Understood. ${commitmentStatement || 'I’ll keep that in mind.'}`
+      )
+
+      await speakLiveEntryLine(
+        `Understood. ${commitmentStatement || 'I’ll keep that in mind.'}`
+      )
     }
 
     setProofComplete(true)
