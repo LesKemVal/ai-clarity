@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const georgeSignals = [
+  { mode: 'OBSERVATION', text: 'Decision maker appears unconvinced.' },
+  { mode: 'CUE', text: 'Build rapport before discussing terms.' },
+  { mode: 'LINE', text: '"Tell me more about that concern."' },
+  { mode: 'SILENCE', text: 'Hold.' },
+]
+
 const scenes = [
   {
     image: '/hero/foam/foam1.png',
@@ -29,6 +36,7 @@ const scenes = [
 export default function HomePage() {
   const router = useRouter()
   const [sceneIndex, setSceneIndex] = useState(0)
+  const [signalIndex, setSignalIndex] = useState(0)
   const scene = scenes[sceneIndex]
 
   useEffect(() => {
@@ -38,6 +46,16 @@ export default function HomePage() {
 
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSignalIndex((current) => (current + 1) % georgeSignals.length)
+    }, 4200)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const signal = georgeSignals[signalIndex]
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
@@ -59,9 +77,47 @@ export default function HomePage() {
         />
       ))}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.035),transparent_34%),linear-gradient(180deg,rgba(3,4,5,0.18),rgba(3,4,5,0.38)_42%,rgba(3,4,5,0.92))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,4,5,0.92)_0%,rgba(3,4,5,0.62)_18%,rgba(3,4,5,0.28)_42%,rgba(3,4,5,0.92)_100%)]" />
 
-      <div className="relative z-10 flex min-h-[100dvh] flex-col px-6 py-5">
+      
+      <div className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center">
+        <div className="relative w-[92vw] max-w-[1100px]">
+
+          <svg
+            viewBox="0 0 1200 520"
+            className="h-auto w-full opacity-90"
+          >
+            <path
+              d="M120 238 C124 132 201 82 333 86 C445 90 503 133 524 221 C545 158 586 132 646 132 C706 132 747 158 768 221 C789 133 847 90 959 86 C1091 82 1168 132 1172 238 C1176 356 1089 423 963 421 C832 419 781 348 768 254 C747 300 706 321 646 321 C586 321 545 300 524 254 C511 348 460 419 329 421 C203 423 116 356 120 238Z"
+              fill="transparent"
+              stroke="rgba(255,255,255,0.28)"
+              strokeWidth="8"
+            />
+          </svg>
+
+          <div className="absolute left-[14%] top-[31%] max-w-[260px]">
+            <div className="mb-2 text-[10px] tracking-[0.3em] text-white/50">
+              {signal.mode}
+            </div>
+            <div className="text-[14px] leading-relaxed text-white/92">
+              {signal.text}
+            </div>
+          </div>
+
+          <div className="absolute right-[14%] top-[31%] max-w-[220px] text-right">
+            <div className="mb-2 text-[10px] tracking-[0.3em] text-white/50">
+              GEORGE
+            </div>
+            <div className="text-[13px] leading-relaxed text-white/82">
+              Adapting to the room.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+<div className="relative z-10 flex min-h-[100dvh] flex-col px-6 py-5">
         <header className="flex items-center justify-between">
           <button
             type="button"
@@ -69,36 +125,13 @@ export default function HomePage() {
             className="flex items-center gap-4"
             aria-label="Open GEORGE"
           >
-            <img src="/logofav.png" alt="Bx" className="h-10 w-10 object-contain opacity-90" />
-            <span className="text-[12px] uppercase tracking-[0.42em] text-white/62">BRANESx</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: 'GEORGE by BRANESx', url: window.location.href }).catch(() => {})
-              }
-            }}
-            className="text-[9px] uppercase tracking-[0.24em] text-white/42 transition hover:text-white/70"
-          >
-            Share
+            <img src="/logofav.png" alt="Bx" className="h-14 w-14 object-contain opacity-95" />
+            
           </button>
         </header>
 
         <section className="flex flex-1 items-end pb-12">
-          <div className="max-w-[720px] rounded-[28px] border border-white/10 bg-black/58 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.68)] backdrop-blur-xl sm:p-7">
-            <div className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/48">
-              Different room. Same GEORGE.
-            </div>
-
-            <h1 className="max-w-[760px] text-[40px] font-semibold leading-[0.94] tracking-[-0.055em] text-white sm:text-[66px]">
-              Prepare. Present. Sell. Negotiate.
-            </h1>
-
-            <p className="mt-5 max-w-[640px] text-[15px] leading-7 text-white/68 sm:text-[17px]">
-              One GEORGE. Different rooms. Different outcomes.
-            </p>
+          <div className="max-w-[720px] rounded-[28px] border border-white/10 bg-black/34 p-5 shadow-[0_24px_90px_rgba(0,0,0,0.68)] backdrop-blur-xl sm:p-7">
 
             <div className="mt-8 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-2">
               <button
@@ -121,11 +154,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        <footer className="flex items-center justify-between text-[10px] uppercase tracking-[0.36em] text-white/42">
-          <span>BRANESx</span>
-          <span>2026</span>
-        </footer>
       </div>
     </main>
   )
