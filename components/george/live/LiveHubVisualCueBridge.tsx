@@ -8,6 +8,8 @@ import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
 type LiveHubVisualCueBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
+  voiceEnabled?: boolean
+  onSpeakCue?: (cue: string) => void
 }
 
 type VisualCueState = {
@@ -21,6 +23,8 @@ type VisualCueState = {
 export function LiveHubVisualCueBridge({
   active,
   context,
+  voiceEnabled = false,
+  onSpeakCue,
 }: LiveHubVisualCueBridgeProps) {
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
   const lastCueRef = useRef('')
@@ -42,7 +46,11 @@ export function LiveHubVisualCueBridge({
       source: cue.source,
       at: Date.now(),
     })
-  }, [visualCue])
+
+    if (voiceEnabled) {
+      onSpeakCue?.(clean)
+    }
+  }, [onSpeakCue, visualCue, voiceEnabled])
 
   useEffect(() => {
     if (!active) {

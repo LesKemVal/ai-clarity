@@ -6010,6 +6010,8 @@ return (
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
         }}
+        voiceEnabled={voiceOn}
+        onSpeakCue={speakText}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
