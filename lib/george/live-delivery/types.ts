@@ -17,6 +17,7 @@ export type GeorgeDeliveryCue = {
   reason: string
   source: GeorgeActionCue['source']
   category: GeorgeActionCue['category']
+  deliveryStyle: GeorgeLiveDeliveryStyle
   confidence: number
   priority: number
   at: number
@@ -24,6 +25,7 @@ export type GeorgeDeliveryCue = {
 
 export type GeorgeDeliveryContext = {
   voiceEnabled?: boolean
+  deliveryStyle?: GeorgeLiveDeliveryStyle
   room?: string
   pressure?: string
 }
