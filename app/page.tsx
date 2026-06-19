@@ -154,6 +154,79 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        <section className="px-6 py-24">
+          <div className="mx-auto max-w-6xl">
+
+            <div className="mb-10">
+              <div className="text-[11px] uppercase tracking-[0.32em] text-white/40">
+                Human Capability
+              </div>
+
+              <h2 className="mt-3 text-[34px] font-semibold tracking-[-0.04em] text-white">
+                GEORGE should help people in the rooms they decide matter.
+              </h2>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+
+              <div className="overflow-hidden rounded-[28px] border border-white/8">
+                <img
+                  src="/hero/foam/foam1.png"
+                  alt=""
+                  className="h-[220px] w-full object-cover"
+                />
+                <div className="p-6">
+                  <div className="text-[18px] text-white/90">
+                    People build.
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-[28px] border border-white/8">
+                <img
+                  src="/hero/foam/foam2.png"
+                  alt=""
+                  className="h-[220px] w-full object-cover"
+                />
+                <div className="p-6">
+                  <div className="text-[18px] text-white/90">
+                    People learn.
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-[28px] border border-white/8">
+                <img
+                  src="/hero/foam/foam3.png"
+                  alt=""
+                  className="h-[220px] w-full object-cover"
+                />
+                <div className="p-6">
+                  <div className="text-[18px] text-white/90">
+                    People decide.
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden rounded-[28px] border border-white/8">
+                <img
+                  src="/hero/foam/foam4.png"
+                  alt=""
+                  className="h-[220px] w-full object-cover"
+                />
+                <div className="p-6">
+                  <div className="text-[18px] text-white/90">
+                    People pursue opportunities.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+
         <section className="border-t border-white/8 px-6 py-20">
           <div className="mx-auto max-w-6xl space-y-4">
 
