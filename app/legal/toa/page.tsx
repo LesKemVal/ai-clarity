@@ -8,38 +8,31 @@ const sections = [
     body: 'By accessing BRANESx / GEORGE, you agree to these Terms of Access and to the operating boundaries of the service.',
   },
   {
-    title: 'No guaranteed outcomes',
-    body: 'GEORGE may assist with strategy, organization, judgment, and execution support, but no result is guaranteed.',
+    title: 'No Guaranteed Outcomes',
+    body: 'GEORGE may assist with strategy, organization, judgment, preparation, communication, and execution support, but no result is guaranteed.',
   },
   {
-    title: 'User responsibility',
-    body: 'You remain responsible for your decisions, actions, purchases, filings, health choices, legal actions, and financial decisions.',
+    title: 'User Responsibility',
+    body: 'You remain responsible for your decisions, actions, purchases, filings, health choices, legal actions, financial decisions, and conduct.',
   },
   {
-    title: 'Not professional advice',
-    body: 'GEORGE is not legal, medical, tax, investment, psychological, or emergency advice.',
+    title: 'Not Professional Advice',
+    body: 'GEORGE is not legal, medical, tax, investment, psychological, emergency, or other licensed professional advice.',
   },
   {
     title: 'Payments',
     body: 'Subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan terms before purchase.',
   },
   {
-    title: 'Acceptable use',
-    bullets: [
-      'fraud',
-      'harassment',
-      'illegal conduct',
-      'abuse',
-      'rights violations',
-      'system attacks',
-    ],
+    title: 'Acceptable Use',
+    body: 'Do not use GEORGE for fraud, harassment, illegal conduct, abuse, rights violations, security attacks, impersonation, or activity that creates risk for the platform or other users.',
   },
   {
-    title: 'Service changes',
+    title: 'Service Changes',
     body: 'Features, pricing, models, and availability may change at any time. Continued use of the service means you accept those changes.',
   },
   {
-    title: 'Limitation of liability',
+    title: 'Limitation of Liability',
     body: 'Use GEORGE at your own discretion. To the maximum extent allowed by law, BRANESx is not liable for indirect or consequential losses.',
   },
   {
@@ -54,70 +47,44 @@ const sections = [
 
 export default function TOAPage() {
   return (
-    <PageShell title="Terms of Access" eyebrow="Agreement" backToGeorge withSidebar={false}>
-      <div className="max-w-4xl space-y-8">
-        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 shadow-none md:p-8">
-          <div className="max-w-3xl space-y-4">
-            <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Terms of Access
-            </h1>
-
-            <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              GEORGE is built to help people think clearly, decide faster, and move with direction.
-            </p>
-
-            <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              These terms define the boundaries of access, the limits of the service, and your responsibility while using BRANESx / GEORGE.
-            </p>
+    <PageShell title="" eyebrow="" backToGeorge withSidebar={false}>
+      <div className="w-full max-w-[980px] bg-black">
+        <section className="border-b border-white/10 pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.32em] text-white/40">
+            Agreement
           </div>
+
+          <h1 className="mt-4 font-serif text-[44px] leading-[0.98] tracking-[-0.06em] text-white md:text-[68px]">
+            Terms of Access
+          </h1>
+
+          <p className="mt-6 max-w-[680px] text-[18px] leading-8 text-white/62 md:text-[21px]">
+            GEORGE is built to help people think clearly, decide faster, prepare better, and move with direction.
+          </p>
         </section>
 
-        <section className="grid gap-4">
+        <section className="divide-y divide-white/10">
           {sections.map((section) => (
-            <div
-              key={section.title}
-              className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 shadow-none md:p-8"
-            >
-              <h2 className="text-xl font-semibold text-white">
+            <div key={section.title} className="py-6">
+              <h2 className="font-mono text-[15px] font-semibold uppercase tracking-[0.18em] text-white/90">
                 {section.title}
               </h2>
 
-              {'body' in section && section.body && (
-                <p className="mt-3 text-sm leading-7 text-neutral-400 md:text-base">
-                  {section.body}
-                </p>
-              )}
-
-              {'bullets' in section && section.bullets && (
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  {section.bullets.map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[1rem] border border-white/[0.045] bg-black/25 px-4 py-3 text-sm text-neutral-300"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/58">
+                {section.body}
+              </p>
             </div>
           ))}
         </section>
 
-        <section className="rounded-[1rem] border border-white/[0.06] bg-white/[0.018] p-5 shadow-none md:p-8">
-          <div className="max-w-3xl space-y-4">
-            <p className="text-sm font-medium text-white md:text-base">
-              Final position
-            </p>
-
-            <p className="text-sm leading-7 text-neutral-200 md:text-base">
-              GEORGE may assist with clarity, planning, and execution support.
-            </p>
-
-            <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              But authority remains with the user. You are responsible for your choices, your conduct, your filings, your purchases, and the consequences that follow.
-            </p>
+        <section className="border-t border-white/10 py-6">
+          <div className="font-mono text-[15px] font-semibold uppercase tracking-[0.18em] text-white/90">
+            Final Position
           </div>
+
+          <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/62">
+            GEORGE may assist with clarity, planning, preparation, and execution support. Authority remains with the user.
+          </p>
         </section>
       </div>
     </PageShell>

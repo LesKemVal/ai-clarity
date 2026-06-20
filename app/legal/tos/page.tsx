@@ -2,87 +2,74 @@
 
 import PageShell from '@/components/layout/PageShell'
 
+const sections = [
+  {
+    title: 'Use of Service',
+    body: 'GEORGE supports clarity, planning, communication, preparation, and execution assistance. GEORGE is software. GEORGE is not a substitute for legal, medical, tax, investment, emergency, or professional judgment.',
+  },
+  {
+    title: 'No Guaranteed Results',
+    body: 'Outcomes depend on your judgment, timing, actions, market conditions, the people involved, and other factors outside our control.',
+  },
+  {
+    title: 'User Responsibility',
+    body: 'You remain responsible for decisions, filings, purchases, relationships, negotiations, health choices, financial actions, and conduct.',
+  },
+  {
+    title: 'Acceptable Use',
+    body: 'Do not use the service for fraud, harassment, abuse, illegal conduct, security attacks, impersonation, rights violations, or activity that creates risk for other users or the platform.',
+  },
+  {
+    title: 'Billing',
+    body: 'Paid subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan details, renewal terms, and cancellation timing.',
+  },
+  {
+    title: 'Availability',
+    body: 'Features, pricing, models, responses, and availability may change, improve, or be withdrawn over time. Continued use of the service means you accept those changes.',
+  },
+]
+
 export default function TosPage() {
   return (
-    <PageShell eyebrow="Legal" title="Terms of Service" backToGeorge>
-      <div className="max-w-4xl space-y-8">
-
-        <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5 md:p-5">
-          <div className="space-y-4 max-w-3xl">
-            <h1 className="text-3xl md:text-4xl font-semibold text-white">
-              Terms of Service
-            </h1>
-
-            <p className="text-neutral-300 leading-7">
-              These terms govern your use of GEORGE, BRANESx, and related pages, tools, and subscriptions.
-            </p>
-
-            <p className="text-neutral-400 leading-7">
-              By using the service, you agree to operate within the boundaries below and accept responsibility for your use of the platform.
-            </p>
-          </div>
-        </section>
-
-        <section className="grid gap-4">
-
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">Use of Service</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              GEORGE is designed for clarity, direction, planning, communication support, and execution assistance. It is a software system, not a substitute for legal, medical, tax, investment, or emergency judgment.
-            </p>
+    <PageShell eyebrow="" title="" backToGeorge>
+      <div className="w-full max-w-[980px] bg-black">
+        <section className="border-b border-white/10 pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[0.32em] text-white/40">
+            Legal
           </div>
 
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">No Guaranteed Results</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              Outcomes depend on your judgment, timing, actions, market conditions, and other factors outside our control.
-            </p>
-          </div>
+          <h1 className="mt-4 font-serif text-[44px] leading-[0.98] tracking-[-0.06em] text-white md:text-[68px]">
+            Terms of Service
+          </h1>
 
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">User Responsibility</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              You remain responsible for decisions, filings, purchases, relationships, negotiations, health choices, and financial actions.
-            </p>
-          </div>
-
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">Acceptable Use</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              Do not use the service for fraud, harassment, abuse, illegal conduct, security attacks, impersonation, or rights violations.
-            </p>
-          </div>
-
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">Billing</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              Paid subscriptions may renew automatically until canceled under the billing terms presented at checkout. You are responsible for reviewing plan details, renewal terms, and cancellation timing.
-            </p>
-          </div>
-
-          <div className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018] p-5">
-            <h2 className="text-white text-xl font-semibold">Availability</h2>
-            <p className="mt-3 text-neutral-400 leading-7">
-              Features, pricing, models, responses, and availability may change, improve, or be withdrawn over time. Continued use of the service means you accept those changes.
-            </p>
-          </div>
-
-        </section>
-
-        <section className="rounded-[1rem] border border-white/[0.06] bg-white/[0.018] p-5 md:p-5">
-          <p className="text-white font-medium">
-            Final position
-          </p>
-
-          <p className="mt-3 text-neutral-200 leading-7">
-            GEORGE can support thinking, structure, and execution.
-          </p>
-
-          <p className="mt-2 text-neutral-300 leading-7">
-            But the user remains the decision-maker and bears responsibility for action, timing, conduct, and outcome.
+          <p className="mt-6 max-w-[680px] text-[18px] leading-8 text-white/62 md:text-[21px]">
+            These terms govern your use of GEORGE, BRANESx, and related pages, tools, subscriptions, and services.
           </p>
         </section>
 
+        <section className="divide-y divide-white/10">
+          {sections.map((section) => (
+            <div key={section.title} className="py-6">
+              <h2 className="font-mono text-[15px] font-semibold uppercase tracking-[0.18em] text-white/90">
+                {section.title}
+              </h2>
+
+              <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/58">
+                {section.body}
+              </p>
+            </div>
+          ))}
+        </section>
+
+        <section className="border-t border-white/10 py-6">
+          <div className="font-mono text-[15px] font-semibold uppercase tracking-[0.18em] text-white/90">
+            Final Position
+          </div>
+
+          <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/62">
+            GEORGE can support thinking, structure, preparation, communication, and execution. The user remains the decision-maker and bears responsibility for action, timing, conduct, and outcome.
+          </p>
+        </section>
       </div>
     </PageShell>
   )

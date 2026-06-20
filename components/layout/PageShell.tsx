@@ -93,8 +93,7 @@ export default function PageShell({
   }
 
   return (
-    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#0B0D12] text-neutral-100">
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[220px] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),transparent_70%)] opacity-55" />
+    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-black text-neutral-100">
 
       <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {withSidebar && showSidebar && (
