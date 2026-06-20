@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import BxPageHeader from '@/components/BxPageHeader'
 import { getActiveSessionForMode, getSessionsForMode, setActiveSessionIdForMode } from '@/lib/george/session/store'
@@ -530,28 +531,14 @@ function PanelShell({
         : 'border-[#AEB6FF]/[0.18]'
 
   return (
-    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-[#030405] px-4 py-5 text-white">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(circle at 50% 0%, ${stageGlow}, transparent 30%), linear-gradient(180deg,#030405 0%,#07090E 48%,#030405 100%)`,
-        }}
-      />
-
-      <div className="relative z-10 w-full max-w-[560px]">
-        <div className="mb-3 flex items-center justify-between px-1">
-          <div className="flex items-center gap-3">
-            <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-[0.94]" />
-            <div className="text-[9px] uppercase tracking-[0.34em] text-white/38">
-              BRANESx
-            </div>
-          </div>
-        </div>
+    <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
+      <div className="relative z-10 w-full max-w-[640px]">
+        <BxPageHeader backLabel="GEORGE" />
 
         <section
-          className={`relative w-full overflow-hidden rounded-[1.45rem] border ${stageBorder} bg-[#080A0E]/[0.92] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.48)]`}
+          className="relative mt-4 w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none  sm:p-6"
         >
-          <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/22 to-transparent" />
+          
 
           <div className="flex items-center justify-between gap-4">
             <div className="text-[9px] uppercase tracking-[0.32em] text-[#8FB6C9]/58">
@@ -601,7 +588,7 @@ function AwakeButton({
 
 
 
-type LiveBriefingSupportPanelId = 'advice' | 'completion' | 'steering'
+type LiveBriefingSupportPanelId = 'advice' | 'completion' | 'response' | 'presentation' | 'steering'
 
 type LiveBriefingSupportPanel = {
   id: LiveBriefingSupportPanelId
@@ -889,6 +876,10 @@ export default function LiveEntryClient() {
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
+  const [showQuickLiveSetup, setShowQuickLiveSetup] = useState(false)
+  const [quickLiveSupportStyle, setQuickLiveSupportStyle] = useState<LiveBriefingSupportPanelId>('advice')
+  const [quickLiveExpandedSupport, setQuickLiveExpandedSupport] = useState<LiveBriefingSupportPanelId | 'recommended'>('recommended')
+  const [quickLiveSteeringOpen, setQuickLiveSteeringOpen] = useState(false)
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
@@ -1457,7 +1448,8 @@ const mandatoryLiveSignals = useMemo(() => {
         setShowOpenAISignalSurface(false)
         setShowPrepPreview(false)
         setShowLiveBriefingRoom(false)
-        setLiveEntryMandatoryMode(true)
+        setLiveEntryMandatoryMode(false)
+        setPreLivePreviewReady(true)
         setMandatorySignalStep(0)
         setMandatorySignalInput('')
         setObjective('')
@@ -1783,6 +1775,39 @@ const mandatoryLiveSignals = useMemo(() => {
         userOverride: true,
       }
     })
+  }
+
+  const openQuickLiveSetup = () => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('george_live_entry_support_preference')
+      if (
+        saved === 'advice' ||
+        saved === 'completion' ||
+        saved === 'response' ||
+        saved === 'presentation'
+      ) {
+        setQuickLiveSupportStyle(saved)
+        setQuickLiveExpandedSupport(saved)
+      }
+    }
+
+    setShowQuickLiveSetup(true)
+    setQuickLiveSteeringOpen(false)
+  }
+
+  const startQuickLive = () => {
+    if (typeof window === 'undefined') return
+
+    try {
+      window.localStorage.setItem('george_start_new_live', '1')
+      window.localStorage.setItem('george_quick_live_entry', '1')
+      window.localStorage.setItem('george_quick_live_message', "I'll become sharper as the interaction unfolds.")
+      window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
+      window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
+    } catch {}
+
+    window.location.href = '/george/live?ready=1'
   }
 
   const startLive = (skipPrep = false, resources = editableResources, bypassBriefing = false) => {
@@ -2118,6 +2143,19 @@ const beginProofOfAwareness = async () => {
   }, [showLiveBriefingRoom, objective, chair, userPosition, audienceType, knownContext, sessionEmail])
 
 
+  const getLiveRoomUserName = () => {
+    if (typeof window === 'undefined') return 'You'
+
+    const roomName =
+      cleanBriefingValue(window.localStorage.getItem('george_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
+      cleanBriefingValue(window.localStorage.getItem('george_user_name'))
+
+    if (roomName) return roomName
+
+    return 'You'
+  }
+
   const waitForLiveEntryVoice = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
   const liveEntryVoiceUnlockedRef = useRef(false)
@@ -2278,7 +2316,7 @@ const beginProofOfAwareness = async () => {
     setSpokenLiveBriefingStep(liveBriefingStep)
 
     if (liveBriefingStep === 1) {
-      const name = cleanBriefingValue(sessionEmail).split('@')[0] || 'You'
+      const name = getLiveRoomUserName()
       void speakLiveEntryLine(`${name}, review the room. Edit anything that changed, then confirm responsibility before we continue.`)
     }
   }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail])
@@ -2373,14 +2411,23 @@ const beginProofOfAwareness = async () => {
 
   if (liveEntryQuestionSurface) {
     return (
-      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#06070A] px-4 py-8 text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(143,182,201,0.075),transparent_32%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
+      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-black px-4 py-8 text-white">
 
-        <div className="absolute left-4 top-4 z-20">
-          <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-[0.94]" />
-        </div>
+        <div className="relative z-10 w-full max-w-[920px]">
+          <BxPageHeader backLabel="GEORGE" />
 
-        <section className="relative z-10 w-full max-w-[560px] rounded-[1.25rem] border border-[#8FB6C9]/[0.11] bg-white/[0.018] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.36)]">
+          <section className="relative w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none sm:p-6">
+            <Image
+            src="/images/live-entry/man1.png"
+            alt=""
+            width={420}
+            height={720}
+            priority
+            className="pointer-events-none absolute bottom-[-8px] right-[-150px] z-20 hidden h-[520px] w-auto select-none object-contain opacity-95 lg:block"
+          />
+
+          <div className="relative z-30 max-w-[640px]">
+
           <div className="flex items-center justify-between gap-4">
             <div className="text-[10px] uppercase tracking-[0.28em] text-[#8FB6C9]/54">
               {liveEntryQuestionSurface.kicker}
@@ -2468,7 +2515,9 @@ const beginProofOfAwareness = async () => {
               </button>
             </div>
           </div>
-        </section>
+          </div>
+          </section>
+        </div>
       </main>
     )
   }
@@ -2529,7 +2578,7 @@ const beginProofOfAwareness = async () => {
   if (!sessionEmail.trim() && !preLivePreviewReady && window.localStorage.getItem('george_founder_access') !== 'server-verified') {
     return (
       <main className="relative flex min-h-[100dvh] items-center justify-center bg-[#06070A] px-4 text-white">
-        <div className="w-full max-w-[420px] rounded-[1.25rem] border border-white/[0.05] bg-white/[0.018] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.30)]">
+        <div className="w-full max-w-[460px] rounded-[28px] bg-[#050505] p-6 shadow-none ">
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE requires sign-in</div>
           <h1 className="mt-3 text-[24px] font-semibold tracking-[-0.04em] text-white/90">Sign in to use LIVE.</h1>
           <p className="mt-2 text-[13px] leading-5 text-white/46">
@@ -2781,7 +2830,7 @@ const beginProofOfAwareness = async () => {
       })
 
       const recommendedSupportPanel =
-        supportPanels.find((panel) => panel.id === 'completion') || supportPanels[0]
+        supportPanels.find((panel) => panel.id === 'advice') || supportPanels[0]
 
       const storedSupportPreference =
         typeof window !== 'undefined'
@@ -2791,13 +2840,14 @@ const beginProofOfAwareness = async () => {
       const validStoredSupportPreference =
         storedSupportPreference === 'advice' ||
         storedSupportPreference === 'completion' ||
+        storedSupportPreference === 'response' ||
+        storedSupportPreference === 'presentation' ||
         storedSupportPreference === 'steering'
           ? storedSupportPreference
           : null
 
       const activeSupportStyle =
         liveBriefingActiveSupportStyle ||
-        validStoredSupportPreference ||
         recommendedSupportPanel.id
 
       const activeSupportPanel =
@@ -2834,163 +2884,91 @@ const beginProofOfAwareness = async () => {
       }
 
       return (
-        <PanelShell label="BRIEF ROOM · CONSTRAINTS" title="Set how GEORGE supports the room." stage={2}>
+        <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
           <div className="mt-3 space-y-3">
-            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-3 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
+            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
-                Support style
+                Recommended
               </div>
 
-              <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/62">
-                GEORGE will use the support style that best protects the room.
+              <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
+                Choose how support is delivered during this conversation. GEORGE starts with Cue. You can keep the recommended setting or choose a different support style for this room.
               </p>
 
-              <div className="mt-4 rounded-[0.7rem] border border-white/[0.06] bg-black/[0.16] px-3 py-3">
-                <div className="text-[9px] uppercase tracking-[0.22em] text-[#D7DCFF]/42">
-                  Recommended for this room.
-                </div>
-
-                <div className="mt-1 flex items-center justify-between gap-3">
-                  <div className="text-[13px] font-semibold text-[#F2F4FF]/82">
-                    {recommendedSupportPanel.label}
-                  </div>
-
-                  {activeSupportPanel.id === recommendedSupportPanel.id && (
-                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-white/46">
-                      <span className="relative flex h-3 w-3">
-                        <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9]' : 'bg-white'} opacity-30`} />
-                        <span className={`relative inline-flex h-3 w-3 rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9] shadow-[0_0_18px_rgba(143,182,201,0.55)]' : 'bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]'}`} />
-                      </span>
-                      Active
-                    </div>
-                  )}
-                </div>
-              </div>
-
               <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
-                {supportPanels.map((panel) => {
+                {([
+                  {
+                    id: 'advice',
+                    label: 'Cue',
+                    line: 'Brief support delivered at the right moment.',
+                    detail: 'I provide short signals that help you recognize opportunities, avoid mistakes, recover your train of thought, identify risks, or decide what to do next. Examples: “Slow down,” “Ask why,” “Anchor value first,” or “Return to the objective.”',
+                  },
+                  {
+                    id: 'completion',
+                    label: 'Continuation',
+                    line: 'I help continue your thought.',
+                    detail: 'Say a few words and pause. I provide a continuation that preserves your point, supports the desired outcome, and helps you keep moving. Useful when presenting, explaining, negotiating, or recovering after interruption.',
+                  },
+                  {
+                    id: 'response',
+                    label: 'Response',
+                    line: 'I provide a complete answer.',
+                    detail: 'Useful when answering questions, handling objections, responding under pressure, or discussing unfamiliar topics. I provide a complete response you can adapt, repeat, hear, or read.',
+                  },
+                  {
+                    id: 'presentation',
+                    label: 'Presentation',
+                    line: 'I help organize and deliver information.',
+                    detail: 'Useful for interviews, investor meetings, negotiations, proposals, and presentations. GEORGE structures information into a clear, easy-to-follow sequence.',
+                  },
+                ] as Array<{ id: LiveBriefingSupportPanelId; label: string; line: string; detail: string }>).map((panel) => {
                   const active = activeSupportPanel.id === panel.id
                   const open = liveBriefingExpandedSupportPanel === panel.id
 
                   return (
-                    <div key={panel.id} className="py-3">
+                    <button
+                      key={panel.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveSupportStyle(panel.id)
+                        setLiveBriefingSupportAccepted(true)
+                        setLiveBriefingExpandedSupportPanel(open ? null : panel.id)
+                      }}
+                      className="w-full py-3 text-left"
+                    >
                       <div className="flex items-start gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setActiveSupportStyle(panel.id)}
-                          className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center"
-                          aria-label={`Use ${panel.label}`}
-                        >
-                          {active ? (
-                            <span className="relative flex h-3.5 w-3.5">
-                              <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9]' : 'bg-white'} opacity-30`} />
-                              <span className={`relative inline-flex h-3.5 w-3.5 rounded-full ${liveBriefingSupportAccepted ? 'bg-[#8FB6C9] shadow-[0_0_18px_rgba(143,182,201,0.55)]' : 'bg-white shadow-[0_0_18px_rgba(255,255,255,0.42)]'}`} />
-                            </span>
-                          ) : (
-                            <span className="h-3.5 w-3.5 rounded-full border border-white/[0.18]" />
-                          )}
-                        </button>
+                        <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
+                          active
+                            ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                            : 'bg-white/[0.14]'
+                        }`} />
 
-                        <button
-                          type="button"
-                          onClick={() => setActiveSupportStyle(panel.id)}
-                          className="min-w-0 flex-1 text-left"
-                        >
-                          <span className={`block text-[13px] font-semibold ${
-                            active ? 'text-[#F2F4FF]/88' : 'text-[#D7DBE4]/58'
-                          }`}>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
                             {panel.label}
                           </span>
-
-                          <span className="mt-0.5 block text-[11px] leading-4 text-[#D7DBE4]/36">
-                            {panel.defaultLine}
+                          <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                            {panel.line}
                           </span>
-                        </button>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setLiveBriefingExpandedSupportPanel(open ? null : panel.id)
-                          }
-                          className="shrink-0 px-1 text-[15px] leading-5 text-[#D7DCFF]/42"
-                          aria-label={open ? `Collapse ${panel.label}` : `Expand ${panel.label}`}
-                        >
-                          {open ? '−' : '+'}
-                        </button>
+                          <span className={`block overflow-hidden transition-all duration-300 ${
+                            open ? 'max-h-44 opacity-100' : 'max-h-0 opacity-0'
+                          }`}>
+                            <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                              {panel.detail}
+                            </span>
+                          </span>
+                        </span>
                       </div>
-
-                      <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          open ? 'mt-3 max-h-[340px] opacity-100' : 'max-h-0 opacity-0'
-                        }`}
-                      >
-                        <div className="space-y-3 border-l border-white/[0.07] pl-3">
-                          <p className="text-[12px] leading-5 text-[#D7DBE4]/54">
-                            {panel.body}
-                          </p>
-
-                          <div className="space-y-1.5">
-                            {panel.examples.map((example) => (
-                              <div key={example} className="text-[11px] leading-5 text-[#D7DBE4]/40">
-                                {example}
-                              </div>
-                            ))}
-                          </div>
-
-                          <details>
-                            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
-                              Why this
-                            </summary>
-                            <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/38">
-                              {panel.why}
-                            </p>
-                          </details>
-                        </div>
-                      </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
             </div>
 
-            <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/42">
-              Your choice becomes the default for future LIVE conversations until you change it.
+            <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46">
+              I can support you through audio, visual display, AI glasses, earbuds, phone, or another available device. You remain responsible for decisions, actions, and outcomes.
             </div>
-
-            {georgeSupportItems.length > 0 && (
-              <div className="rounded-[0.82rem] border border-[#D7DCFF]/[0.09] bg-[#080A10]/[0.50] px-4 py-4">
-                <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
-                  GEORGE Support · Optional
-                </div>
-
-                <p className="mt-3 text-[12px] leading-5 text-[#D7DBE4]/48">
-                  These are outcome-tested signals GEORGE may watch for in the room.
-                </p>
-
-                <div className="mt-4 space-y-3">
-                  {georgeSupportItems.map((item) => (
-                    <div key={item.id} className="rounded-[0.7rem] border border-white/[0.055] bg-black/[0.16] px-3 py-3">
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/70">
-                        {item.label}
-                      </div>
-                      <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/60">
-                        {item.line}
-                      </div>
-                      <details className="mt-2">
-                        <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.18em] text-[#D7DCFF]/42">
-                          Why this matters
-                        </summary>
-                        <p className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/38">
-                          {item.why}
-                        </p>
-                      </details>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
 
             <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
@@ -3014,7 +2992,7 @@ const beginProofOfAwareness = async () => {
               />
 
               <span className="text-[12px] leading-5">
-                I understand GEORGE should operate discreetly, and I remain responsible for the room.{' '}
+                I understand that you provide support discreetly, and I remain responsible for the room.{' '}
                 <button
                   type="button"
                   onClick={(event) => {
@@ -3093,11 +3071,11 @@ const beginProofOfAwareness = async () => {
     return (
       <PanelShell label="BRIEF ROOM · READINESS" title="Ready Room." stage={3}>
         <div className="mt-5 space-y-3 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 text-[13px] leading-6 text-[#D7DBE4]/68 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
-          <p>Remember your earbuds.</p>
+          <p>Check your device.</p>
           <p>Speak normally. Be clear.</p>
-          <p>Your voice I know.<br />The room I understand.</p>
-          <p>If I need additional signal, I&apos;ll let you know.</p>
-          <p>If the room changes, we adapt.</p>
+          <p>I understand your voice, your role, the room, and the desired outcome.</p>
+          <p>If I need additional signal, I will ask.</p>
+          <p>If the room changes, we will adapt.</p>
         </div>
 
         <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
@@ -3113,7 +3091,7 @@ const beginProofOfAwareness = async () => {
           />
 
           <span className="text-[12px] leading-5">
-            I understand GEORGE will assist discreetly, and I remain responsible for what I say in the room.
+            I understand GEORGE provides support, and I remain responsible for what I say and do in the room.
           </span>
         </label>
 
@@ -3124,23 +3102,186 @@ const beginProofOfAwareness = async () => {
     )
   }
 
-  return (
-    <main className="relative min-h-[100dvh] overflow-y-auto bg-[#06070A] px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(124,140,255,0.04),transparent_28%),linear-gradient(180deg,#06070A_0%,#080A0F_52%,#06070A_100%)]" />
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-[linear-gradient(180deg,#06070A_0%,rgba(6,7,10,0.96)_42%,rgba(6,7,10,0.72)_68%,rgba(6,7,10,0)_100%)]" />
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
+  if (showQuickLiveSetup) {
+    const quickLiveOptions: Array<{
+      id: LiveBriefingSupportPanelId | 'recommended'
+      label: string
+      line: string
+      detail: string
+    }> = [
+      {
+        id: 'recommended',
+        label: 'Recommended',
+        line: 'I choose support based on the room.',
+        detail: 'I will start with brief cues and adapt support as I hear more signal from the conversation.',
+      },
+      {
+        id: 'advice',
+        label: 'Cue',
+        line: 'Brief support delivered at the right moment.',
+        detail: 'I provide short signals that help you recognize opportunities, avoid mistakes, recover your train of thought, identify risks, or decide what to do next.',
+      },
+      {
+        id: 'completion',
+        label: 'Continuation',
+        line: 'I help continue your thought.',
+        detail: 'Say 4–5 words and pause. I will continue the thought while preserving your point and objective.',
+      },
+      {
+        id: 'response',
+        label: 'Response',
+        line: 'I provide a complete answer.',
+        detail: 'Useful when answering questions, handling objections, responding under pressure, or discussing unfamiliar topics. I provide a complete response you can adapt, repeat, hear, or read.',
+      },
+      {
+        id: 'presentation',
+        label: 'Presentation',
+        line: 'I help organize and deliver information.',
+        detail: 'Useful when explaining ideas, presenting proposals, or walking someone through a topic. I structure information into a clear, easy-to-follow sequence.',
+      },
+    ]
 
-      <div className="pointer-events-none fixed inset-y-0 left-0 z-0 hidden w-[52vw] max-w-[760px] overflow-hidden lg:block">
-        <img
-          src="/frontviewstick.png"
-          alt=""
-          aria-hidden="true"
-          className="absolute left-[-150px] top-[72px] w-[620px] select-none opacity-[0.105] blur-[0.25px] saturate-[0.82] xl:left-[-90px] xl:w-[700px]"
-        />
-        <div className="absolute left-[120px] top-[132px] h-[62vh] w-px bg-gradient-to-b from-transparent via-[#AEB6FF]/[0.13] to-transparent" />
-        <div className="absolute left-[120px] top-[50vh] h-px w-[34vw] bg-gradient-to-r from-[#AEB6FF]/[0.13] to-transparent" />
-        <div className="absolute left-[118px] top-[50vh] h-1.5 w-1.5 rounded-full bg-[#AEB6FF]/24 shadow-[0_0_22px_rgba(174,182,255,0.20)]" />
-      </div>
+    const steeringRows = [
+      ['Buy time', 'Let me think for a second...'],
+      ['Clarify', 'I want to make sure I understand.'],
+      ['Expand', 'Walk me through that.'],
+      ['Change direction', 'What matters now is...'],
+      ['Slow down', 'Can we slow down?'],
+    ]
+
+    const selectQuickLiveSupport = (style: LiveBriefingSupportPanelId | 'recommended') => {
+      const savedStyle = style === 'recommended' ? 'advice' : style
+      setQuickLiveSupportStyle(savedStyle)
+      setQuickLiveExpandedSupport(style)
+      setQuickLiveSteeringOpen(false)
+
+      try {
+        window.localStorage.setItem('george_live_entry_support_preference', savedStyle)
+        window.localStorage.setItem('george_live_entry_support_default', savedStyle)
+      } catch {}
+    }
+
+    return (
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
+        <div className="pointer-events-none absolute inset-0 bg-black" />
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
+
+        <div className="relative z-30 mx-auto w-full max-w-[640px]">
+          <BxPageHeader backLabel="GEORGE" />
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
+          <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">QUICK LIVE</div>
+
+            <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
+              How should I support you?
+            </h1>
+
+            <p className="mt-3 text-[14px] leading-6 text-white/46">
+              Choose how I should start supporting you. You can change this later.
+            </p>
+
+            <div className="mt-5 overflow-hidden transition-all duration-300 max-h-[620px] opacity-100">
+              <div className="divide-y divide-white/[0.055] border-y border-white/[0.055]">
+              {quickLiveOptions.map((option) => {
+                const active =
+                  option.id === 'recommended'
+                    ? quickLiveExpandedSupport === 'recommended'
+                    : quickLiveExpandedSupport !== 'recommended' && quickLiveSupportStyle === option.id
+                const open = quickLiveExpandedSupport === option.id
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => selectQuickLiveSupport(option.id)}
+                    className="w-full py-3 text-left"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
+                        active
+                          ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                          : 'bg-white/[0.14]'
+                      }`} />
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
+                          {option.label}
+                        </span>
+                        <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                          {option.line}
+                        </span>
+
+                        <span className={`block overflow-hidden transition-all duration-300 ${
+                          open ? 'max-h-44 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
+                          <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                            {option.detail}
+                          </span>
+                        </span>
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setQuickLiveSteeringOpen((open) => {
+                  return !open
+                })
+              }}
+              className="mt-4 w-full rounded-[0.82rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D7DBE4]/58 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/78"
+            >
+              {quickLiveSteeringOpen ? 'Hide steering' : 'View steering'}
+            </button>
+
+            <div className={`overflow-hidden transition-all duration-300 ${
+              quickLiveSteeringOpen ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div className="mt-3 rounded-[0.82rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3">
+                <p className="text-[11px] leading-5 text-[#D7DBE4]/46">
+                  If you are using earbuds alone, steering phrases help us adapt discreetly. You can use these defaults, edit them later, or control support directly from a phone, glasses, watch, or other visual device.
+                </p>
+
+                <div className="mt-3 divide-y divide-white/[0.045]">
+                  {steeringRows.map(([behavior, phrase]) => (
+                    <div key={behavior} className="grid gap-1 py-2 sm:grid-cols-[150px_1fr] sm:gap-3">
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-white/28">
+                        {behavior}
+                      </div>
+                      <div className="text-[12px] leading-5 text-[#D7DBE4]/62">
+                        “{phrase}”
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={startQuickLive}
+              className="mt-5 w-full rounded-[0.95rem] border border-[#8FB6C9]/35 bg-[#8FB6C9]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#8FB6C9]/[0.12] hover:text-white active:scale-[0.98]"
+            >
+              Let&apos;s go to work
+            </button>
+          </section>
+        </div>
+      </main>
+    )
+  }
+
+  return (
+    <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
+      <div className="pointer-events-none absolute inset-0 bg-black" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
         <BxPageHeader backLabel="GEORGE" />
@@ -3150,15 +3291,51 @@ const beginProofOfAwareness = async () => {
       <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
 
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE PREVIEW</div>
+          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE</div>
 
           <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
-            GEORGE has enough signal.
+            Take GEORGE into the room.
           </h1>
 
           <p className="mt-3 text-[14px] leading-6 text-white/46">
-            You can start LIVE now, but more signal betters your experience.
+            Choose how you want to begin.
           </p>
+
+          <div className="mt-5 grid gap-2">
+            <button
+              type="button"
+              onClick={openQuickLiveSetup}
+              className="rounded-[0.95rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.07] px-4 py-3 text-left transition hover:border-[#8FB6C9]/44 hover:bg-[#8FB6C9]/[0.11] active:scale-[0.99]"
+            >
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
+                Quick LIVE
+              </span>
+              <span className="mt-1 block text-[12px] leading-5 text-white/42">
+                Enter now. I’ll listen and sharpen as the interaction unfolds.
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowOpenAISignalSurface(false)
+                setCurrentOptionalSignalQuestion(null)
+                setOptionalSignalLoading(false)
+                setShowLiveBriefingRoom(false)
+                setLiveEntryMandatoryMode(true)
+                setMandatorySignalStep(0)
+                setMandatorySignalInput('')
+              }}
+              className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
+            >
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/76">
+                Brief GEORGE
+              </span>
+              <span className="mt-1 block text-[12px] leading-5 text-white/40">
+                Give me room-specific signal before LIVE.
+              </span>
+            </button>
+          </div>
 
           {hasLiveSession && (
             <button

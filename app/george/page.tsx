@@ -1617,6 +1617,7 @@ const captureLiveEntryOptionalSignal = () => {
 }
 
   const [showExitPopup, setShowExitPopup] = useState(false)
+  const [showLiveLanguagePopup, setShowLiveLanguagePopup] = useState(false)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
@@ -1892,8 +1893,21 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
       setLiveEntryBriefing(null)
       setShowLiveEntrySequence(false)
-      setMessages([])
-      messagesRef.current = []
+
+      const quickLiveRequested = window.localStorage.getItem('george_quick_live_entry') === '1'
+      const quickLiveMessage = window.localStorage.getItem('george_quick_live_message') || "I'll become sharper as the interaction unfolds."
+
+      if (quickLiveRequested) {
+        window.localStorage.removeItem('george_quick_live_entry')
+        window.localStorage.removeItem('george_quick_live_message')
+        const quickLiveMessages = [{ role: 'assistant' as const, content: quickLiveMessage }]
+        setMessages(quickLiveMessages)
+        messagesRef.current = quickLiveMessages
+      } else {
+        setMessages([])
+        messagesRef.current = []
+      }
+
       setVoiceOn(true)
       setInteractionMode('speech')
       setShowEarbudOverlay(true)
@@ -3617,6 +3631,7 @@ requestAnimationFrame(() => {
 
       if (!insideSavePicker && !insideFolderBrowser && !insidePromptMenu && !insideLanguageMenu) {
         setShowLanguageMenu(false)
+        setShowLiveLanguagePopup(false)
         setShowPromptMenu(false)
         setShowRecentFolders(false)
         setActiveMemoryFolder(null)
@@ -7244,7 +7259,7 @@ I am listening now. Speak naturally. I will respond ${
             <div className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
               
 
-              <div className={`fixed bottom-[calc(18px+env(safe-area-inset-bottom))] left-0 right-0 z-[330] mx-auto flex w-full max-w-[900px] px-3 md:w-[calc(100%-24px)] items-center justify-center pointer-events-auto leading-none`}>
+              <div className="hidden">
                 <LiveFooterControls
                   language={language}
                   liveMode={liveMode}
@@ -7838,15 +7853,19 @@ if (liveMode) {
 
 {showExitPopup && typeof document !== 'undefined' && createPortal(
   <>
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       aria-label="Close leave LIVE popup"
       onClick={() => setShowExitPopup(false)}
-      className="fixed inset-0 z-[220] bg-black/58 backdrop-blur-[14px]"
-    />
-
-    <div className="fixed inset-0 z-[230] flex items-center justify-center px-4">
-      <div className={`relative w-[min(360px,calc(100vw-32px))] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+          setShowExitPopup(false)
+        }
+      }}
+      className="fixed inset-0 z-[220] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]"
+    >
+      <div onClick={(e) => e.stopPropagation()} className={`relative w-[min(360px,calc(100vw-32px))] px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
         <div className="mb-2 flex items-center justify-between">
           <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
             Leave LIVE
@@ -7862,7 +7881,7 @@ if (liveMode) {
         </div>
 
         <p className="mb-3 text-[11px] leading-5 text-white/34">
-          Return to GEORGE.
+          Save this LIVE conversation, leave without saving, or continue.
         </p>
 
         <div className="grid gap-1">
@@ -7900,7 +7919,7 @@ if (liveMode) {
             }}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/58 transition hover:text-red-100/88 active:scale-[0.98]"
           >
-            Leave without saving
+            Exit without saving
           </button>
 
           <button
@@ -7908,7 +7927,7 @@ if (liveMode) {
             onClick={() => setShowExitPopup(false)}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
-            Continue session
+            Continue LIVE
           </button>
         </div>
       </div>
@@ -8620,6 +8639,83 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           <path d="M5 20h14"/>
                         </svg>
                       </button>
+
+                      {(forceLive || liveMode) && !showLiveEntrySequence && (
+                        <div data-george-language-menu className="absolute right-2 bottom-full mb-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setShowExitPopup(false)
+                              setShowLiveLanguagePopup((value) => !value)
+                            }}
+                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-white/[0.16] hover:text-white/72"
+                          >
+                            {language === 'English' ? 'EN' : language === 'Español' ? 'ES' : language === 'Français' ? 'FR' : language === 'العربية' ? 'AR' : language === '中文' ? 'ZH' : language === '日本語' ? 'JA' : 'EN'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowLiveLanguagePopup(false)
+                              requestExitLiveMode()
+                            }}
+                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-red-100/[0.18] hover:text-red-100/78"
+                          >
+                            Exit
+                          </button>
+                        </div>
+                      )}
+
+                      {showLiveLanguagePopup && (forceLive || liveMode) && !showLiveEntrySequence && (
+                        <>
+                          <button
+                            type="button"
+                            aria-label="Close language popup"
+                            onClick={() => setShowLiveLanguagePopup(false)}
+                            className="fixed inset-0 z-[45] bg-black/62 backdrop-blur-[14px]"
+                          />
+
+                          <div data-george-language-menu className="absolute right-0 bottom-full z-[160] mb-10 w-[240px] rounded-[1rem] border border-white/[0.07] bg-[#05080D]/94 px-3 py-3 shadow-[0_24px_72px_rgba(0,0,0,0.46)] backdrop-blur-2xl">
+                            <div className="mb-2 flex items-center justify-between">
+                              <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
+                                Language
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => setShowLiveLanguagePopup(false)}
+                                className="text-[11px] text-white/28 transition hover:text-white/72"
+                              >
+                                ×
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-x-5 gap-y-2">
+                              {languageOptions.map((option) => (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  onClick={() => {
+                                    setLanguage(option)
+                                    window.localStorage.setItem('george_language', option)
+                                    setToastMessage(`Language set: ${option}`)
+                                    setShowToast(true)
+                                    setShowLiveLanguagePopup(false)
+                                  }}
+                                  className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
+                                    language === option
+                                      ? 'text-white/82'
+                                      : 'text-white/34 hover:text-white/68'
+                                  }`}
+                                >
+                                  {option}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
 
                       <textarea
                         ref={textareaRef}
