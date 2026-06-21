@@ -38,6 +38,7 @@ import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
+import { buildLiveOutcomeObservation, type LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
@@ -652,87 +653,6 @@ const georgeAmbientPulseStyles = `
 . { animation-delay: 180ms; opacity: 0.52; }
 . { animation-delay: 270ms; opacity: 0.36; }
 `
-
-type LiveOutcomeObservation = {
-  desiredOutcome: string
-  observedProgress: 'unknown' | 'improving' | 'stable' | 'declining'
-  confidence: number
-  possibleSecondaryOutcome: string
-  notes: string
-}
-
-function buildLiveOutcomeObservation({
-  desiredOutcome,
-  transcript,
-  supportSummary,
-}: {
-  desiredOutcome?: string | null
-  transcript?: string | null
-  supportSummary?: string | null
-}): LiveOutcomeObservation {
-  const cleanOutcome = String(desiredOutcome || '').trim() || 'Unspecified LIVE outcome'
-  const cleanTranscript = String(transcript || '').toLowerCase()
-
-  const positiveSignals = [
-    'follow up',
-    'next step',
-    'send me',
-    'send the',
-    'introduction',
-    'referral',
-    'schedule',
-    'calendar',
-    'proposal',
-    'deck',
-    'materials',
-    'call me',
-    'email me',
-    'interested',
-  ]
-
-  const negativeSignals = [
-    'not interested',
-    'no thanks',
-    'too expensive',
-    'not now',
-    'pass',
-    'decline',
-    'not a fit',
-  ]
-
-  const positiveCount = positiveSignals.filter((signal) => cleanTranscript.includes(signal)).length
-  const negativeCount = negativeSignals.filter((signal) => cleanTranscript.includes(signal)).length
-
-  let observedProgress: LiveOutcomeObservation['observedProgress'] = 'unknown'
-  let confidence = 35
-  let possibleSecondaryOutcome = 'Unknown.'
-  let notes = 'Insufficient signal to determine outcome.'
-
-  if (positiveCount > negativeCount) {
-    observedProgress = 'improving'
-    confidence = Math.min(88, 55 + positiveCount * 8)
-    possibleSecondaryOutcome = 'Follow-up, referral, next conversation, or future opportunity may have been preserved.'
-    notes = 'Positive continuation signals appeared in the LIVE transcript.'
-  } else if (negativeCount > positiveCount) {
-    observedProgress = 'declining'
-    confidence = Math.min(82, 52 + negativeCount * 8)
-    possibleSecondaryOutcome = 'A later follow-up, referral request, or relationship-preserving next step may still be available.'
-    notes = 'Negative or rejection signals appeared in the LIVE transcript.'
-  } else if (cleanTranscript.length > 120) {
-    observedProgress = 'stable'
-    confidence = 48
-    possibleSecondaryOutcome = 'Conversation continued, but outcome evidence was not strong enough to classify.'
-    notes = 'Some conversation signal exists, but no clear outcome marker was detected.'
-  }
-
-  return {
-    desiredOutcome: cleanOutcome,
-    observedProgress,
-    confidence,
-    possibleSecondaryOutcome,
-    notes: [notes, supportSummary ? `Runtime: ${supportSummary}` : ''].filter(Boolean).join(' '),
-  }
-}
 
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
@@ -1717,6 +1637,9 @@ const captureLiveEntryOptionalSignal = () => {
 }
 
   const [showExitPopup, setShowExitPopup] = useState(false)
+  const [showOutcomeExitReview, setShowOutcomeExitReview] = useState(false)
+  const [pendingLiveExitAction, setPendingLiveExitAction] = useState<'save' | 'discard' | null>(null)
+  const [liveOutcomeReview, setLiveOutcomeReview] = useState<LiveOutcomeObservation | null>(null)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
@@ -1817,6 +1740,48 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     setShowToast(true)
 
     return record
+  }
+
+  const openLiveOutcomeExitReview = (action: 'save' | 'discard') => {
+    const usage = action === 'save' ? recordActiveLiveRuntimeUsage() : null
+
+    let observation: LiveOutcomeObservation | null = null
+
+    try {
+      observation = JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION') || 'null')
+    } catch {
+      observation = null
+    }
+
+    if (!observation) {
+      observation = buildLiveOutcomeObservation({
+        desiredOutcome: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
+        transcript: messagesRef.current.map((message) => message.content).join('\n'),
+        supportSummary: usage?.summary || '',
+      })
+    }
+
+    setPendingLiveExitAction(action)
+    setLiveOutcomeReview(observation)
+    setShowExitPopup(false)
+    setShowOutcomeExitReview(true)
+  }
+
+  const finishLiveExitAfterOutcomeReview = () => {
+    try {
+      if (liveOutcomeReview) {
+        window.localStorage.setItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION', JSON.stringify(liveOutcomeReview))
+      }
+    } catch {}
+
+    if (pendingLiveExitAction === 'discard') {
+      window.localStorage.removeItem('george_active_live_session_id')
+      window.localStorage.removeItem('george_active_campaign_session_id')
+    }
+
+    setShowOutcomeExitReview(false)
+    setPendingLiveExitAction(null)
+    exitLiveMode()
   }
 
   const ACCESS_CODES: Record<string, 'intelligent' | 'brilliant'> = {
@@ -7962,6 +7927,129 @@ if (liveMode) {
 )}
 
 
+{showOutcomeExitReview && liveOutcomeReview && typeof document !== 'undefined' && createPortal(
+  <>
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Close outcome review"
+      onClick={() => setShowOutcomeExitReview(false)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+          setShowOutcomeExitReview(false)
+        }
+      }}
+      className="fixed inset-0 z-[220] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className={`relative w-[min(380px,calc(100vw-32px))] px-3 py-3 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
+            Outcome Review
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowOutcomeExitReview(false)}
+            className="text-[13px] text-white/28 transition hover:text-white/72"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <label className="block">
+            <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">Desired outcome</span>
+            <input
+              value={liveOutcomeReview.desiredOutcome}
+              onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, desiredOutcome: event.target.value })}
+              className="mt-1 w-full rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+            />
+          </label>
+
+          <div>
+            <div className="mb-1 text-[9px] uppercase tracking-[0.18em] text-white/24">Observed progress</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {(['unknown', 'improving', 'stable', 'declining'] as const).map((state) => (
+                <button
+                  key={state}
+                  type="button"
+                  onClick={() => setLiveOutcomeReview({ ...liveOutcomeReview, observedProgress: state })}
+                  className={`rounded-[0.6rem] border px-2 py-1.5 text-left text-[10px] uppercase tracking-[0.12em] transition ${
+                    liveOutcomeReview.observedProgress === state
+                      ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-emerald-100/78'
+                      : 'border-white/[0.055] bg-black/[0.14] text-white/34 hover:text-white/62'
+                  }`}
+                >
+                  {state}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <label className="block">
+            <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">
+              Confidence · {liveOutcomeReview.confidence}%
+            </span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={liveOutcomeReview.confidence}
+              onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, confidence: Number(event.target.value) })}
+              className="mt-2 w-full"
+            />
+          </label>
+
+          <label className="block">
+            <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">Possible secondary outcome</span>
+            <textarea
+              value={liveOutcomeReview.possibleSecondaryOutcome}
+              onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, possibleSecondaryOutcome: event.target.value })}
+              rows={2}
+              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+            />
+          </label>
+
+          <label className="block">
+            <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">Notes</span>
+            <textarea
+              value={liveOutcomeReview.notes}
+              onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, notes: event.target.value })}
+              rows={2}
+              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+            />
+          </label>
+        </div>
+
+        <div className="mt-4 grid gap-1">
+          <button
+            type="button"
+            onClick={finishLiveExitAfterOutcomeReview}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/62 transition hover:text-white active:scale-[0.98]"
+          >
+            Accept and exit
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowOutcomeExitReview(false)
+              setPendingLiveExitAction(null)
+            }}
+            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/42 transition hover:text-white/72 active:scale-[0.98]"
+          >
+            Continue LIVE
+          </button>
+        </div>
+      </div>
+    </div>
+  </>,
+  document.body
+)}
+
 {showExitPopup && (
   <style>{`
     .george-live-route {
@@ -8019,11 +8107,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => {
-              setShowExitPopup(false)
-              recordActiveLiveRuntimeUsage()
-              exitLiveMode()
-            }}
+            onClick={() => openLiveOutcomeExitReview('save')}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
           >
             Save and exit
@@ -8031,12 +8115,7 @@ if (liveMode) {
 
           <button
             type="button"
-            onClick={() => {
-              setShowExitPopup(false)
-              window.localStorage.removeItem('george_active_live_session_id')
-              window.localStorage.removeItem('george_active_campaign_session_id')
-              exitLiveMode()
-            }}
+            onClick={() => openLiveOutcomeExitReview('discard')}
             className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-red-100/58 transition hover:text-red-100/88 active:scale-[0.98]"
           >
             Exit without saving
