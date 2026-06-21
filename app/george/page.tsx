@@ -1730,6 +1730,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         desiredOutcome,
         transcript: messagesRef.current.map((message) => message.content).join('\n'),
         supportSummary: record.summary,
+        outcomeGovernor: outcomeGovernorSnapshot,
       })
 
       window.localStorage.setItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION', JSON.stringify(observation))
@@ -1758,6 +1759,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         desiredOutcome: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
         transcript: messagesRef.current.map((message) => message.content).join('\n'),
         supportSummary: usage?.summary || '',
+        outcomeGovernor: outcomeGovernorSnapshot,
       })
     }
 
