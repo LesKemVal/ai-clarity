@@ -175,19 +175,32 @@ export default function HomePage() {
           )}
 
           {glassesOn && (
-            <div className="absolute inset-0 flex items-center justify-center px-8">
-              <div className="w-full max-w-[720px]">
-                <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.35em] text-white/55">
-                  GEORGE ACTIVE
+            <div className="absolute inset-0 px-7 pt-[18vh] sm:px-12 sm:pt-[20vh]">
+              <div className="max-w-[560px]">
+                <div className="mb-3 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.34em] text-white/38">
+                  <span className="h-px w-8 bg-white/18" />
+                  <span>GEORGE ACTIVE</span>
                 </div>
 
                 <div
                   key={liveRender}
-                  className="max-w-[680px] rounded-[22px] border border-white/10 bg-black/24 p-5 shadow-[0_20px_80px_rgba(0,0,0,0.44)] backdrop-blur-sm"
+                  className="max-w-[520px] border-l border-white/[0.18] pl-4"
                 >
-                  <div className="font-mono text-[20px] leading-relaxed text-white/94 sm:text-[28px]">
-                    {typedRender}
-                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/70" />
+                  <div className="font-mono text-[12px] uppercase tracking-[0.26em] text-white/38">
+                    {liveRender.startsWith('Say:') || liveRender.startsWith('Ask:')
+                      ? 'line'
+                      : liveRender.startsWith('Cue:')
+                        ? 'cue'
+                        : 'observation'}
+                  </div>
+
+                  <div className="mt-2 font-mono text-[13px] leading-6 text-white/82 sm:text-[15px] sm:leading-7">
+                    {typedRender
+                      .replace(/^Observation:\s*/i, '')
+                      .replace(/^Cue:\s*/i, '')
+                      .replace(/^Say:\s*/i, '')
+                      .replace(/^Ask:\s*/i, '')}
+                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/58" />
                   </div>
                 </div>
               </div>
