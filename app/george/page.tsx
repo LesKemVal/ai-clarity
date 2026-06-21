@@ -1350,6 +1350,25 @@ const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
   const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue'>('advice')
+  const liveSupportOptions: Array<{ id: typeof liveDeliveryStyle; label: string }> = [
+    { id: 'advice', label: 'Cue' },
+    { id: 'continue', label: 'Continuation' },
+    { id: 'response', label: 'Response' },
+    { id: 'expandedLine', label: 'Presentation' },
+  ]
+  const activeLiveSupportLabel =
+    liveSupportOptions.find((option) => option.id === liveDeliveryStyle)?.label || 'Cue'
+  const cycleLiveSupportStyle = () => {
+    const currentIndex = liveSupportOptions.findIndex((option) => option.id === liveDeliveryStyle)
+    const next = liveSupportOptions[(currentIndex + 1 + liveSupportOptions.length) % liveSupportOptions.length]
+    setLiveDeliveryStyle(next.id)
+    try {
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', next.id)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', next.id)
+    } catch {}
+    setToastMessage(`Support: ${next.label}`)
+    setShowToast(true)
+  }
 const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
     activeCampaign?.deliveryMode ||
@@ -8640,6 +8659,14 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                       {(forceLive || liveMode) && !showLiveEntrySequence && (
                         <div className="absolute right-2 bottom-full mb-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={cycleLiveSupportStyle}
+                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-emerald-100/[0.18] hover:text-emerald-100/78"
+                          >
+                            {activeLiveSupportLabel}
+                          </button>
+
                           <button
                             type="button"
                             onClick={(e) => {
