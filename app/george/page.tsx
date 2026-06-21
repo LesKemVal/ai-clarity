@@ -1359,6 +1359,7 @@ const [suggestedSignal, setSuggestedSignal] = useState(0)
   const activeLiveSupportLabel =
     liveSupportOptions.find((option) => option.id === liveDeliveryStyle)?.label || 'Cue'
   const [showLiveSupportMenu, setShowLiveSupportMenu] = useState(false)
+  const [showLiveSteeringReference, setShowLiveSteeringReference] = useState(false)
   const selectLiveSupportStyle = (style: typeof liveDeliveryStyle) => {
     setLiveDeliveryStyle(style)
     setShowLiveSupportMenu(false)
@@ -8683,6 +8684,52 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                                     {option.label}
                                   </button>
                                 ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShowLiveSteeringReference((value) => !value)}
+                              className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#D7DCFF]/[0.18] hover:text-[#D7DCFF]/78"
+                            >
+                              Steering
+                            </button>
+
+                            {showLiveSteeringReference && (
+                              <div className="absolute bottom-full right-0 mb-2 w-[260px] rounded-[0.82rem] border border-white/[0.07] bg-[#05080D]/94 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                                {(() => {
+                                  const defaults = {
+                                    buyTime: 'Let me think for a second...',
+                                    clarify: 'I want to make sure I understand.',
+                                    expand: 'Walk me through that.',
+                                    changeDirection: 'What matters now is...',
+                                    slowDown: 'Can we slow down?',
+                                  }
+
+                                  let saved = defaults
+
+                                  try {
+                                    const parsed = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_STEERING_PHRASES') || 'null')
+                                    if (parsed && typeof parsed === 'object') {
+                                      saved = { ...defaults, ...parsed }
+                                    }
+                                  } catch {}
+
+                                  return [
+                                    ['Buy time', saved.buyTime],
+                                    ['Clarify', saved.clarify],
+                                    ['Expand', saved.expand],
+                                    ['Change direction', saved.changeDirection],
+                                    ['Slow down', saved.slowDown],
+                                  ].map(([label, phrase]) => (
+                                    <div key={label} className="border-b border-white/[0.045] py-1.5 last:border-b-0">
+                                      <div className="text-[9px] uppercase tracking-[0.16em] text-white/24">{label}</div>
+                                      <div className="mt-0.5 text-[11px] leading-4 text-[#D7DBE4]/62">“{phrase}”</div>
+                                    </div>
+                                  ))
+                                })()}
                               </div>
                             )}
                           </div>
