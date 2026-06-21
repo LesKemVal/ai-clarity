@@ -880,6 +880,7 @@ export default function LiveEntryClient() {
   const [quickLiveSupportStyle, setQuickLiveSupportStyle] = useState<LiveBriefingSupportPanelId>('advice')
   const [quickLiveExpandedSupport, setQuickLiveExpandedSupport] = useState<LiveBriefingSupportPanelId | 'recommended'>('recommended')
   const [quickLiveSteeringOpen, setQuickLiveSteeringOpen] = useState(false)
+  const [quickLiveSteeringMode, setQuickLiveSteeringMode] = useState<'default' | 'custom'>('default')
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
@@ -1793,6 +1794,12 @@ const mandatoryLiveSignals = useMemo(() => {
       }
     }
 
+    const savedSteeringMode =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('GEORGE_LIVE_STEERING_MODE')
+        : null
+
+    setQuickLiveSteeringMode(savedSteeringMode === 'custom' ? 'custom' : 'default')
     setShowQuickLiveSetup(true)
     setQuickLiveSteeringOpen(false)
   }
@@ -1808,6 +1815,7 @@ const mandatoryLiveSignals = useMemo(() => {
       window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
       window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_STEERING_MODE', quickLiveSteeringMode)
     } catch {}
 
     window.location.href = '/george/live?ready=1'
@@ -3252,6 +3260,28 @@ const beginProofOfAwareness = async () => {
                 <p className="text-[11px] leading-5 text-[#D7DBE4]/46">
                   If you are using earbuds alone, steering phrases help us adapt discreetly. You can use these defaults, edit them later, or control support directly from a phone, glasses, watch, or other visual device.
                 </p>
+
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {(['default', 'custom'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => {
+                        setQuickLiveSteeringMode(mode)
+                        try {
+                          window.localStorage.setItem('GEORGE_LIVE_STEERING_MODE', mode)
+                        } catch {}
+                      }}
+                      className={`rounded-[0.72rem] border px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.16em] transition ${
+                        quickLiveSteeringMode === mode
+                          ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-emerald-100/78'
+                          : 'border-white/[0.055] bg-black/[0.14] text-white/34 hover:text-white/62'
+                      }`}
+                    >
+                      {mode === 'default' ? 'Defaults' : 'Custom'}
+                    </button>
+                  ))}
+                </div>
 
                 <div className="mt-3 divide-y divide-white/[0.045]">
                   {steeringRows.map(([behavior, phrase]) => (
