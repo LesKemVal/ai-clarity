@@ -7,33 +7,25 @@ const scenes = [
   {
     image: '/hero/foam/scene1.png',
     renders: [
-      'Observation: Decision maker listening.',
-      'Cue: Lead with value.',
-      'Say: "I think this aligns with what you are already building."',
+      'Observation: They are evaluating risk, not interest.',
+      'Cue: Make implementation feel safe.',
+      'Say: "Most clients are operational within two weeks."',
     ],
   },
   {
     image: '/hero/foam/scene2.png',
     renders: [
-      'Observation: Parent seeking reassurance.',
-      'Cue: Reduce uncertainty.',
-      'Say: "Here is what support will look like moving forward."',
+      'Observation: They want reassurance before commitment.',
+      'Cue: Explain the next step clearly.',
+      'Say: "Here is what support looks like after today."',
     ],
   },
   {
     image: '/hero/foam/scene3.png',
     renders: [
-      'Observation: Reception positive.',
-      'Cue: Expand answer.',
-      'Say: "I can walk through how I approached that challenge."',
-    ],
-  },
-  {
-    image: '/hero/foam/foam4.png',
-    renders: [
-      'Observation: Entrepreneur interested.',
-      'Cue: Ask about current project.',
-      'Ask: "What are you spending most of your time building right now?"',
+      'Observation: The room is receptive but waiting for proof.',
+      'Cue: Give a concrete example.',
+      'Say: "Here is how I handled that in practice."',
     ],
   },
 ]
@@ -45,8 +37,8 @@ export default function HomePage() {
   const [glassesStep, setGlassesStep] = useState(0)
   const [renderIndex, setRenderIndex] = useState(0)
   const [typedRender, setTypedRender] = useState('')
-  const scene = scenes[sceneIndex]
-  const liveRender = scene.renders[renderIndex % scene.renders.length]
+  const scene = scenes[sceneIndex] || scenes[0]
+  const liveRender = scene.renders[renderIndex % scene.renders.length] || scene.renders[0]
 
   useEffect(() => {
     const stepOne = window.setTimeout(() => setGlassesStep(1), 700)
@@ -175,32 +167,30 @@ export default function HomePage() {
           )}
 
           {glassesOn && (
-            <div className="absolute inset-0 px-7 pt-[18vh] sm:px-12 sm:pt-[20vh]">
-              <div className="max-w-[560px]">
-                <div className="mb-3 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.34em] text-white/38">
-                  <span className="h-px w-8 bg-white/18" />
-                  <span>GEORGE ACTIVE</span>
-                </div>
-
-                <div
-                  key={liveRender}
-                  className="max-w-[520px] border-l border-white/[0.18] pl-4"
-                >
-                  <div className="font-mono text-[12px] uppercase tracking-[0.26em] text-white/38">
+            <div className="absolute inset-0 px-6 pt-[15vh] sm:px-12 sm:pt-[18vh]">
+              <div
+                key={liveRender}
+                className="max-w-[560px]"
+              >
+                <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.38em] text-white/34">
+                  <span className="h-px w-7 bg-white/16" />
+                  <span>
                     {liveRender.startsWith('Say:') || liveRender.startsWith('Ask:')
-                      ? 'line'
+                      ? 'say'
                       : liveRender.startsWith('Cue:')
                         ? 'cue'
                         : 'observation'}
-                  </div>
+                  </span>
+                </div>
 
-                  <div className="mt-2 font-mono text-[13px] leading-6 text-white/82 sm:text-[15px] sm:leading-7">
+                <div className="mt-2 max-w-[520px] border-l border-white/[0.14] pl-3">
+                  <div className="font-mono text-[12px] leading-6 tracking-[0.02em] text-white/78 sm:text-[14px] sm:leading-7">
                     {typedRender
                       .replace(/^Observation:\s*/i, '')
                       .replace(/^Cue:\s*/i, '')
                       .replace(/^Say:\s*/i, '')
                       .replace(/^Ask:\s*/i, '')}
-                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/58" />
+                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/52" />
                   </div>
                 </div>
               </div>
