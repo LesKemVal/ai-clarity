@@ -1358,16 +1358,15 @@ const [suggestedSignal, setSuggestedSignal] = useState(0)
   ]
   const activeLiveSupportLabel =
     liveSupportOptions.find((option) => option.id === liveDeliveryStyle)?.label || 'Cue'
-  const cycleLiveSupportStyle = () => {
-    const currentIndex = liveSupportOptions.findIndex((option) => option.id === liveDeliveryStyle)
-    const next = liveSupportOptions[(currentIndex + 1 + liveSupportOptions.length) % liveSupportOptions.length]
-    setLiveDeliveryStyle(next.id)
+  const [showLiveSupportMenu, setShowLiveSupportMenu] = useState(false)
+  const selectLiveSupportStyle = (style: typeof liveDeliveryStyle) => {
+    setLiveDeliveryStyle(style)
+    setShowLiveSupportMenu(false)
+
     try {
-      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', next.id)
-      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', next.id)
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', style)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', style)
     } catch {}
-    setToastMessage(`Support: ${next.label}`)
-    setShowToast(true)
   }
 const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
@@ -8659,13 +8658,34 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                       {(forceLive || liveMode) && !showLiveEntrySequence && (
                         <div className="absolute right-2 bottom-full mb-2 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={cycleLiveSupportStyle}
-                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-emerald-100/[0.18] hover:text-emerald-100/78"
-                          >
-                            {activeLiveSupportLabel}
-                          </button>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShowLiveSupportMenu((value) => !value)}
+                              className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-emerald-100/[0.18] hover:text-emerald-100/78"
+                            >
+                              {activeLiveSupportLabel}
+                            </button>
+
+                            {showLiveSupportMenu && (
+                              <div className="absolute bottom-full right-0 mb-2 w-[168px] rounded-[0.82rem] border border-white/[0.07] bg-[#05080D]/94 px-2 py-2 shadow-[0_18px_54px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                                {liveSupportOptions.map((option) => (
+                                  <button
+                                    key={option.id}
+                                    type="button"
+                                    onClick={() => selectLiveSupportStyle(option.id)}
+                                    className={`block w-full rounded-[0.58rem] px-2 py-1.5 text-left text-[10px] font-semibold uppercase tracking-[0.14em] transition ${
+                                      liveDeliveryStyle === option.id
+                                        ? 'bg-emerald-400/[0.06] text-emerald-100/78'
+                                        : 'text-white/36 hover:bg-white/[0.035] hover:text-white/72'
+                                    }`}
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
                           <button
                             type="button"
