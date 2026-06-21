@@ -880,7 +880,13 @@ export default function LiveEntryClient() {
   const [quickLiveSupportStyle, setQuickLiveSupportStyle] = useState<LiveBriefingSupportPanelId>('advice')
   const [quickLiveExpandedSupport, setQuickLiveExpandedSupport] = useState<LiveBriefingSupportPanelId | 'recommended'>('recommended')
   const [quickLiveSteeringOpen, setQuickLiveSteeringOpen] = useState(false)
-  const [quickLiveSteeringMode, setQuickLiveSteeringMode] = useState<'default' | 'custom'>('default')
+  const [quickLiveSteeringPhrases, setQuickLiveSteeringPhrases] = useState<Record<string, string>>({
+    buyTime: 'Let me think for a second...',
+    clarify: 'I want to make sure I understand.',
+    expand: 'Walk me through that.',
+    changeDirection: 'What matters now is...',
+    slowDown: 'Can we slow down?',
+  })
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
@@ -1794,12 +1800,18 @@ const mandatoryLiveSignals = useMemo(() => {
       }
     }
 
-    const savedSteeringMode =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem('GEORGE_LIVE_STEERING_MODE')
-        : null
+    if (typeof window !== 'undefined') {
+      try {
+        const savedPhrases = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_STEERING_PHRASES') || 'null')
+        if (savedPhrases && typeof savedPhrases === 'object') {
+          setQuickLiveSteeringPhrases((current) => ({
+            ...current,
+            ...savedPhrases,
+          }))
+        }
+      } catch {}
+    }
 
-    setQuickLiveSteeringMode(savedSteeringMode === 'custom' ? 'custom' : 'default')
     setShowQuickLiveSetup(true)
     setQuickLiveSteeringOpen(false)
   }
@@ -1815,7 +1827,7 @@ const mandatoryLiveSignals = useMemo(() => {
       window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
       window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
-      window.localStorage.setItem('GEORGE_LIVE_STEERING_MODE', quickLiveSteeringMode)
+      window.localStorage.setItem('GEORGE_LIVE_STEERING_PHRASES', JSON.stringify(quickLiveSteeringPhrases))
     } catch {}
 
     window.location.href = '/george/live?ready=1'
@@ -3152,13 +3164,28 @@ const beginProofOfAwareness = async () => {
       },
     ]
 
-    const steeringRows = [
-      ['Buy time', 'Let me think for a second...'],
-      ['Clarify', 'I want to make sure I understand.'],
-      ['Expand', 'Walk me through that.'],
-      ['Change direction', 'What matters now is...'],
-      ['Slow down', 'Can we slow down?'],
+    const steeringRows: Array<{ key: string; label: string }> = [
+      { key: 'buyTime', label: 'Buy time' },
+      { key: 'clarify', label: 'Clarify' },
+      { key: 'expand', label: 'Expand' },
+      { key: 'changeDirection', label: 'Change direction' },
+      { key: 'slowDown', label: 'Slow down' },
     ]
+
+    const updateQuickLiveSteeringPhrase = (key: string, value: string) => {
+      setQuickLiveSteeringPhrases((current) => {
+        const next = {
+          ...current,
+          [key]: value,
+        }
+
+        try {
+          window.localStorage.setItem('GEORGE_LIVE_STEERING_PHRASES', JSON.stringify(next))
+        } catch {}
+
+        return next
+      })
+    }
 
     const selectQuickLiveSupport = (style: LiveBriefingSupportPanelId | 'recommended') => {
       const savedStyle = style === 'recommended' ? 'advice' : style
@@ -3261,38 +3288,18 @@ const beginProofOfAwareness = async () => {
                   If you are using earbuds alone, steering phrases help us adapt discreetly. You can use these defaults, edit them later, or control support directly from a phone, glasses, watch, or other visual device.
                 </p>
 
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  {(['default', 'custom'] as const).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => {
-                        setQuickLiveSteeringMode(mode)
-                        try {
-                          window.localStorage.setItem('GEORGE_LIVE_STEERING_MODE', mode)
-                        } catch {}
-                      }}
-                      className={`rounded-[0.72rem] border px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.16em] transition ${
-                        quickLiveSteeringMode === mode
-                          ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-emerald-100/78'
-                          : 'border-white/[0.055] bg-black/[0.14] text-white/34 hover:text-white/62'
-                      }`}
-                    >
-                      {mode === 'default' ? 'Defaults' : 'Custom'}
-                    </button>
-                  ))}
-                </div>
-
                 <div className="mt-3 divide-y divide-white/[0.045]">
-                  {steeringRows.map(([behavior, phrase]) => (
-                    <div key={behavior} className="grid gap-1 py-2 sm:grid-cols-[150px_1fr] sm:gap-3">
-                      <div className="text-[10px] uppercase tracking-[0.18em] text-white/28">
-                        {behavior}
-                      </div>
-                      <div className="text-[12px] leading-5 text-[#D7DBE4]/62">
-                        “{phrase}”
-                      </div>
-                    </div>
+                  {steeringRows.map((row) => (
+                    <label key={row.key} className="grid gap-1 py-2 sm:grid-cols-[150px_1fr] sm:gap-3">
+                      <span className="text-[10px] uppercase tracking-[0.18em] text-white/28">
+                        {row.label}
+                      </span>
+                      <input
+                        value={quickLiveSteeringPhrases[row.key] || ''}
+                        onChange={(event) => updateQuickLiveSteeringPhrase(row.key, event.target.value)}
+                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-emerald-400/24 focus:bg-emerald-400/[0.035]"
+                      />
+                    </label>
                   ))}
                 </div>
               </div>
