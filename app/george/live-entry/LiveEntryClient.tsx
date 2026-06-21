@@ -1779,7 +1779,9 @@ const mandatoryLiveSignals = useMemo(() => {
 
   const openQuickLiveSetup = () => {
     if (typeof window !== 'undefined') {
-      const saved = window.localStorage.getItem('george_live_entry_support_preference')
+      const saved =
+        window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
+        window.localStorage.getItem('george_live_entry_support_preference')
       if (
         saved === 'advice' ||
         saved === 'completion' ||
@@ -1802,6 +1804,7 @@ const mandatoryLiveSignals = useMemo(() => {
       window.localStorage.setItem('george_start_new_live', '1')
       window.localStorage.setItem('george_quick_live_entry', '1')
       window.localStorage.setItem('george_quick_live_message', "I'll become sharper as the interaction unfolds.")
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
       window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
@@ -3156,6 +3159,7 @@ const beginProofOfAwareness = async () => {
       setQuickLiveSteeringOpen(false)
 
       try {
+        window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', savedStyle)
         window.localStorage.setItem('george_live_entry_support_preference', savedStyle)
         window.localStorage.setItem('george_live_entry_support_default', savedStyle)
       } catch {}
