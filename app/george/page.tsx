@@ -653,6 +653,87 @@ const georgeAmbientPulseStyles = `
 . { animation-delay: 270ms; opacity: 0.36; }
 `
 
+type LiveOutcomeObservation = {
+  desiredOutcome: string
+  observedProgress: 'unknown' | 'improving' | 'stable' | 'declining'
+  confidence: number
+  possibleSecondaryOutcome: string
+  notes: string
+}
+
+function buildLiveOutcomeObservation({
+  desiredOutcome,
+  transcript,
+  supportSummary,
+}: {
+  desiredOutcome?: string | null
+  transcript?: string | null
+  supportSummary?: string | null
+}): LiveOutcomeObservation {
+  const cleanOutcome = String(desiredOutcome || '').trim() || 'Unspecified LIVE outcome'
+  const cleanTranscript = String(transcript || '').toLowerCase()
+
+  const positiveSignals = [
+    'follow up',
+    'next step',
+    'send me',
+    'send the',
+    'introduction',
+    'referral',
+    'schedule',
+    'calendar',
+    'proposal',
+    'deck',
+    'materials',
+    'call me',
+    'email me',
+    'interested',
+  ]
+
+  const negativeSignals = [
+    'not interested',
+    'no thanks',
+    'too expensive',
+    'not now',
+    'pass',
+    'decline',
+    'not a fit',
+  ]
+
+  const positiveCount = positiveSignals.filter((signal) => cleanTranscript.includes(signal)).length
+  const negativeCount = negativeSignals.filter((signal) => cleanTranscript.includes(signal)).length
+
+  let observedProgress: LiveOutcomeObservation['observedProgress'] = 'unknown'
+  let confidence = 35
+  let possibleSecondaryOutcome = 'Unknown.'
+  let notes = 'Insufficient signal to determine outcome.'
+
+  if (positiveCount > negativeCount) {
+    observedProgress = 'improving'
+    confidence = Math.min(88, 55 + positiveCount * 8)
+    possibleSecondaryOutcome = 'Follow-up, referral, next conversation, or future opportunity may have been preserved.'
+    notes = 'Positive continuation signals appeared in the LIVE transcript.'
+  } else if (negativeCount > positiveCount) {
+    observedProgress = 'declining'
+    confidence = Math.min(82, 52 + negativeCount * 8)
+    possibleSecondaryOutcome = 'A later follow-up, referral request, or relationship-preserving next step may still be available.'
+    notes = 'Negative or rejection signals appeared in the LIVE transcript.'
+  } else if (cleanTranscript.length > 120) {
+    observedProgress = 'stable'
+    confidence = 48
+    possibleSecondaryOutcome = 'Conversation continued, but outcome evidence was not strong enough to classify.'
+    notes = 'Some conversation signal exists, but no clear outcome marker was detected.'
+  }
+
+  return {
+    desiredOutcome: cleanOutcome,
+    observedProgress,
+    confidence,
+    possibleSecondaryOutcome,
+    notes: [notes, supportSummary ? `Runtime: ${supportSummary}` : ''].filter(Boolean).join(' '),
+  }
+}
+
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
@@ -1713,6 +1794,23 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     if (!record) return null
 
     window.localStorage.setItem('george_last_live_runtime_summary', record.summary)
+
+    try {
+      const desiredOutcome =
+        activeCampaign?.desiredOutcome ||
+        activeCampaign?.currentGoal ||
+        readActiveLiveRuntimeSupport()?.objective ||
+        readActiveLiveRuntimeSupport()?.purview?.line ||
+        getActiveLiveDesiredOutcomeTitle('LIVE Conversation')
+
+      const observation = buildLiveOutcomeObservation({
+        desiredOutcome,
+        transcript: messagesRef.current.map((message) => message.content).join('\n'),
+        supportSummary: record.summary,
+      })
+
+      window.localStorage.setItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION', JSON.stringify(observation))
+    } catch {}
 
     const actual = typeof record.actualCents === 'number' ? `${record.actualCents}¢` : 'not estimated'
     setToastMessage(`Actual runtime usage: ${actual} · ${record.summary}`)
@@ -3059,7 +3157,12 @@ if (messagesRef.current.length > 2) {
       userGoal: 'In progress',
       lastKnownState: 'User exited LIVE mode.',
       suggestedRestart: 'Resume this LIVE Conversation naturally.',
-      metadata: {},
+      metadata: {
+        liveOutcomeObservation:
+          typeof window !== 'undefined'
+            ? JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION') || 'null')
+            : null,
+      },
     })
   } catch {}
 }
