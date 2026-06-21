@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 
 const scenes = [
   {
-    image: '/hero/foam/foam1.png',
+    image: '/hero/foam/scene1.png',
     renders: [
       'Observation: Decision maker listening.',
       'Cue: Lead with value.',
@@ -13,7 +13,7 @@ const scenes = [
     ],
   },
   {
-    image: '/hero/foam/foam2.png',
+    image: '/hero/foam/scene2.png',
     renders: [
       'Observation: Parent seeking reassurance.',
       'Cue: Reduce uncertainty.',
@@ -21,7 +21,7 @@ const scenes = [
     ],
   },
   {
-    image: '/hero/foam/foam3.png',
+    image: '/hero/foam/scene3.png',
     renders: [
       'Observation: Reception positive.',
       'Cue: Expand answer.',
