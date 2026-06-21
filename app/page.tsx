@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 
 const scenes = [
   {
-    image: '/hero/foam/scene1.png',
+    image: '/images/home/foams100.png',
     renders: [
-      'Observation: They are evaluating risk, not interest.',
-      'Cue: Make implementation feel safe.',
-      'Say: "Most clients are operational within two weeks."',
+      'Observation: Interest is present.',
+      'Cue: Establish relevance.',
+      'Say: "I think this aligns with what you are already building."',
     ],
   },
   {
