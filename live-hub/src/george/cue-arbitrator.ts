@@ -29,6 +29,9 @@ export function arbitrateCue(input: {
             ? 220
             : 80
 
+  const isGenericLocalCue =
+    input.packet.cue.trim().toLowerCase() === 'give a useful response.'
+
   if (fastCue && fastCue.length <= maxFastCueLength) {
     return {
       cue: fastCue,
@@ -44,13 +47,13 @@ export function arbitrateCue(input: {
   }
 
   return {
-    cue: input.packet.cue,
+    cue: isGenericLocalCue ? '' : input.packet.cue,
     reason: input.packet.reason,
     source: 'local',
     localCue: input.packet.cue,
     category: input.packet.category,
     confidence: input.packet.confidence,
-    priority: input.packet.priority,
+    priority: isGenericLocalCue ? 0 : input.packet.priority,
     at: Date.now(),
   }
 }

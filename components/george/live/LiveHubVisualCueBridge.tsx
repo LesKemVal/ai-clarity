@@ -30,11 +30,21 @@ export function LiveHubVisualCueBridge({
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
   const lastCueRef = useRef('')
   const currentPriorityRef = useRef(0)
+  const lastRenderedAtRef = useRef(0)
 
   const handleVisualCue = useCallback((cue: GeorgeDeliveryCue) => {
     const clean = String(cue.text || '').trim()
     if (!clean) return
     if (lastCueRef.current === clean) return
+
+    const now = Date.now()
+    const cueAgeMs = now - lastRenderedAtRef.current
+    const canInterruptCurrentCue =
+      !visualCue ||
+      cueAgeMs > 2600 ||
+      cue.priority > currentPriorityRef.current + 18
+
+    if (!canInterruptCurrentCue) return
     if (visualCue && cue.priority < currentPriorityRef.current) return
 
     lastCueRef.current = clean
@@ -42,12 +52,14 @@ export function LiveHubVisualCueBridge({
 
     markRuntimeEvent(clean, 'visual_cue_received')
 
+    lastRenderedAtRef.current = now
+
     setVisualCue({
       text: clean,
       priority: cue.priority,
       confidence: cue.confidence,
       source: cue.source,
-      at: Date.now(),
+      at: now,
     })
 
     if (voiceEnabled && cue.source === 'groq') {
@@ -60,6 +72,7 @@ export function LiveHubVisualCueBridge({
     if (!active) {
       lastCueRef.current = ''
       currentPriorityRef.current = 0
+      lastRenderedAtRef.current = 0
       setVisualCue(null)
     }
   }, [active])

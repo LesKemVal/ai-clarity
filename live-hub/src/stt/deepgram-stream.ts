@@ -108,20 +108,22 @@ export function createDeepgramStream(params: {
       cue: localActionCue.cue,
     })
 
-    sendJson(params.ws, {
-      type: 'ACTION_CUE',
-      cue: localActionCue.cue,
-      reason: localActionCue.reason,
-      source: localActionCue.source,
-      localCue: localActionCue.localCue,
-      fastCue: localActionCue.fastCue,
-      category: localActionCue.category,
-      confidence: localActionCue.confidence,
-      priority: localActionCue.priority,
-      at: localActionCue.at,
-    })
+    if (localActionCue.cue.trim()) {
+      sendJson(params.ws, {
+        type: 'ACTION_CUE',
+        cue: localActionCue.cue,
+        reason: localActionCue.reason,
+        source: localActionCue.source,
+        localCue: localActionCue.localCue,
+        fastCue: localActionCue.fastCue,
+        category: localActionCue.category,
+        confidence: localActionCue.confidence,
+        priority: localActionCue.priority,
+        at: localActionCue.at,
+      })
 
-    console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'local_cue_sent'))
+      console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'local_cue_sent'))
+    }
 
     console.log('[LIVE HUB][groq] queued', {
       signal: packet.signal,
