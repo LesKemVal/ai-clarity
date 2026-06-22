@@ -1,6 +1,7 @@
 'use client'
 
 
+import { markRuntimeEvent, startRuntimeTurn } from '@/lib/george/live-metrics/runtime-metrics'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -4043,10 +4044,14 @@ requestAnimationFrame(() => {
     setIsSpeaking(false)
   }
 
-  async function fetchSpeech(text: string) {
+  async function fetchSpeech(text: string, turnId?: string) {
     // block TTS for Smart tier
     if (currentTier === 'smart') {
       return null
+    }
+
+    if (liveMode && turnId) {
+      markRuntimeEvent(turnId, 'tts_request_start')
     }
 
     const res = await fetch(liveMode ? '/api/george/live/tts' : '/api/tts', {
@@ -4071,6 +4076,11 @@ requestAnimationFrame(() => {
     }
 
     const buffer = await res.arrayBuffer()
+
+    if (liveMode && turnId) {
+      markRuntimeEvent(turnId, 'tts_audio_received')
+    }
+
     if (!buffer.byteLength) {
       throw new Error('TTS returned empty audio')
     }
@@ -4132,7 +4142,15 @@ if (activePromptContext || activePromptLabel) {
         const chunk = speechQueueRef.current.shift()
         if (!chunk) continue
 
-        const url = await fetchSpeech(chunk)
+        const turnId = liveMode
+          ? `tts-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+          : undefined
+
+        if (turnId) {
+          startRuntimeTurn(turnId)
+        }
+
+        const url = await fetchSpeech(chunk, turnId)
         if (!url) continue
 
         await new Promise<void>((resolve, reject) => {
@@ -4145,6 +4163,9 @@ if (activePromptContext || activePromptLabel) {
           audio.src = url
 
           audio.onended = () => {
+            if (turnId) {
+              markRuntimeEvent(turnId, 'tts_playback_end')
+            }
             resolve()
           }
 
@@ -4181,6 +4202,9 @@ if (activePromptContext || activePromptLabel) {
               }
 
               audio.play().then(() => {
+                if (turnId) {
+                  markRuntimeEvent(turnId, 'tts_playback_start')
+                }
                 console.info('[GEORGE AUDIO PLAYING]')
               }).catch((err) => {
                 if (stopSpeechRef.current) {
