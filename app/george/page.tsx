@@ -2811,13 +2811,14 @@ const startLiveAudioRuntime = liveAudioRuntime.start
       setIsListening(false)
     }
 
-    if (voiceOn) {
+    if (liveRoomActive) {
       startLiveAudioRuntime()
+      setIsListening(true)
     } else {
       stopLiveAudioRuntimeDirect()
       setIsListening(false)
     }
-  }, [forceLive, liveMode, voiceOn, emergencyStopLiveAudioRuntime, startLiveAudioRuntime, stopLiveAudioRuntimeDirect])
+  }, [forceLive, liveMode, liveRoomActive, emergencyStopLiveAudioRuntime, startLiveAudioRuntime, stopLiveAudioRuntimeDirect])
 
   const interruptAndListen = () => {
     try {
