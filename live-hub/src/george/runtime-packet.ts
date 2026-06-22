@@ -11,6 +11,9 @@ export type GeorgeRuntimePacket = {
   cue: string
   reason: string
   category: string
+  operationalSignal?: string
+  obstacle?: string
+  supportStrategy?: string
   confidence: number
   priority: number
   source: 'local'
@@ -33,6 +36,9 @@ export function buildRuntimePacket(input: {
     cue: input.cue.cue,
     reason: input.cue.reason,
     category: input.cue.category,
+    operationalSignal: input.cue.operationalSignal,
+    obstacle: input.cue.obstacle,
+    supportStrategy: input.cue.supportStrategy,
     confidence: input.cue.confidence,
     priority: input.cue.priority,
     source: 'local',

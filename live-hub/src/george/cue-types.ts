@@ -16,10 +16,23 @@ export type GeorgeCueCategory =
   | 'agreement'
   | 'pressure'
 
+export type GeorgeOperationalSignal =
+  | 'constraint'
+  | 'risk'
+  | 'opportunity'
+  | 'decision'
+  | 'information_gap'
+  | 'pressure'
+  | 'agreement'
+  | 'objection'
+
 export type GeorgeLocalCue = {
   cue: string
   reason: string
   category: GeorgeCueCategory
   confidence: number
   priority: number
+  operationalSignal?: GeorgeOperationalSignal
+  obstacle?: string
+  supportStrategy?: string
 }

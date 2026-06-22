@@ -29,6 +29,8 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   console.log('[LIVE HUB][groq] request', {
     model,
     signal: packet.signal,
+    obstacle: packet.obstacle,
+    supportStrategy: packet.supportStrategy,
     cue: packet.cue,
     deliveryStyle: packet.deliveryStyle,
   })
@@ -71,6 +73,9 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
         content: JSON.stringify({
           transcript: packet.transcript,
           signal: packet.signal,
+          operationalSignal: packet.operationalSignal,
+          obstacle: packet.obstacle,
+          supportStrategy: packet.supportStrategy,
           pressure: packet.pressure,
           objective: packet.objective,
           localCue: packet.cue,
