@@ -101,8 +101,8 @@ export function LiveHubVisualCueBridge({
       />
 
       {active && visualCue && (
-        <div className="pointer-events-none fixed bottom-[108px] left-4 right-4 z-[70] md:left-auto md:right-6 md:w-[380px]">
-          <div className="rounded-2xl border border-white/12 bg-[#0B0D12]/92 px-4 py-3 shadow-2xl backdrop-blur-xl">
+        <div className="pointer-events-none fixed bottom-[184px] left-6 right-6 z-[120] md:left-8 md:right-auto md:w-[440px]">
+          <div className="rounded-2xl border border-emerald-300/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl">
             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
               GEORGE
             </div>
