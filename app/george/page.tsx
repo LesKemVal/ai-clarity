@@ -46,7 +46,7 @@ import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridg
 import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCueBridge'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
-import { type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveGeorgeCoreLiveExecution } from '@/lib/george/core/live-execution'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
@@ -1405,6 +1405,26 @@ function detectLiveInterruption(interim: string) {
 
 const [isListening, setIsListening] = useState(false)
 const liveRoomActive = Boolean(forceLive || liveMode) && liveGeorgeEnabled
+
+function normalizeGeorgeAddressText(value: string) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"'’“”()[\]{}]/g, '')
+    .replace(/\s+/g, ' ')
+}
+
+function isDirectGeorgeAddress(text: string) {
+  if (typeof window === 'undefined') return false
+
+  const normalized = normalizeGeorgeAddressText(text)
+  if (!normalized) return false
+
+  const storedName = normalizeGeorgeAddressText(window.localStorage.getItem('george_name') || '')
+  const names = Array.from(new Set(['george', storedName].filter(Boolean)))
+
+  return names.some((name) => normalized === name || normalized.startsWith(`${name} `))
+}
 const liveStatusStackRef = useRef<HTMLDivElement | null>(null)
 const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
 
@@ -2707,7 +2727,10 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
     setInput('')
     setLiveHubShadowTranscript(clean)
-    liveTranscriptSubmitRef.current(clean)
+
+    if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean)) {
+      liveTranscriptSubmitRef.current(clean)
+    }
   }, [appendLiveContextSignal])
 
   const processLiveAudioError = useCallback((error: unknown) => {
