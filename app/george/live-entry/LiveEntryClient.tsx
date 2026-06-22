@@ -1149,8 +1149,14 @@ export default function LiveEntryClient() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || data?.status === 'sufficient' || !data?.question) {
-        setCurrentOptionalSignalQuestion(null)
-        setOptionalSignalComplete(true)
+        setCurrentOptionalSignalQuestion({
+          key: `manual_signal_${Date.now()}`,
+          label: 'User signal',
+          question: 'LIVE is ready. Add anything else GEORGE should know, or go to LIVE.',
+          why: 'OpenAI does not have a sharper question right now. You may still add signal if it matters.',
+          example: 'E.g. Board approval is required. Timeline is 60 days. Do not press on valuation.',
+        })
+        setOptionalSignalComplete(false)
         return
       }
 
