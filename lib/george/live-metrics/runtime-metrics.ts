@@ -1,12 +1,32 @@
 export type GeorgeRuntimeMetricEvent =
+  | 'mic_open'
+  | 'speech_detected'
+  | 'first_audio_chunk_sent'
+  | 'deepgram_interim'
+  | 'deepgram_final'
   | 'transcript_input'
   | 'action_cue'
   | 'delivery_cue'
   | 'visual_cue_received'
   | 'visual_cue_rendered'
   | 'voice_cue_requested'
+  | 'tts_request_start'
+  | 'tts_audio_received'
+  | 'tts_playback_start'
+  | 'tts_playback_end'
 
 const turnStarts = new Map<string, number>()
+
+export function startRuntimeTurn(turnId: string) {
+  const now = Date.now()
+  turnStarts.set(turnId, now)
+
+  console.info('[LIVE][metrics]', {
+    event: 'turn_start',
+    turnId,
+    at: now,
+  })
+}
 
 export function markRuntimeEvent(
   turnId: string,
@@ -14,16 +34,8 @@ export function markRuntimeEvent(
 ) {
   const now = Date.now()
 
-  if (event === 'transcript_input') {
+  if (event === 'transcript_input' && !turnStarts.has(turnId)) {
     turnStarts.set(turnId, now)
-
-    console.info('[LIVE][metrics]', {
-      event,
-      turnId,
-      at: now,
-    })
-
-    return
   }
 
   const start = turnStarts.get(turnId)
