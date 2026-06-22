@@ -6,10 +6,13 @@ import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
 
+type LiveHubReceiverProfile = 'visual_only' | 'audio_visual' | 'audio_only'
+
 type LiveHubVisualCueBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   voiceEnabled?: boolean
+  receiverProfile?: LiveHubReceiverProfile
   onSpeakCue?: (cue: string) => void
 }
 
@@ -25,6 +28,7 @@ export function LiveHubVisualCueBridge({
   active,
   context,
   voiceEnabled = false,
+  receiverProfile = voiceEnabled ? 'audio_visual' : 'visual_only',
   onSpeakCue,
 }: LiveHubVisualCueBridgeProps) {
   const [visualCue, setVisualCue] = useState<VisualCueState | null>(null)
@@ -62,11 +66,16 @@ export function LiveHubVisualCueBridge({
       at: now,
     })
 
-    if (voiceEnabled && cue.source === 'groq') {
+    const shouldSpeakCue =
+      receiverProfile !== 'visual_only' &&
+      voiceEnabled &&
+      cue.source === 'groq'
+
+    if (shouldSpeakCue) {
       markRuntimeEvent(clean, 'voice_cue_requested')
       onSpeakCue?.(clean)
     }
-  }, [onSpeakCue, visualCue, voiceEnabled])
+  }, [onSpeakCue, receiverProfile, visualCue, voiceEnabled])
 
   useEffect(() => {
     if (!active) {
@@ -82,13 +91,22 @@ export function LiveHubVisualCueBridge({
 
     markRuntimeEvent(visualCue.text, 'visual_cue_rendered')
 
+    const holdMs =
+      receiverProfile === 'audio_only'
+        ? 0
+        : receiverProfile === 'audio_visual'
+          ? 6500
+          : 9000
+
+    if (holdMs <= 0) return
+
     const timeout = window.setTimeout(() => {
       currentPriorityRef.current = 0
       setVisualCue(null)
-    }, 8000)
+    }, holdMs)
 
     return () => window.clearTimeout(timeout)
-  }, [visualCue])
+  }, [receiverProfile, visualCue])
 
   return (
     <>
@@ -100,7 +118,7 @@ export function LiveHubVisualCueBridge({
         onVisualCue={handleVisualCue}
       />
 
-      {active && visualCue && (
+      {active && visualCue && receiverProfile !== 'audio_only' && (
         <div className="pointer-events-none fixed bottom-[184px] left-6 right-6 z-[120] md:left-8 md:right-auto md:w-[440px]">
           <div className="rounded-2xl border border-emerald-300/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl">
             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">

@@ -6189,6 +6189,7 @@ return (
           deliveryStyle: liveDeliveryStyle,
         }}
         voiceEnabled={voiceOn}
+        receiverProfile={voiceOn ? 'audio_visual' : 'visual_only'}
         onSpeakCue={(cue) => speakText(cue, { source: 'hub' })}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
