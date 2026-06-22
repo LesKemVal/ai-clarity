@@ -2323,11 +2323,6 @@ const beginProofOfAwareness = async () => {
         return
       }
 
-      await speakLiveEntryLine('Alright. Check the room once more if you need to.')
-      await waitForLiveEntryVoice(4000)
-
-      if (liveBriefingConfirmSequenceRef.current !== sequence) return
-
       setLiveBriefingReadyToContinue(true)
 
       void speakLiveEntryLine('The room is ready when you are.')
