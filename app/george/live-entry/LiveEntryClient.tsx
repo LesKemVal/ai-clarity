@@ -2328,13 +2328,9 @@ const beginProofOfAwareness = async () => {
 
       if (liveBriefingConfirmSequenceRef.current !== sequence) return
 
-      await speakLiveEntryLine('Confirm when the room is ready.')
-      await waitForLiveEntryVoice(3000)
-
-      if (liveBriefingConfirmSequenceRef.current !== sequence) return
-
       setLiveBriefingReadyToContinue(true)
-      await speakLiveEntryLine("I’m ready when you are.")
+
+      void speakLiveEntryLine('The room is ready when you are.')
     })()
   }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted])
 
