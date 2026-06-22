@@ -34,5 +34,6 @@ export type GeorgeLocalCue = {
   priority: number
   operationalSignal?: GeorgeOperationalSignal
   obstacle?: string
+  outcomeImpact?: string
   supportStrategy?: string
 }

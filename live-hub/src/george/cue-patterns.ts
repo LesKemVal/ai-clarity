@@ -7,6 +7,9 @@ type CuePattern = {
   reason: string
   confidence: number
   priority: number
+  obstacle?: string
+  outcomeImpact?: string
+  supportStrategy?: string
 }
 
 export const GEORGE_CUE_PATTERNS: CuePattern[] = [
@@ -17,6 +20,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Transportation or mobility blocker detected.',
     confidence: 0.88,
     priority: 92,
+    obstacle: 'The user or group may not be able to reach the required place or complete the required movement.',
+    outcomeImpact: 'The desired outcome may fail because physical access or arrival is blocked.',
+    supportStrategy: 'Secure a ride, move the interaction remote, change the location, reschedule, or identify an alternate transportation path.',
   },
   {
     category: 'budget_constraint',
@@ -25,6 +31,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Budget or funding blocker detected.',
     confidence: 0.86,
     priority: 90,
+    obstacle: 'Available money may not be enough to complete the next required action.',
+    outcomeImpact: 'The desired outcome may stall unless scope, timing, funding, or value exchange changes.',
+    supportStrategy: 'Clarify the amount needed, reduce scope, phase the action, find funding, or reframe value before asking for commitment.',
   },
   {
     category: 'authority_constraint',
@@ -33,6 +42,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Authority or approval blocker detected.',
     confidence: 0.86,
     priority: 88,
+    obstacle: 'The person in the room may not have authority to approve or execute the decision.',
+    outcomeImpact: 'The desired outcome may stall unless the real decision-maker or approval path is identified.',
+    supportStrategy: 'Identify who can approve, ask what approval requires, secure a next step, or reposition the conversation around the approval path.',
   },
   {
     category: 'timeline_constraint',
@@ -41,6 +53,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Timeline constraint detected.',
     confidence: 0.84,
     priority: 86,
+    obstacle: 'Time available may be insufficient for the current plan.',
+    outcomeImpact: 'The desired outcome may degrade, expire, or require a narrower next action.',
+    supportStrategy: 'Separate urgency from importance, define the deadline, reduce the ask, choose the next action, or renegotiate timing.',
   },
   {
     category: 'information_gap',
@@ -49,6 +64,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Information gap detected.',
     confidence: 0.82,
     priority: 82,
+    obstacle: 'A missing fact may prevent a confident decision or useful next step.',
+    outcomeImpact: 'The desired outcome may slow down or move in the wrong direction without the missing information.',
+    supportStrategy: 'Name the missing fact, ask for the specific detail, pause the decision, or proceed with a clear assumption.',
   },
   {
     category: 'trust_concern',
@@ -57,6 +75,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Trust or credibility concern detected.',
     confidence: 0.84,
     priority: 86,
+    obstacle: 'The other party may not yet believe the claim, intent, competence, or safety of the proposal.',
+    outcomeImpact: 'The desired outcome may fail if the user pushes before credibility is restored.',
+    supportStrategy: 'Slow down, acknowledge concern, provide proof, reduce pressure, clarify intent, or ask what would create confidence.',
   },
   {
     category: 'access_constraint',
@@ -65,6 +86,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Access blocker detected.',
     confidence: 0.84,
     priority: 86,
+    obstacle: 'The user or group may be blocked from entering, using, viewing, or controlling a required system or resource.',
+    outcomeImpact: 'The desired outcome may not advance until access is restored or bypassed.',
+    supportStrategy: 'Restore credentials, identify the owner, use an alternate access path, escalate support, or shift to a task that does not require access.',
   },
   {
     category: 'resource_constraint',
@@ -73,6 +97,9 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
     reason: 'Resource constraint detected.',
     confidence: 0.82,
     priority: 84,
+    obstacle: 'A required person, tool, material, space, or support resource may be unavailable.',
+    outcomeImpact: 'The desired outcome may stall unless the requirement is replaced, reduced, borrowed, or rescheduled.',
+    supportStrategy: 'Name the missing resource, find a substitute, reduce scope, borrow capacity, delay the dependent step, or change the plan.',
   },
   {
     category: 'pricing',
@@ -149,6 +176,9 @@ export function matchCuePattern(text: string): GeorgeLocalCue | null {
         reason: item.reason,
         confidence: item.confidence,
         priority: item.priority,
+        obstacle: item.obstacle,
+        outcomeImpact: item.outcomeImpact,
+        supportStrategy: item.supportStrategy,
       }
     }
   }
