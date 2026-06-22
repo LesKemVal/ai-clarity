@@ -2773,15 +2773,18 @@ const beginProofOfAwareness = async () => {
             </label>
 
             <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Secondary outcome</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Next optional signal</div>
               <textarea
                 disabled={briefingInputsLocked}
                 value={secondaryPosition}
                 onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
                 rows={2}
                 className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
-                placeholder="What should remain visible if the room shifts?"
+                placeholder="Optional. If empty, GEORGE treats this signal as inconclusive."
               />
+              <div className="mt-1 text-[11px] leading-4 text-white/28">
+                Add the next useful thing GEORGE should determine, remember, convey, watch for, or understand. Leave blank if inconclusive.
+              </div>
             </label>
 
             <div className="text-[12px] leading-5 text-[#8FB6C9]/70">
@@ -3103,7 +3106,7 @@ const beginProofOfAwareness = async () => {
           <p>Check your device.</p>
           <p>Speak normally. Be clear.</p>
           <p>I understand your voice, your role, the room, and the desired outcome.</p>
-          <p>If I need additional signal, I will ask.</p>
+          <p>If I need additional signal, I may ask. If signal is inconclusive, we will adapt.</p>
           <p>If the room changes, we will adapt.</p>
         </div>
 
