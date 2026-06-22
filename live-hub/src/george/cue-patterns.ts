@@ -168,20 +168,23 @@ export const GEORGE_CUE_PATTERNS: CuePattern[] = [
 ]
 
 export function matchCuePattern(text: string): GeorgeLocalCue | null {
-  for (const item of GEORGE_CUE_PATTERNS) {
-    if (item.pattern.test(text)) {
-      return {
-        category: item.category,
-        cue: item.cue,
-        reason: item.reason,
-        confidence: item.confidence,
-        priority: item.priority,
-        obstacle: item.obstacle,
-        outcomeImpact: item.outcomeImpact,
-        supportStrategy: item.supportStrategy,
-      }
-    }
-  }
+  const matches = GEORGE_CUE_PATTERNS.filter((item) => item.pattern.test(text))
 
-  return null
+  if (matches.length === 0) return null
+
+  const [selected] = matches.sort((a, b) => {
+    if (b.priority !== a.priority) return b.priority - a.priority
+    return b.confidence - a.confidence
+  })
+
+  return {
+    category: selected.category,
+    cue: selected.cue,
+    reason: selected.reason,
+    confidence: selected.confidence,
+    priority: selected.priority,
+    obstacle: selected.obstacle,
+    outcomeImpact: selected.outcomeImpact,
+    supportStrategy: selected.supportStrategy,
+  }
 }
