@@ -1,3 +1,4 @@
+import { markRuntimeEvent, startRuntimeTurn } from '@/lib/george/live-metrics/runtime-metrics'
 function liveSttDebug() {
   return typeof window !== 'undefined' &&
     window.localStorage.getItem('george_live_debug') === '1'
@@ -23,6 +24,21 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
   let audioContext: AudioContext | null = null
   let audioMeterTimer: ReturnType<typeof setInterval> | null = null
   let stopped = false
+  let currentTurnId = ''
+  let sentFirstAudioChunk = false
+
+  function nextTurnId() {
+    return `live-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  }
+
+  function ensureTurnId() {
+    if (!currentTurnId) {
+      currentTurnId = nextTurnId()
+      startRuntimeTurn(currentTurnId)
+    }
+    return currentTurnId
+  }
+
 
   const globalStopKey = '__GEORGE_DEEPGRAM_STOPPERS__'
 
@@ -95,6 +111,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       },
     })
 
+    currentTurnId = nextTurnId()
+    sentFirstAudioChunk = false
+    startRuntimeTurn(currentTurnId)
+    markRuntimeEvent(currentTurnId, 'mic_open')
+
     if (stopped) {
       stream.getTracks().forEach((track) => track.stop())
       stream = null
@@ -166,6 +187,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         if (stopped) return
         if (!event.data?.size) return
         if (!socket || socket.readyState !== WebSocket.OPEN) return
+        const turnId = ensureTurnId()
+        if (!sentFirstAudioChunk) {
+          sentFirstAudioChunk = true
+          markRuntimeEvent(turnId, 'first_audio_chunk_sent')
+        }
         if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] audio chunk', { size: event.data.size })
         socket.send(event.data)
       }
@@ -184,9 +210,16 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
 
         if (!transcript.trim()) return
 
+        const turnId = ensureTurnId()
+
         if (payload?.is_final || payload?.speech_final) {
+          markRuntimeEvent(turnId, 'deepgram_final')
           handlers.onFinal?.(transcript.trim())
+          currentTurnId = nextTurnId()
+          sentFirstAudioChunk = false
+          startRuntimeTurn(currentTurnId)
         } else {
+          markRuntimeEvent(turnId, 'deepgram_interim')
           handlers.onPartial?.(transcript.trim())
         }
       } catch (error) {
