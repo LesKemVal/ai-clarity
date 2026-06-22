@@ -3075,20 +3075,9 @@ const beginProofOfAwareness = async () => {
         cleanBriefingValue(window.localStorage.getItem('george_name')) ||
         'Lester'
 
-      void (async () => {
-        await speakLiveEntryLine('Good. Hold here if the room still needs adjustment.')
-        await waitForLiveEntryVoice(4500)
+      setLiveReadinessComplete(true)
 
-        if (liveReadyConfirmSequenceRef.current !== sequence) return
-
-        await speakLiveEntryLine(`${name}, confirm when the room is ready.`)
-        await waitForLiveEntryVoice(3000)
-
-        if (liveReadyConfirmSequenceRef.current !== sequence) return
-
-        setLiveReadinessComplete(true)
-        await speakLiveEntryLine("Good. Enter LIVE when you are ready to carry the room.")
-      })()
+      void speakLiveEntryLine('Enter LIVE when you are ready.')
     }
 
     return (
