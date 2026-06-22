@@ -4086,18 +4086,8 @@ requestAnimationFrame(() => {
       throw new Error('TTS returned empty audio')
     }
 
-    const bytes = new Uint8Array(buffer)
-    let binary = ''
-    const chunkSize = 0x8000
-
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize)
-      binary += String.fromCharCode(...chunk)
-    }
-
-    const base64 = btoa(binary)
-    const dataUrl = `data:audio/mpeg;base64,${base64}`
-    return dataUrl
+    const blob = new Blob([buffer], { type: 'audio/mpeg' })
+    return URL.createObjectURL(blob)
   }
 
   function revealPendingAssistantMessage() {
@@ -4280,7 +4270,15 @@ if (activePromptContext || activePromptLabel) {
           liveRecentSpokenUtterancesRef.current = spokenMemory.recentSpokenLines
         }
 
-        speechQueueRef.current = chunks
+        if (liveMode && options?.source === 'hub' && isSpeakingRef.current) {
+          speechQueueRef.current = chunks.slice(-1)
+          return
+        }
+
+        speechQueueRef.current = liveMode && options?.source === 'hub'
+          ? chunks.slice(-1)
+          : chunks
+
         await playQueue()
       } catch {
         revealPendingAssistantMessage()

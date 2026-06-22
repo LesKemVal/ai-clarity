@@ -36,6 +36,8 @@ export function LiveHubShadowBridge({
         confidence: event.confidence,
         priority: event.priority,
       })
+
+      markRuntimeEvent(event.cue, 'hub_action_cue_received')
     })
 
     adapter.connect(context)
@@ -71,6 +73,7 @@ export function LiveHubShadowBridge({
     markRuntimeEvent(clean, 'transcript_input')
 
     getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal)
+    markRuntimeEvent(clean, 'hub_transcript_sent')
   }, [active, transcript, transcriptFinal])
 
   return null
