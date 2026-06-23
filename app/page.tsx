@@ -253,10 +253,6 @@ export default function HomePage() {
                 <p>GEORGE is designed to help users surface, understand, prioritize, and act on signal in real time.</p>
               </div>
 
-              <p className="mt-8 text-[19px] leading-8 text-black/76 md:text-[22px]">
-                Prepare GEORGE with the material that matters, then bring GEORGE into interviews, meetings, negotiations, presentations, doctor visits, and other rooms where the outcome depends on communication.
-              </p>
-
               <div className="mt-8 flex flex-wrap gap-4">
                 <button
                   type="button"
@@ -279,7 +275,7 @@ export default function HomePage() {
 
           <div className="divide-y divide-black/12">
             {[
-              ['PREPARE', 'Upload the job ad, résumé, notes, deck, offer, agenda, or context. GEORGE uses that material to understand what matters before the room starts.'],
+              ['PREPARE', 'Upload enough information and start immediately, like a job ad + résumé. GEORGE will use that material to prepare you for the room.'],
               ['ENTER THE ROOM', 'Use GEORGE on desktop, mobile, glasses, or other discreet, consent-aware interfaces. The device is transport. GEORGE is the operating layer.'],
               ['GET SUPPORT', 'GEORGE can render a cue, line, response, presentation, continuation, or silence depending on what improves the outcome.'],
               ['STAY IN CONTROL', 'You decide what to accept, change, ignore, or say. GEORGE supports judgment; GEORGE does not replace it.'],
