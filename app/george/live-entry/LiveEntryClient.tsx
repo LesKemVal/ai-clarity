@@ -1909,6 +1909,14 @@ const mandatoryLiveSignals = useMemo(() => {
     ]))
     const finalEstimate = skipPrep ? resourceEstimate : estimateWithResources(resourceEstimate, finalResources)
 
+    const selectedLiveRoomObjectiveLabel =
+      liveRoomObjectiveOption === 'other'
+        ? customLiveRoomObjective.trim()
+        : liveRoomObjectiveOption
+
+    const secondaryObjective =
+      selectedLiveRoomObjectiveLabel || ''
+
     const runtimeSupport = {
       selectedCapacityCents: finalEstimate.estimatedCents,
       selectedCapabilityIds: finalResources,
@@ -1922,6 +1930,9 @@ const mandatoryLiveSignals = useMemo(() => {
       resolvedConversationType,
       userPosition,
       knownContext,
+      secondaryObjective,
+      liveRoomObjectiveOption,
+      customLiveRoomObjective,
       chair,
       roomPackage,
       roomFormation,
@@ -1941,6 +1952,10 @@ const mandatoryLiveSignals = useMemo(() => {
       relatedSessionTitle: selectedRelatedSession?.title || null,
       knownContext,
       observedReality: knownContext,
+      secondaryObjective,
+      fallbackOutcome: secondaryObjective,
+      liveRoomObjectiveOption,
+      customLiveRoomObjective,
       roomPackage,
       language: window.localStorage.getItem('george_live_language') || 'English',
       cadence: pacing,
@@ -1996,6 +2011,8 @@ const mandatoryLiveSignals = useMemo(() => {
         ...roomPackage,
         desiredOutcome: '',
         observedReality: '',
+        secondaryObjective: '',
+        fallbackOutcome: '',
       },
     }
 

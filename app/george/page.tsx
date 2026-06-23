@@ -6166,6 +6166,7 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
         }}
@@ -6185,6 +6186,7 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
         }}
