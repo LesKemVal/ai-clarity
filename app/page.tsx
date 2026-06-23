@@ -129,20 +129,15 @@ export default function HomePage() {
         
 
         {firstFrame && (
-          <div className="pointer-events-none absolute left-5 right-5 top-[22vh] z-30 sm:left-10 sm:right-auto sm:top-[27vh] sm:max-w-[760px]">
+          <div className="pointer-events-none absolute left-5 right-5 top-[56vh] z-30 sm:left-10 sm:right-auto sm:top-[58vh] sm:max-w-[760px]">
             <div className="max-w-[560px] rounded-[24px] border border-white/10 bg-black/34 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-5">
               <p className="font-serif text-[28px] leading-[1.05] tracking-[-0.04em] text-white sm:text-[42px]">
                 Real-time support.
               </p>
 
-              <div className="mt-4 space-y-3 text-[13px] leading-6 text-white/74 sm:text-[15px] sm:leading-7">
+              <div className="mt-4 text-[13px] leading-6 text-white/74 sm:text-[15px] sm:leading-7">
                 <p>GEORGE provides real-time guidance through line-of-sight displays, discreet audio support, and other available interfaces.</p>
-                <p>GEORGE observes relevant signals, considers context and objectives, and provides cues, guidance, and response support in pursuit of your desired outcome.</p>
               </div>
-
-              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.24em] text-white/52 sm:text-[11px]">
-                Success is often determined by conversation.
-              </p>
             </div>
           </div>
         )}
@@ -212,6 +207,14 @@ export default function HomePage() {
         <div className="absolute inset-x-0 bottom-0 z-20 px-6 pb-8">
 
           <div className="mx-auto max-w-[760px] rounded-[28px] border border-white/12 bg-black/36 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.62)] backdrop-blur-xl sm:p-5">
+            {!firstFrame && (
+              <div className="mb-4 rounded-[20px] border border-white/10 bg-white/[0.045] px-4 py-3 backdrop-blur-xl sm:px-5 sm:py-4">
+                <p className="text-[13px] leading-6 text-white/72 sm:text-[15px] sm:leading-7">
+                  GEORGE observes relevant signals, adapts as situations unfold, and helps users communicate, decide, and execute in pursuit of desired outcomes.
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"

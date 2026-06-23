@@ -6172,7 +6172,9 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
+          intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
         }}
@@ -6192,7 +6194,9 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
+          intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
         }}

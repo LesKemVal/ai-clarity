@@ -17,7 +17,9 @@ export type GeorgeLiveHubContext = {
   chair?: string
   objective?: string
   knownContext?: string
+  secondaryOutcome?: string
   secondaryObjective?: string
+  intangibleObjective?: string
   userPosition?: string
   deliveryStyle?: GeorgeLiveDeliveryStyle
 }

@@ -1965,8 +1965,17 @@ const mandatoryLiveSignals = useMemo(() => {
           ? liveRoomObjectiveLabels[liveRoomObjectiveOption]
           : ''
 
-    const secondaryObjective =
+    const secondaryOutcome =
+      cleanBriefingValue((optionalSignalAnswers as any).fallbackOutcome) ||
+      cleanBriefingValue((optionalSignalAnswers as any).secondaryOutcome) ||
+      cleanBriefingValue((preLiveSignals as any).fallbackOutcome) ||
+      cleanBriefingValue((preLiveSignals as any).secondaryOutcome) ||
+      ''
+
+    const intangibleObjective =
       selectedLiveRoomObjectiveLabel || ''
+
+    const secondaryObjective = secondaryOutcome
 
     const runtimeSupport = {
       selectedCapacityCents: finalEstimate.estimatedCents,
@@ -1981,7 +1990,9 @@ const mandatoryLiveSignals = useMemo(() => {
       resolvedConversationType,
       userPosition,
       knownContext,
+      secondaryOutcome,
       secondaryObjective,
+      intangibleObjective,
       liveRoomObjectiveOption,
       customLiveRoomObjective,
       chair,
@@ -2003,8 +2014,10 @@ const mandatoryLiveSignals = useMemo(() => {
       relatedSessionTitle: selectedRelatedSession?.title || null,
       knownContext,
       observedReality: knownContext,
+      secondaryOutcome,
       secondaryObjective,
-      fallbackOutcome: secondaryObjective,
+      fallbackOutcome: secondaryOutcome,
+      intangibleObjective,
       liveRoomObjectiveOption,
       customLiveRoomObjective,
       roomPackage,
@@ -2062,8 +2075,10 @@ const mandatoryLiveSignals = useMemo(() => {
         ...roomPackage,
         desiredOutcome: '',
         observedReality: '',
+        secondaryOutcome: '',
         secondaryObjective: '',
         fallbackOutcome: '',
+        intangibleObjective: '',
       },
     }
 
@@ -3136,17 +3151,17 @@ const beginProofOfAwareness = async () => {
       <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else matters?" stage={3}>
         <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
-            Optional secondary objective
+            Optional intangible objective
           </div>
 
           <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
-            <p>Your desired outcome remains the primary objective.</p>
-            <p>People often pursue additional objectives during important conversations: trust, authority, confidence, common ground, leverage, clarity, commitment, or timeline.</p>
-            <p>Some objectives reinforce each other. Some compete with each other. GEORGE will attempt to balance them, but your desired outcome remains primary.</p>
+            <p>Your desired outcome remains primary. Any secondary outcome you gave earlier remains separate.</p>
+            <p>This step is about what GEORGE should also surface, reinforce, protect, or read while pursuing the outcome: trust, authority, confidence, common ground, leverage, clarity, commitment, or timeline.</p>
+            <p>Some objectives reinforce each other. Some compete with each other. GEORGE will attempt to balance them without replacing the primary outcome.</p>
           </div>
 
           <div className="mt-5 text-[10px] uppercase tracking-[0.22em] text-white/28">
-            What else matters in this conversation?
+            What intangible should GEORGE also watch for?
           </div>
 
           <div className="mt-3 divide-y divide-white/[0.055] border-y border-white/[0.055]">
@@ -3201,8 +3216,8 @@ const beginProofOfAwareness = async () => {
 
           <div className="mt-4 rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46">
             {selectedLiveRoomObjective
-              ? `GEORGE will treat “${selectedLiveRoomObjective.label}” as secondary to your desired outcome. If it conflicts with the outcome, GEORGE should protect the primary outcome first.`
-              : 'No secondary objective selected. GEORGE will focus on the desired outcome and adapt if useful signal appears.'}
+              ? `GEORGE will treat “${selectedLiveRoomObjective.label}” as an additional intangible objective. If it conflicts with the outcome, GEORGE should protect the primary outcome first.`
+              : 'No intangible objective selected. GEORGE will focus on the desired outcome and adapt if useful signal appears.'}
           </div>
         </div>
 
