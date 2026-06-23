@@ -1403,7 +1403,24 @@ const mandatoryLiveSignals = useMemo(() => {
       .catch(() => {})
 
     try {
-      const acquiredSignals = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+      const params = new URLSearchParams(window.location.search)
+      const shouldResetLiveEntry =
+        params.get('source') === 'start' ||
+        window.localStorage.getItem('george_start_new_live') === '1'
+
+      if (shouldResetLiveEntry) {
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+        window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
+        window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
+        window.localStorage.removeItem('GEORGE_LIVE_SETUP')
+        window.localStorage.removeItem('george_live_setup_active')
+        window.localStorage.removeItem('george_live_runtime_support')
+      }
+
+      const acquiredSignals = shouldResetLiveEntry
+        ? {}
+        : JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
       setPreLiveSignals(acquiredSignals)
 
       if (acquiredSignals.name) {
@@ -1469,19 +1486,39 @@ const mandatoryLiveSignals = useMemo(() => {
         window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
         window.localStorage.removeItem('GEORGE_LIVE_SETUP')
         window.localStorage.removeItem('george_live_setup_active')
+        window.localStorage.removeItem('george_live_runtime_support')
+        window.localStorage.removeItem('george_active_live_session_id')
+        window.localStorage.removeItem('george_active_campaign_session_id')
+        window.localStorage.removeItem('george_active_campaign')
+        window.localStorage.removeItem('george_active_context')
+        window.localStorage.removeItem('george_active_label')
 
         setPreLiveSignals({})
+        setOptionalSignalAnswers({})
+        setSkippedOptionalSignalKeys([])
+        setCurrentOptionalSignalQuestion(null)
+        setOptionalSignalInput('')
+        setOptionalSignalComplete(false)
         setShowOpenAISignalSurface(false)
         setShowPrepPreview(false)
         setShowLiveBriefingRoom(false)
         setLiveEntryMandatoryMode(false)
-        setPreLivePreviewReady(true)
+        setPreLivePreviewReady(false)
         setMandatorySignalStep(0)
         setMandatorySignalInput('')
         setObjective('')
         setKnownContext('')
+        setAudienceType('')
+        setUserPosition('')
         setChairs([])
         setCustomChair('')
+        setLiveRoomObjectiveOption('')
+        setCustomLiveRoomObjective('')
+        setLiveBriefingStep(1)
+        setLiveBriefingToaAccepted(false)
+        setLiveRecoveryAcknowledged(false)
+        setLiveReadyAccepted(false)
+        setLiveReadinessComplete(false)
       }
 
       const acquiredSignalsForAccess = isStartSource
