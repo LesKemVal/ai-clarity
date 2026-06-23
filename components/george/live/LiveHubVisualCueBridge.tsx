@@ -37,9 +37,32 @@ export function LiveHubVisualCueBridge({
   const lastRenderedAtRef = useRef(0)
 
   const handleVisualCue = useCallback((cue: GeorgeDeliveryCue) => {
-    const clean = String(cue.text || '').trim()
-    if (!clean) return
-    if (lastCueRef.current === clean) return
+    const clean = String(cue.text || '')
+      .trim()
+      .replace(/^[“”"']+|[“”"']+$/g, '')
+
+    console.info('[LIVE][visual-bridge][candidate]', {
+      clean,
+      source: cue.source,
+      priority: cue.priority,
+      confidence: cue.confidence,
+      receiverProfile,
+      voiceEnabled,
+      hasVisualCue: Boolean(visualCue),
+      lastCue: lastCueRef.current,
+      currentPriority: currentPriorityRef.current,
+      ageMs: Date.now() - lastRenderedAtRef.current,
+    })
+
+    if (!clean) {
+      console.info('[LIVE][visual-bridge][blocked]', 'empty')
+      return
+    }
+
+    if (lastCueRef.current === clean) {
+      console.info('[LIVE][visual-bridge][blocked]', 'duplicate')
+      return
+    }
 
     const now = Date.now()
     const cueAgeMs = now - lastRenderedAtRef.current
@@ -48,8 +71,15 @@ export function LiveHubVisualCueBridge({
       cueAgeMs > 2600 ||
       cue.priority > currentPriorityRef.current + 18
 
-    if (!canInterruptCurrentCue) return
-    if (visualCue && cue.priority < currentPriorityRef.current) return
+    if (!canInterruptCurrentCue) {
+      console.info('[LIVE][visual-bridge][blocked]', 'current cue hold')
+      return
+    }
+
+    if (visualCue && cue.priority < currentPriorityRef.current) {
+      console.info('[LIVE][visual-bridge][blocked]', 'lower priority')
+      return
+    }
 
     lastCueRef.current = clean
     currentPriorityRef.current = cue.priority
@@ -95,8 +125,8 @@ export function LiveHubVisualCueBridge({
       receiverProfile === 'audio_only'
         ? 0
         : receiverProfile === 'audio_visual'
-          ? 6500
-          : 9000
+          ? 12000
+          : 12000
 
     if (holdMs <= 0) return
 
@@ -119,7 +149,7 @@ export function LiveHubVisualCueBridge({
       />
 
       {active && visualCue && receiverProfile !== 'audio_only' && (
-        <div className="pointer-events-none fixed bottom-[184px] left-6 right-6 z-[120] md:left-8 md:right-auto md:w-[440px]">
+        <div className="pointer-events-none fixed bottom-[236px] left-6 right-6 z-[9999] md:left-8 md:right-auto md:w-[440px]">
           <div className="rounded-2xl border border-emerald-300/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl">
             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
               GEORGE

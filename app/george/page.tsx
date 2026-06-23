@@ -4219,7 +4219,13 @@ if (activePromptContext || activePromptLabel) {
                 if (turnId) {
                   markRuntimeEvent(turnId, 'tts_playback_start')
                 }
-                console.info('[GEORGE AUDIO PLAYING]')
+                console.info('[GEORGE AUDIO PLAYING]', {
+                  muted: audio.muted,
+                  volume: audio.volume,
+                  duration: audio.duration,
+                  readyState: audio.readyState,
+                  currentSrc: audio.currentSrc ? 'set' : 'missing',
+                })
               }).catch((err) => {
                 if (stopSpeechRef.current) {
                   resolve()
