@@ -2300,9 +2300,6 @@ const beginProofOfAwareness = async () => {
     if (!showLiveBriefingRoom) return
     if (liveBriefingStep !== 1) return
 
-    liveBriefingConfirmSequenceRef.current += 1
-    const sequence = liveBriefingConfirmSequenceRef.current
-
     if (!liveBriefingToaAccepted) {
       setLiveBriefingReadyToContinue(false)
 
@@ -2313,46 +2310,14 @@ const beginProofOfAwareness = async () => {
       if (liveBriefingTermsPreviouslyAcceptedRef.current) {
         liveBriefingTermsPreviouslyAcceptedRef.current = false
         liveBriefingHasReopenedEditsRef.current = true
-        void speakLiveEntryLine('Take your time. I’ll stay with the room while you adjust it.')
       }
 
       return
     }
 
     liveBriefingTermsPreviouslyAcceptedRef.current = true
-    setLiveBriefingReadyToContinue(false)
-
-    void (async () => {
-      const isRecheck = liveBriefingHasReopenedEditsRef.current
-
-      if (!isRecheck) {
-        await speakLiveEntryLine('Good. Hold here if the room still needs adjustment.')
-        await waitForLiveEntryVoice(5000)
-
-        if (liveBriefingConfirmSequenceRef.current !== sequence) return
-
-        setLiveBriefingReadyToContinue(true)
-        await speakLiveEntryLine("We can continue.")
-        return
-      }
-
-      setLiveBriefingReadyToContinue(true)
-
-      void speakLiveEntryLine('The room is ready when you are.')
-    })()
-  }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted])
-
-  useEffect(() => {
-    if (!showLiveBriefingRoom) return
-    if (spokenLiveBriefingStep === liveBriefingStep) return
-
-    setSpokenLiveBriefingStep(liveBriefingStep)
-
-    if (liveBriefingStep === 1) {
-      const name = getLiveRoomUserName()
-      void speakLiveEntryLine(`${name}, review the room. Edit anything that changed, then confirm responsibility before we continue.`)
-    }
-  }, [showLiveBriefingRoom, liveBriefingStep, spokenLiveBriefingStep, sessionEmail])
+    setLiveBriefingReadyToContinue(true)
+  }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted, knownContext])
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return
@@ -2370,7 +2335,6 @@ const beginProofOfAwareness = async () => {
     if (!actualEditOccurred) return
 
     setLiveBriefingEditAcknowledged(true)
-    void speakLiveEntryLine('I have your updates. I’ll carry them into the room.')
   }, [
     showLiveBriefingRoom,
     liveBriefingToaAccepted,
@@ -2791,9 +2755,6 @@ const beginProofOfAwareness = async () => {
               </div>
             </label>
 
-            <div className="text-[12px] leading-5 text-[#8FB6C9]/70">
-              Estimated LIVE support: {estimatedCents}¢
-            </div>
           </div>
 
           <label className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-2.5 transition ${
@@ -3017,7 +2978,6 @@ const beginProofOfAwareness = async () => {
                 onChange={(event) => {
                   if (event.target.checked) {
                     confirmPrivacyAndContinue()
-                    void speakLiveEntryLine('Good. I’ll keep this room tied to this session.')
                     return
                   }
 
@@ -3082,15 +3042,7 @@ const beginProofOfAwareness = async () => {
 
       if (!checked) return
 
-      const name =
-        cleanBriefingValue(window.localStorage.getItem('george_profile_name')) ||
-        cleanBriefingValue(window.localStorage.getItem('george_user_name')) ||
-        cleanBriefingValue(window.localStorage.getItem('george_name')) ||
-        'Lester'
-
       setLiveReadinessComplete(true)
-
-      void speakLiveEntryLine('Enter LIVE when you are ready.')
     }
 
     const liveRoomObjectiveOptions: Array<{
