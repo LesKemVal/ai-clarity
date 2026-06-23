@@ -5,27 +5,18 @@ import { useRouter } from 'next/navigation'
 
 const scenes = [
   {
-    image: '/images/home/foams100.png',
+    image: '/hero/interview/interview10.png',
+    overlays: false,
     renders: [
-      'Observation: Interest is present.',
-      'Cue: Establish relevance.',
-      'Say: "I think this aligns with what you are already building."',
+      'Not clear, not certain — you are on your own.',
     ],
   },
   {
-    image: '/hero/foam/scene2.png',
+    image: '/hero/interview/interview11.png',
+    overlays: true,
     renders: [
-      'Observation: They want reassurance before commitment.',
-      'Cue: Explain the next step clearly.',
-      'Say: "Here is what support looks like after today."',
-    ],
-  },
-  {
-    image: '/hero/foam/scene3.png',
-    renders: [
-      'Observation: The room is receptive but waiting for proof.',
-      'Cue: Give a concrete example.',
-      'Say: "Here is how I handled that in practice."',
+      'Say: "I think the important question isn\'t whether I can do the work. It\'s how quickly I can begin creating value for the team."',
+      'Say: "I think the important question isn\'t whether I can do the work. It\'s how quickly I can begin creating value for the team."',
     ],
   },
 ]
@@ -37,34 +28,34 @@ export default function HomePage() {
   const [glassesStep, setGlassesStep] = useState(0)
   const [renderIndex, setRenderIndex] = useState(0)
   const [typedRender, setTypedRender] = useState('')
+  const [overlayVisible, setOverlayVisible] = useState(false)
   const scene = scenes[sceneIndex] || scenes[0]
+  const sceneShowsOverlay = Boolean(scene.overlays)
   const liveRender = scene.renders[renderIndex % scene.renders.length] || scene.renders[0]
+  const firstFrame = sceneIndex === 0
 
   useEffect(() => {
-    const stepOne = window.setTimeout(() => setGlassesStep(1), 700)
-    const stepTwo = window.setTimeout(() => setGlassesStep(2), 1400)
-    const stepThree = window.setTimeout(() => setGlassesStep(3), 2100)
-    const finishIntro = window.setTimeout(() => setGlassesOn(true), 3100)
-
     const timer = window.setInterval(() => {
       setSceneIndex((current) => (current + 1) % scenes.length)
-    }, 7000)
+    }, 11200)
 
     return () => {
-      window.clearTimeout(stepOne)
-      window.clearTimeout(stepTwo)
-      window.clearTimeout(stepThree)
-      window.clearTimeout(finishIntro)
       window.clearInterval(timer)
     }
   }, [])
 
   useEffect(() => {
     setRenderIndex(0)
+    setTypedRender('')
+    setOverlayVisible(false)
+
+    const overlayTimer = window.setTimeout(() => setOverlayVisible(true), 1700)
+
+    return () => window.clearTimeout(overlayTimer)
   }, [sceneIndex])
 
   useEffect(() => {
-    if (!glassesOn) return
+    if (!overlayVisible) return
 
     const timer = window.setInterval(() => {
       setRenderIndex((current) => {
@@ -80,10 +71,10 @@ export default function HomePage() {
     }, 2800)
 
     return () => window.clearInterval(timer)
-  }, [glassesOn, sceneIndex, scene.renders.length])
+  }, [overlayVisible, sceneIndex, scene.renders.length])
 
   useEffect(() => {
-    if (!glassesOn) return
+    if (!overlayVisible) return
 
     setTypedRender('')
 
@@ -98,7 +89,7 @@ export default function HomePage() {
     }, 26)
 
     return () => window.clearInterval(timer)
-  }, [glassesOn, liveRender])
+  }, [overlayVisible, liveRender])
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
@@ -110,13 +101,13 @@ export default function HomePage() {
       <section className="relative min-h-[100dvh] overflow-hidden bg-[#030405]">
         {scenes.map((item, index) => (
           <div
-            key={item.image}
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-[1400ms] ease-out ${
+            key={`${item.image}-${index}`}
+            className={`absolute inset-0 bg-cover bg-[center_top] sm:bg-center transition-opacity duration-[1400ms] ease-out ${
               index === sceneIndex ? 'opacity-100' : 'opacity-0'
             }`}
             style={{
               backgroundImage: `url(${item.image})`,
-              transform: 'scale(1.02)',
+              transform: 'scale(1.005)',
             }}
           />
         ))}
@@ -136,43 +127,58 @@ export default function HomePage() {
         </header>
 
         
+
+        {firstFrame && (
+          <div className="pointer-events-none absolute left-5 right-5 top-[15vh] z-30 sm:left-10 sm:right-auto sm:top-[20vh] sm:max-w-[760px]">
+            <div className="rounded-[24px] border border-white/10 bg-black/34 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-6">
+              <p className="font-serif text-[28px] leading-[1.05] tracking-[-0.04em] text-white sm:text-[46px]">
+                Clarity, confidence —
+                <br />
+                real-time guidance in your line of sight or through discreet audio support.
+              </p>
+
+              <p className="mt-5 text-[14px] leading-6 text-white/74 sm:text-[17px] sm:leading-7">
+                GEORGE observes relevant signals, considers context and objectives, and provides cues, guidance, and response support in pursuit of your desired outcome.
+              </p>
+
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.24em] text-white/52 sm:text-[11px]">
+                Success is often determined by conversation.
+              </p>
+            </div>
+          </div>
+        )}
+
 <div className="pointer-events-none absolute inset-0 z-10">
 
-          {!glassesOn && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="relative transition-all duration-700 ease-out"
-                style={{
-                  transform: `scale(${[1, 1.45, 2.15, 3.15][glassesStep]})`,
-                  opacity: [1, 0.88, 0.58, 0.12][glassesStep],
-                }}
-              >
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.35em] text-white/70">
-                  AI GLASSES VIEW
-                </div>
 
-                <svg
-                  viewBox="0 0 1200 520"
-                  className="w-[92vw] max-w-[980px]"
-                >
-                  <path
-                    d="M178 260 C178 152 246 102 365 102 C468 102 533 148 548 242 C566 203 598 184 640 184 C682 184 714 203 732 242 C747 148 812 102 915 102 C1034 102 1102 152 1102 260 C1102 365 1030 418 914 418 C795 418 740 355 732 271 C714 310 682 328 640 328 C598 328 566 310 548 271 C540 355 485 418 366 418 C250 418 178 365 178 260Z"
-                    fill="rgba(255,255,255,0.03)"
-                    stroke="rgba(255,255,255,0.45)"
-                    strokeWidth="8"
-                  />
-                </svg>
+
+          {overlayVisible && sceneShowsOverlay && (
+            <div className="absolute inset-0 px-4 pt-[12vh] sm:px-10 sm:pt-[14vh]">
+              <div className="pointer-events-none absolute right-[148px] top-[20vh] hidden h-px w-[72px] bg-white/[0.18] sm:block" />
+              <div className="pointer-events-none absolute right-[148px] top-[18.7vh] hidden font-mono text-[7px] uppercase tracking-[0.22em] text-white/34 sm:block">
+                glasses signal layer
               </div>
-            </div>
-          )}
 
-          {glassesOn && (
-            <div className="absolute inset-0 px-6 pt-[15vh] sm:px-12 sm:pt-[18vh]">
+              <div className="pointer-events-none absolute left-[5vw] top-[22vh] border-l border-white/[0.16] pl-2 font-mono sm:left-[10vw] sm:top-[28vh]">
+                <div className="text-[7px] uppercase tracking-[0.26em] text-white/34">signal</div>
+                <div className="mt-1 text-[10px] text-white/68 sm:text-[11px]">evaluating risk</div>
+              </div>
+
+              <div className="pointer-events-none absolute right-[6vw] top-[27vh] border-l border-white/[0.16] pl-2 font-mono sm:right-[12vw] sm:top-[30vh]">
+                <div className="text-[7px] uppercase tracking-[0.26em] text-white/34">signal</div>
+                <div className="mt-1 text-[10px] text-white/68 sm:text-[11px]">needs proof</div>
+              </div>
+
+              <div className="pointer-events-none absolute left-[14vw] top-[42vh] border-l border-white/[0.12] pl-2 font-mono sm:left-[20vw] sm:top-[44vh]">
+                <div className="text-[7px] uppercase tracking-[0.26em] text-white/30">signal</div>
+                <div className="mt-1 text-[10px] text-white/62 sm:text-[11px]">interest present</div>
+              </div>
+
               <div
                 key={liveRender}
-                className="max-w-[560px]"
+                className="absolute left-1/2 top-[48vh] w-[82vw] max-w-[520px] -translate-x-1/2 rounded-[14px] border border-white/[0.08] bg-black/[0.22] px-3.5 py-2.5 shadow-[0_18px_62px_rgba(0,0,0,0.34)] backdrop-blur-sm sm:top-[54vh] sm:px-4 sm:py-3"
               >
-                <div className="flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.38em] text-white/34">
+                <div className="mb-2 flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.34em] text-white/38">
                   <span className="h-px w-7 bg-white/16" />
                   <span>
                     {liveRender.startsWith('Say:') || liveRender.startsWith('Ask:')
@@ -183,14 +189,14 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <div className="mt-2 max-w-[520px] border-l border-white/[0.14] pl-3">
-                  <div className="font-mono text-[12px] leading-6 tracking-[0.02em] text-white/78 sm:text-[14px] sm:leading-7">
+                <div className="border-l border-white/[0.14] pl-3">
+                  <div className="font-mono text-[11px] leading-5 tracking-[0.02em] text-white/82 sm:text-[14px] sm:leading-6">
                     {typedRender
                       .replace(/^Observation:\s*/i, '')
                       .replace(/^Cue:\s*/i, '')
                       .replace(/^Say:\s*/i, '')
                       .replace(/^Ask:\s*/i, '')}
-                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/52" />
+                    <span className="ml-1 inline-block h-[1em] w-px translate-y-[2px] animate-pulse bg-white/58" />
                   </div>
                 </div>
               </div>
@@ -233,7 +239,21 @@ export default function HomePage() {
             </h1>
 
             <div className="max-w-2xl">
-              <p className="text-[19px] leading-8 text-black/76 md:text-[22px]">
+              <div className="space-y-5 text-[15px] leading-7 text-black/68 md:text-[17px] md:leading-8">
+                <p>Every decision is made from signals.</p>
+
+                <p>A pause before an answer, a pricing objection, a change in tone, a deadline, a title, a concern, or a question that wasn't asked. These signals, if not missed, tell us something.</p>
+
+                <p>Most people notice some of these signals. GEORGE can recognize, organize, remember, connect, reason and make sense of thousands of these &quot;tells&quot;, simultaneously - which can translate into better decisions, stronger relationships, improved negotiations, more sales, greater trust, better hiring decisions, better investments, reduced risk, increased revenue, and better outcomes overall.</p>
+
+                <p>The more signal GEORGE receives, the better it understands the conversation, the people involved, the pressures that exist, and the outcomes that matter.</p>
+
+                <p>Good decisions are often the result of recognizing the right signal at the right moment.</p>
+
+                <p>GEORGE is designed to help users surface, understand, prioritize, and act on signal in real time.</p>
+              </div>
+
+              <p className="mt-8 text-[19px] leading-8 text-black/76 md:text-[22px]">
                 Prepare GEORGE with the material that matters, then bring GEORGE into interviews, meetings, negotiations, presentations, doctor visits, and other rooms where the outcome depends on communication.
               </p>
 
@@ -277,6 +297,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer className="bg-[#030405] px-6 py-8 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[0.22em] text-white/42 sm:flex-row sm:items-center sm:justify-between">
+          <span>BRANESx by R. Block Share Holdings, LLC</span>
+          <span>© 2026 R. Block Share Holdings, LLC. All rights reserved.</span>
+        </div>
+      </footer>
 
     </main>
   )
