@@ -3082,17 +3082,23 @@ const beginProofOfAwareness = async () => {
       liveRoomObjectiveOptions.find((option) => option.id === liveRoomObjectiveOption)
 
     return (
-      <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else should GEORGE watch for?" stage={3}>
+      <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else matters?" stage={3}>
         <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
             Optional secondary objective
           </div>
 
-          <p className="mt-3 text-[14px] leading-6 text-[#D7DBE4]/68">
-            While pursuing your desired outcome, GEORGE can also try to surface, reinforce, confirm, learn, or acquire something useful from the conversation. Choose one if it helps. Leave it empty if inconclusive.
-          </p>
+          <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
+            <p>Your desired outcome remains the primary objective.</p>
+            <p>People often pursue additional objectives during important conversations: trust, authority, confidence, common ground, leverage, clarity, commitment, or timeline.</p>
+            <p>Some objectives reinforce each other. Some compete with each other. GEORGE will attempt to balance them, but your desired outcome remains primary.</p>
+          </div>
 
-          <div className="mt-4 divide-y divide-white/[0.055] border-y border-white/[0.055]">
+          <div className="mt-5 text-[10px] uppercase tracking-[0.22em] text-white/28">
+            What else matters in this conversation?
+          </div>
+
+          <div className="mt-3 divide-y divide-white/[0.055] border-y border-white/[0.055]">
             {liveRoomObjectiveOptions.map((option) => {
               const active = liveRoomObjectiveOption === option.id
 
