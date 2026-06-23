@@ -590,6 +590,17 @@ function AwakeButton({
 
 type LiveBriefingSupportPanelId = 'advice' | 'completion' | 'response' | 'presentation' | 'steering'
 
+type LiveRoomObjectiveOptionId =
+  | 'project_strength'
+  | 'build_trust'
+  | 'find_leverage'
+  | 'find_common_ground'
+  | 'surface_objections'
+  | 'confirm_authority'
+  | 'confirm_concern'
+  | 'confirm_timeline'
+  | 'other'
+
 type LiveBriefingSupportPanel = {
   id: LiveBriefingSupportPanelId
   label: string
@@ -889,6 +900,8 @@ export default function LiveEntryClient() {
   })
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
+  const [liveRoomObjectiveOption, setLiveRoomObjectiveOption] = useState<LiveRoomObjectiveOptionId | ''>('')
+  const [customLiveRoomObjective, setCustomLiveRoomObjective] = useState('')
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState('')
   const [liveBriefingSttError, setLiveBriefingSttError] = useState('')
   const [editableResources, setEditableResources] = useState<string[]>([])
@@ -3080,14 +3093,91 @@ const beginProofOfAwareness = async () => {
       void speakLiveEntryLine('Enter LIVE when you are ready.')
     }
 
+    const liveRoomObjectiveOptions: Array<{
+      id: LiveRoomObjectiveOptionId
+      label: string
+      line: string
+    }> = [
+      { id: 'project_strength', label: 'Project strength', line: 'Reinforce competence, confidence, and command of the conversation.' },
+      { id: 'build_trust', label: 'Build trust', line: 'Reduce doubt and help the other side feel safer moving forward.' },
+      { id: 'find_leverage', label: 'Find leverage', line: 'Surface information that may improve negotiating position later.' },
+      { id: 'find_common_ground', label: 'Find common ground', line: 'Identify shared interests, mutual benefit, or a path to agreement.' },
+      { id: 'surface_objections', label: 'Surface objections', line: 'Listen for resistance that may not be stated directly.' },
+      { id: 'confirm_authority', label: 'Confirm authority', line: 'Determine who can approve, decide, buy, hire, or move the matter forward.' },
+      { id: 'confirm_concern', label: 'Confirm concern', line: 'Clarify what is really creating hesitation, risk, or resistance.' },
+      { id: 'confirm_timeline', label: 'Confirm timeline', line: 'Identify urgency, deadlines, delay risk, or next-step timing.' },
+      { id: 'other', label: 'Other', line: 'Tell GEORGE what else to look for, reinforce, confirm, or help acquire.' },
+    ]
+
+    const selectedLiveRoomObjective =
+      liveRoomObjectiveOptions.find((option) => option.id === liveRoomObjectiveOption)
+
     return (
-      <PanelShell label="BRIEF ROOM · READINESS" title="Ready Room." stage={3}>
-        <div className="mt-5 space-y-3 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 text-[13px] leading-6 text-[#D7DBE4]/68 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
-          <p>Check your device.</p>
-          <p>Speak normally. Be clear.</p>
-          <p>I understand your voice, your role, the room, and the desired outcome.</p>
-          <p>If I need additional signal, I may ask. If signal is inconclusive, we will adapt.</p>
-          <p>If the room changes, we will adapt.</p>
+      <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else should GEORGE watch for?" stage={3}>
+        <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
+          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
+            Optional secondary objective
+          </div>
+
+          <p className="mt-3 text-[14px] leading-6 text-[#D7DBE4]/68">
+            While pursuing your desired outcome, GEORGE can also try to surface, reinforce, confirm, learn, or acquire something useful from the conversation. Choose one if it helps. Leave it empty if inconclusive.
+          </p>
+
+          <div className="mt-4 divide-y divide-white/[0.055] border-y border-white/[0.055]">
+            {liveRoomObjectiveOptions.map((option) => {
+              const active = liveRoomObjectiveOption === option.id
+
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => {
+                    setLiveRoomObjectiveOption(active ? '' : option.id)
+                    if (option.id !== 'other') setCustomLiveRoomObjective('')
+                  }}
+                  className="w-full py-3 text-left"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
+                      active
+                        ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                        : 'bg-white/[0.14]'
+                    }`} />
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
+                        {option.label}
+                      </span>
+                      <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                        {option.line}
+                      </span>
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          {liveRoomObjectiveOption === 'other' && (
+            <label className="mt-4 block">
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
+                Other
+              </span>
+              <textarea
+                value={customLiveRoomObjective}
+                onChange={(event) => setCustomLiveRoomObjective(event.target.value)}
+                rows={3}
+                placeholder="What should GEORGE help surface, reinforce, confirm, learn, or acquire?"
+                className="mt-2 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+              />
+            </label>
+          )}
+
+          <div className="mt-4 rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46">
+            {selectedLiveRoomObjective
+              ? `GEORGE will treat “${selectedLiveRoomObjective.label}” as secondary to your desired outcome. If it conflicts with the outcome, GEORGE should protect the primary outcome first.`
+              : 'No secondary objective selected. GEORGE will focus on the desired outcome and adapt if useful signal appears.'}
+          </div>
         </div>
 
         <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
