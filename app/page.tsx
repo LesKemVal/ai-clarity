@@ -129,17 +129,16 @@ export default function HomePage() {
         
 
         {firstFrame && (
-          <div className="pointer-events-none absolute left-5 right-5 top-[15vh] z-30 sm:left-10 sm:right-auto sm:top-[20vh] sm:max-w-[760px]">
-            <div className="rounded-[24px] border border-white/10 bg-black/34 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-6">
-              <p className="font-serif text-[28px] leading-[1.05] tracking-[-0.04em] text-white sm:text-[46px]">
-                Clarity, confidence —
-                <br />
-                real-time guidance in your line of sight or through discreet audio support.
+          <div className="pointer-events-none absolute left-5 right-5 top-[22vh] z-30 sm:left-10 sm:right-auto sm:top-[27vh] sm:max-w-[760px]">
+            <div className="max-w-[560px] rounded-[24px] border border-white/10 bg-black/34 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-md sm:p-5">
+              <p className="font-serif text-[28px] leading-[1.05] tracking-[-0.04em] text-white sm:text-[42px]">
+                Real-time support.
               </p>
 
-              <p className="mt-5 text-[14px] leading-6 text-white/74 sm:text-[17px] sm:leading-7">
-                GEORGE observes relevant signals, considers context and objectives, and provides cues, guidance, and response support in pursuit of your desired outcome.
-              </p>
+              <div className="mt-4 space-y-3 text-[13px] leading-6 text-white/74 sm:text-[15px] sm:leading-7">
+                <p>GEORGE provides real-time guidance through line-of-sight displays, discreet audio support, and other available interfaces.</p>
+                <p>GEORGE observes relevant signals, considers context and objectives, and provides cues, guidance, and response support in pursuit of your desired outcome.</p>
+              </div>
 
               <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.24em] text-white/52 sm:text-[11px]">
                 Success is often determined by conversation.
@@ -154,8 +153,8 @@ export default function HomePage() {
 
           {overlayVisible && sceneShowsOverlay && (
             <div className="absolute inset-0 px-4 pt-[12vh] sm:px-10 sm:pt-[14vh]">
-              <div className="pointer-events-none absolute right-[148px] top-[20vh] hidden h-px w-[72px] bg-white/[0.18] sm:block" />
-              <div className="pointer-events-none absolute right-[148px] top-[18.7vh] hidden font-mono text-[7px] uppercase tracking-[0.22em] text-white/34 sm:block">
+              <div className="pointer-events-none absolute right-[148px] top-[14.5vh] hidden h-px w-[72px] bg-white/[0.18] sm:block" />
+              <div className="pointer-events-none absolute right-[148px] top-[13.2vh] hidden font-mono text-[7px] uppercase tracking-[0.22em] text-white/34 sm:block">
                 glasses signal layer
               </div>
 
@@ -164,7 +163,12 @@ export default function HomePage() {
                 <div className="mt-1 text-[10px] text-white/68 sm:text-[11px]">evaluating risk</div>
               </div>
 
-              <div className="pointer-events-none absolute right-[6vw] top-[27vh] border-l border-white/[0.16] pl-2 font-mono sm:right-[12vw] sm:top-[30vh]">
+              <div className="pointer-events-none absolute left-1/2 top-[19vh] -translate-x-1/2 border-l border-white/[0.14] pl-2 font-mono">
+                <div className="text-[7px] uppercase tracking-[0.26em] text-white/32">signal</div>
+                <div className="mt-1 text-[10px] text-white/64 sm:text-[11px]">shared objective</div>
+              </div>
+
+              <div className="pointer-events-none absolute right-[3vw] top-[15vh] border-l border-white/[0.16] pl-2 font-mono sm:right-[5vw] sm:top-[17vh]">
                 <div className="text-[7px] uppercase tracking-[0.26em] text-white/34">signal</div>
                 <div className="mt-1 text-[10px] text-white/68 sm:text-[11px]">needs proof</div>
               </div>
