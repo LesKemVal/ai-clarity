@@ -1909,10 +1909,24 @@ const mandatoryLiveSignals = useMemo(() => {
     ]))
     const finalEstimate = skipPrep ? resourceEstimate : estimateWithResources(resourceEstimate, finalResources)
 
+    const liveRoomObjectiveLabels: Record<LiveRoomObjectiveOptionId, string> = {
+      project_strength: 'Project strength',
+      build_trust: 'Build trust',
+      find_leverage: 'Find leverage',
+      find_common_ground: 'Find common ground',
+      surface_objections: 'Surface objections',
+      confirm_authority: 'Confirm authority',
+      confirm_concern: 'Confirm concern',
+      confirm_timeline: 'Confirm timeline',
+      other: 'Other',
+    }
+
     const selectedLiveRoomObjectiveLabel =
       liveRoomObjectiveOption === 'other'
         ? customLiveRoomObjective.trim()
         : liveRoomObjectiveOption
+          ? liveRoomObjectiveLabels[liveRoomObjectiveOption]
+          : ''
 
     const secondaryObjective =
       selectedLiveRoomObjectiveLabel || ''
