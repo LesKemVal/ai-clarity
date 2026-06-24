@@ -18,7 +18,7 @@ export type LiveHubContext = {
 
 export type ClientMessage =
   | { type: 'SYNC_CONTEXT'; context: LiveHubContext }
-  | { type: 'TRANSCRIPT_INPUT'; text: string; isFinal?: boolean; turnId?: string }
+  | { type: 'TRANSCRIPT_INPUT'; text: string; isFinal?: boolean; turnId?: string; deliveryStyle?: LiveHubDeliveryStyle }
   | { type: 'PING'; at?: number }
 
 export type ServerMessage =

@@ -35,12 +35,16 @@ export function createDeepgramStream(params: {
     isFinal: boolean
     source: 'deepgram' | 'client'
     turnId?: string
+    deliveryStyle?: LiveHubContext['deliveryStyle']
   }) {
     const transcript = input.transcript.trim()
     if (!transcript) return
 
     const turnStartAt = Date.now()
     const activeTurnId = input.turnId
+    const turnContext = input.deliveryStyle
+      ? { ...params.getContext(), deliveryStyle: input.deliveryStyle }
+      : params.getContext()
     const isFinal = input.isFinal
 
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'transcript_received'))
@@ -66,7 +70,7 @@ export function createDeepgramStream(params: {
 
     const cue = resolveLocalCue({
       transcript,
-      context: params.getContext(),
+      context: turnContext,
       isFinal,
     })
 
@@ -87,7 +91,7 @@ export function createDeepgramStream(params: {
     const packet = buildRuntimePacket({
       transcript,
       isFinal,
-      context: params.getContext(),
+      context: turnContext,
       cue,
     })
 
@@ -233,12 +237,18 @@ export function createDeepgramStream(params: {
       dg.send(audio)
     },
 
-    handleTranscriptInput(text: string, isFinal = true, turnId?: string) {
+    handleTranscriptInput(
+      text: string,
+      isFinal = true,
+      turnId?: string,
+      deliveryStyle?: LiveHubContext['deliveryStyle']
+    ) {
       processTranscript({
         transcript: text,
         isFinal,
         source: 'client',
         turnId,
+        deliveryStyle,
       })
     },
 
