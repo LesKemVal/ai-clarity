@@ -58,7 +58,9 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
                 ? 'SILENT CONTRACT: Return exactly SILENT.'
                 : 'CUE CONTRACT: Return one concise tactical cue only. 3 to 8 words. No explanation.'
 
-  const systemPrompt = `You are GEORGE LIVE. ${modeContract}${operationalContextPrompt}`
+  const contextContract = 'Use the supplied room, chair, objective, knownContext, secondaryOutcome, secondaryObjective, intangibleObjective, and userPosition as operational context. Do not default to generic business, startup, investor, sales, or consulting language. Reason from the supplied room context first.'
+
+  const systemPrompt = `You are GEORGE LIVE. ${contextContract} ${modeContract}${operationalContextPrompt}`
 
   const response = await groq.chat.completions.create({
     model,
@@ -89,6 +91,13 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
           supportStrategy: packet.supportStrategy,
           pressure: packet.pressure,
           objective: packet.objective,
+          room: packet.room,
+          chair: packet.chair,
+          knownContext: packet.knownContext,
+          secondaryOutcome: packet.secondaryOutcome,
+          secondaryObjective: packet.secondaryObjective,
+          intangibleObjective: packet.intangibleObjective,
+          userPosition: packet.userPosition,
           localCue: packet.cue,
           reason: packet.reason,
           deliveryStyle,

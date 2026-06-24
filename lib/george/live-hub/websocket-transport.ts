@@ -54,6 +54,14 @@ export function createGeorgeLiveHubWebSocketTransport(params: {
       ws.send(JSON.stringify(message))
     },
 
+    syncContext(context?: GeorgeLiveHubContext) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return
+      ws.send(JSON.stringify({
+        type: 'SYNC_CONTEXT',
+        context: context || {},
+      }))
+    },
+
     close() {
       ws?.close()
       ws = null

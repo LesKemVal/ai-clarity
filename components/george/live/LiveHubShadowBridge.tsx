@@ -47,6 +47,13 @@ export function LiveHubShadowBridge({
       unsubscribe()
       adapter.disconnect()
     }
+  }, [active])
+
+  useEffect(() => {
+    if (!active) return
+    if (!isGeorgeLiveHubEnabled()) return
+
+    getGeorgeLiveHubRuntimeAdapter().syncContext(context)
   }, [
     active,
     context.room,
@@ -54,6 +61,10 @@ export function LiveHubShadowBridge({
     context.objective,
     context.knownContext,
     context.userPosition,
+    context.secondaryOutcome,
+    context.secondaryObjective,
+    context.intangibleObjective,
+    context.deliveryStyle,
   ])
 
   useEffect(() => {

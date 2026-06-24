@@ -11,6 +11,7 @@ export type GeorgeLiveHubRuntimeListener = (event: GeorgeLiveHubRuntimeEvent) =>
 
 export type GeorgeLiveHubRuntimeAdapter = {
   connect: (context?: GeorgeLiveHubContext) => void
+  syncContext: (context?: GeorgeLiveHubContext) => void
   disconnect: () => void
   sendTranscript: (text: string, isFinal?: boolean, turnId?: string) => void
   subscribe: (listener: GeorgeLiveHubRuntimeListener) => () => void
@@ -102,6 +103,11 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       })
 
       transport.connect(context)
+    },
+
+    syncContext(context?: GeorgeLiveHubContext) {
+      if (!connected) return
+      transport?.syncContext?.(context)
     },
 
     disconnect() {

@@ -7,6 +7,13 @@ export type GeorgeRuntimePacket = {
   signal: string
   pressure: string
   objective: string
+  room?: string
+  chair?: string
+  knownContext?: string
+  secondaryOutcome?: string
+  secondaryObjective?: string
+  intangibleObjective?: string
+  userPosition?: string
   deliveryStyle: LiveHubDeliveryStyle
   cue: string
   reason: string
@@ -33,6 +40,13 @@ export function buildRuntimePacket(input: {
     signal: input.cue.category,
     pressure: input.cue.category,
     objective: input.context.objective || '',
+    room: input.context.room || '',
+    chair: input.context.chair || '',
+    knownContext: input.context.knownContext || '',
+    secondaryOutcome: input.context.secondaryOutcome || '',
+    secondaryObjective: input.context.secondaryObjective || '',
+    intangibleObjective: input.context.intangibleObjective || '',
+    userPosition: input.context.userPosition || '',
     deliveryStyle: input.context.deliveryStyle || 'cue',
     cue: input.cue.cue,
     reason: input.cue.reason,

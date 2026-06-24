@@ -4,6 +4,7 @@ export type GeorgeLiveHubTransport = {
   connect: (context?: GeorgeLiveHubContext) => void
   sendAudio: (audio: ArrayBuffer) => void
   sendJson?: (message: Record<string, unknown>) => void
+  syncContext?: (context?: GeorgeLiveHubContext) => void
   close: () => void
 }
 
