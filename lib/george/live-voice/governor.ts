@@ -4,6 +4,7 @@ import { detectConversationSignals } from './runtime/conversation-signals'
 import { selectLiveResponsePolicy } from './runtime/response-policy'
 import { classifyLiveSpeakerIntent } from './runtime/speaker-intent'
 import { buildSteeringContinuation } from './runtime/steering-continuation'
+import { evaluateContinuationCandidate } from './runtime/continuation-intelligence'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -351,6 +352,26 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   packet.volley = cleanLine(packet.volley, input.audio ? 14 : 22)
   packet.cue = cleanLine(packet.cue, input.audio ? 12 : 18)
   packet.liveAssistMode = input.liveAssistMode || 'cues'
+
+  const continuationCandidate = evaluateContinuationCandidate({
+    transcript,
+    deliveryStyle:
+      (input.runtimeSupport as { deliveryStyle?: string } | null | undefined)?.deliveryStyle ||
+      (input as { deliveryStyle?: string }).deliveryStyle ||
+      packet.deliveryStyle,
+    speakerIntent: packet.speakerIntent,
+  })
+
+  if (continuationCandidate.candidate) {
+    packet.speakerIntent = 'assisted_continuation'
+    packet.speakerIntentConfidence = continuationCandidate.confidence
+    packet.speakerIntentReason = continuationCandidate.reason
+    packet.speakerIntentShouldSpeak = true
+    packet.speakerIntentShouldHold = false
+    packet.status = `${packet.status} Continuation candidate: ${continuationCandidate.reason}`.trim()
+  } else if (continuationCandidate.reason !== 'Continuation mode is not active.') {
+    packet.status = `${packet.status} Continuation held: ${continuationCandidate.reason}`.trim()
+  }
 
   if (packet.speakerIntent === 'assisted_continuation' && !packet.cue) {
     packet.cue = input.audio ? 'Finish clean. Goal first.' : 'Continue cleanly toward the goal.'
