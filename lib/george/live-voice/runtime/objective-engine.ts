@@ -140,11 +140,16 @@ export function inferObjectiveFromText(text: string): LiveObjectiveId {
 
 export function reinforceObjective(
   volley: string,
-  objective: LiveObjective
+  objective: LiveObjective,
+  confidence = 1
 ) {
   const clean = volley.trim()
 
   if (!clean) return clean
+
+  // Low-confidence objectives are hypotheses, not authority.
+  // Preserve the generated line and let room signal continue accumulating.
+  if (confidence < 0.72) return clean
 
   if (objective.id === 'secure_raise' && !/compensation|raise|value|pay/i.test(clean)) {
     return 'Bring it back to compensation.'

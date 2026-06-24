@@ -279,7 +279,8 @@ export function orchestrateLiveTurn(
 
   nextPacket.volley = reinforceObjective(
     nextPacket.volley,
-    activeObjective
+    activeObjective,
+    nextPacket.confidence
   )
 
   const roomNeedsCompression =
