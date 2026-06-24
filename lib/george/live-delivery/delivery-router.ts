@@ -23,8 +23,6 @@ export function routeGeorgeDeliveryCue(input: {
     }
   }
 
-  const objective = String(input.context?.objective || '').trim()
-
   const cleanGenerated = rawCue
     .replace(/^(cue|advice|say|ask|response|presentation):\s*/i, '')
     .replace(/^["“”]+|["“”]+$/g, '')
@@ -32,16 +30,6 @@ export function routeGeorgeDeliveryCue(input: {
 
   const imperativeCuePattern =
     /^(ask|clarify|maintain|reassess|slow|pause|control|anchor|focus|lead|return|listen|confirm|probe|surface|verify|build)\b/i
-
-  const continuationBridge = (() => {
-    const outcome = objective.toLowerCase()
-
-    if (!outcome || outcome === 'in progress') {
-      return '...while keeping the current objective in view.'
-    }
-
-    return `...while keeping ${outcome} in view.`
-  })()
 
   const continuationText = (() => {
     if (cleanGenerated.startsWith('...')) return cleanGenerated
@@ -52,24 +40,20 @@ export function routeGeorgeDeliveryCue(input: {
       .replace(/^then\s+/i, '')
       .trim()
 
-    if (!withoutCueOpening) return continuationBridge
+    if (!withoutCueOpening) return ''
 
     if (imperativeCuePattern.test(withoutCueOpening)) {
-      return continuationBridge
+      return ''
     }
 
     const startsLikeSentence =
       /^(whether|because|that|so|if|when|while|without|with|by|to|as|and|but|or|which|who|what|where|why|how)\b/i.test(withoutCueOpening)
 
-    if (startsLikeSentence) {
+    if (startsLikeSentence || withoutCueOpening.length > 90) {
       return `...${withoutCueOpening.replace(/^[.,;:!?\s]+/, '')}`
     }
 
-    if (withoutCueOpening.length > 90) {
-      return `...${withoutCueOpening.replace(/^[.,;:!?\s]+/, '')}`
-    }
-
-    return continuationBridge
+    return ''
   })()
 
   const text =
