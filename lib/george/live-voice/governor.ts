@@ -5,6 +5,7 @@ import { selectLiveResponsePolicy } from './runtime/response-policy'
 import { classifyLiveSpeakerIntent } from './runtime/speaker-intent'
 import { buildSteeringContinuation } from './runtime/steering-continuation'
 import { evaluateContinuationCandidate } from './runtime/continuation-intelligence'
+import { generateContinuation } from './runtime/continuation-generator'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -373,8 +374,30 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     packet.status = `${packet.status} Continuation held: ${continuationCandidate.reason}`.trim()
   }
 
-  if (packet.speakerIntent === 'assisted_continuation' && !packet.cue) {
-    packet.cue = input.audio ? 'Finish clean. Goal first.' : 'Continue cleanly toward the goal.'
+  if (packet.speakerIntent === 'assisted_continuation') {
+    const generatedContinuation = generateContinuation({
+      transcript,
+      objective:
+        (input.runtimeSupport as { objective?: string } | null | undefined)?.objective ||
+        input.lastFiveSeconds ||
+        input.contextHint ||
+        '',
+      room: input.contextHint || '',
+      audio: input.audio,
+    })
+
+    if (generatedContinuation.continuation) {
+      packet.volley = cleanLine(
+        generatedContinuation.continuation,
+        input.audio ? 14 : 24
+      )
+      packet.cue = ''
+      packet.shouldSpeak = true
+      packet.confidence = Math.max(packet.confidence || 0, generatedContinuation.confidence)
+      packet.status = `${packet.status} ${generatedContinuation.reason}`.trim()
+    } else if (!packet.cue) {
+      packet.cue = input.audio ? 'Finish clean. Goal first.' : 'Continue cleanly toward the goal.'
+    }
   }
 
   if (input.audio && packet.speakerIntent !== 'addressed_to_george') {
