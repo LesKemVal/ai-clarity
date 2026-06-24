@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { evaluateContinuationCandidate } from '@/lib/george/live-voice/runtime/continuation-intelligence'
+import { generateContinuation } from '@/lib/george/live-voice/runtime/continuation-generator'
 
 const samples = [
   'The biggest concern investors have is...',
@@ -26,6 +27,23 @@ export default function LiveContinuationTestPage() {
       speakerIntent: null,
     })
   }, [transcript, deliveryStyle])
+
+  const generated = useMemo(() => {
+    if (!result.candidate) {
+      return {
+        continuation: '',
+        confidence: 0,
+        reason: 'No generation because this is not a continuation candidate.',
+      }
+    }
+
+    return generateContinuation({
+      transcript,
+      objective: 'raise capital and show the opportunity can scale',
+      room: 'investor conversation',
+      audio: false,
+    })
+  }, [result.candidate, transcript])
 
   return (
     <main className="min-h-screen bg-black px-6 py-8 text-white">
@@ -114,6 +132,16 @@ export default function LiveContinuationTestPage() {
               <span className="text-white/50">Reason</span>
               <p className="mt-2 rounded-xl bg-black p-3 text-white/80">
                 {result.reason}
+              </p>
+            </div>
+
+            <div className="border-t border-white/10 pt-4">
+              <span className="text-white/50">Generated Continuation</span>
+              <p className="mt-2 rounded-xl bg-black p-3 text-lg text-white">
+                {generated.continuation || '—'}
+              </p>
+              <p className="mt-2 text-xs text-white/40">
+                Confidence: {generated.confidence} · {generated.reason}
               </p>
             </div>
           </div>
