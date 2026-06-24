@@ -1876,6 +1876,10 @@ const mandatoryLiveSignals = useMemo(() => {
     if (typeof window === 'undefined') return
 
     try {
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', quickLiveSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
+      window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
+      window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
       window.localStorage.setItem('george_start_new_live', '1')
       window.localStorage.setItem('george_quick_live_entry', '1')
       window.localStorage.setItem('george_quick_live_message', "I'll become sharper as the interaction unfolds.")
@@ -1977,6 +1981,15 @@ const mandatoryLiveSignals = useMemo(() => {
 
     const secondaryObjective = secondaryOutcome
 
+    const selectedSupportStyle = (() => {
+      const style = liveBriefingActiveSupportStyle || quickLiveSupportStyle || 'advice'
+
+      if (style === 'completion') return 'continue'
+      if (style === 'presentation') return 'expandedLine'
+
+      return style
+    })()
+
     const runtimeSupport = {
       selectedCapacityCents: finalEstimate.estimatedCents,
       selectedCapabilityIds: finalResources,
@@ -2003,6 +2016,8 @@ const mandatoryLiveSignals = useMemo(() => {
       editedByUser: !skipPrep,
       prepRoomProfile,
       recoveryConstraints: liveRecoveryConstraints,
+      supportStyle: selectedSupportStyle,
+      deliveryStyle: selectedSupportStyle,
     }
 
     const liveSetup = {
@@ -2041,6 +2056,8 @@ const mandatoryLiveSignals = useMemo(() => {
       compactPrep: true,
       prepRoomProfile,
       recoveryConstraints: liveRecoveryConstraints,
+      supportStyle: selectedSupportStyle,
+      deliveryStyle: selectedSupportStyle,
       createdAt: Date.now(),
     }
 
@@ -2059,6 +2076,10 @@ const mandatoryLiveSignals = useMemo(() => {
       return
     }
 
+    window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', selectedSupportStyle)
+    window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', selectedSupportStyle)
+    window.localStorage.setItem('george_live_entry_support_preference', selectedSupportStyle)
+    window.localStorage.setItem('george_live_entry_support_default', selectedSupportStyle)
     window.localStorage.setItem('george_start_new_live', '1')
     window.localStorage.removeItem('george_active_live_session_id')
     window.localStorage.removeItem('george_active_campaign_session_id')
