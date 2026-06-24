@@ -589,6 +589,29 @@ function AwakeButton({
 
 
 type LiveBriefingSupportPanelId = 'advice' | 'completion' | 'response' | 'presentation' | 'steering'
+type LiveEntryRuntimeSupportStyle = 'advice' | 'continue' | 'response' | 'expandedLine'
+
+function toRuntimeSupportStyle(style: LiveBriefingSupportPanelId): LiveEntryRuntimeSupportStyle {
+  if (style === 'completion') return 'continue'
+  if (style === 'presentation') return 'expandedLine'
+  if (style === 'response') return 'response'
+  return 'advice'
+}
+
+function toBriefingSupportPanelId(style: string | null): LiveBriefingSupportPanelId | null {
+  if (style === 'continue') return 'completion'
+  if (style === 'expandedLine') return 'presentation'
+  if (
+    style === 'advice' ||
+    style === 'completion' ||
+    style === 'response' ||
+    style === 'presentation'
+  ) {
+    return style
+  }
+  return null
+}
+
 
 type LiveRoomObjectiveOptionId =
   | 'project_strength'
@@ -1845,14 +1868,10 @@ const mandatoryLiveSignals = useMemo(() => {
       const saved =
         window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
         window.localStorage.getItem('george_live_entry_support_preference')
-      if (
-        saved === 'advice' ||
-        saved === 'completion' ||
-        saved === 'response' ||
-        saved === 'presentation'
-      ) {
-        setQuickLiveSupportStyle(saved)
-        setQuickLiveExpandedSupport(saved)
+      const savedPanel = toBriefingSupportPanelId(saved)
+      if (savedPanel) {
+        setQuickLiveSupportStyle(savedPanel)
+        setQuickLiveExpandedSupport(savedPanel)
       }
     }
 
@@ -1876,17 +1895,19 @@ const mandatoryLiveSignals = useMemo(() => {
     if (typeof window === 'undefined') return
 
     try {
-      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', quickLiveSupportStyle)
-      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
+      const runtimeSupportStyle = toRuntimeSupportStyle(quickLiveSupportStyle)
+
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', runtimeSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', runtimeSupportStyle)
       window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
       window.localStorage.setItem('george_start_new_live', '1')
       window.localStorage.setItem('george_quick_live_entry', '1')
       window.localStorage.setItem('george_quick_live_message', "I'll become sharper as the interaction unfolds.")
-      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', quickLiveSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', runtimeSupportStyle)
       window.localStorage.setItem('george_live_entry_support_preference', quickLiveSupportStyle)
       window.localStorage.setItem('george_live_entry_support_default', quickLiveSupportStyle)
-      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', quickLiveSupportStyle)
+      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', runtimeSupportStyle)
       window.localStorage.setItem('GEORGE_LIVE_STEERING_PHRASES', JSON.stringify(quickLiveSteeringPhrases))
     } catch {}
 
@@ -2949,6 +2970,7 @@ const beginProofOfAwareness = async () => {
 
       const activeSupportStyle =
         liveBriefingActiveSupportStyle ||
+        validStoredSupportPreference ||
         recommendedSupportPanel.id
 
       const activeSupportPanel =
@@ -2958,6 +2980,9 @@ const beginProofOfAwareness = async () => {
         setLiveBriefingActiveSupportStyle(style)
 
         try {
+          const runtimeSupportStyle = toRuntimeSupportStyle(style)
+          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', runtimeSupportStyle)
+          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', runtimeSupportStyle)
           window.localStorage.setItem('george_live_entry_support_preference', style)
           window.localStorage.setItem('george_live_entry_support_default', style)
         } catch {}
@@ -3030,10 +3055,16 @@ const beginProofOfAwareness = async () => {
                     <button
                       key={panel.id}
                       type="button"
+                      onMouseDown={(event) => {
+                        event.preventDefault()
+                        setActiveSupportStyle(panel.id)
+                        setLiveBriefingSupportAccepted(true)
+                        setLiveBriefingExpandedSupportPanel(panel.id)
+                      }}
                       onClick={() => {
                         setActiveSupportStyle(panel.id)
                         setLiveBriefingSupportAccepted(true)
-                        setLiveBriefingExpandedSupportPanel(open ? null : panel.id)
+                        setLiveBriefingExpandedSupportPanel(panel.id)
                       }}
                       className="w-full py-3 text-left"
                     >
