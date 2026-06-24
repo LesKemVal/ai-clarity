@@ -8035,6 +8035,17 @@ if (liveMode) {
         </div>
 
         <div className="space-y-3">
+          {liveOutcomeReview.milestone && (
+            <div className="rounded-[0.75rem] border border-emerald-400/14 bg-emerald-400/[0.045] px-3 py-2">
+              <div className="text-[9px] uppercase tracking-[0.18em] text-emerald-100/44">
+                Milestone
+              </div>
+              <div className="mt-1 text-[12px] leading-5 text-emerald-50/74">
+                {liveOutcomeReview.milestone.replace(/^Milestone:\s*/i, '')}
+              </div>
+            </div>
+          )}
+
           <label className="block">
             <span className="block text-[9px] uppercase tracking-[0.18em] text-white/24">Desired outcome</span>
             <input
