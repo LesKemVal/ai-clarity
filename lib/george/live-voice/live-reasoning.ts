@@ -95,6 +95,20 @@ function isContinuationReasoning(input: LiveReasoningInput) {
   )
 }
 
+
+function violatesContinuationAuthority(volley: string) {
+  const clean = String(volley || '').trim()
+  if (!clean) return true
+
+  const strategicOverreach =
+    /\b(plan|mitigate|execution risk|scale effectively|demonstrate|prove|projected opportunity|strategy|structure|valuation|shares?|equity|ownership|percent|percentage|terms?|commitment)\b/i.test(clean)
+
+  const unsupportedNumber =
+    /\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i.test(clean)
+
+  return strategicOverreach || unsupportedNumber
+}
+
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
   if (!shouldUseReasoning(input)) return null
 
@@ -147,7 +161,7 @@ Your job:
 
 Intervention Type:
 ${continuationReasoning
-  ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve trajectory, objective, room context, and natural grammar. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
+  ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve natural grammar, immediate trajectory, and user agency. In continuation mode, objective and room context may shape tone but are not evidence by themselves. Do not create facts, numbers, percentages, valuations, ownership terms, commitments, or claims not already supported by the transcript, recent room memory, known context, or user fragment. If a missing specific is required to preserve the thought, use a natural user-fillable placeholder such as "__". Do not turn the sentence into a template. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
   : mode === 'response'
     ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer to the question, objection, pressure, or unfamiliar topic. Complete means sufficient for the moment, not unnecessarily long. Do not reduce it to a cue unless the room requires restraint.'
     : mode === 'presentation'
@@ -208,7 +222,7 @@ Use facts already present before requesting more information.
 Return the single best next move.
 
 ${continuationReasoning
-  ? 'Continuation requirement: complete the user fragment grammatically. Start with "...". Do not give advice, labels, or coaching language.'
+  ? 'Continuation requirement: complete the user fragment grammatically. Start with "...". Use supported specifics only. Objective and room context are not enough to invent details. When a missing value is necessary, leave a simple "__" placeholder while preserving conversational flow. Do not give advice, labels, strategy, or coaching language.'
   : ''}
 
 Priority:
@@ -238,7 +252,16 @@ Priority:
   const text = completion.choices?.[0]?.message?.content?.trim()
   if (!text) return null
 
-  const volley = text.replace(/^GEORGE:\s*/i, '').trim()
+  let volley = text.replace(/^GEORGE:\s*/i, '').trim()
+
+  if (
+    continuationReasoning &&
+    violatesContinuationAuthority(volley) &&
+    input.fallbackPacket.volley
+  ) {
+    volley = input.fallbackPacket.volley
+  }
+
   const responseForm = continuationReasoning
     ? 'line'
     : carryTurn

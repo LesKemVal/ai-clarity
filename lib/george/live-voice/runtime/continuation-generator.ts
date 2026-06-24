@@ -26,50 +26,52 @@ function objectiveHint(objective?: string | null, room?: string | null) {
   const cleanRoom = normalizeTranscript(String(room || ''))
   const combined = `${cleanObjective} ${cleanRoom}`.trim()
 
-  if (!combined) return 'the outcome can move forward clearly'
-
-  if (/invest|capital|raise|fund|scale|revenue|market/i.test(combined)) {
-    return 'demand, scalability, and execution can support the projected opportunity'
-  }
+  if (!combined) return 'the point can stay clear'
 
   if (/interview|job|hire|role|candidate/i.test(combined)) {
-    return 'the fit is specific, credible, and directly tied to the role'
+    return 'the answer stays tied to the role'
   }
 
   if (/sale|customer|client|buyer|deal/i.test(combined)) {
-    return 'the value is clear enough to justify the next step'
+    return 'the value is clear enough to keep moving'
   }
 
-  if (/negotiat|term|price|agreement/i.test(combined)) {
-    return 'the terms create a fair path forward without weakening the objective'
+  if (/negotiat|term|price|agreement|invest|capital|raise|fund|share|stake|equity|valuation/i.test(combined)) {
+    return 'the structure stays fair and specific'
   }
 
-  return cleanObjective.length <= 90
-    ? cleanObjective
-    : 'the outcome can move forward clearly'
+  return 'the point stays connected to the outcome'
 }
 
 function continuationForStem(stem: string, hint: string) {
   const lower = stem.toLowerCase()
 
+  if (/\b(percent|percentage|valuation|price|salary|compensation|amount|stake|share|equity|split|term|terms|months?|years?)\s+(of|at|for|is|are)?$/i.test(lower)) {
+    return `...__.`
+  }
+
+  if (/\b(for|at|around|about|roughly|approximately|between)\s*$/i.test(lower)) {
+    return `...__.`
+  }
+
   if (/\b(biggest|main|primary) concern\b.*\bis$/i.test(lower)) {
-    return `...whether ${hint}.`
+    return `...whether the concern is something we can answer directly.`
   }
 
   if (/\b(what matters|most important thing|key thing)\b.*\bis$/i.test(lower)) {
-    return `...showing that ${hint}.`
+    return `...staying clear about what actually matters here.`
   }
 
   if (/\b(reason|why)\b.*\bis$/i.test(lower)) {
-    return `...because ${hint}.`
+    return `...because that changes what the next step should be.`
   }
 
   if (/\b(point|question|issue)\b.*\bis$/i.test(lower)) {
-    return `...whether ${hint}.`
+    return `...whether we are solving the right problem.`
   }
 
   if (/\b(challenge|problem)\b.*\bis$/i.test(lower)) {
-    return `...proving that ${hint}.`
+    return `...getting specific without getting ahead of the facts.`
   }
 
   if (/\b(opportunity)\b.*\bis$/i.test(lower)) {
