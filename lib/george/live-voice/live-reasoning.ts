@@ -84,10 +84,21 @@ function shouldCarryTurn(input: LiveReasoningInput) {
   )
 }
 
+function isContinuationReasoning(input: LiveReasoningInput) {
+  const transcript = compact(input.transcript, 500)
+  const fallback = input.fallbackPacket
+
+  return (
+    fallback.speakerIntent === 'assisted_continuation' ||
+    /(?:\.{3}|…)+$/.test(transcript)
+  )
+}
+
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
   if (!shouldUseReasoning(input)) return null
 
   const carryTurn = shouldCarryTurn(input)
+  const continuationReasoning = isContinuationReasoning(input)
 
   const sufficiency = evaluateSignalSufficiency({
     transcript: input.transcript,
@@ -108,7 +119,11 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   .join(', ')
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
-  const mode = input.liveAssistMode === 'lines' ? 'repeatable line' : 'cue'
+  const mode = continuationReasoning
+    ? 'continuation'
+    : input.liveAssistMode === 'lines'
+      ? 'repeatable line'
+      : 'cue'
   const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
 
   const system = `
@@ -121,6 +136,11 @@ Your job:
 - Read the room signal.
 - Use the transcript, room, recent memory, and objective context.
 - Give the next useful LIVE response.
+
+Intervention Type:
+${continuationReasoning
+  ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve trajectory, objective, room context, and natural grammar. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
+  : '- GENERAL LIVE SUPPORT. Provide the next useful cue, direction, repeatable line, or response based on the room signal.'}
 
 Signal Sufficiency:
 ${signalDirective}
@@ -150,6 +170,9 @@ Rules:
 - Do not sound like a therapist, chatbot, teacher, or helpdesk.
 - Preserve user agency.
 - Output only the line GEORGE should give.
+${continuationReasoning
+  ? '- Continuation completion test: user fragment + GEORGE fragment must form one complete, natural sentence.'
+  : ''}
 `.trim()
 
   const user = `
@@ -157,6 +180,7 @@ Room: ${room}
 Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Assist mode: ${mode}
+Intervention type: ${continuationReasoning ? 'continuation' : 'general_live_support'}
 Speaker perspective: ${perspective}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
@@ -170,6 +194,10 @@ Do not echo the offline fallback if the transcript already gives the signal.
 Use facts already present before requesting more information.
 
 Return the single best next move.
+
+${continuationReasoning
+  ? 'Continuation requirement: complete the user fragment grammatically. Start with "...". Do not give advice, labels, or coaching language.'
+  : ''}
 
 Priority:
 1. Advance the desired outcome.
@@ -199,7 +227,11 @@ Priority:
   if (!text) return null
 
   const volley = text.replace(/^GEORGE:\s*/i, '').trim()
-  const responseForm = carryTurn ? 'line' : classifyResponseForm(volley, input.fallbackPacket.responseForm)
+  const responseForm = continuationReasoning
+    ? 'line'
+    : carryTurn
+      ? 'line'
+      : classifyResponseForm(volley, input.fallbackPacket.responseForm)
   const transferReady =
     !carryTurn &&
     sufficiency.sufficient &&
@@ -213,7 +245,7 @@ Priority:
     responseForm,
     responsePerspective: perspective,
     transferReady,
-    status: `${input.fallbackPacket.status} LIVE reasoning applied.${carryTurn ? ' Carry-turn perspective active.' : ''}`,
+    status: `${input.fallbackPacket.status} LIVE reasoning applied.${carryTurn ? ' Carry-turn perspective active.' : ''}${continuationReasoning ? ' Continuation reasoning active.' : ''}`,
     confidence: Math.max(input.fallbackPacket.confidence || 0, carryTurn ? 0.86 : 0.82),
   }
 }
