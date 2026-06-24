@@ -12,6 +12,39 @@ export type ActionCue = {
   at: number
 }
 
+
+function enforceModeContract(cue: string, deliveryStyle: GeorgeRuntimePacket['deliveryStyle']) {
+  const clean = cue.trim()
+  if (!clean) return clean
+
+  if (deliveryStyle === 'continue') {
+    let next = clean.replace(/^GEORGE:\s*/i, '').trim()
+    if (!next.startsWith('...')) next = `...${next.replace(/^[.,;:\s]+/, '')}`
+    return next
+  }
+
+  if (deliveryStyle === 'response') {
+    return clean
+      .replace(/^Start by\s+/i, '')
+      .replace(/^Ask them to\s+/i, '')
+      .replace(/^You should\s+/i, '')
+      .trim()
+  }
+
+  if (deliveryStyle === 'expandedLine') {
+    const lines = clean
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+
+    if (lines.length >= 3) return lines.slice(0, 4).join('\n')
+
+    return clean
+  }
+
+  return clean
+}
+
 export function arbitrateCue(input: {
   packet: GeorgeRuntimePacket
   fastCue?: string | null
@@ -34,7 +67,7 @@ export function arbitrateCue(input: {
 
   if (fastCue && fastCue.length <= maxFastCueLength) {
     return {
-      cue: fastCue,
+      cue: enforceModeContract(fastCue, input.packet.deliveryStyle),
       reason: `Fast cue refined local cue: ${input.packet.cue}`,
       source: 'groq',
       localCue: input.packet.cue,
