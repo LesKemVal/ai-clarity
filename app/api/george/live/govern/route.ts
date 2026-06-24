@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
+      deliveryStyle: typeof body?.deliveryStyle === 'string' ? body.deliveryStyle : '',
       runtimeMemory:
         body?.runtimeMemory && typeof body.runtimeMemory === 'object'
           ? body.runtimeMemory
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
+      deliveryStyle: typeof body?.deliveryStyle === 'string' ? body.deliveryStyle : '',
       fallbackPacket: packet,
     }).catch(() => null)
 

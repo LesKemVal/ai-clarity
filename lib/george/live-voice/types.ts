@@ -79,6 +79,7 @@ export type LiveVoiceGovernorInput = {
   shadowMap?: string
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'
+  deliveryStyle?: string
   runtimeMemory?: LiveRuntimeMemory
   runtimeSupport?: LiveRuntimeSupportInput | null
 }

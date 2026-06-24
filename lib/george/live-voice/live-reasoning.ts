@@ -14,6 +14,7 @@ type LiveReasoningInput = {
   shadowMap?: string
   lastFiveSeconds?: string
   liveAssistMode?: 'cues' | 'lines'
+  deliveryStyle?: string
   fallbackPacket: LiveVoicePacket
 }
 
@@ -119,11 +120,16 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   .join(', ')
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
+  const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryStyle || ''
   const mode = continuationReasoning
     ? 'continuation'
-    : input.liveAssistMode === 'lines'
-      ? 'repeatable line'
-      : 'cue'
+    : deliveryStyle === 'response'
+      ? 'response'
+      : deliveryStyle === 'expandedLine'
+        ? 'presentation'
+        : input.liveAssistMode === 'lines'
+          ? 'repeatable line'
+          : 'cue'
   const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
 
   const system = `
@@ -140,7 +146,11 @@ Your job:
 Intervention Type:
 ${continuationReasoning
   ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve trajectory, objective, room context, and natural grammar. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
-  : '- GENERAL LIVE SUPPORT. Provide the next useful cue, direction, repeatable line, or response based on the room signal.'}
+  : mode === 'response'
+    ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer to the question, objection, pressure, or unfamiliar topic. Do not reduce it to a cue unless the room requires restraint.'
+    : mode === 'presentation'
+      ? '- PRESENTATION. The user selected Presentation mode. Organize the next useful delivery into a clear sequence. Support structure, flow, proof, pacing, and recovery. Do not collapse it into a short cue unless the room requires restraint.'
+      : '- CUE. The user selected Cue mode. Provide the most useful short intervention for the situation. This may be a cue, brief advice, steering signal, risk signal, or recovery cue.'}
 
 Signal Sufficiency:
 ${signalDirective}
@@ -180,7 +190,7 @@ Room: ${room}
 Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Assist mode: ${mode}
-Intervention type: ${continuationReasoning ? 'continuation' : 'general_live_support'}
+Intervention type: ${continuationReasoning ? 'continuation' : mode}
 Speaker perspective: ${perspective}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
