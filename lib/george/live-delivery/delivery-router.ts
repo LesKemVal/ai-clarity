@@ -93,6 +93,7 @@ export function routeGeorgeDeliveryCue(input: {
   }
 
   return {
+    turnId: input.actionCue.turnId,
     mode: 'voice',
     text,
     reason: 'Default LIVE delivery route.',
