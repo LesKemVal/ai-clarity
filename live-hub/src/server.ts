@@ -53,10 +53,12 @@ wss.on('connection', (ws) => {
     if (parsed.type === 'TRANSCRIPT_INPUT') {
       const text = String(parsed.text || '')
       const isFinal = typeof parsed.isFinal === 'boolean' ? parsed.isFinal : true
+      const turnId = typeof parsed.turnId === 'string' ? parsed.turnId : undefined
 
       console.log('[LIVE HUB][TRANSCRIPT_INPUT]', {
         text,
         isFinal,
+        turnId,
         length: text.length,
         hasStt: Boolean(stt),
         hasDeepgramApiKey: Boolean(deepgramApiKey),
@@ -67,7 +69,7 @@ wss.on('connection', (ws) => {
         return
       }
 
-      stt.handleTranscriptInput(text, isFinal)
+      stt.handleTranscriptInput(text, isFinal, turnId)
       return
     }
 

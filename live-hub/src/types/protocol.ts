@@ -18,7 +18,7 @@ export type LiveHubContext = {
 
 export type ClientMessage =
   | { type: 'SYNC_CONTEXT'; context: LiveHubContext }
-  | { type: 'TRANSCRIPT_INPUT'; text: string; isFinal?: boolean }
+  | { type: 'TRANSCRIPT_INPUT'; text: string; isFinal?: boolean; turnId?: string }
   | { type: 'PING'; at?: number }
 
 export type ServerMessage =
@@ -28,6 +28,7 @@ export type ServerMessage =
   | { type: 'TRANSCRIPT_FINAL'; text: string; source?: 'deepgram' | 'client'; at: number }
   | {
       type: 'LOCAL_CUE'
+      turnId?: string
       cue: string
       reason: string
       category?: string
@@ -60,6 +61,7 @@ export type ServerMessage =
     }
   | {
       type: 'ACTION_CUE'
+      turnId?: string
       cue: string
       reason: string
       source: 'local' | 'groq'
