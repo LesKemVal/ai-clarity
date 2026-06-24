@@ -14,6 +14,7 @@ export type LiveOutcomeObservation = {
   bestAvailablePath: string
   assistanceOptions: string[]
   internalNotes: string
+  milestone?: string
 }
 
 export function buildLiveOutcomeObservation({
@@ -156,6 +157,19 @@ export function buildLiveOutcomeObservation({
           ? ['Prepare de-escalation.', 'Protect position.', 'Plan rebrief.', 'Draft careful follow-up.']
           : ['Summarize what happened.', 'Plan the next move.', 'Prepare follow-up.', 'Consider a new outcome.']
 
+  const liveAssistanceUseful =
+    cleanOutcome !== 'Unspecified LIVE outcome' &&
+    (
+      movementState === 'advancing' ||
+      movementState === 'closing' ||
+      observedProgress === 'improving' ||
+      governorConfidence >= 62
+    )
+
+  const milestone = liveAssistanceUseful
+    ? 'Milestone: This project may benefit from LIVE assistance during development.'
+    : undefined
+
   return {
     desiredOutcome: cleanOutcome,
     observedProgress,
@@ -169,6 +183,8 @@ export function buildLiveOutcomeObservation({
     availablePaths,
     bestAvailablePath,
     assistanceOptions,
+    milestone,
+
     internalNotes: [
       notes,
       outcomeGovernor?.reason ? `Governor: ${outcomeGovernor.reason}` : '',
