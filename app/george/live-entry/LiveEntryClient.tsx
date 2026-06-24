@@ -2970,6 +2970,7 @@ const beginProofOfAwareness = async () => {
 
       const activeSupportStyle =
         liveBriefingActiveSupportStyle ||
+        liveBriefingExpandedSupportPanel ||
         validStoredSupportPreference ||
         recommendedSupportPanel.id
 
@@ -3048,8 +3049,8 @@ const beginProofOfAwareness = async () => {
                     detail: 'Useful for interviews, investor meetings, negotiations, proposals, and presentations. GEORGE structures information into a clear, easy-to-follow sequence.',
                   },
                 ] as Array<{ id: LiveBriefingSupportPanelId; label: string; line: string; detail: string }>).map((panel) => {
-                  const active = activeSupportPanel.id === panel.id
-                  const open = liveBriefingExpandedSupportPanel === panel.id
+                  const active = activeSupportStyle === panel.id
+                  const open = activeSupportStyle === panel.id
 
                   return (
                     <button
@@ -3196,8 +3197,17 @@ const beginProofOfAwareness = async () => {
       { id: 'other', label: 'Other', line: 'Tell GEORGE what else to look for, reinforce, confirm, or help acquire.' },
     ]
 
+    const visibleLiveRoomObjectiveOptions = liveRoomObjectiveOptions.slice(0, 3)
+    const moreLiveRoomObjectiveOptions = liveRoomObjectiveOptions.slice(3)
+
     const selectedLiveRoomObjective =
       liveRoomObjectiveOptions.find((option) => option.id === liveRoomObjectiveOption)
+
+    const moreOpen =
+      Boolean(
+        selectedLiveRoomObjective &&
+        moreLiveRoomObjectiveOptions.some((option) => option.id === selectedLiveRoomObjective.id)
+      )
 
     return (
       <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else matters?" stage={3}>
@@ -3208,7 +3218,7 @@ const beginProofOfAwareness = async () => {
 
           <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
             <p>Your desired outcome remains primary. Any secondary outcome you gave earlier remains separate.</p>
-            <p>This step is about what GEORGE should also surface, reinforce, protect, or read while pursuing the outcome: trust, authority, confidence, common ground, leverage, clarity, commitment, or timeline.</p>
+            <p>Choose one additional thing GEORGE should watch for.</p>
             <p>Some objectives reinforce each other. Some compete with each other. GEORGE will attempt to balance them without replacing the primary outcome.</p>
           </div>
 
@@ -3217,7 +3227,7 @@ const beginProofOfAwareness = async () => {
           </div>
 
           <div className="mt-3 divide-y divide-white/[0.055] border-y border-white/[0.055]">
-            {liveRoomObjectiveOptions.map((option) => {
+            {visibleLiveRoomObjectiveOptions.map((option) => {
               const active = liveRoomObjectiveOption === option.id
 
               return (
@@ -3249,6 +3259,57 @@ const beginProofOfAwareness = async () => {
                 </button>
               )
             })}
+
+            <details className="group" open={moreOpen}>
+              <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-left">
+                <span>
+                  <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
+                    More
+                  </span>
+                  <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                    Additional intangible objectives.
+                  </span>
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.18em] text-white/30 group-open:text-emerald-100/56">
+                  {moreOpen ? 'Open' : 'More'}
+                </span>
+              </summary>
+
+              <div className="divide-y divide-white/[0.055] border-t border-white/[0.055]">
+                {moreLiveRoomObjectiveOptions.map((option) => {
+                  const active = liveRoomObjectiveOption === option.id
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => {
+                        setLiveRoomObjectiveOption(active ? '' : option.id)
+                        if (option.id !== 'other') setCustomLiveRoomObjective('')
+                      }}
+                      className="w-full py-3 text-left"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
+                          active
+                            ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                            : 'bg-white/[0.14]'
+                        }`} />
+
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
+                            {option.label}
+                          </span>
+                          <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                            {option.line}
+                          </span>
+                        </span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </details>
           </div>
 
           {liveRoomObjectiveOption === 'other' && (
