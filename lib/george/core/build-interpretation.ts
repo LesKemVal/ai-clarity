@@ -93,6 +93,7 @@ export function buildGeorgeCoreInterpretation(input: {
     conversationSignals,
     roomAnalysis,
     objective,
+    objectiveHypothesis,
     trajectory,
     activeOutcome,
     outcomeGovernor,
