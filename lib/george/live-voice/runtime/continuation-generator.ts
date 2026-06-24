@@ -21,22 +21,70 @@ export function stripContinuationTrigger(transcript: string) {
   return normalizeTranscript(transcript.replace(EXPLICIT_CONTINUATION_TRIGGER, ''))
 }
 
-function objectiveHint(objective?: string | null) {
-  const clean = normalizeTranscript(String(objective || ''))
-  if (!clean) return 'the outcome can move forward clearly'
-  if (/invest|capital|raise|fund|scale|revenue|market/i.test(clean)) {
-    return 'the opportunity can scale predictably'
+function objectiveHint(objective?: string | null, room?: string | null) {
+  const cleanObjective = normalizeTranscript(String(objective || ''))
+  const cleanRoom = normalizeTranscript(String(room || ''))
+  const combined = `${cleanObjective} ${cleanRoom}`.trim()
+
+  if (!combined) return 'the outcome can move forward clearly'
+
+  if (/invest|capital|raise|fund|scale|revenue|market/i.test(combined)) {
+    return 'demand, scalability, and execution can support the projected opportunity'
   }
-  if (/interview|job|hire|role|candidate/i.test(clean)) {
-    return 'the fit is clear, specific, and credible'
+
+  if (/interview|job|hire|role|candidate/i.test(combined)) {
+    return 'the fit is specific, credible, and directly tied to the role'
   }
-  if (/sale|customer|client|buyer|deal/i.test(clean)) {
+
+  if (/sale|customer|client|buyer|deal/i.test(combined)) {
     return 'the value is clear enough to justify the next step'
   }
-  if (/negotiat|term|price|agreement/i.test(clean)) {
-    return 'the terms create a fair path forward'
+
+  if (/negotiat|term|price|agreement/i.test(combined)) {
+    return 'the terms create a fair path forward without weakening the objective'
   }
-  return clean.length <= 90 ? clean : 'the outcome can move forward clearly'
+
+  return cleanObjective.length <= 90
+    ? cleanObjective
+    : 'the outcome can move forward clearly'
+}
+
+function continuationForStem(stem: string, hint: string) {
+  const lower = stem.toLowerCase()
+
+  if (/\b(biggest|main|primary) concern\b.*\bis$/i.test(lower)) {
+    return `...whether ${hint}.`
+  }
+
+  if (/\b(what matters|most important thing|key thing)\b.*\bis$/i.test(lower)) {
+    return `...showing that ${hint}.`
+  }
+
+  if (/\b(reason|why)\b.*\bis$/i.test(lower)) {
+    return `...because ${hint}.`
+  }
+
+  if (/\b(point|question|issue)\b.*\bis$/i.test(lower)) {
+    return `...whether ${hint}.`
+  }
+
+  if (/\b(challenge|problem)\b.*\bis$/i.test(lower)) {
+    return `...proving that ${hint}.`
+  }
+
+  if (/\b(opportunity)\b.*\bis$/i.test(lower)) {
+    return `...turning that proof into a clear next step.`
+  }
+
+  if (/\b(difference)\b.*\bis$/i.test(lower)) {
+    return `...whether the next step is based on proof, not assumption.`
+  }
+
+  if (/\b(if|when)\b/i.test(lower)) {
+    return `...then the next step should protect the objective and clarify the decision.`
+  }
+
+  return `...that ${hint}.`
 }
 
 export function generateContinuation(
@@ -52,24 +100,8 @@ export function generateContinuation(
     }
   }
 
-  const hint = objectiveHint(input.objective)
-  const lower = stem.toLowerCase()
-
-  let continuation = ''
-
-  if (/\b(biggest|main|primary) concern\b.*\bis$/i.test(lower)) {
-    continuation = `...whether ${hint}.`
-  } else if (/\b(what matters|most important thing|key thing)\b.*\bis$/i.test(lower)) {
-    continuation = `...that ${hint}.`
-  } else if (/\b(reason|why)\b.*\bis$/i.test(lower)) {
-    continuation = `...because ${hint}.`
-  } else if (/\b(point|question|issue|challenge|opportunity|problem|difference)\b.*\bis$/i.test(lower)) {
-    continuation = `...that ${hint}.`
-  } else if (/\b(if|when)\b/i.test(lower)) {
-    continuation = `...then the next step should protect the objective.`
-  } else {
-    continuation = `...that ${hint}.`
-  }
+  const hint = objectiveHint(input.objective, input.room)
+  const continuation = continuationForStem(stem, hint)
 
   return {
     continuation,
