@@ -19,6 +19,7 @@ function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
 }
 
+async function main() {
 const fallbackPacket = governLiveVoice({
   transcript: 'The biggest concern investors have is...',
   mode: 'text_test',
@@ -58,6 +59,12 @@ assert(!/^\.\.\.\s*(slow down|ask why|return to|continue cleanly|finish clean)/i
 console.log('Fallback:', fallbackPacket.volley)
 console.log('Reasoned:', reasoned?.volley)
 console.log('GEORGE LIVE reasoning smoke passed')
+}
+
+main().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})
 `)
 
 try {
