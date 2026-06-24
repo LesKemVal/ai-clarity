@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { evaluateContinuationCandidate } from '@/lib/george/live-voice/runtime/continuation-intelligence'
 
 const samples = [
+  'The biggest concern investors have is...',
   'The biggest concern investors have is',
   'The biggest concern investors have is.',
   'What matters most here is',
@@ -96,6 +97,10 @@ export default function LiveContinuationTestPage() {
             <div className="flex justify-between border-b border-white/10 pb-2">
               <span className="text-white/50">Confidence</span>
               <span>{result.confidence}</span>
+            </div>
+            <div className="flex justify-between border-b border-white/10 pb-2">
+              <span className="text-white/50">Explicit Trigger</span>
+              <span>{String(result.explicitTrigger)}</span>
             </div>
             <div className="flex justify-between border-b border-white/10 pb-2">
               <span className="text-white/50">Incomplete Thought</span>

@@ -7,11 +7,13 @@ export type ContinuationCandidateInput = {
 export type ContinuationCandidateResult = {
   candidate: boolean
   confidence: number
+  explicitTrigger: boolean
   incompleteThought: boolean
   punctuationClosed: boolean
   reason: string
 }
 
+const EXPLICIT_CONTINUATION_TRIGGER = /(?:\.{3}|…)+$/
 const CLOSED_PUNCTUATION = /[.!?]$/
 
 const COMPLETE_SHORT_STATEMENTS = [
@@ -51,6 +53,7 @@ export function evaluateContinuationCandidate(
     return {
       candidate: false,
       confidence: 0,
+      explicitTrigger: false,
       incompleteThought: false,
       punctuationClosed: false,
       reason: 'Continuation mode is not active.',
@@ -61,18 +64,35 @@ export function evaluateContinuationCandidate(
     return {
       candidate: false,
       confidence: 0,
+      explicitTrigger: false,
       incompleteThought: false,
       punctuationClosed: false,
       reason: 'No transcript content.',
     }
   }
 
-  const punctuationClosed = CLOSED_PUNCTUATION.test(transcript)
+  const explicitTrigger = EXPLICIT_CONTINUATION_TRIGGER.test(transcript)
+  const transcriptWithoutTrigger = normalizeTranscript(
+    transcript.replace(EXPLICIT_CONTINUATION_TRIGGER, '')
+  )
+  const punctuationClosed = CLOSED_PUNCTUATION.test(transcriptWithoutTrigger || transcript)
+
+  if (explicitTrigger) {
+    return {
+      candidate: true,
+      confidence: 1,
+      explicitTrigger: true,
+      incompleteThought: true,
+      punctuationClosed: false,
+      reason: 'Explicit continuation trigger detected.',
+    }
+  }
 
   if (punctuationClosed) {
     return {
       candidate: false,
       confidence: 0.92,
+      explicitTrigger: false,
       incompleteThought: false,
       punctuationClosed: true,
       reason: 'Transcript closes with punctuation.',
@@ -83,6 +103,7 @@ export function evaluateContinuationCandidate(
     return {
       candidate: false,
       confidence: 0.86,
+      explicitTrigger: false,
       incompleteThought: false,
       punctuationClosed: false,
       reason: 'Transcript is a short complete statement.',
@@ -98,6 +119,7 @@ export function evaluateContinuationCandidate(
     return {
       candidate: true,
       confidence: wordCount <= 14 ? 0.88 : 0.76,
+      explicitTrigger: false,
       incompleteThought: true,
       punctuationClosed: false,
       reason: 'Transcript appears to end on an incomplete thought.',
@@ -107,8 +129,9 @@ export function evaluateContinuationCandidate(
   return {
     candidate: false,
     confidence: 0.38,
+    explicitTrigger: false,
     incompleteThought: false,
     punctuationClosed: false,
-    reason: 'No incomplete-thought continuation signal detected.',
+    reason: 'No explicit continuation trigger or incomplete-thought signal detected.',
   }
 }
