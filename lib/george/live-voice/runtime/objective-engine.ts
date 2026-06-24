@@ -61,36 +61,81 @@ export const LIVE_OBJECTIVES: Record<LiveObjectiveId, LiveObjective> = {
   },
 }
 
-export function inferObjectiveFromText(text: string): LiveObjectiveId {
+export type LiveObjectiveHypothesis = {
+  objective: LiveObjectiveId
+  confidence: number
+  reason: string
+  source: 'keyword_signal' | 'conversation_signal' | 'fallback'
+}
+
+export function inferObjectiveHypothesis(text: string): LiveObjectiveHypothesis {
   const clean = text.toLowerCase()
   const signals = detectConversationSignals(clean)
 
   if (/officer|license|registration|insurance|pulled you over|id\b/.test(clean)) {
-    return 'stay_safe'
+    return {
+      objective: 'stay_safe',
+      confidence: 0.78,
+      reason: 'Authority-safety language detected.',
+      source: 'keyword_signal',
+    }
   }
 
   if (/raise|salary|compensation|pay/.test(clean)) {
-    return 'secure_raise'
+    return {
+      objective: 'secure_raise',
+      confidence: 0.64,
+      reason: 'Compensation language detected.',
+      source: 'keyword_signal',
+    }
   }
 
-if (
-  /\bappointment\b|\bschedule\b|\bcalendar\b|\bbook\b/.test(clean)
-) {
-  return 'book_appointment'
-}
+  if (/\bappointment\b|\bschedule\b|\bcalendar\b|\bbook\b/.test(clean)) {
+    return {
+      objective: 'book_appointment',
+      confidence: 0.62,
+      reason: 'Scheduling language detected.',
+      source: 'keyword_signal',
+    }
+  }
+
   if (/angry|argument|calm|tension|hostile|upset/.test(clean)) {
-    return 'deescalate'
+    return {
+      objective: 'deescalate',
+      confidence: 0.66,
+      reason: 'Conflict or emotional pressure language detected.',
+      source: 'keyword_signal',
+    }
   }
 
   if (signals.has('proof_challenge')) {
-    return 'hold_frame'
+    return {
+      objective: 'hold_frame',
+      confidence: 0.6,
+      reason: 'Proof challenge signal detected.',
+      source: 'conversation_signal',
+    }
   }
 
   if (/interview|leadership|experience|hiring|job|role|candidate|resume/.test(clean)) {
-    return 'advance_outcome'
+    return {
+      objective: 'advance_outcome',
+      confidence: 0.58,
+      reason: 'Interview or role language detected.',
+      source: 'keyword_signal',
+    }
   }
 
-  return 'clarify'
+  return {
+    objective: 'clarify',
+    confidence: 0.35,
+    reason: 'No strong objective signal detected; clarify remains a fallback hypothesis.',
+    source: 'fallback',
+  }
+}
+
+export function inferObjectiveFromText(text: string): LiveObjectiveId {
+  return inferObjectiveHypothesis(text).objective
 }
 
 export function reinforceObjective(

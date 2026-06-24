@@ -1,7 +1,7 @@
 import { detectConversationSignals } from '@/lib/george/live-voice/runtime/conversation-signals'
 import { classifyLiveSpeakerIntent } from '@/lib/george/live-voice/runtime/speaker-intent'
 import { analyzeRoom } from '@/lib/george/live-voice/runtime/room-analyzer'
-import { inferObjectiveFromText } from '@/lib/george/live-voice/runtime/objective-engine'
+import { inferObjectiveHypothesis } from '@/lib/george/live-voice/runtime/objective-engine'
 import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajectory-engine'
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
@@ -30,11 +30,12 @@ export function buildGeorgeCoreInterpretation(input: {
 
   const roomAnalysis = analyzeRoom(context)
 
-  const objective = inferObjectiveFromText(
+  const objectiveHypothesis = inferObjectiveHypothesis(
     [input.desiredOutcome, input.room, input.knownContext, text]
       .filter(Boolean)
       .join(' ')
   )
+  const objective = objectiveHypothesis.objective
 
   const trajectory = georgeTrajectoryEngine.evaluate({
     text: context,
@@ -62,7 +63,7 @@ export function buildGeorgeCoreInterpretation(input: {
     speakerIntent.intent === 'assisted_continuation'
 
   const outcomeGovernor = georgeOutcomeGovernor.evaluate({
-    objectiveKnown: Boolean(input.desiredOutcome || objective),
+    objectiveKnown: Boolean(input.desiredOutcome) || objectiveHypothesis.confidence >= 0.72,
     desiredOutcome: input.desiredOutcome,
     activeOutcome,
     confidence: Math.max(speakerIntent.confidence, trajectory.score),
