@@ -34,28 +34,36 @@ export function resolveLiveRuntimeAuthority(params: {
   if (!setup && !existingSupport && !setupSupport) return null
 
   const room = firstClean(
-    existingSupport?.room,
-    setupSupport?.room,
     setup?.room,
+    setupSupport?.room,
     setupSupport?.purview?.label,
+    existingSupport?.room,
     existingSupport?.purview?.label
   )
 
   const objective = firstClean(
-    existingSupport?.objective,
-    setupSupport?.objective,
     setup?.objective,
+    setupSupport?.objective,
     setupSupport?.purview?.line,
     setupSupport?.purview?.body,
+    existingSupport?.objective,
     existingSupport?.purview?.line,
     existingSupport?.purview?.body
   )
 
   const chair = firstClean(
-    existingSupport?.chair,
     setupSupport?.chair,
     setupSupport?.userPosition,
+    existingSupport?.chair,
     existingSupport?.userPosition
+  )
+
+  const userPosition = firstClean(
+    setup?.userPosition,
+    setupSupport?.userPosition,
+    setupSupport?.chair,
+    existingSupport?.userPosition,
+    existingSupport?.chair
   )
 
   return {
@@ -64,6 +72,7 @@ export function resolveLiveRuntimeAuthority(params: {
     ...(room ? { room } : {}),
     ...(objective ? { objective } : {}),
     ...(chair ? { chair } : {}),
+    ...(userPosition ? { userPosition } : {}),
     selectedCapacityCents:
       existingSupport?.selectedCapacityCents ??
       setupSupport?.selectedCapacityCents ??

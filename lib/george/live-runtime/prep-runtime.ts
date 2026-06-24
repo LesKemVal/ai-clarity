@@ -63,6 +63,7 @@ export type LivePrepSetup = {
   language?: string
   cadence?: string
   objective?: string
+  userPosition?: string
   controlWords?: string
   outcomeShiftPhrase?: string
   toneAdjustment?: 'softer' | 'balanced' | 'sharper'
