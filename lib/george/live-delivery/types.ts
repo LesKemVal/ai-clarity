@@ -29,5 +29,7 @@ export type GeorgeDeliveryContext = {
   voiceEnabled?: boolean
   deliveryStyle?: GeorgeLiveDeliveryStyle
   room?: string
+  objective?: string
+  knownContext?: string
   pressure?: string
 }

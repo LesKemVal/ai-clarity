@@ -39,6 +39,13 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         type: 'TRANSCRIPT_INPUT',
         text: next.text,
         isFinal: next.isFinal,
+        deliveryStyle: (() => {
+          try {
+            return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined
+          } catch {
+            return undefined
+          }
+        })(),
       })
     }
   }
@@ -79,7 +86,16 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
           onEvent: (event) => {
             if (event?.type !== 'ACTION_CUE') return
 
-            emit(event as GeorgeLiveHubRuntimeEvent)
+            const cleanCue = String(event?.cue || '').trim()
+            if (!cleanCue) {
+              console.info('[LIVE][hub][adapter] dropped empty ACTION_CUE', event)
+              return
+            }
+
+            emit({
+              ...event,
+              cue: cleanCue,
+            } as GeorgeLiveHubRuntimeEvent)
           },
         },
       })
@@ -111,6 +127,13 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         type: 'TRANSCRIPT_INPUT',
         text: clean,
         isFinal,
+        deliveryStyle: (() => {
+          try {
+            return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined
+          } catch {
+            return undefined
+          }
+        })(),
       })
     },
 

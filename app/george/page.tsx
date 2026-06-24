@@ -2746,8 +2746,18 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     onError: processLiveAudioError,
   })
   
+  const liveDeliveryStyleHydratedRef = useRef(false)
+
   useEffect(() => {
-    const stored = window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE')
+    const rawStored =
+      window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
+      window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE')
+    const stored =
+      rawStored === 'completion'
+        ? 'continue'
+        : rawStored === 'presentation'
+          ? 'expandedLine'
+          : rawStored
 
     if (
       stored === 'cue' ||
@@ -2759,9 +2769,13 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     ) {
       setLiveDeliveryStyle(stored)
     }
+
+    liveDeliveryStyleHydratedRef.current = true
   }, [])
 
   useEffect(() => {
+    if (!liveDeliveryStyleHydratedRef.current) return
+
     window.localStorage.setItem(
       'GEORGE_LIVE_DELIVERY_STYLE',
       liveDeliveryStyle

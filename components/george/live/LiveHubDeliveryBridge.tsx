@@ -41,6 +41,9 @@ export function LiveHubDeliveryBridge({
         context: {
           voiceEnabled: mode === 'voice',
           deliveryStyle,
+          room: context.room,
+          objective: context.objective,
+          knownContext: context.knownContext,
         },
       })
 
