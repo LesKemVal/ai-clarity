@@ -20,6 +20,7 @@ export function LiveHubShadowBridge({
   transcriptFinal = true,
 }: LiveHubShadowBridgeProps) {
   const lastForwardedTranscriptRef = useRef('')
+  const lastTurnIdRef = useRef('')
   useEffect(() => {
     if (!active) return
     if (!isGeorgeLiveHubEnabled()) return
@@ -37,7 +38,7 @@ export function LiveHubShadowBridge({
         priority: event.priority,
       })
 
-      markRuntimeEvent(event.cue, 'hub_action_cue_received')
+      markRuntimeEvent(event.turnId || lastTurnIdRef.current || event.cue, 'hub_action_cue_received')
     })
 
     adapter.connect(context)
@@ -70,10 +71,13 @@ export function LiveHubShadowBridge({
       isFinal: transcriptFinal,
     })
 
-    markRuntimeEvent(clean, 'transcript_input')
+    const turnId = `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    lastTurnIdRef.current = turnId
 
-    getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal)
-    markRuntimeEvent(clean, 'hub_transcript_sent')
+    markRuntimeEvent(turnId, 'transcript_input')
+
+    getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal, turnId)
+    markRuntimeEvent(turnId, 'hub_transcript_sent')
   }, [active, transcript, transcriptFinal])
 
   return null

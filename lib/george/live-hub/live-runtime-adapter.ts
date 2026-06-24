@@ -12,7 +12,7 @@ export type GeorgeLiveHubRuntimeListener = (event: GeorgeLiveHubRuntimeEvent) =>
 export type GeorgeLiveHubRuntimeAdapter = {
   connect: (context?: GeorgeLiveHubContext) => void
   disconnect: () => void
-  sendTranscript: (text: string, isFinal?: boolean) => void
+  sendTranscript: (text: string, isFinal?: boolean, turnId?: string) => void
   subscribe: (listener: GeorgeLiveHubRuntimeListener) => () => void
 }
 
@@ -22,7 +22,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   const listeners = new Set<GeorgeLiveHubRuntimeListener>()
   let transport: GeorgeLiveHubTransport | null = null
   let connected = false
-  const pendingTranscripts: Array<{ text: string; isFinal: boolean }> = []
+  const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string }> = []
 
   const flushPendingTranscripts = () => {
     if (!connected) return
@@ -39,6 +39,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         type: 'TRANSCRIPT_INPUT',
         text: next.text,
         isFinal: next.isFinal,
+        turnId: next.turnId,
         deliveryStyle: (() => {
           try {
             return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined
@@ -111,13 +112,13 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       emit({ type: 'STATUS', status: 'idle', at: Date.now() })
     },
 
-    sendTranscript(text: string, isFinal = true) {
+    sendTranscript(text: string, isFinal = true, turnId?: string) {
       const clean = String(text || '').trim()
       if (!clean) return
 
       if (!connected) {
         console.info('[LIVE][hub][adapter] queue transcript', { text: clean, isFinal })
-        pendingTranscripts.push({ text: clean, isFinal })
+        pendingTranscripts.push({ text: clean, isFinal, turnId })
         return
       }
 
@@ -127,6 +128,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         type: 'TRANSCRIPT_INPUT',
         text: clean,
         isFinal,
+        turnId,
         deliveryStyle: (() => {
           try {
             return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined

@@ -11,6 +11,7 @@ export function routeGeorgeDeliveryCue(input: {
 
   if (!rawCue) {
     return {
+      turnId: input.actionCue.turnId,
       mode: 'silent',
       text: '',
       reason: 'Dropped empty LIVE action cue.',
@@ -63,6 +64,7 @@ export function routeGeorgeDeliveryCue(input: {
 
   if (!voiceEnabled) {
     return {
+      turnId: input.actionCue.turnId,
       mode: 'visual',
       text,
       reason: 'Voice is disabled; route action cue visually.',
@@ -77,6 +79,7 @@ export function routeGeorgeDeliveryCue(input: {
 
   if (input.actionCue.category === 'pricing') {
     return {
+      turnId: input.actionCue.turnId,
       mode: 'voice',
       text,
       reason: 'Pricing pressure benefits from immediate spoken cue.',

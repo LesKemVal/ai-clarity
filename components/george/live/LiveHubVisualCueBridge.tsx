@@ -17,6 +17,7 @@ type LiveHubVisualCueBridgeProps = {
 }
 
 type VisualCueState = {
+  turnId?: string
   text: string
   priority: number
   confidence: number
@@ -84,11 +85,12 @@ export function LiveHubVisualCueBridge({
     lastCueRef.current = clean
     currentPriorityRef.current = cue.priority
 
-    markRuntimeEvent(clean, 'visual_cue_received')
+    markRuntimeEvent(cue.turnId || clean, 'visual_cue_received')
 
     lastRenderedAtRef.current = now
 
     setVisualCue({
+      turnId: cue.turnId,
       text: clean,
       priority: cue.priority,
       confidence: cue.confidence,
@@ -102,7 +104,7 @@ export function LiveHubVisualCueBridge({
       cue.source === 'groq'
 
     if (shouldSpeakCue) {
-      markRuntimeEvent(clean, 'voice_cue_requested')
+      markRuntimeEvent(cue.turnId || clean, 'voice_cue_requested')
       onSpeakCue?.(clean)
     }
   }, [onSpeakCue, receiverProfile, visualCue, voiceEnabled])
@@ -119,7 +121,7 @@ export function LiveHubVisualCueBridge({
   useEffect(() => {
     if (!visualCue) return
 
-    markRuntimeEvent(visualCue.text, 'visual_cue_rendered')
+    markRuntimeEvent(visualCue.turnId || visualCue.text, 'visual_cue_rendered')
 
     const holdMs =
       receiverProfile === 'audio_only'

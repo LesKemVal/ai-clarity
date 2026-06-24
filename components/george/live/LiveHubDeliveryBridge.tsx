@@ -54,7 +54,7 @@ export function LiveHubDeliveryBridge({
 
       console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
 
-      markRuntimeEvent(resolvedDeliveryCue.text, 'delivery_cue')
+      markRuntimeEvent(event.turnId || resolvedDeliveryCue.text, 'delivery_cue')
 
       if (resolvedDeliveryCue.mode === 'visual') {
         onVisualCue?.(resolvedDeliveryCue)

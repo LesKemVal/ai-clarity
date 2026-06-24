@@ -1,6 +1,7 @@
 import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 export type GeorgeActionCue = {
+  turnId?: string
   cue: string
   reason: string
   source: 'local' | 'groq'

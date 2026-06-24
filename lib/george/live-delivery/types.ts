@@ -14,6 +14,7 @@ export type GeorgeLiveDeliveryStyle =
 export const DEFAULT_GEORGE_LIVE_DELIVERY_STYLE: GeorgeLiveDeliveryStyle = 'advice'
 
 export type GeorgeDeliveryCue = {
+  turnId?: string
   mode: GeorgeDeliveryMode
   text: string
   reason: string
