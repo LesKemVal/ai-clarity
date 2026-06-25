@@ -99,20 +99,35 @@ function isContinuationReasoning(input: LiveReasoningInput) {
 }
 
 
-function violatesContinuationAuthority(volley: string) {
+function violatesContinuationAuthority(volley: string, evidence = '') {
   const clean = String(volley || '').trim()
   if (!clean) return true
 
-  const strategicOverreach =
-    /\b(plan|mitigate|execution risk|scale effectively|demonstrate|prove|projected opportunity|strategy|structure|valuation|shares?|equity|ownership|percent|percentage|terms?|commitment)\b/i.test(clean)
+  const normalizedEvidence = String(evidence || '').toLowerCase().replace(/\s+/g, ' ')
+  const normalizedClean = clean.toLowerCase().replace(/\s+/g, ' ')
+
+  const markedAsInference =
+    /\b(may|might|could|can|would|seems|appears|suggests|signals|likely|possibly|probably|potentially|risk|direction|moving toward|may be|could be|might be)\b/i.test(clean)
 
   const unsupportedNumber =
-    /\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i.test(clean)
+    /\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i.test(clean) &&
+    !normalizedEvidence.includes(normalizedClean.match(/\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i)?.[0]?.toLowerCase() || '')
 
-  const unsupportedBusinessFact =
-    /\b(parties?|counterpart(?:y|ies)|buyer|seller|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|major terms|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader)\b/i.test(clean)
+  const definitiveLanguage =
+    /\b(is|are|was|were|has|have|had|will|did|does|reached|created|creates|creating|secured|agreed|committed|paving|proves|demonstrates)\b/i.test(clean)
 
-  return strategicOverreach || unsupportedNumber || unsupportedBusinessFact
+  const unsupportedFactTerms = Array.from(
+    clean.matchAll(/\b(parties?|counterpart(?:y|ies)|buyer|seller|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|major terms|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader|wife|husband|spouse|partner|children|kids|family)\b/gi)
+  )
+    .map((match) => match[0].toLowerCase())
+    .filter(Boolean)
+
+  const unsupportedDefinitiveFact =
+    definitiveLanguage &&
+    !markedAsInference &&
+    unsupportedFactTerms.some((term) => !normalizedEvidence.includes(term))
+
+  return unsupportedNumber || unsupportedDefinitiveFact
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
@@ -277,7 +292,16 @@ Priority:
 
   if (
     continuationReasoning &&
-    violatesContinuationAuthority(volley) &&
+    violatesContinuationAuthority(
+      volley,
+      [
+        input.transcript,
+        input.lastFiveSeconds,
+        input.shadowMap,
+        input.desiredOutcome,
+        input.activeOutcome,
+      ].join(' ')
+    ) &&
     input.fallbackPacket.volley
   ) {
     volley = input.fallbackPacket.volley
