@@ -73,12 +73,12 @@ function applySteeringContinuationAuthority(
     phrase,
     room: input.contextHint || '',
     objective: input.lastFiveSeconds || input.shadowMap || '',
-    preference: packet.liveAssistMode === 'lines' ? 'repeatable_line' : 'cue',
+    preference: packet.supportStyle === 'continue' ? 'repeatable_line' : 'cue',
   })
 
   if (!continuation.matched) return packet
 
-  if (packet.liveAssistMode === 'lines') {
+  if (packet.supportStyle === 'continue') {
     return {
       ...packet,
       shouldSpeak: true,
@@ -149,7 +149,7 @@ function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInp
     runtimeForce = 'light'
   }
 
-  if (runtimeForce === 'strong' && packet.liveAssistMode === 'cues' && packet.cue) {
+  if (runtimeForce === 'strong' && packet.supportStyle === 'cue' && packet.cue) {
     packet.cue = packet.cue
       ? `${packet.cue.replace(/[.\s]*$/, '')}. Keep moving.`
       : 'Keep moving.'
@@ -420,7 +420,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   }
 
   if (input.audio && packet.speakerIntent !== 'addressed_to_george') {
-    if (packet.liveAssistMode === 'lines') {
+    if (packet.supportStyle === 'continue') {
       packet.cue = ''
       packet.status = `${packet.status} Audio mode: repeatable-line only.`.trim()
     } else if (packet.shouldSpeak && packet.volley) {
