@@ -3017,7 +3017,36 @@ const beginProofOfAwareness = async () => {
       return (
         <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
           <div className="mt-3 space-y-3">
-            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
+            {liveRecoveryAcknowledged && (
+              <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+                      Support selected
+                    </div>
+                    <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
+                      {activeSupportPanel.label}
+                    </div>
+                    <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
+                      {activeSupportPanel.defaultLine || activeSupportPanel.body || 'GEORGE will use this support style in LIVE.'}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLiveRecoveryAcknowledged(false)
+                      setLiveBriefingCapabilitiesConfirmed(false)
+                      setLiveBriefingExpandedSupportPanel(activeSupportPanel.id)
+                    }}
+                    className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className={`${liveRecoveryAcknowledged ? 'hidden' : ''} rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4`}>
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
                 Recommended
               </div>
@@ -3103,7 +3132,7 @@ const beginProofOfAwareness = async () => {
               </div>
             </div>
 
-            <div className="rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46">
+            <div className={`${liveRecoveryAcknowledged ? 'hidden' : ''} rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46`}>
               I can support you through audio, visual display, AI glasses, earbuds, phone, or another available device. You remain responsible for decisions, actions, and outcomes.
             </div>
 
@@ -3215,7 +3244,35 @@ const beginProofOfAwareness = async () => {
 
     return (
       <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else matters?" stage={3}>
-        <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
+        {liveReadyAccepted && (
+          <div className="mt-5 rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+                  Room objective confirmed
+                </div>
+                <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
+                  {selectedLiveRoomObjective ? selectedLiveRoomObjective.label : 'Primary outcome only'}
+                </div>
+                <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
+                  {selectedLiveRoomObjective
+                    ? 'GEORGE will watch this without replacing the primary outcome.'
+                    : 'GEORGE will focus on the desired outcome and adapt as useful signal appears.'}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => confirmReadyRoomAcknowledgement(false)}
+                className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className={`${liveReadyAccepted ? 'hidden' : ''} mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]`}>
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
             Optional intangible objective
           </div>
@@ -3338,7 +3395,7 @@ const beginProofOfAwareness = async () => {
           </div>
         </div>
 
-        <label className={`mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
+        <label className={`${liveReadyAccepted ? 'hidden' : ''} mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
           liveReadyAccepted
             ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
             : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
