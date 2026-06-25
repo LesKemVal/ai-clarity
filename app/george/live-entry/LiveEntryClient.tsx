@@ -3422,12 +3422,16 @@ const beginProofOfAwareness = async () => {
 
     const selectQuickLiveSupport = (style: LiveBriefingSupportPanelId | 'recommended') => {
       const savedStyle = style === 'recommended' ? 'advice' : style
+      const runtimeSupportStyle = toRuntimeSupportStyle(savedStyle)
+
       setQuickLiveSupportStyle(savedStyle)
       setQuickLiveExpandedSupport(style)
       setQuickLiveSteeringOpen(false)
+      setSelectedSupportStyle(normalizeLiveSupportStyle(runtimeSupportStyle))
 
       try {
-        window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', savedStyle)
+        window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', runtimeSupportStyle)
+        window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', runtimeSupportStyle)
         window.localStorage.setItem('george_live_entry_support_preference', savedStyle)
         window.localStorage.setItem('george_live_entry_support_default', savedStyle)
       } catch {}
