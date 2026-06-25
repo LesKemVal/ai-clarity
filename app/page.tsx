@@ -102,8 +102,12 @@ export default function HomePage() {
         {scenes.map((item, index) => (
           <div
             key={`${item.image}-${index}`}
-            className={`absolute inset-0 bg-cover bg-[center_top] sm:bg-center transition-opacity duration-[1400ms] ease-out ${
-              index === sceneIndex ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 bg-cover bg-[center_top] sm:bg-center transition-transform duration-[900ms] ease-out ${
+              index === sceneIndex
+                ? 'translate-x-0'
+                : index < sceneIndex
+                  ? '-translate-x-full'
+                  : 'translate-x-full'
             }`}
             style={{
               backgroundImage: `url(${item.image})`,
