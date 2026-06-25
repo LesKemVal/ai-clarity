@@ -7,97 +7,17 @@ export type EvidenceAuthorityResult = {
 const INFERENCE_MARKERS =
   /\b(may|might|could|can|would|seems|appears|suggests|signals|likely|possibly|probably|potentially|risk|direction|moving toward|may be|could be|might be)\b/i
 
-const ABSTRACT_CONTINUATION_TERMS = new Set([
-  'because',
-  'value',
-  'clear',
-  'clearly',
-  'enough',
-  'support',
-  'supports',
-  'outcome',
-  'room',
-  'understand',
-  'evaluate',
-  'evaluation',
-  'matter',
-  'matters',
-  'staying',
-  'next',
-  'step',
-  'way',
-  'reason',
-  'reasoning',
-  'point',
-  'objective',
-  'trajectory',
-  'signal',
-  'signals',
-  'forward',
-  'conversation',
-  'case',
-  'goal',
+const STRUCTURAL_TERMS = new Set([
+  'the','this','that','these','those','with','without','from','into','onto','about','around','through',
+  'before','after','while','where','when','what','which','who','there','their','they','them','we','our',
+  'you','your','and','but','for','yet','so','not','just','also','than','then','have','has','had','will',
+  'would','could','should','might','being','been','are','was','were','is','because','allowing',
 ])
 
-const STRUCTURAL_TERMS = new Set([
-  'the',
-  'this',
-  'that',
-  'these',
-  'those',
-  'with',
-  'without',
-  'from',
-  'into',
-  'onto',
-  'about',
-  'around',
-  'through',
-  'before',
-  'after',
-  'while',
-  'where',
-  'when',
-  'what',
-  'which',
-  'who',
-  'whom',
-  'whose',
-  'there',
-  'their',
-  'they',
-  'them',
-  'we',
-  'our',
-  'ours',
-  'you',
-  'your',
-  'yours',
-  'and',
-  'but',
-  'for',
-  'nor',
-  'yet',
-  'so',
-  'not',
-  'just',
-  'also',
-  'than',
-  'then',
-  'have',
-  'has',
-  'had',
-  'will',
-  'would',
-  'could',
-  'should',
-  'might',
-  'being',
-  'been',
-  'are',
-  'was',
-  'were',
-  'is',
+const ABSTRACT_CONTINUATION_TERMS = new Set([
+  'value','clear','clearly','enough','support','supports','outcome','room','understand','evaluate',
+  'evaluation','matter','matters','staying','next','step','way','reason','reasoning','point','objective',
+  'trajectory','signal','signals','forward','conversation','case','goal','useful','strongest','active',
 ])
 
 const HIGH_RISK_TERMS =
@@ -106,8 +26,11 @@ const HIGH_RISK_TERMS =
 const NAMED_ENTITIES =
   /\b(microsoft|google|apple|amazon|meta|tesla|nvidia|openai|oracle|ibm|intel|netflix|uber|airbnb|salesforce)\b/gi
 
+const GENERIC_UNSUPPORTED_CONCLUSIONS =
+  /\b(game[- ]changer|global economy|far[- ]reaching|implications|trade|investment|job creation|transformational|historic|unprecedented|revolutionary|ripple effects?|worldwide impact|economic impact|industry landscape|significant shift|major shift|creates jobs?|create jobs?|changes everything)\b/gi
+
 const FACTUAL_VERBS =
-  /\b(reached|created|secured|agreed|committed|accepted|approved|resolved|addressed|established|confirmed|paving|sets the stage|marking|allowing|increase|increased|negotiate|negotiated)\b/i
+  /\b(reached|created|secured|agreed|committed|accepted|approved|resolved|addressed|established|confirmed|paving|sets the stage|marking|allowing|increase|increased|negotiate|negotiated|creates?|becomes?|impacts?|changes?|drives?|positions?)\b/i
 
 function normalize(value: unknown) {
   return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim()
@@ -119,6 +42,28 @@ function words(value: string) {
 
 function unique(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)))
+}
+
+function splitClauses(output: string) {
+  return String(output || '')
+    .replace(/^\.\.\./, '')
+    .split(/[,;.!?]|\s+\b(?:and|but|while|which|that)\b\s+/i)
+    .map((clause) => clause.trim())
+    .filter(Boolean)
+}
+
+function unsupportedMatches(pattern: RegExp, clean: string, evidence: string) {
+  return unique(Array.from(clean.matchAll(pattern)).map((match) => normalize(match[0])))
+    .filter((term) => term && !evidence.includes(term))
+}
+
+function unsupportedSubstantiveTerms(clause: string, evidence: string) {
+  return unique(words(clause)).filter((term) => {
+    if (evidence.includes(term)) return false
+    if (STRUCTURAL_TERMS.has(term)) return false
+    if (ABSTRACT_CONTINUATION_TERMS.has(term)) return false
+    return true
+  })
 }
 
 export function violatesEvidenceAuthority(output: string, evidence = ''): EvidenceAuthorityResult {
@@ -138,38 +83,39 @@ export function violatesEvidenceAuthority(output: string, evidence = ''): Eviden
     return { violates: true, reason: 'unsupported_number', unsupportedTerms: unsupportedNumbers }
   }
 
-  const unsupportedNamedEntities = unique(
-    Array.from(clean.matchAll(NAMED_ENTITIES)).map((match) => normalize(match[0]))
-  ).filter((term) => !normalizedEvidence.includes(term))
-
-  if (unsupportedNamedEntities.length && !markedAsInference) {
-    return { violates: true, reason: 'unsupported_named_entity', unsupportedTerms: unsupportedNamedEntities }
+  const entityTerms = unsupportedMatches(NAMED_ENTITIES, clean, normalizedEvidence)
+  if (entityTerms.length && !markedAsInference) {
+    return { violates: true, reason: 'unsupported_named_entity', unsupportedTerms: entityTerms }
   }
 
-  const highRiskTerms = unique(
-    Array.from(clean.matchAll(HIGH_RISK_TERMS)).map((match) => normalize(match[0]))
-  ).filter((term) => !normalizedEvidence.includes(term))
-
+  const highRiskTerms = unsupportedMatches(HIGH_RISK_TERMS, clean, normalizedEvidence)
   if (highRiskTerms.length && !markedAsInference) {
     return { violates: true, reason: 'unsupported_high_risk_fact', unsupportedTerms: highRiskTerms }
   }
 
-  const substantiveTerms = unique(words(clean)).filter((term) => {
-    if (normalizedEvidence.includes(term)) return false
-    if (STRUCTURAL_TERMS.has(term)) return false
-    if (ABSTRACT_CONTINUATION_TERMS.has(term)) return false
-    return true
-  })
+  const genericConclusions = unsupportedMatches(GENERIC_UNSUPPORTED_CONCLUSIONS, clean, normalizedEvidence)
+  if (genericConclusions.length && !markedAsInference) {
+    return { violates: true, reason: 'unsupported_conclusion', unsupportedTerms: genericConclusions }
+  }
 
-  const propositionLike =
-    /\b(the|these|those|both|all|our|their|we)\b/i.test(clean) ||
-    FACTUAL_VERBS.test(clean)
+  for (const clause of splitClauses(clean)) {
+    const clauseMarkedAsInference = INFERENCE_MARKERS.test(clause)
+    if (clauseMarkedAsInference) continue
 
-  if (!markedAsInference && propositionLike && substantiveTerms.length >= 2) {
-    return {
-      violates: true,
-      reason: 'unsupported_factual_proposition',
-      unsupportedTerms: substantiveTerms.slice(0, 8),
+    const propositionLike =
+      /\b(the|these|those|both|all|our|their|we|this|that)\b/i.test(clause) ||
+      FACTUAL_VERBS.test(clause)
+
+    if (!propositionLike) continue
+
+    const unsupportedTerms = unsupportedSubstantiveTerms(clause, normalizedEvidence)
+
+    if (unsupportedTerms.length >= 2) {
+      return {
+        violates: true,
+        reason: 'unsupported_factual_clause',
+        unsupportedTerms: unsupportedTerms.slice(0, 8),
+      }
     }
   }
 
