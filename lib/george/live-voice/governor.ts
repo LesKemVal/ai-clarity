@@ -374,11 +374,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
 
   const continuationCandidate = evaluateContinuationCandidate({
     transcript,
-    deliveryStyle:
-      (input.runtimeSupport as { deliveryBehavior?: string; deliveryStyle?: string } | null | undefined)?.deliveryBehavior ||
-      (input.runtimeSupport as { deliveryStyle?: string } | null | undefined)?.deliveryStyle ||
-      (input as { deliveryBehavior?: string }).deliveryBehavior ||
-      packet.deliveryBehavior,
+    deliveryStyle: packet.supportStyle,
     speakerIntent: packet.speakerIntent,
   })
 
