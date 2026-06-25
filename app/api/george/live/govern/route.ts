@@ -4,6 +4,8 @@ import { reasonLiveNextMove } from '@/lib/george/live-voice/live-reasoning'
 import { verifyLiveAccessFromRequest } from '@/lib/subscriptions/live-access'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
 import { normalizeLiveSupportStyle } from '@/lib/george/live-runtime/support-style'
+import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
+import { continuationEvidence, safeContinuationReplacement } from '@/lib/george/core/verification/continuation-replacement'
 
 export async function POST(req: NextRequest) {
   try {
@@ -80,7 +82,40 @@ export async function POST(req: NextRequest) {
       fallbackPacket: packet,
     }).catch(() => null)
 
-    return NextResponse.json(reasonedPacket || packet)
+    const finalPacket = reasonedPacket || packet
+
+    if (supportStyle === 'continue' && finalPacket.volley) {
+      const evidence = continuationEvidence({
+        transcript: String(body?.transcript || ''),
+        lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+        shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
+        desiredOutcome: typeof body?.desiredOutcome === 'string' ? body.desiredOutcome : '',
+        activeOutcome: typeof body?.activeOutcome === 'string' ? body.activeOutcome : '',
+      })
+
+      const authority = violatesEvidenceAuthority(finalPacket.volley, evidence)
+
+      if (authority.violates) {
+        console.warn('[GEORGE][continuation][final-authority-replaced]', {
+          reason: authority.reason,
+          unsupportedTerms: authority.unsupportedTerms,
+          originalVolley: finalPacket.volley,
+        })
+
+        finalPacket.volley = safeContinuationReplacement({
+          transcript: String(body?.transcript || ''),
+          lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+          shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
+          desiredOutcome: typeof body?.desiredOutcome === 'string' ? body.desiredOutcome : '',
+          activeOutcome: typeof body?.activeOutcome === 'string' ? body.activeOutcome : '',
+        })
+        finalPacket.cue = ''
+        finalPacket.shouldSpeak = true
+        finalPacket.status = `${finalPacket.status || ''} Final continuation authority replacement: ${authority.reason}`.trim()
+      }
+    }
+
+    return NextResponse.json(finalPacket)
   } catch {
     return NextResponse.json(
       {

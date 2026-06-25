@@ -21,7 +21,7 @@ const ABSTRACT_CONTINUATION_TERMS = new Set([
 ])
 
 const HIGH_RISK_TERMS =
-  /\b(parties?|counterpart(?:y|ies)|buyer|seller|entity|entities|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|framework|major concerns|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader|supplier|suppliers|bargaining power|negotiating power|market presence|combined entity|wife|husband|spouse|partner|children|kids|family)\b/gi
+  /\b(parties?|counterpart(?:y|ies)|buyer|seller|entity|entities|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|framework|major concerns|key terms|relevant parties|negotiation process|smooth and efficient|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader|supplier|suppliers|bargaining power|negotiating power|market presence|combined entity|wife|husband|spouse|partner|children|kids|family)\b/gi
 
 const NAMED_ENTITIES =
   /\b(microsoft|google|apple|amazon|meta|tesla|nvidia|openai|oracle|ibm|intel|netflix|uber|airbnb|salesforce)\b/gi
@@ -96,6 +96,10 @@ export function violatesEvidenceAuthority(output: string, evidence = ''): Eviden
   const genericConclusions = unsupportedMatches(GENERIC_UNSUPPORTED_CONCLUSIONS, clean, normalizedEvidence)
   if (genericConclusions.length && !markedAsInference) {
     return { violates: true, reason: 'unsupported_conclusion', unsupportedTerms: genericConclusions }
+  }
+
+  if (/^\.\.\.\s*(alright|okay|let's|we'll|we need|we are|we're)\b/i.test(clean)) {
+    return { violates: true, reason: 'unsupported_continuation_takeover', unsupportedTerms: [clean.slice(0, 40)] }
   }
 
   for (const clause of splitClauses(clean)) {
