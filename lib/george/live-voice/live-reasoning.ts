@@ -127,7 +127,23 @@ function violatesContinuationAuthority(volley: string, evidence = '') {
     !markedAsInference &&
     unsupportedFactTerms.some((term) => !normalizedEvidence.includes(term))
 
-  return unsupportedNumber || unsupportedDefinitiveFact
+  const unsupportedNamedEntity = Array.from(
+    clean.matchAll(/\b(microsoft|google|apple|amazon|meta|tesla|nvidia|openai|oracle|ibm|intel|netflix|uber|airbnb|salesforce)\b/gi)
+  )
+    .map((match) => match[0].toLowerCase())
+    .filter(Boolean)
+    .some((term) => !normalizedEvidence.includes(term))
+
+  const unsupportedTransactionNarrative =
+    !markedAsInference &&
+    /\b(largest deal|industry shift|market shift|complete integration|combined entity|synergies|supplier|suppliers|stronger market presence|negotiating power|tech industry|industry landscape)\b/i.test(clean)
+
+  return (
+    unsupportedNumber ||
+    unsupportedDefinitiveFact ||
+    unsupportedNamedEntity ||
+    unsupportedTransactionNarrative
+  )
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
