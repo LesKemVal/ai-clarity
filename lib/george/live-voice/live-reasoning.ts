@@ -139,6 +139,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
   const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryBehavior || ''
   const supportStyle = input.supportStyle || input.fallbackPacket.supportStyle || 'cue'
+  const cueDepth = supportStyle === 'cue' ? input.fallbackPacket.cueDepth || 'tactical' : undefined
   const mode = continuationReasoning
     ? 'continuation'
     : deliveryStyle === 'response'
@@ -162,6 +163,17 @@ Your job:
 - Give the next useful LIVE response.
 - Say what is most likely to help the user accomplish the preferred or requested outcome.
 - Optimize for short, usable sentences when brevity best serves the chosen support mode.
+
+Cue Depth:
+${supportStyle === 'cue'
+  ? cueDepth === 'brief'
+    ? '- BRIEF CUE. Give one very short cue. Usually 2–6 words. No explanation. No line for the user to repeat unless absolutely necessary.'
+    : cueDepth === 'tactical'
+      ? '- TACTICAL CUE. Give one concise tactical cue. Usually one short sentence. Name the next move, risk, or timing adjustment.'
+      : cueDepth === 'advisory'
+        ? '- ADVISORY CUE. Give a cue with brief operational advice. Still concise. Do not become a full Response.'
+        : '- EXTENDED ADVISORY CUE. Give the strongest cue-level guidance needed. May be two short sentences, but must remain Cue mode and must not become Response, Presentation, or Continuation.'
+  : '- Not applicable. Cue Depth only applies when Support style is Cue.'}
 
 Intervention Type:
 ${continuationReasoning
@@ -211,6 +223,7 @@ Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Support style: ${mode}
 Runtime intent: ${input.runtimeIntent || input.fallbackPacket.runtimeIntent || 'unknown'}
+Cue depth: ${cueDepth || 'not_applicable'}
 Intervention type: ${continuationReasoning ? 'continuation' : mode}
 Speaker perspective: ${perspective}
 Last signal: ${lastFiveSeconds}
