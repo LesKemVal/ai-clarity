@@ -3,6 +3,7 @@ import type { LiveVoicePacket } from './types'
 import type { LiveSupportStyle } from '../live-runtime/support-style'
 import { evaluateSignalSufficiency } from '../runtime/signal-sufficiency'
 import { rankSignals } from '../runtime/signal-ranking'
+import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -130,61 +131,7 @@ function safeContinuationReplacement(input: LiveReasoningInput) {
 }
 
 function violatesContinuationAuthority(volley: string, evidence = '') {
-  const clean = String(volley || '').trim()
-  if (!clean) return true
-
-  const normalizedEvidence = String(evidence || '').toLowerCase().replace(/\s+/g, ' ')
-  const normalizedClean = clean.toLowerCase().replace(/\s+/g, ' ')
-
-  const markedAsInference =
-    /\b(may|might|could|can|would|seems|appears|suggests|signals|likely|possibly|probably|potentially|risk|direction|moving toward|may be|could be|might be)\b/i.test(clean)
-
-  const unsupportedNumber =
-    /\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i.test(clean) &&
-    !normalizedEvidence.includes(normalizedClean.match(/\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i)?.[0]?.toLowerCase() || '')
-
-  const definitiveLanguage =
-    /\b(is|are|was|were|has|have|had|will|did|does|reached|created|creates|creating|secured|agreed|committed|paving|proves|demonstrates)\b/i.test(clean)
-
-  const unsupportedFactTerms = Array.from(
-    clean.matchAll(/\b(parties?|counterpart(?:y|ies)|buyer|seller|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|major terms|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader|wife|husband|spouse|partner|children|kids|family)\b/gi)
-  )
-    .map((match) => match[0].toLowerCase())
-    .filter(Boolean)
-
-  const unsupportedDefinitiveFact =
-    definitiveLanguage &&
-    !markedAsInference &&
-    unsupportedFactTerms.some((term) => !normalizedEvidence.includes(term))
-
-  const unsupportedNamedEntity = Array.from(
-    clean.matchAll(/\b(microsoft|google|apple|amazon|meta|tesla|nvidia|openai|oracle|ibm|intel|netflix|uber|airbnb|salesforce)\b/gi)
-  )
-    .map((match) => match[0].toLowerCase())
-    .filter(Boolean)
-    .some((term) => !normalizedEvidence.includes(term))
-
-  const unsupportedTransactionNarrative =
-    !markedAsInference &&
-    /\b(largest deal|industry shift|market shift|complete integration|combined entity|synergies|supplier|suppliers|stronger market presence|negotiating power|tech industry|industry landscape|comprehensive framework|major concerns|seamless integration)\b/i.test(clean)
-
-  const unsupportedFactualProposition =
-    !markedAsInference &&
-    /\b(the|these|those|both|all|our|their|we)\s+(parties?|companies|customers?|investors?|buyers?|sellers?|teams?|leaders?|stakeholders?)\s+(have|has|had|are|were|will|agreed|reached|created|secured|committed|accepted|approved|resolved|addressed|set|established|confirmed)\b/i.test(clean)
-
-  const unsupportedEventClaim =
-    !markedAsInference &&
-    /\b(have|has|had|will|did|does|reached|created|secured|agreed|committed|accepted|approved|resolved|addressed|established|confirmed|paving|sets the stage|marking)\b/i.test(clean) &&
-    !/\b(may|might|could|seems|appears|suggests|likely|possibly|potentially)\b/i.test(clean)
-
-  return (
-    unsupportedNumber ||
-    unsupportedDefinitiveFact ||
-    unsupportedNamedEntity ||
-    unsupportedTransactionNarrative ||
-    unsupportedFactualProposition ||
-    unsupportedEventClaim
-  )
+  return violatesEvidenceAuthority(volley, evidence).violates
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
@@ -242,7 +189,8 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
         '- Do not invent transaction types, people, companies, relationships, numbers, agreements, commitments, evidence, customers, revenue, or events.',
         '- If the next factual clause is unsupported, stop before it or use "__" while preserving conversational flow.',
         '- Do not give advice, labels, strategy, or coaching language.',
-      ].join('\\n')
+      ].join('\
+')
     : ''
 
   const system = `
