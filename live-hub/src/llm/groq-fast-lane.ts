@@ -47,9 +47,9 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
     deliveryStyle === 'continue'
       ? 'CONTINUATION CONTRACT: Continue only the unfinished thought in the transcript. Start with "...". Do not answer, advise, explain, or introduce new facts, numbers, valuation, ownership, terms, promises, markets, returns, or claims. If a specific value is missing, use "__".'
       : deliveryStyle === 'expandedLine'
-        ? 'PRESENTATION CONTRACT: Return a structured spoken presentation. Use exactly 4 short lines. Each line should advance the case clearly. Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. Use only transcript/objective/context. If a needed fact is missing, say it as a placeholder with "__".'
+        ? 'PRESENTATION CONTRACT: Return a structured spoken presentation. Use exactly 4 short lines. Each line should advance the users point. Do not describe the room, role, or metadata. Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. Use only transcript and known context. If a needed fact is missing, use "__".'
         : deliveryStyle === 'response'
-          ? 'RESPONSE CONTRACT: Return a complete answer the user can say aloud. Use 2 to 4 concise sentences. Directly answer the question. Do not give meta-advice like "start by" or "ask them". Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. If a needed fact is missing, use "__" or say what is known.'
+          ? 'RESPONSE CONTRACT: Return a complete answer the user can say aloud. Use 2 to 4 concise sentences. Directly answer the question in the transcript. Do not describe the room, role, or metadata. Do not give meta-advice like "start by" or "ask them". Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. If a needed fact is missing, use "__" or say what is known.'
           : deliveryStyle === 'line'
             ? 'LINE CONTRACT: Return one sentence the user can say aloud. No coaching language.'
             : deliveryStyle === 'advice'
@@ -58,7 +58,7 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
                 ? 'SILENT CONTRACT: Return exactly SILENT.'
                 : 'CUE CONTRACT: Return one concise tactical cue only. 3 to 8 words. No explanation.'
 
-  const contextContract = 'Use the supplied room, chair, objective, knownContext, secondaryOutcome, secondaryObjective, intangibleObjective, and userPosition as operational context. Do not default to generic business, startup, investor, sales, or consulting language. Reason from the supplied room context first.'
+  const contextContract = 'The transcript is the primary source. Use room, chair, objective, knownContext, secondaryOutcome, secondaryObjective, intangibleObjective, and userPosition only to interpret what the user is trying to say or answer. Do not repeat room metadata such as "I am the CEO" or "we are in a live setting" unless the transcript itself asks for that. Do not default to generic business, startup, investor, sales, or consulting language. If context is thin, stay neutral and specific to the transcript.'
 
   const systemPrompt = `You are GEORGE LIVE. ${contextContract} ${modeContract}${operationalContextPrompt}`
 
