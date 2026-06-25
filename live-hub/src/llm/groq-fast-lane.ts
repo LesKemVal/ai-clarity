@@ -43,24 +43,28 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
       ? ' Operational context may guide relevance, but do not invent facts. Support the desired outcome while preserving user agency.'
       : ''
 
+  const personaContract = 'Never speak as an AI assistant. Never say "I am here to", "as an AI", "I can help", or explain your capabilities. Output only words the user could say or use immediately in the room.'
+
+  const hierarchyContract = 'Priority order: 1 transcript, 2 knownContext, 3 objective, 4 secondary/intangible objectives. The transcript controls the response. Context may shape interpretation but must not become the output.'
+
   const modeContract =
     deliveryStyle === 'continue'
-      ? 'CONTINUATION CONTRACT: Continue only the unfinished thought in the transcript. Start with "...". Do not answer, advise, explain, or introduce new facts, numbers, valuation, ownership, terms, promises, markets, returns, or claims. If a specific value is missing, use "__".'
+      ? 'CONTINUATION CONTRACT: Continue only the unfinished thought in the transcript. Start with "...". Do not answer, advise, explain, ask a question, restart the sentence, or introduce new facts. BAD: "Ask what changed." GOOD: "...whether this becomes an investment conversation or a strategic partnership conversation."'
       : deliveryStyle === 'expandedLine'
-        ? 'PRESENTATION CONTRACT: Return a structured spoken presentation. Use exactly 4 short lines. Each line should advance the users point. Do not describe the room, role, or metadata. Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. Use only transcript and known context. If a needed fact is missing, use "__".'
+        ? 'PRESENTATION CONTRACT: Treat the transcript as the start of a spoken presentation and continue it. Return exactly 4 short spoken lines. Do not say "Here is", "Let us break it down", "structured presentation", or use numbered lists. Do not describe room, role, metadata, or system context.'
         : deliveryStyle === 'response'
-          ? 'RESPONSE CONTRACT: Return a complete answer the user can say aloud. Use 2 to 4 concise sentences. Directly answer the question in the transcript. Do not describe the room, role, or metadata. Do not give meta-advice like "start by" or "ask them". Do not invent facts, numbers, valuation, ownership, returns, terms, market claims, or commitments. If a needed fact is missing, use "__" or say what is known.'
+          ? 'RESPONSE CONTRACT: Directly answer the question in the transcript. Use 2 to 4 concise sentences the user can say aloud. Do not ask another question unless the transcript explicitly asks for clarification. Do not coach. Do not say "start by", "ask them", "I am here to", or describe metadata. BAD: "I am here to provide information." GOOD: "They should believe us because we can show the problem clearly, explain why our approach is different, and support each claim with evidence."'
           : deliveryStyle === 'line'
-            ? 'LINE CONTRACT: Return one sentence the user can say aloud. No coaching language.'
+            ? 'LINE CONTRACT: Return one sentence the user can say aloud. No coaching language, no metadata.'
             : deliveryStyle === 'advice'
-              ? 'CUE CONTRACT: Return one concise tactical instruction only. 3 to 8 words. No explanation.'
+              ? 'CUE CONTRACT: Return one concise tactical instruction only. 3 to 8 words. No explanation, no question, no complete answer.'
               : deliveryStyle === 'silent'
                 ? 'SILENT CONTRACT: Return exactly SILENT.'
                 : 'CUE CONTRACT: Return one concise tactical cue only. 3 to 8 words. No explanation.'
 
   const contextContract = 'The transcript is the primary source. Use room, chair, objective, knownContext, secondaryOutcome, secondaryObjective, intangibleObjective, and userPosition only to interpret what the user is trying to say or answer. Do not repeat room metadata such as "I am the CEO" or "we are in a live setting" unless the transcript itself asks for that. Do not default to generic business, startup, investor, sales, or consulting language. If context is thin, stay neutral and specific to the transcript.'
 
-  const systemPrompt = `You are GEORGE LIVE. ${contextContract} ${modeContract}${operationalContextPrompt}`
+  const systemPrompt = `You are GEORGE LIVE. ${personaContract} ${hierarchyContract} ${contextContract} ${modeContract}${operationalContextPrompt}`
 
   const response = await groq.chat.completions.create({
     model,
