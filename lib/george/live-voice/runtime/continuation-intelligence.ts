@@ -1,3 +1,5 @@
+import { assessContinuationState } from '../../live-runtime/continuation-state'
+
 export type ContinuationCandidateInput = {
   transcript: string
   deliveryStyle?: string | null
@@ -115,6 +117,23 @@ export function evaluateContinuationCandidate(
     pattern.test(transcript)
   )
 
+  const state = assessContinuationState({
+    transcript,
+    supportStyle: input.deliveryStyle,
+    speakerIntent: input.speakerIntent,
+  })
+
+  if (state.state === 'handoff' || state.state === 'unfinished') {
+    return {
+      candidate: true,
+      confidence: Math.max(state.confidence, hasTrailingContinuationPattern ? (wordCount <= 14 ? 0.88 : 0.76) : 0),
+      explicitTrigger: false,
+      incompleteThought: true,
+      punctuationClosed: false,
+      reason: state.reason,
+    }
+  }
+
   if (hasTrailingContinuationPattern) {
     return {
       candidate: true,
@@ -128,10 +147,10 @@ export function evaluateContinuationCandidate(
 
   return {
     candidate: false,
-    confidence: 0.38,
+    confidence: state.confidence || 0.38,
     explicitTrigger: false,
     incompleteThought: false,
     punctuationClosed: false,
-    reason: 'No explicit continuation trigger or incomplete-thought signal detected.',
+    reason: state.reason || 'No explicit continuation trigger or incomplete-thought signal detected.',
   }
 }
