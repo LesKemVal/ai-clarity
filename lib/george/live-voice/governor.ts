@@ -403,6 +403,16 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
         '',
       room: input.contextHint || '',
       audio: input.audio,
+      assessment: {
+        state: continuationCandidate.explicitTrigger ? 'unfinished' : 'unfinished',
+        confidence: continuationCandidate.confidence,
+        likelyMissing: continuationCandidate.explicitTrigger
+          ? ['completion of unfinished thought']
+          : ['meaningful completion'],
+        preservedObjective: Boolean(input.lastFiveSeconds || input.contextHint),
+        interrupted: !continuationCandidate.explicitTrigger,
+        reason: continuationCandidate.reason,
+      },
     })
 
     if (generatedContinuation.continuation) {

@@ -1,8 +1,11 @@
+import type { ContinuationAssessment } from '../../live-runtime/continuation-state'
+
 export type ContinuationGenerationInput = {
   transcript: string
   objective?: string | null
   room?: string | null
   audio?: boolean
+  assessment?: ContinuationAssessment | null
 }
 
 export type ContinuationGenerationResult = {
@@ -43,8 +46,20 @@ function objectiveHint(objective?: string | null, room?: string | null) {
   return 'the point stays connected to the outcome'
 }
 
-function continuationForStem(stem: string, hint: string) {
+function continuationForStem(stem: string, hint: string, assessment?: ContinuationAssessment | null) {
   const lower = stem.toLowerCase()
+
+  if (assessment?.state === 'handoff') {
+    return `...let me answer that directly.`
+  }
+
+  if (assessment?.interrupted) {
+    return `...and the point I was making is that ${hint}.`
+  }
+
+  if (assessment?.likelyMissing?.includes('meaningful completion') && /\b(what we|what i|what this|what that)\b/i.test(lower)) {
+    return `...what matters is keeping the next step clear.`
+  }
 
   if (/\b(percent|percentage|valuation|price|salary|compensation|amount|stake|share|equity|split|term|terms|months?|years?)\s+(of|at|for|is|are)?$/i.test(lower)) {
     return `...__.`
@@ -103,11 +118,13 @@ export function generateContinuation(
   }
 
   const hint = objectiveHint(input.objective, input.room)
-  const continuation = continuationForStem(stem, hint)
+  const continuation = continuationForStem(stem, hint, input.assessment)
 
   return {
     continuation,
-    confidence: 0.82,
-    reason: 'Generated objective-aware continuation from explicit trigger.',
+    confidence: Math.max(0.82, input.assessment?.confidence || 0),
+    reason: input.assessment?.reason
+      ? `Generated continuation using state: ${input.assessment.reason}`
+      : 'Generated objective-aware continuation from explicit trigger.',
   }
 }
