@@ -16,7 +16,7 @@ export type LiveRuntimeEvent = {
     cue?: string
     nextMove?: string
     responseMode?: string
-    deliveryStyle?: string
+    deliveryBehavior?: string
     intervention?: string
     confidence?: number
     interruptionRisk?: number

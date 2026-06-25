@@ -40,7 +40,7 @@ export type OrchestratorPacket = {
   responseMode?: string
   responseTone?: string
   responseCompression?: string
-  deliveryStyle?: string
+  deliveryBehavior?: string
   intervention?: string
 }
 
@@ -320,7 +320,7 @@ export function orchestrateLiveTurn(
     responseMode: nextPacket.responseMode,
     responseTone: nextPacket.responseTone,
     responseCompression: nextPacket.responseCompression,
-    deliveryStyle: nextPacket.deliveryStyle,
+    deliveryBehavior: nextPacket.deliveryBehavior,
     intervention: nextPacket.intervention,
   })
 
@@ -407,7 +407,7 @@ export function orchestrateLiveTurn(
     decisionAction: decisionWindow.action,
     forecastBias,
     responseMode: nextPacket.responseMode,
-    deliveryStyle: nextPacket.deliveryStyle,
+    deliveryBehavior: nextPacket.deliveryBehavior,
     intervention: nextPacket.intervention,
   })
 
@@ -423,7 +423,7 @@ export function orchestrateLiveTurn(
     georgeLiveRuntimeEvents.emit('silence_required', {
       reason: silence.reason,
       responseMode: nextPacket.responseMode,
-      deliveryStyle: nextPacket.deliveryStyle,
+      deliveryBehavior: nextPacket.deliveryBehavior,
       intervention: nextPacket.intervention,
       interruptionRisk: normalizedInterruptionRisk,
       silence: silence.silenceType,
@@ -435,7 +435,7 @@ export function orchestrateLiveTurn(
       cue: nextPacket.cue,
       nextMove: nextPacket.volley,
       responseMode: nextPacket.responseMode,
-      deliveryStyle: nextPacket.deliveryStyle,
+      deliveryBehavior: nextPacket.deliveryBehavior,
       intervention: nextPacket.intervention,
       confidence: nextPacket.confidence,
       escalationLikelihood,

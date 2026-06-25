@@ -57,7 +57,7 @@ export type LiveVoicePacket = {
   transferReady?: boolean
   responseTone?: string
   responseCompression?: string
-  deliveryStyle?: string
+  deliveryBehavior?: string
   supportStyle?: LiveSupportStyle
   cueDepth?: CueDepth
   runtimeIntent?: string
@@ -87,6 +87,8 @@ export type LiveVoiceGovernorInput = {
   cueDepth?: CueDepth
   runtimeIntent?: string
   liveAssistMode?: LegacyLiveAssistMode
+  deliveryBehavior?: string
+  /** Legacy compatibility input. Prefer supportStyle for user choice and deliveryBehavior for runtime output shaping. */
   deliveryStyle?: string
   runtimeMemory?: LiveRuntimeMemory
   runtimeSupport?: LiveRuntimeSupportInput | null

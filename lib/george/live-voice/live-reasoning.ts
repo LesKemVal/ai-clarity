@@ -137,7 +137,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   .join(', ')
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
-  const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryStyle || ''
+  const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryBehavior || ''
   const mode = continuationReasoning
     ? 'continuation'
     : deliveryStyle === 'response'

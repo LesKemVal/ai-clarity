@@ -12,7 +12,7 @@ export type SilenceDecisionInput = {
   decisionAction?: string
   forecastBias?: string
   responseMode?: string
-  deliveryStyle?: string
+  deliveryBehavior?: string
   intervention?: string
 }
 
@@ -79,7 +79,7 @@ class GeorgeSilenceIntelligence {
       }
     }
 
-    if (input.intervention === 'hold' || input.deliveryStyle === 'silence') {
+    if (input.intervention === 'hold' || input.deliveryBehavior === 'silence') {
       return {
         shouldHold: true,
         reason: 'Response policy requests silence.',

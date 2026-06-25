@@ -18,7 +18,7 @@ export type ResponseShapeInput = {
   responseMode?: string
   responseTone?: string
   responseCompression?: string
-  deliveryStyle?: string
+  deliveryBehavior?: string
   intervention?: string
 }
 
@@ -50,7 +50,7 @@ class GeorgeResponseShaper {
     let calmingLine = ''
     let postureCue = ''
 
-    if (input.deliveryStyle === 'silence' || input.intervention === 'hold') {
+    if (input.deliveryBehavior === 'silence' || input.intervention === 'hold') {
       return {
         volley: '',
         cue,
@@ -220,7 +220,7 @@ class GeorgeResponseShaper {
       reasons.push('policy calm tone')
     }
 
-    if (input.deliveryStyle === 'proof') {
+    if (input.deliveryBehavior === 'proof') {
       volley = this.forceProof(volley)
       cue = this.prependCue(cue, 'Lead with proof.')
       reasons.push('policy proof delivery')

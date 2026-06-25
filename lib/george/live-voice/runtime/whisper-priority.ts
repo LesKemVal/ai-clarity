@@ -58,7 +58,7 @@ class GeorgeWhisperPriority {
     if (
       event.type === 'silence_required' ||
       event.payload?.intervention === 'hold' ||
-      event.payload?.deliveryStyle === 'silence'
+      event.payload?.deliveryBehavior === 'silence'
     ) {
       return {
         priority: 'silent',

@@ -90,7 +90,7 @@ function applySteeringContinuationAuthority(
           : continuation.direction === 'reframe'
             ? 'redirect'
             : 'speak',
-      deliveryStyle:
+      deliveryBehavior:
         continuation.direction === 'buy_time' || continuation.direction === 'hold'
           ? 'silence'
           : continuation.direction === 'soften'
@@ -118,7 +118,7 @@ function applySteeringContinuationAuthority(
         : continuation.direction === 'reframe'
           ? 'redirect'
           : 'speak',
-    deliveryStyle:
+    deliveryBehavior:
       continuation.direction === 'buy_time' || continuation.direction === 'hold'
         ? 'silence'
         : continuation.direction === 'soften'
@@ -182,12 +182,12 @@ function applyRuntimeSupport(packet: LiveVoicePacket, input: LiveVoiceGovernorIn
 
   if (overlay?.cadenceProfile === 'Sharp') {
     nextPacket.responseCompression = 'tight'
-    nextPacket.deliveryStyle = 'compressed_operational'
+    nextPacket.deliveryBehavior = 'compressed_operational'
   }
 
   if (overlay?.cadenceProfile === 'Measured') {
     nextPacket.responseCompression = 'measured'
-    nextPacket.deliveryStyle = 'calm_operational'
+    nextPacket.deliveryBehavior = 'calm_operational'
   }
 
   if (overlay?.qualificationStyle === 'Direct') {
@@ -348,7 +348,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     responseForm: policy.responseForm,
     responseTone: policy.tone,
     responseCompression: policy.compression,
-    deliveryStyle: policy.deliveryStyle,
+    deliveryBehavior: policy.deliveryBehavior,
     intervention: policy.intervention,
     speakerIntent: speakerIntent.intent,
     speakerIntentConfidence: speakerIntent.confidence,
@@ -375,9 +375,10 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   const continuationCandidate = evaluateContinuationCandidate({
     transcript,
     deliveryStyle:
+      (input.runtimeSupport as { deliveryBehavior?: string; deliveryStyle?: string } | null | undefined)?.deliveryBehavior ||
       (input.runtimeSupport as { deliveryStyle?: string } | null | undefined)?.deliveryStyle ||
-      (input as { deliveryStyle?: string }).deliveryStyle ||
-      packet.deliveryStyle,
+      (input as { deliveryBehavior?: string }).deliveryBehavior ||
+      packet.deliveryBehavior,
     speakerIntent: packet.speakerIntent,
   })
 

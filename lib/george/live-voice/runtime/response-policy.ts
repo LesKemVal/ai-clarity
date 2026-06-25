@@ -18,7 +18,7 @@ export type LiveResponsePolicy = {
   tone?: 'calm' | 'firm' | 'neutral'
   compression?: 'low' | 'medium' | 'high'
   responseForm?: 'question' | 'cue' | 'line' | 'direction' | 'silence'
-  deliveryStyle?: 'direct' | 'proof' | 'redirect' | 'silence'
+  deliveryBehavior?: 'direct' | 'proof' | 'redirect' | 'silence'
   intervention?: 'hold' | 'speak' | 'redirect'
 }
 
@@ -54,7 +54,7 @@ export function selectLiveResponsePolicy(input: {
       confidence: 0.86,
       tone: 'calm',
       compression: 'high',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -68,7 +68,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Other party holding the floor.',
       tone: 'calm',
       compression: 'high',
-      deliveryStyle: 'silence',
+      deliveryBehavior: 'silence',
       intervention: 'hold',
       responseForm: 'silence',
     }
@@ -82,7 +82,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Proof challenge detected.',
       tone: 'firm',
       compression: 'medium',
-      deliveryStyle: 'proof',
+      deliveryBehavior: 'proof',
       intervention: 'speak',
       responseForm: 'line',
     }
@@ -96,7 +96,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Opening detected.',
       tone: 'neutral',
       compression: 'medium',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -111,7 +111,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Interview probe detected.',
       tone: 'calm',
       compression: 'high',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -125,7 +125,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Behavioral interview question detected.',
       tone: 'neutral',
       compression: 'high',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -139,7 +139,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Competency verification detected.',
       tone: 'firm',
       compression: 'medium',
-      deliveryStyle: 'proof',
+      deliveryBehavior: 'proof',
       intervention: 'speak',
       responseForm: 'line',
     }
@@ -153,7 +153,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Weak confidence language detected.',
       tone: 'firm',
       compression: 'high',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'redirect',
     }
   }
@@ -166,7 +166,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'Resistance detected.',
       tone: 'calm',
       compression: 'medium',
-      deliveryStyle: 'redirect',
+      deliveryBehavior: 'redirect',
       intervention: 'redirect',
       responseForm: 'question',
     }
@@ -180,7 +180,7 @@ export function selectLiveResponsePolicy(input: {
       status: 'They asked for a response.',
       tone: 'neutral',
       compression: 'medium',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -195,7 +195,7 @@ export function selectLiveResponsePolicy(input: {
       confidence: 0.72,
       tone: 'calm',
       compression: 'medium',
-      deliveryStyle: 'direct',
+      deliveryBehavior: 'direct',
       intervention: 'speak',
       responseForm: 'direction',
     }
@@ -209,7 +209,7 @@ export function selectLiveResponsePolicy(input: {
     confidence: 0.58,
     tone: 'neutral',
     compression: 'medium',
-    deliveryStyle: 'direct',
+    deliveryBehavior: 'direct',
     intervention: 'speak',
   }
 }
