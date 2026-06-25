@@ -312,20 +312,39 @@ Priority:
 
   let volley = text.replace(/^GEORGE:\s*/i, '').trim()
 
-  if (
-    continuationReasoning &&
-    violatesContinuationAuthority(
+  if (continuationReasoning) {
+    const continuationEvidence = [
+      input.transcript,
+      input.lastFiveSeconds,
+      input.shadowMap,
+      input.desiredOutcome,
+      input.activeOutcome,
+    ].join(' ')
+
+    const continuationAuthorityViolation = violatesContinuationAuthority(
       volley,
-      [
-        input.transcript,
-        input.lastFiveSeconds,
-        input.shadowMap,
-        input.desiredOutcome,
-        input.activeOutcome,
-      ].join(' ')
+      continuationEvidence
     )
-  ) {
-    volley = safeContinuationReplacement(input)
+
+    if (continuationAuthorityViolation) {
+      const originalVolley = volley
+      volley = safeContinuationReplacement(input)
+
+      console.warn('[GEORGE][continuation][authority-replaced]', {
+        originalVolley,
+        replacementVolley: volley,
+        transcript: input.transcript,
+        desiredOutcome: input.desiredOutcome,
+        activeOutcome: input.activeOutcome,
+      })
+    } else {
+      console.info('[GEORGE][continuation][authority-pass]', {
+        volley,
+        transcript: input.transcript,
+        desiredOutcome: input.desiredOutcome,
+        activeOutcome: input.activeOutcome,
+      })
+    }
   }
 
   const responseForm = continuationReasoning
