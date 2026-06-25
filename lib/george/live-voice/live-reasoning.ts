@@ -169,6 +169,23 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
           : 'cue'
   const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
 
+  const continuationRequirement = continuationReasoning
+    ? [
+        'Continuation requirement:',
+        '- Complete the user fragment grammatically.',
+        '- Start with "...".',
+        '- Continuation is constrained reasoning.',
+        '- Preserve the user\'s sentence trajectory toward the active outcome.',
+        '- User-declared reality, confirmed observation, transcript, and room memory may ground output.',
+        '- Internal hypotheses may help interpretation, but they are not facts.',
+        '- If using a hypothesis, mark it as possibility: may, might, could, seems, suggests, or likely.',
+        '- Do not state unsupported facts as reality.',
+        '- Do not invent participants, agreements, transaction types, family relationships, commitments, numbers, evidence, customers, revenue, or events.',
+        '- If a factual detail is required but unsupported, use "__" or continue abstractly.',
+        '- Do not give advice, labels, strategy, or coaching language.',
+      ].join('\\n')
+    : ''
+
   const system = `
 You are GEORGE in LIVE mode.
 
@@ -257,9 +274,7 @@ Use facts already present before requesting more information.
 
 Return the single best next move.
 
-${continuationReasoning
-  ? 'Continuation requirement: complete the user fragment grammatically. Start with "...". Use supported specifics only. Objective and room context are not enough to invent details. When a missing value is necessary, leave a simple "__" placeholder while preserving conversational flow. Do not give advice, labels, strategy, or coaching language.'
-  : ''}
+${continuationRequirement}
 
 Priority:
 1. Advance the desired outcome.
