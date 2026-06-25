@@ -99,6 +99,36 @@ function isContinuationReasoning(input: LiveReasoningInput) {
 }
 
 
+function safeContinuationReplacement(input: LiveReasoningInput) {
+  const fallback = String(input.fallbackPacket.volley || '').trim()
+  if (fallback && !violatesContinuationAuthority(fallback, [
+    input.transcript,
+    input.lastFiveSeconds,
+    input.shadowMap,
+    input.desiredOutcome,
+    input.activeOutcome,
+  ].join(' '))) {
+    return fallback
+  }
+
+  const transcript = compact(input.transcript, 240)
+  const lower = transcript.toLowerCase()
+
+  if (/\b(because|reason|why)\b/i.test(lower)) {
+    return '...because the value has to be clear enough to support that outcome.'
+  }
+
+  if (/\b(opportunity|deal|valuation|value)\b/i.test(lower)) {
+    return '...in a way the room can understand and evaluate.'
+  }
+
+  if (/\b(what matters|the point|the issue|the question)\b/i.test(lower)) {
+    return '...what matters is staying clear about the next step.'
+  }
+
+  return '...__.'
+}
+
 function violatesContinuationAuthority(volley: string, evidence = '') {
   const clean = String(volley || '').trim()
   if (!clean) return true
@@ -334,10 +364,9 @@ Priority:
         input.desiredOutcome,
         input.activeOutcome,
       ].join(' ')
-    ) &&
-    input.fallbackPacket.volley
+    )
   ) {
-    volley = input.fallbackPacket.volley
+    volley = safeContinuationReplacement(input)
   }
 
   const responseForm = continuationReasoning
