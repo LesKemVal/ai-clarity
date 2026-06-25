@@ -1636,7 +1636,11 @@ const mandatoryLiveSignals = useMemo(() => {
       ? customConversationType.trim()
       : conversationType
 
-  const supportStyle = selectedSupportStyle
+  const supportStyle = normalizeLiveSupportStyle(
+    liveBriefingActiveSupportStyle
+      ? toRuntimeSupportStyle(liveBriefingActiveSupportStyle)
+      : selectedSupportStyle
+  )
   const liveAssistMode = legacyAssistModeFromSupportStyle(supportStyle)
 
   const prepDocumentPrompt = useMemo(() => {
@@ -2978,7 +2982,7 @@ const beginProofOfAwareness = async () => {
 
       const setActiveSupportStyle = (style: LiveBriefingSupportPanelId) => {
         setLiveBriefingActiveSupportStyle(style)
-        setSelectedSupportStyle(normalizeLiveSupportStyle(style))
+        setSelectedSupportStyle(normalizeLiveSupportStyle(toRuntimeSupportStyle(style)))
 
         try {
           const runtimeSupportStyle = toRuntimeSupportStyle(style)
