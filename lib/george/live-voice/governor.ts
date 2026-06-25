@@ -7,6 +7,7 @@ import { buildSteeringContinuation } from './runtime/steering-continuation'
 import { evaluateContinuationCandidate } from './runtime/continuation-intelligence'
 import { generateContinuation } from './runtime/continuation-generator'
 import { legacyAssistModeFromSupportStyle, normalizeLiveSupportStyle } from '../live-runtime/support-style'
+import { determineCueDepth } from '../live-runtime/cue-depth'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -360,6 +361,15 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   packet.cue = cleanLine(packet.cue, input.audio ? 12 : 18)
   packet.supportStyle = supportStyle
   packet.runtimeIntent = input.runtimeIntent
+  packet.cueDepth = input.cueDepth || determineCueDepth({
+    supportStyle,
+    runtimeIntent: input.runtimeIntent,
+    roomPressure: packet.roomPressure,
+    interruptionRisk: packet.interruptionRisk,
+    confidence: packet.confidence,
+    responseForm: packet.responseForm,
+    audio: input.audio,
+  })
   packet.liveAssistMode = input.liveAssistMode || legacyAssistModeFromSupportStyle(supportStyle)
 
   const continuationCandidate = evaluateContinuationCandidate({
