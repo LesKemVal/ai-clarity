@@ -1,5 +1,6 @@
 import type { GeorgeLocalCue } from './cue-types.js'
 import type { LiveHubContext, LiveHubDeliveryStyle } from '../types/protocol.js'
+import { classifyRuntimeIntent, type GeorgeRuntimeIntent } from './runtime-intent.js'
 
 export type GeorgeRuntimePacket = {
   transcript: string
@@ -15,6 +16,7 @@ export type GeorgeRuntimePacket = {
   intangibleObjective?: string
   userPosition?: string
   deliveryStyle: LiveHubDeliveryStyle
+  runtimeIntent: GeorgeRuntimeIntent
   cue: string
   reason: string
   category: string
@@ -48,6 +50,11 @@ export function buildRuntimePacket(input: {
     intangibleObjective: input.context.intangibleObjective || '',
     userPosition: input.context.userPosition || '',
     deliveryStyle: input.context.deliveryStyle || 'cue',
+    runtimeIntent: classifyRuntimeIntent({
+      transcript: input.transcript,
+      deliveryStyle: input.context.deliveryStyle || 'cue',
+      category: input.cue.category,
+    }),
     cue: input.cue.cue,
     reason: input.cue.reason,
     category: input.cue.category,
