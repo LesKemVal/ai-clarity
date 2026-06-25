@@ -1,5 +1,7 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
 import { DEFAULT_GEORGE_LIVE_DELIVERY_STYLE, type GeorgeDeliveryContext, type GeorgeDeliveryCue } from './types'
+import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
+import { safeContinuationReplacement } from '@/lib/george/core/verification/continuation-replacement'
 
 export function routeGeorgeDeliveryCue(input: {
   actionCue: GeorgeActionCue
@@ -57,10 +59,35 @@ export function routeGeorgeDeliveryCue(input: {
     return ''
   })()
 
-  const text =
+  let text =
     deliveryStyle === 'continue'
       ? continuationText
       : cleanGenerated
+
+  if (deliveryStyle === 'continue' && text) {
+    const evidence = [
+      input.actionCue.cue,
+      input.context?.room,
+      input.context?.objective,
+      input.context?.knownContext,
+    ].join(' ')
+
+    const authority = violatesEvidenceAuthority(text, evidence)
+
+    if (authority.violates) {
+      console.warn('[GEORGE][delivery][authority-replaced]', {
+        reason: authority.reason,
+        unsupportedTerms: authority.unsupportedTerms,
+        originalText: text,
+      })
+
+      text = safeContinuationReplacement({
+        transcript: input.actionCue.cue,
+        desiredOutcome: input.context?.objective,
+        shadowMap: input.context?.knownContext,
+      })
+    }
+  }
 
   if (!voiceEnabled) {
     return {
