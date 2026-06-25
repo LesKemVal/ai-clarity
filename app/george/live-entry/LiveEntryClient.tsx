@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { legacyAssistModeFromSupportStyle, normalizeLiveSupportStyle, type LiveSupportStyle } from '@/lib/george/live-runtime/support-style'
 import BxPageHeader from '@/components/BxPageHeader'
 import { getActiveSessionForMode, getSessionsForMode, setActiveSessionIdForMode } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
@@ -102,9 +103,11 @@ const PACING_OPTIONS: SelectOption[] = [
   { label: 'Sharp', helper: 'faster, compact' },
 ]
 
-const OUTPUT_OPTIONS: SelectOption[] = [
-  { label: 'Cues', helper: 'short directional support' },
-  { label: 'Repeatable lines', helper: 'responses you can repeat or adapt' },
+const SUPPORT_STYLE_OPTIONS: Array<SelectOption & { value: LiveSupportStyle }> = [
+  { label: 'Cue', value: 'cue', helper: 'brief support delivered at the right moment' },
+  { label: 'Continuation', value: 'continue', helper: 'GEORGE helps continue your thought' },
+  { label: 'Response', value: 'response', helper: 'complete answer when pressure or questions require it' },
+  { label: 'Presentation', value: 'presentation', helper: 'longer support for presenting or explaining' },
 ]
 
 const COMMUNICATION_STYLE_OPTIONS: SelectOption[] = [
@@ -409,7 +412,7 @@ function buildBriefingSupport(room: string, audience: string, objective: string,
       'help you organize your thinking under pressure',
       'notice what the interviewer may actually be testing',
       'support stronger examples when useful',
-      mode === 'lines'
+      mode === 'continue' || mode === 'response' || mode === 'presentation'
         ? 'help formulate important answers when precision matters'
         : 'keep support concise unless you ask for more',
     ]
@@ -859,7 +862,7 @@ export default function LiveEntryClient() {
   const [customConversationType, setCustomConversationType] = useState('')
   const [audienceType, setAudienceType] = useState('Executive')
   const [pacing, setPacing] = useState('Balanced')
-  const [outputMode, setOutputMode] = useState('Repeatable lines')
+  const [selectedSupportStyle, setSelectedSupportStyle] = useState<LiveSupportStyle>('cue')
   const [communicationStyle, setCommunicationStyle] = useState('Diplomatic')
   const [objective, setObjective] = useState('')
   const [userPosition, setUserPosition] = useState('Seeking')
@@ -1579,7 +1582,9 @@ const mandatoryLiveSignals = useMemo(() => {
       }
 
       if (saved?.cadence) setPacing(saved.cadence)
-      if (saved?.liveAssistMode === 'lines') setOutputMode('Repeatable lines')
+      if (saved?.supportStyle || saved?.liveAssistMode) {
+        setSelectedSupportStyle(normalizeLiveSupportStyle(saved.supportStyle || saved.liveAssistMode))
+      }
       if (saved?.controlWords) setControlWords(saved.controlWords)
       if (saved?.communicationStyle) setCommunicationStyle(saved.communicationStyle)
     } catch {}
@@ -1631,7 +1636,8 @@ const mandatoryLiveSignals = useMemo(() => {
       ? customConversationType.trim()
       : conversationType
 
-  const liveAssistMode = outputMode === 'Repeatable lines' ? 'lines' : 'cues'
+  const supportStyle = selectedSupportStyle
+  const liveAssistMode = legacyAssistModeFromSupportStyle(supportStyle)
 
   const prepDocumentPrompt = useMemo(() => {
     return getPrepDocumentPrompt(resolvedConversationType, audienceType)
@@ -1642,7 +1648,7 @@ const mandatoryLiveSignals = useMemo(() => {
       ? `${objective}\n\nLoaded document: ${prepDocument.name}`
       : objective
 
-    const estimate = estimateResources({ conversationType: resolvedConversationType, audienceType, pacing, outputMode, objective: adjustedObjective })
+    const estimate = estimateResources({ conversationType: resolvedConversationType, audienceType, pacing, outputMode: supportStyle === 'continue' ? 'Repeatable lines' : 'Cues', objective: adjustedObjective })
 
     if (!prepDocument) return estimate
 
@@ -1653,11 +1659,11 @@ const mandatoryLiveSignals = useMemo(() => {
       resources: Array.from(new Set([...estimate.resources, prepDocumentPrompt.resource])),
       reason: `${estimate.reason} Uploaded context adds document-aware support.`,
     }
-  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, prepDocument, prepDocumentPrompt.resource])
+  }, [resolvedConversationType, audienceType, pacing, supportStyle, objective, prepDocument, prepDocumentPrompt.resource])
 
   useEffect(() => {
     setEditableResources(resourceEstimate.resources)
-  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, resourceEstimate.resources.join('|')])
+  }, [resolvedConversationType, audienceType, pacing, supportStyle, objective, resourceEstimate.resources.join('|')])
 
   const finalResourceEstimate = useMemo(() => {
     return estimateWithResources(resourceEstimate, editableResources.length ? editableResources : resourceEstimate.resources)
@@ -1683,7 +1689,7 @@ const mandatoryLiveSignals = useMemo(() => {
       resolvedConversationType,
       audienceType,
       pacing,
-      outputMode,
+      supportStyle === 'continue' ? 'Repeatable lines' : 'Cues',
       communicationStyle,
       objective,
       userPosition,
@@ -1709,7 +1715,7 @@ const mandatoryLiveSignals = useMemo(() => {
     return () => {
       cancelled = true
     }
-  }, [resolvedConversationType, audienceType, pacing, outputMode, objective, userPosition, knownContext, prepDocument?.summary])
+  }, [resolvedConversationType, audienceType, pacing, supportStyle, objective, userPosition, knownContext, prepDocument?.summary])
 
   const handlePrepDocumentUpload = async (file: File | null) => {
     if (!file) return
@@ -2037,8 +2043,8 @@ const mandatoryLiveSignals = useMemo(() => {
       editedByUser: !skipPrep,
       prepRoomProfile,
       recoveryConstraints: liveRecoveryConstraints,
-      supportStyle: selectedSupportStyle,
-      deliveryStyle: selectedSupportStyle,
+      supportStyle,
+      deliveryStyle: supportStyle,
     }
 
     const liveSetup = {
@@ -2077,8 +2083,8 @@ const mandatoryLiveSignals = useMemo(() => {
       compactPrep: true,
       prepRoomProfile,
       recoveryConstraints: liveRecoveryConstraints,
-      supportStyle: selectedSupportStyle,
-      deliveryStyle: selectedSupportStyle,
+      supportStyle,
+      deliveryStyle: supportStyle,
       createdAt: Date.now(),
     }
 
@@ -2097,10 +2103,10 @@ const mandatoryLiveSignals = useMemo(() => {
       return
     }
 
-    window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', selectedSupportStyle)
-    window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', selectedSupportStyle)
-    window.localStorage.setItem('george_live_entry_support_preference', selectedSupportStyle)
-    window.localStorage.setItem('george_live_entry_support_default', selectedSupportStyle)
+    window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', supportStyle)
+    window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', supportStyle)
+    window.localStorage.setItem('george_live_entry_support_preference', supportStyle)
+    window.localStorage.setItem('george_live_entry_support_default', supportStyle)
     window.localStorage.setItem('george_start_new_live', '1')
     window.localStorage.removeItem('george_active_live_session_id')
     window.localStorage.removeItem('george_active_campaign_session_id')
@@ -2787,7 +2793,7 @@ const beginProofOfAwareness = async () => {
 
     const canBeginLiveFromBriefing = liveBriefingReadyToContinue && previousLiveUserRecognized && hasSeenLiveSteering
 
-    const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, liveAssistMode)
+    const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, supportStyle)
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
 
@@ -3888,21 +3894,21 @@ const beginProofOfAwareness = async () => {
             <div className="mt-3 border-t border-white/[0.04] pt-3">
               <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Output</span>
               <div className="mt-2 flex flex-wrap gap-2">
-                {OUTPUT_OPTIONS.map((option) => {
-                  const active = outputMode === option.label
+                {SUPPORT_STYLE_OPTIONS.map((option) => {
+                  const active = selectedSupportStyle === option.value
 
                   return (
                     <button
                       key={option.label}
                       type="button"
-                      onClick={() => setOutputMode(option.label)}
+                      onClick={() => setSelectedSupportStyle(option.value)}
                       className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
                         active
                           ? 'border-[#AEB6FF]/38 bg-[#AEB6FF]/[0.08] text-white'
                           : 'border-white/[0.06] bg-white/[0.015] text-white/44 hover:text-white/72'
                       }`}
                     >
-                      {option.label === 'Repeatable lines' ? 'Lines' : option.label}
+                      {option.label}
                     </button>
                   )
                 })}
