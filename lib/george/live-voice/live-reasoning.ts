@@ -166,13 +166,24 @@ function violatesContinuationAuthority(volley: string, evidence = '') {
 
   const unsupportedTransactionNarrative =
     !markedAsInference &&
-    /\b(largest deal|industry shift|market shift|complete integration|combined entity|synergies|supplier|suppliers|stronger market presence|negotiating power|tech industry|industry landscape)\b/i.test(clean)
+    /\b(largest deal|industry shift|market shift|complete integration|combined entity|synergies|supplier|suppliers|stronger market presence|negotiating power|tech industry|industry landscape|comprehensive framework|major concerns|seamless integration)\b/i.test(clean)
+
+  const unsupportedFactualProposition =
+    !markedAsInference &&
+    /\b(the|these|those|both|all|our|their|we)\s+(parties?|companies|customers?|investors?|buyers?|sellers?|teams?|leaders?|stakeholders?)\s+(have|has|had|are|were|will|agreed|reached|created|secured|committed|accepted|approved|resolved|addressed|set|established|confirmed)\b/i.test(clean)
+
+  const unsupportedEventClaim =
+    !markedAsInference &&
+    /\b(have|has|had|will|did|does|reached|created|secured|agreed|committed|accepted|approved|resolved|addressed|established|confirmed|paving|sets the stage|marking)\b/i.test(clean) &&
+    !/\b(may|might|could|seems|appears|suggests|likely|possibly|potentially)\b/i.test(clean)
 
   return (
     unsupportedNumber ||
     unsupportedDefinitiveFact ||
     unsupportedNamedEntity ||
-    unsupportedTransactionNarrative
+    unsupportedTransactionNarrative ||
+    unsupportedFactualProposition ||
+    unsupportedEventClaim
   )
 }
 
