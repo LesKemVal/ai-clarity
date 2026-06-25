@@ -2978,6 +2978,7 @@ const beginProofOfAwareness = async () => {
 
       const setActiveSupportStyle = (style: LiveBriefingSupportPanelId) => {
         setLiveBriefingActiveSupportStyle(style)
+        setSelectedSupportStyle(normalizeLiveSupportStyle(style))
 
         try {
           const runtimeSupportStyle = toRuntimeSupportStyle(style)
