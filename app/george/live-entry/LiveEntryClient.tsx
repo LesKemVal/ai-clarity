@@ -2008,15 +2008,6 @@ const mandatoryLiveSignals = useMemo(() => {
 
     const secondaryObjective = secondaryOutcome
 
-    const selectedSupportStyle = (() => {
-      const style = liveBriefingActiveSupportStyle || quickLiveSupportStyle || 'advice'
-
-      if (style === 'completion') return 'continue'
-      if (style === 'presentation') return 'expandedLine'
-
-      return style
-    })()
-
     const runtimeSupport = {
       selectedCapacityCents: finalEstimate.estimatedCents,
       selectedCapabilityIds: finalResources,
@@ -2088,6 +2079,12 @@ const mandatoryLiveSignals = useMemo(() => {
       createdAt: Date.now(),
     }
 
+    window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', supportStyle)
+    window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', supportStyle)
+    window.localStorage.setItem('george_live_entry_support_preference', supportStyle)
+    window.localStorage.setItem('george_live_entry_support_default', supportStyle)
+    window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
+
     if (!bypassBriefing) {
       setLiveBriefingStep(1)
       setLiveBriefingToaAccepted(false)
@@ -2103,10 +2100,6 @@ const mandatoryLiveSignals = useMemo(() => {
       return
     }
 
-    window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', supportStyle)
-    window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', supportStyle)
-    window.localStorage.setItem('george_live_entry_support_preference', supportStyle)
-    window.localStorage.setItem('george_live_entry_support_default', supportStyle)
     window.localStorage.setItem('george_start_new_live', '1')
     window.localStorage.removeItem('george_active_live_session_id')
     window.localStorage.removeItem('george_active_campaign_session_id')
