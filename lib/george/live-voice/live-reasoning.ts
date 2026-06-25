@@ -109,7 +109,10 @@ function violatesContinuationAuthority(volley: string) {
   const unsupportedNumber =
     /\b\d+(?:\.\d+)?\s*(?:%|percent|shares?|months?|years?|dollars?|\$)\b/i.test(clean)
 
-  return strategicOverreach || unsupportedNumber
+  const unsupportedBusinessFact =
+    /\b(parties?|counterpart(?:y|ies)|buyer|seller|company|companies|customer|customers|revenue|ebitda|margin|users?|contracts?|signed|committed|agreed|agreement|consensus|major terms|term sheet|execution|integration|integrating|merger|acquisition|licensing|license|partnership|joint venture|ipo|financing|strategic investment|market leader|global leader|industry leader)\b/i.test(clean)
+
+  return strategicOverreach || unsupportedNumber || unsupportedBusinessFact
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
