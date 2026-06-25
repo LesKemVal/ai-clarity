@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import type { LiveVoicePacket } from './types'
+import type { LiveSupportStyle } from '../live-runtime/support-style'
 import { evaluateSignalSufficiency } from '../runtime/signal-sufficiency'
 import { rankSignals } from '../runtime/signal-ranking'
 const openai = new OpenAI({
@@ -13,6 +14,8 @@ type LiveReasoningInput = {
   activeOutcome?: string
   shadowMap?: string
   lastFiveSeconds?: string
+  supportStyle?: LiveSupportStyle
+  runtimeIntent?: string
   liveAssistMode?: 'cues' | 'lines'
   deliveryStyle?: string
   fallbackPacket: LiveVoicePacket
@@ -205,7 +208,8 @@ ${continuationReasoning
 Room: ${room}
 Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
-Assist mode: ${mode}
+Support style: ${mode}
+Runtime intent: ${input.runtimeIntent || input.fallbackPacket.runtimeIntent || 'unknown'}
 Intervention type: ${continuationReasoning ? 'continuation' : mode}
 Speaker perspective: ${perspective}
 Last signal: ${lastFiveSeconds}

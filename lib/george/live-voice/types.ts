@@ -1,3 +1,5 @@
+import type { CueDepth, LegacyLiveAssistMode, LiveSupportStyle } from '../live-runtime/support-style'
+
 export type LiveSpeakerRole =
   | 'other_party'
   | 'user'
@@ -56,13 +58,16 @@ export type LiveVoicePacket = {
   responseTone?: string
   responseCompression?: string
   deliveryStyle?: string
+  supportStyle?: LiveSupportStyle
+  cueDepth?: CueDepth
+  runtimeIntent?: string
   intervention?: string
   speakerIntent?: string
   speakerIntentConfidence?: number
   speakerIntentReason?: string
   speakerIntentShouldSpeak?: boolean
   speakerIntentShouldHold?: boolean
-  liveAssistMode?: 'cues' | 'lines'
+  liveAssistMode?: LegacyLiveAssistMode
   runtimeForce?: 'light' | 'balanced' | 'strong'
   runtimeMemoryApplied?: boolean
   runtimeSupportApplied?: boolean
@@ -78,7 +83,10 @@ export type LiveVoiceGovernorInput = {
   activeOutcome?: string
   shadowMap?: string
   lastFiveSeconds?: string
-  liveAssistMode?: 'cues' | 'lines'
+  supportStyle?: LiveSupportStyle
+  cueDepth?: CueDepth
+  runtimeIntent?: string
+  liveAssistMode?: LegacyLiveAssistMode
   deliveryStyle?: string
   runtimeMemory?: LiveRuntimeMemory
   runtimeSupport?: LiveRuntimeSupportInput | null

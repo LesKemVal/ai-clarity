@@ -3,6 +3,7 @@ import { governLiveVoice } from '@/lib/george/live-voice/governor'
 import { reasonLiveNextMove } from '@/lib/george/live-voice/live-reasoning'
 import { verifyLiveAccessFromRequest } from '@/lib/subscriptions/live-access'
 import { checkRateLimit, getRequestIdentity } from '@/lib/security/rate-limit'
+import { normalizeLiveSupportStyle } from '@/lib/george/live-runtime/support-style'
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,6 +43,10 @@ export async function POST(req: NextRequest) {
       }, { status: access.status })
     }
 
+    const supportStyle = normalizeLiveSupportStyle(
+      body?.supportStyle || body?.deliveryStyle || body?.liveAssistMode
+    )
+
     const packet = governLiveVoice({
       transcript: String(body?.transcript || ''),
       mode: body?.mode === 'voice_live' ? 'voice_live' : 'text_test',
@@ -51,6 +56,8 @@ export async function POST(req: NextRequest) {
       activeOutcome: typeof body?.activeOutcome === 'string' ? body.activeOutcome : '',
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+      supportStyle,
+      runtimeIntent: typeof body?.runtimeIntent === 'string' ? body.runtimeIntent : '',
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
       deliveryStyle: typeof body?.deliveryStyle === 'string' ? body.deliveryStyle : '',
       runtimeMemory:
@@ -66,6 +73,8 @@ export async function POST(req: NextRequest) {
       activeOutcome: typeof body?.activeOutcome === 'string' ? body.activeOutcome : '',
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
+      supportStyle,
+      runtimeIntent: typeof body?.runtimeIntent === 'string' ? body.runtimeIntent : '',
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
       deliveryStyle: typeof body?.deliveryStyle === 'string' ? body.deliveryStyle : '',
       fallbackPacket: packet,

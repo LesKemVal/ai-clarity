@@ -6,6 +6,7 @@ import { classifyLiveSpeakerIntent } from './runtime/speaker-intent'
 import { buildSteeringContinuation } from './runtime/steering-continuation'
 import { evaluateContinuationCandidate } from './runtime/continuation-intelligence'
 import { generateContinuation } from './runtime/continuation-generator'
+import { legacyAssistModeFromSupportStyle, normalizeLiveSupportStyle } from '../live-runtime/support-style'
 
 const TEACHER_LANGUAGE =
   /(try saying|you should|it might be helpful|consider|the best approach|what you want to do|proof points|target number|schedule a meeting|book time)/i
@@ -265,6 +266,9 @@ function applySpeakerIntentAuthority(
 
 export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket {
   const transcript = String(input.transcript || '').trim()
+  const supportStyle = normalizeLiveSupportStyle(
+    input.supportStyle || input.deliveryStyle || input.liveAssistMode
+  )
 
   const shadowMap = String(input.shadowMap || '').trim()
 
@@ -303,6 +307,8 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     speakerIntentReason: speakerIntent.reason,
     speakerIntentShouldSpeak: speakerIntent.shouldSpeak,
     speakerIntentShouldHold: speakerIntent.shouldHold,
+    supportStyle,
+    runtimeIntent: input.runtimeIntent,
   }
 
   if (!transcript) {
@@ -352,7 +358,9 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
 
   packet.volley = cleanLine(packet.volley, input.audio ? 14 : 22)
   packet.cue = cleanLine(packet.cue, input.audio ? 12 : 18)
-  packet.liveAssistMode = input.liveAssistMode || 'cues'
+  packet.supportStyle = supportStyle
+  packet.runtimeIntent = input.runtimeIntent
+  packet.liveAssistMode = input.liveAssistMode || legacyAssistModeFromSupportStyle(supportStyle)
 
   const continuationCandidate = evaluateContinuationCandidate({
     transcript,
