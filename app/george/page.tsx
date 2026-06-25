@@ -560,10 +560,18 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
   }
 
   const liveUserText = String(opts.userText || '').toLowerCase()
+  const storedSupportStyle =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
+        window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE')
+      : null
   const storedAssistMode =
     typeof window !== 'undefined'
       ? window.localStorage.getItem('george_live_assist_mode')
       : null
+  const resolvedSupportStyle =
+    storedSupportStyle ||
+    (storedAssistMode === 'lines' ? 'continue' : storedAssistMode === 'cues' ? 'cue' : null)
 
   let say = normalizeLine(sayMatch?.[1] || fallbackLine, opts.audio ? 10 : 18)
 
@@ -596,12 +604,14 @@ function governLiveResponse(raw: string, opts: { audio: boolean; userText?: stri
   }
 
   const wantsCue =
-    storedAssistMode === 'cues' ||
+    resolvedSupportStyle === 'cue' ||
+    resolvedSupportStyle === 'advice' ||
     /cue|slow down|listen/i.test(liveUserText) ||
     /\b(pause|hold|wait)\b/i.test(liveUserText)
 
   const wantsLine =
-    storedAssistMode === 'lines' ||
+    resolvedSupportStyle === 'continue' ||
+    resolvedSupportStyle === 'line' ||
     /what should i say|what do i say|how do i say|give me a line|exact line|exact wording/i.test(liveUserText)
 
   if (wantsLine) {
@@ -2203,8 +2213,18 @@ async function canGovernorInjectLiveCue(transcript: string) {
         audio: true,
         shadowMap: liveContextBufferRef.current.join('\n'),
         lastFiveSeconds: transcript,
+        supportStyle:
+          typeof window !== 'undefined'
+            ? window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
+              window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') ||
+              (window.localStorage.getItem('george_live_assist_mode') === 'lines' ? 'continue' : 'cue')
+            : 'cue',
         liveAssistMode:
-          typeof window !== 'undefined' && window.localStorage.getItem('george_live_assist_mode') === 'lines'
+          typeof window !== 'undefined' && (
+            window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') === 'continue' ||
+            window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') === 'continue' ||
+            window.localStorage.getItem('george_live_assist_mode') === 'lines'
+          )
             ? 'lines'
             : 'cues',
         runtimeMemory: liveRuntimeMemoryRef.current,
