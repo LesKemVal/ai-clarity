@@ -188,16 +188,18 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   const continuationRequirement = continuationReasoning
     ? [
         'Continuation requirement:',
-        '- Complete the user fragment grammatically.',
+        '- Continuation is grammatical completion, not semantic invention.',
+        '- Finish the user\'s sentence rather than writing a better one.',
         '- Start with "...".',
-        '- Continuation is constrained reasoning.',
-        '- Preserve the user\'s sentence trajectory toward the active outcome.',
+        '- Preserve the user\'s sentence trajectory toward the desired outcome or strongest confirmed active outcome.',
+        '- Complete grammar first. Complete meaning only from evidence.',
         '- User-declared reality, confirmed observation, transcript, and room memory may ground output.',
+        '- Objective and room context may shape tone, but they are never evidence by themselves.',
         '- Internal hypotheses may help interpretation, but they are not facts.',
         '- If using a hypothesis, mark it as possibility: may, might, could, seems, suggests, or likely.',
         '- Do not state unsupported facts as reality.',
-        '- Do not invent participants, agreements, transaction types, family relationships, commitments, numbers, evidence, customers, revenue, or events.',
-        '- If a factual detail is required but unsupported, use "__" or continue abstractly.',
+        '- Do not invent transaction types, people, companies, relationships, numbers, agreements, commitments, evidence, customers, revenue, or events.',
+        '- If the next factual clause is unsupported, stop before it or use "__" while preserving conversational flow.',
         '- Do not give advice, labels, strategy, or coaching language.',
       ].join('\\n')
     : ''
