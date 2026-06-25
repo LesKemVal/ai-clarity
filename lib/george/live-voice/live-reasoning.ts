@@ -138,13 +138,14 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
   const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryBehavior || ''
+  const supportStyle = input.supportStyle || input.fallbackPacket.supportStyle || 'cue'
   const mode = continuationReasoning
     ? 'continuation'
     : deliveryStyle === 'response'
       ? 'response'
       : deliveryStyle === 'expandedLine'
         ? 'presentation'
-        : input.liveAssistMode === 'lines'
+        : supportStyle === 'continue'
           ? 'repeatable line'
           : 'cue'
   const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
