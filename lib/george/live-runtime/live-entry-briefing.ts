@@ -1,6 +1,8 @@
 import type { LivePrepSetup } from './prep-runtime'
+import type { LiveSupportStyle } from './support-style'
+import { normalizeLiveSupportStyle } from './support-style'
 
-type LiveBriefingMode = 'cues' | 'lines'
+type LiveBriefingMode = LiveSupportStyle
 
 type LiveEntryBriefingInput = {
   setup: LivePrepSetup | null
@@ -23,7 +25,7 @@ function normalizeRoom(value: unknown, fallback = 'this room') {
 }
 
 function normalizeAssistMode(setup: LivePrepSetup | null): LiveBriefingMode {
-  return setup?.liveAssistMode === 'lines' ? 'lines' : 'cues'
+  return normalizeLiveSupportStyle(setup?.supportStyle || setup?.liveAssistMode)
 }
 
 function getName(setup: LivePrepSetup | null) {
@@ -63,7 +65,7 @@ function buildSignalLine(setup: LivePrepSetup | null) {
 }
 
 function buildAssistLine(mode: LiveBriefingMode) {
-  if (mode === 'lines') {
+  if (mode === 'continue') {
     return 'If useful, I can help frame the opening or formulate important moments when greater precision would improve the outcome.'
   }
 

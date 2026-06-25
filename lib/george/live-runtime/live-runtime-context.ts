@@ -1,4 +1,6 @@
 import { buildOutcomeReassessmentRuntimeBlock } from './outcome-reassessment'
+import type { LiveSupportStyle } from './support-style'
+import { normalizeLiveSupportStyle } from './support-style'
 
 type RuntimeCapability = {
   label?: string
@@ -10,6 +12,8 @@ type LiveRuntimeContextSetup = {
   objective?: string | null
   language?: string | null
   cadence?: string | null
+  supportStyle?: LiveSupportStyle | null
+  /** Legacy compatibility. Prefer supportStyle. */
   liveAssistMode?: string | null
   controlWords?: string | null
   outcomeShiftPhrase?: string | null
@@ -46,7 +50,7 @@ export function buildLiveRuntimeContext(params: {
   const pressure = steeringLabels[2] || 'idle'
   const language = setup?.language || 'English'
   const cadence = setup?.cadence || 'Balanced'
-  const assistMode = setup?.liveAssistMode || 'cues'
+  const supportStyle = normalizeLiveSupportStyle(setup?.supportStyle || setup?.liveAssistMode)
   const triggerPhrase =
     setup?.outcomeShiftPhrase ||
     setup?.outcomeReassessmentPhrase ||
@@ -77,7 +81,7 @@ Angle: ${angle}
 Pressure: ${pressure}
 Language: ${language}
 Cadence: ${cadence}
-Assist mode: ${assistMode}
+Support style: ${supportStyle}
 
 Treat these as current operational reality.
 

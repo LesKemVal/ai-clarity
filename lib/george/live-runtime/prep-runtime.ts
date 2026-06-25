@@ -1,6 +1,8 @@
 import { resolveLiveRuntimeAuthority } from './live-runtime-authority'
+import type { LegacyLiveAssistMode, LiveSupportStyle } from './support-style'
+import { legacyAssistModeFromSupportStyle, normalizeLiveSupportStyle } from './support-style'
 
-export type LiveAssistMode = 'cues' | 'lines'
+export type LiveAssistMode = LegacyLiveAssistMode
 
 export type LiveRuntimeCostBreakdownItem = {
   label: string
@@ -13,7 +15,7 @@ export type LiveRuntimeCostEstimate = {
   baseCents?: number
   capacityCents?: number
   outputModeCents?: number
-  outputMode?: LiveAssistMode
+  outputMode?: LiveSupportStyle
   breakdown?: LiveRuntimeCostBreakdownItem[]
   basis?: string
 }
@@ -68,6 +70,8 @@ export type LivePrepSetup = {
   outcomeShiftPhrase?: string
   toneAdjustment?: 'softer' | 'balanced' | 'sharper'
   supportDensity?: 'minimal' | 'balanced' | 'supportive'
+  supportStyle?: LiveSupportStyle
+  /** Legacy compatibility. Prefer supportStyle. */
   liveAssistMode?: LiveAssistMode
   purview?: LivePurview | null
   deliveryOverlay?: LiveDeliveryOverlay | null
@@ -271,8 +275,11 @@ export function consumePreparedLiveSetup(): LivePrepSetup | null {
 export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
   if (typeof window === 'undefined') return
 
-  if (setup?.liveAssistMode === 'lines' || setup?.liveAssistMode === 'cues') {
-    window.localStorage.setItem(LIVE_ASSIST_MODE_KEY, setup.liveAssistMode)
+  const supportStyle = normalizeLiveSupportStyle(setup?.supportStyle || setup?.liveAssistMode)
+  const legacyAssistMode = legacyAssistModeFromSupportStyle(supportStyle)
+
+  if (setup?.supportStyle || setup?.liveAssistMode) {
+    window.localStorage.setItem(LIVE_ASSIST_MODE_KEY, legacyAssistMode)
   } else {
     window.localStorage.removeItem(LIVE_ASSIST_MODE_KEY)
   }
