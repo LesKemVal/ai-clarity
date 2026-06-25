@@ -34,9 +34,9 @@ const HELP_ITEMS: Array<{
     id: 'signal',
     index: '02',
     label: 'SIGNAL',
-    title: 'Give GEORGE useful material.',
-    body: 'Upload or snap pictures of what matters: a job ad, résumé, offer, agenda, email, deck, notes, screenshots, contract, medical question, or anything else that explains the room. More signal gives GEORGE better judgment.',
-    utility: 'Documents, screenshots, photos, notes, and goals.',
+    title: 'GEORGE reasons from signal.',
+    body: 'GEORGE uses your declared outcome, role, constraints, room context, transcript, observed signals, confirmed changes, and room memory to support you. Internal hypotheses help GEORGE interpret the room, but they are not facts. If GEORGE is not sure, he marks uncertainty or helps you surface more signal rather than inventing details.',
+    utility: 'User signal. Observed signal. Confirmation signal. Transcript. Room memory.',
   },
   {
     id: 'live',
@@ -50,9 +50,9 @@ const HELP_ITEMS: Array<{
     id: 'room',
     index: '04',
     label: 'SUPPORT',
-    title: 'Choose how much help you want.',
-    body: 'GEORGE can give a cue, a line, a response, a presentation, a continuation, or silence. Cue is the default. You can override GEORGE before LIVE starts or while the room is active.',
-    utility: 'Cue. Line. Response. Presentation. Continue.',
+    title: 'Choose how GEORGE supports.',
+    body: 'GEORGE can give a cue, a continuation, a response, a presentation, or silence. Continuation finishes your sentence while preserving your trajectory toward the active outcome. If signal drops too low, GEORGE may offer a repeatable line that helps the room reveal more information.',
+    utility: 'Cue. Continuation. Response. Presentation. Silence.',
   },
   {
     id: 'voice',
@@ -66,9 +66,9 @@ const HELP_ITEMS: Array<{
     id: 'continuity',
     index: '06',
     label: 'CONTROL',
-    title: 'You remain responsible.',
-    body: 'GEORGE supports judgment; GEORGE does not replace it. You decide what to accept, change, ignore, or say. Sign in when you want GEORGE to preserve work and restore useful context later.',
-    utility: 'You decide. GEORGE supports.',
+    title: 'You remain the authority.',
+    body: 'Your words, role, outcome, values, corrections, and interpretation of the room are highest authority. GEORGE adapts tactics from signal, but he does not drift away from your declared reality. GEORGE only updates the active room model when enough confirming signal shows the room or outcome has changed.',
+    utility: 'You decide. GEORGE interprets, supports, and adapts.',
   },
 ]
 
