@@ -6416,11 +6416,11 @@ return (
                     if (!showSidebar) setShowSidebar(true)
                   }}
                   disabled={showSidebar}
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] text-[22px] text-[#D7DBE4]/72 shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition hover:bg-white/[0.075] hover:text-white active:scale-[0.96] xl:inline-flex ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  className={`inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] text-[22px] text-[#D7DBE4]/72 shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition hover:-translate-x-1 hover:bg-white/[0.075] hover:text-white active:scale-[0.96] xl:inline-flex ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
                   aria-label="Open GEORGE sidebar"
                   title="Open"
                 >
-                  →
+                  ←
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
