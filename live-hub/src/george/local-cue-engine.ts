@@ -8,7 +8,7 @@ export function resolveLocalCue(input: {
   isFinal?: boolean
 }): GeorgeLocalCue | null {
   const text = input.transcript.trim()
-  if (text.length < 8) return null
+  if (text.length < 8 && input.context.deliveryStyle !== 'continue') return null
 
   const cue = matchCuePattern(text)
 
