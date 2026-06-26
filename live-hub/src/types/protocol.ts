@@ -9,6 +9,7 @@ export type LiveHubDeliveryStyle =
 
 export type GeorgeActionCueEvidence = {
   transcript?: string
+  recentTranscript?: string
   room?: string
   objective?: string
   knownContext?: string
@@ -52,6 +53,7 @@ export type ServerMessage =
       priority?: number
       packet?: {
         transcript: string
+        recentTranscript?: string
         isFinal: boolean
         signal: string
         pressure: string
