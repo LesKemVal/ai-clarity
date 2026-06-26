@@ -69,6 +69,7 @@ export type ServerMessage =
     }
   | {
       type: 'FAST_CUE'
+      turnId?: string
       cue: string
       source: 'groq'
       model: string
