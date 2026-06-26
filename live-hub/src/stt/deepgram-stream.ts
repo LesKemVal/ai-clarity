@@ -8,6 +8,10 @@ import { resolveGroqFastCue } from '../llm/groq-fast-lane.js'
 import { arbitrateCue } from '../george/cue-arbitrator.js'
 import { markLatency } from '../metrics/latency.js'
 
+function createRuntimeTurnId() {
+  return `live-turn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export function createDeepgramStream(params: {
   ws: WebSocket
   apiKey: string
@@ -41,11 +45,17 @@ export function createDeepgramStream(params: {
     if (!transcript) return
 
     const turnStartAt = Date.now()
-    const activeTurnId = input.turnId
+    const activeTurnId = input.turnId || createRuntimeTurnId()
     const turnContext = input.deliveryStyle
       ? { ...params.getContext(), deliveryStyle: input.deliveryStyle }
       : params.getContext()
     const isFinal = input.isFinal
+
+    console.log('[LIVE HUB][turn]', {
+      turnId: activeTurnId,
+      source: input.source,
+      providedTurnId: Boolean(input.turnId),
+    })
 
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'transcript_received'))
 
@@ -97,6 +107,7 @@ export function createDeepgramStream(params: {
 
     sendJson(params.ws, {
       type: 'LOCAL_CUE',
+      turnId: activeTurnId,
       cue: cue.cue,
       reason: cue.reason,
       category: cue.category,
@@ -110,6 +121,7 @@ export function createDeepgramStream(params: {
 
     console.log('[LIVE HUB][metric]', {
       event: 'action_cue',
+      turnId: activeTurnId,
       source: localActionCue.source,
       cue: localActionCue.cue,
     })
@@ -134,6 +146,7 @@ export function createDeepgramStream(params: {
     }
 
     console.log('[LIVE HUB][groq] queued', {
+      turnId: activeTurnId,
       signal: packet.signal,
       cue: packet.cue,
       deliveryStyle: packet.deliveryStyle,
@@ -143,13 +156,17 @@ export function createDeepgramStream(params: {
 
     void resolveGroqFastCue(packet)
       .then((fastCue) => {
-        console.log('[LIVE HUB][groq] resolved', fastCue)
+        console.log('[LIVE HUB][groq] resolved', {
+          turnId: activeTurnId,
+          fastCue,
+        })
         console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_response'))
 
         if (!fastCue) return
 
         sendJson(params.ws, {
           type: 'FAST_CUE',
+          turnId: activeTurnId,
           cue: fastCue.cue,
           source: fastCue.source,
           model: fastCue.model,
@@ -164,6 +181,7 @@ export function createDeepgramStream(params: {
 
         console.log('[LIVE HUB][metric]', {
           event: 'action_cue',
+          turnId: activeTurnId,
           source: actionCue.source,
           cue: actionCue.cue,
         })
