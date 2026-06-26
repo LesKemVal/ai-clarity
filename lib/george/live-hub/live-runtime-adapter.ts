@@ -23,6 +23,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   const listeners = new Set<GeorgeLiveHubRuntimeListener>()
   let transport: GeorgeLiveHubTransport | null = null
   let connected = false
+  let currentContext: GeorgeLiveHubContext = {}
   const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string }> = []
 
   const flushPendingTranscripts = () => {
@@ -41,13 +42,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         text: next.text,
         isFinal: next.isFinal,
         turnId: next.turnId,
-        deliveryStyle: (() => {
-          try {
-            return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined
-          } catch {
-            return undefined
-          }
-        })(),
+        deliveryStyle: currentContext.deliveryStyle,
       })
     }
   }
@@ -58,6 +53,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
 
   return {
     connect(context?: GeorgeLiveHubContext) {
+      currentContext = context || {}
       const url =
         params?.url ||
         process.env.NEXT_PUBLIC_LIVE_HUB_URL ||
@@ -106,8 +102,9 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     },
 
     syncContext(context?: GeorgeLiveHubContext) {
+      currentContext = context || {}
       if (!connected) return
-      transport?.syncContext?.(context)
+      transport?.syncContext?.(currentContext)
     },
 
     disconnect() {
@@ -123,25 +120,27 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       if (!clean) return
 
       if (!connected) {
-        console.info('[LIVE][hub][adapter] queue transcript', { text: clean, isFinal })
+        console.info('[LIVE][hub][adapter] queue transcript', {
+        text: clean,
+        isFinal,
+        deliveryStyle: currentContext.deliveryStyle,
+      })
         pendingTranscripts.push({ text: clean, isFinal, turnId })
         return
       }
 
-      console.info('[LIVE][hub][adapter] send transcript', { text: clean, isFinal })
+      console.info('[LIVE][hub][adapter] send transcript', {
+        text: clean,
+        isFinal,
+        deliveryStyle: currentContext.deliveryStyle,
+      })
 
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',
         text: clean,
         isFinal,
         turnId,
-        deliveryStyle: (() => {
-          try {
-            return window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') || undefined
-          } catch {
-            return undefined
-          }
-        })(),
+        deliveryStyle: currentContext.deliveryStyle,
       })
     },
 

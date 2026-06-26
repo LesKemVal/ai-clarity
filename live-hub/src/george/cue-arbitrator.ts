@@ -6,6 +6,12 @@ export type ActionCue = {
   source: 'local' | 'groq'
   localCue: string
   fastCue?: string
+  evidence?: {
+    transcript?: string
+    room?: string
+    objective?: string
+    knownContext?: string
+  }
   category: string
   confidence: number
   priority: number
@@ -72,6 +78,12 @@ export function arbitrateCue(input: {
       source: 'groq',
       localCue: input.packet.cue,
       fastCue,
+      evidence: {
+        transcript: input.packet.transcript,
+        room: input.packet.room,
+        objective: input.packet.objective,
+        knownContext: input.packet.knownContext,
+      },
       category: input.packet.category,
       confidence: Math.min(1, input.packet.confidence + 0.04),
       priority: input.packet.priority + 5,
@@ -84,6 +96,12 @@ export function arbitrateCue(input: {
     reason: input.packet.reason,
     source: 'local',
     localCue: input.packet.cue,
+    evidence: {
+      transcript: input.packet.transcript,
+      room: input.packet.room,
+      objective: input.packet.objective,
+      knownContext: input.packet.knownContext,
+    },
     category: input.packet.category,
     confidence: input.packet.confidence,
     priority: isGenericLocalCue ? 0 : input.packet.priority,

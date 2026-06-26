@@ -66,13 +66,29 @@ export function routeGeorgeDeliveryCue(input: {
 
   if (deliveryStyle === 'continue' && text) {
     const evidence = [
-      input.actionCue.cue,
+      input.actionCue.evidence?.transcript,
+      input.actionCue.evidence?.room,
+      input.actionCue.evidence?.objective,
+      input.actionCue.evidence?.knownContext,
       input.context?.room,
       input.context?.objective,
       input.context?.knownContext,
     ].join(' ')
 
     const authority = violatesEvidenceAuthority(text, evidence)
+
+    console.info('[GEORGE][delivery][authority-check]', {
+      deliveryStyle,
+      rawCue,
+      cleanGenerated,
+      text,
+      evidence,
+      evidenceFromActionCue: input.actionCue.evidence,
+      context: input.context,
+      violates: authority.violates,
+      reason: authority.reason,
+      unsupportedTerms: authority.unsupportedTerms,
+    })
 
     if (authority.violates) {
       console.warn('[GEORGE][delivery][authority-replaced]', {
@@ -82,9 +98,9 @@ export function routeGeorgeDeliveryCue(input: {
       })
 
       text = safeContinuationReplacement({
-        transcript: input.actionCue.cue,
-        desiredOutcome: input.context?.objective,
-        shadowMap: input.context?.knownContext,
+        transcript: input.actionCue.evidence?.transcript || text,
+        desiredOutcome: input.actionCue.evidence?.objective || input.context?.objective,
+        shadowMap: input.actionCue.evidence?.knownContext || input.context?.knownContext,
       })
     }
   }

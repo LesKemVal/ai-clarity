@@ -70,6 +70,12 @@ export type ServerMessage =
       source: 'local' | 'groq'
       localCue: string
       fastCue?: string
+      evidence?: {
+        transcript?: string
+        room?: string
+        objective?: string
+        knownContext?: string
+      }
       category: string
       confidence: number
       priority: number

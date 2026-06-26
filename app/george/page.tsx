@@ -5388,6 +5388,15 @@ return true
       authority,
     })
 
+    if (liveMode && liveDeliveryStyle === 'continue') {
+      console.info('[GEORGE LIVE CONTINUATION ROUTE]', {
+        route: 'hub_only',
+        transcript: clean,
+        suppressedLegacyAction: authority.action.type,
+      })
+      return
+    }
+
     if (authority.action.type === 'ignore') {
       if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
         console.warn('[GEORGE LIVE ACTION IGNORED]', {
@@ -5425,7 +5434,7 @@ return true
       console.info('[GEORGE LIVE SEND]', { text: authority.action.text })
       void handleSend(authority.action.text, { source: 'live_transcript' })
     }
-  }, [handleSend, isThinking, liveMode, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
+  }, [handleSend, isThinking, liveMode, liveDeliveryStyle, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript

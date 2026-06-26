@@ -102,6 +102,23 @@ export function violatesEvidenceAuthority(output: string, evidence = ''): Eviden
     return { violates: true, reason: 'unsupported_continuation_takeover', unsupportedTerms: [clean.slice(0, 40)] }
   }
 
+  const continuationAssertionMarkers =
+    /\b(we believe|we know|we have|we've|our analysts|our team|the deal gives|this gives us|will give us|puts us|gives us a seat|seat at the table|shape the future direction|future direction of)\b/gi
+
+  const unsupportedAssertions = unsupportedMatches(
+    continuationAssertionMarkers,
+    clean,
+    normalizedEvidence
+  )
+
+  if (unsupportedAssertions.length) {
+    return {
+      violates: true,
+      reason: 'unsupported_asserted_continuation',
+      unsupportedTerms: unsupportedAssertions,
+    }
+  }
+
   for (const clause of splitClauses(clean)) {
     const clauseMarkedAsInference = INFERENCE_MARKERS.test(clause)
     if (clauseMarkedAsInference) continue
