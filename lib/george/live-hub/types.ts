@@ -1,5 +1,18 @@
 import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
+export type GeorgeActionCueEvidence = {
+  transcript?: string
+  room?: string
+  objective?: string
+  knownContext?: string
+  secondaryOutcome?: string
+  secondaryObjective?: string
+  intangibleObjective?: string
+  userPosition?: string
+  deliveryStyle?: GeorgeLiveDeliveryStyle
+  runtimeIntent?: string
+}
+
 export type GeorgeActionCue = {
   turnId?: string
   cue: string
@@ -7,12 +20,7 @@ export type GeorgeActionCue = {
   source: 'local' | 'groq'
   localCue: string
   fastCue?: string
-  evidence?: {
-    transcript?: string
-    room?: string
-    objective?: string
-    knownContext?: string
-  }
+  evidence?: GeorgeActionCueEvidence
   category: string
   confidence: number
   priority: number
