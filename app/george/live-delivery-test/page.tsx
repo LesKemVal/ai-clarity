@@ -3,8 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGeorgeLiveHub } from '@/hooks/george/live-hub/useGeorgeLiveHub'
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
-import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { markRuntimeEvent, startRuntimeTurn } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeDeliveryCue, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
+
+function createTestTurnId() {
+  return `delivery-test-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
 
 export default function LiveDeliveryTestPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(false)
@@ -26,7 +30,7 @@ export default function LiveDeliveryTestPage() {
         },
       })
 
-      markRuntimeEvent(routed.text, 'delivery_cue')
+      markRuntimeEvent(routed.turnId || actionCue.turnId || routed.text, 'delivery_cue')
       setDeliveryCue(routed)
 
       if (routed.mode !== 'voice') return
@@ -48,7 +52,7 @@ export default function LiveDeliveryTestPage() {
   useEffect(() => {
     if (!deliveryCue?.text) return
 
-    markRuntimeEvent(deliveryCue.text, 'visual_cue_rendered')
+    markRuntimeEvent(deliveryCue.turnId || deliveryCue.text, 'visual_cue_rendered')
   }, [deliveryCue])
 
   useEffect(() => {
@@ -166,6 +170,10 @@ export default function LiveDeliveryTestPage() {
           <button
             type="button"
             onClick={() => {
+              const turnId = createTestTurnId()
+              startRuntimeTurn(turnId)
+              markRuntimeEvent(turnId, 'transcript_input')
+
               hub.connect({
                 room: 'test room',
                 chair: 'founder',
@@ -175,7 +183,7 @@ export default function LiveDeliveryTestPage() {
               })
 
               window.setTimeout(() => {
-                hub.sendTranscript(testTranscript, true)
+                hub.sendTranscript(testTranscript, true, turnId)
               }, 150)
             }}
             className="mt-3 rounded-xl bg-[#AEB6FF] px-4 py-3 text-sm font-semibold text-black"
@@ -205,6 +213,7 @@ export default function LiveDeliveryTestPage() {
               </div>
 
               <div className="mt-4 text-xs leading-5 text-white/35">
+                <div>turnId: {deliveryCue.turnId || 'none'}</div>
                 <div>mode: {deliveryCue.mode}</div>
                 <div>source: {deliveryCue.source}</div>
                 <div>category: {deliveryCue.category}</div>
