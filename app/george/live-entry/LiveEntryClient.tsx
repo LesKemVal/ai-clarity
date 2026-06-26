@@ -1056,20 +1056,20 @@ export default function LiveEntryClient() {
       example: 'Lester, Mr. Sawyer, Dr. Patel, Alex, Coach Rivera.',
     },
     {
-      key: 'role',
-      kicker: 'POSITION SIGNAL',
-      label: 'Signal 2',
-      question: 'What is your role in this conversation?',
-      helper: 'This tells GEORGE where you stand in the room.',
-      example: 'Founder, candidate, patient, manager, investor, customer.',
-    },
-    {
       key: 'desiredOutcome',
       kicker: 'OUTCOME SIGNAL',
-      label: 'Signal 3',
+      label: 'Signal 2',
       question: 'What outcome do you want from this conversation?',
       helper: 'Minimum signal for competence. More signal for excellence.',
       example: 'Secure a second meeting. Leave with a treatment plan. Get agreement on next steps.',
+    },
+    {
+      key: 'role',
+      kicker: 'ROLE SIGNAL',
+      label: 'Signal 3',
+      question: 'What is your role in this room?',
+      helper: 'Your role helps GEORGE understand your responsibility, authority, and likely support needs.',
+      example: 'CEO, founder, candidate, attorney, physician, manager, parent, lead negotiator.',
     },
   ], [])
 
@@ -2515,7 +2515,7 @@ const beginProofOfAwareness = async () => {
           loading: false,
           step: 'Optional',
           primaryAction: 'Continue preparing',
-          canBeginLive: hasRequiredLiveSignal,
+          canBeginLive: false,
         }
       : showOpenAISignalSurface && optionalSignalLoading
         ? {
@@ -2530,7 +2530,7 @@ const beginProofOfAwareness = async () => {
             loading: true,
             step: 'Optional',
             primaryAction: 'Continue',
-            canBeginLive: hasRequiredLiveSignal,
+            canBeginLive: false,
           }
         : null
 
