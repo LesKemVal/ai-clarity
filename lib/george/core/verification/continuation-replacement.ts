@@ -11,6 +11,58 @@ function compact(value: unknown, max = 240) {
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, max)
 }
 
+function trimTerminal(value: string) {
+  return value.replace(/[.!?;:\s]+$/, '').trim()
+}
+
+function lowerFirst(value: string) {
+  if (!value) return value
+  return value.charAt(0).toLowerCase() + value.slice(1)
+}
+
+function words(value: string) {
+  return compact(value, 500).split(/\s+/).filter(Boolean)
+}
+
+function objectivePhrase(input: ContinuationReplacementInput) {
+  const objective = trimTerminal(
+    compact(input.activeOutcome || input.desiredOutcome, 220)
+  )
+
+  if (!objective) return ''
+
+  const normalized = lowerFirst(objective)
+
+  if (/^(to|whether|why|how|what|when|where|who|that|if|because)\b/i.test(normalized)) {
+    return normalized
+  }
+
+  if (/^(secure|evaluate|protect|build|clarify|decide|determine|negotiate|explain|present|answer|gather|resolve|teach|learn|show|move|leave)\b/i.test(normalized)) {
+    return `to ${normalized}`
+  }
+
+  return normalized
+}
+
+function premiseStrength(input: ContinuationReplacementInput) {
+  const count = words(input.transcript || '').length
+
+  if (count >= 10) return 'strong'
+  if (count >= 5) return 'developing'
+  if (count >= 2) return 'thin'
+  return 'minimal'
+}
+
+function hasContinuationRuntime(input: ContinuationReplacementInput) {
+  return /\b(continue|continue_thought|presentation_continuation)\b/i.test(
+    [input.shadowMap, input.lastFiveSeconds].join(' ')
+  )
+}
+
+function hasPremiseStarter(value: string) {
+  return /\b(because|reason|why|what matters|matters most|the point|the opportunity|what i want|what we need|if we|when we|before we|the concern|the issue|the risk|the value|the decision)\b/i.test(value)
+}
+
 export function continuationEvidence(input: ContinuationReplacementInput) {
   return [
     input.transcript,
@@ -23,6 +75,7 @@ export function continuationEvidence(input: ContinuationReplacementInput) {
 
 export function safeContinuationReplacement(input: ContinuationReplacementInput) {
   const transcript = compact(input.transcript)
+  const fallback = compact(input.fallback)
   const evidence = compact(
     [
       input.transcript,
@@ -31,62 +84,58 @@ export function safeContinuationReplacement(input: ContinuationReplacementInput)
       input.desiredOutcome,
       input.activeOutcome,
     ].join(' '),
-    600
+    800
   )
   const lower = transcript.toLowerCase()
-  const evidenceLower = evidence.toLowerCase()
-
-  const stakeTrajectory =
-    /\b(stake|equity|ownership|company|deal|valuation|evaluation|\$|billion)\b/i.test(evidenceLower)
+  const objective = objectivePhrase(input)
+  const strength = premiseStrength(input)
+  const continuationRuntime = hasContinuationRuntime(input)
+  const premiseStarted = hasPremiseStarter(lower)
 
   console.info('[GEORGE][continuation][replacement-context]', {
     transcript,
+    fallback,
     desiredOutcome: input.desiredOutcome,
     activeOutcome: input.activeOutcome,
+    lastFiveSeconds: input.lastFiveSeconds,
     shadowMap: input.shadowMap,
     evidence,
-    stakeTrajectory,
+    premiseStrength: strength,
+    continuationRuntime,
+    premiseStarted,
   })
 
-  if (/\b(because|reason|why)\b/i.test(lower)) {
-    if (stakeTrajectory) {
-      return '...because the stake has to make sense on both sides.'
-    }
-
-    return '...because that is what has to be made clear.'
+  if (objective && /\b(because|reason|why)\b/i.test(lower)) {
+    return `...because the conversation has to stay tied ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
   }
 
-  if (/\b(what matters|matters most)\b/i.test(lower)) {
-    if (stakeTrajectory) {
-      return '...that the terms stay clear on both sides.'
-    }
-
-    return '...what has to be decided next.'
+  if (objective && /\b(what matters|matters most|the point)\b/i.test(lower)) {
+    return `...whether this moves us closer ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
   }
 
-  if (/\b(the opportunity|opportunity here)\b/i.test(lower)) {
-    if (stakeTrajectory) {
-      return '...to make the value and the stake clear enough to evaluate.'
-    }
-
-    return '...to explain the value without getting ahead of the evidence.'
+  if (objective && /\b(if we|when we|before we)\b/i.test(lower)) {
+    return `...we should keep the next step tied ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
   }
 
-  if (/\b(valuation|evaluation|\$|billion|deal|stake)\b/i.test(lower)) {
-    if (stakeTrajectory) {
-      return '...because the stake has to be supported clearly.'
-    }
-
-    return '...because the value has to be supported clearly.'
+  if (objective && /\b(the concern|the issue|the risk)\b/i.test(lower)) {
+    return `...is whether that affects our ability ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
   }
 
-  if (/\b(what i want|understand)\b/i.test(lower)) {
-    if (stakeTrajectory) {
-      return '...why the stake matters and what has to be clear next.'
-    }
-
-    return '...why this matters and what should happen next.'
+  if (objective && /\b(the value|the opportunity)\b/i.test(lower)) {
+    return `...is in how clearly it supports our ability ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
   }
 
-  return '...what has to be clear next.'
+  if (objective && /\b(what i want|what we need|understand)\b/i.test(lower)) {
+    return `...is why this needs to stay connected ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
+  }
+
+  if (objective && (continuationRuntime || premiseStarted || strength !== 'minimal')) {
+    return `...so the next words should stay tied ${objective.startsWith('to ') ? objective : `to ${objective}`}.`
+  }
+
+  if (fallback.startsWith('...') && fallback.length <= 180) {
+    return fallback
+  }
+
+  return '...so the next point stays tied to the outcome.'
 }
