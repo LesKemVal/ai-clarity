@@ -103,7 +103,7 @@ export function useGeorgeLiveHub(params?: {
     setStatus('idle')
   }, [stopMic])
 
-  const sendTranscript = useCallback((text: string, isFinal = true) => {
+  const sendTranscript = useCallback((text: string, isFinal = true, turnId?: string) => {
     const clean = String(text || '').trim()
 
     if (!clean) return
@@ -113,12 +113,13 @@ export function useGeorgeLiveHub(params?: {
       return
     }
 
-    console.info('[LIVE][hub][hook] send transcript', { text: clean, isFinal })
+    console.info('[LIVE][hub][hook] send transcript', { text: clean, isFinal, turnId })
 
     transportRef.current.sendJson?.({
       type: 'TRANSCRIPT_INPUT',
       text: clean,
       isFinal,
+      turnId,
     })
   }, [])
 
