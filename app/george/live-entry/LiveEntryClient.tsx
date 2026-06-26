@@ -1843,10 +1843,14 @@ const mandatoryLiveSignals = useMemo(() => {
 
     setShowResumeConversationList(false)
     setShowPrepPreview(false)
-    setShowOpenAISignalSurface(false)
+    const restoredHasOperationalSignal = Boolean(
+      cleanBriefingValue(restoredContext) ||
+      cleanBriefingValue(restoredChair)
+    )
+
     setCurrentOptionalSignalQuestion(null)
     setOptionalSignalLoading(false)
-    setLiveEntryMandatoryMode(false)
+    setLiveEntryMandatoryMode(!restoredHasOperationalSignal)
     setLiveBriefingStep(1)
     setLiveBriefingToaAccepted(false)
     setLiveBriefingSupportAccepted(false)
@@ -1855,7 +1859,8 @@ const mandatoryLiveSignals = useMemo(() => {
     setLiveBriefingProofReply('')
     setLiveBriefingSttError('')
     setSpokenLiveBriefingStep(null)
-    setShowLiveBriefingRoom(true)
+    setShowOpenAISignalSurface(!restoredHasOperationalSignal)
+    setShowLiveBriefingRoom(restoredHasOperationalSignal)
   }
 
   const editPrepRoomResource = <K extends keyof PrepRoomResourceProfile>(
@@ -2510,7 +2515,7 @@ const beginProofOfAwareness = async () => {
         loading: false,
         step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
         primaryAction: 'Continue',
-        canBeginLive: true,
+        canBeginLive: false,
       }
     : showOpenAISignalSurface && currentOptionalSignalQuestion
       ? {
