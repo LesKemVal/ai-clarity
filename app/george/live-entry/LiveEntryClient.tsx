@@ -2500,7 +2500,7 @@ const beginProofOfAwareness = async () => {
         loading: false,
         step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
         primaryAction: 'Continue',
-        canBeginLive: false,
+        canBeginLive: true,
       }
     : showOpenAISignalSurface && currentOptionalSignalQuestion
       ? {
