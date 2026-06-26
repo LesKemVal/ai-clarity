@@ -6,9 +6,16 @@ export type LiveSpeakerRole =
   | 'george_instruction'
   | 'unclear'
 
+export type LiveCommunicationBaseline =
+  | 'adaptive'
+  | 'executive'
+  | 'conversational'
+
 export type LiveRuntimeMemory = {
   preferredForce?: 'light' | 'balanced' | 'strong'
   toneCorrection?: 'softer' | 'firmer' | 'neutral'
+  communicationBaseline?: LiveCommunicationBaseline
+  roomCommunicationNotes?: string[]
   acceptedCarryCount?: number
   overrideCount?: number
   hesitationCount?: number

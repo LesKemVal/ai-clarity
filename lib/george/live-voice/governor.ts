@@ -159,6 +159,31 @@ function applyRuntimeMemory(packet: LiveVoicePacket, input: LiveVoiceGovernorInp
     packet.confidence = Math.min(packet.confidence, 0.74)
   }
 
+  if (memory.communicationBaseline === 'executive') {
+    packet.responseTone = packet.responseTone || 'executive'
+    packet.responseCompression = packet.responseCompression || 'measured'
+    packet.deliveryBehavior = packet.deliveryBehavior || 'structured_operational'
+    packet.status = `${packet.status} Communication baseline: executive.`.trim()
+  }
+
+  if (memory.communicationBaseline === 'conversational') {
+    packet.responseTone = packet.responseTone || 'conversational'
+    packet.responseCompression = packet.responseCompression || 'natural'
+    packet.deliveryBehavior = packet.deliveryBehavior || 'natural_operational'
+    packet.status = `${packet.status} Communication baseline: conversational.`.trim()
+  }
+
+  if (memory.communicationBaseline === 'adaptive' || !memory.communicationBaseline) {
+    packet.status = `${packet.status} Communication baseline: adaptive.`.trim()
+  }
+
+  if (memory.roomCommunicationNotes?.length) {
+    packet.runtimeSupportSummary = [
+      packet.runtimeSupportSummary,
+      `Room communication: ${memory.roomCommunicationNotes.slice(-2).join(' / ')}`,
+    ].filter(Boolean).join(' ')
+  }
+
   return {
     ...packet,
     runtimeForce,
