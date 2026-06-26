@@ -1189,7 +1189,7 @@ export default function LiveEntryClient() {
 
       if (!response.ok || data?.status === 'sufficient' || !data?.question) {
         setCurrentOptionalSignalQuestion({
-          key: `manual_signal_${Date.now()}`,
+          key: `ready_signal_${Date.now()}`,
           label: 'User signal',
           question: 'LIVE is ready. Add anything else GEORGE should know, or go to LIVE.',
           why: 'OpenAI does not have a sharper question right now. You may still add signal if it matters.',
@@ -2530,7 +2530,7 @@ const beginProofOfAwareness = async () => {
           loading: false,
           step: 'Optional',
           primaryAction: 'Continue preparing',
-          canBeginLive: false,
+          canBeginLive: String(currentOptionalSignalQuestion.key || '').startsWith('ready_signal_'),
         }
       : showOpenAISignalSurface && optionalSignalLoading
         ? {
