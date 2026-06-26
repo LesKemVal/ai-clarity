@@ -2443,9 +2443,19 @@ const beginProofOfAwareness = async () => {
       return
     }
 
+    const hasOperationalBriefingSignal =
+      Boolean(cleanBriefingValue(knownContext)) ||
+      Boolean(cleanBriefingValue(userPosition))
+
     liveBriefingTermsPreviouslyAcceptedRef.current = true
-    setLiveBriefingReadyToContinue(true)
-  }, [showLiveBriefingRoom, liveBriefingStep, liveBriefingToaAccepted, knownContext])
+    setLiveBriefingReadyToContinue(hasOperationalBriefingSignal)
+  }, [
+    showLiveBriefingRoom,
+    liveBriefingStep,
+    liveBriefingToaAccepted,
+    knownContext,
+    userPosition,
+  ])
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return
