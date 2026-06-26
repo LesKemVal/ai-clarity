@@ -1195,7 +1195,7 @@ export default function LiveEntryClient() {
           why: 'OpenAI does not have a sharper question right now. You may still add signal if it matters.',
           example: 'E.g. Board approval is required. Timeline is 60 days. Do not press on valuation.',
         })
-        setOptionalSignalComplete(false)
+        setOptionalSignalComplete(true)
         return
       }
 
@@ -2530,7 +2530,7 @@ const beginProofOfAwareness = async () => {
           loading: false,
           step: 'Optional',
           primaryAction: 'Continue preparing',
-          canBeginLive: String(currentOptionalSignalQuestion.key || '').startsWith('ready_signal_'),
+          canBeginLive: optionalSignalComplete,
         }
       : showOpenAISignalSurface && optionalSignalLoading
         ? {
