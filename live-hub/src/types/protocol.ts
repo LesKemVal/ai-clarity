@@ -7,6 +7,19 @@ export type LiveHubDeliveryStyle =
   | 'expandedLine'
   | 'continue'
 
+export type GeorgeActionCueEvidence = {
+  transcript?: string
+  room?: string
+  objective?: string
+  knownContext?: string
+  secondaryOutcome?: string
+  secondaryObjective?: string
+  intangibleObjective?: string
+  userPosition?: string
+  deliveryStyle?: LiveHubDeliveryStyle
+  runtimeIntent?: string
+}
+
 export type LiveHubContext = {
   room?: string
   chair?: string
@@ -70,12 +83,7 @@ export type ServerMessage =
       source: 'local' | 'groq'
       localCue: string
       fastCue?: string
-      evidence?: {
-        transcript?: string
-        room?: string
-        objective?: string
-        knownContext?: string
-      }
+      evidence?: GeorgeActionCueEvidence
       category: string
       confidence: number
       priority: number
