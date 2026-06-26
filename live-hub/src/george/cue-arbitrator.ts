@@ -1,4 +1,5 @@
 import type { GeorgeRuntimePacket } from './runtime-packet.js'
+import type { GeorgeActionCueEvidence } from '../types/protocol.js'
 
 export type ActionCue = {
   cue: string
@@ -6,18 +7,27 @@ export type ActionCue = {
   source: 'local' | 'groq'
   localCue: string
   fastCue?: string
-  evidence?: {
-    transcript?: string
-    room?: string
-    objective?: string
-    knownContext?: string
-  }
+  evidence?: GeorgeActionCueEvidence
   category: string
   confidence: number
   priority: number
   at: number
 }
 
+function buildActionCueEvidence(packet: GeorgeRuntimePacket): GeorgeActionCueEvidence {
+  return {
+    transcript: packet.transcript,
+    room: packet.room,
+    objective: packet.objective,
+    knownContext: packet.knownContext,
+    secondaryOutcome: packet.secondaryOutcome,
+    secondaryObjective: packet.secondaryObjective,
+    intangibleObjective: packet.intangibleObjective,
+    userPosition: packet.userPosition,
+    deliveryStyle: packet.deliveryStyle,
+    runtimeIntent: packet.runtimeIntent,
+  }
+}
 
 function enforceModeContract(cue: string, deliveryStyle: GeorgeRuntimePacket['deliveryStyle']) {
   const clean = cue.trim()
@@ -56,6 +66,7 @@ export function arbitrateCue(input: {
   fastCue?: string | null
 }): ActionCue {
   const fastCue = input.fastCue?.trim()
+  const evidence = buildActionCueEvidence(input.packet)
 
   const maxFastCueLength =
     input.packet.deliveryStyle === 'expandedLine'
@@ -78,12 +89,7 @@ export function arbitrateCue(input: {
       source: 'groq',
       localCue: input.packet.cue,
       fastCue,
-      evidence: {
-        transcript: input.packet.transcript,
-        room: input.packet.room,
-        objective: input.packet.objective,
-        knownContext: input.packet.knownContext,
-      },
+      evidence,
       category: input.packet.category,
       confidence: Math.min(1, input.packet.confidence + 0.04),
       priority: input.packet.priority + 5,
@@ -96,12 +102,7 @@ export function arbitrateCue(input: {
     reason: input.packet.reason,
     source: 'local',
     localCue: input.packet.cue,
-    evidence: {
-      transcript: input.packet.transcript,
-      room: input.packet.room,
-      objective: input.packet.objective,
-      knownContext: input.packet.knownContext,
-    },
+    evidence,
     category: input.packet.category,
     confidence: input.packet.confidence,
     priority: isGenericLocalCue ? 0 : input.packet.priority,
