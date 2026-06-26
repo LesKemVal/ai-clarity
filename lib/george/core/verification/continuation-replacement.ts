@@ -80,7 +80,7 @@ export function continuationEvidence(input: ContinuationReplacementInput) {
   ].join(' ')
 }
 
-export function safeContinuationReplacement(input: ContinuationReplacementInput) {
+export function repairContinuationTrajectory(input: ContinuationReplacementInput) {
   const transcript = compact(input.transcript)
   const fallback = compact(input.fallback)
   const evidence = compact(
@@ -98,7 +98,7 @@ export function safeContinuationReplacement(input: ContinuationReplacementInput)
   const continuationRuntime = hasContinuationRuntime(input)
   const premiseStarted = hasPremiseStarter(lower)
 
-  console.info('[GEORGE][continuation][replacement-context]', {
+  console.info('[GEORGE][continuation][repair-context]', {
     transcript,
     fallback,
     desiredOutcome: input.desiredOutcome,
@@ -148,3 +148,5 @@ export function safeContinuationReplacement(input: ContinuationReplacementInput)
 
   return '...so the thought stays connected.'
 }
+
+export const safeContinuationReplacement = repairContinuationTrajectory
