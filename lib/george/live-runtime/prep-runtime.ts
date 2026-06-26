@@ -83,12 +83,19 @@ export type LivePrepSetup = {
   createdAt?: number
 }
 
+export type LiveCommunicationBaseline =
+  | 'adaptive'
+  | 'executive'
+  | 'conversational'
+
 export type LiveRuntimeMemory = {
   acceptedCarryCount: number
   overrideCount: number
   hesitationCount: number
   preferredForce: 'light' | 'balanced' | 'strong'
   toneCorrection: 'softer' | 'firmer' | 'neutral'
+  communicationBaseline: LiveCommunicationBaseline
+  roomCommunicationNotes: string[]
 }
 
 export type LiveRuntimeUsageRecord = {
@@ -491,6 +498,8 @@ export function applyPreparedRuntimeMemory(
   return {
     ...current,
     preferredForce: capabilityIds.includes('pressure_management') ? 'strong' : current.preferredForce,
+    communicationBaseline: current.communicationBaseline || 'adaptive',
+    roomCommunicationNotes: current.roomCommunicationNotes || [],
   }
 }
 

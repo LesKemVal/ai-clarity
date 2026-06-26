@@ -1051,6 +1051,8 @@ const [voiceError, setVoiceError] = useState('')
     hesitationCount: 0,
     preferredForce: 'balanced' as 'light' | 'balanced' | 'strong',
     toneCorrection: 'neutral' as 'softer' | 'firmer' | 'neutral',
+    communicationBaseline: 'adaptive' as 'adaptive' | 'executive' | 'conversational',
+    roomCommunicationNotes: [] as string[],
   })
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
@@ -2265,6 +2267,33 @@ async function injectGovernedLiveCue(transcript: string, content: string) {
 
   if (/hmm|maybe|i guess|i don’t know|i don't know|i dont know/.test(lower)) {
     memory.hesitationCount += 1
+    memory.roomCommunicationNotes = [
+      ...(memory.roomCommunicationNotes || []),
+      'User hesitated; preserve clarity and reduce cognitive load.',
+    ].slice(-5)
+  }
+
+  if (/\b(softer|soften|less aggressive|gentler|calmer)\b/i.test(lower)) {
+    memory.toneCorrection = 'softer'
+    memory.roomCommunicationNotes = [
+      ...(memory.roomCommunicationNotes || []),
+      'User requested softer communication in this room.',
+    ].slice(-5)
+  }
+
+  if (/\b(firmer|stronger|more direct|be direct|sharper)\b/i.test(lower)) {
+    memory.toneCorrection = 'firmer'
+    memory.roomCommunicationNotes = [
+      ...(memory.roomCommunicationNotes || []),
+      'User requested firmer communication in this room.',
+    ].slice(-5)
+  }
+
+  if (/\b(shorter|tighten|compress|too much|less)\b/i.test(lower)) {
+    memory.roomCommunicationNotes = [
+      ...(memory.roomCommunicationNotes || []),
+      'User prefers tighter language in this room.',
+    ].slice(-5)
   }
 
   if (!allowed) return false
