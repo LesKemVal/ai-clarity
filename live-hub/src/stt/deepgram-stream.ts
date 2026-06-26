@@ -12,6 +12,18 @@ function createRuntimeTurnId() {
   return `live-turn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function normalizeTranscriptFragment(value: string) {
+  return String(value || '').trim().replace(/\s+/g, ' ')
+}
+
+function buildRecentTranscript(fragments: string[]) {
+  return fragments
+    .map(normalizeTranscriptFragment)
+    .filter(Boolean)
+    .slice(-8)
+    .join('\n')
+}
+
 export function createDeepgramStream(params: {
   ws: WebSocket
   apiKey: string
@@ -26,6 +38,7 @@ export function createDeepgramStream(params: {
   let lastFinalTranscriptKey = ''
   let lastFinalAt = 0
   const pendingAudio: ArrayBuffer[] = []
+  const recentTranscriptFragments: string[] = []
 
   const dg = deepgram.listen.live({
     model: 'nova-2',
@@ -33,6 +46,22 @@ export function createDeepgramStream(params: {
     interim_results: true,
     endpointing: 350,
   })
+
+  function rememberTranscriptFragment(transcript: string, isFinal: boolean) {
+    const clean = normalizeTranscriptFragment(transcript)
+    if (!clean) return
+
+    if (!isFinal && clean.length < 12) return
+
+    const last = recentTranscriptFragments[recentTranscriptFragments.length - 1]
+    if (last === clean) return
+
+    recentTranscriptFragments.push(clean)
+
+    while (recentTranscriptFragments.length > 12) {
+      recentTranscriptFragments.shift()
+    }
+  }
 
   function processTranscript(input: {
     transcript: string
@@ -71,6 +100,9 @@ export function createDeepgramStream(params: {
       lastFinalAt = now
     }
 
+    rememberTranscriptFragment(transcript, isFinal)
+    const recentTranscript = buildRecentTranscript(recentTranscriptFragments)
+
     sendJson(params.ws, {
       type: isFinal ? 'TRANSCRIPT_FINAL' : 'TRANSCRIPT_PARTIAL',
       text: transcript,
@@ -100,6 +132,7 @@ export function createDeepgramStream(params: {
 
     const packet = buildRuntimePacket({
       transcript,
+      recentTranscript,
       isFinal,
       context: turnContext,
       cue,
@@ -150,6 +183,7 @@ export function createDeepgramStream(params: {
       signal: packet.signal,
       cue: packet.cue,
       deliveryStyle: packet.deliveryStyle,
+      recentTranscriptAvailable: Boolean(packet.recentTranscript),
     })
 
     console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_request'))
