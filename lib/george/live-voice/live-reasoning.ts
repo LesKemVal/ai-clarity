@@ -21,14 +21,19 @@ function compact(value: string | undefined, limit = 900) {
   return String(value || '').replace(/\s+/g, ' ').trim().slice(0, limit)
 }
 
+function wordCount(value: string | undefined) {
+  return compact(value, 900).split(/\s+/).filter(Boolean).length
+}
+
 function shouldUseReasoning(input: LiveReasoningInput) {
   const transcript = compact(input.transcript, 500)
   if (!transcript) return false
   if (!input.fallbackPacket.shouldSpeak) return false
 
   return (
+    input.fallbackPacket.speakerIntent === 'assisted_continuation' ||
     transcript.length >= 8 ||
-    /\b(help|what do i say|asking|asked|questioning|challenged|dropped|declined|revenue|forecast|number|pressure|objection|concern|issue|take it|take this|you answer|answer for me|carry this)\b/i.test(transcript)
+    /\b(help|what do i say|asking|asked|questioning|challenged|dropped|declined|revenue|forecast|number|pressure|objection|concern|issue|take it|take this|carry this)\b/i.test(transcript)
   )
 }
 
@@ -72,6 +77,35 @@ function looksLikeRepeatedSignal(input: LiveReasoningInput) {
   return signalRepairPrompted && (shortSignal || repeatedQuestion)
 }
 
+function shouldCarryAssistedContinuation(input: LiveReasoningInput) {
+  if (input.liveAssistMode !== 'lines') return false
+  if (input.fallbackPacket.speakerIntent !== 'assisted_continuation') return false
+
+  return true
+}
+
+function getContinuationPremiseInstruction(input: LiveReasoningInput) {
+  if (!shouldCarryAssistedContinuation(input)) return ''
+
+  const transcriptWords = wordCount(input.transcript)
+  const premiseStrength =
+    transcriptWords >= 10
+      ? 'strong'
+      : transcriptWords >= 5
+        ? 'developing'
+        : 'thin'
+
+  if (premiseStrength === 'strong') {
+    return 'The user has given a strong partial premise. Continue inside that exact supposition and preserve the direction. Do not replace it with a better topic.'
+  }
+
+  if (premiseStrength === 'developing') {
+    return 'The user has started a recognizable premise. Continue it directly, using the objective and recent room memory only to stay aligned.'
+  }
+
+  return 'The user has given only a thin sentence start. Continue safely from the start and current room signal without inventing facts.'
+}
+
 function shouldCarryTurn(input: LiveReasoningInput) {
   const combined = [
     input.transcript,
@@ -79,7 +113,8 @@ function shouldCarryTurn(input: LiveReasoningInput) {
   ].join(' ').toLowerCase()
 
   return (
-    /\b(george[,\s]+take it|take it george|take this|you answer|answer for me|carry this|speak for me|give them the answer|handle this)\b/i.test(combined) ||
+    shouldCarryAssistedContinuation(input) ||
+    /\b(george[,\s]+take it|take it george|take this|carry this|handle this)\b/i.test(combined) ||
     looksLikeRepeatedSignal(input)
   )
 }
@@ -88,6 +123,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   if (!shouldUseReasoning(input)) return null
 
   const carryTurn = shouldCarryTurn(input)
+  const continuationPremiseInstruction = getContinuationPremiseInstruction(input)
 
   const sufficiency = evaluateSignalSufficiency({
     transcript: input.transcript,
@@ -127,12 +163,14 @@ ${signalDirective}
 
 Speaker Perspective:
 ${carryTurn
-  ? '- The user has delegated the next conversational turn to GEORGE. Answer as the user in first person. Do not say "say", "ask", "question", or explain the move. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then respond as the user would for this turn.'
-  : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not pretend to be the user unless transfer is requested.'}
+  ? '- The user is carrying the conversational turn and GEORGE is continuing the user\'s partial sentence. Continue from the user\'s premise and supposition. Do not reset the thought, coach the user, explain the move, or switch topics. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then provide a first-person continuation suitable for this turn.'
+  : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not switch into first-person continuation unless continuation is active.'}
 
 Rules:
 - Extract facts already present in the transcript before asking a question.
 - If the transcript already contains a likely answer, use it.
+- Preserve the user\'s intended premise. The more the user gets out, the more tightly you must continue inside that direction.
+- Do not replace the user\'s sentence with a generic coaching phrase.
 - Prefer surfacing known facts over gathering more facts.
 - If a cause, objection, pressure, concern, metric, number, or answer is already present, lead with it.
 - Examples:
@@ -158,6 +196,8 @@ Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Assist mode: ${mode}
 Speaker perspective: ${perspective}
+Speaker intent: ${input.fallbackPacket.speakerIntent || 'unknown'}
+Continuation premise instruction: ${continuationPremiseInstruction || 'none'}
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
 Highest value signals: ${rankedSignals || 'none'}
@@ -174,9 +214,10 @@ Return the single best next move.
 Priority:
 1. Advance the desired outcome.
 2. Identify and serve the active outcome created by the current room signal.
-3. Use known facts.
-4. Recover missing signal only when it materially improves the next move.
-5. Ask a question only if necessary.
+3. Preserve and continue the user's partial premise when continuation is active.
+4. Use known facts.
+5. Recover missing signal only when it materially improves the next move.
+6. Ask a question only if necessary.
 `.trim()
 
   const model =
