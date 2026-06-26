@@ -16,7 +16,10 @@ export type ActionCue = {
 
 function buildActionCueEvidence(packet: GeorgeRuntimePacket): GeorgeActionCueEvidence {
   return {
+    // transcript is the latest/governing utterance.
     transcript: packet.transcript,
+    // recentTranscript is continuity evidence only; it may clarify premise, not override transcript.
+    recentTranscript: packet.recentTranscript,
     room: packet.room,
     objective: packet.objective,
     knownContext: packet.knownContext,
