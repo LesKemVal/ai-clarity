@@ -2834,6 +2834,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 const startLiveAudioRuntime = liveAudioRuntime.start
   const stopLiveAudioRuntimeDirect = liveAudioRuntime.stop
   const emergencyStopLiveAudioRuntime = liveAudioRuntime.emergencyStop
+  const liveAudioDesiredActiveRef = useRef(false)
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
@@ -2887,17 +2888,29 @@ const startLiveAudioRuntime = liveAudioRuntime.start
   })
 
   useEffect(() => {
-    if (!(forceLive || liveMode)) {
-      stopLiveAudioRuntimeDirect()
+    const liveEnabled = Boolean(forceLive || liveMode)
+    const desiredActive = Boolean(liveEnabled && liveRoomActive)
+
+    if (!liveEnabled) {
+      if (liveAudioDesiredActiveRef.current) {
+        stopLiveAudioRuntimeDirect()
+        setIsListening(false)
+      }
+      liveAudioDesiredActiveRef.current = false
       return
     }
 
     ;(window as any).__GEORGE_STOP_LIVE_MIC__ = () => {
       emergencyStopLiveAudioRuntime()
+      liveAudioDesiredActiveRef.current = false
       setIsListening(false)
     }
 
-    if (liveRoomActive) {
+    if (desiredActive === liveAudioDesiredActiveRef.current) return
+
+    liveAudioDesiredActiveRef.current = desiredActive
+
+    if (desiredActive) {
       startLiveAudioRuntime()
       setIsListening(true)
     } else {
