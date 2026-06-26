@@ -3,6 +3,27 @@ import { DEFAULT_GEORGE_LIVE_DELIVERY_STYLE, type GeorgeDeliveryContext, type Ge
 import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
 import { safeContinuationReplacement } from '@/lib/george/core/verification/continuation-replacement'
 
+function buildContinuationEvidence(input: {
+  actionCue: GeorgeActionCue
+  context?: GeorgeDeliveryContext
+}) {
+  return [
+    input.actionCue.evidence?.transcript,
+    input.actionCue.evidence?.room,
+    input.actionCue.evidence?.objective,
+    input.actionCue.evidence?.knownContext,
+    input.actionCue.evidence?.secondaryOutcome,
+    input.actionCue.evidence?.secondaryObjective,
+    input.actionCue.evidence?.intangibleObjective,
+    input.actionCue.evidence?.userPosition,
+    input.actionCue.evidence?.deliveryStyle,
+    input.actionCue.evidence?.runtimeIntent,
+    input.context?.room,
+    input.context?.objective,
+    input.context?.knownContext,
+  ].join(' ')
+}
+
 export function routeGeorgeDeliveryCue(input: {
   actionCue: GeorgeActionCue
   context?: GeorgeDeliveryContext
@@ -65,15 +86,7 @@ export function routeGeorgeDeliveryCue(input: {
       : cleanGenerated
 
   if (deliveryStyle === 'continue' && text) {
-    const evidence = [
-      input.actionCue.evidence?.transcript,
-      input.actionCue.evidence?.room,
-      input.actionCue.evidence?.objective,
-      input.actionCue.evidence?.knownContext,
-      input.context?.room,
-      input.context?.objective,
-      input.context?.knownContext,
-    ].join(' ')
+    const evidence = buildContinuationEvidence(input)
 
     const authority = violatesEvidenceAuthority(text, evidence)
 
@@ -98,9 +111,21 @@ export function routeGeorgeDeliveryCue(input: {
       })
 
       text = safeContinuationReplacement({
+        fallback: text,
         transcript: input.actionCue.evidence?.transcript || text,
+        lastFiveSeconds: input.actionCue.evidence?.room || input.context?.room,
         desiredOutcome: input.actionCue.evidence?.objective || input.context?.objective,
-        shadowMap: input.actionCue.evidence?.knownContext || input.context?.knownContext,
+        activeOutcome:
+          input.actionCue.evidence?.secondaryOutcome ||
+          input.actionCue.evidence?.secondaryObjective ||
+          input.actionCue.evidence?.intangibleObjective,
+        shadowMap: [
+          input.actionCue.evidence?.knownContext,
+          input.actionCue.evidence?.userPosition,
+          input.actionCue.evidence?.deliveryStyle,
+          input.actionCue.evidence?.runtimeIntent,
+          input.context?.knownContext,
+        ].join(' '),
       })
     }
   }
