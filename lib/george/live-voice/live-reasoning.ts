@@ -11,8 +11,11 @@ const openai = new OpenAI({
 type LiveReasoningInput = {
   transcript: string
   room?: string
+  userPosition?: string
   desiredOutcome?: string
   activeOutcome?: string
+  knownContext?: string
+  briefingKnowledge?: string
   shadowMap?: string
   lastFiveSeconds?: string
   supportStyle?: LiveSupportStyle
@@ -146,8 +149,11 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   })
 
   const room = compact(input.room || 'Adaptive LIVE', 80)
+  const userPosition = compact(input.userPosition || '', 140)
   const desiredOutcome = compact(input.desiredOutcome || '', 180)
   const activeOutcome = compact(input.activeOutcome || '', 180)
+  const knownContext = compact(input.knownContext || '', 900)
+  const briefingKnowledge = compact(input.briefingKnowledge || '', 1400)
 
   const signalDirective = sufficiency.sufficient
     ? 'Enough signal exists. Act. Do not investigate.'
@@ -265,6 +271,7 @@ ${continuationReasoning
 
   const user = `
 Room: ${room}
+User role in room: ${userPosition || 'unknown'}
 Desired outcome: ${desiredOutcome || 'unknown'}
 Active outcome: ${activeOutcome || 'infer from current signal'}
 Support style: ${mode}
@@ -272,10 +279,17 @@ Runtime intent: ${input.runtimeIntent || input.fallbackPacket.runtimeIntent || '
 Cue depth: ${cueDepth || 'not_applicable'}
 Intervention type: ${continuationReasoning ? 'continuation' : mode}
 Speaker perspective: ${perspective}
+
+Briefing knowledge:
+${briefingKnowledge || 'none'}
+
+Known context:
+${knownContext || 'none'}
+
 Last signal: ${lastFiveSeconds}
 Transcript: ${transcript}
 Highest value signals: ${rankedSignals || 'none'}
-Recent room memory: ${shadowMap || 'none'}
+Conversation memory: ${shadowMap || 'none'}
 Offline fallback status: ${input.fallbackPacket.status}
 Offline fallback volley, use only if reasoning cannot improve it: ${input.fallbackPacket.volley}
 Offline fallback cue: ${input.fallbackPacket.cue}
@@ -323,6 +337,8 @@ Priority:
       input.transcript,
       input.lastFiveSeconds,
       input.shadowMap,
+      input.knownContext,
+      input.briefingKnowledge,
       input.desiredOutcome,
       input.activeOutcome,
     ].join(' ')
