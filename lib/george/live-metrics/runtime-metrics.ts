@@ -14,6 +14,8 @@ export type GeorgeRuntimeMetricEvent =
   | 'visual_cue_received'
   | 'visual_cue_rendered'
   | 'voice_cue_requested'
+  | 'core_authority_pass'
+  | 'core_authority_replaced'
   | 'tts_request_start'
   | 'tts_audio_received'
   | 'tts_playback_start'

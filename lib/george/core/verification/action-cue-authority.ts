@@ -1,4 +1,5 @@
 import type { GeorgeActionCue, GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { violatesEvidenceAuthority } from './evidence-gate'
 import { safeContinuationReplacement } from './continuation-replacement'
 
@@ -84,6 +85,8 @@ export function finalizeGeorgeActionCueAuthority(input: {
   })
 
   if (!authority.violates) {
+    markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_pass')
+
     return {
       ...input.actionCue,
       cue: text,
@@ -114,6 +117,8 @@ export function finalizeGeorgeActionCueAuthority(input: {
     originalText: text,
     replacementText,
   })
+
+  markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
 
   return {
     ...input.actionCue,
