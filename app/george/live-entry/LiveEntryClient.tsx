@@ -954,6 +954,7 @@ export default function LiveEntryClient() {
   const [exampleIndex, setExampleIndex] = useState(0)
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false)
   const [liveEntryMandatoryMode, setLiveEntryMandatoryMode] = useState(false)
+  const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] = useState(false)
   const [mandatorySignalStep, setMandatorySignalStep] = useState(0)
   const [mandatorySignalInput, setMandatorySignalInput] = useState('')
   const [typedMandatorySignalQuestion, setTypedMandatorySignalQuestion] = useState('')
@@ -1146,6 +1147,7 @@ export default function LiveEntryClient() {
 
     if (nextStep >= liveEntryMandatoryQuestions.length) {
       setLiveEntryMandatoryMode(false)
+      setLiveEntryReadyMessageVisible(true)
       setMandatorySignalStep(0)
       setPreLivePreviewReady(true)
       setShowOpenAISignalSurface(true)
@@ -1287,9 +1289,21 @@ export default function LiveEntryClient() {
   }, [])
 
   useEffect(() => {
-    if (!showOpenAISignalSurface || currentOptionalSignalQuestion || optionalSignalLoading || optionalSignalComplete) return
+    if (!showOpenAISignalSurface || liveEntryReadyMessageVisible || currentOptionalSignalQuestion || optionalSignalLoading || optionalSignalComplete) return
     void requestNextOptionalSignalQuestion()
-  }, [showOpenAISignalSurface, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
+  }, [showOpenAISignalSurface, liveEntryReadyMessageVisible, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
+
+  useEffect(() => {
+    if (!showOpenAISignalSurface || !liveEntryReadyMessageVisible) return
+    if (currentOptionalSignalQuestion || optionalSignalLoading || optionalSignalComplete) return
+
+    const timer = window.setTimeout(() => {
+      setLiveEntryReadyMessageVisible(false)
+      void requestNextOptionalSignalQuestion()
+    }, 3000)
+
+    return () => window.clearTimeout(timer)
+  }, [showOpenAISignalSurface, liveEntryReadyMessageVisible, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
 
   useEffect(() => {
     if (!currentOptionalSignalQuestion) {
@@ -1526,6 +1540,7 @@ const mandatoryLiveSignals = useMemo(() => {
         setOptionalSignalInput('')
         setOptionalSignalComplete(false)
         setShowOpenAISignalSurface(false)
+        setLiveEntryReadyMessageVisible(false)
         setShowPrepPreview(false)
         setShowLiveBriefingRoom(false)
         setLiveEntryMandatoryMode(false)
@@ -2516,7 +2531,28 @@ const beginProofOfAwareness = async () => {
         step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
         primaryAction: 'Continue',
         canBeginLive: false,
+        readinessMessage: false,
       }
+    : showOpenAISignalSurface && liveEntryReadyMessageVisible
+      ? {
+          kicker: 'LIVE READY',
+          label: 'Minimum signal acquired',
+          question: "You're ready for LIVE.\n\nI have enough information to begin supporting you.\n\nAdditional briefing can make my guidance more specific as I learn more about the room.",
+          helper: 'You may enter LIVE now, or continue briefing to make GEORGE more precise.',
+          example: '',
+          inputValue: '',
+          setInputValue: () => {},
+          submit: () => {
+            setLiveEntryReadyMessageVisible(false)
+            void requestNextOptionalSignalQuestion()
+            return true
+          },
+          loading: false,
+          step: 'Ready',
+          primaryAction: 'Continue to Brief',
+          canBeginLive: true,
+          readinessMessage: true,
+        }
     : showOpenAISignalSurface && currentOptionalSignalQuestion
       ? {
           kicker: 'ADDITIONAL SIGNAL',
@@ -2531,6 +2567,7 @@ const beginProofOfAwareness = async () => {
           step: 'Optional',
           primaryAction: 'Continue preparing',
           canBeginLive: optionalSignalComplete,
+          readinessMessage: false,
         }
       : showOpenAISignalSurface && optionalSignalLoading
         ? {
@@ -2546,6 +2583,7 @@ const beginProofOfAwareness = async () => {
             step: 'Optional',
             primaryAction: 'Continue',
             canBeginLive: false,
+            readinessMessage: false,
           }
         : null
 
@@ -2578,7 +2616,7 @@ const beginProofOfAwareness = async () => {
           </div>
 
           <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
-            {liveEntryQuestionSurface.canBeginLive ? 'GEORGE has enough signal.' : 'Bring GEORGE up to speed.'}
+            {liveEntryQuestionSurface.readinessMessage ? "You're ready for LIVE." : liveEntryQuestionSurface.canBeginLive ? 'GEORGE has enough signal.' : 'Bring GEORGE up to speed.'}
           </h1>
 
           <div className="mt-6 border-l border-[#AEB6FF]/24 pl-5 text-left">
@@ -2586,9 +2624,9 @@ const beginProofOfAwareness = async () => {
               {liveEntryQuestionSurface.label}
             </div>
 
-            <div className="mt-4 min-h-[72px] text-[22px] leading-8 tracking-[-0.02em] text-[#F2F4FF]/86">
+            <div className={`mt-4 min-h-[72px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? 'text-[17px] leading-7' : 'text-[22px] leading-8'} tracking-[-0.02em] text-[#F2F4FF]/86`}>
               {liveEntryQuestionSurface.question}
-              {!liveEntryQuestionSurface.loading && (
+              {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && (
                 <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
               )}
             </div>
@@ -2597,7 +2635,7 @@ const beginProofOfAwareness = async () => {
               {liveEntryQuestionSurface.helper}
             </div>
 
-            {liveEntryQuestionSurface.example && (
+            {!liveEntryQuestionSurface.readinessMessage && liveEntryQuestionSurface.example && (
               <div className="mt-5 rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
                   Example
@@ -2608,7 +2646,7 @@ const beginProofOfAwareness = async () => {
               </div>
             )}
 
-            {!liveEntryQuestionSurface.loading && (
+            {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && (
               <input
                 value={liveEntryQuestionSurface.inputValue}
                 onChange={(event) => liveEntryQuestionSurface.setInputValue(event.target.value)}
@@ -2639,6 +2677,7 @@ const beginProofOfAwareness = async () => {
                 disabled={!liveEntryQuestionSurface.canBeginLive}
                 onClick={() => {
                   setShowOpenAISignalSurface(false)
+                  setLiveEntryReadyMessageVisible(false)
                   setCurrentOptionalSignalQuestion(null)
                   setOptionalSignalLoading(false)
                   setLiveEntryMandatoryMode(false)
@@ -2651,7 +2690,7 @@ const beginProofOfAwareness = async () => {
                     : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
                 }`}
               >
-                {liveEntryQuestionSurface.canBeginLive ? 'Continue to Brief Room' : 'Add signal for LIVE'}
+                {liveEntryQuestionSurface.canBeginLive ? 'Enter LIVE' : 'Add signal for LIVE'}
               </button>
             </div>
           </div>
