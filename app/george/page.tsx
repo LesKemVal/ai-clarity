@@ -1291,20 +1291,6 @@ const resolvedAssistTone =
       ? 'calm'
       : 'direct')
 
-const syncCampaignEnvironment = (
-  _campaignId: string | null,
-  _updates: Partial<{
-    assistMode: string
-    outputStyle: string
-    deliveryMode: string
-    assistTone: string
-  }>
-) => {
-  // PRO LIVE / campaign architecture is archived.
-  // This helper remains only as a legacy no-op until campaign code is extracted or deleted.
-  return
-}
-
 const replaceLastLiveGuidance = (guidance: string) => {
   const existingMessages = [...messagesRef.current]
   const lastMessage = existingMessages[existingMessages.length - 1]
