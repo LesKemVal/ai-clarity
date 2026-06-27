@@ -4,6 +4,7 @@ import { classifyRuntimeIntent, type GeorgeRuntimeIntent } from './runtime-inten
 
 export type GeorgeRuntimePacket = {
   transcript: string
+  recentTranscript?: string
   isFinal: boolean
   signal: string
   pressure: string
@@ -32,12 +33,14 @@ export type GeorgeRuntimePacket = {
 
 export function buildRuntimePacket(input: {
   transcript: string
+  recentTranscript?: string
   isFinal: boolean
   context: LiveHubContext
   cue: GeorgeLocalCue
 }): GeorgeRuntimePacket {
   return {
     transcript: input.transcript,
+    recentTranscript: input.recentTranscript,
     isFinal: input.isFinal,
     signal: input.cue.category,
     pressure: input.cue.category,
