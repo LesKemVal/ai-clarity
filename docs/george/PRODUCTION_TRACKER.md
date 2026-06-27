@@ -416,3 +416,37 @@ Continuity should eventually support:
 
 Continuity becomes one of GEORGE's core runtime systems.
 
+
+# Delivery Router / Authority Notes
+
+Current authority replacement is working.
+
+Observed in delivery-router test:
+
+- unsupported high-risk continuation was detected
+- authority replacement triggered correctly
+- replacement preserved user trajectory instead of inventing facts
+
+Current improvement to make:
+
+- Add `replacementText` to authority replacement logs so debugging shows:
+  - original text
+  - replacement text
+  - reason
+  - unsupported terms
+
+Future architecture improvement:
+
+`delivery-router.ts` currently builds continuation evidence locally.
+
+That should eventually move into shared verification ownership:
+
+`lib/george/core/verification/evidence-builder.ts`
+
+Reason:
+
+Delivery should own routing and presentation.
+
+Verification should own evidence construction.
+
+This is not urgent. Runtime behavior should not change during the logging patch.
