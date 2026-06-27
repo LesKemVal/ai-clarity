@@ -140,6 +140,57 @@ Do not migrate dead architecture into new files.
 | Campaign runtime | Archive | Shelved but remnants remain | Do not migrate; remove only after verification |
 | `handleLiveFinalTranscript()` decision call | GEORGE Core / LIVE runtime boundary | Adapter introduced, side effects remain in page | Continue ownership audit |
 | UI rendering and controls | Presentation | Correctly belongs in `page.tsx` | Keep |
+| Browser SpeechRecognition non-LIVE input | Presentation / browser adapter | `startListening()` now exits early during LIVE and remains available for non-LIVE voice input | Preserve until non-LIVE voice has a replacement owner |
+| LIVE audio capture | LIVE audio runtime / hook boundary | `useLiveAudioRuntime()` owns Deepgram runtime start/stop/status and transcript callbacks | Keep page as consumer only; do not reintroduce LIVE browser SpeechRecognition loops |
+| LIVE final transcript handoff | LIVE runtime adapter / page side-effect boundary | `handleLiveFinalTranscript()` calls `resolveLiveFinalTranscriptAction()` and executes resulting side effects | Next reduction target: move side-effect execution behind a delivery/handoff owner without changing authority |
+| TTS request construction | Delivery boundary, with tier/config inputs from presentation/subscription state | `fetchSpeech()` still selects `/api/george/live/tts` vs `/api/tts` and carries `currentTier`, `activeCampaign`, `forceClose`, `voiceSpeed`, and `voiceType` | Split config classification before extraction; do not move campaign/tier assumptions into runtime |
+| TTS playback queue | Delivery | `playQueue()` owns chunk turn IDs, audio element lifecycle, playback start/end metrics, and reveal timing | Candidate for extraction after request construction is classified |
+| Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` cancels queue, bridge speech, audio element, refs, and visible speaking state | Candidate for small helper only after playback extraction plan is clear |
+| Spoken line memory | LIVE runtime evidence | `speakText()` writes `rememberLiveSpokenLine()` state during LIVE before queueing audio | Keep with LIVE evidence owner; do not bury inside generic audio playback |
+
+## Speech lifecycle inspection notes
+
+Current branch inspected: `live-hub-runtime`.
+
+`startListening()` is now guarded so browser SpeechRecognition does not own LIVE listening. If `liveMode` is true, it returns immediately. That means browser SpeechRecognition should be treated as non-LIVE voice input until a separate replacement exists.
+
+`useLiveAudioRuntime()` already provides a better LIVE audio ownership boundary. It owns runtime start, stop, emergency stop, status, interim transcript state, final transcript cleanup, and callback handoff into the page.
+
+`fetchSpeech()` should not be extracted wholesale yet. It still mixes production TTS concerns with subscription/campaign/config inputs:
+
+- Smart tier blocking
+- LIVE vs normal TTS endpoint selection
+- campaign mode selection
+- force close
+- voice speed
+- tier
+- voice type
+- LIVE TTS request/audio metrics
+
+`playQueue()` is closer to a true Delivery responsibility. It owns:
+
+- speech queue draining
+- LIVE TTS turn ID generation
+- audio element lifecycle
+- playback start timing
+- playback start/end metrics
+- reveal timing for pending assistant messages
+- pause timing between chunks
+
+`stopSpeech()` is a shared cancellation primitive. It currently cancels delivery side effects and reflects presentation state. It should move only after playback ownership is clearer.
+
+`speakText()` is an orchestration seam, not just playback. It currently owns:
+
+- user permission / voice-on guard
+- iOS guard
+- legacy-vs-hub suppression
+- speech cleanup and chunking
+- LIVE spoken-line memory
+- queue selection
+- delivery execution
+- visible error state
+
+Do not move `speakText()` as one block. Split only after deciding what belongs to Delivery, LIVE evidence, and Presentation state.
 
 ## Next audit targets
 
@@ -151,3 +202,16 @@ Do not migrate dead architecture into new files.
    - `stopSpeech()`
 4. Classify remaining campaign references as active, archived, or removable.
 5. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
+
+## Next safe implementation move
+
+Do not extract `fetchSpeech()` yet.
+
+The safest next implementation move is to create a small Delivery-owned helper for pure audio playback mechanics only after confirming no UI behavior changes:
+
+- keep TTS request construction in `page.tsx` temporarily
+- keep tier/campaign/voice config in `page.tsx` temporarily
+- keep LIVE spoken-line memory outside the playback helper
+- move only audio element playback lifecycle and playback metrics behind a delivery helper
+
+This would reduce `page.tsx` ownership without migrating subscription, campaign, or GEORGE authority concerns into Delivery.
