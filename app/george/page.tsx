@@ -48,7 +48,7 @@ import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
-import { resolveGeorgeCoreLiveExecution } from '@/lib/george/core/live-execution'
+import { resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
@@ -5403,22 +5403,19 @@ return true
     const clean = String(text || '').trim()
     if (!clean) return
 
-    const execution = resolveGeorgeCoreLiveExecution({
+    const execution = resolveLiveFinalTranscriptAction({
       transcript: clean,
       lastFinalTranscript: lastLiveFinalTranscriptRef.current,
-      routingContext: {
-        isThinking,
-        isSpeaking: isSpeakingRef.current,
-        liveMode,
-        buyTimeUntil: liveBuyTimeUntilRef.current,
-      },
-      lastSpokenLine: liveLastSpokenUtteranceRef.current,
-      isGeorgeSpeaking: isSpeakingRef.current,
       isThinking,
+      isSpeaking: isSpeakingRef.current,
+      liveMode,
+      buyTimeUntil: liveBuyTimeUntilRef.current,
+      lastSpokenLine: liveLastSpokenUtteranceRef.current,
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
-      overlapRequiresAttention: false,
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
     })
+
+    if (!execution) return
 
     lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
 
