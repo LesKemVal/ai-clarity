@@ -135,7 +135,7 @@ Do not migrate dead architecture into new files.
 | Delivery routing | Delivery modules | Mostly owned by delivery router/bridge | Continue auditing voice and visual edges |
 | TTS metric event names | Delivery/runtime metrics | Extracted into helper | Keep; behavior still needs ownership audit |
 | TTS fetch behavior | Mixed | Still in `page.tsx` with tier/campaign remnants | Do not extract until dependencies are classified |
-| Audio playback | Delivery vs presentation | Still mixed in `page.tsx` | Audit before extraction |
+| Audio playback | Delivery | Audio element lifecycle moved to `audio-playback.ts` | Keep request construction and spoken memory outside helper |
 | Browser SpeechRecognition LIVE decisions | Archive | Removed from production path | Preserved in PRO LIVE / campaigns archive |
 | Campaign runtime | Archive | Shelved but remnants remain | Do not migrate; remove only after verification |
 | `handleLiveFinalTranscript()` decision call | GEORGE Core / LIVE runtime boundary | Adapter introduced, side effects remain in page | Continue ownership audit |
@@ -144,8 +144,8 @@ Do not migrate dead architecture into new files.
 | LIVE audio capture | LIVE audio runtime / hook boundary | `useLiveAudioRuntime()` owns Deepgram runtime start/stop/status and transcript callbacks | Keep page as consumer only; do not reintroduce LIVE browser SpeechRecognition loops |
 | LIVE final transcript handoff | LIVE runtime adapter / page side-effect boundary | `handleLiveFinalTranscript()` calls `resolveLiveFinalTranscriptAction()` and executes resulting side effects | Next reduction target: move side-effect execution behind a delivery/handoff owner without changing authority |
 | TTS request construction | Delivery boundary, with tier/config inputs from presentation/subscription state | `fetchSpeech()` still selects `/api/george/live/tts` vs `/api/tts` and carries `currentTier`, `activeCampaign`, `forceClose`, `voiceSpeed`, and `voiceType` | Split config classification before extraction; do not move campaign/tier assumptions into runtime |
-| TTS playback queue | Delivery | `playQueue()` owns chunk turn IDs, audio element lifecycle, playback start/end metrics, and reveal timing | Candidate for extraction after request construction is classified |
-| Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` cancels queue, bridge speech, audio element, refs, and visible speaking state | Candidate for small helper only after playback extraction plan is clear |
+| TTS playback queue | Delivery | Queue draining moved to `speech-queue.ts`; `page.tsx` still supplies turn IDs, fetch, playback hooks, and presentation state callbacks | Remove duplicate speaking-state setup in `playQueue()`; keep chunk request construction outside queue helper |
+| Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for small helper only after playback/queue duplicate setup is removed |
 | Spoken line memory | LIVE runtime evidence | `speakText()` writes `rememberLiveSpokenLine()` state during LIVE before queueing audio | Keep with LIVE evidence owner; do not bury inside generic audio playback |
 
 ## Speech lifecycle inspection notes
@@ -167,15 +167,14 @@ Current branch inspected: `live-hub-runtime`.
 - voice type
 - LIVE TTS request/audio metrics
 
-`playQueue()` is closer to a true Delivery responsibility. It owns:
+`playQueue()` is now a delivery handoff seam. It should supply the page-specific callbacks and dependencies needed by `drainSpeechQueue()` but should not duplicate queue lifecycle state that the helper already owns.
 
-- speech queue draining
-- LIVE TTS turn ID generation
-- audio element lifecycle
-- playback start timing
-- playback start/end metrics
-- reveal timing for pending assistant messages
-- pause timing between chunks
+Current duplicate ownership found after `speech-queue.ts` extraction:
+
+- `playQueue()` sets `isSpeakingRef.current`, `stopSpeechRef.current`, `speakingRef.current`, and `setIsSpeaking(true)` before calling `drainSpeechQueue()`.
+- `drainSpeechQueue()` then calls `beforeStart`, which sets the same values again.
+
+Correct owner for queue start/stop lifecycle is `speech-queue.ts` plus the callbacks passed into it. The smallest next code change is to remove the pre-`drainSpeechQueue()` speaking-state setup from `playQueue()` and leave the existing `beforeStart`/`afterStop` callbacks in place.
 
 `stopSpeech()` is a shared cancellation primitive. It currently cancels delivery side effects and reflects presentation state. It should move only after playback ownership is clearer.
 
@@ -196,10 +195,7 @@ Do not move `speakText()` as one block. Split only after deciding what belongs t
 
 1. Verify `liveContextBufferRef` is no longer an authoritative owner of conversational memory.
 2. Verify `handleLiveFinalTranscript()` now only executes side effects and handoff.
-3. Classify speech lifecycle responsibilities:
-   - `fetchSpeech()`
-   - `playQueue()`
-   - `stopSpeech()`
+3. Remove duplicate speaking-state setup before `drainSpeechQueue()` in `playQueue()`.
 4. Classify remaining campaign references as active, archived, or removable.
 5. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
 
@@ -207,11 +203,11 @@ Do not move `speakText()` as one block. Split only after deciding what belongs t
 
 Do not extract `fetchSpeech()` yet.
 
-The safest next implementation move is to create a small Delivery-owned helper for pure audio playback mechanics only after confirming no UI behavior changes:
+The safest next implementation move is a small `page.tsx` cleanup:
 
-- keep TTS request construction in `page.tsx` temporarily
-- keep tier/campaign/voice config in `page.tsx` temporarily
-- keep LIVE spoken-line memory outside the playback helper
-- move only audio element playback lifecycle and playback metrics behind a delivery helper
+- keep TTS request construction in `page.tsx`
+- keep tier/campaign/voice config in `page.tsx`
+- keep LIVE spoken-line memory outside queue/playback helpers
+- remove duplicated speaking-state setup immediately before `drainSpeechQueue()`
 
-This would reduce `page.tsx` ownership without migrating subscription, campaign, or GEORGE authority concerns into Delivery.
+This preserves behavior while leaving speech queue lifecycle with the queue helper and presentation state reflection with the existing callbacks.
