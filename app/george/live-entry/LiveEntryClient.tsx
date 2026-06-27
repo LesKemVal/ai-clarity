@@ -19,6 +19,7 @@ import {
   type LiveRecoveryOptionId,
 } from '@/lib/george/live-voice/runtime/recovery-options'
 import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/live-entry-briefing'
+import { getConversationResponsibilityOptions } from '@/lib/george/live-entry/responsibility-options'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -987,6 +988,8 @@ export default function LiveEntryClient() {
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] = useState(false)
   const [mandatorySignalStep, setMandatorySignalStep] = useState(0)
   const [mandatorySignalInput, setMandatorySignalInput] = useState('')
+  const [selectedConversationResponsibilities, setSelectedConversationResponsibilities] = useState<string[]>([])
+  const [customConversationResponsibility, setCustomConversationResponsibility] = useState('')
   const [typedMandatorySignalQuestion, setTypedMandatorySignalQuestion] = useState('')
   const [founderAccessReady, setFounderAccessReady] = useState(false)
 
@@ -1077,6 +1080,43 @@ export default function LiveEntryClient() {
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== 'not_related'
 
+  const responsibilitySelectionLimit =
+    tier === 'brilliant'
+      ? 12
+      : tier === 'intelligent'
+        ? 2
+        : 1
+
+  const responsibilityLimitCopy =
+    tier === 'brilliant'
+      ? 'Select the responsibilities you carry in this conversation.'
+      : tier === 'intelligent'
+        ? 'Select up to 2 responsibilities.'
+        : 'Select the responsibility that matters most.'
+
+  const suggestedConversationResponsibilities = useMemo(
+    () => getConversationResponsibilityOptions(preLiveSignals.desiredOutcome || objective || ''),
+    [objective, preLiveSignals.desiredOutcome]
+  )
+
+  const toggleConversationResponsibility = (value: string) => {
+    setSelectedConversationResponsibilities((current) => {
+      if (current.includes(value)) return current.filter((item) => item !== value)
+      if (current.length >= responsibilitySelectionLimit) return current
+      return [...current, value]
+    })
+  }
+
+  const conversationResponsibilityAnswer = useMemo(() => {
+    const selected = selectedConversationResponsibilities.filter((item) => item !== 'Other')
+    const other = customConversationResponsibility.trim()
+
+    return [
+      ...selected,
+      other ? `Other: ${other}` : '',
+    ].filter(Boolean).join(', ')
+  }, [customConversationResponsibility, selectedConversationResponsibilities])
+
   const liveEntryMandatoryQuestions = useMemo(() => [
     {
       key: 'name',
@@ -1096,11 +1136,11 @@ export default function LiveEntryClient() {
     },
     {
       key: 'role',
-      kicker: 'ROLE SIGNAL',
+      kicker: 'RESPONSIBILITY SIGNAL',
       label: 'Signal 3',
-      question: 'What is your role in this room?',
-      helper: 'Your role helps GEORGE understand your responsibility, authority, and likely support needs.',
-      example: 'CEO, founder, candidate, attorney, physician, manager, parent, lead negotiator.',
+      question: 'What is your responsibility in this conversation?',
+      helper: 'Your responsibility tells GEORGE how you are expected to contribute, what authority you may have, and how best to support you.',
+      example: 'Interviewee, founder, CEO, presenter, decision maker, parent, advisor, lead negotiator.',
     },
   ], [])
 
@@ -1132,10 +1172,12 @@ export default function LiveEntryClient() {
   const submitMandatoryLiveEntrySignal = () => {
     if (!currentMandatorySignalQuestion) return false
 
-    const answer = mandatorySignalInput.trim()
-    if (!answer) return false
-
     const key = currentMandatorySignalQuestion.key
+    const answer = key === 'role'
+      ? conversationResponsibilityAnswer.trim()
+      : mandatorySignalInput.trim()
+
+    if (!answer) return false
     const nextSignals = {
       ...preLiveSignals,
       [key]: answer,
@@ -1172,6 +1214,8 @@ export default function LiveEntryClient() {
     } catch {}
 
     setMandatorySignalInput('')
+    setSelectedConversationResponsibilities([])
+    setCustomConversationResponsibility('')
 
     const nextStep = mandatorySignalStep + 1
 
@@ -2572,7 +2616,7 @@ const beginProofOfAwareness = async () => {
         submit: submitMandatoryLiveEntrySignal,
         loading: false,
         step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
-        primaryAction: 'Continue',
+        primaryAction: currentMandatorySignalQuestion.key === 'role' ? 'Send' : 'Continue',
         canBeginLive: false,
         readinessMessage: false,
       }
@@ -2609,7 +2653,7 @@ const beginProofOfAwareness = async () => {
           loading: false,
           step: 'Optional',
           primaryAction: 'Continue preparing',
-          canBeginLive: optionalSignalComplete,
+          canBeginLive: true,
           readinessMessage: false,
         }
       : showOpenAISignalSurface && optionalSignalLoading
@@ -2625,7 +2669,7 @@ const beginProofOfAwareness = async () => {
             loading: true,
             step: 'Optional',
             primaryAction: 'Continue',
-            canBeginLive: false,
+            canBeginLive: true,
             readinessMessage: false,
           }
         : null
@@ -2689,7 +2733,54 @@ const beginProofOfAwareness = async () => {
               </div>
             )}
 
-            {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && (
+            {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && currentMandatorySignalQuestion?.key === 'role' && (
+              <div className="mt-6">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">
+                  Suggested responsibilities
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {[...suggestedConversationResponsibilities, 'Other'].map((option) => {
+                    const active = selectedConversationResponsibilities.includes(option)
+                    const disabled = !active && selectedConversationResponsibilities.length >= responsibilitySelectionLimit
+
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => toggleConversationResponsibility(option)}
+                        className={`rounded-full border px-3 py-2 text-[11px] transition ${
+                          active
+                            ? 'border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.12] text-white'
+                            : disabled
+                              ? 'cursor-not-allowed border-white/[0.035] bg-white/[0.012] text-white/20'
+                              : 'border-white/[0.065] bg-white/[0.018] text-white/48 hover:border-[#D7DCFF]/20 hover:text-white/72'
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-3 text-[12px] leading-5 text-white/34">
+                  {responsibilityLimitCopy}
+                </div>
+
+                {selectedConversationResponsibilities.includes('Other') && (
+                  <input
+                    value={customConversationResponsibility}
+                    onChange={(event) => setCustomConversationResponsibility(event.target.value)}
+                    autoFocus
+                    className="mt-4 w-full border-0 border-b border-[#8FB6C9]/22 bg-transparent px-0 py-3 text-[16px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#8FB6C9]/46"
+                    placeholder="write another responsibility..."
+                  />
+                )}
+              </div>
+            )}
+
+            {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && currentMandatorySignalQuestion?.key !== 'role' && (
               <input
                 value={liveEntryQuestionSurface.inputValue}
                 onChange={(event) => liveEntryQuestionSurface.setInputValue(event.target.value)}
@@ -3764,6 +3855,8 @@ const beginProofOfAwareness = async () => {
                 setLiveEntryMandatoryMode(true)
                 setMandatorySignalStep(0)
                 setMandatorySignalInput('')
+                setSelectedConversationResponsibilities([])
+                setCustomConversationResponsibility('')
               }}
               className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
             >
