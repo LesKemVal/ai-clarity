@@ -12,7 +12,7 @@ export type AudioPlaybackOptions = {
   onPlaybackStart?: () => void
   onPlaybackEnd?: () => void
   onStopRequested?: () => boolean
-  onError?: (event: Event, audio: HTMLAudioElement) => void
+  onError?: (event: Event | string, audio: HTMLAudioElement) => void
 }
 
 export function createAudioPlayback(options: AudioPlaybackOptions): AudioPlaybackHandle {

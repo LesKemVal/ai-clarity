@@ -3,6 +3,7 @@
 
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
+import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -4232,28 +4233,31 @@ if (activePromptContext || activePromptLabel) {
         const url = await fetchSpeech(chunk, turnId)
         if (!url) continue
 
-        await new Promise<void>((resolve, reject) => {
-          const audio = new Audio()
-          audioRef.current = audio
-          stopBridgeSpeech()
+        const playback = createAudioPlayback({
+          url,
+          onStopRequested: () => stopSpeechRef.current,
+          onBeforePlay: revealPendingAssistantMessage,
+          onPlaybackStart: () => {
+            if (turnId) {
+              markLiveTtsPlaybackStart(turnId)
+            }
 
-          audio.preload = 'auto'
-          audio.setAttribute('playsinline', 'true')
-          audio.src = url
+            const audio = playback.audio
 
-          audio.onended = () => {
+            console.info('[GEORGE AUDIO PLAYING]', {
+              muted: audio.muted,
+              volume: audio.volume,
+              duration: audio.duration,
+              readyState: audio.readyState,
+              currentSrc: audio.currentSrc ? 'set' : 'missing',
+            })
+          },
+          onPlaybackEnd: () => {
             if (turnId) {
               markLiveTtsPlaybackEnd(turnId)
             }
-            resolve()
-          }
-
-          audio.onerror = (event) => {
-            if (stopSpeechRef.current) {
-              resolve()
-              return
-            }
-
+          },
+          onError: (event, audio) => {
             console.error('Audio playback failed', event, {
               currentSrc: audio.currentSrc,
               networkState: audio.networkState,
@@ -4263,53 +4267,12 @@ if (activePromptContext || activePromptLabel) {
                 message: audio.error.message,
               } : null,
             })
-            reject(new Error('Audio playback failed'))
-          }
-
-          let playStarted = false
-
-          const startAudioPlayback = () => {
-            if (playStarted) return
-            playStarted = true
-
-            revealPendingAssistantMessage()
-
-            setTimeout(() => {
-              if (stopSpeechRef.current) {
-                resolve()
-                return
-              }
-
-              audio.play().then(() => {
-                if (turnId) {
-                  markLiveTtsPlaybackStart(turnId)
-                }
-                console.info('[GEORGE AUDIO PLAYING]', {
-                  muted: audio.muted,
-                  volume: audio.volume,
-                  duration: audio.duration,
-                  readyState: audio.readyState,
-                  currentSrc: audio.currentSrc ? 'set' : 'missing',
-                })
-              }).catch((err) => {
-                if (stopSpeechRef.current) {
-                  resolve()
-                  return
-                }
-
-                console.error('audio.play() failed', err)
-                reject(err)
-              })
-            }, 80)
-          }
-
-          audio.oncanplaythrough = startAudioPlayback
-          audio.oncanplay = startAudioPlayback
-          audio.onloadeddata = startAudioPlayback
-
-          audio.load()
-          setTimeout(startAudioPlayback, 450)
+          },
         })
+
+        audioRef.current = playback.audio
+        stopBridgeSpeech()
+        await playback.play()
 
         if (!stopSpeechRef.current) {
           await wait(pauseMs(chunk))
