@@ -4,6 +4,7 @@ const commands = [
   ['Build', 'npm run build'],
   ['Production readiness', 'node scripts/george-production-readiness.mjs'],
   ['Operational validation', 'node scripts/george-operational-validation.mjs'],
+  ['Behavioral suite', 'npx tsx scripts/george-behavior-suite.mjs'],
 ]
 
 let failed = 0
