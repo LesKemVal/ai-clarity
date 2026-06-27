@@ -138,11 +138,11 @@ Do not migrate dead architecture into new files.
 | Audio playback | Delivery | Audio element lifecycle moved to `audio-playback.ts` | Keep request construction and spoken memory outside helper |
 | Browser SpeechRecognition LIVE decisions | Archive | Removed from production path | Preserved in PRO LIVE / campaigns archive |
 | Campaign runtime | Archive | Shelved but remnants remain | Do not migrate; remove only after verification |
-| `handleLiveFinalTranscript()` decision call | GEORGE Core / LIVE runtime boundary | Adapter introduced, side effects remain in page | Continue ownership audit |
+| `handleLiveFinalTranscript()` decision call | GEORGE Core / LIVE runtime boundary | Adapter introduced; authority resolution belongs to GEORGE Core through `resolveLiveFinalTranscriptAction()` | Keep authority out of page; inspect side-effect execution separately |
+| LIVE final transcript side effects | Presentation / Delivery handoff boundary | `handleLiveFinalTranscript()` still executes logs, continuation-route suppression, buy-time timer, speak handoff, and send handoff | Do not extract yet; first classify whether these are delivery actions, UI effects, or runtime timers |
 | UI rendering and controls | Presentation | Correctly belongs in `page.tsx` | Keep |
 | Browser SpeechRecognition non-LIVE input | Presentation / browser adapter | `startListening()` now exits early during LIVE and remains available for non-LIVE voice input | Preserve until non-LIVE voice has a replacement owner |
 | LIVE audio capture | LIVE audio runtime / hook boundary | `useLiveAudioRuntime()` owns Deepgram runtime start/stop/status and transcript callbacks | Keep page as consumer only; do not reintroduce LIVE browser SpeechRecognition loops |
-| LIVE final transcript handoff | LIVE runtime adapter / page side-effect boundary | `handleLiveFinalTranscript()` calls `resolveLiveFinalTranscriptAction()` and executes resulting side effects | Next reduction target: move side-effect execution behind a delivery/handoff owner without changing authority |
 | TTS request construction | Delivery boundary, with tier/config inputs from presentation/subscription state | `fetchSpeech()` still selects `/api/george/live/tts` vs `/api/tts` and carries `currentTier`, `activeCampaign`, `forceClose`, `voiceSpeed`, and `voiceType` | Split config classification before extraction; do not move campaign/tier assumptions into runtime |
 | TTS playback queue | Delivery | Queue draining moved to `speech-queue.ts`; duplicate startup state removed from `playQueue()` | Keep chunk request construction outside queue helper |
 | Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for audit after final transcript side effects are classified |
@@ -187,10 +187,26 @@ Ownership conclusion: do not patch `speakText()` right now. The remaining logic 
 
 `stopSpeech()` is a shared cancellation primitive. It currently cancels delivery side effects and reflects presentation state. It should move only after playback ownership is clearer.
 
+## LIVE final transcript inspection notes
+
+`resolveLiveFinalTranscriptAction()` is the correct GEORGE Core / LIVE runtime boundary. It receives transcript, routing state, overlap evidence, last spoken line, and desired outcome, then delegates to `resolveGeorgeCoreLiveExecution()`.
+
+`handleLiveFinalTranscript()` should not own authority. Current inspection shows authority resolution has already moved out of page-level logic. The remaining page code executes effects after an authority result exists:
+
+- update `lastLiveFinalTranscriptRef`
+- log the action for debugging
+- suppress legacy continuation when `liveDeliveryStyle === 'continue'`
+- optionally warn when an ignored action is debug-visible
+- start and expire local buy-time timer
+- hand a `speak` action to `speakText()`
+- hand a `send` action to `handleSend()` with `source: 'live_transcript'`
+
+Ownership conclusion: do not move these side effects yet. The next step is to classify action execution into a possible `live-final-transcript-effects` helper only if it can remain dependency-injected and avoid importing React state, browser globals beyond timers, or GEORGE authority.
+
 ## Next audit targets
 
 1. Verify `liveContextBufferRef` is no longer an authoritative owner of conversational memory.
-2. Verify `handleLiveFinalTranscript()` now only executes side effects and handoff.
+2. Classify `handleLiveFinalTranscript()` side-effect execution into delivery actions, UI/debug effects, and runtime timers.
 3. Classify remaining campaign references as active, archived, or removable.
 4. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
 
@@ -200,6 +216,8 @@ Do not extract `fetchSpeech()` yet.
 
 Do not extract `speakText()` yet.
 
-The safest next move is not another speech extraction. Continue auditing outside the speech queue/playback path, beginning with `handleLiveFinalTranscript()` side effects and remaining campaign references.
+Do not extract final transcript side effects yet.
+
+The safest next move is a classification pass for final transcript action execution. If a helper is introduced later, it must be dependency-injected and must not own GEORGE authority, React state, or scenario-specific continuation behavior.
 
 This preserves behavior while leaving speech queue lifecycle with the queue helper, browser playback mechanics with the playback helper, LIVE spoken memory in the runtime evidence path, and `speakText()` as a temporary orchestration seam.
