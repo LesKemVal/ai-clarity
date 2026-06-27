@@ -4219,11 +4219,6 @@ if (activePromptContext || activePromptLabel) {
   async function playQueue() {
     if (isSpeakingRef.current) return
 
-    isSpeakingRef.current = true
-    stopSpeechRef.current = false
-    speakingRef.current = true
-    setIsSpeaking(true)
-
     await drainSpeechQueue({
       getQueue: () => speechQueueRef.current,
       setQueue: (queue) => {
