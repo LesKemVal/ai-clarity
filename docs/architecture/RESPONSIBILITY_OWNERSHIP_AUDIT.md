@@ -137,7 +137,11 @@ Do not migrate dead architecture into new files.
 | TTS fetch behavior | Mixed | Still in `page.tsx` with tier/campaign remnants | Do not extract until dependencies are classified |
 | Audio playback | Delivery | Audio element lifecycle moved to `audio-playback.ts` | Keep request construction and spoken memory outside helper |
 | Browser SpeechRecognition LIVE decisions | Archive | Removed from production path | Preserved in PRO LIVE / campaigns archive |
-| Campaign runtime | Archive | Shelved but remnants remain | Do not migrate; remove only after verification |
+| Campaign runtime | Archive | Shelved but remnants remain; startup clears campaigns and activeCampaignId | Do not migrate; remove only after field-level references are replaced or proven inert |
+| Campaign delivery fallback | Presentation / compatibility residue | `resolvedDeliveryMode` still reads `activeCampaign?.deliveryMode` before voiceOn fallback | Replace only after confirming no active UI sets campaigns |
+| Campaign posture/output fallback | Compatibility residue | `resolvedLivePosture`, `resolvedOutputStyle`, and desired-outcome fallbacks still read campaign fields | Keep until LIVE posture/objective paths are fully non-campaign-owned |
+| Campaign chat payload | Compatibility residue | `/api/chat` payload still includes `activeCampaign` only when campaign-like prompt context is active | Keep until backend no longer expects this optional shape |
+| Campaign no-op helpers | Archive residue | `syncCampaignEnvironment()` is a no-op and campaign persistence effect returns immediately | Deletion candidate after reliable local grep/build |
 | `handleLiveFinalTranscript()` decision call | GEORGE Core / LIVE runtime boundary | Adapter introduced; authority resolution belongs to GEORGE Core through `resolveLiveFinalTranscriptAction()` | Keep authority out of page; inspect side-effect execution separately |
 | LIVE final transcript side effects | Presentation / Delivery handoff boundary | `handleLiveFinalTranscript()` still executes logs, continuation-route suppression, buy-time timer, speak handoff, and send handoff | Do not extract yet; first classify whether these are delivery actions, UI effects, or runtime timers |
 | UI rendering and controls | Presentation | Correctly belongs in `page.tsx` | Keep |
@@ -234,9 +238,27 @@ The legacy governor bridge is split across page and API responsibilities.
 
 Ownership conclusion: classify the page bridge as archival/legacy, not active core runtime. Classify the API route as compatibility/legacy service until all callers and test surfaces are inspected. Do not delete either from GitHub tooling without a local build after removing the bridge and verifying no direct references remain.
 
+## Campaign inspection notes
+
+Campaign architecture is explicitly shelved in `docs/architecture/PRO_LIVE_CAMPAIGNS.bak.md`. The active rule is: do not expand campaign runtime, do not add campaign UX, do not route users into campaigns, and do not let campaign state govern Normal GEORGE or individual LIVE.
+
+Current `page.tsx` inspection shows campaigns are disabled at startup by setting `campaigns` to `[]` and `activeCampaignId` to `null`. Campaign persistence is also inert because the persistence effect immediately returns.
+
+However, campaign references are still entangled as optional fallbacks or compatibility fields:
+
+- `GeorgeCampaign` type remains for local state and payload typing.
+- `activeCampaign` is derived from empty/inert state but still referenced across posture, delivery, desired outcome, and chat payload construction.
+- `resolvedDeliveryMode` uses `activeCampaign?.deliveryMode || (voiceOn ? 'audio' : 'text')`.
+- `resolvedLivePosture` and `resolvedOutputStyle` still read campaign fields before posture/context fallbacks.
+- desired outcome paths still read `activeCampaign?.desiredOutcome` and `activeCampaign?.currentGoal` before LIVE runtime support fallbacks.
+- `/api/chat` still receives an `activeCampaign` object only when `campaignContextActive` is true.
+- `syncCampaignEnvironment()` is currently a no-op.
+
+Ownership conclusion: campaigns are archived/inert, but their references are not yet safe for blind deletion. The next cleanup should be field-by-field replacement: first remove no-op helpers and impossible state paths after local grep/build, then replace activeCampaign fallbacks with LIVE runtime support equivalents where behavior is identical.
+
 ## Next audit targets
 
-1. Classify remaining campaign references as active, archived, or removable.
+1. Inspect direct call paths for `syncCampaignEnvironment()`, `setCampaigns()`, and `setActiveCampaignId()` with reliable local grep before deleting campaign no-ops.
 2. Inspect direct call paths for `injectGovernedLiveCue()` and `canGovernorInjectLiveCue()` with reliable local grep before deleting.
 3. Classify `/api/george/live/govern` consumers, including test pages, before deleting or changing route behavior.
 4. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
@@ -251,6 +273,6 @@ Do not extract final transcript side effects yet.
 
 Do not migrate legacy governor behavior into the new LIVE Hub.
 
-The safest next move is campaign classification and reliable local grep for legacy governor call paths. If the page-level governor bridge has no callers, it may become a deletion candidate, but only after build verification.
+The safest next move is local grep/build around archived no-op campaign helpers. If `syncCampaignEnvironment()` has no callers, it is a deletion candidate. If campaign state setters have only startup-clearing usage, campaign local state can become a later deletion candidate after replacing fallbacks.
 
 This preserves behavior while leaving speech queue lifecycle with the queue helper, browser playback mechanics with the playback helper, LIVE spoken memory in the runtime evidence path, and `speakText()` as a temporary orchestration seam.
