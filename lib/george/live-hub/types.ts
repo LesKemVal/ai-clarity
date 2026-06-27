@@ -1,7 +1,10 @@
 import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 export type GeorgeActionCueEvidence = {
+  // transcript is the latest/governing utterance.
   transcript?: string
+  // recentTranscript is continuity evidence only; it may clarify premise, not override transcript.
+  recentTranscript?: string
   room?: string
   objective?: string
   knownContext?: string
