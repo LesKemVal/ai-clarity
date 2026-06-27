@@ -4,6 +4,7 @@
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
 import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
+import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -4117,8 +4118,14 @@ requestAnimationFrame(() => {
   }
 
   async function stopSpeech() {
-    stopSpeechRef.current = true
-    speechQueueRef.current = []
+    clearSpeechQueue({
+      setQueue: (queue) => {
+        speechQueueRef.current = queue
+      },
+      setStopped: (stopped) => {
+        stopSpeechRef.current = stopped
+      },
+    })
     stopBridgeSpeech()
 
     if (audioRef.current) {
@@ -4217,11 +4224,30 @@ if (activePromptContext || activePromptLabel) {
     speakingRef.current = true
     setIsSpeaking(true)
 
-    try {
-      while (speechQueueRef.current.length && !stopSpeechRef.current) {
-        const chunk = speechQueueRef.current.shift()
-        if (!chunk) continue
-
+    await drainSpeechQueue({
+      getQueue: () => speechQueueRef.current,
+      setQueue: (queue) => {
+        speechQueueRef.current = queue
+      },
+      isStopped: () => stopSpeechRef.current,
+      setStopped: (stopped) => {
+        stopSpeechRef.current = stopped
+      },
+      beforeStart: () => {
+        isSpeakingRef.current = true
+        stopSpeechRef.current = false
+        speakingRef.current = true
+        setIsSpeaking(true)
+      },
+      afterStop: () => {
+        isSpeakingRef.current = false
+        speakingRef.current = false
+        audioRef.current = null
+        setIsSpeaking(false)
+      },
+      pauseMs,
+      wait,
+      playChunk: async (chunk) => {
         const turnId = liveMode
           ? `tts-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
           : undefined
@@ -4231,7 +4257,7 @@ if (activePromptContext || activePromptLabel) {
         }
 
         const url = await fetchSpeech(chunk, turnId)
-        if (!url) continue
+        if (!url) return
 
         const playback = createAudioPlayback({
           url,
@@ -4273,17 +4299,8 @@ if (activePromptContext || activePromptLabel) {
         audioRef.current = playback.audio
         stopBridgeSpeech()
         await playback.play()
-
-        if (!stopSpeechRef.current) {
-          await wait(pauseMs(chunk))
-        }
-      }
-    } finally {
-      isSpeakingRef.current = false
-      speakingRef.current = false
-      audioRef.current = null
-      setIsSpeaking(false)
-    }
+      },
+    })
   }
 
   const speakText = useCallback(
@@ -4328,13 +4345,21 @@ if (activePromptContext || activePromptLabel) {
         }
 
         if (liveMode && options?.source === 'hub' && isSpeakingRef.current) {
-          speechQueueRef.current = chunks.slice(-1)
+          replaceSpeechQueue({
+            setQueue: (queue) => {
+              speechQueueRef.current = queue
+            },
+          }, chunks.slice(-1))
           return
         }
 
-        speechQueueRef.current = liveMode && options?.source === 'hub'
+        replaceSpeechQueue({
+          setQueue: (queue) => {
+            speechQueueRef.current = queue
+          },
+        }, liveMode && options?.source === 'hub'
           ? chunks.slice(-1)
-          : chunks
+          : chunks)
 
         await playQueue()
       } catch {
