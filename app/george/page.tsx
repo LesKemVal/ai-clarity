@@ -5596,6 +5596,12 @@ if (outcomeSignal) {
 }
         setInterimTranscript('')
 
+        if (liveMode) {
+          // Browser SpeechRecognition no longer owns LIVE prompt construction or response decisions.
+          // Deepgram LIVE Hub owns LIVE transcript interpretation, runtime evidence, and cue delivery.
+          return
+        }
+
         const liveContextSnapshot = liveContextBufferRef.current.join("\n")
         const hasEnoughLiveSignal = liveContextSnapshot.length > 40
 
