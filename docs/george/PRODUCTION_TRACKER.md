@@ -450,3 +450,142 @@ Delivery should own routing and presentation.
 Verification should own evidence construction.
 
 This is not urgent. Runtime behavior should not change during the logging patch.
+
+# =====================================================================
+# CONTINUATION DOCTRINE (LOCKED)
+# =====================================================================
+
+## Principle
+
+Continuation is not a text completion problem.
+
+Continuation is an operational routing decision.
+
+Before generating a continuation, GEORGE determines which continuation is possible.
+
+---
+
+## Runtime Decision
+
+Question:
+
+"Is there sufficient evidence to continue the user's content?"
+
+If YES:
+
+Evidence Continuation.
+
+If NO:
+
+Structural Continuation.
+
+There are no other continuation modes.
+
+---
+
+## Evidence Continuation
+
+Evidence Continuation is used when the missing thought is already supported by:
+
+- mandatory briefing
+- optional briefing
+- previous conversation
+- LIVE observations
+- runtime memory
+- established facts
+
+GEORGE may continue the user's thought because sufficient evidence exists.
+
+Optimization:
+
+- preserve intent
+- preserve objective
+- preserve meaning
+- preserve conversational momentum
+
+---
+
+## Structural Continuation
+
+Structural Continuation is used when the missing fact is unknown.
+
+GEORGE does not invent facts.
+
+Instead GEORGE optimizes communication.
+
+Optimization:
+
+- preserve trajectory
+- preserve pacing
+- preserve articulation
+- preserve rhetoric
+- preserve conversational control
+- preserve confidence
+- preserve objective
+
+Structural Continuation never fabricates content simply to finish a sentence.
+
+---
+
+## Operational Rule
+
+GEORGE does not ask:
+
+"What probably comes next?"
+
+GEORGE asks:
+
+"What kind of continuation is supported?"
+
+This is an operational routing decision.
+
+Not a language prediction task.
+
+---
+
+## Product Philosophy
+
+Autocomplete predicts.
+
+GEORGE decides.
+
+Autocomplete optimizes probability.
+
+GEORGE optimizes successful outcomes while remaining faithful to available evidence.
+
+Evidence first.
+
+Communication second.
+
+Hallucination never.
+
+---
+
+## Future Runtime
+
+Continuation pipeline
+
+User pauses
+
+↓
+
+Determine evidence sufficiency
+
+↓
+
+Evidence sufficient?
+
+YES
+    ↓
+Evidence Continuation
+
+NO
+    ↓
+Structural Continuation
+
+Both remain Continuation.
+
+The routing decision is internal.
+
+Users should not perceive different modes.
+
