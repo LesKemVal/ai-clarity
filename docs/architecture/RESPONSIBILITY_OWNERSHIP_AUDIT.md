@@ -148,7 +148,9 @@ Do not migrate dead architecture into new files.
 | Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for audit after final transcript side effects are classified |
 | Spoken line memory | LIVE runtime evidence | `speakText()` writes `rememberLiveSpokenLine()` state during LIVE before queueing audio | Keep with LIVE evidence owner; do not bury inside generic audio playback |
 | `speakText()` orchestration seam | Presentation-to-Delivery boundary | Currently acceptable: coordinates permission, suppression, text prep, spoken memory, queue replacement, and delivery start | Do not extract as one block; no obvious safe 15-30 line extraction remains right now |
-| Legacy governor runtime memory | Archive / legacy governor bridge | `liveRuntimeMemoryRef` remains for `injectGovernedLiveCue()` and `/api/george/live/govern`, not as active conversational transcript memory | Classify with campaign/legacy governor cleanup, not with transcript continuity |
+| Legacy governor runtime memory | Archive / legacy governor bridge | `liveRuntimeMemoryRef` remains for `injectGovernedLiveCue()` and `/api/george/live/govern`, not as active conversational transcript memory | Keep classified as legacy until call path is proven removable |
+| Legacy governor page bridge | Archive / legacy bridge | `canGovernorInjectLiveCue()` and `injectGovernedLiveCue()` remain in `page.tsx`; current inspected active Deepgram path uses final transcript adapter instead | Do not migrate; remove only after direct call-path search/build verification |
+| LIVE governor API route | Legacy/API compatibility | `/api/george/live/govern` still performs access checks, support-style normalization, live voice governance, reasoning fallback, and continuation evidence safeguards | Do not delete with page bridge unless all test/legacy consumers are classified |
 
 ## Speech lifecycle inspection notes
 
@@ -220,11 +222,23 @@ Active LIVE evidence now flows through more specific boundaries:
 
 Ownership conclusion: the old page-level rolling transcript buffer is resolved. The next relevant cleanup is legacy governor/campaign classification, not another transcript buffer extraction.
 
+## Legacy governor inspection notes
+
+The legacy governor bridge is split across page and API responsibilities.
+
+`canGovernorInjectLiveCue()` is a page-level bridge to `/api/george/live/govern`. It sends transcript, support style, live assist mode, legacy runtime memory, and active runtime support. It does not appear to be part of the active Deepgram transcript -> router -> controller -> action-authority path inspected so far.
+
+`injectGovernedLiveCue()` mutates `liveRuntimeMemoryRef` based on user overrides, hesitation, tone correction, and compression requests, then conditionally sets a pending assistant message when the governor allows a cue. This is legacy adaptive cue behavior and should not be migrated into the new LIVE Hub without a specific product decision.
+
+`/api/george/live/govern` is not equivalent to the page bridge. The route still performs useful standalone responsibilities: rate limiting, LIVE access verification, support-style normalization, `governLiveVoice()`, `reasonLiveNextMove()`, and final continuation evidence replacement. It may still support test pages or compatibility surfaces even if the page bridge is retired later.
+
+Ownership conclusion: classify the page bridge as archival/legacy, not active core runtime. Classify the API route as compatibility/legacy service until all callers and test surfaces are inspected. Do not delete either from GitHub tooling without a local build after removing the bridge and verifying no direct references remain.
+
 ## Next audit targets
 
-1. Classify `handleLiveFinalTranscript()` side-effect execution into delivery actions, UI/debug effects, and runtime timers.
-2. Classify remaining campaign references as active, archived, or removable.
-3. Classify legacy governor bridge references (`injectGovernedLiveCue`, `canGovernorInjectLiveCue`, `liveRuntimeMemoryRef`) as active, archived, or removable.
+1. Classify remaining campaign references as active, archived, or removable.
+2. Inspect direct call paths for `injectGovernedLiveCue()` and `canGovernorInjectLiveCue()` with reliable local grep before deleting.
+3. Classify `/api/george/live/govern` consumers, including test pages, before deleting or changing route behavior.
 4. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
 
 ## Next safe implementation move
@@ -235,6 +249,8 @@ Do not extract `speakText()` yet.
 
 Do not extract final transcript side effects yet.
 
-The safest next move is a classification pass for campaign and legacy governor code. If a helper is introduced later, it must be dependency-injected and must not own GEORGE authority, React state, or scenario-specific continuation behavior.
+Do not migrate legacy governor behavior into the new LIVE Hub.
+
+The safest next move is campaign classification and reliable local grep for legacy governor call paths. If the page-level governor bridge has no callers, it may become a deletion candidate, but only after build verification.
 
 This preserves behavior while leaving speech queue lifecycle with the queue helper, browser playback mechanics with the playback helper, LIVE spoken memory in the runtime evidence path, and `speakText()` as a temporary orchestration seam.
