@@ -144,9 +144,10 @@ Do not migrate dead architecture into new files.
 | LIVE audio capture | LIVE audio runtime / hook boundary | `useLiveAudioRuntime()` owns Deepgram runtime start/stop/status and transcript callbacks | Keep page as consumer only; do not reintroduce LIVE browser SpeechRecognition loops |
 | LIVE final transcript handoff | LIVE runtime adapter / page side-effect boundary | `handleLiveFinalTranscript()` calls `resolveLiveFinalTranscriptAction()` and executes resulting side effects | Next reduction target: move side-effect execution behind a delivery/handoff owner without changing authority |
 | TTS request construction | Delivery boundary, with tier/config inputs from presentation/subscription state | `fetchSpeech()` still selects `/api/george/live/tts` vs `/api/tts` and carries `currentTier`, `activeCampaign`, `forceClose`, `voiceSpeed`, and `voiceType` | Split config classification before extraction; do not move campaign/tier assumptions into runtime |
-| TTS playback queue | Delivery | Queue draining moved to `speech-queue.ts`; `page.tsx` still supplies turn IDs, fetch, playback hooks, and presentation state callbacks | Remove duplicate speaking-state setup in `playQueue()`; keep chunk request construction outside queue helper |
-| Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for small helper only after playback/queue duplicate setup is removed |
+| TTS playback queue | Delivery | Queue draining moved to `speech-queue.ts`; duplicate startup state removed from `playQueue()` | Keep chunk request construction outside queue helper |
+| Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for audit after final transcript side effects are classified |
 | Spoken line memory | LIVE runtime evidence | `speakText()` writes `rememberLiveSpokenLine()` state during LIVE before queueing audio | Keep with LIVE evidence owner; do not bury inside generic audio playback |
+| `speakText()` orchestration seam | Presentation-to-Delivery boundary | Currently acceptable: coordinates permission, suppression, text prep, spoken memory, queue replacement, and delivery start | Do not extract as one block; no obvious safe 15-30 line extraction remains right now |
 
 ## Speech lifecycle inspection notes
 
@@ -167,47 +168,38 @@ Current branch inspected: `live-hub-runtime`.
 - voice type
 - LIVE TTS request/audio metrics
 
-`playQueue()` is now a delivery handoff seam. It should supply the page-specific callbacks and dependencies needed by `drainSpeechQueue()` but should not duplicate queue lifecycle state that the helper already owns.
+`playQueue()` is now a delivery handoff seam. It supplies the page-specific callbacks and dependencies needed by `drainSpeechQueue()` but no longer duplicates queue startup state before handing off to the helper.
 
-Current duplicate ownership found after `speech-queue.ts` extraction:
+`speakText()` is currently the correct orchestration seam between Presentation intent and Delivery queue. It still owns:
 
-- `playQueue()` sets `isSpeakingRef.current`, `stopSpeechRef.current`, `speakingRef.current`, and `setIsSpeaking(true)` before calling `drainSpeechQueue()`.
-- `drainSpeechQueue()` then calls `beforeStart`, which sets the same values again.
+- permission / UI gating
+- voice enabled checks
+- iOS/browser guard
+- legacy-vs-hub suppression
+- text cleaning
+- chunk generation
+- LIVE spoken-line memory update
+- queue replacement decision
+- call into `playQueue()`
+- visible voice error fallback
 
-Correct owner for queue start/stop lifecycle is `speech-queue.ts` plus the callbacks passed into it. The smallest next code change is to remove the pre-`drainSpeechQueue()` speaking-state setup from `playQueue()` and leave the existing `beforeStart`/`afterStop` callbacks in place.
+Ownership conclusion: do not patch `speakText()` right now. The remaining logic is mostly the coordination boundary between Presentation intent and Delivery queue. It is acceptable for `page.tsx` to hold this seam temporarily while it coordinates UI permission, hub/legacy suppression, text preparation, LIVE evidence update, and delivery start.
 
 `stopSpeech()` is a shared cancellation primitive. It currently cancels delivery side effects and reflects presentation state. It should move only after playback ownership is clearer.
-
-`speakText()` is an orchestration seam, not just playback. It currently owns:
-
-- user permission / voice-on guard
-- iOS guard
-- legacy-vs-hub suppression
-- speech cleanup and chunking
-- LIVE spoken-line memory
-- queue selection
-- delivery execution
-- visible error state
-
-Do not move `speakText()` as one block. Split only after deciding what belongs to Delivery, LIVE evidence, and Presentation state.
 
 ## Next audit targets
 
 1. Verify `liveContextBufferRef` is no longer an authoritative owner of conversational memory.
 2. Verify `handleLiveFinalTranscript()` now only executes side effects and handoff.
-3. Remove duplicate speaking-state setup before `drainSpeechQueue()` in `playQueue()`.
-4. Classify remaining campaign references as active, archived, or removable.
-5. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
+3. Classify remaining campaign references as active, archived, or removable.
+4. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
 
 ## Next safe implementation move
 
 Do not extract `fetchSpeech()` yet.
 
-The safest next implementation move is a small `page.tsx` cleanup:
+Do not extract `speakText()` yet.
 
-- keep TTS request construction in `page.tsx`
-- keep tier/campaign/voice config in `page.tsx`
-- keep LIVE spoken-line memory outside queue/playback helpers
-- remove duplicated speaking-state setup immediately before `drainSpeechQueue()`
+The safest next move is not another speech extraction. Continue auditing outside the speech queue/playback path, beginning with `handleLiveFinalTranscript()` side effects and remaining campaign references.
 
-This preserves behavior while leaving speech queue lifecycle with the queue helper and presentation state reflection with the existing callbacks.
+This preserves behavior while leaving speech queue lifecycle with the queue helper, browser playback mechanics with the playback helper, LIVE spoken memory in the runtime evidence path, and `speakText()` as a temporary orchestration seam.
