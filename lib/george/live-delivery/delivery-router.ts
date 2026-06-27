@@ -8,7 +8,10 @@ function buildContinuationEvidence(input: {
   context?: GeorgeDeliveryContext
 }) {
   return [
+    // Latest/governing utterance remains primary authority evidence.
     input.actionCue.evidence?.transcript,
+    // Recent transcript is continuity evidence only; it may clarify premise, not override the latest utterance.
+    input.actionCue.evidence?.recentTranscript,
     input.actionCue.evidence?.room,
     input.actionCue.evidence?.objective,
     input.actionCue.evidence?.knownContext,
@@ -113,7 +116,8 @@ export function routeGeorgeDeliveryCue(input: {
       text = safeContinuationReplacement({
         fallback: text,
         transcript: input.actionCue.evidence?.transcript || text,
-        lastFiveSeconds: input.actionCue.evidence?.room || input.context?.room,
+        // Existing repair API name kept for compatibility. Source is recentTranscript only.
+        lastFiveSeconds: input.actionCue.evidence?.recentTranscript,
         desiredOutcome: input.actionCue.evidence?.objective || input.context?.objective,
         activeOutcome:
           input.actionCue.evidence?.secondaryOutcome ||
