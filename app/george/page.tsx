@@ -1,7 +1,8 @@
 'use client'
 
 
-import { markRuntimeEvent, startRuntimeTurn } from '@/lib/george/live-metrics/runtime-metrics'
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -4151,7 +4152,7 @@ requestAnimationFrame(() => {
     }
 
     if (liveMode && turnId) {
-      markRuntimeEvent(turnId, 'tts_request_start')
+      markLiveTtsRequestStart(turnId)
     }
 
     const res = await fetch(liveMode ? '/api/george/live/tts' : '/api/tts', {
@@ -4178,7 +4179,7 @@ requestAnimationFrame(() => {
     const buffer = await res.arrayBuffer()
 
     if (liveMode && turnId) {
-      markRuntimeEvent(turnId, 'tts_audio_received')
+      markLiveTtsAudioReceived(turnId)
     }
 
     if (!buffer.byteLength) {
@@ -4237,7 +4238,7 @@ if (activePromptContext || activePromptLabel) {
           : undefined
 
         if (turnId) {
-          startRuntimeTurn(turnId)
+          startLiveTtsTurn(turnId)
         }
 
         const url = await fetchSpeech(chunk, turnId)
@@ -4254,7 +4255,7 @@ if (activePromptContext || activePromptLabel) {
 
           audio.onended = () => {
             if (turnId) {
-              markRuntimeEvent(turnId, 'tts_playback_end')
+              markLiveTtsPlaybackEnd(turnId)
             }
             resolve()
           }
@@ -4293,7 +4294,7 @@ if (activePromptContext || activePromptLabel) {
 
               audio.play().then(() => {
                 if (turnId) {
-                  markRuntimeEvent(turnId, 'tts_playback_start')
+                  markLiveTtsPlaybackStart(turnId)
                 }
                 console.info('[GEORGE AUDIO PLAYING]', {
                   muted: audio.muted,
