@@ -2,6 +2,7 @@ import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeActionCue, GeorgeLiveHubContext } from './types'
 import { createGeorgeLiveHubWebSocketTransport } from './websocket-transport'
 import type { GeorgeLiveHubTransport } from './transport'
+import { finalizeGeorgeActionCueAuthority } from '@/lib/george/core/verification/action-cue-authority'
 
 export type GeorgeLiveHubRuntimeEvent =
   | ({ type: 'ACTION_CUE' } & GeorgeActionCue)
@@ -95,9 +96,18 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
               return
             }
 
+            const finalizedEvent = finalizeGeorgeActionCueAuthority({
+              actionCue: {
+                ...event,
+                cue: cleanCue,
+              } as GeorgeActionCue,
+              context: currentContext,
+            })
+
             emit({
               ...event,
-              cue: cleanCue,
+              ...finalizedEvent,
+              cue: finalizedEvent.cue,
             } as GeorgeLiveHubRuntimeEvent)
           },
         },

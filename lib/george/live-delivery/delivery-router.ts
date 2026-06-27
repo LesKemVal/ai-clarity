@@ -1,31 +1,5 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
 import { DEFAULT_GEORGE_LIVE_DELIVERY_STYLE, type GeorgeDeliveryContext, type GeorgeDeliveryCue } from './types'
-import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
-import { safeContinuationReplacement } from '@/lib/george/core/verification/continuation-replacement'
-
-function buildContinuationEvidence(input: {
-  actionCue: GeorgeActionCue
-  context?: GeorgeDeliveryContext
-}) {
-  return [
-    // Latest/governing utterance remains primary authority evidence.
-    input.actionCue.evidence?.transcript,
-    // Recent transcript is continuity evidence only; it may clarify premise, not override the latest utterance.
-    input.actionCue.evidence?.recentTranscript,
-    input.actionCue.evidence?.room,
-    input.actionCue.evidence?.objective,
-    input.actionCue.evidence?.knownContext,
-    input.actionCue.evidence?.secondaryOutcome,
-    input.actionCue.evidence?.secondaryObjective,
-    input.actionCue.evidence?.intangibleObjective,
-    input.actionCue.evidence?.userPosition,
-    input.actionCue.evidence?.deliveryStyle,
-    input.actionCue.evidence?.runtimeIntent,
-    input.context?.room,
-    input.context?.objective,
-    input.context?.knownContext,
-  ].join(' ')
-}
 
 export function routeGeorgeDeliveryCue(input: {
   actionCue: GeorgeActionCue
@@ -87,55 +61,6 @@ export function routeGeorgeDeliveryCue(input: {
     deliveryStyle === 'continue'
       ? continuationText
       : cleanGenerated
-
-  if (deliveryStyle === 'continue' && text) {
-    const evidence = buildContinuationEvidence(input)
-
-    const authority = violatesEvidenceAuthority(text, evidence)
-
-    console.info('[GEORGE][delivery][authority-check]', {
-      deliveryStyle,
-      rawCue,
-      cleanGenerated,
-      text,
-      evidence,
-      evidenceFromActionCue: input.actionCue.evidence,
-      context: input.context,
-      violates: authority.violates,
-      reason: authority.reason,
-      unsupportedTerms: authority.unsupportedTerms,
-    })
-
-    if (authority.violates) {
-      const replacementText = safeContinuationReplacement({
-        fallback: text,
-        transcript: input.actionCue.evidence?.transcript || text,
-        // Existing repair API name kept for compatibility. Source is recentTranscript only.
-        lastFiveSeconds: input.actionCue.evidence?.recentTranscript,
-        desiredOutcome: input.actionCue.evidence?.objective || input.context?.objective,
-        activeOutcome:
-          input.actionCue.evidence?.secondaryOutcome ||
-          input.actionCue.evidence?.secondaryObjective ||
-          input.actionCue.evidence?.intangibleObjective,
-        shadowMap: [
-          input.actionCue.evidence?.knownContext,
-          input.actionCue.evidence?.userPosition,
-          input.actionCue.evidence?.deliveryStyle,
-          input.actionCue.evidence?.runtimeIntent,
-          input.context?.knownContext,
-        ].join(' '),
-      })
-
-      console.warn('[GEORGE][delivery][authority-replaced]', {
-        reason: authority.reason,
-        unsupportedTerms: authority.unsupportedTerms,
-        originalText: text,
-        replacementText,
-      })
-
-      text = replacementText
-    }
-  }
 
   if (!voiceEnabled) {
     return {
