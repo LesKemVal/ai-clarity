@@ -655,3 +655,201 @@ Next phase:
 - Latency measurement and optimization.
 - Continued page.tsx reduction.
 - Portability packaging.
+
+
+
+# Behavioral Validation Phase (June 2026)
+
+## Principle
+
+Every change to GEORGE must answer one question before it is accepted:
+
+> Does this improve GEORGE's ability to help the user reach their desired outcome?
+
+Architecture alone is insufficient.
+
+Passing builds are insufficient.
+
+Passing smoke tests are insufficient.
+
+Behavior must remain aligned with GEORGE doctrine.
+
+Behavioral tests exist to verify operational judgment rather than implementation details.
+
+If a behavioral test fails, the preferred solution is to improve GEORGE's reasoning—not weaken the test.
+
+---
+
+## Behavioral Validation Pyramid
+
+Level 1
+Build
+
+Can the project compile?
+
+Level 2
+Production Readiness
+
+Is the architecture in the expected production state?
+
+Level 3
+Operational Validation
+
+Do runtime contracts remain intact?
+
+Level 4
+Behavioral Validation
+
+Does GEORGE behave according to doctrine?
+
+Level 5
+Operational Flow Validation
+
+Can GEORGE successfully move users toward their desired outcome through realistic conversation?
+
+Future levels should extend this pyramid rather than replace it.
+
+---
+
+## Current Behavioral Coverage
+
+Current scenarios:
+
+✓ Continuation authority repair
+
+✓ Cue doctrine boundary
+
+✓ Cue runtime behavior
+
+✓ Cue depth adaptation
+
+✓ Response runtime behavior
+
+✓ Desired outcome preservation
+
+✓ Outcome change detection
+
+✓ Operational investor outcome flow
+
+✓ Delivery meaning preservation
+
+✓ Briefing propagation
+
+Behavioral Suite Status:
+
+10 / 10 passing
+
+---
+
+## Important Production Discovery
+
+Behavioral testing exposed a real architectural weakness.
+
+GEORGE's response policy originally ignored the user's desired outcome when selecting a response.
+
+The runtime instead optimized for the latest conversational event.
+
+Behavioral testing identified this because the Desired Outcome Preservation scenario failed.
+
+Rather than weakening the test, the runtime was improved.
+
+Desired outcome is now an input to LIVE response policy selection.
+
+This is considered a production milestone.
+
+---
+
+## Production Testing Doctrine
+
+Behavioral tests should verify doctrine.
+
+They should not verify implementation details.
+
+Tests should survive refactoring.
+
+Tests should describe observable behavior.
+
+Future contributors should feel comfortable rewriting implementation provided every behavioral scenario continues to pass.
+
+Behavior is the contract.
+
+---
+
+## Next Behavioral Milestones
+
+Priority 1
+
+Long-session stability
+
+Verify:
+
+• desired outcome remains stable
+
+• support style never changes
+
+• cue depth adapts correctly
+
+• no conversational drift
+
+• no repetitive degradation
+
+Priority 2
+
+Intervention timing
+
+Verify:
+
+• cue
+
+• continuation
+
+• response
+
+• presentation
+
+• silence
+
+occur only when operationally appropriate.
+
+Priority 3
+
+Signal sufficiency
+
+Verify GEORGE advances using available evidence whenever reasonable and requests additional signal only when it materially improves the next move.
+
+Priority 4
+
+Recovery behavior
+
+Verify GEORGE successfully recovers from:
+
+interruptions
+
+forgotten thoughts
+
+objections
+
+room changes
+
+corrections
+
+noisy transcripts
+
+while preserving user objective.
+
+---
+
+## Core Testing Philosophy
+
+GEORGE is not tested because code changed.
+
+GEORGE is tested because user outcomes matter.
+
+Every behavioral scenario should answer:
+
+Did this increase the probability that the user reaches their desired outcome?
+
+If the answer is no,
+
+the implementation is incomplete.
+
