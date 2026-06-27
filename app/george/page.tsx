@@ -48,7 +48,6 @@ import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCu
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
-import { appendLiveContextSignal as appendLiveContextSignalValue } from '@/lib/george/live-runtime/context-signals'
 import { resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
@@ -1045,7 +1044,6 @@ const [voiceError, setVoiceError] = useState('')
         ? 'repeatable_lines'
         : 'short_cues')
 
-  const liveContextBufferRef = useRef<string[]>([])
   const liveRuntimeMemoryRef = useRef({
     acceptedCarryCount: 0,
     overrideCount: 0,
@@ -1653,7 +1651,6 @@ const captureLiveEntryOptionalSignal = () => {
       window.localStorage.setItem('GEORGE_LIVE_FINAL_SIGNAL', finalSignal)
     } catch {}
 
-    liveContextBufferRef.current = [...liveContextBufferRef.current, finalSignal].slice(-12)
     setTypedLiveEntryBriefing((current) => `${current}\n\nI'll account for that.`)
   } else {
     setTypedLiveEntryBriefing((current) => `${current}\n\nUnderstood.`)
@@ -2214,7 +2211,7 @@ async function canGovernorInjectLiveCue(transcript: string) {
         transcript,
         mode: 'voice_live',
         audio: true,
-        shadowMap: liveContextBufferRef.current.join('\n'),
+        shadowMap: transcript,
         lastFiveSeconds: transcript,
         supportStyle:
           typeof window !== 'undefined'
@@ -2728,20 +2725,12 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const liveRecentSpokenUtterancesRef = useRef<string[]>([])
   const liveAwarenessBufferRef = useRef<LiveAwarenessFragment[]>([])
 
-  const appendLiveContextSignal = useCallback((text: string) => {
-    liveContextBufferRef.current = appendLiveContextSignalValue(
-      liveContextBufferRef.current,
-      text
-    )
-  }, [])
-
   const processLivePartialTranscript = useCallback((text: string) => {
     setVoiceError('')
     setInterimTranscript(text)
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
-    liveContextBufferRef.current = [...liveContextBufferRef.current, text].slice(-12)
-  }, [appendLiveContextSignal])
+  }, [])
 
   const processLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
@@ -2755,7 +2744,6 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setInterimTranscript('')
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
-    appendLiveContextSignal(clean)
     liveAwarenessBufferRef.current = appendLiveAwarenessFragment({
       buffer: liveAwarenessBufferRef.current,
       kind: 'final',
@@ -2781,7 +2769,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean)) {
       liveTranscriptSubmitRef.current(clean)
     }
-  }, [appendLiveContextSignal])
+  }, [])
 
   const processLiveAudioError = useCallback((error: unknown) => {
     console.warn('[GEORGE LIVE AUDIO]', error)
@@ -5554,9 +5542,7 @@ return true
 
       setInterimTranscript(liveTranscript)
       if (liveMode && liveTranscript.trim()) {
-        const cleanLiveSignal = liveTranscript.trim()
         liveLastSignalRef.current = Date.now()
-        liveContextBufferRef.current = [...liveContextBufferRef.current, cleanLiveSignal].slice(-12)
       }
 lastSpeechTsRef.current = Date.now()
 
@@ -5571,7 +5557,6 @@ if (responseTimerRef.current) {
         const clean = finalTranscript.trim()
         if (liveMode) {
           liveLastSignalRef.current = Date.now()
-          liveContextBufferRef.current = [...liveContextBufferRef.current, clean].slice(-12)
         }
 
 const outcomeSignal = (() => {
@@ -5602,57 +5587,7 @@ if (outcomeSignal) {
           return
         }
 
-        const liveContextSnapshot = liveContextBufferRef.current.join("\n")
-        const hasEnoughLiveSignal = liveContextSnapshot.length > 40
-
-        const livePrompt = liveMode
-          ? hasEnoughLiveSignal
-            ? `LIVE CONVERSATION CONTEXT:
-${liveContextSnapshot}
-
-LATEST HEARD:
-${clean}
-
-You are GEORGE in Conversation Mode.
-
-Respond ONLY from what you actually heard.
-
-Keep responses:
-- short
-- usable out loud
-- natural
-
-Return ONLY ONE operational deliverable.
-
-If no room was selected or context is unclear:
-- do not interrogate the user
-- do not assume context from a single word, name, joke, greeting, or slang phrase
-- “what’s up doc” does not mean medical context
-- listen first
-- if enough signal appears, ask one short confirmation such as “Interview?” or “Doctor context?”
-- otherwise give a neutral listening cue or a minimal next move
-
-If assist mode is:
-- cues → return one short cue only
-- lines → return one short repeatable line only
-
-Never output labels like:
-Word:
-Say:
-Cue:
-Need:
-Style:
-Pause:
-Backup:
-
-Never explain your reasoning.
-Never format as sections.
-Never return multiple options.
-
-${resolvedLivePosture === 'debate' ? 'Debate posture: detect contradictions, protect the frame, answer proof demands, handle interruptions, and keep lines short and sharp.' : ''}`
-            : `What's happening right now?`
-          : clean
-
+        const livePrompt = clean
         
 responseTimerRef.current = setTimeout(() => {
   const now = Date.now()
