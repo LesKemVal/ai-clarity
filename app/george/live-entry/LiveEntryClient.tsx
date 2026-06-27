@@ -395,6 +395,36 @@ function buildBriefingObservation(room: string, audience: string, objective: str
   return 'I am aware that the room may reveal more once the conversation begins.'
 }
 
+function buildNextBriefingBenefit(room: string, audience: string, objective: string, position: string) {
+  const signal = `${room} ${audience} ${objective} ${position}`.toLowerCase()
+
+  if (/interview|candidate|hiring|job|recruiter|amazon|warehouse|fulfillment/.test(signal)) {
+    return 'The next question will help me tailor your answers to the role and what the interviewer is likely testing.'
+  }
+
+  if (/investor|capital|fundraising|raise|fund|terms|valuation/.test(signal)) {
+    return 'The next question will help me anticipate objections, credibility tests, and timing pressure.'
+  }
+
+  if (/acquisition|merger|board|executive|enterprise|corporate/.test(signal)) {
+    return 'The next question will help me protect precision, leverage, and decision authority in a high-consequence room.'
+  }
+
+  if (/negotiat|offer|deal|price|counter|buyer|seller/.test(signal)) {
+    return 'The next question will help me recognize leverage, pressure, and better timing.'
+  }
+
+  if (/doctor|medical|patient|symptom|treatment|physician/.test(signal)) {
+    return 'The next question will help me organize facts, unanswered questions, and next steps.'
+  }
+
+  if (/sales|client|customer|buyer/.test(signal)) {
+    return 'The next question will help me notice trust, buying signals, objections, and moments to ask better questions.'
+  }
+
+  return 'The next question will help me make my guidance more specific to this room.'
+}
+
 function buildBriefingSupport(room: string, audience: string, objective: string, mode: string) {
   const signal = `${room} ${audience} ${objective}`.toLowerCase()
 
@@ -1294,18 +1324,6 @@ export default function LiveEntryClient() {
   }, [showOpenAISignalSurface, liveEntryReadyMessageVisible, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
 
   useEffect(() => {
-    if (!showOpenAISignalSurface || !liveEntryReadyMessageVisible) return
-    if (currentOptionalSignalQuestion || optionalSignalLoading || optionalSignalComplete) return
-
-    const timer = window.setTimeout(() => {
-      setLiveEntryReadyMessageVisible(false)
-      void requestNextOptionalSignalQuestion()
-    }, 3000)
-
-    return () => window.clearTimeout(timer)
-  }, [showOpenAISignalSurface, liveEntryReadyMessageVisible, currentOptionalSignalQuestion?.key, optionalSignalLoading, optionalSignalComplete])
-
-  useEffect(() => {
     if (!currentOptionalSignalQuestion) {
       setTypedOptionalSignalQuestion('')
       return
@@ -1657,6 +1675,13 @@ const mandatoryLiveSignals = useMemo(() => {
       : selectedSupportStyle
   )
   const liveAssistMode = legacyAssistModeFromSupportStyle(supportStyle)
+
+  const nextBriefingBenefit = buildNextBriefingBenefit(
+    resolvedConversationType,
+    audienceType,
+    objective || String(preLiveSignals.desiredOutcome || ''),
+    userPosition || chair || String(preLiveSignals.role || '')
+  )
 
   const prepDocumentPrompt = useMemo(() => {
     return getPrepDocumentPrompt(resolvedConversationType, audienceType)
@@ -2538,7 +2563,7 @@ const beginProofOfAwareness = async () => {
           kicker: 'LIVE READY',
           label: 'Minimum signal acquired',
           question: "You're ready for LIVE.\n\nI have enough information to begin supporting you.\n\nAdditional briefing can make my guidance more specific as I learn more about the room.",
-          helper: 'You may enter LIVE now, or continue briefing to make GEORGE more precise.',
+          helper: nextBriefingBenefit,
           example: '',
           inputValue: '',
           setInputValue: () => {},
@@ -2549,7 +2574,7 @@ const beginProofOfAwareness = async () => {
           },
           loading: false,
           step: 'Ready',
-          primaryAction: 'Continue to Brief',
+          primaryAction: 'Continue Briefing',
           canBeginLive: true,
           readinessMessage: true,
         }
@@ -2631,7 +2656,7 @@ const beginProofOfAwareness = async () => {
               )}
             </div>
 
-            <div className="mt-2 text-[13px] leading-5 text-white/42">
+            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#8FB6C9]/72' : 'text-white/42'}`}>
               {liveEntryQuestionSurface.helper}
             </div>
 
