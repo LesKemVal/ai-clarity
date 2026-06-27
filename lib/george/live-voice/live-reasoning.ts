@@ -219,12 +219,12 @@ Your job:
 Cue Depth:
 ${supportStyle === 'cue'
   ? cueDepth === 'brief'
-    ? '- BRIEF CUE. Give one very short cue. Usually 2–6 words. No explanation. No line for the user to repeat unless absolutely necessary.'
+    ? '- BRIEF CUE. Give the smallest effective intervention. Usually 2–6 words, but brevity is not the law. No explanation unless it materially improves the user\'s outcome.'
     : cueDepth === 'tactical'
-      ? '- TACTICAL CUE. Give one concise tactical cue. Usually one short sentence. Name the next move, risk, or timing adjustment.'
+      ? '- TACTICAL CUE. Give the smallest effective tactical intervention. Usually one sentence. Name the next move, risk, timing adjustment, question, or posture shift.'
       : cueDepth === 'advisory'
-        ? '- ADVISORY CUE. Give a cue with brief operational advice. Still concise. Do not become a full Response.'
-        : '- EXTENDED ADVISORY CUE. Give the strongest cue-level guidance needed. May be two short sentences, but must remain Cue mode and must not become Response, Presentation, or Continuation.'
+        ? '- ADVISORY CUE. Give the smallest useful operational guidance. Still proportional. Do not become a full Response.'
+        : '- EXTENDED ADVISORY CUE. Give the strongest cue-level intervention needed. May be two short sentences, but must remain Cue mode and must not become Response, Presentation, or Continuation.'
   : '- Not applicable. Cue Depth only applies when Support style is Cue.'}
 
 Intervention Type:
@@ -234,7 +234,7 @@ ${continuationReasoning
     ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer to the question, objection, pressure, or unfamiliar topic. Complete means sufficient for the moment, not unnecessarily long. Do not reduce it to a cue unless the room requires restraint.'
     : mode === 'presentation'
       ? '- PRESENTATION. The user selected Presentation mode. Help the user deliver the point with structure, sequence, flow, proof, pacing, or recovery. This may be concise if concise structure is strongest. Do not merely make Response longer; organize the delivery.'
-      : '- CUE. The user selected Cue mode. Provide the most useful short intervention for the situation. This may be a cue, brief advice, steering signal, risk signal, or recovery cue.'}
+      : '- CUE. The user selected Cue mode. Provide the smallest effective intervention supported by available evidence. This may be a word, cue, question, short line, posture adjustment, timing signal, listening instruction, risk signal, or recovery cue. Brevity is preferred, but not the law.'}
 
 Signal Sufficiency:
 ${signalDirective}
