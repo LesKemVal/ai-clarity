@@ -1,3 +1,4 @@
+import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import type { GeorgeActionCue, GeorgeLiveHubContext } from './types'
 import { createGeorgeLiveHubWebSocketTransport } from './websocket-transport'
 import type { GeorgeLiveHubTransport } from './transport'
@@ -125,6 +126,9 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         isFinal,
         deliveryStyle: currentContext.deliveryStyle,
       })
+        if (turnId) {
+          markRuntimeEvent(turnId, 'hub_transcript_queued')
+        }
         pendingTranscripts.push({ text: clean, isFinal, turnId })
         return
       }
