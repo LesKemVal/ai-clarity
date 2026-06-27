@@ -2,6 +2,7 @@ const scenarios = [
   ['Continuation authority repair', './george-behavior/continuation-authority.mjs'],
   ['Cue doctrine boundary', './george-behavior/cue-doctrine.mjs'],
   ['Cue mode runtime behavior', './george-behavior/cue-mode-runtime.mjs'],
+  ['Cue depth adapts within Cue', './george-behavior/cue-depth-runtime.mjs'],
   ['Response mode runtime behavior', './george-behavior/response-mode-runtime.mjs'],
   ['Delivery cannot alter meaning', './george-behavior/delivery-meaning.mjs'],
   ['Briefing propagation', './george-behavior/briefing-propagation.mjs'],
