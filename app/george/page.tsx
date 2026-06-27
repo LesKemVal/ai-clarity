@@ -1,5 +1,6 @@
 'use client'
 
+import { applyGovernedLiveCueRuntimeMemory } from '@/lib/george/live-runtime/governed-live-cue'
 
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
@@ -2258,59 +2259,13 @@ async function canGovernorInjectLiveCue(transcript: string) {
 
 async function injectGovernedLiveCue(transcript: string, content: string) {
   const allowed = await canGovernorInjectLiveCue(transcript)
-  const memory = liveRuntimeMemoryRef.current
-  const lower = transcript.toLowerCase()
+  const shouldInject = applyGovernedLiveCueRuntimeMemory(
+    liveRuntimeMemoryRef.current,
+    transcript,
+    allowed
+  )
 
-  if (/^(ok|okay|got it|i got it|i've got it|ive got it)$/.test(lower.trim())) {
-    memory.overrideCount += 1
-    memory.preferredForce = memory.overrideCount >= 3 ? 'light' : memory.preferredForce
-  }
-
-  if (
-    /^(ok|okay|hold|pause|wait|stop)$/.test(lower.trim()) &&
-    !allowed
-  ) {
-    memory.overrideCount += 1
-    memory.preferredForce = memory.overrideCount >= 3 ? 'light' : memory.preferredForce
-  }
-
-  if (/hmm|maybe|i guess|i don’t know|i don't know|i dont know/.test(lower)) {
-    memory.hesitationCount += 1
-    memory.roomCommunicationNotes = [
-      ...(memory.roomCommunicationNotes || []),
-      'User hesitated; preserve clarity and reduce cognitive load.',
-    ].slice(-5)
-  }
-
-  if (/\b(softer|soften|less aggressive|gentler|calmer)\b/i.test(lower)) {
-    memory.toneCorrection = 'softer'
-    memory.roomCommunicationNotes = [
-      ...(memory.roomCommunicationNotes || []),
-      'User requested softer communication in this room.',
-    ].slice(-5)
-  }
-
-  if (/\b(firmer|stronger|more direct|be direct|sharper)\b/i.test(lower)) {
-    memory.toneCorrection = 'firmer'
-    memory.roomCommunicationNotes = [
-      ...(memory.roomCommunicationNotes || []),
-      'User requested firmer communication in this room.',
-    ].slice(-5)
-  }
-
-  if (/\b(shorter|tighten|compress|too much|less)\b/i.test(lower)) {
-    memory.roomCommunicationNotes = [
-      ...(memory.roomCommunicationNotes || []),
-      'User prefers tighter language in this room.',
-    ].slice(-5)
-  }
-
-  if (!allowed) return false
-
-  memory.acceptedCarryCount += 1
-  if (memory.acceptedCarryCount >= 3 && memory.overrideCount < 2) {
-    memory.preferredForce = 'strong'
-  }
+  if (!shouldInject) return false
 
   setPendingAssistantMessage(null)
   setPendingAssistantMessage({
