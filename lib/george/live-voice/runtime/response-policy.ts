@@ -40,8 +40,10 @@ export function selectLiveResponsePolicy(input: {
   signals: ConversationSignalState
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   room?: string
+  desiredOutcome?: string
 }): LiveResponsePolicy {
-  const { speaker, signals, roomPressure, room: activeRoom = '' } = input
+  const { speaker, signals, roomPressure, room: activeRoom = '', desiredOutcome = '' } = input
+  const outcome = desiredOutcome.toLowerCase()
 
   if (speaker === 'other_party' && signals.has('authority_pressure')) {
     return {
@@ -169,6 +171,20 @@ export function selectLiveResponsePolicy(input: {
       deliveryBehavior: 'redirect',
       intervention: 'redirect',
       responseForm: 'question',
+    }
+  }
+
+  if (speaker === 'other_party' && /follow[- ]?up|next meeting|next conversation|second meeting|investor/i.test(outcome)) {
+    return {
+      mode: 'direct',
+      volley: 'Answer the concern directly, then earn the next conversation.',
+      cue: 'Reduce uncertainty. Build confidence for the follow-up.',
+      status: 'Outcome-preserving investor response.',
+      tone: 'calm',
+      compression: 'medium',
+      deliveryBehavior: 'direct',
+      intervention: 'speak',
+      responseForm: 'direction',
     }
   }
 

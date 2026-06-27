@@ -4,6 +4,7 @@ const scenarios = [
   ['Cue mode runtime behavior', './george-behavior/cue-mode-runtime.mjs'],
   ['Cue depth adapts within Cue', './george-behavior/cue-depth-runtime.mjs'],
   ['Response mode runtime behavior', './george-behavior/response-mode-runtime.mjs'],
+  ['Desired outcome preservation', './george-behavior/outcome-preservation-runtime.mjs'],
   ['Delivery cannot alter meaning', './george-behavior/delivery-meaning.mjs'],
   ['Briefing propagation', './george-behavior/briefing-propagation.mjs'],
 ]

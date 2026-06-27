@@ -359,6 +359,7 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
     signals,
     roomPressure: room.pressure,
     room: input.contextHint || '',
+    desiredOutcome: input.desiredOutcome || '',
   })
 
   packet = {
