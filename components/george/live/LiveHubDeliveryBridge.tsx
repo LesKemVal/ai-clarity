@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
@@ -27,6 +27,8 @@ export function LiveHubDeliveryBridge({
   onVoiceCue,
   onSilentCue,
 }: LiveHubDeliveryBridgeProps) {
+  const deliveredCueByTurnRef = useRef<Record<string, string>>({})
+
   useEffect(() => {
     if (!active) return
     if (!isGeorgeLiveHubEnabled()) return
@@ -52,9 +54,23 @@ export function LiveHubDeliveryBridge({
         mode,
       }
 
+      const deliveryKey = event.turnId || resolvedDeliveryCue.text
+      const previousText = deliveredCueByTurnRef.current[deliveryKey]
+
+      if (previousText && previousText === resolvedDeliveryCue.text) {
+        markRuntimeEvent(deliveryKey, 'delivery_duplicate_suppressed')
+        return
+      }
+
+      if (previousText && previousText !== resolvedDeliveryCue.text) {
+        markRuntimeEvent(deliveryKey, 'delivery_revision')
+      }
+
+      deliveredCueByTurnRef.current[deliveryKey] = resolvedDeliveryCue.text
+
       console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
 
-      markRuntimeEvent(event.turnId || resolvedDeliveryCue.text, 'delivery_cue')
+      markRuntimeEvent(deliveryKey, 'delivery_cue')
 
       if (resolvedDeliveryCue.mode === 'visual') {
         onVisualCue?.(resolvedDeliveryCue)
