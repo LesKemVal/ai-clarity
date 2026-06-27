@@ -71,8 +71,11 @@ export async function POST(req: NextRequest) {
     const reasonedPacket = await reasonLiveNextMove({
       transcript: String(body?.transcript || ''),
       room: typeof body?.contextHint === 'string' ? body.contextHint : '',
+      userPosition: typeof body?.userPosition === 'string' ? body.userPosition : '',
       desiredOutcome: typeof body?.desiredOutcome === 'string' ? body.desiredOutcome : '',
       activeOutcome: typeof body?.activeOutcome === 'string' ? body.activeOutcome : '',
+      knownContext: typeof body?.knownContext === 'string' ? body.knownContext : '',
+      briefingKnowledge: typeof body?.briefingKnowledge === 'string' ? body.briefingKnowledge : '',
       shadowMap: typeof body?.shadowMap === 'string' ? body.shadowMap : '',
       lastFiveSeconds: typeof body?.lastFiveSeconds === 'string' ? body.lastFiveSeconds : '',
       supportStyle,
