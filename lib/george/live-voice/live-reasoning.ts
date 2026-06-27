@@ -4,6 +4,7 @@ import type { LiveSupportStyle } from '../live-runtime/support-style'
 import { evaluateSignalSufficiency } from '../runtime/signal-sufficiency'
 import { rankSignals } from '../runtime/signal-ranking'
 import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
+import { classifyLiveResponseForm } from './runtime/response-form'
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -38,18 +39,6 @@ function shouldUseReasoning(input: LiveReasoningInput) {
     transcript.length >= 8 ||
     /\b(help|what do i say|asking|asked|questioning|challenged|dropped|declined|revenue|forecast|number|pressure|objection|concern|issue|take it|take this|you answer|answer for me|carry this)\b/i.test(transcript)
   )
-}
-
-function classifyResponseForm(text: string, fallback?: LiveVoicePacket['responseForm']): LiveVoicePacket['responseForm'] {
-  const clean = text.trim()
-
-  if (!clean) return fallback || 'silence'
-  if (/\?$/.test(clean)) return 'question'
-  if (/^(say|tell them|respond|answer):/i.test(clean)) return 'line'
-  if (/\b(use|lead with|start with|keep|pause|wait|hold|ask|state|frame|focus)\b/i.test(clean)) return 'direction'
-  if (clean.split(/\s+/).length <= 8) return 'cue'
-
-  return fallback || 'direction'
 }
 
 function looksLikeRepeatedSignal(input: LiveReasoningInput) {
@@ -373,7 +362,7 @@ Priority:
     ? 'line'
     : carryTurn
       ? 'line'
-      : classifyResponseForm(volley, input.fallbackPacket.responseForm)
+      : classifyLiveResponseForm(volley, input.fallbackPacket.responseForm)
   const transferReady =
     !carryTurn &&
     sufficiency.sufficient &&
