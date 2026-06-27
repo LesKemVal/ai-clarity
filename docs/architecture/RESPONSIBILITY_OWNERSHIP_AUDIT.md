@@ -129,7 +129,7 @@ Do not migrate dead architecture into new files.
 
 | Responsibility | Correct owner | Current status | Action |
 |---|---|---|---|
-| Recent transcript continuity | LIVE Hub | Migrated to `recentTranscript` | Verify page mirror no longer authoritative |
+| Recent transcript continuity | LIVE Hub | `liveContextBufferRef` removed; no current search hits on branch | Treat as resolved unless a new page-level transcript buffer appears |
 | Continuation authority | GEORGE Core | Mostly owned by core/verification | Continue verifying no delivery/page duplication |
 | Continuation repair | GEORGE Core | Owned by core/verification | Keep minimal; do not create second generator |
 | Delivery routing | Delivery modules | Mostly owned by delivery router/bridge | Continue auditing voice and visual edges |
@@ -148,6 +148,7 @@ Do not migrate dead architecture into new files.
 | Speech interruption / cancellation | Delivery with presentation state reflection | `stopSpeech()` now calls `clearSpeechQueue()` but still owns audio cancellation and visible speaking state | Candidate for audit after final transcript side effects are classified |
 | Spoken line memory | LIVE runtime evidence | `speakText()` writes `rememberLiveSpokenLine()` state during LIVE before queueing audio | Keep with LIVE evidence owner; do not bury inside generic audio playback |
 | `speakText()` orchestration seam | Presentation-to-Delivery boundary | Currently acceptable: coordinates permission, suppression, text prep, spoken memory, queue replacement, and delivery start | Do not extract as one block; no obvious safe 15-30 line extraction remains right now |
+| Legacy governor runtime memory | Archive / legacy governor bridge | `liveRuntimeMemoryRef` remains for `injectGovernedLiveCue()` and `/api/george/live/govern`, not as active conversational transcript memory | Classify with campaign/legacy governor cleanup, not with transcript continuity |
 
 ## Speech lifecycle inspection notes
 
@@ -203,11 +204,27 @@ Ownership conclusion: do not patch `speakText()` right now. The remaining logic 
 
 Ownership conclusion: do not move these side effects yet. The next step is to classify action execution into a possible `live-final-transcript-effects` helper only if it can remain dependency-injected and avoid importing React state, browser globals beyond timers, or GEORGE authority.
 
+## LIVE context buffer inspection notes
+
+`liveContextBufferRef` is no longer present on the current `live-hub-runtime` branch. It should no longer be treated as an authoritative page-level conversational memory owner.
+
+Do not confuse the removed `liveContextBufferRef` with `liveRuntimeMemoryRef`. The latter is legacy governor/cue memory used by `injectGovernedLiveCue()` and `/api/george/live/govern`; it tracks accepted carry count, override count, hesitation count, preferred force, tone correction, and communication notes. That is not the active transcript continuity owner.
+
+Active LIVE evidence now flows through more specific boundaries:
+
+- `useLiveAudioRuntime()` for audio runtime transcript callbacks
+- `resolveLiveFinalTranscriptAction()` for final transcript action authority
+- `lastLiveFinalTranscriptRef` for final transcript routing continuity
+- `liveLastSpokenUtteranceRef` / spoken-memory helpers for overlap and repetition evidence
+- prepared runtime support from `prep-runtime` for room/objective/user-position context
+
+Ownership conclusion: the old page-level rolling transcript buffer is resolved. The next relevant cleanup is legacy governor/campaign classification, not another transcript buffer extraction.
+
 ## Next audit targets
 
-1. Verify `liveContextBufferRef` is no longer an authoritative owner of conversational memory.
-2. Classify `handleLiveFinalTranscript()` side-effect execution into delivery actions, UI/debug effects, and runtime timers.
-3. Classify remaining campaign references as active, archived, or removable.
+1. Classify `handleLiveFinalTranscript()` side-effect execution into delivery actions, UI/debug effects, and runtime timers.
+2. Classify remaining campaign references as active, archived, or removable.
+3. Classify legacy governor bridge references (`injectGovernedLiveCue`, `canGovernorInjectLiveCue`, `liveRuntimeMemoryRef`) as active, archived, or removable.
 4. Keep reducing `page.tsx` only where it owns non-presentation responsibilities.
 
 ## Next safe implementation move
@@ -218,6 +235,6 @@ Do not extract `speakText()` yet.
 
 Do not extract final transcript side effects yet.
 
-The safest next move is a classification pass for final transcript action execution. If a helper is introduced later, it must be dependency-injected and must not own GEORGE authority, React state, or scenario-specific continuation behavior.
+The safest next move is a classification pass for campaign and legacy governor code. If a helper is introduced later, it must be dependency-injected and must not own GEORGE authority, React state, or scenario-specific continuation behavior.
 
 This preserves behavior while leaving speech queue lifecycle with the queue helper, browser playback mechanics with the playback helper, LIVE spoken memory in the runtime evidence path, and `speakText()` as a temporary orchestration seam.
