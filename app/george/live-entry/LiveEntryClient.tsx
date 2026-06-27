@@ -3746,8 +3746,11 @@ const beginProofOfAwareness = async () => {
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
                 Quick LIVE
               </span>
-              <span className="mt-1 block text-[12px] leading-5 text-white/42">
-                Enter now. I’ll listen and sharpen as the interaction unfolds.
+              <span className="mt-1 block text-[12px] leading-5 text-white/56">
+                Start immediately with minimum setup.
+              </span>
+              <span className="mt-2 block text-[12px] leading-5 text-white/34">
+                Best when the conversation is already happening or you only need light, adaptive support.
               </span>
             </button>
 
@@ -3767,422 +3770,40 @@ const beginProofOfAwareness = async () => {
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/76">
                 Brief GEORGE
               </span>
-              <span className="mt-1 block text-[12px] leading-5 text-white/40">
-                Give me room-specific signal before LIVE.
+              <span className="mt-1 block text-[12px] leading-5 text-white/52">
+                Give GEORGE room-specific signal before LIVE.
+              </span>
+              <span className="mt-2 block text-[12px] leading-5 text-white/34">
+                Best when the outcome matters and a little preparation will improve the guidance.
               </span>
             </button>
-          </div>
 
-          {hasLiveSession && (
-            <button
-              type="button"
-              onClick={() => setShowResumeConversationList(true)}
-              className="mt-3 w-full rounded-[0.82rem] border border-[#D7DCFF]/[0.16] bg-[#D7DCFF]/[0.055] px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/76 transition hover:border-[#D7DCFF]/30 hover:bg-[#D7DCFF]/[0.10] hover:text-white"
-            >
-              Resume Conversation
-            </button>
-          )}
-
-          {runtimeMotionContext && (
-            <div className="mt-2 rounded-[0.82rem] border border-[#AEB6FF]/10 bg-[#AEB6FF]/[0.035] px-3 py-2">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DCFF]/44">Inherited context</div>
-              <div className="mt-1 text-[14px] font-medium text-white/78">{runtimeMotionContext.title}</div>
-            </div>
-          )}
-
-          {contextSignalsCollapsed && !hideAcquiredMandatoryFields && (
-            <div className="mt-2 rounded-[0.72rem] border border-white/[0.035] bg-black/12 px-3 py-2">
+            {hasLiveSession && (
               <button
                 type="button"
-                onClick={() => {
-                  setContextSectionCollapsed(false)
-                  setChairSectionCollapsed(false)
-                }}
-                className="flex w-full items-center justify-between gap-3 text-left"
+                onClick={() => setShowResumeConversationList(true)}
+                className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
               >
-                <span>
-                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/24">Room signals</span>
-                  <span className="mt-0.5 block truncate text-[12px] text-white/48">
-                    {chair || 'Identity not selected'}
-                  </span>
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/76">
+                  Resume Conversation
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
-              </button>
-            </div>
-          )}
-
-          {!contextSignalsCollapsed && !hideAcquiredMandatoryFields && (
-          <div className={`${relatedSessions.length > 0 ? 'mt-2' : 'mt-3'} rounded-[0.82rem] border border-white/[0.04] bg-black/18 px-3 py-2`}>
-            {chairSectionCollapsed ? (
-              <button
-                type="button"
-                onClick={() => setChairSectionCollapsed(false)}
-                className="flex w-full items-center justify-between gap-3 text-left"
-              >
-                <span>
-                  <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Role / position</span>
-                  <span className="mt-1 block truncate text-[13px] text-white/62">{chair || 'Not selected'}</span>
+                <span className="mt-1 block text-[12px] leading-5 text-white/52">
+                  Continue from a previous LIVE room.
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-[#8FB6C9]/42">Open</span>
+                <span className="mt-2 block text-[12px] leading-5 text-white/34">
+                  Best when GEORGE should preserve context from an earlier conversation.
+                </span>
               </button>
-            ) : (
-              <>
-            <p className="mt-1 text-[11px] leading-5 text-white/36">Name, nickname, title, or whatever people in the room will recognize as you.</p>
-<div className="text-[10px] uppercase tracking-[0.22em] text-white/24">How will the room address you?</div>
-<p className="mt-1 text-[11px] leading-5 text-white/36">
-  How shall I address you?
-  <br />
-  <br />
-  Name, title, nickname, or moniker you'll use in the room.
-</p>
-            <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
-              <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Choose role or position</span>
-              <select
-                value={chairs[0] || ''}
-                onChange={(event) => {
-                  const value = event.target.value
-                  setChairs(value ? [value] : [])
-                }}
-                className="mt-2 w-full appearance-none bg-transparent text-[14px] text-white/72 outline-none"
-              >
-                <option value="" className="bg-[#090B10] text-white">Not selected</option>
-                {CHAIR_OPTIONS.map((option) => (
-                  <option key={option.label} value={option.label} className="bg-[#090B10] text-white">
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            {chairs.includes('Other') && (
-              <label className="mt-2 block rounded-[0.72rem] border border-white/[0.035] bg-black/14 px-3 py-2">
-                <span className="block text-[10px] uppercase tracking-[0.18em] text-white/22">Write position</span>
-                <input
-                  value={customChair}
-                  onChange={(event) => setCustomChair(event.target.value)}
-                  placeholder={positionExamples[exampleIndex % positionExamples.length]}
-                  className="mt-2 w-full caret-[#D7DCFF] bg-transparent text-[14px] text-white/72 outline-none placeholder:text-white/22"
-                />
-              </label>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setChairSectionCollapsed(true)}
-              className="mt-2 w-full rounded-[0.72rem] border border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.06] px-3 py-2 text-[11px] uppercase tracking-[0.18em] text-[#D7DCFF]/70 transition hover:text-white"
-            >
-              Done
-            </button>
-              </>
             )}
           </div>
-          )}
 
-
-
-          {showOpenAISignalSurface && optionalSignalLoading && (
-            <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
-              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                Additional signal
-              </div>
-              <div className="mt-4 text-[16px] leading-7 text-white/54">
-                GEORGE is determining the next useful signal…
-              </div>
-            </div>
-          )}
-
-          {showOpenAISignalSurface && currentOptionalSignalQuestion && (
-            <div className="mt-6 max-w-[680px] border-l border-[#AEB6FF]/24 pl-5 text-left">
-              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                Additional signal
-              </div>
-
-              <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                Optional. OpenAI determines the next useful signal.
-              </div>
-
-              <div
-                key={currentOptionalSignalQuestion.key}
-                className="mt-4 min-h-[64px] text-[20px] leading-8 tracking-[-0.02em] text-white/78"
-              >
-                {typedOptionalSignalQuestion}
-                <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
-              </div>
-
-              <div className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/46">
-                {currentOptionalSignalQuestion.why}
-              </div>
-
-              <div className="mt-6 flex items-center gap-5">
-                <div className="relative min-h-[38px] flex-1">
-                  {!optionalSignalInput.trim() && !optionalSignalInputFocused && (
-                    <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-[15px] text-white/22">
-                      {typedOptionalAnswerExample}
-                      <span className="ml-1 inline-block h-[16px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/50" />
-                    </div>
-                  )}
-
-                  <input
-                    value={optionalSignalInput}
-                    onFocus={() => setOptionalSignalInputFocused(true)}
-                    onBlur={() => {
-                      if (!optionalSignalInput.trim()) setOptionalSignalInputFocused(false)
-                    }}
-                    onChange={(event) => setOptionalSignalInput(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault()
-                        submitOptionalSignalAnswer()
-                      }
-                    }}
-                    placeholder=""
-                    className="min-h-[38px] w-full caret-[#D7DCFF] border-0 bg-transparent text-[15px] text-[#F2F4FF]/86 outline-none placeholder:text-transparent"
-                  />
-                </div>
-
-                {optionalSignalInput.trim() && (
-                  <button
-                    type="button"
-                    onClick={submitOptionalSignalAnswer}
-                    className="text-[11px] uppercase tracking-[0.22em] text-[#D7DCFF]/62 transition hover:text-white active:scale-[0.98]"
-                  >
-                    Enter
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-5 flex items-center gap-6">
-                <button
-                  type="button"
-                  onClick={skipOptionalSignalQuestion}
-                  className="text-[11px] uppercase tracking-[0.22em] text-white/34 transition hover:text-white/70 active:scale-[0.98]"
-                >
-                  Skip
-                </button>
-              </div>
-            </div>
-          )}
-
-          {optionalSignalSurfaceComplete && (
-            <section className="mt-5 border-l border-[#AEB6FF]/24 pl-5">
-              <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/42">
-                Room phrases
-              </div>
-
-              <div className="mt-3 text-[15px] leading-6 text-white/68">
-                Use natural phrases during LIVE to subtly steer GEORGE without exposing GEORGE.
-              </div>
-
-              <label className="mt-4 flex items-start gap-3 text-[12px] leading-5 text-white/48">
-                <input
-                  type="checkbox"
-                  checked={useRoomPhrases}
-                  onChange={(event) => setUseRoomPhrases(event.target.checked)}
-                  className="mt-1 h-4 w-4 accent-[#8FB6C9]"
-                />
-                <span>
-                  <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
-                    Use room phrases
-                  </span>
-                  If you do not add your own phrases, GEORGE will use quiet defaults you may use or ignore.
-                </span>
-              </label>
-
-              {useRoomPhrases && (
-                <label className="mt-5 block">
-                  <span className="block text-[10px] uppercase tracking-[0.18em] text-white/24">
-                    Phrases you could actually say
-                  </span>
-
-                  <div className="relative mt-2 min-h-[42px]">
-                    {!customRoomPhrases.trim() && !roomPhraseFocused && (
-                      <div className="pointer-events-none absolute inset-x-0 top-2 text-[13px] leading-6 text-white/22">
-                        {typedRoomPhraseExample}
-                        <span className="ml-1 inline-block h-[15px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/50" />
-                      </div>
-                    )}
-
-                    <textarea
-                      value={customRoomPhrases}
-                      onFocus={() => setRoomPhraseFocused(true)}
-                      onBlur={() => {
-                        if (!customRoomPhrases.trim()) setRoomPhraseFocused(false)
-                      }}
-                      onChange={(event) => {
-                        const value = event.target.value
-                        setCustomRoomPhrases(value)
-                        setControlWords(value.trim() || DEFAULT_ROOM_PHRASES.join(', '))
-                      }}
-                      rows={3}
-                      placeholder=""
-                      className="min-h-[92px] w-full resize-none caret-[#D7DCFF] bg-transparent text-[13px] leading-6 text-white/72 outline-none placeholder:text-transparent"
-                    />
-                  </div>
-
-                  <div className="mt-3 text-[11px] leading-5 text-white/34">
-                    Defaults include: {DEFAULT_ROOM_PHRASES.slice(0, 4).join(' · ')}
-                  </div>
-                </label>
-              )}
-            </section>
-          )}
-
-          {!hideAcquiredMandatoryFields && (
-            <label className="mt-2 block rounded-[0.72rem] border border-white/[0.028] bg-black/14 px-3 py-2 backdrop-blur-md">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">Direction</span>
-              <textarea
-                id="george-desired-outcome"
-                data-live-signal="desired-outcome"
-                value={objective}
-                onChange={(event) => setObjective(event.target.value)}
-                rows={2}
-                placeholder={desiredOutcomeExamples[exampleIndex % desiredOutcomeExamples.length]}
-                className="mt-2 w-full resize-none caret-[#D7DCFF] bg-transparent text-[15px] leading-5 text-white/76 outline-none placeholder:text-white/22"
-              />
-            </label>
-          )}
-
-          <details className="mt-5 rounded-[0.82rem] border border-white/[0.035] bg-black/12 px-3 py-2">
-            <summary className="cursor-pointer list-none text-[10px] uppercase tracking-[0.22em] text-white/34">
-              Room controls
-            </summary>
-
-            <div className="mt-3 border-t border-white/[0.04] pt-3">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Output</span>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {SUPPORT_STYLE_OPTIONS.map((option) => {
-                  const active = selectedSupportStyle === option.value
-
-                  return (
-                    <button
-                      key={option.label}
-                      type="button"
-                      onClick={() => setSelectedSupportStyle(option.value)}
-                      className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
-                        active
-                          ? 'border-[#AEB6FF]/38 bg-[#AEB6FF]/[0.08] text-white'
-                          : 'border-white/[0.06] bg-white/[0.015] text-white/44 hover:text-white/72'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="mt-4 border-t border-white/[0.04] pt-3">
-              <span className="block text-[10px] uppercase tracking-[0.22em] text-white/24">Style</span>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {COMMUNICATION_STYLE_OPTIONS.map((option) => {
-                  const active = communicationStyle === option.label
-
-                  return (
-                    <button
-                      key={option.label}
-                      type="button"
-                      onClick={() => setCommunicationStyle(option.label)}
-                      className={`rounded-full border px-3 py-1.5 text-[11px] transition ${
-                        active
-                          ? 'border-[#AEB6FF]/38 bg-[#AEB6FF]/[0.08] text-white'
-                          : 'border-white/[0.06] bg-white/[0.015] text-white/44 hover:text-white/72'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-          </details>
-
-          <label className="mt-3 block rounded-[0.72rem] border border-[#8FB6C9]/[0.11] bg-[#8FB6C9]/[0.055] px-3 py-2 shadow-[0_10px_30px_rgba(80,130,190,0.10)] backdrop-blur-md">
-            <span className="block text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/30">{prepDocumentPrompt.label}</span>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <div className="truncate text-[12px] text-white/62">
-                  {prepDocument ? prepDocument.name : prepDocumentPrompt.helper}
-                </div>
-                {prepDocument && (
-                  <div className="mt-1 text-[11px] text-[#8FB6C9]/50">
-                    Loaded into LIVE prep · {prepDocument.kind}
-                  </div>
-                )}
-              </div>
-
-              <input
-                type="file"
-                accept=".pdf,.docx,.txt,image/*"
-                className="hidden"
-                id="george-live-prep-document"
-                onChange={(event) => {
-                  void handlePrepDocumentUpload(event.target.files?.[0] || null)
-                  event.currentTarget.value = ''
-                }}
-              />
-
-              <span className="flex shrink-0 items-center gap-2">
-                {prepDocument && (
-                  <button
-                    type="button"
-                    onClick={() => setPrepDocument(null)}
-                    className="text-[12px] text-white/34 transition hover:text-white/62"
-                  >
-                    Clear
-                  </button>
-                )}
-
-                <span
-                  onClick={() => document.getElementById('george-live-prep-document')?.click()}
-                  className="cursor-pointer rounded-[0.8rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.09] px-3 py-2 text-[12px] text-[#D7DCFF]/76 transition hover:bg-[#8FB6C9]/[0.16] hover:text-white"
-                >
-                  {prepDocumentReading ? 'Reading…' : prepDocumentPrompt.action}
-                </span>
-              </span>
-            </div>
-          </label>
-
-
-
-          <div className="mt-2 flex items-center gap-2 text-[12px] leading-5 text-white/34">
-            <span className="h-[5px] w-[5px] rounded-full bg-[#8FB6C9]/70 shadow-[0_0_12px_rgba(143,182,201,0.42)]" />
-            <span>
-              <span className="text-white/48">{loadedSummary}</span>
-            </span>
-          </div>
-
-<div className="mt-5">
-            <button
-              type="button"
-              
-              onClick={() => {
-                if (!hasRequiredLiveSignal) {
-                  const missing = missingMandatoryLiveSignals
-                    .map((signal) => signal.label)
-                    .join(', ')
-
-                  window.alert(`Add signal before LIVE: ${missing}.`)
-                  return
-                }
-
-                startLive(false, editableResources)
-              }}
-              className={`w-full py-4 text-right text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
-                hasRequiredLiveSignal
-                  ? 'text-[#D7DCFF]/92 hover:text-white'
-                  : 'text-white/24'
-              }`}
-            >
-              {hasRequiredLiveSignal ? 'Begin LIVE' : 'Add signal for LIVE'}
-            </button>
-          </div>
-
-          {hasLiveSession && (
-            <p className="mt-3 text-[12px] leading-5 text-white/34">
-              A previous LIVE session exists. Starting LIVE creates a clean room so stale context does not bleed in.
+          <div className="mt-4 rounded-[0.82rem] border border-white/[0.055] bg-white/[0.018] px-4 py-3">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/42">Notice</div>
+            <p className="mt-2 text-[12px] leading-5 text-white/38">
+              GEORGE supports your communication in real time. You remain responsible for what you say, decide, and do.
             </p>
-          )}
+          </div>
+
         </section>
 
         {tier === 'smart' && (
