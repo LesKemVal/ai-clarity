@@ -1350,7 +1350,30 @@ const [forceClose, setForceClose] = useState(false)
 const [suggestedSignal, setSuggestedSignal] = useState(0)
   const [voiceSupported, setVoiceSupported] = useState(false)
   const [voiceOn, setVoiceOn] = useState(false)
-  const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue'>('advice')
+  const getInitialLiveDeliveryStyle = (): 'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue' => {
+    if (typeof window === 'undefined') return 'advice'
+
+    const rawStored =
+      window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
+      window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE')
+
+    const stored =
+      rawStored === 'completion'
+        ? 'continue'
+        : rawStored === 'presentation'
+          ? 'expandedLine'
+          : rawStored
+
+    return stored === 'cue' ||
+      stored === 'advice' ||
+      stored === 'line' ||
+      stored === 'response' ||
+      stored === 'expandedLine' ||
+      stored === 'continue'
+      ? stored
+      : 'advice'
+  }
+  const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue'>(getInitialLiveDeliveryStyle)
   const liveSupportOptions: Array<{ id: typeof liveDeliveryStyle; label: string }> = [
     { id: 'advice', label: 'Cue' },
     { id: 'continue', label: 'Continuation' },
