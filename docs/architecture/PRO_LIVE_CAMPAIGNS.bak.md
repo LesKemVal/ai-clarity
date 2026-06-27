@@ -65,3 +65,25 @@ It must not bleed into:
 Disable first.
 Stabilize Normal + LIVE.
 Delete only after stability is proven.
+
+## Archived browser-STT LIVE decision engine
+
+Archived during LIVE portability audit.
+
+The old browser SpeechRecognition LIVE decision path contained:
+
+- proactive conversational guidance
+- voice-state heuristics
+- browser-level injected cue logic
+- profession-specific line templates
+- campaign performance tracking
+- objection / callback / close counters
+- old sales-style LIVE response branches
+
+These ideas are preserved as shelved PRO LIVE / campaign concepts, not active runtime architecture.
+
+Future recovery rule:
+
+If these capabilities return, they should be rebuilt through GEORGE Core / LIVE Hub / Delivery modules, not restored into `page.tsx`.
+
+`page.tsx` should remain the LIVE shell: mounting, rendering, controls, and handoff only.
