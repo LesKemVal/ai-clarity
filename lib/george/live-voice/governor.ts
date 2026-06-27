@@ -398,6 +398,24 @@ export function governLiveVoice(input: LiveVoiceGovernorInput): LiveVoicePacket 
   })
   packet.liveAssistMode = input.liveAssistMode || legacyAssistModeFromSupportStyle(supportStyle)
 
+  const possibleOutcomeShift =
+    speakerIntent.intent === 'correction_signal' &&
+    /\b(what matters now|now is|instead|before we|before i|shift|different outcome|new outcome|pilot|investment)\b/i.test(
+      `${transcript} ${input.activeOutcome || ''} ${shadowMap}`
+    )
+
+  if (possibleOutcomeShift) {
+    packet.shouldSpeak = true
+    packet.volley = 'Confirm the outcome shift before moving forward'
+    packet.cue = 'Name the new target. Keep the old one parked.'
+    packet.status = `${packet.status} Possible outcome shift detected; preserve user agency before switching objectives.`.trim()
+    packet.responseForm = 'direction'
+    packet.deliveryBehavior = 'direct'
+    packet.intervention = 'speak'
+    packet.speakerIntentShouldSpeak = true
+    packet.speakerIntentShouldHold = false
+  }
+
   const continuationCandidate = evaluateContinuationCandidate({
     transcript,
     deliveryStyle: packet.supportStyle,
