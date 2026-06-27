@@ -107,13 +107,7 @@ export function routeGeorgeDeliveryCue(input: {
     })
 
     if (authority.violates) {
-      console.warn('[GEORGE][delivery][authority-replaced]', {
-        reason: authority.reason,
-        unsupportedTerms: authority.unsupportedTerms,
-        originalText: text,
-      })
-
-      text = safeContinuationReplacement({
+      const replacementText = safeContinuationReplacement({
         fallback: text,
         transcript: input.actionCue.evidence?.transcript || text,
         // Existing repair API name kept for compatibility. Source is recentTranscript only.
@@ -131,6 +125,15 @@ export function routeGeorgeDeliveryCue(input: {
           input.context?.knownContext,
         ].join(' '),
       })
+
+      console.warn('[GEORGE][delivery][authority-replaced]', {
+        reason: authority.reason,
+        unsupportedTerms: authority.unsupportedTerms,
+        originalText: text,
+        replacementText,
+      })
+
+      text = replacementText
     }
   }
 
