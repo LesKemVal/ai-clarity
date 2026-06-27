@@ -52,6 +52,7 @@ export type LiveRuntimeSupport = {
   purview?: LivePurview | null
   userPosition?: string
   knownContext?: string
+  briefingKnowledge?: string
   secondaryOutcome?: string
   secondaryObjective?: string
   intangibleObjective?: string

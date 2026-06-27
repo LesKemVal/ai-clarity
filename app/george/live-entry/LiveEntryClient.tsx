@@ -2045,6 +2045,22 @@ const mandatoryLiveSignals = useMemo(() => {
           ? liveRoomObjectiveLabels[liveRoomObjectiveOption]
           : ''
 
+    const optionalBriefingLines = Object.entries(optionalSignalAnswers)
+      .map(([key, value]) => {
+        const cleanValue = cleanBriefingValue(value)
+        if (!cleanValue) return ''
+        return `${key}: ${cleanValue}`
+      })
+      .filter(Boolean)
+
+    const briefingKnowledge = [
+      preLiveSignals.name ? `User name: ${preLiveSignals.name}` : '',
+      preLiveSignals.role ? `User role in room: ${preLiveSignals.role}` : '',
+      preLiveSignals.desiredOutcome ? `Desired outcome: ${preLiveSignals.desiredOutcome}` : '',
+      cleanBriefingValue(knownContext) ? `Known context: ${cleanBriefingValue(knownContext)}` : '',
+      optionalBriefingLines.length ? `Additional briefing: ${optionalBriefingLines.join(' | ')}` : '',
+    ].filter(Boolean).join('\n')
+
     const secondaryOutcome =
       cleanBriefingValue((optionalSignalAnswers as any).fallbackOutcome) ||
       cleanBriefingValue((optionalSignalAnswers as any).secondaryOutcome) ||
@@ -2070,6 +2086,7 @@ const mandatoryLiveSignals = useMemo(() => {
       resolvedConversationType,
       userPosition,
       knownContext,
+      briefingKnowledge,
       secondaryOutcome,
       secondaryObjective,
       intangibleObjective,
@@ -2095,6 +2112,7 @@ const mandatoryLiveSignals = useMemo(() => {
       relatedSessionId,
       relatedSessionTitle: selectedRelatedSession?.title || null,
       knownContext,
+      briefingKnowledge,
       observedReality: knownContext,
       secondaryOutcome,
       secondaryObjective,

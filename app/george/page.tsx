@@ -5914,6 +5914,7 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          briefingKnowledge: String(liveRuntimeSupport?.briefingKnowledge || ''),
           secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
           intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),
@@ -5936,6 +5937,7 @@ return (
             ''
           ),
           knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          briefingKnowledge: String(liveRuntimeSupport?.briefingKnowledge || ''),
           secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
           intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),

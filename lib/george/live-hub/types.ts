@@ -8,6 +8,7 @@ export type GeorgeActionCueEvidence = {
   room?: string
   objective?: string
   knownContext?: string
+  briefingKnowledge?: string
   secondaryOutcome?: string
   secondaryObjective?: string
   intangibleObjective?: string
@@ -35,6 +36,7 @@ export type GeorgeLiveHubContext = {
   chair?: string
   objective?: string
   knownContext?: string
+  briefingKnowledge?: string
   secondaryOutcome?: string
   secondaryObjective?: string
   intangibleObjective?: string
