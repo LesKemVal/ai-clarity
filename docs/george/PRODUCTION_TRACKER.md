@@ -622,3 +622,36 @@ Production estimate:
 - Portability readiness: ~90%
 
 No redesign. No new philosophy. Finish implementation, reduce duplication, validate runtime.
+
+# Architecture Freeze Milestone
+
+The core LIVE runtime architecture is now considered stable.
+
+Latest completed ownership work:
+
+- Governed LIVE cue memory handling moved out of page.tsx.
+- LIVE response form classification extracted into runtime helper.
+- ACTION_CUE authority finalization moved into GEORGE Core.
+- Delivery no longer owns semantic repair.
+- Delivery now tracks cue revisions and suppresses exact duplicates.
+
+Current runtime contract:
+
+- User owns desired outcome, support style, and final judgment.
+- Presentation owns controls and visualization.
+- LIVE Hub owns runtime state and synchronization.
+- GEORGE Core owns operational judgment, evidence, authority, continuation, response shaping, and semantic meaning.
+- Delivery owns voice, visual, silent, suppression, timing, modality, and revision execution.
+- Delivery may not alter operational meaning.
+
+Acceptance test for every future change:
+
+1. Does this materially improve GEORGE's ability to help the user reach their desired outcome?
+2. Does this preserve a single operational GEORGE across every runtime?
+
+Next phase:
+
+- Long-session validation.
+- Latency measurement and optimization.
+- Continued page.tsx reduction.
+- Portability packaging.
