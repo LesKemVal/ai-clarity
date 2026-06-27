@@ -3189,6 +3189,38 @@ const beginProofOfAwareness = async () => {
         previousPattern: '',
       })
 
+      const supportCapabilityLines = (style: LiveBriefingSupportPanelId) => {
+        const outcome = objectiveLabel || 'your desired outcome'
+        const signalLines = georgeSupportItems.map((item) => item.line).slice(0, 2)
+
+        const styleLines =
+          style === 'completion'
+            ? [
+                'finish explanations without losing momentum',
+                'recover your train of thought after pressure or interruption',
+                `keep continuation aligned with ${outcome}`,
+              ]
+            : style === 'response'
+              ? [
+                  'shape answers to questions, pressure, or objections',
+                  'give you wording you can use, revise, shorten, or ignore',
+                  `keep responses tied to ${outcome}`,
+                ]
+              : style === 'presentation'
+                ? [
+                    'organize longer explanations into a clear sequence',
+                    'help you regroup if the room interrupts or drifts',
+                    `keep delivery pointed toward ${outcome}`,
+                  ]
+                : [
+                    'adjust your posture, timing, pacing, or next move',
+                    'surface a short question, cue, or line when it materially helps',
+                    `protect movement toward ${outcome}`,
+                  ]
+
+        return [...styleLines, ...signalLines].slice(0, 5)
+      }
+
       const confirmPrivacyAndContinue = () => {
         setLiveRecoveryAcknowledged(true)
         setLiveBriefingCapabilitiesConfirmed(true)
@@ -3240,7 +3272,7 @@ const beginProofOfAwareness = async () => {
               </div>
 
               <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                Choose how support is delivered during this conversation. GEORGE starts with Cue. You can keep the recommended setting or choose a different support style for this room.
+                Choose how GEORGE supports this room. Each style shows what I can already help you do based on the outcome and signal you’ve given me.
               </p>
 
               <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
@@ -3248,26 +3280,26 @@ const beginProofOfAwareness = async () => {
                   {
                     id: 'advice',
                     label: 'Cue',
-                    line: 'Brief support delivered at the right moment.',
-                    detail: 'I provide short signals that help you recognize opportunities, avoid mistakes, recover your train of thought, identify risks, or decide what to do next. Examples: “Slow down,” “Ask why,” “Anchor value first,” or “Return to the objective.”',
+                    line: 'Adaptive support delivered at the right moment.',
+                    detail: 'I use the least intrusive intervention that can materially improve your chances: a cue, question, short line, posture adjustment, or timing signal. Brevity is preferred, but not the law.',
                   },
                   {
                     id: 'completion',
                     label: 'Continuation',
-                    line: 'I help continue your thought.',
-                    detail: 'Say a few words and pause. I provide a continuation that preserves your point, supports the desired outcome, and helps you keep moving. Useful when presenting, explaining, negotiating, or recovering after interruption.',
+                    line: 'I help preserve your trajectory.',
+                    detail: 'Say a few words and pause. If enough evidence exists, I can continue your thought. If not, I preserve structure, pacing, and direction without inventing facts.',
                   },
                   {
                     id: 'response',
                     label: 'Response',
-                    line: 'I provide a complete answer.',
-                    detail: 'Useful when answering questions, handling objections, responding under pressure, or discussing unfamiliar topics. I provide a complete response you can adapt, repeat, hear, or read.',
+                    line: 'I provide a complete response.',
+                    detail: 'Useful when questions, objections, pressure, or unfamiliar topics require more than a cue. I provide a complete response you can use, revise, shorten, ignore, or reword.',
                   },
                   {
                     id: 'presentation',
                     label: 'Presentation',
-                    line: 'I help organize and deliver information.',
-                    detail: 'Useful for interviews, investor meetings, negotiations, proposals, and presentations. GEORGE structures information into a clear, easy-to-follow sequence.',
+                    line: 'I help structure and deliver longer information.',
+                    detail: 'Useful when the room requires structured explanation, sequence, framing, or delivery. I help organize information without replacing your judgment or responsibility.',
                   },
                 ] as Array<{ id: LiveBriefingSupportPanelId; label: string; line: string; detail: string }>).map((panel) => {
                   const active = activeSupportStyle === panel.id
@@ -3310,6 +3342,22 @@ const beginProofOfAwareness = async () => {
                           }`}>
                             <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                               {panel.detail}
+                            </span>
+
+                            <span className="mt-3 block rounded-[0.72rem] border border-white/[0.045] bg-white/[0.018] px-3 py-2">
+                              <span className="block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/24">
+                                What I can do here
+                              </span>
+                              <span className="mt-2 block space-y-1.5">
+                                {supportCapabilityLines(panel.id).map((line) => (
+                                  <span key={line} className="block text-[11px] leading-4 text-[#D7DBE4]/46">
+                                    · {line}
+                                  </span>
+                                ))}
+                              </span>
+                              <span className="mt-2 block text-[10.5px] leading-4 text-white/28">
+                                More briefing makes this more specific. You decide what to use, reword, or ignore.
+                              </span>
                             </span>
                           </span>
                         </span>
