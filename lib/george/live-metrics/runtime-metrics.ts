@@ -6,6 +6,7 @@ export type GeorgeRuntimeMetricEvent =
   | 'deepgram_final'
   | 'transcript_input'
   | 'hub_transcript_queued'
+  | 'hub_transcript_flushed'
   | 'hub_transcript_sent'
   | 'hub_action_cue_received'
   | 'action_cue'

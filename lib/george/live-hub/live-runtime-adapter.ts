@@ -38,6 +38,10 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         isFinal: next.isFinal,
       })
 
+      if (next.turnId) {
+        markRuntimeEvent(next.turnId, 'hub_transcript_flushed')
+      }
+
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',
         text: next.text,
