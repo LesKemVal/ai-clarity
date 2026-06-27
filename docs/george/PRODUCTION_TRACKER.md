@@ -186,3 +186,233 @@ Do not commit if build fails.
 
 Do not add git save/commit commands inside build patches.
 
+
+# =====================================================================
+# CONTINUITY MEMORY (LOCKED PRODUCT DIRECTION)
+# =====================================================================
+
+## Product Principle
+
+Continuity is an internal GEORGE capability.
+
+It is not a user workflow.
+
+Users should never need to manually manage memory.
+
+GEORGE owns continuity.
+
+Normal GEORGE and LIVE share the same continuity system.
+
+There is one GEORGE.
+
+---
+
+## Mission
+
+Every completed session automatically produces a structured continuity object.
+
+Future sessions automatically retrieve relevant continuity whenever the user naturally references:
+
+- a project
+- a previous discussion
+- a prior decision
+- a meeting
+- an interview
+- a negotiation
+- a company
+- a customer
+- a repository
+- a feature
+- a runtime
+- an architecture discussion
+
+Users should interact naturally.
+
+GEORGE should understand naturally.
+
+---
+
+## Internal Rule
+
+Continuity retrieval happens before reasoning.
+
+Reasoning always operates from:
+
+Current Conversation
+
++
+
+Relevant Continuity
+
++
+
+Current User Signal
+
+GEORGE should reason as though work has been continuous across sessions.
+
+---
+
+## Retrieval Philosophy
+
+Reason from signals.
+
+Not exact words.
+
+Examples:
+
+"Continue GEORGE."
+
+"Resume production."
+
+"Let's work on LIVE."
+
+"Go back to the Amazon interview."
+
+"Continue yesterday."
+
+"Remember the confidence meter."
+
+GEORGE should identify the correct project and retrieve the appropriate continuity automatically.
+
+---
+
+## Continuity Hierarchy
+
+User
+
+↓
+
+Projects
+
+↓
+
+Sessions
+
+↓
+
+Decisions
+
+↓
+
+Artifacts
+
+↓
+
+Files
+
+↓
+
+Commits
+
+↓
+
+Next Actions
+
+Projects own sessions.
+
+Sessions accumulate project knowledge.
+
+Nothing is lost between sessions.
+
+---
+
+## Continuity Object
+
+Each completed session should automatically capture:
+
+• project identity
+
+• session objective
+
+• decisions made
+
+• philosophy changes
+
+• architecture changes
+
+• files modified
+
+• commits created
+
+• testing completed
+
+• runtime changes
+
+• completed work
+
+• unfinished work
+
+• blockers
+
+• risks
+
+• recommended next actions
+
+This object exists for retrieval.
+
+It is not simply a conversation summary.
+
+---
+
+## Project Resolution
+
+One user may have multiple projects.
+
+Each project maintains its own continuity chain.
+
+GEORGE should determine which project the user means through conversational signals.
+
+If ambiguity exists,
+
+GEORGE may ask one clarifying question.
+
+Otherwise,
+
+retrieve automatically.
+
+---
+
+## User Agency
+
+The user remains authoritative.
+
+Users may always request:
+
+• ignore previous work
+
+• compare earlier sessions
+
+• restore an earlier direction
+
+• continue another project
+
+• start a completely new project
+
+Automatic continuity never overrides explicit user intent.
+
+---
+
+## Future Direction
+
+Continuity should eventually support:
+
+• project timelines
+
+• architecture history
+
+• decision history
+
+• milestone tracking
+
+• searchable sessions
+
+• cross-project reasoning
+
+• confidence scoring
+
+• automatic project health reports
+
+• automatic production summaries
+
+Continuity becomes one of GEORGE's core runtime systems.
+
