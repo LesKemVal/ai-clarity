@@ -6,6 +6,7 @@ const scenarios = [
   ['Response mode runtime behavior', './george-behavior/response-mode-runtime.mjs'],
   ['Desired outcome preservation', './george-behavior/outcome-preservation-runtime.mjs'],
   ['Outcome change detection', './george-behavior/outcome-change-detection.mjs'],
+  ['Operational investor outcome flow', './george-behavior/operational-flow-runtime.mjs'],
   ['Delivery cannot alter meaning', './george-behavior/delivery-meaning.mjs'],
   ['Briefing propagation', './george-behavior/briefing-propagation.mjs'],
 ]
