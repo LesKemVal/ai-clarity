@@ -21,6 +21,7 @@ const scenarios = [
   ['Outcome progression', './george-behavior/outcome-progression.mjs'],
   ['Signal sufficiency', './george-behavior/signal-sufficiency.mjs'],
   ['Interrupted thought recovery', './george-behavior/interrupted-thought-recovery.mjs'],
+  ['Objection recovery', './george-behavior/objection-recovery.mjs'],
 ]
 
 let failed = 0

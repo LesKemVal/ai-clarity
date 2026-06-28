@@ -749,9 +749,11 @@ Current scenarios:
 
 ✓ Interrupted thought recovery
 
+✓ Objection recovery
+
 Behavioral Suite Status:
 
-17 / 17 passing
+18 / 18 passing
 
 ---
 
