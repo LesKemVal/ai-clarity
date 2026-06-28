@@ -49,3 +49,65 @@ export function summarizeConversationIntelligence(
     ],
   }
 }
+
+
+export type OutcomeProgressionReport = {
+  desiredOutcome: string
+  probability: 'increased' | 'unchanged' | 'decreased'
+  reasons: string[]
+  remainingBarriers: string[]
+  missingEvidence: string[]
+  highestLeverageAction: string
+}
+
+export function summarizeOutcomeProgression(
+  input: PostConversationIntelligenceInput
+): OutcomeProgressionReport {
+
+  const transcript = input.transcript.map(t => t.text).join(' ').toLowerCase()
+
+  const reasons:string[]=[]
+  const barriers:string[]=[]
+  const evidence:string[]=[]
+
+  let probability:'increased'|'unchanged'|'decreased'='unchanged'
+
+  if(/next meeting|second meeting|follow up|schedule/i.test(transcript)){
+    probability='increased'
+    reasons.push('Future conversation was invited.')
+  }
+
+  if(/send|pilot|results|proof|evidence|data/i.test(transcript)){
+    evidence.push('Supporting evidence still required.')
+  }
+
+  if(/but|however|concern|risk|not convinced|skeptical/i.test(transcript)){
+    barriers.push('Outstanding resistance remains.')
+  }
+
+  if(probability==='unchanged' && barriers.length){
+    probability='decreased'
+  }
+
+  return{
+
+    desiredOutcome:input.desiredOutcome,
+
+    probability,
+
+    reasons,
+
+    remainingBarriers:barriers,
+
+    missingEvidence:evidence,
+
+    highestLeverageAction:
+      evidence.length
+        ? 'Provide the requested evidence.'
+        : barriers.length
+          ? 'Resolve the strongest remaining objection.'
+          : 'Advance the next conversation while momentum is positive.'
+
+  }
+
+}

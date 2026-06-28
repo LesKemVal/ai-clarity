@@ -27,7 +27,7 @@ export function run() {
 
       {
         speaker:'other_party',
-        text:'Let's schedule another discussion after that.'
+        text:"Let's schedule another discussion after that."
       }
 
     ]

@@ -743,9 +743,11 @@ Current scenarios:
 
 ✓ Post-conversation intelligence
 
+✓ Outcome progression
+
 Behavioral Suite Status:
 
-14 / 14 passing
+15 / 15 passing
 
 ---
 
