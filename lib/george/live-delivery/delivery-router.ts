@@ -25,12 +25,12 @@ export function routeGeorgeDeliveryCue(input: {
   }
 
   const cleanGenerated = rawCue
-    .replace(/^(cue|advice|say|ask|response|presentation):\s*/i, '')
+    .replace(/^(cue|advice|response|presentation):\s*/i, '')
     .replace(/^["“”]+|["“”]+$/g, '')
     .trim()
 
   const imperativeCuePattern =
-    /^(ask|clarify|maintain|reassess|slow|pause|control|anchor|focus|lead|return|listen|confirm|probe|surface|verify|build)\b/i
+    /^(ask|clarify|maintain|reassess|pause|control|anchor|focus|lead|return|listen|confirm|probe|surface|verify|build|find|did|try)\b/i
 
   const continuationText = (() => {
     if (cleanGenerated.startsWith('...')) return cleanGenerated

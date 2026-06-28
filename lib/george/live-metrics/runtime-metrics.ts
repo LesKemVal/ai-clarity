@@ -13,6 +13,7 @@ export type GeorgeRuntimeMetricEvent =
   | 'delivery_cue'
   | 'delivery_revision'
   | 'delivery_duplicate_suppressed'
+  | 'delivery_revision_suppressed'
   | 'visual_cue_received'
   | 'visual_cue_rendered'
   | 'voice_cue_requested'

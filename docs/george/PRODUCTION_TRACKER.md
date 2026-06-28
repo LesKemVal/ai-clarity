@@ -739,9 +739,11 @@ Current scenarios:
 
 ✓ Intervention timing
 
+✓ Delivery commitment
+
 Behavioral Suite Status:
 
-12 / 12 passing
+13 / 13 passing
 
 ---
 
