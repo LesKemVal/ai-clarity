@@ -885,3 +885,169 @@ If the answer is no,
 
 the implementation is incomplete.
 
+
+
+---
+
+# Post-Production Architectural Consolidation (Do Not Perform Before Production)
+
+Purpose:
+
+Reduce architectural duplication.
+
+Improve portability.
+
+Do **not** change externally observable behavior.
+
+Behavioral certification remains authoritative.
+
+---
+
+## Outcome Priority Authority
+
+Current outcome reasoning is intentionally distributed while production hardening continues.
+
+After production:
+
+Extract a single Outcome Priority Authority.
+
+Target flow:
+
+Highest-Priority Desired Outcome
+
+↓
+
+Operational Intervention
+
+↓
+
+Response Policy
+
+↓
+
+Delivery Authority
+
+↓
+
+Delivery
+
+Every runtime subsystem should consume the active prioritized desired outcome from this authority instead of independently inferring outcomes.
+
+---
+
+## Bridge Selection Authority
+
+Current bridge behavior spans several runtime components.
+
+Do not introduce additional bridge libraries.
+
+After production:
+
+• consolidate bridge selection into one authority
+
+• preserve existing wording
+
+• remove duplicated bridge logic
+
+• maintain one operational source of truth
+
+Bridge selection remains behavioral.
+
+Bridge wording remains portable.
+
+---
+
+## Intent Classification Authority
+
+Intent recognition currently exists in multiple runtime modules.
+
+Examples include:
+
+• "what do I say"
+
+• "help me"
+
+• "jump in"
+
+• "say something"
+
+After production:
+
+Extract one shared runtime intent classifier.
+
+All runtime systems should consume identical intent classifications.
+
+---
+
+## Response Policy Evolution
+
+Current response policy is event-oriented.
+
+Long-term target:
+
+Highest-Priority Desired Outcome
+
+↓
+
+Operational Intervention
+
+↓
+
+Response Form
+
+↓
+
+Delivery
+
+rather than event-first reasoning.
+
+This is an architectural simplification only.
+
+Behavior must remain identical.
+
+---
+
+## Runtime Philosophy
+
+Every runtime decision should eventually answer one question before execution:
+
+Does this measurably increase the probability of achieving the user's highest-priority desired outcome?
+
+If not,
+
+GEORGE should not do it.
+
+This doctrine governs:
+
+• reasoning
+
+• cue depth
+
+• response
+
+• presentation
+
+• silence
+
+• delivery timing
+
+• bridges
+
+• commitment
+
+• post-conversation intelligence
+
+• portability
+
+Everything else is implementation.
+
+---
+
+Production First.
+
+Refactor Later.
+
+Behavior is the contract.
+
+Architecture serves behavior.
+
