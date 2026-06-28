@@ -741,9 +741,11 @@ Current scenarios:
 
 ✓ Delivery commitment
 
+✓ Post-conversation intelligence
+
 Behavioral Suite Status:
 
-13 / 13 passing
+14 / 14 passing
 
 ---
 

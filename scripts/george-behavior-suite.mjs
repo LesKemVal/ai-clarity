@@ -17,6 +17,7 @@ const scenarios = [
   ['Long-session stability', './george-behavior/long-session-stability.mjs'],
   ['Intervention timing', './george-behavior/intervention-timing.mjs'],
   ['Delivery commitment', './george-behavior/delivery-commitment.mjs'],
+  ['Post-conversation intelligence', './george-behavior/post-conversation-intelligence.mjs'],
 ]
 
 let failed = 0
