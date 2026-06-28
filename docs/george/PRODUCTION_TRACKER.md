@@ -735,9 +735,11 @@ Current scenarios:
 
 ✓ Briefing propagation
 
+✓ Long-session stability
+
 Behavioral Suite Status:
 
-10 / 10 passing
+11 / 11 passing
 
 ---
 
