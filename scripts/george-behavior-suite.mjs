@@ -20,6 +20,7 @@ const scenarios = [
   ['Post-conversation intelligence', './george-behavior/post-conversation-intelligence.mjs'],
   ['Outcome progression', './george-behavior/outcome-progression.mjs'],
   ['Signal sufficiency', './george-behavior/signal-sufficiency.mjs'],
+  ['Interrupted thought recovery', './george-behavior/interrupted-thought-recovery.mjs'],
 ]
 
 let failed = 0

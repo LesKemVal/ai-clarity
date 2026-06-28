@@ -747,9 +747,11 @@ Current scenarios:
 
 ✓ Signal sufficiency
 
+✓ Interrupted thought recovery
+
 Behavioral Suite Status:
 
-16 / 16 passing
+17 / 17 passing
 
 ---
 
