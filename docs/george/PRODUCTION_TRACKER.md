@@ -1051,3 +1051,77 @@ Behavior is the contract.
 
 Architecture serves behavior.
 
+
+
+---
+
+## Post-Production Removal Candidates
+
+These appear to be remnants of earlier scenario-specific runtime iterations rather than the current outcome-first architecture.
+
+Do not remove until production certification is complete and behavioral validation confirms no dependency.
+
+### Candidate removals
+
+Objective templates
+
+- LIVE_OBJECTIVES
+- LiveObjectiveId
+
+Scenario objectives
+
+- secure_raise
+- book_appointment
+- stay_safe
+- deescalate
+- hold_frame
+
+Scenario inference
+
+- inferObjectiveHypothesis()
+- inferObjectiveFromText()
+
+Scenario reinforcement
+
+- reinforceObjective()
+
+### Removal criteria
+
+Before deleting any candidate:
+
+✓ no production runtime dependency
+
+✓ no behavioral test dependency
+
+✓ no delivery dependency
+
+✓ no portability dependency
+
+✓ no regression in behavioral certification
+
+### Replacement doctrine
+
+GEORGE no longer reasons from predefined scenarios.
+
+GEORGE reasons from:
+
+Prioritized Desired Outcomes
+
+↓
+
+Operational Signals
+
+↓
+
+Probability of Success
+
+↓
+
+Operational Intervention
+
+↓
+
+Delivery
+
+No scenario-specific objective tables should remain in the production runtime once migration is complete.
+
