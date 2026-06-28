@@ -15,6 +15,7 @@ const scenarios = [
   ['Delivery cannot alter meaning', './george-behavior/delivery-meaning.mjs'],
   ['Briefing propagation', './george-behavior/briefing-propagation.mjs'],
   ['Long-session stability', './george-behavior/long-session-stability.mjs'],
+  ['Intervention timing', './george-behavior/intervention-timing.mjs'],
 ]
 
 let failed = 0

@@ -737,9 +737,11 @@ Current scenarios:
 
 ✓ Long-session stability
 
+✓ Intervention timing
+
 Behavioral Suite Status:
 
-11 / 11 passing
+12 / 12 passing
 
 ---
 
@@ -840,6 +842,32 @@ noisy transcripts
 while preserving user objective.
 
 ---
+
+
+
+## Intervention Timing Doctrine
+
+Timing is part of correctness.
+
+Cue is the default/adaptive support style.
+
+Cue means GEORGE chooses the smallest effective intervention needed to move the user toward the desired outcome.
+
+Cue depth is GEORGE's adaptive decision inside Cue.
+
+Support style does not change.
+
+Depth may change.
+
+Least possible words remains the optimization.
+
+Continuation occurs only after a genuine continuation opportunity.
+
+Response occurs only when a complete response is warranted or selected.
+
+Presentation occurs only when the user selected Presentation.
+
+Silence occurs when intervention would not improve the outcome or user agency requires GEORGE to hold.
 
 ## Core Testing Philosophy
 
