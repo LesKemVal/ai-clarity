@@ -19,6 +19,7 @@ const scenarios = [
   ['Delivery commitment', './george-behavior/delivery-commitment.mjs'],
   ['Post-conversation intelligence', './george-behavior/post-conversation-intelligence.mjs'],
   ['Outcome progression', './george-behavior/outcome-progression.mjs'],
+  ['Signal sufficiency', './george-behavior/signal-sufficiency.mjs'],
 ]
 
 let failed = 0

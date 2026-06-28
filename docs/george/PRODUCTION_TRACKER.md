@@ -745,9 +745,11 @@ Current scenarios:
 
 ✓ Outcome progression
 
+✓ Signal sufficiency
+
 Behavioral Suite Status:
 
-15 / 15 passing
+16 / 16 passing
 
 ---
 
