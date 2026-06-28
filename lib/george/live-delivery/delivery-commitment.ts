@@ -15,6 +15,10 @@ export type GeorgeDeliveryCandidate = {
   confidence?: number
   priority?: number
   materiallyBetter?: boolean
+
+  highestPriorityOutcome?: string
+  outcomeProbabilityDelta?: number
+  outcomeReason?: string
 }
 
 export type GeorgeDeliveryCommitmentDecision =
@@ -40,11 +44,17 @@ const MATERIAL_IMPROVEMENT_DELTA = 0.18
 function scoreCandidate(input: {
   confidence?: number
   priority?: number
+  outcomeProbabilityDelta?: number
 }) {
   const confidence = Number(input.confidence || 0)
   const priority = Number(input.priority || 0)
+  const outcome = Number(input.outcomeProbabilityDelta || 0)
 
-  return confidence + Math.min(priority, 10) / 100
+  return (
+    confidence +
+    Math.min(priority,10)/100 +
+    outcome
+  )
 }
 
 export function evaluateGeorgeDeliveryCommitment(input: {
@@ -84,7 +94,11 @@ export function evaluateGeorgeDeliveryCommitment(input: {
   const elapsedMs = Math.max(0, candidate.now - generatedAt)
   const insideWindow = elapsedMs <= deadlineMs
 
-  const currentScore = scoreCandidate(current)
+  const currentScore = scoreCandidate({
+    confidence: current.confidence,
+    priority: current.priority,
+  })
+
   const candidateScore = scoreCandidate(candidate)
   const materiallyBetter =
     Boolean(candidate.materiallyBetter) ||
@@ -113,4 +127,18 @@ export function isGeorgeOperationalBridge(text: string) {
     clean === bridge.toLowerCase() ||
     clean.startsWith(bridge.toLowerCase().replace(/\.\.\.$/, ''))
   ))
+}
+
+
+export function improvesHighestPriorityOutcome(input:{
+  currentProbability:number
+  candidateProbability:number
+  minimumGain?:number
+}){
+
+  const minimumGain=input.minimumGain ?? 0.05
+
+  return (
+    input.candidateProbability-input.currentProbability
+  )>=minimumGain
 }
