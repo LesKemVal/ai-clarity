@@ -755,9 +755,11 @@ Current scenarios:
 
 ✓ Pressure recovery
 
+✓ Adaptive delivery evidence
+
 Behavioral Suite Status:
 
-21 / 21 passing
+22 / 22 passing
 
 ---
 
