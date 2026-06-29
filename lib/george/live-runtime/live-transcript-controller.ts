@@ -45,5 +45,9 @@ export function resolveLiveTranscriptDecision(params: {
       : { type: 'ignore' }
   }
 
+  if (decision.content === 'awareness_check') {
+    return { type: 'send', text: 'Anything?' }
+  }
+
   return { type: 'ignore' }
 }

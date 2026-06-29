@@ -6,6 +6,7 @@ export type LiveSteeringAction =
   | 'bring_it_back'
   | 'hold_the_line'
   | 'close_with'
+  | 'awareness_check'
 
 export type LiveSteeringPhraseMap = Partial<Record<LiveSteeringAction, string[]>>
 
@@ -45,6 +46,13 @@ export const DEFAULT_LIVE_STEERING_PHRASES: LiveSteeringPhraseMap = {
   close_with: [
     'close with',
   ],
+  awareness_check: [
+    'anything',
+    'anything important',
+    'anything i am missing',
+    "anything i'm missing",
+    'what am i missing',
+  ],
 }
 
 function normalizeLiveSteeringText(text: string) {
@@ -61,6 +69,16 @@ function getDefaultSteeringPhrases(action: LiveSteeringAction) {
   return DEFAULT_LIVE_STEERING_PHRASES[action] || []
 }
 
+function getSteeringPhrases(
+  action: LiveSteeringAction,
+  custom?: LiveSteeringPhraseMap
+) {
+  return [
+    ...getDefaultSteeringPhrases(action),
+    ...(custom?.[action] || []),
+  ].filter(Boolean)
+}
+
 const STANDALONE_FILLER_TOKENS = new Set([
   'yeah',
   'okay',
@@ -71,12 +89,16 @@ const STANDALONE_FILLER_TOKENS = new Set([
   'um',
 ])
 
-function isCompressLineSteeringPhrase(text: string) {
-  return matchesLiveSteeringPhrase(text, getDefaultSteeringPhrases('compress_last_line'))
+function isCompressLineSteeringPhrase(text: string, custom?: LiveSteeringPhraseMap) {
+  return matchesLiveSteeringPhrase(text, getSteeringPhrases('compress_last_line', custom))
 }
 
-function isRepeatLineSteeringPhrase(text: string) {
-  return matchesLiveSteeringPhrase(text, getDefaultSteeringPhrases('repeat_last_line'))
+function isRepeatLineSteeringPhrase(text: string, custom?: LiveSteeringPhraseMap) {
+  return matchesLiveSteeringPhrase(text, getSteeringPhrases('repeat_last_line', custom))
+}
+
+function isAwarenessCheckSteeringPhrase(text: string, custom?: LiveSteeringPhraseMap) {
+  return matchesLiveSteeringPhrase(text, getSteeringPhrases('awareness_check', custom))
 }
 
 export function getBuyTimeDurationMs(text: string) {
@@ -91,8 +113,8 @@ export function getBuyTimeDurationMs(text: string) {
   return 0
 }
 
-function isBuyTimeSteeringPhrase(text: string) {
-  return getBuyTimeDurationMs(text) > 0
+function isBuyTimeSteeringPhrase(text: string, custom?: LiveSteeringPhraseMap) {
+  return getBuyTimeDurationMs(text) > 0 || matchesLiveSteeringPhrase(text, getSteeringPhrases('buy_time', custom))
 }
 
 export function isLiveSteeringPhrase(text: string) {
@@ -120,7 +142,11 @@ export type LiveTranscriptDecision =
     }
   | {
       type: 'local'
-      content: string
+      content:
+        | 'buy_time'
+        | 'repeat_last_line'
+        | 'compress_last_line'
+        | 'awareness_check'
     }
   | {
       type: 'send'
@@ -137,6 +163,7 @@ export type LiveTranscriptRoutingContext = {
   isSpeaking?: boolean
   liveMode?: boolean
   buyTimeUntil?: number
+  steeringPhrases?: LiveSteeringPhraseMap
 }
 
 export function routeLiveTranscript(params: {
@@ -192,7 +219,9 @@ export function routeLiveTranscript(params: {
     }
   }
 
-  if (isBuyTimeSteeringPhrase(text)) {
+  const steeringPhrases = params.context?.steeringPhrases
+
+  if (isBuyTimeSteeringPhrase(text, steeringPhrases)) {
     return {
       decision: {
         type: 'local',
@@ -202,7 +231,7 @@ export function routeLiveTranscript(params: {
     }
   }
 
-  if (isRepeatLineSteeringPhrase(text)) {
+  if (isRepeatLineSteeringPhrase(text, steeringPhrases)) {
     return {
       decision: {
         type: 'local',
@@ -212,11 +241,21 @@ export function routeLiveTranscript(params: {
     }
   }
 
-  if (isCompressLineSteeringPhrase(text)) {
+  if (isCompressLineSteeringPhrase(text, steeringPhrases)) {
     return {
       decision: {
         type: 'local',
         content: 'compress_last_line',
+      },
+      nextFinalTranscript: last,
+    }
+  }
+
+  if (isAwarenessCheckSteeringPhrase(text, steeringPhrases)) {
+    return {
+      decision: {
+        type: 'local',
+        content: 'awareness_check',
       },
       nextFinalTranscript: last,
     }
