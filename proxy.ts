@@ -36,7 +36,7 @@ function checkLimit(key: string, limit: number, windowMs: number) {
   return true
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const rule = rules[req.nextUrl.pathname]
 
   if (!rule) return NextResponse.next()
