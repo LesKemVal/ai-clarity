@@ -753,9 +753,11 @@ Current scenarios:
 
 ✓ Outcome shift recovery\n\n✓ Transcript error recovery
 
+✓ Pressure recovery
+
 Behavioral Suite Status:
 
-20 / 20 passing
+21 / 21 passing
 
 ---
 
