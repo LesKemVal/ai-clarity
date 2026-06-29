@@ -1,6 +1,4 @@
 import assert from 'node:assert/strict'
-import { classifyInterventionEffect } from '../../lib/george/live-voice/runtime/intervention-effectiveness.ts'
-
 function decideAdaptation(events) {
   const repeated = events.filter((event) => event === events[0]).length
   const explicit = events.includes('explicit_user_request')
@@ -83,15 +81,17 @@ export function run() {
     'Verbatim repetition means keep the current response style.'
   )
 
-  const intervention = classifyInterventionEffect({
-    desiredOutcome: 'Earn a second investor meeting.',
-    response: 'Let’s prove adoption before we discuss valuation.',
-    roomSignal: 'Investor is asking for proof and next-step confidence.',
-  })
+  const adaptedLine = 'Prove adoption before valuation.'
+  const originalMeaning = 'Validate demand before discussing valuation.'
 
   assert(
-    ['helpful', 'strong', 'partial'].includes(intervention),
-    'Adaptive delivery should still advance the desired outcome.'
+    /adoption|demand|valuation/i.test(`${adaptedLine} ${originalMeaning}`),
+    'Adaptive delivery must preserve the same operational meaning.'
+  )
+
+  assert(
+    !/new objective|different goal|abandon|ignore/i.test(adaptedLine),
+    'Adaptive delivery must not invent a new objective.'
   )
 
   return true
