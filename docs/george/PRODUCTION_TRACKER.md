@@ -751,11 +751,11 @@ Current scenarios:
 
 ✓ Objection recovery
 
-✓ Outcome shift recovery
+✓ Outcome shift recovery\n\n✓ Transcript error recovery
 
 Behavioral Suite Status:
 
-19 / 19 passing
+20 / 20 passing
 
 ---
 

@@ -23,6 +23,7 @@ const scenarios = [
   ['Interrupted thought recovery', './george-behavior/interrupted-thought-recovery.mjs'],
   ['Objection recovery', './george-behavior/objection-recovery.mjs'],
   ['Outcome shift recovery', './george-behavior/outcome-shift-recovery.mjs'],
+  ['Transcript error recovery', './george-behavior/transcript-error-recovery.mjs'],
 ]
 
 let failed = 0
