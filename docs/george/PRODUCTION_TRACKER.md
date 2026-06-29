@@ -1169,3 +1169,40 @@ The user should not be shown this full adaptation logic.
 
 User-facing copy should remain simple.
 
+
+
+## LIVE Delivery Authority Boundaries
+
+Do not merge or expand delivery authorities casually.
+
+Each authority must answer one question.
+
+Response Policy:
+Should GEORGE offer support, and what general form should that support take?
+
+Adaptive Delivery Policy:
+How should support style be biased by accumulated user behavior and runtime evidence?
+
+Response Shaper:
+How should the selected delivery be expressed in wording, density, tone, and compression?
+
+Silence Intelligence:
+Is saying nothing currently the highest-value action?
+
+Delivery Commitment:
+Is the pending delivery still worth delivering before the timing window expires?
+
+Cue Depth:
+How much cue-level support is appropriate when the selected support style is Cue?
+
+Steering Phrase Routing:
+What user intent signal was detected from survivable in-room language?
+
+Rule:
+No module should independently own another module's question.
+
+If two modules answer the same question, consolidate after production.
+
+If one module answers multiple questions, split after production.
+
+Behavioral certification remains authoritative.
