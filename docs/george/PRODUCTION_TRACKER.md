@@ -1139,3 +1139,31 @@ Delivery
 
 No scenario-specific objective tables should remain in the production runtime once migration is complete.
 
+
+
+## Adaptive Delivery Doctrine
+
+Do not expose full adaptation logic to the user.
+
+The user's selected support style remains authoritative, but support style is a bias, not a separate reasoning engine.
+
+Cue biases toward the smallest useful intervention.
+
+Response biases toward usable wording or a line.
+
+Presentation remains singular and structured.
+
+All non-presentation support styles may compress, expand, hold, or sharpen delivery only when doing so materially increases the probability of the user's highest-priority desired outcome.
+
+Do not create separate adaptive engines for each support style.
+
+One Adaptive Delivery Authority should eventually govern delivery shape across support styles.
+
+Steering phrases are user intent signals.
+
+They request operational assistance but do not override GEORGE's judgment, support style, or desired-outcome priority.
+
+The user should not be shown this full adaptation logic.
+
+User-facing copy should remain simple.
+
