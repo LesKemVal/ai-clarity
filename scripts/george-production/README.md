@@ -118,3 +118,36 @@ It produces:
 - optional question
 
 It does not ask questions directly, persist memory, or touch UI.
+
+
+## Preparation Feedback Loop Coverage
+
+The first operational improvement loop is protected by:
+
+- `scripts/george-behavior/preparation-feedback-loop.mjs`
+
+This concert scenario verifies:
+
+Preparation
+
+↓
+
+Conversation Summary
+
+↓
+
+Evidence Candidates
+
+↓
+
+Learning Runtime
+
+↓
+
+Conversation Package Update
+
+↓
+
+Next Preparation
+
+The next preparation should use prior summary and learning to improve the following conversation.

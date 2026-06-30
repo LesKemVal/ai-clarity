@@ -60,7 +60,8 @@
       ],
       "concertBehavior": [
         "scripts/george-behavior/conversation-package-runtime.mjs",
-        "scripts/george-behavior/conversation-package-concert.mjs"
+        "scripts/george-behavior/conversation-package-concert.mjs",
+        "scripts/george-behavior/preparation-feedback-loop.mjs"
       ],
       "invariants": [
         "continue existing package when evidence supports continuity",
@@ -74,7 +75,9 @@
       "targetedBehavior": [
         "scripts/george-behavior/conversation-summary-runtime.mjs"
       ],
-      "concertBehavior": [],
+      "concertBehavior": [
+        "scripts/george-behavior/preparation-feedback-loop.mjs"
+      ],
       "invariants": [
         "summary preserves desired outcome",
         "summary produces evidence candidates",
@@ -88,7 +91,9 @@
       "targetedBehavior": [
         "scripts/george-behavior/learning-runtime.mjs"
       ],
-      "concertBehavior": [],
+      "concertBehavior": [
+        "scripts/george-behavior/preparation-feedback-loop.mjs"
+      ],
       "invariants": [
         "outcome relevance is evaluated before learning promotion",
         "high confidence alone does not preserve unrelated evidence",
@@ -102,7 +107,9 @@
       "targetedBehavior": [
         "scripts/george-behavior/preparation-runtime.mjs"
       ],
-      "concertBehavior": [],
+      "concertBehavior": [
+        "scripts/george-behavior/preparation-feedback-loop.mjs"
+      ],
       "invariants": [
         "preparation is tied to desired outcome",
         "known context includes summaries and learning",
