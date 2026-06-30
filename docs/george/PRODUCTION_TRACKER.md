@@ -1757,3 +1757,12 @@ Conversation Packages exist to reduce cognitive load and improve future executio
 
 If storing something in a Conversation Package does not improve preparation, support, learning, follow-up, or future outcome probability, it should not be retained there.
 
+
+
+## Conversation Package Identification Runtime
+
+Implemented the first runtime primitive for Conversation Packages.
+
+GEORGE can now score whether a new objective appears to continue an existing Conversation Package, needs user confirmation, or should begin as a new Conversation Package.
+
+This supports the doctrine that the user should not manage folders, chats, or sessions. GEORGE should organize work around outcomes and conversations.

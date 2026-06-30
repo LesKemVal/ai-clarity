@@ -27,6 +27,7 @@ const scenarios = [
   ['Pressure recovery', './george-behavior/pressure-recovery.mjs'],
   ['Adaptive delivery evidence', './george-behavior/adaptive-delivery-evidence.mjs'],
   ['Speech synchronization', './george-behavior/speech-synchronization.mjs'],
+  ['Conversation package identification', './george-behavior/conversation-package-identification.mjs'],
 ]
 
 let failed = 0
