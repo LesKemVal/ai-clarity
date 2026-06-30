@@ -206,74 +206,79 @@ const OBSERVED_REALITY_EXAMPLES: Record<string, string> = {
 }
 
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
+  const base = {
+    label: 'Relevant Documentation',
+    helper: 'These documents could improve my understanding of this conversation. Upload only what you think will help.',
+  }
+
   if (conversationType === 'Interview') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload résumé',
-      helper: 'Resume, job description, cover letter, or notes GEORGE should use.',
-      resource: 'resume/document preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Resume', 'Job description', 'Portfolio', 'Recruiter email', 'Company notes'],
+      resource: 'interview documentation preload',
     }
   }
 
   if (conversationType === 'Boardroom') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload deck or memo',
-      helper: 'Deck, board memo, metrics, forecast, agenda, objections, or executive notes.',
-      resource: 'boardroom material preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Deck', 'Board memo', 'KPI report', 'Forecast', 'Agenda'],
+      resource: 'boardroom documentation preload',
     }
   }
 
   if (conversationType === 'Negotiation') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload offer or terms',
-      helper: 'Offer, contract, pricing, terms, notes, or leverage points.',
-      resource: 'terms/document preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Contract', 'Offer letter', 'Pricing sheet', 'Previous emails', 'Terms'],
+      resource: 'negotiation documentation preload',
     }
   }
 
   if (conversationType === 'Doctor Appointment') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload notes',
-      helper: 'Symptoms, questions, lab notes, medications, timeline, or concerns.',
-      resource: 'medical notes preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Symptoms timeline', 'Lab results', 'Medication list', 'Questions', 'Insurance notes'],
+      resource: 'medical documentation preload',
     }
   }
 
   if (conversationType === 'Sales Call') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload pitch notes',
-      helper: 'Product notes, objection notes, pricing, offer, or prospect context.',
-      resource: 'sales brief preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Product notes', 'Pricing', 'Prospect context', 'Objection notes', 'Offer'],
+      resource: 'sales documentation preload',
     }
   }
 
   if (conversationType === 'Presentation') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload outline',
-      helper: 'Slides, outline, speaking notes, or audience context.',
-      resource: 'presentation material preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Slides', 'Outline', 'Speaking notes', 'Audience context', 'Questions'],
+      resource: 'presentation documentation preload',
     }
   }
 
   if (audienceType === 'Investor') {
     return {
-      label: 'Relevant Documentation',
-      action: 'Upload deck or memo',
-      helper: 'Pitch deck, one-pager, investor notes, traction, or risk notes.',
-      resource: 'investor material preload',
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Pitch deck', 'Financial model', 'One-pager', 'Traction summary', 'Customer evidence'],
+      resource: 'investor documentation preload',
     }
   }
 
   return {
-    label: 'Relevant Documentation',
-    action: 'Upload context',
-    helper: 'Upload documents, images, notes, or screenshots that could help me better understand this conversation.',
-    resource: 'context document preload',
+    ...base,
+    action: 'Upload documentation',
+    recommendations: ['Agenda', 'Brief', 'Screenshot', 'Notes', 'Previous messages'],
+    resource: 'conversation documentation preload',
   }
 }
 
@@ -3006,6 +3011,25 @@ const beginProofOfAwareness = async () => {
           <div className="mt-5 space-y-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
             <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
               Review your conversation readiness. Update anything that has changed. GEORGE only needs enough context to begin well. The rest is learned through the conversation.
+            </div>
+
+            <div className="rounded-[0.82rem] border border-[#E7C47D]/[0.10] bg-[#E7C47D]/[0.035] px-4 py-3">
+              <div className="text-[10px] uppercase tracking-[0.22em] text-[#E7C47D]/64">
+                {prepDocumentPrompt.label}
+              </div>
+              <div className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/58">
+                {prepDocumentPrompt.helper}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(prepDocumentPrompt as any).recommendations?.slice(0, 5).map((item: string) => (
+                  <span
+                    key={item}
+                    className="rounded-full bg-white/[0.045] px-3 py-1 text-[10px] tracking-[0.08em] text-white/54"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <label className="block">
