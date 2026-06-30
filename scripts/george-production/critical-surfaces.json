@@ -147,6 +147,43 @@
         "document assets dedupe before reaching runtime setup",
         "does not duplicate /api/extract-file"
       ]
+    },
+    {
+      "path": "app/george/page.tsx",
+      "role": "UI mount surface and normal GEORGE coordinator only.",
+      "targetedBehavior": [],
+      "concertBehavior": [],
+      "invariants": [
+        "must not own operational doctrine",
+        "must not own document intelligence",
+        "must not own learning, summary, or package logic",
+        "may render UI, collect user events, call runtime modules, and route user actions"
+      ]
+    },
+    {
+      "path": "app/george/live-entry/LiveEntryClient.tsx",
+      "role": "LIVE Entry UI and conversation-readiness coordinator only.",
+      "targetedBehavior": [],
+      "concertBehavior": [],
+      "invariants": [
+        "must not duplicate upload extraction pipeline",
+        "must not own Conversation Package logic",
+        "may render readiness UI, collect signal, and call runtime modules"
+      ]
+    },
+    {
+      "path": "lib/george/documents/normal-document-assets.ts",
+      "role": "Maps Normal GEORGE uploads into Document Asset shape.",
+      "targetedBehavior": [
+        "scripts/george-behavior/normal-document-assets.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "Normal GEORGE uploads become Document Assets",
+        "Normal upload context attaches initially to current normal conversation",
+        "normal document assets dedupe before storage",
+        "does not duplicate /api/extract-file"
+      ]
     }
   ]
 }

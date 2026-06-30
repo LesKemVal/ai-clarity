@@ -567,3 +567,29 @@ Conversation Package Update
 Next Preparation
 
 This proves GEORGE can use prior conversation evidence and learning to improve the next conversation without persistence, UI changes, or page-level logic.
+
+
+## Page and UI Boundary Rule
+
+`app/george/page.tsx` and `app/george/live-entry/LiveEntryClient.tsx` are UI surfaces.
+
+They may:
+
+- render interface
+- collect user actions
+- call runtime modules
+- route user actions
+- coordinate display state
+
+They must not own:
+
+- operational doctrine
+- Conversation Package logic
+- document intelligence
+- learning promotion
+- summary generation
+- relevance scoring
+- package attachment decisions
+- LIVE reasoning or delivery meaning
+
+Operational behavior belongs under `lib/george/**` and must be protected by behavior coverage.

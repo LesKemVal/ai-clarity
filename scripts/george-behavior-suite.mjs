@@ -38,6 +38,7 @@ const scenarios = [
   ['Preparation feedback loop', './george-behavior/preparation-feedback-loop.mjs'],
   ['Document Asset runtime', './george-behavior/document-asset-runtime.mjs'],
   ['LIVE Entry document assets', './george-behavior/live-entry-document-assets.mjs'],
+  ['Normal GEORGE document assets', './george-behavior/normal-document-assets.mjs'],
 ]
 
 let failed = 0
