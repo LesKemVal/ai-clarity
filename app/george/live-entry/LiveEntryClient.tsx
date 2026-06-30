@@ -208,7 +208,7 @@ const OBSERVED_REALITY_EXAMPLES: Record<string, string> = {
 function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
   if (conversationType === 'Interview') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload résumé',
       helper: 'Resume, job description, cover letter, or notes GEORGE should use.',
       resource: 'resume/document preload',
@@ -217,7 +217,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (conversationType === 'Boardroom') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload deck or memo',
       helper: 'Deck, board memo, metrics, forecast, agenda, objections, or executive notes.',
       resource: 'boardroom material preload',
@@ -226,7 +226,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (conversationType === 'Negotiation') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload offer or terms',
       helper: 'Offer, contract, pricing, terms, notes, or leverage points.',
       resource: 'terms/document preload',
@@ -235,7 +235,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (conversationType === 'Doctor Appointment') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload notes',
       helper: 'Symptoms, questions, lab notes, medications, timeline, or concerns.',
       resource: 'medical notes preload',
@@ -244,7 +244,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (conversationType === 'Sales Call') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload pitch notes',
       helper: 'Product notes, objection notes, pricing, offer, or prospect context.',
       resource: 'sales brief preload',
@@ -253,7 +253,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (conversationType === 'Presentation') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload outline',
       helper: 'Slides, outline, speaking notes, or audience context.',
       resource: 'presentation material preload',
@@ -262,7 +262,7 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
 
   if (audienceType === 'Investor') {
     return {
-      label: 'Relevant document optional',
+      label: 'Relevant Documentation',
       action: 'Upload deck or memo',
       helper: 'Pitch deck, one-pager, investor notes, traction, or risk notes.',
       resource: 'investor material preload',
@@ -270,9 +270,9 @@ function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
   }
 
   return {
-    label: 'Relevant document optional',
+    label: 'Relevant Documentation',
     action: 'Upload context',
-    helper: 'Agenda, brief, screenshot, notes, or anything GEORGE should account for.',
+    helper: 'Upload documents, images, notes, or screenshots that could help me better understand this conversation.',
     resource: 'context document preload',
   }
 }
@@ -3000,16 +3000,16 @@ const beginProofOfAwareness = async () => {
       return (
         <PanelShell
           label="BRIEF ROOM · EDITABLE"
-          title={liveBriefingToaAccepted ? 'The room has now taken shape.' : 'The room is taking shape.'}
+          title={liveBriefingToaAccepted ? 'Your conversation has taken shape.' : 'Your conversation is taking shape.'}
           stage={1}
         >
           <div className="mt-5 space-y-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
             <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
-              Review the room. Edit anything that changed.
+              Review your conversation readiness. Update anything that has changed. GEORGE only needs enough context to begin well. The rest is learned through the conversation.
             </div>
 
             <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Objective</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Desired Outcome</div>
               <textarea
                 value={objective}
                 disabled={briefingInputsLocked}
@@ -3022,7 +3022,7 @@ const beginProofOfAwareness = async () => {
 
             <div className="grid grid-cols-2 gap-3">
               <label className="block">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Position</div>
+                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Your Role</div>
                 <input
                   value={userPosition}
                   disabled={briefingInputsLocked}
@@ -3033,7 +3033,7 @@ const beginProofOfAwareness = async () => {
               </label>
 
               <label className="block">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Audience</div>
+                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Conversation With</div>
                 <input
                   value={audienceType}
                   disabled={briefingInputsLocked}
@@ -3045,7 +3045,7 @@ const beginProofOfAwareness = async () => {
             </div>
 
             <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Room signal</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Known Conversation Context</div>
               <textarea
                 value={knownContext}
                 disabled={briefingInputsLocked}
@@ -3057,7 +3057,7 @@ const beginProofOfAwareness = async () => {
             </label>
 
             <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Next optional signal</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Additional Context (Optional)</div>
               <textarea
                 disabled={briefingInputsLocked}
                 value={secondaryPosition}
@@ -3272,7 +3272,7 @@ const beginProofOfAwareness = async () => {
               </div>
 
               <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                Choose how GEORGE supports this room. Each style shows what I can already help you do based on the outcome and signal you’ve given me.
+                Choose how GEORGE supports this conversation. Each style shows what I can already help you do based on the outcome and signal you’ve given me.
               </p>
 
               <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
@@ -3393,7 +3393,7 @@ const beginProofOfAwareness = async () => {
               />
 
               <span className="text-[12px] leading-5">
-                I understand that you provide support discreetly, and I remain responsible for the room.{' '}
+                I understand that GEORGE provides support discreetly, and I remain responsible for the conversation, my decisions, and my actions.{' '}
                 <button
                   type="button"
                   onClick={(event) => {
@@ -3485,7 +3485,7 @@ const beginProofOfAwareness = async () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                  Room objective confirmed
+                  Conversation objective confirmed
                 </div>
                 <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
                   {selectedLiveRoomObjective ? selectedLiveRoomObjective.label : 'Primary outcome only'}
