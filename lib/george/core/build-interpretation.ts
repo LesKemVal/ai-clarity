@@ -6,6 +6,9 @@ import { georgeTrajectoryEngine } from '@/lib/george/live-voice/runtime/trajecto
 import { deriveActiveOutcome } from '@/lib/george/live-voice/runtime/active-outcome'
 import { georgeOutcomeGovernor } from '@/lib/george/live-voice/runtime/outcome-governor'
 import { createGeorgeCoreInterpretation } from './interpretation'
+import { evaluateSignalSufficiency } from '@/lib/george/runtime/signal-sufficiency'
+import { rankSignals } from '@/lib/george/runtime/signal-ranking'
+import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 
 export function buildGeorgeCoreInterpretation(input: {
   transcript: string
@@ -18,6 +21,7 @@ export function buildGeorgeCoreInterpretation(input: {
 }) {
   const text = String(input.transcript || '').trim()
   const context = [input.shadowMap, text].filter(Boolean).join('\n')
+  const signalText = [input.desiredOutcome, input.knownContext, context].filter(Boolean).join('\n')
 
   const conversationSignals = detectConversationSignals(context)
 
@@ -62,6 +66,14 @@ export function buildGeorgeCoreInterpretation(input: {
     speakerIntent.intent === 'addressed_to_george' ||
     speakerIntent.intent === 'assisted_continuation'
 
+  const signalSufficiency = evaluateSignalSufficiency({
+    transcript: text,
+    outcome: input.desiredOutcome,
+    context: input.knownContext,
+  })
+
+  const rankedSignals = rankSignals(signalText)
+
   const outcomeGovernor = georgeOutcomeGovernor.evaluate({
     objectiveKnown: Boolean(input.desiredOutcome) || objectiveHypothesis.confidence >= 0.72,
     desiredOutcome: input.desiredOutcome,
@@ -88,6 +100,23 @@ export function buildGeorgeCoreInterpretation(input: {
       speakerIntent.intent === 'ambiguous',
   })
 
+  const operationalConfidence = Number(
+    Math.max(
+      signalSufficiency.confidence,
+      speakerIntent.confidence,
+      trajectory.score
+    ).toFixed(3)
+  )
+
+  const signalArbitration = arbitrateRuntimeSignals({
+    explicitUserSignal: userHasRequestedHelp,
+    objectiveRisk: ['protect_position', 'buy_time', 'context_recovery'].includes(outcomeGovernor.move),
+    livePressure: roomAnalysis.pressure === 'authority' || roomAnalysis.pressure === 'high',
+    emotionalCareNeeded: roomAnalysis.emotionalTemperature > 0.7,
+    shouldCompress: input.room === 'LIVE' || input.room === 'Investor Meeting',
+    shouldNarrow: !signalSufficiency.sufficient,
+  })
+
   return createGeorgeCoreInterpretation({
     speakerIntent,
     conversationSignals,
@@ -97,5 +126,10 @@ export function buildGeorgeCoreInterpretation(input: {
     trajectory,
     activeOutcome,
     outcomeGovernor,
+    signalSufficiency,
+    rankedSignals,
+    signalArbitration,
+    operationalReadiness: signalSufficiency.sufficient ? 'sufficient' : 'needs_signal',
+    operationalConfidence,
   })
 }

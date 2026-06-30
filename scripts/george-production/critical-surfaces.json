@@ -239,6 +239,24 @@
         "runtime metrics are observational only",
         "runtime metrics can reset deterministically for tests"
       ]
+    },
+    {
+      "path": "lib/george/core/build-interpretation.ts",
+      "role": "Assembles transcript, signals, room analysis, objective, sufficiency, ranking, and arbitration into one operational state.",
+      "targetedBehavior": [
+        "scripts/george-behavior/operational-state-contract.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/runtime-concert.mjs"
+      ],
+      "invariants": [
+        "operational state is assembled once",
+        "signal sufficiency is exposed before downstream governance",
+        "ranked signals are exposed before downstream support",
+        "signal arbitration produces one governing signal",
+        "operational confidence is bounded",
+        "operational state remains internally coherent"
+      ]
     }
   ]
 }
