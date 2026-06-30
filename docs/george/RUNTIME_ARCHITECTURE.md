@@ -225,3 +225,47 @@ GEORGE remembers only what improves future execution.
 The doctrines are stable. The work ahead is implementation.
 
 If implementation reveals a genuine gap, document that gap first. Only then decide whether a new doctrine is necessary. Otherwise, implement what already exists.
+
+
+## Current Validated Operational Chain
+
+Current clean validation:
+
+- Behavioral suite: 30 / 30 passing
+- Core smoke: passing
+- LIVE Entry smoke: passing
+- Production build: passing
+
+The validated operational chain is:
+
+LIVE Entry
+
+↓
+
+Conversation Package Runtime
+
+↓
+
+Conversation Package Manager
+
+↓
+
+Conversation Summary Runtime
+
+↓
+
+Evidence Candidates
+
+↓
+
+Learning Runtime
+
+↓
+
+Conversation Package Update
+
+Conversation Summary Runtime produces operational summaries, evidence candidates, and suggested next actions.
+
+Learning Runtime begins with outcome relevance before confidence or promotion. High confidence alone is not enough to preserve unrelated evidence.
+
+Conversation Packages remain the operational container. Summary and Learning outputs attach to the package rather than creating independent state.

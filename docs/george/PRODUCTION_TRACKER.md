@@ -378,6 +378,73 @@ The conversation remains the primary source of intelligence.
 
 Never allow forms to become more important than the conversation itself.
 
+---
+
+## Current Clean Behavioral State
+
+Validated clean state:
+
+- Behavioral suite: 30 / 30 passing
+- GEORGE Core Smoke: passing
+- LIVE Entry Smoke: passing
+- Production Build: passing
+- Working tree: clean at validation checkpoint
+
+Current operational concert flow:
+
+LIVE Entry
+
+↓
+
+Conversation Package
+
+↓
+
+Conversation Summary Runtime
+
+↓
+
+Evidence Candidates
+
+↓
+
+Learning Runtime
+
+↓
+
+Learning Candidates
+
+↓
+
+Conversation Package Update
+
+This concert flow proves the core continuity chain works together before persistence, storage, or UI integration.
+
+## Production Validation Framework Status
+
+GEORGE now has a production validation framework under:
+
+- `scripts/george-production/README.md`
+- `scripts/george-production/critical-surfaces.json`
+
+The governing rule:
+
+Individual behavior tests protect the part.
+
+Concert behavior tests protect the system.
+
+Every vulnerable operational file should eventually be listed as a critical surface with:
+
+- targeted behavior coverage
+- concert behavior coverage where applicable
+- invariants
+- required validation commands
+
+Current required validation:
+
+- `node scripts/george-behavior-suite.mjs`
+- `npm run build`
+
 # =====================================================================
 # CONTINUITY MEMORY (LOCKED PRODUCT DIRECTION)
 # =====================================================================
@@ -950,9 +1017,21 @@ Current scenarios:
 
 ✓ Conversation package identification
 
+✓ Conversation package manager
+
+✓ Conversation package LIVE Entry adapter
+
+✓ Conversation package runtime
+
+✓ Conversation package concert flow
+
+✓ Conversation summary runtime
+
+✓ Learning runtime
+
 Behavioral Suite Status:
 
-24 / 24 passing
+30 / 30 passing
 
 ---
 
