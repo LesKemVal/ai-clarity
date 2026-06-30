@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "principle": "Individual behavior tests protect the part. Concert behavior tests protect the system.",
+  "requiredValidation": [
+    "node scripts/george-behavior-suite.mjs",
+    "npm run build"
+  ],
+  "surfaces": [
+    {
+      "path": "lib/george/conversation-packages/identity.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/conversation-package-identification.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/conversation-package-runtime.mjs"
+      ],
+      "invariants": [
+        "prioritize outcome and context continuity over generic recency",
+        "ask for confirmation when evidence is partial",
+        "create new package when continuity is unsupported"
+      ]
+    },
+    {
+      "path": "lib/george/conversation-packages/manager.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/conversation-package-manager.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/conversation-package-runtime.mjs"
+      ],
+      "invariants": [
+        "documentation attaches to package",
+        "LIVE summaries attach to package",
+        "learning attaches to package",
+        "outcome progression attaches to package",
+        "documentation is not duplicated"
+      ]
+    },
+    {
+      "path": "lib/george/conversation-packages/live-entry-package.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/conversation-package-live-entry.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/conversation-package-runtime.mjs"
+      ],
+      "invariants": [
+        "LIVE Entry becomes a conversation event",
+        "Relevant Documentation attaches to package",
+        "steering phrases travel as support context"
+      ]
+    },
+    {
+      "path": "lib/george/conversation-packages/runtime.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/conversation-package-runtime.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/conversation-package-runtime.mjs"
+      ],
+      "invariants": [
+        "continue existing package when evidence supports continuity",
+        "ask for confirmation when evidence is incomplete",
+        "create new package when continuity is unsupported",
+        "post-LIVE summaries, outcome progression, and learning attach to package"
+      ]
+    }
+  ]
+}
