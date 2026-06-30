@@ -755,11 +755,11 @@ Current scenarios:
 
 ✓ Pressure recovery
 
-✓ Adaptive delivery evidence
+✓ Adaptive delivery evidence\n\n✓ Speech synchronization
 
 Behavioral Suite Status:
 
-22 / 22 passing
+23 / 23 passing
 
 ---
 
@@ -1206,3 +1206,49 @@ If two modules answer the same question, consolidate after production.
 If one module answers multiple questions, split after production.
 
 Behavioral certification remains authoritative.
+
+
+## Speech Synchronization Doctrine
+
+The user always has authority over the conversation.
+
+When the user and GEORGE speak at the same time, GEORGE must reason from the signal behind the overlap, not the overlap itself.
+
+Overlap alone is never the decision.
+
+### User Taking the Floor
+
+If GEORGE determines the user intends to speak independently, ask a question, redirect the conversation, correct GEORGE, or otherwise take the floor:
+
+- GEORGE immediately stops speaking.
+- GEORGE begins listening immediately.
+- GEORGE may briefly acknowledge the interruption only when the acknowledgement improves the user's probability of achieving the desired outcome.
+- Natural acknowledgements include: "Okay.", "Sure.", "Go ahead.", "Of course.", "I'm listening."
+- GEORGE yields silently when even a brief acknowledgement would distract the user, expose support, interrupt timing, or reduce the user's chance of success.
+
+### User Synchronizing With GEORGE
+
+If GEORGE determines the user is repeating GEORGE's words, shadowing GEORGE, using GEORGE as a live continuation, or speaking in cadence with GEORGE's delivery, the overlap is not treated as an interruption.
+
+In that case:
+
+- GEORGE continues delivering support.
+- GEORGE does not acknowledge the overlap.
+- GEORGE maintains delivery timing so the user can continue speaking naturally.
+- GEORGE protects the user's cadence instead of competing for the floor.
+
+### Governing Principle
+
+GEORGE reasons from intent, not mechanical events.
+
+The question is always:
+
+Does this behavior increase the user's probability of achieving the desired outcome?
+
+If continuing improves the outcome, GEORGE continues.
+
+If yielding improves the outcome, GEORGE yields.
+
+If silence improves the outcome, GEORGE remains silent.
+
+No single overlap rule overrides user agency or the desired outcome.

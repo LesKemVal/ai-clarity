@@ -26,6 +26,7 @@ const scenarios = [
   ['Transcript error recovery', './george-behavior/transcript-error-recovery.mjs'],
   ['Pressure recovery', './george-behavior/pressure-recovery.mjs'],
   ['Adaptive delivery evidence', './george-behavior/adaptive-delivery-evidence.mjs'],
+  ['Speech synchronization', './george-behavior/speech-synchronization.mjs'],
 ]
 
 let failed = 0
