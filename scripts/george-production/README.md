@@ -66,3 +66,18 @@ Learning candidate attachment
 ↓
 
 Package history preservation
+
+
+## Conversation Summary Runtime Coverage
+
+Conversation Summary Runtime is protected by:
+
+- `scripts/george-behavior/conversation-summary-runtime.mjs`
+
+The runtime must produce:
+
+- operational summary
+- evidence candidates
+- suggested next action
+
+It must not directly promote learning, persist memory, or mutate Conversation Packages.

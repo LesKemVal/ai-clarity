@@ -32,6 +32,7 @@ const scenarios = [
   ['Conversation package LIVE Entry adapter', './george-behavior/conversation-package-live-entry.mjs'],
   ['Conversation package runtime', './george-behavior/conversation-package-runtime.mjs'],
   ['Conversation package concert flow', './george-behavior/conversation-package-concert.mjs'],
+  ['Conversation summary runtime', './george-behavior/conversation-summary-runtime.mjs'],
 ]
 
 let failed = 0

@@ -68,6 +68,20 @@
         "create new package when continuity is unsupported",
         "post-LIVE summaries, outcome progression, and learning attach to package"
       ]
+    },
+    {
+      "path": "lib/george/conversation-summary/runtime.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/conversation-summary-runtime.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "summary preserves desired outcome",
+        "summary produces evidence candidates",
+        "summary suggests next action",
+        "summary does not promote learning directly",
+        "summary does not persist operational state"
+      ]
     }
   ]
 }
