@@ -3,6 +3,12 @@ import {
   prepareConversation,
   updateAfterLive,
 } from '../../lib/george/conversation-packages/index.mjs'
+import { summarizeConversation } from '../../lib/george/conversation-summary/runtime.mjs'
+import {
+  evaluateLearningCandidates,
+  holdLearningCandidates,
+  promoteLearningCandidates,
+} from '../../lib/george/learning/runtime.mjs'
 
 export function run() {
   const prepared = prepareConversation(
@@ -53,26 +59,57 @@ export function run() {
     'Relevant Documentation should attach during preparation.'
   )
 
+  const summary = summarizeConversation(
+    {
+      conversationPackage: prepared.package,
+      liveResult: {
+        outcome: 'Investor asked for retention proof and agreed to review follow-up materials.',
+        transcript: 'The investor asked about retention and acquisition cost. The founder anchored retention proof before cost.',
+        signals: [
+          'Investor concern focused on retention risk.',
+          'Follow-up materials requested.',
+        ],
+        nextSuggestedAction: 'Send retention metrics and ask for a second meeting.',
+      },
+    },
+    {
+      id: 'summary-investor-1',
+      timestamp: '2026-06-30T12:10:00.000Z',
+    }
+  )
+
+  const learningCandidates = evaluateLearningCandidates(
+    {
+      conversationPackage: prepared.package,
+      conversationSummary: summary,
+      evidenceCandidates: [
+        ...summary.evidenceCandidates,
+        {
+          id: 'learning-investor-1',
+          type: 'communication_pattern',
+          evidence: 'Anchoring retention before acquisition cost improved investor confidence.',
+          confidence: 0.72,
+          outcomeRelevant: true,
+        },
+      ],
+    },
+    { timestamp: '2026-06-30T12:11:00.000Z' }
+  )
+
+  const promotedLearning = promoteLearningCandidates(learningCandidates)
+  const heldLearning = holdLearningCandidates(learningCandidates)
+
   const afterLive = updateAfterLive(
     prepared.package,
     {
-      summary: {
-        id: 'summary-investor-1',
-        outcome: 'Investor asked for retention proof and agreed to review follow-up materials.',
-        nextSuggestedAction: 'Send retention metrics and ask for a second meeting.',
-      },
+      summary,
       outcomeProgression: {
         state: 'follow_up_materials_requested',
         evidence: 'Investor requested retention proof.',
       },
-      learning: {
-        id: 'learning-investor-1',
-        evidence: 'Anchoring retention before acquisition cost improved investor confidence.',
-        confidence: 0.72,
-        candidate: true,
-      },
+      learning: [...promotedLearning, ...heldLearning],
     },
-    { timestamp: '2026-06-30T12:10:00.000Z' }
+    { timestamp: '2026-06-30T12:12:00.000Z' }
   )
 
   assert.equal(
@@ -87,10 +124,14 @@ export function run() {
     'Outcome progression should attach to the same package.'
   )
 
-  assert.equal(
-    afterLive.learning[0].candidate,
-    true,
-    'Learning should enter the package as evidence-backed candidate state.'
+  assert(
+    afterLive.learning.some((candidate) => candidate.id === 'learning-investor-1'),
+    'Learning should enter the package through Summary evidence and Learning Runtime evaluation.'
+  )
+
+  assert(
+    afterLive.learning.every((candidate) => candidate.outcomeRelevant),
+    'Concert flow should only attach learning candidates that are relevant to the outcome.'
   )
 
   assert.deepEqual(
