@@ -10,7 +10,7 @@ This document reflects the current Production Runtime Phase. The codebase and be
 
 Current validation target:
 
-- Behavioral Suite: 24 / 24 passing
+- Behavioral Suite: 32 / 32 passing
 - GEORGE Core Smoke: passing
 - LIVE Entry Smoke: passing
 - Production Build: passing
@@ -231,7 +231,7 @@ If implementation reveals a genuine gap, document that gap first. Only then deci
 
 Current clean validation:
 
-- Behavioral suite: 30 / 30 passing
+- Behavioral suite: 32 / 32 passing
 - Core smoke: passing
 - LIVE Entry smoke: passing
 - Production build: passing
@@ -269,3 +269,39 @@ Conversation Summary Runtime produces operational summaries, evidence candidates
 Learning Runtime begins with outcome relevance before confidence or promotion. High confidence alone is not enough to preserve unrelated evidence.
 
 Conversation Packages remain the operational container. Summary and Learning outputs attach to the package rather than creating independent state.
+
+
+## Current Operational Improvement Loop
+
+Validated clean state:
+
+- Behavioral Suite: 32 / 32 passing
+- GEORGE Core Smoke: passing
+- LIVE Entry Smoke: passing
+- Production Build: passing
+
+Current protected loop:
+
+Preparation Runtime
+
+↓
+
+Conversation Package Runtime
+
+↓
+
+Conversation Summary Runtime
+
+↓
+
+Learning Runtime
+
+↓
+
+Conversation Package Update
+
+↓
+
+Next Preparation
+
+This proves GEORGE can use prior conversation evidence and learning to improve the next conversation without persistence, UI changes, or page-level logic.

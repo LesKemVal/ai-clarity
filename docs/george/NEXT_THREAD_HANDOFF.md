@@ -41,7 +41,7 @@ Primary docs:
 
 Latest stated validation target:
 
-- Behavioral Suite: 30 / 30 passing
+- Behavioral Suite: 32 / 32 passing
 - GEORGE Core Smoke: passing
 - LIVE Entry Smoke: passing
 - Production Build: passing
@@ -497,7 +497,7 @@ Conversation Packages are now the primary operational container for continuity.
 
 The current clean behavioral state is:
 
-- Behavioral Suite: 30 / 30 passing
+- Behavioral Suite: 32 / 32 passing
 - GEORGE Core Smoke: passing
 - LIVE Entry Smoke: passing
 - Production Build: passing
@@ -531,3 +531,39 @@ Learning Runtime
 Conversation Package update
 
 This is protected by both targeted behavior contracts and the Conversation Package concert flow.
+
+
+## Current Operational Improvement Loop
+
+Validated clean state:
+
+- Behavioral Suite: 32 / 32 passing
+- GEORGE Core Smoke: passing
+- LIVE Entry Smoke: passing
+- Production Build: passing
+
+Current protected loop:
+
+Preparation Runtime
+
+↓
+
+Conversation Package Runtime
+
+↓
+
+Conversation Summary Runtime
+
+↓
+
+Learning Runtime
+
+↓
+
+Conversation Package Update
+
+↓
+
+Next Preparation
+
+This proves GEORGE can use prior conversation evidence and learning to improve the next conversation without persistence, UI changes, or page-level logic.
