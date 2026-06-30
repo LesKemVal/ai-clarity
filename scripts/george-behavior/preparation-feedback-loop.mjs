@@ -40,6 +40,12 @@ export function run() {
     'First preparation should identify missing documentation.'
   )
 
+  assert.deepEqual(
+    firstPreparation.reusableDocumentation.map((doc) => doc.title),
+    ['Pitch deck'],
+    'First preparation should reuse package documentation instead of requiring re-upload.'
+  )
+
   const summary = summarizeConversation(
     {
       conversationPackage: resolved.package,

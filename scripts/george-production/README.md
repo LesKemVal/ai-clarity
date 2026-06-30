@@ -120,6 +120,14 @@ It produces:
 It does not ask questions directly, persist memory, or touch UI.
 
 
+Relevant Documentation reuse rule:
+
+- Prior package documentation should surface as reusable context.
+- Missing documentation should be suggested only when it would materially improve preparation.
+- The uploader remains secondary to recommendation and reuse.
+
+
+
 ## Preparation Feedback Loop Coverage
 
 The first operational improvement loop is protected by:

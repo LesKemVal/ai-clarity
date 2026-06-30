@@ -115,7 +115,10 @@
         "known context includes summaries and learning",
         "documentation suggestions are derived from outcome and context",
         "missing signals do not block when sufficient context exists",
-        "runtime does not ask questions directly; it only suggests optional questions"
+        "runtime does not ask questions directly; it only suggests optional questions",
+        "prior package documentation is surfaced as reusable",
+        "documentation suggestions should not duplicate reusable documentation",
+        "uploader remains secondary to recommendation and reuse"
       ]
     }
   ]

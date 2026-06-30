@@ -58,6 +58,19 @@ export function run() {
     'Preparation Runtime should recommend missing documentation based on outcome and context.'
   )
 
+
+  assert.deepEqual(
+    preparation.reusableDocumentation.map((doc) => doc.title),
+    ['Pitch deck'],
+    'Preparation Runtime should surface prior package documentation as reusable context.'
+  )
+
+  assert.equal(
+    preparation.reusableDocumentation[0].reusable,
+    true,
+    'Relevant Documentation already attached to a package should be reusable when it may improve the next preparation.'
+  )
+
   assert(
     preparation.risks.some((risk) => risk.includes('proof')),
     'Preparation Runtime should identify operational risk from package context.'
