@@ -1629,37 +1629,53 @@ A Conversation Package is the operational container for preparation, relevant do
 
 ## Conversation Package Contents
 
+A Conversation Package is the operational container for a larger objective.
+
+It may contain one or many related conversations.
+
+Everything that materially improves future execution belongs to the Conversation Package.
+
 A Conversation Package may contain:
 
 Desired outcome
 
-User role
+Project
 
-Conversation type
+Organizations
 
-Known conversation context
+People GEORGE has helped the user communicate with
 
 Relevant documentation
 
-Support style
-
 Conversation readiness
 
-LIVE sessions
+Support preferences
+
+Conversation history
 
 Conversation summaries
 
-Follow-ups
-
-Outcome progression
+LIVE sessions
 
 Learning evidence
 
+Outcome progression
+
+Follow-ups
+
 Future next actions
+
+Conversation relationships
+
+Associated projects
 
 ---
 
 ## Conversation Lifecycle
+
+Conversation Package
+
+↓
 
 Conversation
 
@@ -1690,6 +1706,10 @@ Learning
 ↓
 
 Future Conversation
+
+↓
+
+Conversation Package
 
 ---
 
@@ -1766,3 +1786,67 @@ Implemented the first runtime primitive for Conversation Packages.
 GEORGE can now score whether a new objective appears to continue an existing Conversation Package, needs user confirmation, or should begin as a new Conversation Package.
 
 This supports the doctrine that the user should not manage folders, chats, or sessions. GEORGE should organize work around outcomes and conversations.
+
+
+---
+
+## Conversation Hierarchy
+
+Users organize work around outcomes.
+
+GEORGE organizes work around Conversation Packages.
+
+A Conversation Package may contain multiple conversations.
+
+Example
+
+Conversation Package
+
+Acme Series A
+
+↓
+
+Conversation
+
+Initial Investor Meeting
+
+↓
+
+Conversation
+
+Partner Follow-up
+
+↓
+
+Conversation
+
+Due Diligence
+
+↓
+
+Conversation
+
+Term Sheet Negotiation
+
+↓
+
+Conversation
+
+Board Approval
+
+Every conversation contributes evidence, learning, documentation, and outcome progression back into the same Conversation Package.
+
+The user is never responsible for organizing chats, folders, or sessions.
+
+GEORGE maintains continuity automatically.
+
+---
+
+## Governing Principle
+
+Conversations are events.
+
+Conversation Packages are operational containers.
+
+Packages exist to improve preparation, continuity, learning, and future execution.
+
