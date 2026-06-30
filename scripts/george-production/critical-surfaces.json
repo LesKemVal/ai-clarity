@@ -120,6 +120,20 @@
         "documentation suggestions should not duplicate reusable documentation",
         "uploader remains secondary to recommendation and reuse"
       ]
+    },
+    {
+      "path": "lib/george/documents/runtime.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/document-asset-runtime.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "upload context determines initial attachment",
+        "outcome relevance determines future reuse",
+        "documents are not trapped by Normal or LIVE mode",
+        "duplicate document assets are not created",
+        "runtime does not duplicate the extraction pipeline"
+      ]
     }
   ]
 }

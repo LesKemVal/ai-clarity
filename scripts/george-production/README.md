@@ -159,3 +159,18 @@ Conversation Package Update
 Next Preparation
 
 The next preparation should use prior summary and learning to improve the following conversation.
+
+
+## Document Asset Runtime Coverage
+
+Document Asset Runtime is protected by:
+
+- `scripts/george-behavior/document-asset-runtime.mjs`
+
+Doctrine:
+
+Upload context determines initial attachment.
+
+Outcome relevance determines future reuse.
+
+Normal GEORGE and LIVE share document intelligence. A document uploaded in one mode may be suggested in another mode when it is relevant to the desired outcome or conversation context.
