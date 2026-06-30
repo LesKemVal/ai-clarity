@@ -30,6 +30,7 @@ const scenarios = [
   ['Conversation package identification', './george-behavior/conversation-package-identification.mjs'],
   ['Conversation package manager', './george-behavior/conversation-package-manager.mjs'],
   ['Conversation package LIVE Entry adapter', './george-behavior/conversation-package-live-entry.mjs'],
+  ['Conversation package runtime', './george-behavior/conversation-package-runtime.mjs'],
 ]
 
 let failed = 0
