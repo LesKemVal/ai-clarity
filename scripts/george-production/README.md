@@ -81,3 +81,18 @@ The runtime must produce:
 - suggested next action
 
 It must not directly promote learning, persist memory, or mutate Conversation Packages.
+
+
+## Learning Runtime Coverage
+
+Learning Runtime is protected by:
+
+- `scripts/george-behavior/learning-runtime.mjs`
+
+The runtime starts with outcome relevance.
+
+Evidence may become learning only when it is useful for the current outcome, an ongoing outcome, or a likely future related outcome.
+
+High confidence alone is not enough.
+
+The runtime classifies candidates, evaluates confidence, and returns decisions. It does not write memory directly.

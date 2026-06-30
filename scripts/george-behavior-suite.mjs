@@ -33,6 +33,7 @@ const scenarios = [
   ['Conversation package runtime', './george-behavior/conversation-package-runtime.mjs'],
   ['Conversation package concert flow', './george-behavior/conversation-package-concert.mjs'],
   ['Conversation summary runtime', './george-behavior/conversation-summary-runtime.mjs'],
+  ['Learning runtime', './george-behavior/learning-runtime.mjs'],
 ]
 
 let failed = 0

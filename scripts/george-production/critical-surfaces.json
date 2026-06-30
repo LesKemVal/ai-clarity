@@ -82,6 +82,20 @@
         "summary does not promote learning directly",
         "summary does not persist operational state"
       ]
+    },
+    {
+      "path": "lib/george/learning/runtime.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/learning-runtime.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "outcome relevance is evaluated before learning promotion",
+        "high confidence alone does not preserve unrelated evidence",
+        "communication patterns are held until confidence grows",
+        "user override may promote or reject candidates",
+        "runtime does not write memory directly"
+      ]
     }
   ]
 }
