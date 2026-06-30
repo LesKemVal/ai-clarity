@@ -28,7 +28,8 @@
       ],
       "concertBehavior": [
         "scripts/george-behavior/conversation-package-runtime.mjs",
-        "scripts/george-behavior/conversation-package-concert.mjs"
+        "scripts/george-behavior/conversation-package-concert.mjs",
+        "scripts/george-behavior/runtime-concert.mjs"
       ],
       "invariants": [
         "documentation attaches to package",
@@ -61,7 +62,8 @@
       "concertBehavior": [
         "scripts/george-behavior/conversation-package-runtime.mjs",
         "scripts/george-behavior/conversation-package-concert.mjs",
-        "scripts/george-behavior/preparation-feedback-loop.mjs"
+        "scripts/george-behavior/preparation-feedback-loop.mjs",
+        "scripts/george-behavior/runtime-concert.mjs"
       ],
       "invariants": [
         "continue existing package when evidence supports continuity",
@@ -76,7 +78,8 @@
         "scripts/george-behavior/conversation-summary-runtime.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/preparation-feedback-loop.mjs"
+        "scripts/george-behavior/preparation-feedback-loop.mjs",
+        "scripts/george-behavior/runtime-concert.mjs"
       ],
       "invariants": [
         "summary preserves desired outcome",
@@ -92,7 +95,8 @@
         "scripts/george-behavior/learning-runtime.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/preparation-feedback-loop.mjs"
+        "scripts/george-behavior/preparation-feedback-loop.mjs",
+        "scripts/george-behavior/runtime-concert.mjs"
       ],
       "invariants": [
         "outcome relevance is evaluated before learning promotion",
@@ -108,7 +112,8 @@
         "scripts/george-behavior/preparation-runtime.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/preparation-feedback-loop.mjs"
+        "scripts/george-behavior/preparation-feedback-loop.mjs",
+        "scripts/george-behavior/runtime-concert.mjs"
       ],
       "invariants": [
         "preparation is tied to desired outcome",
@@ -126,7 +131,9 @@
       "targetedBehavior": [
         "scripts/george-behavior/document-asset-runtime.mjs"
       ],
-      "concertBehavior": [],
+      "concertBehavior": [
+        "scripts/george-behavior/runtime-concert.mjs"
+      ],
       "invariants": [
         "upload context determines initial attachment",
         "outcome relevance determines future reuse",
@@ -183,6 +190,22 @@
         "Normal upload context attaches initially to current normal conversation",
         "normal document assets dedupe before storage",
         "does not duplicate /api/extract-file"
+      ]
+    },
+    {
+      "path": "scripts/george-behavior/runtime-concert.mjs",
+      "role": "System-level production behavior validating the runtime chain as one operational intelligence.",
+      "targetedBehavior": [
+        "scripts/george-behavior/runtime-concert.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "Operational intent is preserved",
+        "Every behavior has exactly one owner",
+        "Runtimes enrich operational state; they never duplicate or replace it",
+        "Governor constrains execution without altering operational understanding",
+        "Support is selected from operational state and delivery preserves its meaning",
+        "Telemetry is observational only"
       ]
     }
   ]

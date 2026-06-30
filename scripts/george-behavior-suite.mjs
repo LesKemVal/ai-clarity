@@ -39,6 +39,7 @@ const scenarios = [
   ['Document Asset runtime', './george-behavior/document-asset-runtime.mjs'],
   ['LIVE Entry document assets', './george-behavior/live-entry-document-assets.mjs'],
   ['Normal GEORGE document assets', './george-behavior/normal-document-assets.mjs'],
+  ['Runtime concert', './george-behavior/runtime-concert.mjs'],
 ]
 
 let failed = 0
