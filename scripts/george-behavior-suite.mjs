@@ -29,6 +29,7 @@ const scenarios = [
   ['Speech synchronization', './george-behavior/speech-synchronization.mjs'],
   ['Conversation package identification', './george-behavior/conversation-package-identification.mjs'],
   ['Conversation package manager', './george-behavior/conversation-package-manager.mjs'],
+  ['Conversation package LIVE Entry adapter', './george-behavior/conversation-package-live-entry.mjs'],
 ]
 
 let failed = 0
