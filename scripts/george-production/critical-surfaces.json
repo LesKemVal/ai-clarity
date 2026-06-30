@@ -134,6 +134,19 @@
         "duplicate document assets are not created",
         "runtime does not duplicate the extraction pipeline"
       ]
+    },
+    {
+      "path": "lib/george/documents/live-entry-document-assets.ts",
+      "targetedBehavior": [
+        "scripts/george-behavior/live-entry-document-assets.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "LIVE Entry uploads become Document Assets",
+        "LIVE Entry upload context attaches initially to the active Conversation Package",
+        "document assets dedupe before reaching runtime setup",
+        "does not duplicate /api/extract-file"
+      ]
     }
   ]
 }
