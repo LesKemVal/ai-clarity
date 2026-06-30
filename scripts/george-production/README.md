@@ -96,3 +96,25 @@ Evidence may become learning only when it is useful for the current outcome, an 
 High confidence alone is not enough.
 
 The runtime classifies candidates, evaluates confidence, and returns decisions. It does not write memory directly.
+
+
+## Preparation Runtime Coverage
+
+Preparation Runtime is protected by:
+
+- `scripts/george-behavior/preparation-runtime.mjs`
+
+The runtime consumes Conversation Package state, Relevant Documentation, summaries, and learning.
+
+It produces:
+
+- preparation brief
+- known context
+- missing signals
+- documentation suggestions
+- risks
+- opportunities
+- confidence
+- optional question
+
+It does not ask questions directly, persist memory, or touch UI.

@@ -96,6 +96,20 @@
         "user override may promote or reject candidates",
         "runtime does not write memory directly"
       ]
+    },
+    {
+      "path": "lib/george/preparation/runtime.mjs",
+      "targetedBehavior": [
+        "scripts/george-behavior/preparation-runtime.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "preparation is tied to desired outcome",
+        "known context includes summaries and learning",
+        "documentation suggestions are derived from outcome and context",
+        "missing signals do not block when sufficient context exists",
+        "runtime does not ask questions directly; it only suggests optional questions"
+      ]
     }
   ]
 }
