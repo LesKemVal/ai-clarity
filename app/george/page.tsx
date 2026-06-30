@@ -167,12 +167,27 @@ function deriveNormalSessionTitleFromMessages(messages: Message[], fallback?: st
 
 
 
+const GEORGE_PREPARATION_TAGLINES = [
+  'preparation serves outcome.',
+  'prepare before the room begins.',
+  'preparation reveals fresh options.',
+  'preparation reduces uncertainty.',
+  'preparation strengthens judgment.',
+  'preparation uncovers better questions.',
+  'preparation improves timing.',
+  'preparation increases confidence.',
+  'preparation strengthens communication.',
+  'preparation protects opportunity.',
+  'preparation turns understanding into movement.',
+  'preparation makes better outcomes more likely.',
+]
+
 const OPERATIONAL_SIGNALS = [
   'Add visual context during LIVE. GEORGE can reference documents, screenshots, and photos in real time.',
   'Say “shorter” if you want compressed responses.',
   'Say “line” if you want exact wording.',
   'Use your outcome-shift phrase when the room may be changing direction.',
-  'LIVE works best with one earbud.',
+  'LIVE works best when GEORGE can support you discreetly.',
 ]
 
 function getLiveRuntimeSteeringLabels(room?: string | null) {
@@ -671,6 +686,9 @@ const georgeAmbientPulseStyles = `
 export default function Page({ forceLive = false }: { forceLive?: boolean } = {}) {
   const router = useRouter()
   const [input, setInput] = useState('')
+  const [preparationTaglineIndex, setPreparationTaglineIndex] = useState(0)
+  const [typedPreparationTagline, setTypedPreparationTagline] = useState('')
+  const [hasSentFirstNormalMessage, setHasSentFirstNormalMessage] = useState(false)
   const [composerPlaceholder, setComposerPlaceholder] = useState('say it here...')
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
@@ -1870,7 +1888,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   const LIVE_SEGUES = [
     {
       title: 'LIVE listens with you.',
-      body: 'Use one earbud if you can. GEORGE helps with timing, pressure, escalation, hesitation, and next responses in real time.'
+      body: 'Use LIVE when the conversation is active. GEORGE helps with timing, pressure, escalation, hesitation, and next responses in real time.'
     },
     {
       title: 'You do not need to explain everything first.',
@@ -2986,7 +3004,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
         }
       } catch {}
 
-      return `If this work becomes a consequential conversation, LIVE may help GEORGE stay with the room in real time.
+      return `LIVE can support this conversation in real time if you decide to take GEORGE into the room.
 
 [LIVE]`
     })()
@@ -4517,6 +4535,8 @@ const handleSend = useCallback(
     ) => {
       let text = (overrideText ?? input).trim()
 
+      if (text && !(forceLive || liveMode)) setHasSentFirstNormalMessage(true)
+
       const isConversationAssistContext =
         activePromptContext?.startsWith('conversation_assist_')
 
@@ -5659,6 +5679,27 @@ responseTimerRef.current = setTimeout(() => {
     return m.role === 'user'
   })
 
+  useEffect(() => {
+    if (hasSentFirstNormalMessage) return
+
+    const timer = window.setInterval(() => {
+      setPreparationTaglineIndex((index) => (index + 1) % GEORGE_PREPARATION_TAGLINES.length)
+    }, 180000)
+
+    return () => window.clearInterval(timer)
+  }, [hasSentFirstNormalMessage])
+
+  useEffect(() => {
+    if (hasSentFirstNormalMessage) {
+      setTypedPreparationTagline('')
+      return
+    }
+
+    setTypedPreparationTagline(
+      `Start here because ${GEORGE_PREPARATION_TAGLINES[preparationTaglineIndex]}`
+    )
+  }, [hasSentFirstNormalMessage, preparationTaglineIndex])
+
   const hasDraftInput = input.trim().length > 0
   const isPreLiveSignalAcquisition = activePromptContext === 'pre_live_signal_acquisition'
   const showConversation = hasDraftInput || liveMode || (hasVisibleThread && !isPreLiveSignalAcquisition)
@@ -6108,7 +6149,11 @@ return (
                   aria-label="Open GEORGE sidebar"
                   title="Open"
                 >
-                  ←
+                  {hasSentFirstNormalMessage ? (
+                    <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-95" />
+                  ) : (
+                    '←'
+                  )}
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -6330,26 +6375,16 @@ return (
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
         {showGeorgeHeroTitle && <h1 className='mb-4'>GEORGE</h1>}
-        {showGeorgeHeroTagline && (
+        {showGeorgeHeroTagline && !hasSentFirstNormalMessage && (
           <p>
             {showPreLiveSignalSurface ? (
               'Start with your desired outcome.'
             ) : (
               <>
-                <span className="block text-[15px] leading-[1.3] text-[#D7DBE4]/72">
-                  Start with your desired outcome.
+                <span className="block min-h-[2.6em] max-w-[280px] text-[15px] leading-[1.3] text-[#D7DBE4]/72 sm:max-w-[420px]">
+                  {typedPreparationTagline}
+                  <span className="ml-1 animate-pulse text-[#D7DBE4]/48">|</span>
                 </span>
-                <span className="mt-1 block text-[15px] leading-[1.3] text-[#D7DBE4]/72">
-                  Your words create motion.
-                </span>
-                {showGeorgeSupportCopy && (
-                  <>
-                    <span className="mt-3 block hidden text-[13px] leading-6 text-[#D7DBE4]/42 sm:block">
-                      Conversation moves trust, money, care, conflict, opportunity, and work.
-                    </span>
-                    <span className="mt-1 block text-[13px] leading-6 text-[#D7DBE4]/58" />
-                  </>
-                )}
               </>
             )}
           </p>
@@ -6548,7 +6583,7 @@ return (
         <div className="flex flex-wrap gap-2">
           {[
             ['Text Assist', 'Use Text Assist. Give me short onscreen guidance for this conversation.'],
-            ['Audio Assist', 'Use Audio Assist. Give me spoken help for earbud use, only when it is useful.'],
+            ['LIVE', 'Use LIVE. Give me real-time support only when it is useful.'],
             ['Full Sentence', 'Use Full Sentence Assist. Give me exact lines I can say in this conversation.'],
             ['Silent Insight', 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.'],
           ].map(([label, prompt]) => (
@@ -6824,7 +6859,7 @@ I am listening now. Speak naturally. I will respond ${
               onClick={() => openLiveEntryFromMessage(m)}
               className="px-1 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
             >
-              Earbuds
+              LIVE
             </button>
 
               </>

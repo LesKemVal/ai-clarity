@@ -108,10 +108,14 @@ export function evaluateLiveRecommendation(
     executionImminent &&
     conversationPressure
 
+  const hasConversationOutcome =
+    Boolean(input.objectiveKnown) &&
+    conversationPressure
+
   const shouldSurfaceEarbud =
     !alreadyLive &&
     signalUsable &&
-    (trajectorySignal || conversationPressure)
+    hasConversationOutcome
 
   const shouldExplainLive =
     shouldSurfaceEarbud &&
@@ -127,7 +131,7 @@ export function evaluateLiveRecommendation(
     shouldRecommendLive
       ? 'The situation appears to be moving from planning into real-time human execution pressure.'
       : shouldExplainLive
-        ? 'GEORGE has enough trajectory signal to understand that LIVE may become useful down the road.'
+        ? 'GEORGE has enough outcome and conversation signal to understand that LIVE may help if this moves into the room.'
         : alreadyLive
           ? 'Already in LIVE mode.'
           : !signalUsable
@@ -142,7 +146,7 @@ export function evaluateLiveRecommendation(
         ? 'LIVE RECOMMENDATION GOVERNOR: The user appears to be entering real-time execution pressure. Offer LIVE as available support without selling it. Ask simply if they want GEORGE in the room.'
         : 'LIVE RECOMMENDATION GOVERNOR: Offer LIVE as optional execution support only if the user is about to enter the room. Do not upsell and do not auto-route.'
       : shouldExplainLive
-        ? 'LIVE RECOMMENDATION GOVERNOR: Earbud may be surfaced as a quiet capability marker. Explain LIVE only once when the user taps or asks. Frame it as potentially useful down the road, not as the next required move.'
+        ? 'LIVE RECOMMENDATION GOVERNOR: LIVE may be surfaced as a quiet execution capability marker. Explain LIVE only once when the user taps or asks. Frame it as support for a specific conversation or desired outcome, not as the next required move.'
         : 'LIVE RECOMMENDATION GOVERNOR: Do not recommend LIVE. Continue normal GEORGE support.'
 
   return {
@@ -162,15 +166,15 @@ export function buildLiveRecommendationNote(state: LiveRecommendationState) {
   return `
 LIVE RECOMMENDATION GOVERNOR
 - Recommend LIVE: ${state.shouldRecommendLive ? 'yes' : 'no'}
-- Surface earbud: ${state.shouldSurfaceEarbud ? 'yes' : 'no'}
+- Surface LIVE: ${state.shouldSurfaceEarbud ? 'yes' : 'no'}
 - Explain LIVE: ${state.shouldExplainLive ? 'yes' : 'no'}
 - Strength: ${state.strength}
 - Execution imminent: ${state.executionImminent ? 'yes' : 'no'}
 - Conversation pressure: ${state.conversationPressure ? 'yes' : 'no'}
 - Trajectory signal: ${state.trajectorySignal ? 'yes' : 'no'}
 - Reason: ${state.reason}
-- Rule: The earbud appearing does not mean LIVE is next.
-- Rule: The earbud appearing means GEORGE has enough signal to understand that LIVE might be useful down the road.
+- Rule: The LIVE tag appearing does not mean LIVE is next.
+- Rule: The LIVE tag appears only when GEORGE has enough outcome and conversation signal to understand that LIVE may be useful.
 - Rule: Do not explain LIVE when GEORGE only understands the topic. Explain LIVE when GEORGE understands the user's trajectory.
 - Rule: The user retains agency. GEORGE may surface or explain LIVE, but must not push or auto-route the user into LIVE.
 - ${state.instruction}

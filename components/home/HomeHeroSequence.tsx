@@ -6,19 +6,39 @@ import { useRouter } from 'next/navigation'
 const scenarios = [
   {
     room: 'INTERVIEW',
+    tier: 'SMART',
     signals: ['interest present', 'needs proof', 'decision forming'],
     supportLabel: 'Say this:',
     support: 'Start with the result, then explain how you achieved it.',
   },
   {
     room: 'BOARDROOM',
-    signals: ['evaluating ROI', 'assessing risk', 'consensus forming'],
+    tier: 'INTELLIGENT',
+    signals: [
+      'evaluating ROI',
+      'assessing risk',
+      'consensus forming',
+      'methodology tested',
+      'forecast pressure',
+      'authority watching',
+    ],
     supportLabel: 'Lead with:',
     support: 'Projected impact first, then implementation.',
   },
   {
     room: 'NEGOTIATION',
-    signals: ['price resistance', 'testing confidence', 'decision window'],
+    tier: 'BRILLIANT',
+    signals: [
+      'price resistance',
+      'testing confidence',
+      'decision window',
+      'leverage shifting',
+      'trust forming',
+      'risk surfaced',
+      'proof needed',
+      'timing open',
+      'outcome available',
+    ],
     supportLabel: 'Cue:',
     support: 'Return to value before discussing price.',
   },
@@ -26,9 +46,9 @@ const scenarios = [
 
 const timeline = [
   ['room', 1200],
-  ['signals_in', 4800],
-  ['signals_out', 2300],
-  ['support', 3200],
+  ['signals_in', 4200],
+  ['support', 3600],
+  ['signals_out', 2200],
   ['hold', 1700],
 ] as const
 
@@ -94,23 +114,26 @@ export function HomeHeroSequence() {
   const { stage, stageTick } = getStage(cycle)
 
   const roomTyped = useTypewriter(stage !== 'room' || stageTick > 150, scenario.room)
-  const showSupport = stage === 'support' || stage === 'hold'
+  const showSupport = stage === 'support' || stage === 'signals_out' || stage === 'hold'
   const typedSupport = useTypewriter(stage === 'support', scenario.support)
-  const renderedSupport = stage === 'hold' ? scenario.support : typedSupport
+  const renderedSupport = stage === 'signals_out' || stage === 'hold' ? scenario.support : typedSupport
 
   const signalStates = useMemo(() => {
-    if (stage !== 'signals_in' && stage !== 'signals_out') return []
+    if (stage !== 'signals_in' && stage !== 'support' && stage !== 'signals_out') return []
 
     return scenario.signals.map((signal, index) => {
-      const inAt = index * 820
+      const inAt = index * 360
       const visibleDuringIn = stage === 'signals_in' && stageTick >= inAt
-      const outAt = index * 700
-      const visibleDuringOut = stage === 'signals_out' && stageTick < outAt
+      const visibleDuringSupport = stage === 'support'
+      const reverseIndex = scenario.signals.length - 1 - index
+      const outAt = reverseIndex * 210
+      const fadingOut = stage === 'signals_out' && stageTick >= outAt
+      const visibleDuringOut = stage === 'signals_out'
 
       return {
         signal,
-        visible: visibleDuringIn || visibleDuringOut,
-        fadingOut: stage === 'signals_out' && stageTick >= outAt - 520 && stageTick < outAt,
+        visible: visibleDuringIn || visibleDuringSupport || visibleDuringOut,
+        fadingOut,
       }
     }).filter((item) => item.visible)
   }, [scenario.signals, stage, stageTick])
@@ -137,7 +160,7 @@ export function HomeHeroSequence() {
         <div className="absolute left-[9%] top-[13%] z-30 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.34em] text-white/58">
           <span>GEORGE</span>
           <span className="h-px w-8 bg-white/18" />
-          <span className="text-[9px] uppercase tracking-[0.28em] text-[#37B7FF]/82">audio</span>
+          <span className="text-[9px] uppercase tracking-[0.28em] text-[#37B7FF]/82">{scenario.tier}</span>
         </div>
 
         <div className="absolute left-[9%] top-[19%] z-30 font-mono">
@@ -146,21 +169,19 @@ export function HomeHeroSequence() {
             <span className="ml-1 animate-pulse text-[#4A90FF]">|</span>
           </div>
 
-          <div className="mt-5 flex flex-col items-start gap-3">
+          <div className="mt-5 grid w-[min(88vw,640px)] grid-cols-3 gap-x-3 gap-y-3">
             {signalStates.map(({ signal, fadingOut }) => (
               <div
                 key={signal}
-                className={`transition-all duration-700 ${
-                  fadingOut
-                    ? 'opacity-0 translate-y-2'
-                    : 'opacity-100 translate-y-0'
+                className={`min-h-[48px] transition-opacity duration-700 ${
+                  fadingOut ? 'opacity-0' : 'opacity-100'
                 }`}
               >
                 <div className="text-[8px] uppercase tracking-[0.28em] text-[#E7C47D]/78">
-                  thinking
+                  Thinking...
                 </div>
 
-                <div className="mt-1 font-mono text-[11px] lowercase tracking-[0.12em] text-white/72">
+                <div className="mt-1 font-mono text-[10px] lowercase tracking-[0.11em] text-white/72 sm:text-[11px]">
                   {signal}
                 </div>
               </div>
@@ -171,11 +192,14 @@ export function HomeHeroSequence() {
         <img
           src="/hero/glasses21.png"
           alt="Generic AR glasses"
-          className="absolute left-1/2 top-[50%] z-10 h-auto w-[112vw] max-w-[1450px] -translate-x-1/2 -translate-y-1/2 object-contain opacity-95 sm:w-[96vw]"
+          className="absolute left-1/2 top-[53%] z-10 h-auto w-[112vw] max-w-[1450px] -translate-x-1/2 -translate-y-1/2 object-contain opacity-95 sm:w-[96vw]"
         />
 
         {showSupport && (
           <div className="absolute left-1/2 bottom-[23%] z-30 w-[78%] max-w-[560px] -translate-x-1/2 text-left">
+            <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.34em] text-white/72">
+              GEORGE <span className="text-white/42">(Audio)</span>
+            </div>
             <div className="mb-2 font-mono text-[9px] uppercase tracking-[0.3em] text-[#E7C47D]/70">
               {scenario.supportLabel}
             </div>
@@ -196,7 +220,7 @@ export function HomeHeroSequence() {
                 onClick={() => router.push('/george')}
                 className="group flex h-[56px] items-center justify-between rounded-[17px] bg-white px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:-translate-y-[1px]"
               >
-                <span>Ask GEORGE</span>
+                <span>Ask GEORGE <span className="text-black/45">(Prepare)</span></span>
                 <span className="text-[20px] transition-transform group-hover:translate-x-1">→</span>
               </button>
 
@@ -205,7 +229,7 @@ export function HomeHeroSequence() {
                 onClick={startLive}
                 className="group flex h-[56px] items-center justify-between rounded-[17px] border border-white/18 bg-white/8 px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-md transition hover:-translate-y-[1px] hover:bg-white/12"
               >
-                <span>LIVE Support</span>
+                <span>LIVE Support <span className="text-white/45">(Execute)</span></span>
                 <span className="text-[20px] transition-transform group-hover:translate-x-1">→</span>
               </button>
             </div>

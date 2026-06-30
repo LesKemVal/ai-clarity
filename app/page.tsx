@@ -155,6 +155,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer className="border-t border-white/10 bg-black px-5 py-8 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-white/34 sm:px-8">
+        © 2026 BRANESx. All Rights Reserved.
+      </footer>
     </main>
   )
 }
