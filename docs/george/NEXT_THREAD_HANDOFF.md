@@ -593,3 +593,58 @@ They must not own:
 - LIVE reasoning or delivery meaning
 
 Operational behavior belongs under `lib/george/**` and must be protected by behavior coverage.
+
+
+
+## Production Modification Rule
+
+No manual coding.
+
+Ever.
+
+Production modifications are applied through deterministic scripts.
+
+Workflow
+
+Inspect
+
+↓
+
+Generate deterministic script
+
+↓
+
+Apply script
+
+↓
+
+Behavior tests
+
+↓
+
+Concert tests
+
+↓
+
+Behavioral suite
+
+↓
+
+Smoke tests
+
+↓
+
+Production build
+
+↓
+
+Inspect git diff
+
+↓
+
+Commit
+
+↓
+
+Push
+
