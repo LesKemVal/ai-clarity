@@ -8,6 +8,7 @@ import { getActiveSessionForMode, getSessionsForMode, setActiveSessionIdForMode 
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { getActiveRuntimeMotionContext } from '@/lib/george/operator/load-runtime-overlay'
 import { PrepRoomResourcePopup } from '@/components/george/PrepRoomResourcePopup'
+import { RelevantDocumentationPanel } from '@/components/george/live/RelevantDocumentationPanel'
 import type { PrepRoomResourceProfile } from '@/lib/george/prep-room/resources'
 import { deriveRoomFormation } from '@/lib/george/live/prep-room'
 import {
@@ -3013,75 +3014,13 @@ const beginProofOfAwareness = async () => {
               Review your conversation readiness. Update anything that has changed. GEORGE only needs enough context to begin well. The rest is learned through the conversation.
             </div>
 
-            <div className="rounded-[0.82rem] border border-[#E7C47D]/[0.10] bg-[#E7C47D]/[0.03] px-4 py-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-[#E7C47D]/68">
-                    {prepDocumentPrompt.label}
-                  </div>
-                  <div className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/60">
-                    {prepDocumentPrompt.helper}
-                  </div>
-                </div>
-
-                {prepDocument && (
-                  <div className="shrink-0 rounded-full bg-emerald-300/[0.10] px-3 py-1 text-[9px] uppercase tracking-[0.16em] text-emerald-100/70">
-                    Loaded
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-3 text-[9px] uppercase tracking-[0.22em] text-white/28">
-                Recommended
-              </div>
-
-              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] leading-5 text-white/50">
-                {(prepDocumentPrompt as any).recommendations?.slice(0, 5).map((item: string, index: number) => (
-                  <span key={item}>
-                    {item}{index < Math.min(((prepDocumentPrompt as any).recommendations || []).length, 5) - 1 ? ' ·' : ''}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                <label className="cursor-pointer rounded-[0.72rem] border border-[#E7C47D]/18 bg-[#E7C47D]/[0.045] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#E7C47D]/78 transition hover:bg-[#E7C47D]/[0.075]">
-                  {prepDocumentPrompt.action}
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0] || null
-                      void handlePrepDocumentUpload(file)
-                      event.currentTarget.value = ''
-                    }}
-                  />
-                </label>
-
-                {prepDocument && (
-                  <button
-                    type="button"
-                    onClick={() => setPrepDocument(null)}
-                    className="rounded-[0.72rem] border border-white/[0.06] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/42 transition hover:border-white/[0.16] hover:text-white/72"
-                  >
-                    Remove
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  className="rounded-[0.72rem] border border-white/[0.05] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/32"
-                  title="Previous documentation will connect to Conversation Packages in the next production phase."
-                >
-                  Use Previous Soon
-                </button>
-              </div>
-
-              {prepDocument && (
-                <div className="mt-3 rounded-[0.7rem] bg-black/22 px-3 py-2 text-[11px] leading-5 text-white/48">
-                  {prepDocument.name}
-                </div>
-              )}
-            </div>
+            <RelevantDocumentationPanel
+              recommendations={[]}
+              document={prepDocument}
+              reading={prepDocumentReading}
+              onUpload={(file) => void handlePrepDocumentUpload(file)}
+              onRemove={() => setPrepDocument(null)}
+            />
 
             <label className="block">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Desired Outcome</div>
