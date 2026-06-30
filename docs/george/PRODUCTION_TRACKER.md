@@ -1447,3 +1447,165 @@ Knowledge should become more valuable.
 
 Not merely larger.
 
+
+
+---
+
+# GEORGE Production Discipline
+
+Every production change follows the same order.
+
+Doctrine
+
+↓
+
+Operational Behavior
+
+↓
+
+Runtime
+
+↓
+
+Validation
+
+↓
+
+Commit
+
+Doctrine always precedes implementation.
+
+GEORGE is never implemented before its behavior is understood.
+
+---
+
+## Doctrine
+
+Agree on the governing principle.
+
+Answer one question:
+
+What should GEORGE fundamentally do?
+
+---
+
+## Operational Behavior
+
+Translate doctrine into observable user behavior.
+
+Answer:
+
+How should a user experience this?
+
+Behavior must be understandable before code exists.
+
+---
+
+## Runtime
+
+Only after doctrine and behavior are settled should runtime implementation begin.
+
+Implementation serves doctrine.
+
+Doctrine never serves implementation.
+
+---
+
+## Validation
+
+Every production change must successfully complete:
+
+GEORGE behavioral suite
+
+Core smoke
+
+LIVE entry smoke
+
+Production build
+
+Behavior is considered incomplete until validated.
+
+---
+
+## Commit
+
+Keep commits atomic.
+
+One operational idea.
+
+One commit.
+
+Avoid unrelated changes.
+
+---
+
+# Product First
+
+Every decision should answer:
+
+Does this increase the user's probability of achieving the desired outcome?
+
+If not, it does not belong in GEORGE.
+
+---
+
+# Runtime Second
+
+Every runtime behavior should answer:
+
+Does this faithfully implement the governing doctrine?
+
+Not:
+
+Is this technically clever?
+
+---
+
+# Interface Third
+
+The interface should reveal doctrine.
+
+It should never invent doctrine.
+
+The UI exists to expose operational intelligence, not replace it.
+
+---
+
+# GEORGE Hierarchy
+
+Desired Outcome
+
+↓
+
+Conversation
+
+↓
+
+Preparation
+
+↓
+
+Execution
+
+↓
+
+Learning
+
+↓
+
+Future Conversations
+
+Learning exists to improve future conversations.
+
+Preparation exists to improve execution.
+
+Execution exists to improve outcomes.
+
+Conversation is the execution surface.
+
+---
+
+# Product Statement
+
+GEORGE continuously prepares, supports, learns from, and improves conversations so users have a greater probability of achieving their desired outcomes.
+
