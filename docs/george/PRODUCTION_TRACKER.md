@@ -159,14 +159,14 @@ Telemetry currently covers:
 
 ## Current High-Priority Todo
 
-- Test responsibility selector end-to-end.
-- Confirm Smart / Intelligent / Brilliant responsibility limits.
-- Confirm Other field submits and collapses.
-- Add GEORGE’s single highest-value optional question.
-- Add readiness/confidence explanation under the answer field.
-- Verify Enter LIVE stays available during optional briefing.
-- Re-test LIVE memory with an interview scenario.
-- Continue runtime latency testing.
+- Keep production documentation synchronized with implementation.
+- Build the Conversation Package Manager under `lib/george/conversation-packages/`.
+- Integrate Conversation Package identification into runtime flow.
+- Attach Relevant Documentation to Conversation Packages instead of duplicating operational state.
+- Implement Conversation Summary Runtime as an operational asset, not an archive.
+- Implement Learning Runtime through Evidence → Confidence → Learning → Future Conversations.
+- Add behavioral coverage for Conversation Package Manager behavior.
+- Continue end-to-end latency measurement through microphone, Deepgram, reasoning, delivery, Cartesia, and playback.
 
 ## Working Rules
 
@@ -186,6 +186,197 @@ Do not commit if build fails.
 
 Do not add git save/commit commands inside build patches.
 
+
+---
+
+## Production Runtime Phase Commitments
+
+These commitments reflect the current production direction and should be treated as implementation commitments unless superseded by validated code or architecture.
+
+### Homepage
+
+Homepage is considered production quality.
+
+Completed direction:
+
+- `public/hero/glasses21.png` is the production hero image.
+- Signals appear and disappear sequentially.
+- Support renders only after the final signal disappears.
+- Signals never render on the glasses.
+- `GEORGE is thinking...` replaced `Understanding.`
+- `Audio` is presented as text rather than an image.
+- LIVE Support button is renamed.
+- Conversation scenarios rotate automatically.
+- Support rendering remains intentionally smaller so it does not dominate the hero.
+
+Remaining verification:
+
+- desktop spacing and unnecessary whitespace
+- final copy emphasizing LIVE Support, underserved communities, neurodivergent users, people with speech and communication disabilities, professionals, entrepreneurs, interviews, fundraising, Cartesia, and Deepgram
+- concrete outcome-oriented messaging such as `Forty-one cents could help secure the job.`
+
+### LIVE Entry
+
+Final readiness sequence:
+
+GEORGE says:
+
+> Everything looks good.
+>
+> I'll keep listening and help when it matters.
+>
+> Questions?
+
+After GEORGE finishes speaking:
+
+- microphone activates automatically
+- no button press required
+- user may begin speaking immediately
+
+If approximately four seconds pass with no speech, GEORGE says:
+
+> Alright.
+>
+> Let's go to work.
+
+The `Let's go to work` button remains visible immediately, may be pressed at any time, and begins a subtle pulse after the silence timeout. `Save for later` remains available.
+
+### Conversation Readiness
+
+Conversation Readiness is resumable.
+
+Every readiness panel should support:
+
+- Save for later
+- Continue later
+
+Approved copy:
+
+> Review your conversation readiness. Update anything that has changed. GEORGE only needs enough context to begin well. The rest is learned through the conversation.
+
+### Relevant Documentation
+
+The uploader already exists. Do not build another uploader.
+
+Remaining work:
+
+- integrate documentation into Conversation Packages
+- support previous documentation
+- suggest documentation from existing Conversation Packages
+- automatically reuse documentation when appropriate
+
+### Conversation Packages
+
+Conversation Packages are now the architectural center of GEORGE.
+
+The identification runtime exists.
+
+The next implementation milestone is the Conversation Package Manager.
+
+Responsibilities:
+
+- create package
+- retrieve package
+- update package
+- merge related packages
+- attach documentation
+- attach LIVE summaries
+- attach learning
+- track outcome progression
+- determine completion
+
+### Learning Runtime
+
+Learning doctrine is complete. Implementation remains.
+
+Target pipeline:
+
+Conversation
+
+↓
+
+Evidence
+
+↓
+
+Confidence
+
+↓
+
+Learning
+
+↓
+
+Future Conversations
+
+Support promotion, retirement, confidence thresholds, and user override.
+
+### Conversation Summary Runtime
+
+Conversation summaries are operational assets, not archives.
+
+Target flow:
+
+Conversation
+
+↓
+
+Outcome
+
+↓
+
+Summary
+
+↓
+
+Evidence
+
+↓
+
+Learning
+
+↓
+
+Conversation Package Update
+
+↓
+
+Suggested Next Action
+
+### Voice Stack
+
+Current production direction:
+
+- Speech recognition: Deepgram
+- Speech synthesis: Cartesia
+
+Do not revert to ElevenLabs.
+
+### Communication Pattern Learning
+
+GEORGE should learn how the user communicates when repeated evidence shows that pattern improves outcomes.
+
+Examples:
+
+- prefers concise cues
+- benefits from examples before abstractions
+- prefers data before narrative
+- responds better to reassurance versus direct challenge
+- asks follow-up questions before deciding
+- prefers numbered explanations
+- tends to pause before answering under pressure
+
+These are communication preferences, not personality traits.
+
+### Architectural Reminder
+
+GEORGE reasons from signals, not forms.
+
+Forms exist only to provide enough signal to begin well.
+
+The conversation remains the primary source of intelligence.
+
+Never allow forms to become more important than the conversation itself.
 
 # =====================================================================
 # CONTINUITY MEMORY (LOCKED PRODUCT DIRECTION)
@@ -757,9 +948,11 @@ Current scenarios:
 
 ✓ Adaptive delivery evidence\n\n✓ Speech synchronization
 
+✓ Conversation package identification
+
 Behavioral Suite Status:
 
-23 / 23 passing
+24 / 24 passing
 
 ---
 
