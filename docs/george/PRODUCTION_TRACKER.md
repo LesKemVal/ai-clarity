@@ -1609,3 +1609,151 @@ Conversation is the execution surface.
 
 GEORGE continuously prepares, supports, learns from, and improves conversations so users have a greater probability of achieving their desired outcomes.
 
+
+
+---
+
+# Conversation Package Doctrine
+
+GEORGE should organize work around conversations with desired outcomes.
+
+Not chats.
+
+Not isolated sessions.
+
+Not folders the user has to manage.
+
+A Conversation Package is the operational container for preparation, relevant documentation, LIVE support, learning, follow-up, and future continuation.
+
+---
+
+## Conversation Package Contents
+
+A Conversation Package may contain:
+
+Desired outcome
+
+User role
+
+Conversation type
+
+Known conversation context
+
+Relevant documentation
+
+Support style
+
+Conversation readiness
+
+LIVE sessions
+
+Conversation summaries
+
+Follow-ups
+
+Outcome progression
+
+Learning evidence
+
+Future next actions
+
+---
+
+## Conversation Lifecycle
+
+Conversation
+
+↓
+
+Briefing
+
+↓
+
+Relevant Documentation
+
+↓
+
+Conversation Readiness
+
+↓
+
+LIVE Support
+
+↓
+
+Conversation Summary
+
+↓
+
+Learning
+
+↓
+
+Future Conversation
+
+---
+
+## Continuity Principle
+
+The user should not have to organize GEORGE.
+
+GEORGE should organize the work around outcomes and conversations.
+
+When the user states what they want to accomplish, GEORGE should determine whether this appears to continue an existing Conversation Package or requires a new one.
+
+GEORGE should not ask:
+
+Start a new conversation?
+
+GEORGE should ask:
+
+What would you like to accomplish?
+
+If the answer appears related to existing work, GEORGE may say:
+
+I found a related conversation. Continue where we left off?
+
+If not, GEORGE begins a new Conversation Package automatically.
+
+---
+
+## Sufficiency and Continuation
+
+A Conversation Package does not require complete information.
+
+It begins when there is enough context to help.
+
+It becomes more useful as GEORGE acquires:
+
+conversation signals
+
+relevant documentation
+
+LIVE history
+
+user corrections
+
+outcome evidence
+
+follow-up results
+
+future context
+
+---
+
+## User Benefit
+
+The user is not resuming a chat.
+
+The user is continuing work toward an outcome.
+
+GEORGE should make continuity feel natural, useful, and low-friction.
+
+---
+
+## Governing Principle
+
+Conversation Packages exist to reduce cognitive load and improve future execution.
+
+If storing something in a Conversation Package does not improve preparation, support, learning, follow-up, or future outcome probability, it should not be retained there.
+
