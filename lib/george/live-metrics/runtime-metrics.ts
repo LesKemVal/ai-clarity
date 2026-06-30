@@ -1,3 +1,5 @@
+import { validateLatencyTimeline } from './latency-contract.mjs'
+
 export type GeorgeRuntimeMetricEvent =
   | 'mic_open'
   | 'speech_detected'
@@ -25,6 +27,7 @@ export type GeorgeRuntimeMetricEvent =
   | 'tts_playback_end'
 
 const turnStarts = new Map<string, number>()
+const turnEvents = new Map<string, GeorgeRuntimeMetricEvent[]>()
 
 export function startRuntimeTurn(turnId: string) {
   const now = Date.now()
@@ -48,11 +51,48 @@ export function markRuntimeEvent(
   }
 
   const start = turnStarts.get(turnId)
+  const timeline = [...(turnEvents.get(turnId) || []), event]
+  turnEvents.set(turnId, timeline)
+
+  const contract = validateLatencyTimeline(timeline)
 
   console.info('[LIVE][metrics]', {
     event,
     turnId,
     latencyMs: start ? now - start : undefined,
     at: now,
+    latencyContract: {
+      complete: contract.complete,
+      ordered: contract.ordered,
+      missing: contract.missing,
+    },
   })
+
+  if (!contract.ordered) {
+    console.warn('[LIVE][metrics][latency-contract]', {
+      turnId,
+      ordered: contract.ordered,
+      missing: contract.missing,
+      timeline,
+    })
+  }
+}
+
+export function getRuntimeTurnTimeline(turnId: string) {
+  return [...(turnEvents.get(turnId) || [])]
+}
+
+export function getRuntimeTurnLatencyContract(turnId: string) {
+  return validateLatencyTimeline(getRuntimeTurnTimeline(turnId))
+}
+
+export function resetRuntimeTurnMetrics(turnId?: string) {
+  if (turnId) {
+    turnStarts.delete(turnId)
+    turnEvents.delete(turnId)
+    return
+  }
+
+  turnStarts.clear()
+  turnEvents.clear()
 }

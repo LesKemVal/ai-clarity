@@ -222,6 +222,23 @@
         "timeline detects out-of-order stages",
         "latency validation is observational only"
       ]
+    },
+    {
+      "path": "lib/george/live-metrics/runtime-metrics.ts",
+      "role": "Records LIVE runtime turn metrics and evaluates each turn against the latency contract.",
+      "targetedBehavior": [
+        "scripts/george-behavior/live-runtime-metrics-contract.mjs"
+      ],
+      "concertBehavior": [
+        "scripts/george-behavior/live-latency-contract.mjs"
+      ],
+      "invariants": [
+        "runtime metrics preserve ordered per-turn timelines",
+        "runtime metrics expose latency contract status per turn",
+        "runtime metrics warn on out-of-order contract stages",
+        "runtime metrics are observational only",
+        "runtime metrics can reset deterministically for tests"
+      ]
     }
   ]
 }
