@@ -31,3 +31,38 @@ Every production-critical behavior should have:
 ## Production-Critical Surface
 
 A file is production-critical when it affects user authority, desired outcome preservation, LIVE timing, delivery meaning, speech synchronization, Conversation Package continuity, Relevant Documentation, Learning, Conversation Summary generation, runtime portability, or operational state ownership.
+
+
+## Current Concert Coverage
+
+Conversation Package concert coverage is protected by:
+
+- `scripts/george-behavior/conversation-package-concert.mjs`
+
+This scenario verifies:
+
+LIVE Entry setup
+
+↓
+
+Package resolution
+
+↓
+
+Relevant Documentation attachment
+
+↓
+
+LIVE summary attachment
+
+↓
+
+Outcome progression
+
+↓
+
+Learning candidate attachment
+
+↓
+
+Package history preservation

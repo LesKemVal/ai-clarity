@@ -12,7 +12,8 @@
         "scripts/george-behavior/conversation-package-identification.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/conversation-package-runtime.mjs"
+        "scripts/george-behavior/conversation-package-runtime.mjs",
+        "scripts/george-behavior/conversation-package-concert.mjs"
       ],
       "invariants": [
         "prioritize outcome and context continuity over generic recency",
@@ -26,7 +27,8 @@
         "scripts/george-behavior/conversation-package-manager.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/conversation-package-runtime.mjs"
+        "scripts/george-behavior/conversation-package-runtime.mjs",
+        "scripts/george-behavior/conversation-package-concert.mjs"
       ],
       "invariants": [
         "documentation attaches to package",
@@ -42,7 +44,8 @@
         "scripts/george-behavior/conversation-package-live-entry.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/conversation-package-runtime.mjs"
+        "scripts/george-behavior/conversation-package-runtime.mjs",
+        "scripts/george-behavior/conversation-package-concert.mjs"
       ],
       "invariants": [
         "LIVE Entry becomes a conversation event",
@@ -56,7 +59,8 @@
         "scripts/george-behavior/conversation-package-runtime.mjs"
       ],
       "concertBehavior": [
-        "scripts/george-behavior/conversation-package-runtime.mjs"
+        "scripts/george-behavior/conversation-package-runtime.mjs",
+        "scripts/george-behavior/conversation-package-concert.mjs"
       ],
       "invariants": [
         "continue existing package when evidence supports continuity",
