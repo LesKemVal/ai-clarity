@@ -40,6 +40,7 @@ const scenarios = [
   ['LIVE Entry document assets', './george-behavior/live-entry-document-assets.mjs'],
   ['Normal GEORGE document assets', './george-behavior/normal-document-assets.mjs'],
   ['Runtime concert', './george-behavior/runtime-concert.mjs'],
+  ['LIVE latency contract', './george-behavior/live-latency-contract.mjs'],
 ]
 
 let failed = 0

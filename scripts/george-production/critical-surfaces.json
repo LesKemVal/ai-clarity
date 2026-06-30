@@ -207,6 +207,21 @@
         "Support is selected from operational state and delivery preserves its meaning",
         "Telemetry is observational only"
       ]
+    },
+    {
+      "path": "lib/george/live-metrics/latency-contract.mjs",
+      "role": "Defines the required LIVE latency timeline from microphone through playback.",
+      "targetedBehavior": [
+        "scripts/george-behavior/live-latency-contract.mjs"
+      ],
+      "concertBehavior": [],
+      "invariants": [
+        "latency timeline starts at microphone open",
+        "latency timeline ends at playback completion",
+        "timeline detects missing stages",
+        "timeline detects out-of-order stages",
+        "latency validation is observational only"
+      ]
     }
   ]
 }
