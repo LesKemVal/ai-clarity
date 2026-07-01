@@ -3279,6 +3279,12 @@ const beginProofOfAwareness = async () => {
         return [...styleLines, ...signalLines].slice(0, 5)
       }
 
+      const liveTierLabel = String(tier || 'smart').toUpperCase()
+      const liveObjectiveLabel =
+        objectiveLabel && objectiveLabel !== 'the desired outcome'
+          ? objectiveLabel
+          : 'move toward my desired outcome'
+
       const confirmPrivacyAndContinue = () => {
         setLiveRecoveryAcknowledged(true)
         setLiveBriefingCapabilitiesConfirmed(true)
@@ -3451,7 +3457,7 @@ const beginProofOfAwareness = async () => {
               />
 
               <span className="text-[12px] leading-5">
-                I understand that GEORGE provides support discreetly, and I remain responsible for the conversation, my decisions, and my actions.{' '}
+                I understand that GEORGE is {liveTierLabel}, but I am the final authority. If GEORGE&apos;s support doesn&apos;t fit the conversation, I may ignore it, revise it, or take another approach. I understand GEORGE will adapt its support as it learns what works best for me and the conversation while helping me {liveObjectiveLabel}.{' '}
                 <button
                   type="button"
                   onClick={(event) => {
