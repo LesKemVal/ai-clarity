@@ -3318,7 +3318,7 @@ const beginProofOfAwareness = async () => {
       return (
         <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
           <div className="mt-3 space-y-3">
-            {liveBriefingSupportAccepted && (
+            {!liveBriefingExpandedSupportPanel && (
               <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -3336,7 +3336,6 @@ const beginProofOfAwareness = async () => {
                   <button
                     type="button"
                     onClick={() => {
-                      setLiveBriefingSupportAccepted(false)
                       setLiveBriefingCommunicationConfirmed(false)
                       setLiveRecoveryAcknowledged(false)
                       setLiveBriefingCapabilitiesConfirmed(false)
@@ -3349,7 +3348,7 @@ const beginProofOfAwareness = async () => {
                 </div>
               </div>
             )}
-            <div className={`${liveBriefingSupportAccepted ? 'hidden' : ''} rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4`}>
+            <div className={`${liveBriefingExpandedSupportPanel ? '' : 'hidden'} rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4`}>
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
                 Recommended
               </div>
@@ -3396,11 +3395,17 @@ const beginProofOfAwareness = async () => {
                         event.preventDefault()
                         setActiveSupportStyle(panel.id)
                         setLiveBriefingSupportAccepted(true)
+                        setLiveBriefingCommunicationConfirmed(false)
+                        setLiveRecoveryAcknowledged(false)
+                        setLiveBriefingCapabilitiesConfirmed(false)
                         setLiveBriefingExpandedSupportPanel(null)
                       }}
                       onClick={() => {
                         setActiveSupportStyle(panel.id)
                         setLiveBriefingSupportAccepted(true)
+                        setLiveBriefingCommunicationConfirmed(false)
+                        setLiveRecoveryAcknowledged(false)
+                        setLiveBriefingCapabilitiesConfirmed(false)
                         setLiveBriefingExpandedSupportPanel(null)
                       }}
                       className="w-full py-3 text-left"
@@ -3451,9 +3456,9 @@ const beginProofOfAwareness = async () => {
               </div>
             </div>
 
-            {liveBriefingSupportAccepted && (
+            {!liveBriefingExpandedSupportPanel && (
               <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
-                {liveBriefingCommunicationConfirmed ? (
+                {liveBriefingCommunicationConfirmed || !liveBriefingExpandedSupportPanel ? (
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
@@ -3531,7 +3536,7 @@ const beginProofOfAwareness = async () => {
               </div>
             )}
 
-            {liveBriefingCommunicationConfirmed && (
+            {!liveBriefingExpandedSupportPanel && (
               <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
                 ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
