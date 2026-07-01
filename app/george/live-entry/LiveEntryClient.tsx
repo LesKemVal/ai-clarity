@@ -3886,11 +3886,17 @@ const beginProofOfAwareness = async () => {
             Take GEORGE into the room.
           </h1>
 
-          <p className="mt-3 text-[14px] leading-6 text-white/46">
-            LIVE supports conversations while they're happening. GEORGE recognizes and interprets changing objectives, pressure, hesitation, opportunities, objections, and other meaningful signals while providing support when it can still improve the outcome.
-
-A transcript can tell you what happened after the conversation. LIVE helps while the conversation still matters.
-          </p>
+          <div className="mt-3 space-y-3 text-[14px] leading-6 text-white/46">
+            <p>
+              LIVE supports conversations while they're happening. GEORGE recognizes and interprets changing objectives, pressure, hesitation, opportunities, objections, and other meaningful signals while providing support when it can still improve the outcome.
+            </p>
+            <p>
+              A transcript can tell you what happened after the conversation.
+            </p>
+            <p className="font-semibold text-[#D7DCFF]/72">
+              LIVE helps while the conversation still matters.
+            </p>
+          </div>
 
           <div className="mt-5 grid gap-2">
             <button
@@ -3952,13 +3958,6 @@ A transcript can tell you what happened after the conversation. LIVE helps while
                 </span>
               </button>
             )}
-          </div>
-
-          <div className="mt-4 rounded-[0.82rem] border border-white/[0.055] bg-white/[0.018] px-4 py-3">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-[#D7DCFF]/42">Notice</div>
-            <p className="mt-2 text-[12px] leading-5 text-white/38">
-              GEORGE supports your communication in real time. You remain responsible for what you say, decide, and do.
-            </p>
           </div>
 
         </section>
