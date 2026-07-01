@@ -3516,7 +3516,8 @@ const beginProofOfAwareness = async () => {
               </div>
             )}
 
-            <label className={`${liveBriefingCommunicationConfirmed ? '' : 'hidden'} flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
+            {liveBriefingCommunicationConfirmed && (
+              <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
                 ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
                 : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
@@ -3549,7 +3550,8 @@ const beginProofOfAwareness = async () => {
                   Privacy
                 </button>
               </span>
-            </label>
+              </label>
+            )}
 
             <div className="grid gap-2 sm:grid-cols-2">
               <button
