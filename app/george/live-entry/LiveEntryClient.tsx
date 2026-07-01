@@ -3336,7 +3336,7 @@ const beginProofOfAwareness = async () => {
               </div>
 
               <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                Choose how GEORGE supports this conversation. Each style shows what I can already help you do based on the outcome and signal you’ve given me.
+                Here's how I can support you. Choose what feels most natural to you.
               </p>
 
               <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
@@ -3345,13 +3345,13 @@ const beginProofOfAwareness = async () => {
                     id: 'advice',
                     label: 'Cue',
                     line: 'Adaptive support delivered at the right moment.',
-                    detail: 'I use the least intrusive intervention that can materially improve your chances: a cue, question, short line, posture adjustment, or timing signal. Brevity is preferred, but not the law.',
+                    detail: 'I use the least intrusive support that can meaningfully improve your chances of success. That may be a cue, question, short phrase, timing adjustment, or posture reminder.',
                   },
                   {
                     id: 'completion',
                     label: 'Continuation',
                     line: 'I help preserve your trajectory.',
-                    detail: 'Say a few words and pause. If enough evidence exists, I can continue your thought. If not, I preserve structure, pacing, and direction without inventing facts.',
+                    detail: 'Start your thought naturally. When the conversation benefits from support, I\'ll help while preserving your objective.',
                   },
                   {
                     id: 'response',
@@ -3402,7 +3402,7 @@ const beginProofOfAwareness = async () => {
                           </span>
 
                           <span className={`block overflow-hidden transition-all duration-300 ${
-                            open ? 'max-h-44 opacity-100' : 'max-h-0 opacity-0'
+                            open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                           }`}>
                             <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                               {panel.detail}
@@ -3420,7 +3420,7 @@ const beginProofOfAwareness = async () => {
                                 ))}
                               </span>
                               <span className="mt-2 block text-[10.5px] leading-4 text-white/28">
-                                More briefing makes this more specific. You decide what to use, reword, or ignore.
+                                The better I understand the conversation, the better I can support you.
                               </span>
                             </span>
                           </span>
