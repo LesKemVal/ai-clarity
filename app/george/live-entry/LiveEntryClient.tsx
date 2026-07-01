@@ -3887,7 +3887,9 @@ const beginProofOfAwareness = async () => {
           </h1>
 
           <p className="mt-3 text-[14px] leading-6 text-white/46">
-            Choose how you want to begin.
+            LIVE supports conversations while they're happening. GEORGE recognizes and interprets changing objectives, pressure, hesitation, opportunities, objections, and other meaningful signals while providing support when it can still improve the outcome.
+
+A transcript can tell you what happened after the conversation. LIVE helps while the conversation still matters.
           </p>
 
           <div className="mt-5 grid gap-2">
@@ -3900,10 +3902,10 @@ const beginProofOfAwareness = async () => {
                 Quick LIVE
               </span>
               <span className="mt-1 block text-[12px] leading-5 text-white/56">
-                Start immediately with minimum setup.
+                Enter LIVE immediately with minimal setup.
               </span>
               <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                Best when the conversation is already happening or you only need light, adaptive support.
+                Best when the conversation is less complex or when the user prefers to brief GEORGE organically as the conversation unfolds.
               </span>
             </button>
 
@@ -3926,10 +3928,10 @@ const beginProofOfAwareness = async () => {
                 Brief GEORGE
               </span>
               <span className="mt-1 block text-[12px] leading-5 text-white/52">
-                Give GEORGE room-specific signal before LIVE.
+                Brief GEORGE before entering LIVE.
               </span>
               <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                Best when the outcome matters and a little preparation will improve the guidance.
+                Ideal when you have time before a negotiation, board meeting, presentation, interview, investor meeting, or any conversation where preparation improves judgment, timing, and execution.
               </span>
             </button>
 
@@ -3943,10 +3945,10 @@ const beginProofOfAwareness = async () => {
                   Resume Conversation
                 </span>
                 <span className="mt-1 block text-[12px] leading-5 text-white/52">
-                  Continue from a previous LIVE room.
+                  Continue an existing LIVE conversation.
                 </span>
                 <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                  Best when GEORGE should preserve context from an earlier conversation.
+                  GEORGE restores previous objectives, context, and conversation continuity before re-entering the room.
                 </span>
               </button>
             )}
