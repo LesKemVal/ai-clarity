@@ -3640,7 +3640,7 @@ const beginProofOfAwareness = async () => {
       )
 
     return (
-      <PanelShell label="BRIEF ROOM · OBJECTIVE" title="What else matters?" stage={3}>
+      <PanelShell label="BRIEF ROOM · FINAL CHECK" title="Before we begin" stage={3}>
         {liveReadyAccepted && (
           <div className="mt-5 rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
@@ -3671,17 +3671,18 @@ const beginProofOfAwareness = async () => {
 
         <div className={`${liveReadyAccepted ? 'hidden' : ''} mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]`}>
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
-            Optional intangible objective
+Final check
           </div>
 
           <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
-            <p>Your desired outcome remains primary. Any secondary outcome you gave earlier remains separate.</p>
-            <p>Choose one additional thing GEORGE should watch for.</p>
-            <p>Some objectives reinforce each other. Some compete with each other. GEORGE will attempt to balance them without replacing the primary outcome.</p>
+            <p>Is there anything else?</p>
+            <p>Users instinctively try to talk to me, which I understand. But you're not supposed to.</p>
+            <p>Talk normally to everyone else.</p>
+            <p>I'll adapt.</p>
           </div>
 
           <div className="mt-5 text-[10px] uppercase tracking-[0.22em] text-white/28">
-            What intangible should GEORGE also watch for?
+Anything I should keep in mind?
           </div>
 
           <div className="mt-3 divide-y divide-white/[0.055] border-y border-white/[0.055]">
@@ -3805,7 +3806,7 @@ const beginProofOfAwareness = async () => {
           />
 
           <span className="text-[12px] leading-5">
-            I understand GEORGE provides support, and I remain responsible for what I say and do in the room.
+I understand. I'm ready to begin.
           </span>
         </label>
 
