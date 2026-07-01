@@ -206,10 +206,21 @@ const OBSERVED_REALITY_EXAMPLES: Record<string, string> = {
   Other: 'Something changed that affects the outcome.',
 }
 
-function getPrepDocumentPrompt(conversationType: string, audienceType: string) {
+function getPrepDocumentPrompt(conversationType: string, audienceType: string, objective = '') {
   const base = {
     label: 'Relevant Documentation',
     helper: 'These documents could improve my understanding of this conversation. Upload only what you think will help.',
+  }
+
+  const signal = `${conversationType} ${audienceType} ${objective}`.toLowerCase()
+
+  if (/vc|venture|investor|capital|fundraising|raise|financing|valuation|term sheet|series\s*[abc]|\$|billion|deal/.test(signal)) {
+    return {
+      ...base,
+      action: 'Upload documentation',
+      recommendations: ['Pitch deck', 'Financial model', 'Cap table', 'Term sheet', 'Market analysis', 'Traction summary'],
+      resource: 'investor documentation preload',
+    }
   }
 
   if (conversationType === 'Interview') {
@@ -1734,8 +1745,8 @@ const mandatoryLiveSignals = useMemo(() => {
   )
 
   const prepDocumentPrompt = useMemo(() => {
-    return getPrepDocumentPrompt(resolvedConversationType, audienceType)
-  }, [resolvedConversationType, audienceType])
+    return getPrepDocumentPrompt(resolvedConversationType, audienceType, objective)
+  }, [resolvedConversationType, audienceType, objective])
 
   const resourceEstimate = useMemo(() => {
     const adjustedObjective = prepDocument
@@ -2987,6 +2998,28 @@ const beginProofOfAwareness = async () => {
     const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, supportStyle)
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
+    const briefingUnderstandingSignals = Array.from(new Set([
+      roomLabel !== 'this room' ? roomLabel : '',
+      audienceLabel !== 'the audience' ? audienceLabel : '',
+      /vc|venture|investor|capital|fundraising|raise|financing|valuation|term sheet|series\s*[abc]|\$|billion|deal/i.test(objectiveLabel)
+        ? 'Capital / investor signal'
+        : '',
+      /board|executive|ceo|strategy|acquisition|merger/i.test(`${roomLabel} ${audienceLabel} ${objectiveLabel}`)
+        ? 'Executive room signal'
+        : '',
+      /negotiat|terms|offer|price|deal/i.test(`${roomLabel} ${objectiveLabel}`)
+        ? 'Negotiation signal'
+        : '',
+      prepDocument ? 'Documentation attached' : '',
+    ].filter(Boolean))).slice(0, 5)
+
+    const documentationRecommendations = prepDocumentPrompt.recommendations.map((title) => ({
+      title,
+      reason: /pitch|financial|cap table|term|market|traction/i.test(title)
+        ? 'Useful for credibility, proof, valuation, risk, or investor questions.'
+        : 'Useful if it materially improves timing, judgment, or execution.',
+    }))
+
 
     const skipLiveRecoveryConstraints = () => {
       const selected = normalizeLiveRecoverySelection(DEFAULT_LIVE_RECOVERY_SELECTION)
@@ -3009,18 +3042,10 @@ const beginProofOfAwareness = async () => {
           title={liveBriefingToaAccepted ? 'Your conversation has taken shape.' : 'Your conversation is taking shape.'}
           stage={1}
         >
-          <div className="mt-5 space-y-3 rounded-[1rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
-            <div className="text-[13px] leading-6 text-[#D7DBE4]/64">
-              Review your conversation readiness. Update anything that has changed. GEORGE only needs enough context to begin well. The rest is learned through the conversation.
+          <div className="mt-4 space-y-2 rounded-[0.9rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
+            <div className="text-[11.5px] leading-5 text-[#D7DBE4]/52">
+              Review the briefing. The more accurate the signal, the better GEORGE can support timing, judgment, and execution.
             </div>
-
-            <RelevantDocumentationPanel
-              recommendations={[]}
-              document={prepDocument}
-              reading={prepDocumentReading}
-              onUpload={(file) => void handlePrepDocumentUpload(file)}
-              onRemove={() => setPrepDocument(null)}
-            />
 
             <label className="block">
               <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Desired Outcome</div>
@@ -3028,8 +3053,8 @@ const beginProofOfAwareness = async () => {
                 value={objective}
                 disabled={briefingInputsLocked}
                 onChange={(event) => updateBriefingObjective(event.target.value)}
-                rows={2}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                rows={1}
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={objectiveLabel}
               />
             </label>
@@ -3041,7 +3066,7 @@ const beginProofOfAwareness = async () => {
                   value={userPosition}
                   disabled={briefingInputsLocked}
                   onChange={(event) => setUserPosition(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={positionLabel}
                 />
               </label>
@@ -3052,7 +3077,7 @@ const beginProofOfAwareness = async () => {
                   value={audienceType}
                   disabled={briefingInputsLocked}
                   onChange={(event) => setAudienceType(event.target.value)}
-                  className="mt-1 w-full rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                   placeholder={audienceLabel}
                 />
               </label>
@@ -3064,8 +3089,8 @@ const beginProofOfAwareness = async () => {
                 value={knownContext}
                 disabled={briefingInputsLocked}
                 onChange={(event) => updateBriefingRoomSignal(event.target.value)}
-                rows={3}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                rows={2}
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder={observation}
               />
             </label>
@@ -3076,14 +3101,33 @@ const beginProofOfAwareness = async () => {
                 disabled={briefingInputsLocked}
                 value={secondaryPosition}
                 onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
-                rows={2}
-                className="mt-1 w-full resize-none rounded-[0.75rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[14px] leading-6 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
+                rows={1}
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#8FB6C9]/42 focus:bg-[#8FB6C9]/[0.035]"
                 placeholder="Optional. If empty, GEORGE treats this signal as inconclusive."
               />
-              <div className="mt-1 text-[11px] leading-4 text-white/28">
+              <div className="mt-1 text-[10px] leading-4 text-white/24">
                 Add the next useful thing GEORGE should determine, remember, convey, watch for, or understand. Leave blank if inconclusive.
               </div>
             </label>
+
+            {briefingUnderstandingSignals.length > 0 && (
+              <div className="rounded-[0.82rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
+                <div className="text-[9px] uppercase tracking-[0.22em] text-white/30">
+                  GEORGE understands
+                </div>
+                <div className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/48">
+                  {briefingUnderstandingSignals.join(' • ')}
+                </div>
+              </div>
+            )}
+
+            <RelevantDocumentationPanel
+              recommendations={documentationRecommendations}
+              document={prepDocument}
+              reading={prepDocumentReading}
+              onUpload={(file) => void handlePrepDocumentUpload(file)}
+              onRemove={() => setPrepDocument(null)}
+            />
 
           </div>
 
