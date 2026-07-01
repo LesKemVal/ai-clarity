@@ -2815,7 +2815,7 @@ const beginProofOfAwareness = async () => {
               />
             )}
 
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="mt-3 grid gap-2 sm:grid-cols-3">
               <button
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
@@ -2824,6 +2824,21 @@ const beginProofOfAwareness = async () => {
               >
                 {liveEntryQuestionSurface.primaryAction}
               </button>
+
+              {showOpenAISignalSurface &&
+               currentOptionalSignalQuestion &&
+               !liveEntryQuestionSurface.readinessMessage && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    unlockLiveEntryVoice()
+                    void requestNextOptionalSignalQuestion()
+                  }}
+                  className="rounded-[0.95rem] border border-white/[0.08] bg-transparent px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-white/46 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/78"
+                >
+                  Skip
+                </button>
+              )}
 
               <button
                 type="button"
