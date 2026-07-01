@@ -3039,7 +3039,7 @@ const beginProofOfAwareness = async () => {
       return (
         <PanelShell
           label="BRIEF ROOM · EDITABLE"
-          title={liveBriefingToaAccepted ? 'Your conversation has taken shape.' : 'Your conversation is taking shape.'}
+          title="Prepare Briefing"
           stage={1}
         >
           <div className="mt-4 space-y-2 rounded-[0.9rem] border border-[#8FB6C9]/[0.10] bg-black/22 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
@@ -3143,7 +3143,7 @@ const beginProofOfAwareness = async () => {
               className="mt-1 h-4 w-4 accent-[#8FB6C9]"
             />
             <span className="text-[12.5px] leading-5 text-[#D7DBE4]/72">
-              I agree to the Terms of Assistance.{' '}
+              I’ve reviewed this briefing. It accurately reflects what I want GEORGE to understand before entering LIVE.{' '}
               <button
                 type="button"
                 onClick={(event) => {
@@ -3171,7 +3171,7 @@ const beginProofOfAwareness = async () => {
                 <button
                   type="button"
                   onClick={() => setLiveBriefingStep(3)}
-                  className="rounded-[0.82rem] border border-white/[0.07] bg-white/[0.018] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                  className="rounded-[0.72rem] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-[#8FB6C9]/28 hover:bg-[#8FB6C9]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
                 >
                   Skip to Proof
                 </button>
@@ -3180,7 +3180,7 @@ const beginProofOfAwareness = async () => {
                   <button
                     type="button"
                     onClick={() => startLive(false, editableResources, true)}
-                    className="rounded-[0.82rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.055] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/78 transition hover:border-[#8FB6C9]/42 hover:bg-[#8FB6C9]/[0.09] hover:text-white active:scale-[0.98]"
+                    className="rounded-[0.72rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.055] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#D7DCFF]/78 transition hover:border-[#8FB6C9]/42 hover:bg-[#8FB6C9]/[0.09] hover:text-white active:scale-[0.98]"
                   >
                     Begin LIVE
                   </button>
