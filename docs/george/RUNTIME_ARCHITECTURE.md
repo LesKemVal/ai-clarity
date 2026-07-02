@@ -193,7 +193,7 @@ The behavior suite includes this scenario through `scripts/george-behavior-suite
 
 Presentation owns controls and visualization.
 
-LIVE Hub owns runtime state and synchronization.
+LIVE Hub owns runtime state, synchronization, runtime turn identity, and cue emission.
 
 GEORGE Core owns operational judgment, evidence, authority, continuation, response shaping, and semantic meaning.
 
@@ -201,7 +201,27 @@ Delivery owns voice, visual, silent, suppression, timing, modality, and revision
 
 Delivery may not alter operational meaning.
 
+Runtime metrics own event naming, latency timing, correlation, and latency contract inspection.
+
 `app/george/page.tsx` must remain thin. Prefer bridges, runtime adapters, conversation runtime modules, behavior tests, and focused modules.
+
+`page.tsx` may pass an existing `turnId` from a bridge into a runtime call, but must not own turn lifecycle, create competing telemetry, or invent LIVE reasoning behavior.
+
+## LIVE Turn Correlation
+
+The production telemetry direction is one LIVE turn identifier flowing through the execution path:
+
+mic → STT → transcript → cue → delivery → TTS → playback
+
+The turn starts once.
+
+The same identifier should be carried forward when possible.
+
+Hub voice playback uses pass-through turn identity rather than page-owned lifecycle state.
+
+`app/george/page.tsx` remains a pass-through orchestration surface for this identifier.
+
+Runtime metrics helpers remain the authority for event names and timing.
 
 ## Relevant Documentation Runtime
 
@@ -267,11 +287,13 @@ GEORGE remembers only what improves future execution.
 
 ## Next Runtime Implementation Order
 
-1. Conversation Package Manager
-2. Learning Runtime
-3. Conversation Summary Runtime
-4. Resumable Conversation Readiness
-5. Quick LIVE
+1. Inspect real LIVE latency logs from the full turn path.
+2. Optimize the slowest measured segment first.
+3. Continue Conversation Package Manager hardening.
+4. Continue Learning Runtime hardening.
+5. Continue Conversation Summary Runtime hardening.
+6. Continue Resumable Conversation Readiness.
+7. Continue Quick LIVE.
 
 ## Engineering Constraint
 
@@ -318,124 +340,3 @@ Learning Runtime
 Conversation Package Update
 
 Conversation Summary Runtime produces operational summaries, evidence candidates, and suggested next actions.
-
-Learning Runtime begins with outcome relevance before confidence or promotion. High confidence alone is not enough to preserve unrelated evidence.
-
-Conversation Packages remain the operational container. Summary and Learning outputs attach to the package rather than creating independent state.
-
-
-## Current Operational Improvement Loop
-
-Validated clean state:
-
-- Behavioral Suite: 32 / 32 passing
-- GEORGE Core Smoke: passing
-- LIVE Entry Smoke: passing
-- Production Build: passing
-
-Current protected loop:
-
-Preparation Runtime
-
-↓
-
-Conversation Package Runtime
-
-↓
-
-Conversation Summary Runtime
-
-↓
-
-Learning Runtime
-
-↓
-
-Conversation Package Update
-
-↓
-
-Next Preparation
-
-This proves GEORGE can use prior conversation evidence and learning to improve the next conversation without persistence, UI changes, or page-level logic.
-
-
-## Page and UI Boundary Rule
-
-`app/george/page.tsx` and `app/george/live-entry/LiveEntryClient.tsx` are UI surfaces.
-
-They may:
-
-- render interface
-- collect user actions
-- call runtime modules
-- route user actions
-- coordinate display state
-
-They must not own:
-
-- operational doctrine
-- Conversation Package logic
-- document intelligence
-- learning promotion
-- summary generation
-- relevance scoring
-- package attachment decisions
-- LIVE reasoning or delivery meaning
-
-Operational behavior belongs under `lib/george/**` and must be protected by behavior coverage.
-
-
-
-## Production Modification Rule
-
-No manual coding.
-
-Ever.
-
-Production modifications are applied through deterministic scripts.
-
-Workflow
-
-Inspect
-
-↓
-
-Generate deterministic script
-
-↓
-
-Apply script
-
-↓
-
-Behavior tests
-
-↓
-
-Concert tests
-
-↓
-
-Behavioral suite
-
-↓
-
-Smoke tests
-
-↓
-
-Production build
-
-↓
-
-Inspect git diff
-
-↓
-
-Commit
-
-↓
-
-Push
-
