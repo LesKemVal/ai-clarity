@@ -5,6 +5,7 @@ import type { MouseEvent } from 'react'
 type LiveFooterControlsProps = {
   language: string
   liveMode: boolean
+  voiceOn?: boolean
   tierLabel: string
   tierActionLabel: string
   motionHoverText: string
@@ -12,6 +13,7 @@ type LiveFooterControlsProps = {
   onHelp: () => void
   onLanguage: (event: MouseEvent<HTMLButtonElement>) => void
   onExitOrTier: () => void
+  onVoiceToggle?: () => void
 }
 
 export function LiveFooterControls({
