@@ -27,6 +27,7 @@ const updated = updateAfterLive(pkg, {
     id: 'summary-1',
     type: 'live_summary',
     summary: 'Investor asked for implementation material and a next call.',
+    suggestedNextAction: 'Send implementation material before the next investor meeting.',
   },
   outcomeReview: {
     desiredOutcome: 'secure investor follow-up',
@@ -51,6 +52,11 @@ const updated = updateAfterLive(pkg, {
 assert(updated.liveSummaries.length === 1, 'post-LIVE update should attach live summary')
 assert(updated.outcomeProgression.length === 1, 'outcome review should create outcome progression evidence')
 assert(updated.learning.length === 1, 'outcome review should create learning evidence')
+assert(updated.futureActions.length === 1, 'summary next action should become package future action')
+assert(
+  updated.futureActions[0].includes('implementation material'),
+  'future action should preserve summary next action'
+)
 
 const progression = updated.outcomeProgression[0]
 assert(progression.source === 'outcome_review', 'outcome progression should identify Outcome Review source')
@@ -73,6 +79,10 @@ assert(
 assert(
   updated.events.some((event) => event.type === 'learning_attached'),
   'events should record learning attachment'
+)
+assert(
+  updated.events.some((event) => event.type === 'conversation_package_updated' && event.fields.includes('futureActions')),
+  'events should record future action update'
 )
 
 console.log('GEORGE conversation package smoke passed')
