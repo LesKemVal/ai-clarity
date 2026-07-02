@@ -10,6 +10,7 @@ writeFileSync(file, `
 import {
   createConversationPackage,
   updateAfterLive,
+  buildConversationRecord,
 } from '${process.cwd()}/lib/george/conversation-packages/index.mjs'
 
 function assert(condition, message) {
@@ -67,6 +68,15 @@ const learning = updated.learning[0]
 assert(learning.source === 'outcome_review', 'learning should identify Outcome Review source')
 assert(learning.learning.startsWith('We can '), 'learning should use GEORGE memory doctrine wording')
 assert(learning.futureConversations.includes('Prepare follow-up.'), 'learning should preserve future preparation options')
+
+const record = buildConversationRecord(updated, { timestamp: '2026-07-02T00:10:00.000Z' })
+assert(record.source === 'conversation-package-runtime', 'conversation record should project from package runtime')
+assert(record.packageId === updated.id, 'conversation record should keep package identity')
+assert(record.summary.includes('Investor asked'), 'conversation record should expose latest operational summary')
+assert(record.latestOutcome.observedProgress === 'improving', 'conversation record should expose latest outcome')
+assert(record.latestLearning.learning.startsWith('We can '), 'conversation record should expose operational learning')
+assert(record.futureActions[0].includes('implementation material'), 'conversation record should expose future actions')
+assert(record.transcriptEvidenceAvailable === false, 'conversation record should not pretend transcript evidence exists')
 
 assert(
   updated.events.some((event) => event.type === 'live_summary_attached'),
