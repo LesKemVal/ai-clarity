@@ -8423,7 +8423,7 @@ Continue from here, tell me what changed, or start fresh.`
           <div data-george-language-menu className={`absolute bottom-full left-1/2 z-[90] mb-3 w-[220px] -translate-x-1/2 px-3 py-2.5 md:px-5 md:py-4 md:px-5 md:py-4 ${operationalMotion.anchorPanel} ${operationalMotion.surface}`}>
           <div className="mb-2 flex items-center justify-between gap-3">
             <div className="text-[9px] uppercase tracking-[0.22em] text-white/24">
-              Execution
+              LIVE
             </div>
             <button
               type="button"
@@ -8435,57 +8435,92 @@ Continue from here, tell me what changed, or start fresh.`
             </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (currentTier === 'smart') {
-                setToastMessage('Voice replies unlock above Smart.')
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => {
+                setToastMessage(`Support: ${activeLiveSupportLabel}`)
                 setShowToast(true)
-                return
-              }
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+            >
+              Support · {activeLiveSupportLabel}
+            </button>
 
-              const nextVoice = !voiceOn
-              hasUserInteractedRef.current = true
-              setVoiceOn(nextVoice)
-              setInteractionMode(nextVoice ? 'speech' : 'text')
-              window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-              setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
-              setShowToast(true)
-            }}
-            className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
-          >
-            {voiceOn ? 'Audio on' : 'Audio off'}
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setToastMessage(`Communication: ${communicationBaseline}`)
+                setShowToast(true)
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+            >
+              Communication · {communicationBaseline}
+            </button>
 
-          <div className="border-t border-white/[0.045] pt-2 mt-1">
-            <div className="mb-1 text-[9px] uppercase tracking-[0.20em] text-white/22">
-              Language
-            </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-              {languageOptions.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => {
-                    setLanguage(option)
-                    window.localStorage.setItem('george_language', option)
-                    setToastMessage(`Language set: ${option}`)
-                    setShowToast(true)
-                    setShowLiveQuickMenu(false)
-                  }}
-                  className={`py-1 text-left text-[10px] uppercase tracking-[0.12em] transition active:scale-[0.98] ${
-                    language === option
-                      ? 'text-white/82'
-                      : 'text-white/34 hover:text-white/68'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setToastMessage('Language Assist: Automatic')
+                setShowToast(true)
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+            >
+              Language Assist · Automatic
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (currentTier === 'smart') {
+                  setToastMessage('Voice replies unlock above Smart.')
+                  setShowToast(true)
+                  return
+                }
+
+                const nextVoice = !voiceOn
+                hasUserInteractedRef.current = true
+                setVoiceOn(nextVoice)
+                setInteractionMode(nextVoice ? 'speech' : 'text')
+                window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
+                setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
+                setShowToast(true)
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
+            >
+              Voice · {voiceOn ? 'Audio On' : 'Muted'}
+            </button>
           </div>
 
           <div className="mt-1 border-t border-white/[0.045] pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setToastMessage('Conversation record will open after LIVE.')
+                setShowToast(true)
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
+            >
+              Conversation
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const details = [
+                  liveRuntimeSupport?.room ? `Room: ${liveRuntimeSupport.room}` : null,
+                  liveRuntimeSupport?.chair ? `Role: ${liveRuntimeSupport.chair}` : null,
+                  liveRuntimeSupport?.objective ? `Outcome: ${liveRuntimeSupport.objective}` : null,
+                ].filter(Boolean).join(' · ') || 'Session details unavailable'
+
+                setToastMessage(details)
+                setShowToast(true)
+              }}
+              className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
+            >
+              Session Details
+            </button>
+
             <button
               type="button"
               onClick={() => {
