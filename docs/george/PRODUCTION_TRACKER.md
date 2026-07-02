@@ -52,6 +52,7 @@ Page/UI owns:
 - interaction
 - presentation
 - signal collection
+- pass-through orchestration for existing runtime identifiers
 
 Helper modules own:
 - deterministic UI support
@@ -64,6 +65,7 @@ LIVE Hub owns:
 - signal interpretation
 - decision making
 - support selection
+- LIVE turn identity
 
 Reasoning owns:
 - OpenAI prompting
@@ -77,6 +79,12 @@ Delivery owns:
 - silent delivery
 - timing
 - routing
+
+Runtime metrics own:
+- event naming
+- latency timing
+- turn correlation
+- latency contract inspection
 
 Do not violate these boundaries.
 
@@ -153,9 +161,21 @@ Telemetry currently covers:
 - hub receive
 - delivery cue
 - visual render
+- voice cue request
 - TTS request
 - TTS receive
+- playback start
 - playback complete
+
+LIVE turn correlation direction:
+
+One LIVE turn starts once and the same runtime turn identifier should flow through:
+
+mic → STT → transcript → cue → delivery → TTS → playback
+
+`page.tsx` may pass through an existing `turnId`, but must not invent turn lifecycle rules.
+
+Runtime metrics helpers own event naming, timing, and correlation.
 
 ## Current High-Priority Todo
 
@@ -163,8 +183,9 @@ Telemetry currently covers:
 - Continue refining Brief Room presentation using the existing Preparation Runtime.
 - Improve reusable documentation presentation inside Brief Room.
 - Related Conversation Package selection now ranks and bounds packages before Preparation Runtime ingestion; continue validating this through `george:preparation:smoke` and production build.
+- LIVE hub voice playback now accepts the existing LIVE `turnId` pass-through; commit `ad12b56` was validated by `npm run build` locally.
 - Continue Relevant Documentation attachment and reuse inside Conversation Packages.
-- Continue end-to-end latency measurement through microphone, Deepgram, reasoning, delivery, Cartesia, and playback.
+- Inspect real LIVE latency logs and optimize the slowest measured segment first.
 - Continue production hardening through modular smoke suites.
 - Continue portability and runtime extraction where page orchestration grows.
 
@@ -237,6 +258,8 @@ This loop is implemented, smoke-tested, documented, and now surfaced in Brief Ro
 Conversation Records and related Conversation Packages can influence future preparation through the existing Preparation Runtime.
 
 Related Conversation Packages are now selected through deterministic Preparation Runtime ranking before ingestion, with bounded package count and selection metadata exposed for inspection.
+
+End-to-end LIVE telemetry now supports passing the same LIVE `turnId` from hub cue delivery into hub voice playback without adding page-owned lifecycle logic.
 
 ## Engineering / Tooling Notes
 
