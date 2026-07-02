@@ -6299,6 +6299,8 @@ return (
         chairLabel={liveRuntimeSupport?.chair || 'User'}
         objectiveLabel={liveRuntimeSupport?.objective || 'Outcome pending'}
         steeringLabels={getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room).slice(0, 3) as [string, string, string]}
+        activeSupportLabel={activeLiveSupportLabel}
+        communicationStyle={activeLiveCommunicationStyle}
         onRoomToggle={() => {
           const nextEnabled = !liveGeorgeEnabled
           setLiveGeorgeEnabled(nextEnabled)
@@ -6333,6 +6335,18 @@ return (
           stopListening()
           setInterimTranscript('')
           setToastMessage('LIVE paused')
+          setShowToast(true)
+        }}
+        onSupportPressed={() => {
+          setShowLiveSupportMenu(true)
+        }}
+        onCommunicationPressed={() => {
+          setToastMessage(`Communication: ${activeLiveCommunicationStyle}`)
+          setShowToast(true)
+        }}
+        onConversationPressed={() => {
+          setShowLiveQuickMenu(false)
+          setToastMessage('Conversation record will open after LIVE.')
           setShowToast(true)
         }}
       />

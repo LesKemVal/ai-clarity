@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+
 type LiveRoomStatusPanelProps = {
   isListening: boolean
   liveRoomActive: boolean
@@ -9,10 +11,59 @@ type LiveRoomStatusPanelProps = {
   chairLabel: string
   objectiveLabel: string
   steeringLabels: [string, string, string]
+  activeSupportLabel: string
+  communicationStyle: string
   onRoomToggle: () => void
   onVoiceToggle: () => void
   onPauseLive: () => void
+  onSupportPressed: () => void
+  onCommunicationPressed: () => void
+  onConversationPressed: () => void
 }
+
+function TypewriterLabel({ value }: { value: string }) {
+  const previousValueRef = useRef(value)
+  const [displayValue, setDisplayValue] = useState(value)
+
+  useEffect(() => {
+    if (previousValueRef.current === value) return
+
+    let frame = 0
+    const next = String(value || '').trim() || 'Cue'
+    const eraseFrom = previousValueRef.current
+    const eraseFrames = Math.min(eraseFrom.length, 5)
+    const writeFrames = next.length
+    const totalFrames = eraseFrames + 1 + writeFrames
+
+    const timer = window.setInterval(() => {
+      frame += 1
+
+      if (frame <= eraseFrames) {
+        setDisplayValue(eraseFrom.slice(0, Math.max(0, eraseFrom.length - frame)))
+        return
+      }
+
+      if (frame === eraseFrames + 1) {
+        setDisplayValue('')
+        return
+      }
+
+      const writeIndex = frame - eraseFrames - 1
+      setDisplayValue(next.slice(0, writeIndex))
+
+      if (frame >= totalFrames) {
+        window.clearInterval(timer)
+        previousValueRef.current = next
+        setDisplayValue(next)
+      }
+    }, 24)
+
+    return () => window.clearInterval(timer)
+  }, [value])
+
+  return <span>{displayValue || ' '}</span>
+}
+
 
 export function LiveRoomStatusPanel({
   isListening,
@@ -23,9 +74,14 @@ export function LiveRoomStatusPanel({
   chairLabel,
   objectiveLabel,
   steeringLabels,
+  activeSupportLabel,
+  communicationStyle,
   onRoomToggle,
   onVoiceToggle,
   onPauseLive,
+  onSupportPressed,
+  onCommunicationPressed,
+  onConversationPressed,
 }: LiveRoomStatusPanelProps) {
   return (
     <div className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
@@ -67,14 +123,14 @@ export function LiveRoomStatusPanel({
             event.preventDefault()
             event.stopPropagation()
             if (isThinking) return
-            onRoomToggle()
+            onSupportPressed()
           }}
           disabled={isThinking}
           className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-150 active:scale-[0.985] active:border-[#8FF0C7]/[0.28] active:bg-[#8FF0C7]/[0.105] hover:border-[#8FF0C7]/[0.22] hover:bg-[#8FF0C7]/[0.085] disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.20] bg-[#8FF0C7]/[0.075] text-[#DCEBFF]/72 shadow-[0_0_26px_rgba(143,240,199,0.055),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.026] text-[#DCEBFF]/36'}`}
         >
-          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Support</span>
+          <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Guidance</span>
           <span className="mt-1 flex items-center justify-between gap-2">
-            <span>Cue</span>
+            <TypewriterLabel value={activeSupportLabel} />
             <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[12px] transition ${liveRoomActive ? 'border-[#8FF0C7]/24 bg-[#8FF0C7]/18 text-[#8FF0C7]' : 'border-white/[0.06] bg-white/[0.025] text-white/30'}`}>
               {liveRoomActive ? '◉' : '○'}
             </span>
@@ -83,16 +139,16 @@ export function LiveRoomStatusPanel({
 
         <button
           type="button"
-          onClick={onVoiceToggle}
-          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 ${voiceOn ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
+          onClick={onCommunicationPressed}
+          className={`rounded-[0.95rem] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 ${liveRoomActive ? 'border-[#8FB6C9]/[0.20] bg-[#8FB6C9]/[0.075] text-[#DCEBFF]/68' : 'border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] text-[#DCEBFF]/46'}`}
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Communication</span>
-          Adaptive
+          {communicationStyle}
         </button>
 
         <button
           type="button"
-          onClick={onPauseLive}
+          onClick={onConversationPressed}
           className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/52 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Conversation</span>
