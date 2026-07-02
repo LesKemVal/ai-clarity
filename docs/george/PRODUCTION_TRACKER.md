@@ -160,13 +160,12 @@ Telemetry currently covers:
 ## Current High-Priority Todo
 
 - Keep production documentation synchronized with implementation.
-- Build the Conversation Package Manager under `lib/george/conversation-packages/`.
-- Integrate Conversation Package identification into runtime flow.
-- Attach Relevant Documentation to Conversation Packages instead of duplicating operational state.
-- Implement Conversation Summary Runtime as an operational asset, not an archive.
-- Implement Learning Runtime through Evidence → Confidence → Learning → Future Conversations.
-- Add behavioral coverage for Conversation Package Manager behavior.
+- Refine the post-LIVE Conversation Record surface and integrate it cleanly with Session Details.
+- Promote recurring evidence across Conversation Packages into future preparation.
+- Continue Relevant Documentation attachment and reuse inside Conversation Packages.
+- Expand long-term operational memory through Evidence → Confidence → Learning → Future Conversations.
 - Continue end-to-end latency measurement through microphone, Deepgram, reasoning, delivery, Cartesia, and playback.
+- Continue production hardening through modular smoke suites.
 
 ## Working Rules
 
@@ -185,6 +184,32 @@ Build before commit.
 Do not commit if build fails.
 
 Do not add git save/commit commands inside build patches.
+
+
+## Production Validation Gate
+
+Production validation is now modular.
+
+Current protected smoke suites:
+
+- `george:core:smoke`
+- `george:live-entry:smoke`
+- `george:conversation-package:smoke`
+- `george:live-runtime:smoke`
+
+`npm run build` runs all four smoke suites before `next build`.
+
+Do not return to a single monolithic behavioral-suite metric.
+
+Add focused smoke suites as production subsystems mature.
+
+## Engineering / Tooling Notes
+
+GitHub connector repository search can produce false negatives for existing symbols and files.
+
+Do not treat connector search misses as evidence that runtime modules are absent.
+
+For repository-wide inspection, prefer local `rg` / `git grep` before adding, moving, or duplicating runtime modules.
 
 
 ---
@@ -2320,6 +2345,17 @@ Conversation → Transcript → User figures it out
 Always:
 
 Execution → Reflection → Evidence
+
+
+## Conversation Record Implementation Status
+
+Current implementation:
+
+- `buildConversationRecord()` projects Conversation Records from the existing Conversation Package runtime.
+- `PostLiveConversationRecordPanel` renders post-LIVE operational memory.
+- The panel is wired after Outcome Review and does not open transcript during LIVE.
+- Conversation Record currently surfaces summary, latest outcome, promoted learning, future actions, documentation count, and transcript evidence availability.
+- Conversation Record remains a projection of operational memory, not a separate runtime or transcript viewer.
 
 ## Language Assist Update
 
