@@ -20,6 +20,7 @@ import {
   type LiveRecoveryOptionId,
 } from '@/lib/george/live-voice/runtime/recovery-options'
 import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/live-entry-briefing'
+import { prepareConversationFromPackage } from '@/lib/george/preparation/runtime.mjs'
 import { getConversationResponsibilityOptions } from '@/lib/george/live-entry/responsibility-options'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
@@ -1926,6 +1927,63 @@ const mandatoryLiveSignals = useMemo(() => {
     }
   }
 
+  const readLastConversationRecord = () => {
+    if (typeof window === 'undefined') return null
+
+    try {
+      const raw = window.localStorage.getItem('GEORGE_LAST_CONVERSATION_RECORD')
+      return raw ? JSON.parse(raw) : null
+    } catch {
+      return null
+    }
+  }
+
+  const buildBriefRoomPreparation = () => {
+    const relatedPackage = selectedRelatedSession
+      ? {
+          id: selectedRelatedSession.id || 'selected-related-session',
+          desiredOutcome:
+            selectedRelatedSession.metadata?.desiredOutcome ||
+            selectedRelatedSession.userGoal ||
+            selectedRelatedSession.currentGoal ||
+            '',
+          conversationContext:
+            selectedRelatedSession.lastKnownState ||
+            selectedRelatedSession.summary ||
+            selectedRelatedSession.title ||
+            '',
+          liveSummaries: selectedRelatedSession.summary
+            ? [{ summary: selectedRelatedSession.summary, source: 'selected_related_session' }]
+            : [],
+          learning: selectedRelatedSession.metadata?.learning || [],
+          futureActions:
+            selectedRelatedSession.metadata?.futureActions ||
+            selectedRelatedSession.metadata?.nextActions ||
+            [],
+          relevantDocumentation:
+            selectedRelatedSession.metadata?.relevantDocumentation ||
+            selectedRelatedSession.metadata?.documents ||
+            [],
+        }
+      : null
+
+    return prepareConversationFromPackage({
+      conversationPackage: {
+        id: 'live-entry-brief-room',
+        desiredOutcome: objective,
+        conversationType: resolvedConversationType,
+        conversationContext: knownContext,
+        conversationWith: audienceType,
+        role: userPosition || chair,
+        relevantDocumentation: prepDocument
+          ? [{ id: prepDocument.name, title: prepDocument.name, type: prepDocument.kind, summary: prepDocument.summary }]
+          : [],
+      },
+      relatedConversationPackages: relatedPackage ? [relatedPackage] : [],
+      conversationRecord: readLastConversationRecord() || undefined,
+    })
+  }
+
   const resumeLiveConversation = (session: any) => {
     if (!session) return
 
@@ -2062,6 +2120,7 @@ const mandatoryLiveSignals = useMemo(() => {
     const continuityPackage = relatedSessionId === 'not_related'
       ? null
       : buildContinuityPackage(selectedRelatedSession)
+    const preparationRuntime = buildBriefRoomPreparation()
 
     const roomPackage = {
       relatedSessionId,
@@ -2122,6 +2181,9 @@ const mandatoryLiveSignals = useMemo(() => {
       preLiveSignals.desiredOutcome ? `Desired outcome: ${preLiveSignals.desiredOutcome}` : '',
       cleanBriefingValue(knownContext) ? `Known context: ${cleanBriefingValue(knownContext)}` : '',
       optionalBriefingLines.length ? `Additional briefing: ${optionalBriefingLines.join(' | ')}` : '',
+      preparationRuntime?.preparationBrief ? `Preparation: ${preparationRuntime.preparationBrief}` : '',
+      preparationRuntime?.opportunities?.[0] ? `Preparation opportunity: ${preparationRuntime.opportunities[0]}` : '',
+      preparationRuntime?.risks?.[0] ? `Preparation risk: ${preparationRuntime.risks[0]}` : '',
     ].filter(Boolean).join('\n')
 
     const secondaryOutcome =
@@ -2162,6 +2224,7 @@ const mandatoryLiveSignals = useMemo(() => {
       compactPrep: true,
       editedByUser: !skipPrep,
       prepRoomProfile,
+      preparationRuntime,
       recoveryConstraints: liveRecoveryConstraints,
       supportStyle,
       deliveryStyle: supportStyle,
@@ -3013,6 +3076,7 @@ const beginProofOfAwareness = async () => {
     const canBeginLiveFromBriefing = liveBriefingReadyToContinue && previousLiveUserRecognized && hasSeenLiveSteering
 
     const supportItems = buildBriefingSupport(roomLabel, audienceLabel, objectiveLabel, supportStyle)
+    const briefingPreparation = buildBriefRoomPreparation()
     const estimatedCents = Math.max(0, Math.round(finalResourceEstimate.estimatedCents || 0))
     const proofReady = Boolean(liveBriefingProofReply.trim())
     const briefingUnderstandingSignals = Array.from(new Set([
@@ -3134,6 +3198,26 @@ const beginProofOfAwareness = async () => {
                 </div>
                 <div className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/48">
                   {briefingUnderstandingSignals.join(' • ')}
+                </div>
+              </div>
+            )}
+
+            {(briefingPreparation?.sufficientToBegin || briefingPreparation?.knownContext?.length > 0) && (
+              <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-3">
+                <div className="text-[9px] uppercase tracking-[0.22em] text-[#D7DCFF]/45">
+                  Preparation memory
+                </div>
+                <div className="mt-2 space-y-1.5 text-[11px] leading-5 text-[#D7DBE4]/56">
+                  {briefingPreparation?.opportunities?.[0] && (
+                    <div>Opportunity: {briefingPreparation.opportunities[0]}</div>
+                  )}
+                  {briefingPreparation?.risks?.[0] && (
+                    <div>Risk: {briefingPreparation.risks[0]}</div>
+                  )}
+                  {briefingPreparation?.reusableDocumentation?.length > 0 && (
+                    <div>Reusable documentation: {briefingPreparation.reusableDocumentation.length}</div>
+                  )}
+                  <div>Confidence: {Math.round((briefingPreparation?.confidence || 0) * 100)}%</div>
                 </div>
               </div>
             )}
