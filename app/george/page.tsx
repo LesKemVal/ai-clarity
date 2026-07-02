@@ -1516,6 +1516,7 @@ const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
   const [showPromptMenu, setShowPromptMenu] = useState(false)
   const [showConversationMenu, setShowConversationMenu] = useState(false)
   const [showLiveQuickMenu, setShowLiveQuickMenu] = useState(false)
+  const [showLiveSessionDetails, setShowLiveSessionDetails] = useState(false)
 
   useEffect(() => {
     // LIVE route ownership now belongs exclusively to /george/live
@@ -6367,7 +6368,7 @@ return (
         scrollPaddingTop: liveStatusStackClearance,
       }
     : undefined}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) && !showLiveEntrySequence || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${(forceLive || liveMode) && !showLiveEntrySequence || (hasVisibleThread && !isPreLiveSignalAcquisition) ? "" : showMobileHero ? "pt-3 md:pt-14" : "pt-10 md:pt-6"} ${(showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
   
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
@@ -7758,6 +7759,67 @@ if (liveMode) {
 )}
 
 
+{showLiveSessionDetails && typeof document !== 'undefined' && createPortal(
+  <div className="fixed inset-0 z-[340] flex items-end justify-center px-4 pb-6 pt-10 sm:items-center sm:pb-10">
+    <button
+      type="button"
+      aria-label="Close session details"
+      onClick={() => setShowLiveSessionDetails(false)}
+      className="absolute inset-0 bg-black/54 [backdrop-filter:blur(16px)] [-webkit-backdrop-filter:blur(16px)]"
+    />
+
+    <div className="relative w-full max-w-[420px] rounded-[1.15rem] border border-white/[0.075] bg-[#05080D]/94 p-4 shadow-[0_28px_92px_rgba(0,0,0,0.62)]">
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <div>
+          <div className="text-[9px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">
+            LIVE
+          </div>
+          <h2 className="mt-1 text-[17px] font-semibold tracking-[-0.035em] text-white/88">
+            Session Details
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Close session details"
+          onClick={() => setShowLiveSessionDetails(false)}
+          className="rounded-full border border-white/[0.07] px-2 py-1 text-[12px] leading-none text-white/44 transition hover:bg-white/[0.04] hover:text-white"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="divide-y divide-white/[0.055] border-y border-white/[0.055]">
+        {[
+          ['Support', activeLiveSupportLabel],
+          ['Communication', activeLiveCommunicationStyle],
+          ['Language Assist', 'Automatic'],
+          ['Voice', voiceOn ? 'Audio On' : 'Muted'],
+          ['Conversation', liveRoomActive ? 'Active' : 'Inactive'],
+          ['Room', liveRuntimeSupport?.room || 'Not specified'],
+          ['Role', liveRuntimeSupport?.chair || liveRuntimeSupport?.userPosition || 'Not specified'],
+          ['Outcome', liveRuntimeSupport?.objective || 'Not specified'],
+          ['Secondary', liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || 'None'],
+        ].map(([label, value]) => (
+          <div key={label} className="grid grid-cols-[112px_1fr] gap-3 py-2.5 text-[12px] leading-5">
+            <div className="uppercase tracking-[0.18em] text-white/28">
+              {label}
+            </div>
+            <div className="text-[#D7DBE4]/68">
+              {String(value)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-[11px] leading-5 text-white/34">
+        These are the details GEORGE is using during LIVE. They remain available without occupying the runtime HUD.
+      </p>
+    </div>
+  </div>,
+  document.body
+)}
+
 {showOutcomeExitReview && liveOutcomeReview && typeof document !== 'undefined' && createPortal(
   <>
     <div
@@ -8520,14 +8582,8 @@ Continue from here, tell me what changed, or start fresh.`
             <button
               type="button"
               onClick={() => {
-                const details = [
-                  liveRuntimeSupport?.room ? `Room: ${liveRuntimeSupport.room}` : null,
-                  liveRuntimeSupport?.chair ? `Role: ${liveRuntimeSupport.chair}` : null,
-                  liveRuntimeSupport?.objective ? `Outcome: ${liveRuntimeSupport.objective}` : null,
-                ].filter(Boolean).join(' · ') || 'Session details unavailable'
-
-                setToastMessage(details)
-                setShowToast(true)
+                setShowLiveQuickMenu(false)
+                setShowLiveSessionDetails(true)
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-[#D7DBE4]/58 transition hover:text-white active:scale-[0.98]"
             >
