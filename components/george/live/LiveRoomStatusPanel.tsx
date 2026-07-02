@@ -9,13 +9,13 @@ type LiveRoomStatusPanelProps = {
   isThinking: boolean
   roomLabel: string
   chairLabel: string
-  objectiveLabel: string
+  objectiveLabel?: string
   steeringLabels: [string, string, string]
   activeSupportLabel: string
   communicationStyle: string
   onRoomToggle: () => void
   onVoiceToggle: () => void
-  onPauseLive: () => void
+  onPauseLive?: () => void
   onSupportPressed: () => void
   onCommunicationPressed: () => void
   onConversationPressed: () => void
@@ -72,19 +72,15 @@ export function LiveRoomStatusPanel({
   isThinking,
   roomLabel,
   chairLabel,
-  objectiveLabel,
   steeringLabels,
   activeSupportLabel,
   communicationStyle,
   onRoomToggle,
   onVoiceToggle,
-  onPauseLive,
   onSupportPressed,
   onCommunicationPressed,
   onConversationPressed,
 }: LiveRoomStatusPanelProps) {
-  void objectiveLabel
-
   const safeRoomLabel = String(roomLabel || 'LIVE room').trim()
   const safeChairLabel = String(chairLabel || 'User').trim()
 
