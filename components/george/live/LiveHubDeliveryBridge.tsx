@@ -52,10 +52,11 @@ export function LiveHubDeliveryBridge({
 
       const resolvedDeliveryCue = {
         ...deliveryCue,
+        turnId: event.turnId || deliveryCue.turnId,
         mode,
       }
 
-      const deliveryKey = event.turnId || resolvedDeliveryCue.text
+      const deliveryKey = resolvedDeliveryCue.turnId || resolvedDeliveryCue.text
       const previousDelivery = deliveredCueByTurnRef.current[deliveryKey]
 
       const deliveryDecision = evaluateGeorgeDeliveryCommitment({
@@ -97,7 +98,7 @@ export function LiveHubDeliveryBridge({
 
       console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
 
-      markRuntimeEvent(deliveryKey, 'delivery_cue')
+      markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')
 
       if (resolvedDeliveryCue.mode === 'visual') {
         onVisualCue?.(resolvedDeliveryCue)
