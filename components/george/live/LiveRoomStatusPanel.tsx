@@ -101,16 +101,35 @@ export function LiveRoomStatusPanel({
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
         <div className={`rounded-[0.8rem] border px-3 py-2 ${isListening ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.07] text-[#8FF0C7]' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/42'}`}>
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">GEORGE</span>
-          {isListening ? 'LISTENING' : 'READY'}
+          {isThinking ? 'THINKING' : isListening ? 'LISTENING' : 'READY'}
         </div>
-        <div className={`rounded-[0.8rem] border px-3 py-2 ${liveRoomActive ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.055] text-[#DCEBFF]/68' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+        <button
+          type="button"
+          onClick={onRoomToggle}
+          disabled={isThinking}
+          className={`rounded-[0.8rem] border px-3 py-2 text-left transition active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-40 ${liveRoomActive ? 'border-[#8FF0C7]/[0.18] bg-[#8FF0C7]/[0.055] text-[#DCEBFF]/72' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/42 hover:border-[#8FF0C7]/[0.18] hover:bg-[#8FF0C7]/[0.045]'}`}
+        >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">LIVE</span>
-          {liveRoomActive ? 'ROOM ACTIVE' : 'ROOM INACTIVE'}
-        </div>
-        <div className={`rounded-[0.8rem] border px-3 py-2 ${voiceOn ? 'border-emerald-200/[0.16] bg-emerald-200/[0.055] text-emerald-100/72' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/36'}`}>
+          <span className="mt-1 flex items-center justify-between gap-2">
+            <span>{liveRoomActive ? 'ON' : 'OFF'}</span>
+            <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${liveRoomActive ? 'border-[#8FF0C7]/24 bg-[#8FF0C7]/18 text-[#8FF0C7]' : 'border-white/[0.08] bg-white/[0.025] text-white/34'}`}>
+              {liveRoomActive ? '●' : '○'}
+            </span>
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={onVoiceToggle}
+          className={`rounded-[0.8rem] border px-3 py-2 text-left transition active:scale-[0.985] ${voiceOn ? 'border-emerald-200/[0.16] bg-emerald-200/[0.055] text-emerald-100/72' : 'border-white/[0.045] bg-white/[0.018] text-[#D7DBE4]/42 hover:border-emerald-200/[0.16] hover:bg-emerald-200/[0.045]'}`}
+        >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">AUDIO</span>
-          {voiceOn ? 'AUDIO ON' : 'MUTE'}
-        </div>
+          <span className="mt-1 flex items-center justify-between gap-2">
+            <span>{voiceOn ? 'ON' : 'OFF'}</span>
+            <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${voiceOn ? 'border-emerald-200/24 bg-emerald-200/18 text-emerald-100' : 'border-white/[0.08] bg-white/[0.025] text-white/34'}`}>
+              {voiceOn ? '●' : '○'}
+            </span>
+          </span>
+        </button>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-2 text-[9px] md:text-[10px] leading-4">
@@ -158,7 +177,7 @@ export function LiveRoomStatusPanel({
 
       <div className={`mt-2 border-t pt-2 text-[10px] md:text-[11px] leading-4 transition duration-500 ${liveRoomActive ? 'border-[#8FB6C9]/[0.08] text-[#DCEBFF]/52' : 'border-white/[0.035] text-[#D7DBE4]/42'}`}>
         <span className={`block ${liveRoomActive ? 'text-[#DCEBFF]/68' : 'text-[#D7DBE4]/56'}`}>
-          {liveRoomActive ? 'GEORGE is ready.' : 'LIVE inactive.'}
+          {liveRoomActive ? (isListening ? 'Listening for the next useful signal.' : 'LIVE is on. GEORGE is standing by.') : 'LIVE is off.'}
         </span>
         {!liveRoomActive && (
           <span>Talk naturally. I'll adapt.</span>
