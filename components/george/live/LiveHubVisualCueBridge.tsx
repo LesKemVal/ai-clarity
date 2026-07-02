@@ -13,7 +13,7 @@ type LiveHubVisualCueBridgeProps = {
   context: GeorgeLiveHubContext
   voiceEnabled?: boolean
   receiverProfile?: LiveHubReceiverProfile
-  onSpeakCue?: (cue: string) => void
+  onSpeakCue?: (cue: string, turnId?: string) => void
 }
 
 type VisualCueState = {
@@ -53,6 +53,7 @@ export function LiveHubVisualCueBridge({
       lastCue: lastCueRef.current,
       currentPriority: currentPriorityRef.current,
       ageMs: Date.now() - lastRenderedAtRef.current,
+      turnId: cue.turnId,
     })
 
     if (!clean) {
@@ -105,7 +106,7 @@ export function LiveHubVisualCueBridge({
 
     if (shouldSpeakCue) {
       markRuntimeEvent(cue.turnId || clean, 'voice_cue_requested')
-      onSpeakCue?.(clean)
+      onSpeakCue?.(clean, cue.turnId)
     }
   }, [onSpeakCue, receiverProfile, visualCue, voiceEnabled])
 
