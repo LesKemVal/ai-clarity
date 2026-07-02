@@ -47,8 +47,8 @@ assert(
   'preparation should consume Conversation Record summary'
 )
 assert(
-  preparation.knownContext.some((item) => item.includes('lead with proof')),
-  'preparation should consume latest Conversation Record learning'
+  preparation.knownContext.some((item) => item.includes('Proof became the decision blocker')),
+  'preparation should consume latest Conversation Record learning evidence'
 )
 assert(
   preparation.opportunities.some((item) => item.includes('prior post-LIVE action')),
