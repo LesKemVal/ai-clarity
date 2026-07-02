@@ -11,6 +11,7 @@ function assert(condition, message) {
 const root = process.cwd()
 const panelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusPanel.tsx`, 'utf8')
 const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-outcome-review.ts`, 'utf8')
+const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 
 assert(panelSource.includes('onRoomToggle'), 'LIVE runtime console should expose room on/off control')
 assert(panelSource.includes('onVoiceToggle'), 'LIVE runtime console should expose audio on/off control')
@@ -27,6 +28,13 @@ assert(outcomeReviewSource.includes('availablePaths'), 'Outcome Review should pr
 assert(outcomeReviewSource.includes('bestAvailablePath'), 'Outcome Review should produce best available path')
 assert(outcomeReviewSource.includes('assistanceOptions'), 'Outcome Review should produce post-LIVE assistance options')
 assert(outcomeReviewSource.includes('internalNotes'), 'Outcome Review should preserve operational notes for package learning')
+
+assert(recordPanelSource.includes('Post-LIVE operational memory'), 'Conversation Record panel should be post-LIVE operational memory')
+assert(recordPanelSource.includes('Outcome Review'), 'Conversation Record panel should surface Outcome Review')
+assert(recordPanelSource.includes('Learning'), 'Conversation Record panel should surface promoted learning')
+assert(recordPanelSource.includes('Future actions'), 'Conversation Record panel should surface future actions')
+assert(recordPanelSource.includes('Transcript evidence:'), 'Conversation Record panel should label transcript evidence availability')
+assert(!recordPanelSource.includes('Transcript viewer'), 'Conversation Record panel should not become a transcript viewer')
 
 const pkg = createConversationPackage({
   desiredOutcome: 'secure investor follow-up',
