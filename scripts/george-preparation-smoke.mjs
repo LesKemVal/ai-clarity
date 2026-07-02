@@ -14,6 +14,27 @@ const preparation = prepareConversationFromPackage({
       { id: 'implementation-plan', title: 'Implementation Plan', type: 'document' },
     ],
   },
+  relatedConversationPackages: [
+    {
+      id: 'conversation-package-related-investor-proof',
+      conversationContext: 'Prior investor meeting stalled on deployment readiness.',
+      liveSummaries: [
+        { summary: 'Second investor asked for deployment timeline before committing.' },
+      ],
+      learning: [
+        {
+          decision: 'promote',
+          evidence: 'Deployment readiness repeatedly improved investor confidence.',
+        },
+      ],
+      futureActions: [
+        'Prepare deployment timeline before the next investor conversation.',
+      ],
+      relevantDocumentation: [
+        { id: 'deployment-timeline', title: 'Deployment Timeline', type: 'document' },
+      ],
+    },
+  ],
   conversationRecord: {
     source: 'conversation-package-runtime',
     desiredOutcome: 'secure investor follow-up',
@@ -51,12 +72,32 @@ assert(
   'preparation should consume latest Conversation Record learning evidence'
 )
 assert(
+  preparation.knownContext.some((item) => item.includes('Prior investor meeting stalled on deployment readiness')),
+  'preparation should consume related package context'
+)
+assert(
+  preparation.knownContext.some((item) => item.includes('Second investor asked for deployment timeline')),
+  'preparation should consume related package summaries'
+)
+assert(
+  preparation.knownContext.some((item) => item.includes('Deployment readiness repeatedly improved investor confidence')),
+  'preparation should consume related package learning'
+)
+assert(
   preparation.opportunities.some((item) => item.includes('prior post-LIVE action')),
   'preparation should turn Conversation Record future actions into opportunities'
 )
 assert(
+  preparation.opportunities.some((item) => item.includes('deployment timeline')),
+  'preparation should turn related package future actions into opportunities'
+)
+assert(
   preparation.reusableDocumentation.some((doc) => doc.title === 'Investor Deck'),
   'preparation should reuse Conversation Record documentation'
+)
+assert(
+  preparation.reusableDocumentation.some((doc) => doc.title === 'Deployment Timeline'),
+  'preparation should reuse related package documentation'
 )
 assert(preparation.confidence >= 0.48, 'Conversation Record evidence should improve preparation confidence')
 assert(preparation.sufficientToBegin === true, 'prepared package with record evidence should be sufficient to begin')
