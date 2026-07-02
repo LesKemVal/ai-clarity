@@ -160,12 +160,13 @@ Telemetry currently covers:
 ## Current High-Priority Todo
 
 - Keep production documentation synchronized with implementation.
-- Refine the post-LIVE Conversation Record surface and integrate it cleanly with Session Details.
-- Promote recurring evidence across Conversation Packages into future preparation.
+- Continue refining Brief Room presentation using the existing Preparation Runtime.
+- Improve reusable documentation presentation inside Brief Room.
+- Improve selection of related Conversation Packages before Preparation.
 - Continue Relevant Documentation attachment and reuse inside Conversation Packages.
-- Expand long-term operational memory through Evidence → Confidence → Learning → Future Conversations.
 - Continue end-to-end latency measurement through microphone, Deepgram, reasoning, delivery, Cartesia, and playback.
 - Continue production hardening through modular smoke suites.
+- Continue portability and runtime extraction where page orchestration grows.
 
 ## Working Rules
 
@@ -203,6 +204,37 @@ Current protected smoke suites:
 Do not return to a single monolithic behavioral-suite metric.
 
 Add focused smoke suites as production subsystems mature.
+
+
+## Current Production Runtime Loop
+
+Current validated production loop:
+
+Preparation
+
+↓
+
+LIVE
+
+↓
+
+Outcome Review
+
+↓
+
+Conversation Package
+
+↓
+
+Conversation Record
+
+↓
+
+Preparation
+
+This loop is implemented, smoke-tested, documented, and now surfaced in Brief Room.
+
+Conversation Records and related Conversation Packages can influence future preparation through the existing Preparation Runtime.
 
 ## Engineering / Tooling Notes
 
@@ -2367,6 +2399,9 @@ Current implementation:
 - Preparation now consumes Conversation Record projections as operational evidence.
 - Conversation Record summaries, promoted learning, future actions, relevant documentation, and context can influence future preparation.
 - Preparation also accepts related Conversation Packages and conservatively aggregates summaries, promoted learning, relevant documentation, future actions, and context.
+- Brief Room now consumes Preparation Runtime output.
+- Brief Room surfaces Preparation memory including opportunity, risk, reusable documentation count, and confidence.
+- Preparation Runtime output is also included in LIVE setup/runtime support so LIVE can receive the same preparation context.
 - Related packages are not merged, ranked, or scored yet.
 - No separate operational memory runtime was created.
 - `george:preparation:smoke` protects Conversation Record and related-package evidence feeding Preparation.
