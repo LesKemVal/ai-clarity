@@ -211,7 +211,8 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
         : supportStyle === 'continue'
           ? 'repeatable line'
           : 'cue'
-  const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
+  const responseAsUser = mode === 'response' && !continuationReasoning
+  const perspective = responseAsUser ? 'carry_turn_as_user' : carryTurn ? 'carry_turn_as_user' : 'assist_user'
 
   const promptBuildStartedAt = reasoningNow()
 
@@ -266,7 +267,7 @@ Intervention Type:
 ${continuationReasoning
   ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve natural grammar, immediate trajectory, and user agency. In continuation mode, objective and room context may shape tone but are not evidence by themselves. Do not create facts, numbers, percentages, valuations, ownership terms, commitments, or claims not already supported by the transcript, recent room memory, known context, or user fragment. If a missing specific is required to preserve the thought, use a natural user-fillable placeholder such as "__". Do not turn the sentence into a template. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
   : mode === 'response'
-    ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer to the question, objection, pressure, or unfamiliar topic. Complete means sufficient for the moment, not unnecessarily long. Do not reduce it to a cue unless the room requires restraint.'
+    ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer as user-ready language the user could say in the room. Complete means sufficient for the moment, not unnecessarily long. Do not reduce it to a cue unless the room requires restraint.'
     : mode === 'presentation'
       ? '- PRESENTATION. The user selected Presentation mode. Help the user deliver the point with structure, sequence, flow, proof, pacing, or recovery. This may be concise if concise structure is strongest. Do not merely make Response longer; organize the delivery.'
       : '- CUE. The user selected Cue mode. Provide the smallest effective intervention supported by available evidence. This may be a word, cue, question, short line, posture adjustment, timing signal, listening instruction, risk signal, or recovery cue. Brevity is preferred, but not the law.'}
@@ -275,9 +276,11 @@ Signal Sufficiency:
 ${signalDirective}
 
 Speaker Perspective:
-${carryTurn
-  ? '- The user has delegated the next conversational turn to GEORGE. Answer as the user in first person. Do not say "say", "ask", "question", or explain the move. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then respond as the user would for this turn.'
-  : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not pretend to be the user unless transfer is requested.'}
+${responseAsUser
+  ? '- RESPONSE MODE. The other party is speaking to the user. produce the answer as user-ready language the user could say. Do not answer as GEORGE when the other party asks about GEORGE. Preserve doctrine: GEORGE is operational intelligence, not another AI assistant. Speak from the user\'s perspective without saying "say", "ask", or explaining the move.'
+  : carryTurn
+    ? '- The user has delegated the next conversational turn to GEORGE. Answer as the user in first person. Do not say "say", "ask", "question", or explain the move. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then respond as the user would for this turn.'
+    : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not pretend to be the user unless transfer is requested.'}
 
 Rules:
 - Extract facts already present in the transcript before asking a question.
@@ -367,7 +370,7 @@ Priority:
   const completion = await openai.chat.completions.create({
     model,
     temperature: 0.25,
-    max_tokens: carryTurn ? 120 : 80,
+    max_tokens: mode === 'response' ? 220 : carryTurn ? 120 : 80,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },

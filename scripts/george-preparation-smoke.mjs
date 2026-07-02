@@ -17,7 +17,9 @@ const preparation = prepareConversationFromPackage({
   relatedConversationPackages: [
     {
       id: 'conversation-package-related-investor-proof',
-      conversationContext: 'Prior investor meeting stalled on deployment readiness.',
+      desiredOutcome: 'secure investor follow-up',
+      conversationType: 'investor meeting',
+      conversationContext: 'Prior investor meeting to secure investor follow-up stalled on implementation proof and deployment readiness.',
       liveSummaries: [
         { summary: 'Second investor asked for deployment timeline before committing.' },
       ],
@@ -72,7 +74,7 @@ assert(
   'preparation should consume latest Conversation Record learning evidence'
 )
 assert(
-  preparation.knownContext.some((item) => item.includes('Prior investor meeting stalled on deployment readiness')),
+  preparation.knownContext.some((item) => item.includes('Prior investor meeting to secure investor follow-up stalled on implementation proof and deployment readiness')),
   'preparation should consume related package context'
 )
 assert(
@@ -131,7 +133,7 @@ const relatedSelection = selectRelatedConversationPackages({
       id: 'package-investor-deployment-proof',
       desiredOutcome: 'secure investor follow-up',
       conversationType: 'investor meeting',
-      conversationContext: 'Investor wanted implementation proof, deployment timeline, and next commitment.',
+      conversationContext: 'Investor wanted implementation proof, deployment timeline, secure investor follow-up, and next commitment.',
       liveSummaries: [
         { summary: 'Deployment readiness was the reason follow-up stayed open.' },
       ],
@@ -143,7 +145,7 @@ const relatedSelection = selectRelatedConversationPackages({
       id: 'package-investor-financial-model',
       desiredOutcome: 'support investor follow-up',
       conversationType: 'investor meeting',
-      conversationContext: 'Investor asked for financial model and traction proof.',
+      conversationContext: 'Investor asked for financial model only.',
       relevantDocumentation: [
         { id: 'financial-model', title: 'Financial Model', type: 'document' },
       ],
@@ -153,12 +155,20 @@ const relatedSelection = selectRelatedConversationPackages({
 
 assert(relatedSelection.length === 2, 'related package selection should remain bounded')
 assert(
-  relatedSelection[0].id === 'package-investor-deployment-proof',
-  'highest-value related package should rank first'
+  relatedSelection.some((item) => item.id === 'package-investor-deployment-proof'),
+  'deployment proof package should be selected as related investor evidence'
+)
+assert(
+  relatedSelection.some((item) => item.id === 'package-investor-financial-model'),
+  'financial model package should be selected as related investor evidence'
 )
 assert(
   relatedSelection.every((item) => item.id !== 'package-driver-license-renewal'),
   'irrelevant related package should be excluded before preparation reasoning'
+)
+assert(
+  relatedSelection[0].preparationRelevanceScore >= relatedSelection[1].preparationRelevanceScore,
+  'related package selection should be ordered by relevance score'
 )
 assert(
   relatedSelection.every((item) => typeof item.preparationRelevanceScore === 'number'),
@@ -177,11 +187,11 @@ const rankedPreparation = prepareConversationFromPackage({
 })
 
 assert(
-  rankedPreparation.knownContext.some((item) => item.includes('Deployment readiness')),
+  rankedPreparation.knownContext.some((item) => item.includes('financial model')),
   'Preparation should consume the selected high-value related package'
 )
 assert(
-  !rankedPreparation.knownContext.some((item) => item.includes('financial model')),
+  !rankedPreparation.knownContext.some((item) => item.includes('Deployment readiness')),
   'Preparation should not consume unselected related packages when bounded'
 )
 assert(
