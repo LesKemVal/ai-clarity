@@ -159,7 +159,10 @@ export function createDeepgramStream(params: {
       cue: localActionCue.cue,
     })
 
-    if (localActionCue.cue.trim()) {
+    const shouldSendLocalActionCue =
+      packet.deliveryStyle !== 'response' && localActionCue.cue.trim()
+
+    if (shouldSendLocalActionCue) {
       sendJson(params.ws, {
         type: 'ACTION_CUE',
         turnId: activeTurnId,

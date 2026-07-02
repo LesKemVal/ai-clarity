@@ -15,6 +15,8 @@ const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveC
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
 const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.ts`, 'utf8')
+const actionCueAuthoritySource = readFileSync(`${root}/lib/george/core/verification/action-cue-authority.ts`, 'utf8')
+const liveHubStreamSource = readFileSync(`${root}/live-hub/src/stt/deepgram-stream.ts`, 'utf8')
 
 assert(panelSource.includes('onRoomToggle'), 'LIVE runtime console should expose room on/off control')
 assert(panelSource.includes('onVoiceToggle'), 'LIVE runtime console should expose audio on/off control')
@@ -60,6 +62,22 @@ assert(
 assert(
   liveHubGroqSource.includes('repaired: Boolean(rawCue && cue && cue !== rawCue)'),
   'LIVE hub Groq guard should report repaired response candidates'
+)
+assert(
+  actionCueAuthoritySource.includes('violatesResponseAuthority'),
+  'Response authority should reject generic AI assistant identity'
+)
+assert(
+  actionCueAuthoritySource.includes('[GEORGE][core][response-authority-check]'),
+  'Response authority should trace response authority decisions'
+)
+assert(
+  actionCueAuthoritySource.includes('It is an operational intelligence runtime'),
+  'Response authority should repair investor objection with operational intelligence doctrine'
+)
+assert(
+  liveHubStreamSource.includes("packet.deliveryStyle !== 'response'"),
+  'Response mode should not emit local generic cue before fast response authority'
 )
 
 assert(outcomeReviewSource.includes('buildLiveOutcomeObservation'), 'LIVE runtime should expose Outcome Review builder')

@@ -107,6 +107,8 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
             emit({
               ...event,
               ...finalizedEvent,
+              turnId: finalizedEvent.turnId || event.turnId,
+              evidence: finalizedEvent.evidence || event.evidence,
               cue: finalizedEvent.cue,
             } as GeorgeLiveHubRuntimeEvent)
           },

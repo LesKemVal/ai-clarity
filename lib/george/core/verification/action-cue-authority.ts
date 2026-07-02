@@ -25,11 +25,50 @@ function buildActionCueAuthorityEvidence(input: {
   ].join(' ')
 }
 
-function extractContinuationText(rawCue: string) {
-  const cleanGenerated = String(rawCue || '')
+function cleanAuthorityText(rawCue: string) {
+  return String(rawCue || '')
     .replace(/^(cue|advice|say|ask|response|presentation):\s*/i, '')
     .replace(/^["“”]+|["“”]+$/g, '')
     .trim()
+}
+
+function violatesResponseAuthority(text: string) {
+  const clean = text.toLowerCase()
+
+  return (
+    /\b(i am|i'm)\s+(george|george live|an ai|a conversational ai)\b/i.test(text) ||
+    /\b(ai assistant|conversational ai|virtual assistant|human-like conversation|empathetic responses)\b/i.test(clean) ||
+    /\b(as an ai|i can help|i am here to)\b/i.test(clean)
+  )
+}
+
+function repairResponseAuthority(input: {
+  text: string
+  transcript?: string
+  objective?: string
+  knownContext?: string
+  userPosition?: string
+}) {
+  const transcript = String(input.transcript || '').toLowerCase()
+  const evidence = [
+    input.objective,
+    input.knownContext,
+    input.userPosition,
+  ].join(' ').toLowerCase()
+
+  if (/\b(ai assistant|another ai assistant|just another ai|why shouldn't|why should not|what is george)\b/i.test(transcript)) {
+    if (/\b(investor|venture|capital|founder|executive|investment|operational intelligence|outcome|runtime)\b/i.test(evidence)) {
+      return 'GEORGE is not another AI assistant. It is an operational intelligence runtime that helps people prepare for, perform in, and learn from high-stakes conversations where timing, judgment, and communication affect the outcome. The value is not just generating answers; it is improving execution before, during, and after the room.'
+    }
+
+    return 'GEORGE is operational intelligence. It helps people prepare, communicate, decide, and execute better in important moments, then uses what happened to improve future preparation.'
+  }
+
+  return ''
+}
+
+function extractContinuationText(rawCue: string) {
+  const cleanGenerated = cleanAuthorityText(rawCue)
 
   if (cleanGenerated.startsWith('...')) return cleanGenerated
 
@@ -63,6 +102,47 @@ export function finalizeGeorgeActionCueAuthority(input: {
   const deliveryStyle =
     input.actionCue.evidence?.deliveryStyle ||
     input.context?.deliveryStyle
+
+  if (deliveryStyle === 'response') {
+    const text = cleanAuthorityText(input.actionCue.cue)
+    if (!text) return input.actionCue
+
+    const replacementText = violatesResponseAuthority(text)
+      ? repairResponseAuthority({
+          text,
+          transcript: input.actionCue.evidence?.transcript,
+          objective: input.actionCue.evidence?.objective || input.context?.objective,
+          knownContext: [
+            input.actionCue.evidence?.knownContext,
+            input.context?.knownContext,
+          ].join(' '),
+          userPosition: input.actionCue.evidence?.userPosition,
+        })
+      : ''
+
+    console.info('[GEORGE][core][response-authority-check]', {
+      deliveryStyle,
+      originalCue: input.actionCue.cue,
+      text,
+      replaced: Boolean(replacementText),
+      transcript: input.actionCue.evidence?.transcript,
+      objective: input.actionCue.evidence?.objective || input.context?.objective,
+    })
+
+    if (replacementText) {
+      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
+      return {
+        ...input.actionCue,
+        cue: replacementText,
+      }
+    }
+
+    markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_pass')
+    return {
+      ...input.actionCue,
+      cue: text,
+    }
+  }
 
   if (deliveryStyle !== 'continue') return input.actionCue
 
