@@ -44,6 +44,8 @@ import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import { buildLiveOutcomeObservation, type LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
+import { createConversationPackage, updateAfterLive, buildConversationRecord } from '@/lib/george/conversation-packages/index.mjs'
+import { PostLiveConversationRecordPanel } from '@/components/george/live/PostLiveConversationRecordPanel'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
@@ -1721,6 +1723,8 @@ const captureLiveEntryOptionalSignal = () => {
   const [showOutcomeExitReview, setShowOutcomeExitReview] = useState(false)
   const [pendingLiveExitAction, setPendingLiveExitAction] = useState<'save' | 'discard' | null>(null)
   const [liveOutcomeReview, setLiveOutcomeReview] = useState<LiveOutcomeObservation | null>(null)
+  const [showConversationRecord, setShowConversationRecord] = useState(false)
+  const [lastConversationRecord, setLastConversationRecord] = useState<any | null>(null)
   const [showSaveNaming, setShowSaveNaming] = useState(false)
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
@@ -1854,6 +1858,33 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     try {
       if (liveOutcomeReview) {
         window.localStorage.setItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION', JSON.stringify(liveOutcomeReview))
+
+        const summary = window.localStorage.getItem('george_last_live_runtime_summary') || ''
+        const pkg = createConversationPackage({
+          desiredOutcome: liveOutcomeReview.desiredOutcome,
+          conversationType: 'LIVE',
+          conversationContext: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
+          conversations: messagesRef.current.length
+            ? [{ type: 'live_transcript_evidence', count: messagesRef.current.length }]
+            : [],
+        })
+
+        const updatedPackage = updateAfterLive(pkg, {
+          summary: summary
+            ? {
+                id: 'last-live-summary',
+                type: 'live_summary',
+                summary,
+                suggestedNextAction: liveOutcomeReview.bestAvailablePath || '',
+              }
+            : undefined,
+          outcomeReview: liveOutcomeReview,
+        })
+
+        const record = buildConversationRecord(updatedPackage)
+        window.localStorage.setItem('GEORGE_LAST_CONVERSATION_RECORD', JSON.stringify(record))
+        setLastConversationRecord(record)
+        setShowConversationRecord(true)
       }
     } catch {}
 
@@ -6352,7 +6383,24 @@ return (
         }}
         onConversationPressed={() => {
           setShowLiveQuickMenu(false)
-          setToastMessage('Conversation record will open after LIVE.')
+
+          if (liveRoomActive) {
+            setToastMessage('Conversation record will open after LIVE.')
+            setShowToast(true)
+            return
+          }
+
+          try {
+            const raw = window.localStorage.getItem('GEORGE_LAST_CONVERSATION_RECORD')
+            const record = raw ? JSON.parse(raw) : lastConversationRecord
+            if (record) {
+              setLastConversationRecord(record)
+              setShowConversationRecord(true)
+              return
+            }
+          } catch {}
+
+          setToastMessage('Conversation record is not available yet.')
           setShowToast(true)
         }}
       />
@@ -7836,6 +7884,16 @@ if (liveMode) {
         These are the details GEORGE is using during LIVE. They remain available without occupying the runtime HUD.
       </p>
     </div>
+  </div>,
+  document.body
+)}
+
+{showConversationRecord && lastConversationRecord && typeof document !== 'undefined' && createPortal(
+  <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]">
+    <PostLiveConversationRecordPanel
+      record={lastConversationRecord}
+      onClose={() => setShowConversationRecord(false)}
+    />
   </div>,
   document.body
 )}
