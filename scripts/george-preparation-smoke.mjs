@@ -1,4 +1,4 @@
-import { prepareConversationFromPackage } from '../lib/george/preparation/runtime.mjs'
+import { prepareConversationFromPackage, selectRelatedConversationPackages } from '../lib/george/preparation/runtime.mjs'
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -99,7 +99,94 @@ assert(
   preparation.reusableDocumentation.some((doc) => doc.title === 'Deployment Timeline'),
   'preparation should reuse related package documentation'
 )
+assert(
+  preparation.relatedConversationPackageSelection?.[0]?.id === 'conversation-package-related-investor-proof',
+  'preparation should expose selected related package metadata'
+)
 assert(preparation.confidence >= 0.48, 'Conversation Record evidence should improve preparation confidence')
 assert(preparation.sufficientToBegin === true, 'prepared package with record evidence should be sufficient to begin')
+
+const relatedSelection = selectRelatedConversationPackages({
+  conversationPackage: {
+    id: 'conversation-package-investor-follow-up',
+    desiredOutcome: 'secure investor follow-up',
+    conversationType: 'investor meeting',
+    conversationContext: 'Investor asked for implementation proof and deployment timeline.',
+    relevantDocumentation: [
+      { id: 'investor-deck', title: 'Investor Deck', type: 'document' },
+    ],
+  },
+  maxRelatedConversationPackages: 2,
+  relatedConversationPackages: [
+    {
+      id: 'package-driver-license-renewal',
+      desiredOutcome: 'renew driver license',
+      conversationType: 'appointment',
+      conversationContext: 'DMV appointment about proof of residency.',
+      relevantDocumentation: [
+        { id: 'utility-bill', title: 'Utility Bill', type: 'document' },
+      ],
+    },
+    {
+      id: 'package-investor-deployment-proof',
+      desiredOutcome: 'secure investor follow-up',
+      conversationType: 'investor meeting',
+      conversationContext: 'Investor wanted implementation proof, deployment timeline, and next commitment.',
+      liveSummaries: [
+        { summary: 'Deployment readiness was the reason follow-up stayed open.' },
+      ],
+      relevantDocumentation: [
+        { id: 'deployment-timeline', title: 'Deployment Timeline', type: 'document' },
+      ],
+    },
+    {
+      id: 'package-investor-financial-model',
+      desiredOutcome: 'support investor follow-up',
+      conversationType: 'investor meeting',
+      conversationContext: 'Investor asked for financial model and traction proof.',
+      relevantDocumentation: [
+        { id: 'financial-model', title: 'Financial Model', type: 'document' },
+      ],
+    },
+  ],
+})
+
+assert(relatedSelection.length === 2, 'related package selection should remain bounded')
+assert(
+  relatedSelection[0].id === 'package-investor-deployment-proof',
+  'highest-value related package should rank first'
+)
+assert(
+  relatedSelection.every((item) => item.id !== 'package-driver-license-renewal'),
+  'irrelevant related package should be excluded before preparation reasoning'
+)
+assert(
+  relatedSelection.every((item) => typeof item.preparationRelevanceScore === 'number'),
+  'selected related packages should carry relevance scores'
+)
+
+const rankedPreparation = prepareConversationFromPackage({
+  conversationPackage: {
+    id: 'conversation-package-investor-follow-up',
+    desiredOutcome: 'secure investor follow-up',
+    conversationType: 'investor meeting',
+    conversationContext: 'Investor asked for implementation proof and deployment timeline.',
+  },
+  maxRelatedConversationPackages: 1,
+  relatedConversationPackages: relatedSelection,
+})
+
+assert(
+  rankedPreparation.knownContext.some((item) => item.includes('Deployment readiness')),
+  'Preparation should consume the selected high-value related package'
+)
+assert(
+  !rankedPreparation.knownContext.some((item) => item.includes('financial model')),
+  'Preparation should not consume unselected related packages when bounded'
+)
+assert(
+  rankedPreparation.relatedConversationPackageSelection.length === 1,
+  'Preparation should expose bounded related package selection'
+)
 
 console.log('GEORGE preparation smoke passed')
