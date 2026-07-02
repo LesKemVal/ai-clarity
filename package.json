@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "npm run george:core:smoke && npm run george:live-entry:smoke && next build",
+    "build": "npm run george:core:smoke && npm run george:live-entry:smoke && npm run george:conversation-package:smoke && next build",
     "start": "next start",
     "lint": "eslint",
     "live:proxy": "node server/live/deepgram-proxy.js",
     "george:core:smoke": "node scripts/george-core-smoke.mjs",
-    "george:live-entry:smoke": "node scripts/george-live-entry-smoke.mjs"
+    "george:live-entry:smoke": "node scripts/george-live-entry-smoke.mjs",
+    "george:conversation-package:smoke": "node scripts/george-conversation-package-smoke.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",
