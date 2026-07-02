@@ -1401,6 +1401,19 @@ const [suggestedSignal, setSuggestedSignal] = useState(0)
   ]
   const activeLiveSupportLabel =
     liveSupportOptions.find((option) => option.id === liveDeliveryStyle)?.label || 'Cue'
+  const activeLiveCommunicationStyle =
+    (() => {
+      try {
+        const setup = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || 'null')
+        return (
+          String(setup?.communicationStyle || '').trim() ||
+          String(window.localStorage.getItem('george_live_communication_style') || '').trim() ||
+          'Adaptive'
+        )
+      } catch {
+        return 'Adaptive'
+      }
+    })()
   const [showLiveSupportMenu, setShowLiveSupportMenu] = useState(false)
   const [showLiveSteeringReference, setShowLiveSteeringReference] = useState(false)
   const selectLiveSupportStyle = (style: typeof liveDeliveryStyle) => {
@@ -8450,12 +8463,12 @@ Continue from here, tell me what changed, or start fresh.`
             <button
               type="button"
               onClick={() => {
-                setToastMessage('Communication: Adaptive')
+                setToastMessage(`Communication: ${activeLiveCommunicationStyle}`)
                 setShowToast(true)
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
             >
-              Communication · Adaptive
+              Communication · {activeLiveCommunicationStyle}
             </button>
 
             <button
