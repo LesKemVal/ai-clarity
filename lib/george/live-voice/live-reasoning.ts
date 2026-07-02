@@ -9,7 +9,24 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+function reasoningNow() {
+  return Date.now()
+}
+
+function logReasoningLatency(
+  turnId: string,
+  event: string,
+  payload: Record<string, unknown> = {}
+) {
+  console.info('[LIVE][reasoning][latency]', {
+    event,
+    turnId,
+    ...payload,
+  })
+}
+
 type LiveReasoningInput = {
+  turnId?: string
   transcript: string
   room?: string
   userPosition?: string
@@ -127,8 +144,27 @@ function violatesContinuationAuthority(volley: string, evidence = '') {
 }
 
 export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<LiveVoicePacket | null> {
-  if (!shouldUseReasoning(input)) return null
+  const startedAt = reasoningNow()
+  const turnId = input.turnId || `reasoning_${startedAt}`
 
+  if (!shouldUseReasoning(input)) {
+    logReasoningLatency(turnId, 'reasoning_skipped', {
+      at: reasoningNow(),
+      durationMs: reasoningNow() - startedAt,
+      reason: !compact(input.transcript, 500)
+        ? 'empty_transcript'
+        : !input.fallbackPacket.shouldSpeak
+          ? 'fallback_silent'
+          : 'below_reasoning_threshold',
+    })
+    return null
+  }
+
+  logReasoningLatency(turnId, 'reasoning_started', {
+    at: startedAt,
+  })
+
+  const localClassificationStartedAt = reasoningNow()
   const carryTurn = shouldCarryTurn(input)
   const continuationReasoning = isContinuationReasoning(input)
 
@@ -152,6 +188,15 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
   .slice(0, 3)
   .map((s) => `${s.name}:${s.score}`)
   .join(', ')
+
+  logReasoningLatency(turnId, 'signal_context_ready', {
+    at: reasoningNow(),
+    durationMs: reasoningNow() - localClassificationStartedAt,
+    sufficientSignal: sufficiency.sufficient,
+    carryTurn,
+    continuationReasoning,
+  })
+
   const shadowMap = compact(input.shadowMap, 900)
   const lastFiveSeconds = compact(input.lastFiveSeconds || transcript, 400)
   const deliveryStyle = input.deliveryStyle || input.fallbackPacket.deliveryBehavior || ''
@@ -167,6 +212,8 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
           ? 'repeatable line'
           : 'cue'
   const perspective = carryTurn ? 'carry_turn_as_user' : 'assist_user'
+
+  const promptBuildStartedAt = reasoningNow()
 
   const continuationRequirement = continuationReasoning
     ? [
@@ -184,8 +231,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
         '- Do not invent transaction types, people, companies, relationships, numbers, agreements, commitments, evidence, customers, revenue, or events.',
         '- If the next factual clause is unsupported, stop before it or use "__" while preserving conversational flow.',
         '- Do not give advice, labels, strategy, or coaching language.',
-      ].join('\
-')
+      ].join('\n')
     : ''
 
   const system = `
@@ -285,7 +331,6 @@ Offline fallback cue: ${input.fallbackPacket.cue}
 
 Do not echo the offline fallback if the transcript already gives the signal.
 Use facts already present before requesting more information.
-
 Return the single best next move.
 
 ${continuationRequirement}
@@ -300,11 +345,24 @@ Priority:
 7. Ask a question only if necessary.
 `.trim()
 
+  logReasoningLatency(turnId, 'prompt_ready', {
+    at: reasoningNow(),
+    durationMs: reasoningNow() - promptBuildStartedAt,
+    systemChars: system.length,
+    userChars: user.length,
+  })
+
   const model =
     process.env.OPENAI_MODEL_LIVE ||
     process.env.OPENAI_MODEL_BRILLIANT ||
     process.env.OPENAI_MODEL_INTELLIGENT ||
     'gpt-4o-mini'
+
+  const openAiStartedAt = reasoningNow()
+  logReasoningLatency(turnId, 'openai_request_start', {
+    at: openAiStartedAt,
+    model,
+  })
 
   const completion = await openai.chat.completions.create({
     model,
@@ -316,10 +374,23 @@ Priority:
     ],
   })
 
+  logReasoningLatency(turnId, 'openai_response_received', {
+    at: reasoningNow(),
+    durationMs: reasoningNow() - openAiStartedAt,
+  })
+
   const text = completion.choices?.[0]?.message?.content?.trim()
-  if (!text) return null
+  if (!text) {
+    logReasoningLatency(turnId, 'reasoning_empty_response', {
+      at: reasoningNow(),
+      totalDurationMs: reasoningNow() - startedAt,
+    })
+    return null
+  }
 
   let volley = text.replace(/^GEORGE:\s*/i, '').trim()
+
+  const authorityStartedAt = reasoningNow()
 
   if (continuationReasoning) {
     const continuationEvidence = [
@@ -358,6 +429,12 @@ Priority:
     }
   }
 
+  logReasoningLatency(turnId, 'authority_check_complete', {
+    at: reasoningNow(),
+    durationMs: reasoningNow() - authorityStartedAt,
+    continuationReasoning,
+  })
+
   const responseForm = continuationReasoning
     ? 'line'
     : carryTurn
@@ -367,6 +444,13 @@ Priority:
     !carryTurn &&
     sufficiency.sufficient &&
     (responseForm === 'line' || responseForm === 'direction')
+
+  logReasoningLatency(turnId, 'reasoning_complete', {
+    at: reasoningNow(),
+    totalDurationMs: reasoningNow() - startedAt,
+    responseForm,
+    transferReady,
+  })
 
   return {
     ...input.fallbackPacket,
