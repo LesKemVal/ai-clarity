@@ -12,7 +12,9 @@ export default function GeorgeLivePage() {
     try {
       const existing =
         window.localStorage.getItem('george_live_setup_active') ||
-        window.localStorage.getItem('GEORGE_LIVE_SETUP')
+        window.localStorage.getItem('GEORGE_LIVE_SETUP') ||
+        window.localStorage.getItem('george_live_runtime_support_active') ||
+        window.localStorage.getItem('george_live_runtime_support')
 
       if (!existing) {
         const fallbackSetup = {
