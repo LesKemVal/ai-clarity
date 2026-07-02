@@ -2238,3 +2238,118 @@ Commit
 
 Push
 
+---
+
+# LIVE Console + Conversation Record Update — July 1, 2026
+
+## LIVE Console Direction
+
+LIVE is moving from dashboard to operational console.
+
+Configuration belongs in Brief Room.
+
+Execution belongs in LIVE.
+
+During LIVE, visible controls should either:
+
+- show operational state
+- directly control GEORGE in the room
+- improve the user's probability of success
+
+Top console cards are becoming primary runtime controls.
+
+Bottom controls are becoming readable mirrors of runtime state, especially for real-room use.
+
+Menus and popups should be minimized during LIVE.
+
+## Current LIVE Console Decisions
+
+GEORGE tile:
+
+- status only
+- READY / LISTENING / THINKING / SPEAKING / WAITING
+
+LIVE tile:
+
+- primary runtime on/off control
+- controls room listening/runtime participation
+- displays ON / OFF
+
+AUDIO tile:
+
+- controls voice delivery only
+- does not control listening
+- displays ON / OFF
+
+GUIDANCE tile:
+
+- replaces old support popup behavior
+- tap cycles support style
+- bottom guidance mirrors active support state
+- GEORGE-driven changes render with typewriter transition
+- user-driven changes render immediately
+
+COMMUNICATION tile:
+
+- displays active communication style
+- future behavior may cycle or open lightweight controls
+
+CONVERSATION tile:
+
+- does not surface transcript during LIVE
+- becomes gateway after Post Brief and Outcome Review
+
+## Conversation Record Sequence
+
+LIVE does not surface Conversation Records during execution.
+
+After LIVE:
+
+1. Post Brief
+2. Outcome Review
+3. Conversation Record
+
+The transcript is evidence.
+
+The outcome report is the product.
+
+Never:
+
+Conversation → Transcript → User figures it out
+
+Always:
+
+Execution → Reflection → Evidence
+
+## Language Assist Update
+
+Language is operational signal.
+
+GEORGE may detect, translate, interpret, and reason from other languages.
+
+Translation is not the product.
+
+GEORGE surfaces language only when it materially improves the user's probability of success.
+
+Otherwise, GEORGE uses what he understands to improve guidance silently.
+
+## Cross-Conversation Reasoning Update
+
+GEORGE is one intelligence.
+
+Normal and LIVE share operational memory.
+
+Conversation Packages preserve outcome boundaries.
+
+GEORGE may reason across conversations and outcomes when transferable evidence improves the user's probability of success.
+
+GEORGE should identify recurring friction and propose possible fixes, not merely report patterns.
+
+Example:
+
+"Three previous investor conversations point to implementation planning as the recurring hesitation. We can prepare a one-page implementation roadmap before the next meeting."
+
+GEORGE works with the user during execution.
+
+Success belongs to the user.
+
