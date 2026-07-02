@@ -7,7 +7,20 @@ import { normalizeLiveSupportStyle } from '@/lib/george/live-runtime/support-sty
 import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
 import { continuationEvidence, safeContinuationReplacement } from '@/lib/george/core/verification/continuation-replacement'
 
+function runtimeNow() {
+  return Date.now()
+}
+
+function logGovernLatency(event: string, payload: Record<string, unknown>) {
+  console.info('[LIVE][govern][latency]', {
+    event,
+    ...payload,
+  })
+}
+
 export async function POST(req: NextRequest) {
+  const requestStartedAt = runtimeNow()
+
   try {
     const rate = checkRateLimit({
       key: `live-govern:${getRequestIdentity(req)}`,
@@ -27,7 +40,23 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
+    const turnId = typeof body?.turnId === 'string' && body.turnId.trim()
+      ? body.turnId.trim()
+      : `server_turn_${requestStartedAt}`
+
+    logGovernLatency('request_received', {
+      turnId,
+      at: requestStartedAt,
+    })
+
+    const accessStartedAt = runtimeNow()
     const access = await verifyLiveAccessFromRequest(req, body?.email)
+
+    logGovernLatency('access_checked', {
+      turnId,
+      at: runtimeNow(),
+      durationMs: runtimeNow() - accessStartedAt,
+    })
 
     if (!access.ok) {
       console.warn('[LIVE][govern][auth-failed]', {
@@ -49,6 +78,7 @@ export async function POST(req: NextRequest) {
       body?.supportStyle || body?.deliveryStyle || body?.liveAssistMode
     )
 
+    const localGovernStartedAt = runtimeNow()
     const packet = governLiveVoice({
       transcript: String(body?.transcript || ''),
       mode: body?.mode === 'voice_live' ? 'voice_live' : 'text_test',
@@ -68,7 +98,20 @@ export async function POST(req: NextRequest) {
           : undefined,
     })
 
+    logGovernLatency('local_govern_complete', {
+      turnId,
+      at: runtimeNow(),
+      durationMs: runtimeNow() - localGovernStartedAt,
+    })
+
+    const reasoningStartedAt = runtimeNow()
+    logGovernLatency('reasoning_request_start', {
+      turnId,
+      at: reasoningStartedAt,
+    })
+
     const reasonedPacket = await reasonLiveNextMove({
+      turnId,
       transcript: String(body?.transcript || ''),
       room: typeof body?.contextHint === 'string' ? body.contextHint : '',
       userPosition: typeof body?.userPosition === 'string' ? body.userPosition : '',
@@ -83,7 +126,20 @@ export async function POST(req: NextRequest) {
       liveAssistMode: body?.liveAssistMode === 'lines' ? 'lines' : 'cues',
       deliveryStyle: typeof body?.deliveryStyle === 'string' ? body.deliveryStyle : '',
       fallbackPacket: packet,
-    }).catch(() => null)
+    }).catch((error) => {
+      console.warn('[LIVE][govern][reasoning-failed]', {
+        turnId,
+        reason: error instanceof Error ? error.message : 'unknown',
+      })
+      return null
+    })
+
+    logGovernLatency('reasoning_request_end', {
+      turnId,
+      at: runtimeNow(),
+      durationMs: runtimeNow() - reasoningStartedAt,
+      usedReasoning: Boolean(reasonedPacket),
+    })
 
     const finalPacket = reasonedPacket || packet
 
@@ -117,6 +173,13 @@ export async function POST(req: NextRequest) {
         finalPacket.status = `${finalPacket.status || ''} Final continuation authority replacement: ${authority.reason}`.trim()
       }
     }
+
+    logGovernLatency('response_ready', {
+      turnId,
+      at: runtimeNow(),
+      totalDurationMs: runtimeNow() - requestStartedAt,
+      source: reasonedPacket ? 'reasoning' : 'local_governor',
+    })
 
     return NextResponse.json(finalPacket)
   } catch {
