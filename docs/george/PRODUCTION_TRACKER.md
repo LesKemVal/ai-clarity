@@ -196,8 +196,9 @@ Current protected smoke suites:
 - `george:live-entry:smoke`
 - `george:conversation-package:smoke`
 - `george:live-runtime:smoke`
+- `george:preparation:smoke`
 
-`npm run build` runs all four smoke suites before `next build`.
+`npm run build` runs all five smoke suites before `next build`.
 
 Do not return to a single monolithic behavioral-suite metric.
 
@@ -2356,6 +2357,19 @@ Current implementation:
 - The panel is wired after Outcome Review and does not open transcript during LIVE.
 - Conversation Record currently surfaces summary, latest outcome, promoted learning, future actions, documentation count, and transcript evidence availability.
 - Conversation Record remains a projection of operational memory, not a separate runtime or transcript viewer.
+
+
+## Preparation Runtime Implementation Status
+
+Current implementation:
+
+- Preparation consumes Conversation Packages through `prepareConversationFromPackage()`.
+- Preparation now consumes Conversation Record projections as operational evidence.
+- Conversation Record summaries, promoted learning, future actions, relevant documentation, and context can influence future preparation.
+- Preparation also accepts related Conversation Packages and conservatively aggregates summaries, promoted learning, relevant documentation, future actions, and context.
+- Related packages are not merged, ranked, or scored yet.
+- No separate operational memory runtime was created.
+- `george:preparation:smoke` protects Conversation Record and related-package evidence feeding Preparation.
 
 ## Language Assist Update
 
