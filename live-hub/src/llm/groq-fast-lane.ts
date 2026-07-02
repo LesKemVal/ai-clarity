@@ -12,6 +12,43 @@ function createGroqClient() {
     : null
 }
 
+function isResponseStyle(packet: GeorgeRuntimePacket) {
+  return (packet.deliveryStyle || 'cue') === 'response'
+}
+
+function violatesResponseOutcomeContract(cue: string) {
+  const clean = cue.toLowerCase()
+
+  return (
+    /\b(i am|i'm)\s+(george|george live|an ai|a conversational ai)\b/i.test(cue) ||
+    /\b(ai assistant|conversational ai|virtual assistant)\b/i.test(clean) ||
+    /\b(as an ai|i can help|i am here to)\b/i.test(clean)
+  )
+}
+
+function repairResponseCandidate(packet: GeorgeRuntimePacket, cue: string) {
+  if (!isResponseStyle(packet)) return cue
+  if (!violatesResponseOutcomeContract(cue)) return cue
+
+  const transcript = String(packet.transcript || '').toLowerCase()
+  const knownContext = [
+    packet.knownContext,
+    packet.objective,
+    packet.userPosition,
+    packet.room,
+  ].join(' ').toLowerCase()
+
+  if (/\bwhat is george\b|\bmore than another ai assistant\b|\bai assistant\b/.test(transcript)) {
+    if (/investor|venture|capital|founder|lead investment|category/i.test(knownContext)) {
+      return 'GEORGE is operational intelligence: it helps people prepare for, perform in, and learn from high-stakes conversations where timing, judgment, and communication affect the outcome. It is more than another AI assistant because the value is not just generating answers; it is the runtime loop of preparation, live support, outcome review, and reusable learning that improves execution over time.'
+    }
+
+    return 'GEORGE is operational intelligence. It helps people prepare, communicate, decide, and execute better in important moments, then uses what happened to improve future preparation.'
+  }
+
+  return ''
+}
+
 export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
   cue: string
   source: 'groq'
@@ -114,10 +151,15 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
     ],
   })
 
-  const cue = response.choices[0]?.message?.content?.trim()
+  const rawCue = response.choices[0]?.message?.content?.trim()
+  const cue = rawCue ? repairResponseCandidate(packet, rawCue) : ''
+
   console.log('[LIVE HUB][groq] response', {
     deliveryStyle,
     cue,
+    rawCue,
+    repaired: Boolean(rawCue && cue && cue !== rawCue),
+    suppressed: Boolean(rawCue && !cue),
     length: cue?.length || 0,
   })
 

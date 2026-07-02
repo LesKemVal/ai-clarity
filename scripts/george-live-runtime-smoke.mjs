@@ -14,6 +14,7 @@ const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-o
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
+const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.ts`, 'utf8')
 
 assert(panelSource.includes('onRoomToggle'), 'LIVE runtime console should expose room on/off control')
 assert(panelSource.includes('onVoiceToggle'), 'LIVE runtime console should expose audio on/off control')
@@ -47,6 +48,18 @@ assert(
 assert(
   deliveryBridgeSource.includes("markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')"),
   'Delivery metrics should use preserved delivery turnId when available'
+)
+assert(
+  liveHubGroqSource.includes('violatesResponseOutcomeContract'),
+  'LIVE hub Groq response mode should have deterministic outcome guard'
+)
+assert(
+  liveHubGroqSource.includes('GEORGE is operational intelligence'),
+  'LIVE hub response repair should preserve GEORGE operational intelligence doctrine'
+)
+assert(
+  liveHubGroqSource.includes('repaired: Boolean(rawCue && cue && cue !== rawCue)'),
+  'LIVE hub Groq guard should report repaired response candidates'
 )
 
 assert(outcomeReviewSource.includes('buildLiveOutcomeObservation'), 'LIVE runtime should expose Outcome Review builder')
