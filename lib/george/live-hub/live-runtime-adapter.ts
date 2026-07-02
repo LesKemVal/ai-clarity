@@ -26,6 +26,8 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   let transport: GeorgeLiveHubTransport | null = null
   let connected = false
   let currentContext: GeorgeLiveHubContext = {}
+  let lastTranscriptRef = ''
+  let lastTurnIdRef = ''
   const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string }> = []
 
   const flushPendingTranscripts = () => {
@@ -60,6 +62,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   return {
     connect(context?: GeorgeLiveHubContext) {
       currentContext = context || {}
+      console.info('[LIVE][hub][adapter][connect-context]', currentContext)
       const url =
         params?.url ||
         process.env.NEXT_PUBLIC_LIVE_HUB_URL ||
@@ -91,26 +94,58 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
             if (event?.type !== 'ACTION_CUE') return
 
             const cleanCue = String(event?.cue || '').trim()
+            const fallbackEvidence = {
+              transcript: lastTranscriptRef,
+              room: currentContext.room,
+              objective: currentContext.objective,
+              knownContext: currentContext.knownContext,
+              briefingKnowledge: currentContext.briefingKnowledge,
+              secondaryOutcome: currentContext.secondaryOutcome,
+              secondaryObjective: currentContext.secondaryObjective,
+              intangibleObjective: currentContext.intangibleObjective,
+              userPosition: currentContext.userPosition,
+              deliveryStyle: currentContext.deliveryStyle,
+            }
             if (!cleanCue) {
               console.info('[LIVE][hub][adapter] dropped empty ACTION_CUE', event)
               return
             }
 
+            console.info('[LIVE][hub][adapter][raw-action-cue]', {
+              turnId: event.turnId || lastTurnIdRef,
+              cue: event.cue,
+              source: event.source,
+              hasEvidence: Boolean(event.evidence),
+              evidence: event.evidence || fallbackEvidence,
+            })
+
             const finalizedEvent = finalizeGeorgeActionCueAuthority({
               actionCue: {
                 ...event,
+                turnId: event.turnId || lastTurnIdRef,
+                evidence: event.evidence || fallbackEvidence,
                 cue: cleanCue,
               } as GeorgeActionCue,
               context: currentContext,
             })
 
-            emit({
+            const resolvedEvent = {
               ...event,
               ...finalizedEvent,
-              turnId: finalizedEvent.turnId || event.turnId,
-              evidence: finalizedEvent.evidence || event.evidence,
+              turnId: finalizedEvent.turnId || event.turnId || lastTurnIdRef,
+              evidence: finalizedEvent.evidence || event.evidence || fallbackEvidence,
               cue: finalizedEvent.cue,
-            } as GeorgeLiveHubRuntimeEvent)
+            } as ({ type: 'ACTION_CUE' } & GeorgeActionCue)
+
+            console.info('[LIVE][hub][adapter][final-action-cue]', {
+              turnId: resolvedEvent.turnId,
+              cue: resolvedEvent.cue,
+              source: resolvedEvent.source,
+              hasEvidence: Boolean(resolvedEvent.evidence),
+              evidence: resolvedEvent.evidence,
+            })
+
+            emit(resolvedEvent)
           },
         },
       })
@@ -120,6 +155,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
 
     syncContext(context?: GeorgeLiveHubContext) {
       currentContext = context || {}
+      console.info('[LIVE][hub][adapter][sync-context]', currentContext)
       if (!connected) return
       transport?.syncContext?.(currentContext)
     },
@@ -135,6 +171,9 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     sendTranscript(text: string, isFinal = true, turnId?: string) {
       const clean = String(text || '').trim()
       if (!clean) return
+
+      lastTranscriptRef = clean
+      lastTurnIdRef = turnId || lastTurnIdRef
 
       if (!connected) {
         console.info('[LIVE][hub][adapter] queue transcript', {
@@ -154,6 +193,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         isFinal,
         deliveryStyle: currentContext.deliveryStyle,
       })
+      console.info('[LIVE][hub][adapter][send-transcript-context]', currentContext)
 
       transport?.sendJson?.({
         type: 'TRANSCRIPT_INPUT',

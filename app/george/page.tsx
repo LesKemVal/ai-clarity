@@ -5434,9 +5434,10 @@ return true
       authority,
     })
 
-    if (liveMode && liveDeliveryStyle === 'continue') {
-      console.info('[GEORGE LIVE CONTINUATION ROUTE]', {
+    if (liveMode && (liveDeliveryStyle === 'continue' || liveDeliveryStyle === 'response')) {
+      console.info('[GEORGE LIVE HUB ROUTE]', {
         route: 'hub_only',
+        deliveryStyle: liveDeliveryStyle,
         transcript: clean,
         suppressedLegacyAction: authority.action.type,
       })
@@ -5975,15 +5976,15 @@ return (
       <LiveHubShadowBridge
         active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
         context={{
-          room: String(liveRuntimeSupport?.purview || 'live'),
-          chair: String(liveRuntimeSupport?.userPosition || ''),
+          room: String(liveRuntimeSupport?.room || liveRuntimeSupport?.purview?.line || liveRuntimeSupport?.purview || 'live'),
+          chair: String(liveRuntimeSupport?.chair || liveRuntimeSupport?.userPosition || ''),
           objective: String(
             liveRuntimeSupport?.objective ||
             activeCampaign?.desiredOutcome ||
             activeCampaign?.currentGoal ||
             ''
           ),
-          knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          knownContext: String(liveRuntimeSupport?.knownContext || liveRuntimeSupport?.purview?.body || liveRuntimeSupport?.purview?.line || ''),
           briefingKnowledge: String(liveRuntimeSupport?.briefingKnowledge || ''),
           secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
@@ -5998,15 +5999,15 @@ return (
       <LiveHubVisualCueBridge
         active={Boolean(forceLive || liveMode) && !showLiveEntrySequence}
         context={{
-          room: String(liveRuntimeSupport?.purview || 'live'),
-          chair: String(liveRuntimeSupport?.userPosition || ''),
+          room: String(liveRuntimeSupport?.room || liveRuntimeSupport?.purview?.line || liveRuntimeSupport?.purview || 'live'),
+          chair: String(liveRuntimeSupport?.chair || liveRuntimeSupport?.userPosition || ''),
           objective: String(
             liveRuntimeSupport?.objective ||
             activeCampaign?.desiredOutcome ||
             activeCampaign?.currentGoal ||
             ''
           ),
-          knownContext: String(liveRuntimeSupport?.knownContext || ''),
+          knownContext: String(liveRuntimeSupport?.knownContext || liveRuntimeSupport?.purview?.body || liveRuntimeSupport?.purview?.line || ''),
           briefingKnowledge: String(liveRuntimeSupport?.briefingKnowledge || ''),
           secondaryOutcome: String(liveRuntimeSupport?.secondaryOutcome || liveRuntimeSupport?.secondaryObjective || ''),
           secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || ''),
