@@ -4249,7 +4249,7 @@ if (activePromptContext || activePromptLabel) {
 
   }
 
-  async function playQueue() {
+  async function playQueue(liveTurnId?: string) {
     if (isSpeakingRef.current) return
 
     await drainSpeechQueue({
@@ -4277,7 +4277,7 @@ if (activePromptContext || activePromptLabel) {
       wait,
       playChunk: async (chunk) => {
         const turnId = liveMode
-          ? `tts-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+          ? liveTurnId || `tts-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
           : undefined
 
         if (turnId) {
@@ -4332,7 +4332,7 @@ if (activePromptContext || activePromptLabel) {
   }
 
   const speakText = useCallback(
-    async (text: string, options?: { source?: 'hub' | 'legacy' }) => {
+    async (text: string, options?: { source?: 'hub' | 'legacy'; turnId?: string }) => {
       if (typeof window === 'undefined') return
       if (isIOS || !voiceOn || (!hasUserInteractedRef.current && !liveMode)) {
         return
@@ -4389,7 +4389,7 @@ if (activePromptContext || activePromptLabel) {
           ? chunks.slice(-1)
           : chunks)
 
-        await playQueue()
+        await playQueue(options?.turnId)
       } catch {
         revealPendingAssistantMessage()
         speakingRef.current = false
@@ -6016,7 +6016,7 @@ return (
         }}
         voiceEnabled={voiceOn}
         receiverProfile={voiceOn ? 'audio_visual' : 'visual_only'}
-        onSpeakCue={(cue) => speakText(cue, { source: 'hub' })}
+        onSpeakCue={(cue, turnId) => speakText(cue, { source: 'hub', turnId })}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
         {showSidebar && (
