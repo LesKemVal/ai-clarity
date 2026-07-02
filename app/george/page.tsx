@@ -8450,12 +8450,12 @@ Continue from here, tell me what changed, or start fresh.`
             <button
               type="button"
               onClick={() => {
-                setToastMessage(`Communication: ${communicationBaseline}`)
+                setToastMessage('Communication: Adaptive')
                 setShowToast(true)
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
             >
-              Communication · {communicationBaseline}
+              Communication · Adaptive
             </button>
 
             <button
