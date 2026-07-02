@@ -171,7 +171,7 @@ export function LiveRoomStatusPanel({
           className="rounded-[0.72rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] px-2 py-1.5 text-left text-[#DCEBFF]/52 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] transition duration-300 hover:border-[#8FB6C9]/[0.18] hover:bg-[#8FB6C9]/[0.07]"
         >
           <span className="block uppercase tracking-[0.16em] text-[#BFD9FF]/34">Conversation</span>
-          Active
+          After LIVE
         </button>
       </div>
 
