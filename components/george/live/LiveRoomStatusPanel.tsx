@@ -83,9 +83,10 @@ export function LiveRoomStatusPanel({
   onCommunicationPressed,
   onConversationPressed,
 }: LiveRoomStatusPanelProps) {
+  void objectiveLabel
+
   const safeRoomLabel = String(roomLabel || 'LIVE room').trim()
   const safeChairLabel = String(chairLabel || 'User').trim()
-  const safeObjectiveLabel = String(objectiveLabel || 'Outcome pending').trim()
 
   return (
     <div className={`pointer-events-auto w-full max-w-[430px] md:max-w-[520px] md:max-w-[780px] xl:max-w-[980px] md:max-w-[720px] xl:max-w-[860px] md:max-w-[720px] xl:max-w-[860px] rounded-[1.15rem] border px-4 py-3 transition duration-300 ${liveRoomActive ? 'border-white/[0.055] bg-[#05070B]/82 shadow-[0_22px_80px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)]' : 'border-white/[0.035] bg-[#05070B]/58 opacity-72 shadow-[0_14px_48px_rgba(0,0,0,0.32)]'}`}>
@@ -184,7 +185,7 @@ export function LiveRoomStatusPanel({
           {liveRoomActive ? (isListening ? 'Listening for the next useful signal.' : 'LIVE is on. GEORGE is standing by.') : 'LIVE is off.'}
         </span>
         <span className="mt-1 block truncate">
-          {safeRoomLabel} · {safeChairLabel} · {safeObjectiveLabel}
+          {safeRoomLabel} · {safeChairLabel}
         </span>
         <span className="mt-1 block truncate text-[#DCEBFF]/36">
           {steeringLabels.filter(Boolean).join(' · ')}
