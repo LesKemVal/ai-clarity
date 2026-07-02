@@ -17,6 +17,9 @@ const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHu
 const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.ts`, 'utf8')
 const actionCueAuthoritySource = readFileSync(`${root}/lib/george/core/verification/action-cue-authority.ts`, 'utf8')
 const liveHubStreamSource = readFileSync(`${root}/live-hub/src/stt/deepgram-stream.ts`, 'utf8')
+const liveHubProtocolSource = readFileSync(`${root}/live-hub/src/types/protocol.ts`, 'utf8')
+const runtimePacketSource = readFileSync(`${root}/live-hub/src/george/runtime-packet.ts`, 'utf8')
+const cueArbitratorSource = readFileSync(`${root}/live-hub/src/george/cue-arbitrator.ts`, 'utf8')
 
 assert(panelSource.includes('onRoomToggle'), 'LIVE runtime console should expose room on/off control')
 assert(panelSource.includes('onVoiceToggle'), 'LIVE runtime console should expose audio on/off control')
@@ -78,6 +81,26 @@ assert(
 assert(
   liveHubStreamSource.includes("packet.deliveryStyle !== 'response'"),
   'Response mode should not emit local generic cue before fast response authority'
+)
+assert(
+  liveHubProtocolSource.includes('briefingKnowledge?: string'),
+  'LIVE hub protocol should carry briefingKnowledge'
+)
+assert(
+  runtimePacketSource.includes('briefingKnowledge: input.context.briefingKnowledge'),
+  'LIVE runtime packet should preserve briefingKnowledge'
+)
+assert(
+  cueArbitratorSource.includes('briefingKnowledge: packet.briefingKnowledge'),
+  'ACTION_CUE evidence should include briefingKnowledge'
+)
+assert(
+  liveHubGroqSource.includes('briefingKnowledge: packet.briefingKnowledge'),
+  'Groq fast lane should receive briefingKnowledge'
+)
+assert(
+  actionCueAuthoritySource.includes('input.context?.briefingKnowledge'),
+  'Response authority should include briefingKnowledge in authority evidence'
 )
 
 assert(outcomeReviewSource.includes('buildLiveOutcomeObservation'), 'LIVE runtime should expose Outcome Review builder')

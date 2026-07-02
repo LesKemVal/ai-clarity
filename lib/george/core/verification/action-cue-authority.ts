@@ -13,6 +13,7 @@ function buildActionCueAuthorityEvidence(input: {
     input.actionCue.evidence?.room,
     input.actionCue.evidence?.objective,
     input.actionCue.evidence?.knownContext,
+    input.actionCue.evidence?.briefingKnowledge,
     input.actionCue.evidence?.secondaryOutcome,
     input.actionCue.evidence?.secondaryObjective,
     input.actionCue.evidence?.intangibleObjective,
@@ -22,6 +23,7 @@ function buildActionCueAuthorityEvidence(input: {
     input.context?.room,
     input.context?.objective,
     input.context?.knownContext,
+    input.context?.briefingKnowledge,
   ].join(' ')
 }
 
@@ -114,7 +116,9 @@ export function finalizeGeorgeActionCueAuthority(input: {
           objective: input.actionCue.evidence?.objective || input.context?.objective,
           knownContext: [
             input.actionCue.evidence?.knownContext,
+            input.actionCue.evidence?.briefingKnowledge,
             input.context?.knownContext,
+            input.context?.briefingKnowledge,
           ].join(' '),
           userPosition: input.actionCue.evidence?.userPosition,
         })

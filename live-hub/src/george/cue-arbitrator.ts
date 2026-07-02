@@ -23,6 +23,7 @@ function buildActionCueEvidence(packet: GeorgeRuntimePacket): GeorgeActionCueEvi
     room: packet.room,
     objective: packet.objective,
     knownContext: packet.knownContext,
+    briefingKnowledge: packet.briefingKnowledge,
     secondaryOutcome: packet.secondaryOutcome,
     secondaryObjective: packet.secondaryObjective,
     intangibleObjective: packet.intangibleObjective,

@@ -12,6 +12,7 @@ export type GeorgeRuntimePacket = {
   room?: string
   chair?: string
   knownContext?: string
+  briefingKnowledge?: string
   secondaryOutcome?: string
   secondaryObjective?: string
   intangibleObjective?: string
@@ -48,6 +49,7 @@ export function buildRuntimePacket(input: {
     room: input.context.room || '',
     chair: input.context.chair || '',
     knownContext: input.context.knownContext || '',
+    briefingKnowledge: input.context.briefingKnowledge || '',
     secondaryOutcome: input.context.secondaryOutcome || '',
     secondaryObjective: input.context.secondaryObjective || '',
     intangibleObjective: input.context.intangibleObjective || '',

@@ -33,6 +33,7 @@ function repairResponseCandidate(packet: GeorgeRuntimePacket, cue: string) {
   const transcript = String(packet.transcript || '').toLowerCase()
   const knownContext = [
     packet.knownContext,
+    packet.briefingKnowledge,
     packet.objective,
     packet.userPosition,
     packet.room,
@@ -138,6 +139,7 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
           room: packet.room,
           chair: packet.chair,
           knownContext: packet.knownContext,
+          briefingKnowledge: packet.briefingKnowledge,
           secondaryOutcome: packet.secondaryOutcome,
           secondaryObjective: packet.secondaryObjective,
           intangibleObjective: packet.intangibleObjective,
