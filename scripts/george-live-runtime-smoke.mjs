@@ -12,6 +12,8 @@ const root = process.cwd()
 const panelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusPanel.tsx`, 'utf8')
 const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-outcome-review.ts`, 'utf8')
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
+const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
+const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
 
 assert(panelSource.includes('onRoomToggle'), 'LIVE runtime console should expose room on/off control')
 assert(panelSource.includes('onVoiceToggle'), 'LIVE runtime console should expose audio on/off control')
@@ -21,6 +23,31 @@ assert(panelSource.includes('onConversationPressed'), 'LIVE runtime console shou
 assert(panelSource.includes('After LIVE'), 'Conversation control should remain post-LIVE only')
 assert(!panelSource.includes('{safeObjectiveLabel}'), 'LIVE primary console should not render outcome/objective mirror')
 assert(!panelSource.includes('MUTE'), 'LIVE footer audio duplicate should not return to runtime console')
+
+assert(
+  liveReasoningSource.includes('produce the answer as user-ready language'),
+  'LIVE Response mode should produce user-ready language rather than GEORGE self-description'
+)
+assert(
+  liveReasoningSource.includes('Do not answer as GEORGE when the other party asks about GEORGE'),
+  'LIVE Response mode should prevent GEORGE from answering as itself in investor-style questions'
+)
+assert(
+  liveReasoningSource.includes('GEORGE is operational intelligence'),
+  'LIVE Response mode should preserve GEORGE positioning as operational intelligence'
+)
+assert(
+  liveReasoningSource.includes('max_tokens: mode === \'response\' ? 220'),
+  'LIVE Response mode should allow enough tokens for a complete answer'
+)
+assert(
+  deliveryBridgeSource.includes('turnId: event.turnId || deliveryCue.turnId'),
+  'Delivery bridge should preserve ACTION_CUE turnId into delivery cue'
+)
+assert(
+  deliveryBridgeSource.includes("markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')"),
+  'Delivery metrics should use preserved delivery turnId when available'
+)
 
 assert(outcomeReviewSource.includes('buildLiveOutcomeObservation'), 'LIVE runtime should expose Outcome Review builder')
 assert(outcomeReviewSource.includes('observedProgress'), 'Outcome Review should produce observed progress')
