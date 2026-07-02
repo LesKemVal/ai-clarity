@@ -10,17 +10,20 @@ This document reflects the current Production Runtime Phase. The codebase and be
 
 Current validation target:
 
-- Behavioral Suite: 32 / 32 passing
 - GEORGE Core Smoke: passing
 - LIVE Entry Smoke: passing
+- Conversation Package Smoke: passing
+- LIVE Runtime Smoke: passing
+- Preparation Smoke: passing
 - Production Build: passing
 
-Required commands after every production change:
+Required command after every production change:
 
-```bash
-node scripts/george-behavior-suite.mjs
-npm run build
-```
+    npm run build
+
+`npm run build` executes all protected smoke suites before Next.js production build.
+
+Do not return to a single monolithic behavioral suite.
 
 ## Runtime Doctrine
 
@@ -46,6 +49,40 @@ Relevant Documentation improves understanding.
 
 User authority remains primary.
 
+## Current Runtime Loop
+
+Current validated production loop:
+
+Preparation
+
+↓
+
+LIVE
+
+↓
+
+Outcome Review
+
+↓
+
+Conversation Package
+
+↓
+
+Conversation Record
+
+↓
+
+Preparation
+
+Brief Room now consumes Preparation Runtime output.
+
+Preparation Runtime consumes Conversation Packages, Conversation Records, related Conversation Packages, promoted learning, future actions, reusable documentation, and known context.
+
+Conversation Record remains a projection of operational memory rather than a separate runtime.
+
+No duplicate operational memory runtime exists.
+
 ## Architecture Flow
 
 Homepage
@@ -64,7 +101,11 @@ Relevant Documentation
 
 ↓
 
-Conversation Readiness
+Conversation Readiness / Brief Room
+
+↓
+
+Preparation Runtime
 
 ↓
 
@@ -72,11 +113,23 @@ LIVE
 
 ↓
 
-Conversation Summary
+Outcome Review
 
 ↓
 
-Learning
+Conversation Package Update
+
+↓
+
+Conversation Record
+
+↓
+
+Preparation Runtime
+
+↓
+
+Future Preparation
 
 ↓
 
