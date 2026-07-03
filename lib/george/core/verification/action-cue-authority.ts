@@ -69,6 +69,26 @@ function repairResponseAuthority(input: {
   return ''
 }
 
+
+function safeResponseEvidenceReplacement(input: {
+  transcript?: string
+  objective?: string
+  knownContext?: string
+}) {
+  const transcript = String(input.transcript || '').toLowerCase()
+  const context = [input.objective, input.knownContext].join(' ').toLowerCase()
+
+  if (/\broi|numbers?|metrics?|business value|measurable|productivity|pilot\b/i.test(transcript + ' ' + context)) {
+    return 'We should not ask you to believe unsupported numbers. The right way to prove this is to define the baseline, run a controlled pilot, measure the agreed success metrics, and compare GEORGE-supported outcomes against the current workflow. If the results do not show measurable improvement, we either adjust the implementation or we do not scale it.'
+  }
+
+  if (/\bprivacy|security|confidential|data\b/i.test(transcript + ' ' + context)) {
+    return 'The answer has to be evidence-based: define what data GEORGE can access, what stays out of scope, how information is protected, and how enterprise controls are enforced. I would not ask you to accept broad claims without a security review, deployment boundaries, and measurable compliance requirements.'
+  }
+
+  return 'I would not make a factual claim we cannot support. The strongest answer is to separate what we know, what we can measure in a pilot, and what evidence would be required before scaling.'
+}
+
 function extractContinuationText(rawCue: string) {
   const cleanGenerated = cleanAuthorityText(rawCue)
 
@@ -138,6 +158,35 @@ export function finalizeGeorgeActionCueAuthority(input: {
       return {
         ...input.actionCue,
         cue: replacementText,
+      }
+    }
+
+    const evidence = buildActionCueAuthorityEvidence(input)
+    const evidenceAuthority = violatesEvidenceAuthority(text, evidence)
+
+    if (evidenceAuthority.violates) {
+      const safeReplacement = safeResponseEvidenceReplacement({
+        transcript: input.actionCue.evidence?.transcript,
+        objective: input.actionCue.evidence?.objective || input.context?.objective,
+        knownContext: [
+          input.actionCue.evidence?.knownContext,
+          input.actionCue.evidence?.briefingKnowledge,
+          input.context?.knownContext,
+          input.context?.briefingKnowledge,
+        ].join(' '),
+      })
+
+      console.warn('[GEORGE][core][response-authority-replaced]', {
+        reason: evidenceAuthority.reason,
+        unsupportedTerms: evidenceAuthority.unsupportedTerms,
+        originalText: text,
+        replacementText: safeReplacement,
+      })
+
+      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
+      return {
+        ...input.actionCue,
+        cue: safeReplacement,
       }
     }
 
