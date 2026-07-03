@@ -86,7 +86,7 @@ export async function resolveGroqFastCue(packet: GeorgeRuntimePacket): Promise<{
 
   const intentContract = `Runtime intent: ${packet.runtimeIntent}. Obey this intent over generic language habits. If runtimeIntent is OBJECTION_RESPONSE or ANSWER_QUESTION, directly answer the spoken question. If runtimeIntent is PRESENTATION_CONTINUATION, continue the presentation. If runtimeIntent is CONTINUE_THOUGHT, only continue the unfinished thought.`
 
-  const hierarchyContract = 'Priority order: 1 transcript, 2 knownContext, 3 objective, 4 secondary/intangible objectives. The transcript controls the response. Context may shape interpretation but must not become the output.'
+  const hierarchyContract = 'The transcript is the newest operational signal. Treat it as direct evidence of what was just said, but reason from the full available signal set: transcript, recentTranscript, room, chair, objective, knownContext, briefingKnowledge, userPosition, operationalSignal, obstacle, outcomeImpact, supportStrategy, and secondary/intangible objectives. If the transcript is the only reliable signal available, reason from it alone.'
 
   const modeContract =
     deliveryStyle === 'continue'
