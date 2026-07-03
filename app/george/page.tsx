@@ -4,7 +4,7 @@ import { applyGovernedLiveCueRuntimeMemory } from '@/lib/george/live-runtime/gov
 
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
-import { normalizeGeorgeBrandForSpeech } from '@/lib/george/live-voice/spoken-text'
+import { normalizeBrandSpeech } from '@/lib/george/live-voice/spoken-text'
 import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -4205,7 +4205,7 @@ requestAnimationFrame(() => {
   }
 
   async function fetchSpeech(text: string, turnId?: string) {
-    const speechText = normalizeGeorgeBrandForSpeech(text)
+    const speechText = normalizeBrandSpeech(text)
     // block TTS for Smart tier
     if (currentTier === 'smart') {
       return null
