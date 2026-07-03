@@ -34,6 +34,77 @@ function cleanAuthorityText(rawCue: string) {
     .trim()
 }
 
+
+function normalizeAuthorityContextValue(value?: string) {
+  return String(value || '').trim()
+}
+
+function buildVerifiedResponse(input: {
+  transcript?: string
+  objective?: string
+  room?: string
+  knownContext?: string
+  briefingKnowledge?: string
+  userPosition?: string
+  runtimeIntent?: string
+  fallback?: string
+}) {
+  const transcript = normalizeAuthorityContextValue(input.transcript)
+  const lowerTranscript = transcript.toLowerCase()
+  const objective = normalizeAuthorityContextValue(input.objective)
+  const room = normalizeAuthorityContextValue(input.room)
+  const knownContext = normalizeAuthorityContextValue(input.knownContext)
+  const briefingKnowledge = normalizeAuthorityContextValue(input.briefingKnowledge)
+  const userPosition = normalizeAuthorityContextValue(input.userPosition)
+  const context = [objective, room, knownContext, briefingKnowledge, userPosition].join(' ').toLowerCase()
+
+  const isGeorgeQuestion = /\b(what is george|what business problem|how is george different|why george|why does the market need george|why should we choose george|build this ourselves|chatgpt|copilot|claude)\b/i.test(
+    `${lowerTranscript} ${context}`
+  )
+
+  if (/\b(how much|cost|price|pricing|brilliant cost|subscription|tier)\b/i.test(lowerTranscript)) {
+    return 'I would not give you an invented price. The right answer is to scope the deployment, define the level of support required, and price BRILLIANT against the operational value and implementation requirements of the pilot.'
+  }
+
+  if (/\b(how many|customers|enterprise customers|clients|current customers)\b/i.test(lowerTranscript)) {
+    return 'I would not claim customer counts we cannot verify. The stronger answer is to focus this discussion on the product, the pilot design, the measurable outcomes, and the evidence we can produce during evaluation.'
+  }
+
+  if (/\b(guarantee|guaranteed|promise improved|guarantee improved performance)\b/i.test(lowerTranscript)) {
+    return 'I would not guarantee performance before measurement. What we can do is define the baseline, run a controlled pilot, measure communication quality, decision quality, and execution quality, then decide whether the results justify expansion.'
+  }
+
+  if (/\b(measurable|outcomes|pilot|measure success|metrics|roi|return on investment|business value)\b/i.test(lowerTranscript)) {
+    return 'A pilot should measure whether GEORGE improves communication quality, decision quality, and execution quality in real operating moments. We would define the baseline first, compare GEORGE-supported work against the current workflow, and scale only if the evidence shows measurable improvement.'
+  }
+
+  if (isGeorgeQuestion && /\b(chatgpt|copilot|claude|different|instead)\b/i.test(lowerTranscript)) {
+    return 'ChatGPT, Copilot, and Claude primarily generate answers. GEORGE is designed as an operational intelligence runtime: it uses the room, objective, role, briefing, timing, evidence, and conversation signals to help the user prepare, respond, decide, and execute toward a desired outcome.'
+  }
+
+  if (isGeorgeQuestion && /\b(build this ourselves|ourselves|choose george)\b/i.test(lowerTranscript)) {
+    return 'You can build tools, but GEORGE is not just a prompt interface. The value is the runtime judgment around timing, restraint, evidence, delivery style, room context, and outcome movement. A pilot lets us prove whether that operating layer improves execution before you commit to scaling.'
+  }
+
+  if (isGeorgeQuestion && /\b(market need|why does the market|why need)\b/i.test(lowerTranscript)) {
+    return 'The market needs GEORGE because work increasingly depends on live judgment, not just stored information. People do not only need more answers; they need better decisions, better communication, and better execution in the moments where outcomes are won or lost.'
+  }
+
+  if (isGeorgeQuestion && /\b(business problem|problem does george solve)\b/i.test(lowerTranscript)) {
+    return 'GEORGE addresses the gap between knowing something and executing well when the moment matters. It helps people prepare for the room, recognize operational signals while the conversation is happening, communicate with better timing and judgment, and turn the outcome into measurable learning.'
+  }
+
+  if (isGeorgeQuestion) {
+    return 'GEORGE is an operational intelligence runtime. It helps people prepare, communicate, decide, and execute in important moments by reasoning from the objective, room, role, briefing, evidence, timing, and live conversation signals—not from words alone.'
+  }
+
+  if (/\b(privacy|security|confidential|data|compliance)\b/i.test(lowerTranscript)) {
+    return 'The security answer has to be evidence-based. We would define what data GEORGE can access, what stays out of scope, how enterprise controls are enforced, and what review is required before deployment.'
+  }
+
+  return cleanAuthorityText(input.fallback || '') || 'I would separate what we know, what we can measure, and what evidence is required before making the claim.'
+}
+
 function violatesResponseAuthority(text: string) {
   const clean = text.toLowerCase()
 
@@ -74,19 +145,13 @@ function safeResponseEvidenceReplacement(input: {
   transcript?: string
   objective?: string
   knownContext?: string
+  briefingKnowledge?: string
+  room?: string
+  userPosition?: string
+  runtimeIntent?: string
+  fallback?: string
 }) {
-  const transcript = String(input.transcript || '').toLowerCase()
-  const context = [input.objective, input.knownContext].join(' ').toLowerCase()
-
-  if (/\broi|numbers?|metrics?|business value|measurable|productivity|pilot\b/i.test(transcript + ' ' + context)) {
-    return 'We should not ask you to believe unsupported numbers. The right way to prove this is to define the baseline, run a controlled pilot, measure the agreed success metrics, and compare GEORGE-supported outcomes against the current workflow. If the results do not show measurable improvement, we either adjust the implementation or we do not scale it.'
-  }
-
-  if (/\bprivacy|security|confidential|data\b/i.test(transcript + ' ' + context)) {
-    return 'The answer has to be evidence-based: define what data GEORGE can access, what stays out of scope, how information is protected, and how enterprise controls are enforced. I would not ask you to accept broad claims without a security review, deployment boundaries, and measurable compliance requirements.'
-  }
-
-  return 'I would not make a factual claim we cannot support. The strongest answer is to separate what we know, what we can measure in a pilot, and what evidence would be required before scaling.'
+  return buildVerifiedResponse(input)
 }
 
 
@@ -237,12 +302,18 @@ export function finalizeGeorgeActionCueAuthority(input: {
       const safeReplacement = safeResponseEvidenceReplacement({
         transcript: input.actionCue.evidence?.transcript,
         objective: input.actionCue.evidence?.objective || input.context?.objective,
+        room: input.actionCue.evidence?.room || input.context?.room,
         knownContext: [
           input.actionCue.evidence?.knownContext,
-          input.actionCue.evidence?.briefingKnowledge,
           input.context?.knownContext,
+        ].join(' '),
+        briefingKnowledge: [
+          input.actionCue.evidence?.briefingKnowledge,
           input.context?.briefingKnowledge,
         ].join(' '),
+        userPosition: input.actionCue.evidence?.userPosition,
+        runtimeIntent: input.actionCue.evidence?.runtimeIntent,
+        fallback: text,
       })
 
       console.warn('[GEORGE][core][response-authority-replaced]', {
