@@ -29,7 +29,11 @@ function isLikelyIncompleteSttUtterance(value: string) {
 
   const lower = clean.toLowerCase()
 
-  if (/\b(and|but|because|so|which|that|what|why|how|when|where|who|must|should|can|could|would|will|to|for|about|with|the|a|an|most|single|point|in|of)$/i.test(lower)) {
+  if (/^(how can we be confident|how can we know|how do we know|why should an enterprise|why should we|what makes george|what makes GEORGE|what makes this|if every company|how does george scale|how does GEORGE scale)\b/i.test(clean)) {
+    return true
+  }
+
+  if (/\b(and|but|because|so|which|that|what|why|how|when|where|who|must|should|can|could|would|will|to|for|about|with|the|a|an|most|single|point|in|of|confident|instead|different)$/i.test(lower)) {
     return true
   }
 

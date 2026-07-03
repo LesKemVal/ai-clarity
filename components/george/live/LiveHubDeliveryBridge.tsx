@@ -56,6 +56,16 @@ export function LiveHubDeliveryBridge({
         mode,
       }
 
+      const responseModePlaceholder =
+        deliveryStyle === 'response' &&
+        event.source === 'local' &&
+        /^(clarify before answering\.?|ask for clarification\.?|clarify\.?)/i.test(resolvedDeliveryCue.text.trim())
+
+      if (responseModePlaceholder) {
+        markRuntimeEvent(resolvedDeliveryCue.turnId || resolvedDeliveryCue.text, 'delivery_duplicate_suppressed')
+        return
+      }
+
       const deliveryKey = resolvedDeliveryCue.turnId || resolvedDeliveryCue.text
       const previousDelivery = deliveredCueByTurnRef.current[deliveryKey]
 
