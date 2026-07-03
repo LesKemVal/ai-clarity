@@ -39,3 +39,9 @@ export function normalizeTextForSpeech(text: string) {
     .replace(/\s+/g, ' ')
     .trim()
 }
+
+export function normalizeGeorgeBrandForSpeech(value: string) {
+  return String(value || '')
+    .replace(/\bGEORGE\b/g, 'George')
+    .replace(/\bBRANESx\b/g, 'Brains')
+}

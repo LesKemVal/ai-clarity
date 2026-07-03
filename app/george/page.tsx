@@ -4,6 +4,7 @@ import { applyGovernedLiveCueRuntimeMemory } from '@/lib/george/live-runtime/gov
 
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
+import { normalizeGeorgeBrandForSpeech } from '@/lib/george/live-voice/spoken-text'
 import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -2309,13 +2310,7 @@ async function canGovernorInjectLiveCue(transcript: string) {
             ? 'lines'
             : 'cues',
         runtimeMemory: liveRuntimeMemoryRef.current,
-        runtimeSupport: (() => {
-          try {
-            return JSON.parse(window.localStorage.getItem('george_live_runtime_support_active') || 'null')
-          } catch {
-            return null
-          }
-        })(),
+        runtimeSupport: readActiveLiveRuntimeSupport(),
       }),
     })
 
@@ -4210,6 +4205,7 @@ requestAnimationFrame(() => {
   }
 
   async function fetchSpeech(text: string, turnId?: string) {
+    const speechText = normalizeGeorgeBrandForSpeech(text)
     // block TTS for Smart tier
     if (currentTier === 'smart') {
       return null
