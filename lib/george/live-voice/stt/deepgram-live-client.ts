@@ -44,11 +44,33 @@ function isLikelyIncompleteSttUtterance(value: string) {
   return clean.split(/\s+/).length >= 8 && !/[.!?]/.test(clean)
 }
 
+function normalizeSttToken(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9']/g, '')
+}
+
 function mergeSttUtterance(previous: string, next: string) {
   const left = cleanSttText(previous)
   const right = cleanSttText(next)
   if (!left) return right
   if (!right) return left
+
+  const leftTokens = left.split(/\s+/)
+  const rightTokens = right.split(/\s+/)
+  const leftNorm = leftTokens.map(normalizeSttToken)
+  const rightNorm = rightTokens.map(normalizeSttToken)
+
+  const maxOverlap = Math.min(leftNorm.length, rightNorm.length)
+  for (let size = maxOverlap; size >= 1; size -= 1) {
+    const leftSuffix = leftNorm.slice(leftNorm.length - size).join(' ')
+    const rightPrefix = rightNorm.slice(0, size).join(' ')
+
+    if (leftSuffix && leftSuffix === rightPrefix) {
+      return [...leftTokens, ...rightTokens.slice(size)].join(' ').replace(/\s+/g, ' ').trim()
+    }
+  }
+
   return `${left} ${right}`.replace(/\s+/g, ' ').trim()
 }
 
