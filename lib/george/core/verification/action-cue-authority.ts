@@ -115,6 +115,48 @@ function violatesResponseAuthority(text: string) {
   )
 }
 
+function isGeorgeProductQuestion(text?: string) {
+  return /\b(what is george|who is george|what does george do|what business problem|business problems?|how is george different|why george|why does the market need george|why should we choose george|build this ourselves|chatgpt|copilot|claude|pilot|measure success|measurable outcomes?|guarantee|enterprise customers?|how much|pricing|cost|brilliant cost)\b/i.test(String(text || ''))
+}
+
+function violatesResponseQuality(input: {
+  text: string
+  transcript?: string
+  objective?: string
+  knownContext?: string
+  briefingKnowledge?: string
+}) {
+  const text = cleanAuthorityText(input.text)
+  const clean = text.toLowerCase()
+  const transcript = String(input.transcript || '')
+  const context = [
+    input.objective,
+    input.knownContext,
+    input.briefingKnowledge,
+  ].join(' ')
+
+  if (!isGeorgeProductQuestion(`${transcript} ${context}`)) return false
+
+  const genericGeorgeAnswer =
+    /\bhelps? (teams?|people|users?) (improve|with|get|make)\b/i.test(clean) ||
+    /\bcommunication,?\s+make better decisions\b/i.test(clean) ||
+    /\bhigh-stakes conversations\b/i.test(clean) && !/\boperational intelligence|runtime|prepare|perform|learn|execution|outcome|timing|judgment\b/i.test(clean)
+
+  const lacksOperationalDoctrine =
+    /\bwhat is george|who is george|what does george do|business problem|different|chatgpt|copilot|claude\b/i.test(transcript) &&
+    !/\boperational intelligence|runtime|desired outcome|outcome|execution|prepare|perform|learn|timing|judgment|evidence|signals?\b/i.test(clean)
+
+  const weakPilotAnswer =
+    /\bpilot|measure success|measurable outcomes?|roi|metrics?\b/i.test(transcript) &&
+    !/\bbaseline|measure|communication quality|decision quality|execution quality|compare|evidence\b/i.test(clean)
+
+  const unsupportedCommercialAnswer =
+    /\bhow much|cost|pricing|enterprise customers?|guarantee\b/i.test(transcript) &&
+    !/\bnot|cannot|would not|baseline|pilot|measure|evidence|scope|verify\b/i.test(clean)
+
+  return genericGeorgeAnswer || lacksOperationalDoctrine || weakPilotAnswer || unsupportedCommercialAnswer
+}
+
 function repairResponseAuthority(input: {
   text: string
   transcript?: string
@@ -292,6 +334,49 @@ export function finalizeGeorgeActionCueAuthority(input: {
       return {
         ...input.actionCue,
         cue: safeReplacement,
+      }
+    }
+
+    if (violatesResponseQuality({
+      text,
+      transcript: input.actionCue.evidence?.transcript,
+      objective: input.actionCue.evidence?.objective || input.context?.objective,
+      knownContext: [
+        input.actionCue.evidence?.knownContext,
+        input.context?.knownContext,
+      ].join(' '),
+      briefingKnowledge: [
+        input.actionCue.evidence?.briefingKnowledge,
+        input.context?.briefingKnowledge,
+      ].join(' '),
+    })) {
+      const qualityReplacement = buildVerifiedResponse({
+        transcript: input.actionCue.evidence?.transcript,
+        objective: input.actionCue.evidence?.objective || input.context?.objective,
+        room: input.actionCue.evidence?.room || input.context?.room,
+        knownContext: [
+          input.actionCue.evidence?.knownContext,
+          input.context?.knownContext,
+        ].join(' '),
+        briefingKnowledge: [
+          input.actionCue.evidence?.briefingKnowledge,
+          input.context?.briefingKnowledge,
+        ].join(' '),
+        userPosition: input.actionCue.evidence?.userPosition,
+        runtimeIntent: input.actionCue.evidence?.runtimeIntent,
+        fallback: text,
+      })
+
+      console.warn('[GEORGE][core][response-quality-replaced]', {
+        originalText: text,
+        replacementText: qualityReplacement,
+        transcript: input.actionCue.evidence?.transcript,
+      })
+
+      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
+      return {
+        ...input.actionCue,
+        cue: qualityReplacement,
       }
     }
 
