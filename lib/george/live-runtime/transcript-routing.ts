@@ -156,6 +156,7 @@ export type LiveTranscriptDecision =
 export type LastLiveFinalTranscript = {
   text: string
   at: number
+  pending?: boolean
 } | null
 
 export type LiveTranscriptRoutingContext = {
@@ -164,6 +165,33 @@ export type LiveTranscriptRoutingContext = {
   liveMode?: boolean
   buyTimeUntil?: number
   steeringPhrases?: LiveSteeringPhraseMap
+}
+
+function isLikelyIncompleteLiveThought(text: string) {
+  const clean = String(text || '').trim()
+  if (!clean) return false
+  if (/[.!?][”"]?$/.test(clean)) return false
+
+  const lower = clean.toLowerCase()
+
+  if (/\b(and|but|because|so|which|that|what|why|how|when|where|who|must|should|can|could|would|will|to|for|about|with|the|a|an|most|single|point)$/i.test(lower)) {
+    return true
+  }
+
+  if (/\b(what is the|what's the|based on|given everything|in the first|i need to|i must|i should)$/i.test(lower)) {
+    return true
+  }
+
+  return clean.split(/\s+/).length >= 8 && !/[.!?]/.test(clean)
+}
+
+function mergePendingLiveTranscript(last: LastLiveFinalTranscript, text: string) {
+  if (!last?.pending) return text
+  const previous = String(last.text || '').trim()
+  const next = String(text || '').trim()
+  if (!previous) return next
+  if (!next) return previous
+  return `${previous} ${next}`.replace(/\s+/g, ' ').trim()
 }
 
 export function routeLiveTranscript(params: {
@@ -175,9 +203,10 @@ export function routeLiveTranscript(params: {
   decision: LiveTranscriptDecision
   nextFinalTranscript: LastLiveFinalTranscript
 } {
-  const text = String(params.text || '').trim()
+  const rawText = String(params.text || '').trim()
   const now = params.now ?? Date.now()
   const last = params.lastFinalTranscript
+  const text = mergePendingLiveTranscript(last, rawText)
 
   if (!text) {
     return {
@@ -261,13 +290,23 @@ export function routeLiveTranscript(params: {
     }
   }
 
-  if (last && last.text === text && now - last.at < 1800) {
+  if (last && !last.pending && last.text === text && now - last.at < 1800) {
     return {
       decision: {
         type: 'ignore',
         reason: 'duplicate_final_transcript',
       },
       nextFinalTranscript: last,
+    }
+  }
+
+  if (isLikelyIncompleteLiveThought(text)) {
+    return {
+      decision: {
+        type: 'ignore',
+        reason: 'likely_incomplete_live_thought',
+      },
+      nextFinalTranscript: { text, at: now, pending: true },
     }
   }
 

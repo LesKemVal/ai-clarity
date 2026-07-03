@@ -2822,7 +2822,12 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       execution.authority.action.type !== 'ignore'
 
     if (shouldForwardToHub) {
-      setLiveHubShadowTranscript(clean)
+      const hubTranscript =
+        execution.authority.action.type === 'send'
+          ? execution.authority.action.text
+          : clean
+
+      setLiveHubShadowTranscript(hubTranscript)
     } else {
       console.info('[GEORGE LIVE HUB ROUTE]', {
         route: 'held_before_hub',
