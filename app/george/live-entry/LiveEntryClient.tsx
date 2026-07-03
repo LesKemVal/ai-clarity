@@ -2207,6 +2207,8 @@ const mandatoryLiveSignals = useMemo(() => {
       estimatedCents: finalEstimate.estimatedCents,
       resourceEstimate: finalEstimate,
       runtimeBias: finalResources,
+      room: skipPrep ? 'Adaptive LIVE' : conversationType,
+      objective,
       audienceType,
       resolvedConversationType,
       userPosition,
