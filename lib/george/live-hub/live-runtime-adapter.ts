@@ -137,6 +137,20 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
               cue: finalizedEvent.cue,
             } as ({ type: 'ACTION_CUE' } & GeorgeActionCue)
 
+            const isResponseModeLocalCue =
+              currentContext.deliveryStyle === 'response' &&
+              resolvedEvent.source === 'local'
+
+            if (isResponseModeLocalCue) {
+              console.info('[LIVE][hub][adapter][local-action-cue-suppressed]', {
+                turnId: resolvedEvent.turnId,
+                cue: resolvedEvent.cue,
+                source: resolvedEvent.source,
+                deliveryStyle: currentContext.deliveryStyle,
+              })
+              return
+            }
+
             console.info('[LIVE][hub][adapter][final-action-cue]', {
               turnId: resolvedEvent.turnId,
               cue: resolvedEvent.cue,
