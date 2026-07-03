@@ -4219,11 +4219,11 @@ requestAnimationFrame(() => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: liveMode
-        ? JSON.stringify({ text })
+        ? JSON.stringify({ text: speechText })
         : JSON.stringify({
             mode: activeCampaign ? 'campaign' : 'normal',
             forceClose,
-            input: text,
+            input: speechText,
             speed: voiceSpeed,
             tier: currentTier,
             voice: voiceType,

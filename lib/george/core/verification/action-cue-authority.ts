@@ -89,6 +89,47 @@ function safeResponseEvidenceReplacement(input: {
   return 'I would not make a factual claim we cannot support. The strongest answer is to separate what we know, what we can measure in a pilot, and what evidence would be required before scaling.'
 }
 
+
+function isEnvironmentalOrSocialResponse(text: string) {
+  return /\b(turn on the lights|turn off the lights|lights on|lights off|coffee|bathroom|lunch|door|projector|chair|temperature|too hot|too cold)\b/i.test(text)
+}
+
+function isTierOrBrandTranscript(text: string) {
+  return /\b(smart|intelligent|brilliant|george|branesx|tier|plan|subscription|product|platform|agent)\b/i.test(text)
+}
+
+function violatesResponseRelevance(input: {
+  text: string
+  transcript?: string
+  objective?: string
+  knownContext?: string
+}) {
+  const transcript = String(input.transcript || '')
+  const context = [input.objective, input.knownContext].join(' ')
+
+  if (
+    isEnvironmentalOrSocialResponse(input.text) &&
+    !isEnvironmentalOrSocialResponse(transcript) &&
+    (isTierOrBrandTranscript(transcript) || isTierOrBrandTranscript(context))
+  ) {
+    return true
+  }
+
+  return false
+}
+
+function safeResponseRelevanceReplacement(input: {
+  transcript?: string
+}) {
+  const transcript = String(input.transcript || '').toLowerCase()
+
+  if (/\bsmart|intelligent|brilliant\b/i.test(transcript)) {
+    return 'Yes. SMART, INTELLIGENT, and BRILLIANT are the access tiers. SMART is the entry level, INTELLIGENT adds stronger operational support, and BRILLIANT is the highest tier for the most capable GEORGE experience.'
+  }
+
+  return 'Let me stay with the question. I would answer the point directly and tie it back to the room, the objective, and the decision in front of us.'
+}
+
 function extractContinuationText(rawCue: string) {
   const cleanGenerated = cleanAuthorityText(rawCue)
 
@@ -158,6 +199,34 @@ export function finalizeGeorgeActionCueAuthority(input: {
       return {
         ...input.actionCue,
         cue: replacementText,
+      }
+    }
+
+    if (violatesResponseRelevance({
+      text,
+      transcript: input.actionCue.evidence?.transcript,
+      objective: input.actionCue.evidence?.objective || input.context?.objective,
+      knownContext: [
+        input.actionCue.evidence?.knownContext,
+        input.actionCue.evidence?.briefingKnowledge,
+        input.context?.knownContext,
+        input.context?.briefingKnowledge,
+      ].join(' '),
+    })) {
+      const safeReplacement = safeResponseRelevanceReplacement({
+        transcript: input.actionCue.evidence?.transcript,
+      })
+
+      console.warn('[GEORGE][core][response-relevance-replaced]', {
+        originalText: text,
+        replacementText: safeReplacement,
+        transcript: input.actionCue.evidence?.transcript,
+      })
+
+      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
+      return {
+        ...input.actionCue,
+        cue: safeReplacement,
       }
     }
 
