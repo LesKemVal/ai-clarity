@@ -301,6 +301,8 @@ export function persistActiveLiveRuntimeSupport(setup: LivePrepSetup | null) {
     const serializedSupport = JSON.stringify(activeRuntimeSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY, serializedSupport)
     window.localStorage.setItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY, serializedSupport)
+  } else if (setup === null) {
+    return
   } else {
     window.localStorage.removeItem(LIVE_RUNTIME_SUPPORT_ACTIVE_KEY)
     window.localStorage.removeItem(LIVE_RUNTIME_SUPPORT_LEGACY_KEY)
