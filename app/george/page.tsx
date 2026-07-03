@@ -2799,7 +2799,37 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     }
 
     setInput('')
-    setLiveHubShadowTranscript(clean)
+
+    const execution = resolveLiveFinalTranscriptAction({
+      transcript: clean,
+      lastFinalTranscript: lastLiveFinalTranscriptRef.current,
+      isThinking,
+      isSpeaking: isSpeakingRef.current,
+      liveMode,
+      buyTimeUntil: liveBuyTimeUntilRef.current,
+      lastSpokenLine: liveLastSpokenUtteranceRef.current,
+      overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
+      desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+    })
+
+    if (execution) {
+      lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
+    }
+
+    const shouldForwardToHub =
+      execution &&
+      execution.authority.verdict === 'allow' &&
+      execution.authority.action.type !== 'ignore'
+
+    if (shouldForwardToHub) {
+      setLiveHubShadowTranscript(clean)
+    } else {
+      console.info('[GEORGE LIVE HUB ROUTE]', {
+        route: 'held_before_hub',
+        transcript: clean,
+        authority: execution?.authority || null,
+      })
+    }
 
     if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean)) {
       liveTranscriptSubmitRef.current(clean)
