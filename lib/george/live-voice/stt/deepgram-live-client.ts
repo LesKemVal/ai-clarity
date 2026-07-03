@@ -17,6 +17,37 @@ export type DeepgramLiveClient = {
   stop: () => void
 }
 
+
+function cleanSttText(value: unknown) {
+  return String(value || '').replace(/\s+/g, ' ').trim()
+}
+
+function isLikelyIncompleteSttUtterance(value: string) {
+  const clean = cleanSttText(value)
+  if (!clean) return false
+  if (/[.!?][”"]?$/.test(clean)) return false
+
+  const lower = clean.toLowerCase()
+
+  if (/\b(and|but|because|so|which|that|what|why|how|when|where|who|must|should|can|could|would|will|to|for|about|with|the|a|an|most|single|point|in|of)$/i.test(lower)) {
+    return true
+  }
+
+  if (/\b(what is the|what's the|based on|given everything|in the first|i need to|i must|i should)$/i.test(lower)) {
+    return true
+  }
+
+  return clean.split(/\s+/).length >= 8 && !/[.!?]/.test(clean)
+}
+
+function mergeSttUtterance(previous: string, next: string) {
+  const left = cleanSttText(previous)
+  const right = cleanSttText(next)
+  if (!left) return right
+  if (!right) return left
+  return `${left} ${right}`.replace(/\s+/g, ' ').trim()
+}
+
 export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): DeepgramLiveClient {
   let socket: WebSocket | null = null
   let stream: MediaStream | null = null
@@ -26,6 +57,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
   let stopped = false
   let currentTurnId = ''
   let sentFirstAudioChunk = false
+    let pendingFinalTranscript = ''
 
   function nextTurnId() {
     return `live-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -214,7 +246,21 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
 
         if (payload?.is_final || payload?.speech_final) {
           markRuntimeEvent(turnId, 'deepgram_final')
-          handlers.onFinal?.(transcript.trim())
+
+          const assembledTranscript = mergeSttUtterance(pendingFinalTranscript, transcript)
+
+          if (isLikelyIncompleteSttUtterance(assembledTranscript)) {
+            pendingFinalTranscript = assembledTranscript
+            if (liveSttDebug()) {
+              console.info('[GEORGE DEEPGRAM] final held for utterance assembly', {
+                transcript: assembledTranscript,
+              })
+            }
+            return
+          }
+
+          pendingFinalTranscript = ''
+          handlers.onFinal?.(assembledTranscript)
           currentTurnId = nextTurnId()
           sentFirstAudioChunk = false
           startRuntimeTurn(currentTurnId)
