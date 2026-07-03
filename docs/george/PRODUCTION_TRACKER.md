@@ -295,17 +295,16 @@ Validated:
 - Delivery style propagates with Hub transcripts.
 - Response mode suppresses local placeholders.
 - Response mode evidence authority blocks unsupported facts.
+- Response relevance gate blocks environmental/social leakage.
 - Speech normalization is centralized.
 - Environmental/social chatter can be held before Hub.
+- Verified response repair path exists in `lib/george/core/verification/action-cue-authority.ts`.
+- Cue overfire language was reduced in `live-hub/src/george/cue-patterns.ts`.
 
-Current failures:
-- Cue mode overfires: "Ask what changed."
-- Clarification overfires on clear questions.
-- Generic fallback is safe but not executive-quality.
-- Need Verified Response Builder in `lib/george/core/verification/action-cue-authority.ts`.
-
-Next milestone:
-Build Verified Response Builder in the active authority path. When Groq fails evidence/relevance/usefulness authority, rebuild from verified briefing, product doctrine, objective, room, and role instead of returning generic fallback.
+Current production focus:
+- Validate executive-quality response behavior against enterprise briefing questions.
+- Confirm no generic fallback appears when evidence/relevance/usefulness repair is possible.
+- Confirm clear product questions do not trigger unnecessary clarification cues.
 
 Doctrine:
 - BRANESx is the platform. GEORGE is the agent.
