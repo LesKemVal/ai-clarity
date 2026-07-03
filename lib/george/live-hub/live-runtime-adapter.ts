@@ -15,7 +15,7 @@ export type GeorgeLiveHubRuntimeAdapter = {
   connect: (context?: GeorgeLiveHubContext) => void
   syncContext: (context?: GeorgeLiveHubContext) => void
   disconnect: () => void
-  sendTranscript: (text: string, isFinal?: boolean, turnId?: string) => void
+  sendTranscript: (text: string, isFinal?: boolean, turnId?: string, deliveryStyle?: GeorgeLiveHubContext['deliveryStyle']) => void
   subscribe: (listener: GeorgeLiveHubRuntimeListener) => () => void
 }
 
@@ -28,7 +28,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   let currentContext: GeorgeLiveHubContext = {}
   let lastTranscriptRef = ''
   let lastTurnIdRef = ''
-  const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string }> = []
+  const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string; deliveryStyle?: GeorgeLiveHubContext['deliveryStyle'] }> = []
 
   const flushPendingTranscripts = () => {
     if (!connected) return
@@ -182,30 +182,31 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       emit({ type: 'STATUS', status: 'idle', at: Date.now() })
     },
 
-    sendTranscript(text: string, isFinal = true, turnId?: string) {
+    sendTranscript(text: string, isFinal = true, turnId?: string, deliveryStyle?: GeorgeLiveHubContext['deliveryStyle']) {
       const clean = String(text || '').trim()
       if (!clean) return
 
       lastTranscriptRef = clean
       lastTurnIdRef = turnId || lastTurnIdRef
+      const resolvedDeliveryStyle = deliveryStyle || currentContext.deliveryStyle
 
       if (!connected) {
         console.info('[LIVE][hub][adapter] queue transcript', {
         text: clean,
         isFinal,
-        deliveryStyle: currentContext.deliveryStyle,
+        deliveryStyle: resolvedDeliveryStyle,
       })
         if (turnId) {
           markRuntimeEvent(turnId, 'hub_transcript_queued')
         }
-        pendingTranscripts.push({ text: clean, isFinal, turnId })
+        pendingTranscripts.push({ text: clean, isFinal, turnId, deliveryStyle: resolvedDeliveryStyle })
         return
       }
 
       console.info('[LIVE][hub][adapter] send transcript', {
         text: clean,
         isFinal,
-        deliveryStyle: currentContext.deliveryStyle,
+        deliveryStyle: resolvedDeliveryStyle,
       })
       console.info('[LIVE][hub][adapter][send-transcript-context]', currentContext)
 
@@ -214,7 +215,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         text: clean,
         isFinal,
         turnId,
-        deliveryStyle: currentContext.deliveryStyle,
+        deliveryStyle: resolvedDeliveryStyle,
       })
     },
 

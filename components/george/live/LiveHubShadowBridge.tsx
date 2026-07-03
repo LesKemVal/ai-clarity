@@ -87,9 +87,9 @@ export function LiveHubShadowBridge({
 
     markRuntimeEvent(turnId, 'transcript_input')
 
-    getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal, turnId)
+    getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal, turnId, context.deliveryStyle)
     markRuntimeEvent(turnId, 'hub_transcript_sent')
-  }, [active, transcript, transcriptFinal])
+  }, [active, transcript, transcriptFinal, context.deliveryStyle])
 
   return null
 }
