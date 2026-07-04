@@ -321,6 +321,9 @@ export function finalizeGeorgeActionCueAuthority(input: {
       return {
         ...input.actionCue,
         cue: verifiedBriefingResponse,
+        reason: 'Verified from operational understanding.',
+        category: 'operational_answer',
+        confidence: Math.max(input.actionCue.confidence, 0.72),
       }
     }
 
