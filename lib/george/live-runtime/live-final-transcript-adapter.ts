@@ -58,6 +58,7 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
       hubTranscript,
       shouldSuppressLegacy,
       shouldApplyLegacy: !shouldSuppressLegacy && execution.authority.action.type !== 'ignore',
+      suppressedLegacyActionType: execution.authority.action.type,
       holdReason: shouldForwardToHub ? '' : execution.authority.reason,
     },
   }

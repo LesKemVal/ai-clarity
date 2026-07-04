@@ -5425,12 +5425,10 @@ return true
 
     if (!execution) return
 
-    const authority = execution.authority
-
     console.info('[GEORGE LIVE ACTION]', {
       transcript: clean,
       nextFinalTranscript: execution.nextFinalTranscript,
-      authority,
+      authority: null,
     })
 
     if (execution.routing.shouldSuppressLegacy) {
@@ -5438,7 +5436,7 @@ return true
         route: 'hub_only',
         deliveryStyle: liveDeliveryStyle,
         transcript: clean,
-        suppressedLegacyAction: authority.action.type,
+        suppressedLegacyAction: execution.routing.suppressedLegacyActionType,
         routing: execution.routing,
       })
       return
