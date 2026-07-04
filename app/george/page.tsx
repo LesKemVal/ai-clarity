@@ -53,7 +53,7 @@ import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridg
 import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCueBridge'
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
-import { isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
+import { isDirectGeorgeAddress, isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
 import { applyLiveFinalTranscriptExecution, resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
@@ -1469,25 +1469,6 @@ function detectLiveInterruption(interim: string) {
 const [isListening, setIsListening] = useState(false)
 const liveRoomActive = Boolean(forceLive || liveMode) && liveGeorgeEnabled
 
-function normalizeGeorgeAddressText(value: string) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/[.,!?;:"'’“”()[\]{}]/g, '')
-    .replace(/\s+/g, ' ')
-}
-
-function isDirectGeorgeAddress(text: string) {
-  if (typeof window === 'undefined') return false
-
-  const normalized = normalizeGeorgeAddressText(text)
-  if (!normalized) return false
-
-  const storedName = normalizeGeorgeAddressText(window.localStorage.getItem('george_name') || '')
-  const names = Array.from(new Set(['george', storedName].filter(Boolean)))
-
-  return names.some((name) => normalized === name || normalized.startsWith(`${name} `))
-}
 const liveStatusStackRef = useRef<HTMLDivElement | null>(null)
 const [liveStatusStackClearance, setLiveStatusStackClearance] = useState(0)
 
@@ -2829,7 +2810,8 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       })
     }
 
-    if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean)) {
+    const storedGeorgeName = typeof window !== 'undefined' ? window.localStorage.getItem('george_name') || '' : ''
+    if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean, storedGeorgeName)) {
       liveTranscriptSubmitRef.current(clean)
     }
   }, [resolveLiveFinalTranscriptExecution])

@@ -59,6 +59,24 @@ function normalizeLiveSteeringText(text: string) {
   return String(text || '').trim().toLowerCase()
 }
 
+export function normalizeGeorgeAddressText(value: string) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[.,!?;:"'’“”()[\]{}]/g, '')
+    .replace(/\s+/g, ' ')
+}
+
+export function isDirectGeorgeAddress(text: string, storedName?: string) {
+  const normalized = normalizeGeorgeAddressText(text)
+  if (!normalized) return false
+
+  const resolvedStoredName = normalizeGeorgeAddressText(storedName || '')
+  const names = Array.from(new Set(['george', resolvedStoredName].filter(Boolean)))
+
+  return names.some((name) => normalized === name || normalized.startsWith(`${name} `))
+}
+
 function matchesLiveSteeringPhrase(text: string, phrases: string[] = []) {
   const normalized = normalizeLiveSteeringText(text)
 
