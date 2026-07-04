@@ -5450,9 +5450,9 @@ return true
       if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
         console.warn('[GEORGE LIVE ACTION IGNORED]', {
           transcript: clean,
-          reason: authority.reason,
-          verdict: authority.verdict,
-          action: authority.action,
+          reason: application.debugReason,
+          verdict: application.debugVerdict,
+          action: application.debugAction,
         })
       }
       return

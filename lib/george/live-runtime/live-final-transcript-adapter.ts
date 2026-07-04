@@ -72,6 +72,9 @@ export type LiveFinalTranscriptExecutionApplication = {
   speechText: string
   shouldSend: boolean
   sendText: string
+  debugReason?: string
+  debugVerdict?: string
+  debugAction?: unknown
 }
 
 export function applyLiveFinalTranscriptExecution(execution: ReturnType<typeof resolveLiveFinalTranscriptAction>): LiveFinalTranscriptExecutionApplication {
@@ -98,6 +101,9 @@ export function applyLiveFinalTranscriptExecution(execution: ReturnType<typeof r
       speechText: '',
       shouldSend: false,
       sendText: '',
+      debugReason: authority.reason,
+      debugVerdict: authority.verdict,
+      debugAction: authority.action,
     }
   }
 
