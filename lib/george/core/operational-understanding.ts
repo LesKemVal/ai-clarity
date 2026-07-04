@@ -5,6 +5,7 @@ export type GeorgeOperationalUnderstandingInput = {
   knownContext?: string
   briefingKnowledge?: string
   userPosition?: string
+  persistentSignals?: string[]
 }
 
 export type GeorgeOperationalUnderstanding = {
@@ -14,6 +15,8 @@ export type GeorgeOperationalUnderstanding = {
   operationalObjective: string
   objectiveSource: 'explicit' | 'inferred' | 'default'
   hasStrategicCommercializationSignal: boolean
+  persistentSignals: string[]
+  persistentSignalSummary: string
 }
 
 function clean(value?: string) {
@@ -28,8 +31,12 @@ export function buildGeorgeOperationalUnderstanding(
   const knownContext = clean(input.knownContext)
   const briefingKnowledge = clean(input.briefingKnowledge)
   const userPosition = clean(input.userPosition)
+  const persistentSignals = Array.from(new Set(input.persistentSignals || []))
+    .map(clean)
+    .filter(Boolean)
+    .slice(0, 6)
 
-  const context = [objective, room, knownContext, briefingKnowledge, userPosition]
+  const context = [objective, room, knownContext, briefingKnowledge, userPosition, persistentSignals.join(' ')]
     .filter(Boolean)
     .join(' ')
 
@@ -70,6 +77,10 @@ export function buildGeorgeOperationalUnderstanding(
       ? "observe the conversation, preserve credibility, preserve optionality, and infer the user's likely objective from accumulating signals"
       : synthesizedObjective
 
+  const persistentSignalSummary = persistentSignals.length
+    ? `Persistent conversation signals: ${persistentSignals.join(', ')}.`
+    : ''
+
   return {
     context,
     synthesizedObjective,
@@ -77,5 +88,7 @@ export function buildGeorgeOperationalUnderstanding(
     operationalObjective,
     objectiveSource,
     hasStrategicCommercializationSignal,
+    persistentSignals,
+    persistentSignalSummary,
   }
 }
