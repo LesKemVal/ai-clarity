@@ -19,6 +19,8 @@ const liveHubAdapterSource = readFileSync(`${root}/lib/george/live-hub/live-runt
 const liveFinalTranscriptAdapterSource = readFileSync(`${root}/lib/george/live-runtime/live-final-transcript-adapter.ts`, 'utf8')
 const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.ts`, 'utf8')
 const actionCueAuthoritySource = readFileSync(`${root}/lib/george/core/verification/action-cue-authority.ts`, 'utf8')
+const operationalUnderstandingSource = readFileSync(`${root}/lib/george/core/operational-understanding.ts`, 'utf8')
+const liveExecutionSource = readFileSync(`${root}/lib/george/core/live-execution.ts`, 'utf8')
 const liveHubStreamSource = readFileSync(`${root}/live-hub/src/stt/deepgram-stream.ts`, 'utf8')
 const liveHubProtocolSource = readFileSync(`${root}/live-hub/src/types/protocol.ts`, 'utf8')
 const runtimePacketSource = readFileSync(`${root}/live-hub/src/george/runtime-packet.ts`, 'utf8')
@@ -149,8 +151,6 @@ assert(updated.learning.length === 1, 'LIVE runtime should hand Outcome Review i
 assert(updated.futureActions.length === 1, 'LIVE runtime should hand summary next action into package future action')
 assert(updated.learning[0].learning.startsWith('We can '), 'LIVE runtime learning should preserve memory doctrine wording')
 
-console.log('GEORGE LIVE runtime smoke passed')
-
 assert(
   liveFinalTranscriptAdapterSource.includes("input.deliveryStyle === 'continue'") &&
     liveFinalTranscriptAdapterSource.includes("input.deliveryStyle === 'response'") &&
@@ -162,6 +162,27 @@ assert(
   'LIVE hub adapter should synthesize fallback evidence when hub payload is incomplete'
 )
 assert(
-  liveHubAdapterSource.includes('lastTranscriptRef'),
-  'LIVE hub adapter should preserve last transcript for authority fallback'
+  liveHubAdapterSource.includes('lastTranscriptRef') &&
+    liveHubAdapterSource.includes('recentTranscript: lastTranscriptRef'),
+  'LIVE hub adapter should preserve recent transcript for authority fallback'
 )
+assert(
+  operationalUnderstandingSource.includes('operationalObjective') &&
+    operationalUnderstandingSource.includes('objectiveSource') &&
+    operationalUnderstandingSource.includes('credibility') &&
+    operationalUnderstandingSource.includes('optionality') &&
+    operationalUnderstandingSource.includes('accumulating signals'),
+  'Operational Understanding should own default/live operational objective synthesis'
+)
+assert(
+  liveExecutionSource.includes('buildGeorgeOperationalUnderstanding') &&
+    liveExecutionSource.includes('understanding.operationalObjective'),
+  'LIVE execution should use synthesized operational objective'
+)
+assert(
+  actionCueAuthoritySource.includes("category: 'operational_answer'") &&
+    actionCueAuthoritySource.includes('Verified from operational understanding.'),
+  'Verified Response replacements should be marked as operational answers'
+)
+
+console.log('GEORGE LIVE runtime smoke passed')
