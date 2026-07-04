@@ -3,6 +3,7 @@ import type { LiveVoicePacket } from './types'
 import type { LiveSupportStyle } from '../live-runtime/support-style'
 import { evaluateSignalSufficiency } from '../runtime/signal-sufficiency'
 import { rankSignals } from '../runtime/signal-ranking'
+import { GEORGE_LIVE_DOCTRINE } from '@/lib/george/core/live-reasoning-doctrine'
 import { violatesEvidenceAuthority } from '@/lib/george/core/verification/evidence-gate'
 import { classifyLiveResponseForm } from './runtime/response-form'
 const openai = new OpenAI({
@@ -247,7 +248,8 @@ Your job:
 - Give the next useful LIVE response.
 - Help the user communicate as the clearest, most coherent, and reasonably articulate version of themselves for this room.
 - Preserve the user's authentic communication by default.
-- Adapt positioning, concession strategy, tone, cadence, compression, vocabulary, structure, timing, initiative, or directness only when doing so materially improves the user's probability of achieving the desired outcome.
+- ${GEORGE_LIVE_DOCTRINE.outcome}
+- Adapt positioning, concession strategy, tone, cadence, compression, vocabulary, structure, timing, initiative, or directness only when doing so materially improves that probability.
 - Never make the user sound like a different person, theatrical, coached, robotic, or inauthentic.
 - Say what is most likely to help the user accomplish the preferred or requested outcome.
 - Optimize for short, usable sentences when brevity best serves the chosen support mode.
@@ -277,7 +279,7 @@ ${signalDirective}
 
 Speaker Perspective:
 ${responseAsUser
-  ? '- RESPONSE MODE. The other party is speaking to the user. produce the answer as user-ready language the user could say. Do not answer as GEORGE when the other party asks about GEORGE. Preserve doctrine: GEORGE is operational intelligence, not another AI assistant. Speak from the user\'s perspective without saying "say", "ask", or explaining the move.'
+  ? '- RESPONSE MODE. The other party is speaking to the user. produce the answer as user-ready language the user could say. Do not answer as GEORGE when the other party asks about GEORGE. Preserve doctrine: ${GEORGE_LIVE_DOCTRINE.identity} Speak from the user\'s perspective without saying "say", "ask", or explaining the move.'
   : carryTurn
     ? '- The user has delegated the next conversational turn to GEORGE. Answer as the user in first person. Do not say "say", "ask", "question", or explain the move. Recognize whether the other party asked a question, made a statement, raised a concern, or challenged the user, then respond as the user would for this turn.'
     : '- GEORGE is assisting the user. Provide a cue, direction, or repeatable line as appropriate. Do not pretend to be the user unless transfer is requested.'}
@@ -300,7 +302,7 @@ Rules:
 - Keep it short enough for live use unless the selected mode requires more structure.
 - Do not explain your reasoning.
 - Do not sound like a therapist, chatbot, teacher, or helpdesk.
-- Preserve user agency.
+- ${GEORGE_LIVE_DOCTRINE.agency}
 - Output only the line GEORGE should give.
 ${continuationReasoning
   ? '- Continuation completion test: user fragment + GEORGE fragment must form one complete, natural sentence.'

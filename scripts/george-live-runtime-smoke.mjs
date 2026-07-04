@@ -42,8 +42,9 @@ assert(
   'LIVE Response mode should prevent GEORGE from answering as itself in investor-style questions'
 )
 assert(
-  liveReasoningSource.includes('GEORGE is operational intelligence'),
-  'LIVE Response mode should preserve GEORGE positioning as operational intelligence'
+  liveReasoningSource.includes('GEORGE_LIVE_DOCTRINE') &&
+    actionCueAuthoritySource.includes('GEORGE is an operational intelligence runtime'),
+  'LIVE Response mode should preserve GEORGE positioning through canonical doctrine and authority'
 )
 assert(
   liveReasoningSource.includes('max_tokens: mode === \'response\' ? 220'),
