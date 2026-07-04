@@ -54,7 +54,7 @@ import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCu
 import { useLiveAudioRuntime } from '@/hooks/useLiveAudioRuntime'
 import { useLiveReflexListener } from '@/hooks/useLiveReflexListener'
 import { isLiveSteeringPhrase, type LastLiveFinalTranscript } from '@/lib/george/live-runtime/transcript-routing'
-import { resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
+import { applyLiveFinalTranscriptExecution, resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
@@ -5469,7 +5469,9 @@ return true
       return
     }
 
-    if (authority.action.type === 'ignore') {
+    const application = applyLiveFinalTranscriptExecution(execution)
+
+    if (application.shouldLogIgnored) {
       if (typeof window !== 'undefined' && window.localStorage.getItem('george_live_debug') === '1') {
         console.warn('[GEORGE LIVE ACTION IGNORED]', {
           transcript: clean,
@@ -5481,30 +5483,30 @@ return true
       return
     }
 
-    if (authority.action.type === 'start_buy_time') {
+    if (application.shouldStartBuyTime) {
       console.info('[GEORGE LIVE LOCAL]', 'buy_time')
 
-      const buyTimeUntil = Date.now() + authority.action.durationMs
+      const buyTimeUntil = Date.now() + application.buyTimeDurationMs
       liveBuyTimeUntilRef.current = buyTimeUntil
 
       window.setTimeout(() => {
         if (liveBuyTimeUntilRef.current === buyTimeUntil) {
           console.info('[GEORGE LIVE LOCAL]', 'buy_time_expired')
         }
-      }, authority.action.durationMs)
+      }, application.buyTimeDurationMs)
 
       return
     }
 
-    if (authority.action.type === 'speak') {
-      console.info('[GEORGE LIVE LOCAL]', 'speak', { text: authority.action.text })
-      void speakText(authority.action.text)
+    if (application.shouldSpeak) {
+      console.info('[GEORGE LIVE LOCAL]', 'speak', { text: application.speechText })
+      void speakText(application.speechText)
       return
     }
 
-    if (authority.action.type === 'send') {
-      console.info('[GEORGE LIVE SEND]', { text: authority.action.text })
-      void handleSend(authority.action.text, { source: 'live_transcript' })
+    if (application.shouldSend) {
+      console.info('[GEORGE LIVE SEND]', { text: application.sendText })
+      void handleSend(application.sendText, { source: 'live_transcript' })
     }
   }, [handleSend, isThinking, liveMode, liveDeliveryStyle, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
 

@@ -62,3 +62,88 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
     },
   }
 }
+
+
+export type LiveFinalTranscriptExecutionApplication = {
+  shouldLogIgnored: boolean
+  shouldStartBuyTime: boolean
+  buyTimeDurationMs: number
+  shouldSpeak: boolean
+  speechText: string
+  shouldSend: boolean
+  sendText: string
+}
+
+export function applyLiveFinalTranscriptExecution(execution: ReturnType<typeof resolveLiveFinalTranscriptAction>): LiveFinalTranscriptExecutionApplication {
+  const authority = execution?.authority
+
+  if (!execution || !authority || execution.routing.shouldSuppressLegacy) {
+    return {
+      shouldLogIgnored: false,
+      shouldStartBuyTime: false,
+      buyTimeDurationMs: 0,
+      shouldSpeak: false,
+      speechText: '',
+      shouldSend: false,
+      sendText: '',
+    }
+  }
+
+  if (authority.action.type === 'ignore') {
+    return {
+      shouldLogIgnored: true,
+      shouldStartBuyTime: false,
+      buyTimeDurationMs: 0,
+      shouldSpeak: false,
+      speechText: '',
+      shouldSend: false,
+      sendText: '',
+    }
+  }
+
+  if (authority.action.type === 'start_buy_time') {
+    return {
+      shouldLogIgnored: false,
+      shouldStartBuyTime: true,
+      buyTimeDurationMs: authority.action.durationMs,
+      shouldSpeak: false,
+      speechText: '',
+      shouldSend: false,
+      sendText: '',
+    }
+  }
+
+  if (authority.action.type === 'speak') {
+    return {
+      shouldLogIgnored: false,
+      shouldStartBuyTime: false,
+      buyTimeDurationMs: 0,
+      shouldSpeak: true,
+      speechText: authority.action.text,
+      shouldSend: false,
+      sendText: '',
+    }
+  }
+
+  if (authority.action.type === 'send') {
+    return {
+      shouldLogIgnored: false,
+      shouldStartBuyTime: false,
+      buyTimeDurationMs: 0,
+      shouldSpeak: false,
+      speechText: '',
+      shouldSend: true,
+      sendText: authority.action.text,
+    }
+  }
+
+  return {
+    shouldLogIgnored: false,
+    shouldStartBuyTime: false,
+    buyTimeDurationMs: 0,
+    shouldSpeak: false,
+    speechText: '',
+    shouldSend: false,
+    sendText: '',
+  }
+}
