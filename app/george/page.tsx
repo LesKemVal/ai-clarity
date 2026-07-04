@@ -2805,29 +2805,21 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+      deliveryStyle: liveDeliveryStyle,
     })
 
     if (execution) {
       lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
     }
 
-    const shouldForwardToHub =
-      execution &&
-      execution.authority.verdict === 'allow' &&
-      execution.authority.action.type !== 'ignore'
-
-    if (shouldForwardToHub) {
-      const hubTranscript =
-        execution.authority.action.type === 'send'
-          ? execution.authority.action.text
-          : clean
-
-      setLiveHubShadowTranscript(hubTranscript)
+    if (execution?.routing?.shouldForwardToHub) {
+      setLiveHubShadowTranscript(execution.routing.hubTranscript)
     } else {
       console.info('[GEORGE LIVE HUB ROUTE]', {
         route: 'held_before_hub',
         transcript: clean,
         authority: execution?.authority || null,
+        routing: execution?.routing || null,
       })
     }
 
@@ -5451,6 +5443,7 @@ return true
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+      deliveryStyle: liveDeliveryStyle,
     })
 
     if (!execution) return
@@ -5465,12 +5458,13 @@ return true
       authority,
     })
 
-    if (liveMode && (liveDeliveryStyle === 'continue' || liveDeliveryStyle === 'response')) {
+    if (execution.routing.shouldSuppressLegacy) {
       console.info('[GEORGE LIVE HUB ROUTE]', {
         route: 'hub_only',
         deliveryStyle: liveDeliveryStyle,
         transcript: clean,
         suppressedLegacyAction: authority.action.type,
+        routing: execution.routing,
       })
       return
     }

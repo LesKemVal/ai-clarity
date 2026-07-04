@@ -11,6 +11,7 @@ export type LiveFinalTranscriptAdapterInput = {
   lastSpokenLine: string
   overlapDetected: boolean
   desiredOutcome: string
+  deliveryStyle?: string
 }
 
 export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapterInput) {
@@ -18,7 +19,7 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
 
   if (!transcript) return null
 
-  return resolveGeorgeCoreLiveExecution({
+  const execution = resolveGeorgeCoreLiveExecution({
     transcript,
     lastFinalTranscript: input.lastFinalTranscript,
     routingContext: {
@@ -34,4 +35,30 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
     overlapRequiresAttention: false,
     desiredOutcome: input.desiredOutcome,
   })
+
+  const shouldForwardToHub =
+    execution.authority.verdict === 'allow' &&
+    execution.authority.action.type !== 'ignore'
+
+  const hubTranscript =
+    shouldForwardToHub && execution.authority.action.type === 'send'
+      ? execution.authority.action.text
+      : shouldForwardToHub
+        ? transcript
+        : ''
+
+  const shouldSuppressLegacy =
+    input.liveMode &&
+    (input.deliveryStyle === 'continue' || input.deliveryStyle === 'response')
+
+  return {
+    ...execution,
+    routing: {
+      shouldForwardToHub,
+      hubTranscript,
+      shouldSuppressLegacy,
+      shouldApplyLegacy: !shouldSuppressLegacy && execution.authority.action.type !== 'ignore',
+      holdReason: shouldForwardToHub ? '' : execution.authority.reason,
+    },
+  }
 }

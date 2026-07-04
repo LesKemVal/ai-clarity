@@ -16,6 +16,7 @@ const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveC
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
 const liveHubAdapterSource = readFileSync(`${root}/lib/george/live-hub/live-runtime-adapter.ts`, 'utf8')
+const liveFinalTranscriptAdapterSource = readFileSync(`${root}/lib/george/live-runtime/live-final-transcript-adapter.ts`, 'utf8')
 const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.ts`, 'utf8')
 const actionCueAuthoritySource = readFileSync(`${root}/lib/george/core/verification/action-cue-authority.ts`, 'utf8')
 const liveHubStreamSource = readFileSync(`${root}/live-hub/src/stt/deepgram-stream.ts`, 'utf8')
@@ -152,7 +153,9 @@ assert(updated.learning[0].learning.startsWith('We can '), 'LIVE runtime learnin
 console.log('GEORGE LIVE runtime smoke passed')
 
 assert(
-  pageSource.includes("liveDeliveryStyle === 'continue' || liveDeliveryStyle === 'response'"),
+  liveFinalTranscriptAdapterSource.includes("input.deliveryStyle === 'continue'") &&
+    liveFinalTranscriptAdapterSource.includes("input.deliveryStyle === 'response'") &&
+    liveFinalTranscriptAdapterSource.includes('shouldSuppressLegacy'),
   'LIVE Response should route through hub only and suppress legacy chat path'
 )
 assert(
