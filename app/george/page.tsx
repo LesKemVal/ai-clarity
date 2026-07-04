@@ -2762,6 +2762,27 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     lastSpeechTsRef.current = Date.now()
   }, [])
 
+  const resolveLiveFinalTranscriptExecution = useCallback((clean: string) => {
+    const execution = resolveLiveFinalTranscriptAction({
+      transcript: clean,
+      lastFinalTranscript: lastLiveFinalTranscriptRef.current,
+      isThinking,
+      isSpeaking: isSpeakingRef.current,
+      liveMode,
+      buyTimeUntil: liveBuyTimeUntilRef.current,
+      lastSpokenLine: liveLastSpokenUtteranceRef.current,
+      overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
+      desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+      deliveryStyle: liveDeliveryStyle,
+    })
+
+    if (execution) {
+      lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
+    }
+
+    return execution
+  }, [isThinking, liveMode, liveDeliveryStyle, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal])
+
   const processLiveFinalTranscript = useCallback((text: string) => {
     const clean = String(text || '').trim()
     if (!clean) return
@@ -2795,22 +2816,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
     setInput('')
 
-    const execution = resolveLiveFinalTranscriptAction({
-      transcript: clean,
-      lastFinalTranscript: lastLiveFinalTranscriptRef.current,
-      isThinking,
-      isSpeaking: isSpeakingRef.current,
-      liveMode,
-      buyTimeUntil: liveBuyTimeUntilRef.current,
-      lastSpokenLine: liveLastSpokenUtteranceRef.current,
-      overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
-      desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
-      deliveryStyle: liveDeliveryStyle,
-    })
-
-    if (execution) {
-      lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
-    }
+    const execution = resolveLiveFinalTranscriptExecution(clean)
 
     if (execution?.routing?.shouldForwardToHub) {
       setLiveHubShadowTranscript(execution.routing.hubTranscript)
@@ -2826,7 +2832,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     if (isLiveSteeringPhrase(clean) || isDirectGeorgeAddress(clean)) {
       liveTranscriptSubmitRef.current(clean)
     }
-  }, [])
+  }, [resolveLiveFinalTranscriptExecution])
 
   const processLiveAudioError = useCallback((error: unknown) => {
     console.warn('[GEORGE LIVE AUDIO]', error)
@@ -5433,22 +5439,9 @@ return true
     const clean = String(text || '').trim()
     if (!clean) return
 
-    const execution = resolveLiveFinalTranscriptAction({
-      transcript: clean,
-      lastFinalTranscript: lastLiveFinalTranscriptRef.current,
-      isThinking,
-      isSpeaking: isSpeakingRef.current,
-      liveMode,
-      buyTimeUntil: liveBuyTimeUntilRef.current,
-      lastSpokenLine: liveLastSpokenUtteranceRef.current,
-      overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
-      desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
-      deliveryStyle: liveDeliveryStyle,
-    })
+    const execution = resolveLiveFinalTranscriptExecution(clean)
 
     if (!execution) return
-
-    lastLiveFinalTranscriptRef.current = execution.nextFinalTranscript
 
     const authority = execution.authority
 
@@ -5508,7 +5501,7 @@ return true
       console.info('[GEORGE LIVE SEND]', { text: application.sendText })
       void handleSend(application.sendText, { source: 'live_transcript' })
     }
-  }, [handleSend, isThinking, liveMode, liveDeliveryStyle, liveRuntimeSupport?.objective, activeCampaign?.desiredOutcome, activeCampaign?.currentGoal, speakText])
+  }, [handleSend, liveDeliveryStyle, resolveLiveFinalTranscriptExecution, speakText])
 
   useEffect(() => {
     liveTranscriptSubmitRef.current = handleLiveFinalTranscript
