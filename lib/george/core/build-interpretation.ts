@@ -9,6 +9,7 @@ import { createGeorgeCoreInterpretation } from './interpretation'
 import { evaluateSignalSufficiency } from '@/lib/george/runtime/signal-sufficiency'
 import { rankSignals } from '@/lib/george/runtime/signal-ranking'
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
+import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
 
 export function buildGeorgeCoreInterpretation(input: {
   transcript: string
@@ -20,8 +21,19 @@ export function buildGeorgeCoreInterpretation(input: {
   userPosition?: string
 }) {
   const text = String(input.transcript || '').trim()
-  const context = [input.shadowMap, text].filter(Boolean).join('\n')
-  const signalText = [input.desiredOutcome, input.knownContext, context].filter(Boolean).join('\n')
+
+  const understanding = buildGeorgeOperationalUnderstanding({
+    transcript: text,
+    objective: input.desiredOutcome,
+    room: input.room,
+    knownContext: input.knownContext,
+    userPosition: input.userPosition,
+  })
+
+  const operationalObjective = understanding.operationalObjective
+
+  const context = [input.shadowMap, text, understanding.persistentSignalSummary].filter(Boolean).join('\n')
+  const signalText = [operationalObjective, input.knownContext, context].filter(Boolean).join('\n')
 
   const conversationSignals = detectConversationSignals(context)
 
@@ -29,13 +41,13 @@ export function buildGeorgeCoreInterpretation(input: {
     transcript: text,
     knownUserSpeaking: input.knownUserSpeaking,
     activeRoom: input.room,
-    objective: input.desiredOutcome,
+    objective: operationalObjective,
   })
 
   const roomAnalysis = analyzeRoom(context)
 
   const objectiveHypothesis = inferObjectiveHypothesis(
-    [input.desiredOutcome, input.room, input.knownContext, text]
+    [operationalObjective, input.room, input.knownContext, text]
       .filter(Boolean)
       .join(' ')
   )
@@ -55,7 +67,7 @@ export function buildGeorgeCoreInterpretation(input: {
   })
 
   const activeOutcome = deriveActiveOutcome({
-    desiredOutcome: input.desiredOutcome,
+    desiredOutcome: operationalObjective,
     room: input.room,
     transcript: text,
     userPosition: input.userPosition,
@@ -68,7 +80,7 @@ export function buildGeorgeCoreInterpretation(input: {
 
   const signalSufficiency = evaluateSignalSufficiency({
     transcript: text,
-    outcome: input.desiredOutcome,
+    outcome: operationalObjective,
     context: input.knownContext,
   })
 
@@ -76,7 +88,7 @@ export function buildGeorgeCoreInterpretation(input: {
 
   const outcomeGovernor = georgeOutcomeGovernor.evaluate({
     objectiveKnown: Boolean(input.desiredOutcome) || objectiveHypothesis.confidence >= 0.72,
-    desiredOutcome: input.desiredOutcome,
+    desiredOutcome: operationalObjective,
     activeOutcome,
     confidence: Math.max(speakerIntent.confidence, trajectory.score),
     consequence:
