@@ -314,6 +314,31 @@ export function finalizeGeorgeActionCueAuthority(input: {
     const text = cleanAuthorityText(input.actionCue.cue)
     if (!text) return input.actionCue
 
+    const verifiedBriefingResponse = buildVerifiedResponse({
+      transcript: input.actionCue.evidence?.transcript,
+      objective: input.actionCue.evidence?.objective || input.context?.objective,
+      room: input.actionCue.evidence?.room || input.context?.room,
+      knownContext: [
+        input.actionCue.evidence?.knownContext,
+        input.context?.knownContext,
+      ].join(' '),
+      briefingKnowledge: [
+        input.actionCue.evidence?.briefingKnowledge,
+        input.context?.briefingKnowledge,
+      ].join(' '),
+      userPosition: input.actionCue.evidence?.userPosition,
+      runtimeIntent: input.actionCue.evidence?.runtimeIntent,
+      fallback: '',
+    })
+
+    if (verifiedBriefingResponse) {
+      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
+      return {
+        ...input.actionCue,
+        cue: verifiedBriefingResponse,
+      }
+    }
+
     const replacementText = violatesResponseAuthority(text, input.actionCue.evidence?.transcript)
       ? repairResponseAuthority({
           text,
