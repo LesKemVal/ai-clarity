@@ -2754,6 +2754,14 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
       lastSpokenLine: liveLastSpokenUtteranceRef.current,
       overlapDetected: liveAwarenessBufferRef.current.some((fragment) => fragment.overlapLikely),
       desiredOutcome: liveRuntimeSupport?.objective || activeCampaign?.desiredOutcome || activeCampaign?.currentGoal || '',
+      persistentSignals: liveAwarenessBufferRef.current
+        ? processLiveAwarenessSignal({
+            buffer: liveAwarenessBufferRef.current,
+            kind: 'final',
+            text: clean,
+            whileGeorgeSpeaking: isSpeakingRef.current,
+          }).awarenessState.persistentSignals
+        : [],
       deliveryStyle: liveDeliveryStyle,
     })
 

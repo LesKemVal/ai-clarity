@@ -23,6 +23,7 @@ export type GeorgeCoreLiveExecutionInput = {
   overlapDetected?: boolean
   overlapRequiresAttention?: boolean
   desiredOutcome?: string
+  persistentSignals?: string[]
   now?: number
 }
 
@@ -87,6 +88,7 @@ export function resolveGeorgeCoreLiveExecution(
   const understanding = buildGeorgeOperationalUnderstanding({
     transcript: input.transcript,
     objective: input.desiredOutcome,
+    persistentSignals: input.persistentSignals,
   })
 
   const speakerIntent = classifyLiveSpeakerIntent({

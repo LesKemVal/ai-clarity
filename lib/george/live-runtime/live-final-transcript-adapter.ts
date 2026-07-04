@@ -11,6 +11,7 @@ export type LiveFinalTranscriptAdapterInput = {
   lastSpokenLine: string
   overlapDetected: boolean
   desiredOutcome: string
+  persistentSignals?: string[]
   deliveryStyle?: string
 }
 
@@ -34,6 +35,7 @@ export function resolveLiveFinalTranscriptAction(input: LiveFinalTranscriptAdapt
     overlapDetected: input.overlapDetected,
     overlapRequiresAttention: false,
     desiredOutcome: input.desiredOutcome,
+    persistentSignals: input.persistentSignals,
   })
 
   const shouldForwardToHub =
