@@ -87,7 +87,7 @@ export function buildGeorgeCoreInterpretation(input: {
   const rankedSignals = rankSignals(signalText)
 
   const outcomeGovernor = georgeOutcomeGovernor.evaluate({
-    objectiveKnown: Boolean(input.desiredOutcome) || objectiveHypothesis.confidence >= 0.72,
+    objectiveKnown: understanding.objectiveSource !== 'default',
     desiredOutcome: operationalObjective,
     activeOutcome,
     confidence: Math.max(speakerIntent.confidence, trajectory.score),
