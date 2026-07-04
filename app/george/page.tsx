@@ -25,6 +25,7 @@ import { adaptCueForUser, buildBrilliantLiveTriggerResponse, buildLiveGuidance, 
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
+import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
@@ -5578,25 +5579,13 @@ if (responseTimerRef.current) {
           liveLastSignalRef.current = Date.now()
         }
 
-const outcomeSignal = (() => {
-  const text = clean.toLowerCase()
-
-  if (text.includes("closed") || text.includes("deal done")) return "WIN"
-  if (text.includes("call me") || text.includes("next week")) return "CALLBACK"
-  if (text.includes("not interested") || text.includes("no thanks")) return "LOSS"
-  if (text.includes("send") || text.includes("info")) return "STALL"
-
-  return null
-})()
+const outcomeSignal = detectLiveOutcomeSignal(clean)
 
 if (outcomeSignal) {
-  const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
-  history.unshift({
+  recordLiveOutcomeSignal({
     signal: outcomeSignal,
     text: clean,
-    ts: Date.now()
   })
-  window.localStorage.setItem('GEORGE_OUTCOMES', JSON.stringify(history.slice(0, 50)))
 }
         setInterimTranscript('')
 
