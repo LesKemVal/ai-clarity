@@ -57,9 +57,8 @@ import { isDirectGeorgeAddress, isLiveSteeringPhrase, type LastLiveFinalTranscri
 import { applyLiveFinalTranscriptExecution, resolveLiveFinalTranscriptAction } from '@/lib/george/live-runtime/live-final-transcript-adapter'
 import { resolveLiveTranscriptDecision } from '@/lib/george/live-runtime/live-transcript-controller'
 import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
-import { appendLiveAwarenessFragment, type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
-import { reconcileLiveAwareness } from '@/lib/george/live-runtime/live-awareness-reconciliation'
-import { recoverLiveOverlapContext } from '@/lib/george/live-runtime/live-overlap-recovery'
+import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
+import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -2776,15 +2775,16 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     setInterimTranscript('')
     liveLastSignalRef.current = Date.now()
     lastSpeechTsRef.current = Date.now()
-    liveAwarenessBufferRef.current = appendLiveAwarenessFragment({
+    const awareness = processLiveAwarenessSignal({
       buffer: liveAwarenessBufferRef.current,
       kind: 'final',
       text: clean,
       whileGeorgeSpeaking: isSpeakingRef.current,
     })
+    liveAwarenessBufferRef.current = awareness.buffer
 
-    const awarenessState = reconcileLiveAwareness(liveAwarenessBufferRef.current)
-    const overlapRecovery = recoverLiveOverlapContext(awarenessState)
+    const awarenessState = awareness.awarenessState
+    const overlapRecovery = awareness.overlapRecovery
     if (
       awarenessState.overlapDetected ||
       overlapRecovery.requiresAttention
