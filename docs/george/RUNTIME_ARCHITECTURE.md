@@ -197,6 +197,8 @@ LIVE Hub owns runtime state, synchronization, runtime turn identity, and cue emi
 
 GEORGE Core owns operational judgment, evidence, authority, continuation, response shaping, and semantic meaning.
 
+Groq fast lane proposes candidate language only. It must not own GEORGE doctrine, verified response repair, or final replacement.
+
 Delivery owns voice, visual, silent, suppression, timing, modality, and revision execution.
 
 Delivery may not alter operational meaning.
