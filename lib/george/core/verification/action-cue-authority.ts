@@ -1,5 +1,6 @@
 import type { GeorgeActionCue, GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
 import { violatesEvidenceAuthority } from './evidence-gate'
 import { safeContinuationReplacement } from './continuation-replacement'
 
@@ -56,42 +57,26 @@ function buildVerifiedResponse(input: {
   const knownContext = normalizeAuthorityContextValue(input.knownContext)
   const briefingKnowledge = normalizeAuthorityContextValue(input.briefingKnowledge)
   const userPosition = normalizeAuthorityContextValue(input.userPosition)
-  const context = [objective, room, knownContext, briefingKnowledge, userPosition].join(' ').toLowerCase()
+  const understanding = buildGeorgeOperationalUnderstanding({
+    transcript,
+    objective,
+    room,
+    knownContext,
+    briefingKnowledge,
+    userPosition,
+  })
+  const context = understanding.context.toLowerCase()
 
   const isGeorgeQuestion = /\b(what is george|what business problem|how is george different|why george|why does the market need george|why should we choose george|build this ourselves|chatgpt|copilot|claude)\b/i.test(
     `${lowerTranscript} ${context}`
   )
 
   if (/\bwhat outcome am i trying to achieve|what is my outcome|what am i trying to achieve|what is the goal|what is my goal\b/i.test(lowerTranscript)) {
-    return objective
-      ? `Your objective is to ${objective.replace(/\.$/, '')}.`
-      : 'Your objective is to move this conversation toward the desired outcome using the strongest available evidence, timing, and communication strategy.'
+    return `You are trying to ${understanding.synthesizedObjective}.`
   }
 
   if (/\bwho am i in this meeting|what is my role|what role am i playing|what responsibility do i carry\b/i.test(lowerTranscript)) {
-    if (userPosition || room || knownContext || briefingKnowledge) {
-      const roleEvidence = [userPosition, room, knownContext, briefingKnowledge]
-        .filter(Boolean)
-        .join(' ')
-      const founder = /\bfounder\b/i.test(roleEvidence)
-      const ceo = /\bceo\b/i.test(roleEvidence)
-      const negotiator = /lead negotiator|negotiator/i.test(roleEvidence)
-      const presenter = /presenter/i.test(roleEvidence)
-      const decisionMaker = /decision maker|decision-maker/i.test(roleEvidence)
-      const roles = [
-        founder ? 'Founder' : '',
-        ceo ? 'CEO' : '',
-        negotiator ? 'lead negotiator' : '',
-        presenter ? 'presenter' : '',
-        decisionMaker ? 'decision maker' : '',
-      ].filter(Boolean)
-
-      if (roles.length) {
-        return `You are operating as ${roles.join(', ')} in this conversation. GEORGE should support you by helping you communicate, negotiate, present, and protect the path toward the desired outcome.`
-      }
-    }
-
-    return 'You are the person responsible for advancing the conversation toward the desired outcome. GEORGE should support your judgment, communication, and execution without taking authority away from you.'
+    return `You are operating as ${understanding.synthesizedRole} in this conversation. GEORGE should support your judgment, communication, timing, and tactical execution without taking authority away from you.`
   }
 
   if (/\b(how much|cost|price|pricing|brilliant cost|subscription|tier)\b/i.test(lowerTranscript)) {
