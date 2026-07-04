@@ -96,6 +96,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
             const cleanCue = String(event?.cue || '').trim()
             const fallbackEvidence = {
               transcript: lastTranscriptRef,
+              recentTranscript: lastTranscriptRef,
               room: currentContext.room,
               objective: currentContext.objective,
               knownContext: currentContext.knownContext,
