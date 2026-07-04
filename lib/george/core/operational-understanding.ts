@@ -11,6 +11,8 @@ export type GeorgeOperationalUnderstanding = {
   context: string
   synthesizedObjective: string
   synthesizedRole: string
+  operationalObjective: string
+  objectiveSource: 'explicit' | 'inferred' | 'default'
   hasStrategicCommercializationSignal: boolean
 }
 
@@ -56,10 +58,24 @@ export function buildGeorgeOperationalUnderstanding(
     ? roles.join(', ')
     : 'the person responsible for advancing the conversation toward the desired outcome'
 
+  const objectiveSource: GeorgeOperationalUnderstanding['objectiveSource'] =
+    objective
+      ? 'explicit'
+      : hasStrategicCommercializationSignal
+        ? 'inferred'
+        : 'default'
+
+  const operationalObjective =
+    objectiveSource === 'default'
+      ? "strengthen the user's conversational position by improving clarity, preserving credibility, maintaining optionality, and gathering useful signal"
+      : synthesizedObjective
+
   return {
     context,
     synthesizedObjective,
     synthesizedRole,
+    operationalObjective,
+    objectiveSource,
     hasStrategicCommercializationSignal,
   }
 }

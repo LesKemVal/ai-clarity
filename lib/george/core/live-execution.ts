@@ -11,6 +11,7 @@ import {
 import { classifyLiveSpeakerIntent } from '@/lib/george/core/live-speaker-intent'
 import type { LiveTranscriptControllerAction } from '@/lib/george/live-runtime/live-transcript-controller'
 import type { LiveTranscriptDecision } from '@/lib/george/live-runtime/transcript-routing'
+import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
 
 export type GeorgeCoreLiveExecutionInput = {
   transcript: string
@@ -83,14 +84,19 @@ function isOutcomeRelevantTranscript(transcript: string, desiredOutcome?: string
 export function resolveGeorgeCoreLiveExecution(
   input: GeorgeCoreLiveExecutionInput
 ): GeorgeCoreLiveExecutionResult {
+  const understanding = buildGeorgeOperationalUnderstanding({
+    transcript: input.transcript,
+    objective: input.desiredOutcome,
+  })
+
   const speakerIntent = classifyLiveSpeakerIntent({
     transcript: input.transcript,
     knownUserSpeaking: false,
-    objective: input.desiredOutcome || null,
+    objective: understanding.operationalObjective || null,
   })
 
   const environmentalOrSocial = isEnvironmentalOrSocialTranscript(input.transcript)
-  const outcomeRelevant = isOutcomeRelevantTranscript(input.transcript, input.desiredOutcome)
+  const outcomeRelevant = isOutcomeRelevantTranscript(input.transcript, understanding.operationalObjective)
 
   if (
     environmentalOrSocial &&
@@ -136,7 +142,7 @@ export function resolveGeorgeCoreLiveExecution(
     overlapDetected: input.overlapDetected,
     overlapRequiresAttention: input.overlapRequiresAttention,
     lastSpokenLine: input.lastSpokenLine || '',
-    desiredOutcome: input.desiredOutcome,
+    desiredOutcome: understanding.operationalObjective,
   })
 
   return {
