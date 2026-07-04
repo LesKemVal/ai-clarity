@@ -62,6 +62,38 @@ function buildVerifiedResponse(input: {
     `${lowerTranscript} ${context}`
   )
 
+  if (/\bwhat outcome am i trying to achieve|what is my outcome|what am i trying to achieve|what is the goal|what is my goal\b/i.test(lowerTranscript)) {
+    return objective
+      ? `Your objective is to ${objective.replace(/\.$/, '')}.`
+      : 'Your objective is to move this conversation toward the desired outcome using the strongest available evidence, timing, and communication strategy.'
+  }
+
+  if (/\bwho am i in this meeting|what is my role|what role am i playing|what responsibility do i carry\b/i.test(lowerTranscript)) {
+    if (userPosition || room || knownContext || briefingKnowledge) {
+      const roleEvidence = [userPosition, room, knownContext, briefingKnowledge]
+        .filter(Boolean)
+        .join(' ')
+      const founder = /\bfounder\b/i.test(roleEvidence)
+      const ceo = /\bceo\b/i.test(roleEvidence)
+      const negotiator = /lead negotiator|negotiator/i.test(roleEvidence)
+      const presenter = /presenter/i.test(roleEvidence)
+      const decisionMaker = /decision maker|decision-maker/i.test(roleEvidence)
+      const roles = [
+        founder ? 'Founder' : '',
+        ceo ? 'CEO' : '',
+        negotiator ? 'lead negotiator' : '',
+        presenter ? 'presenter' : '',
+        decisionMaker ? 'decision maker' : '',
+      ].filter(Boolean)
+
+      if (roles.length) {
+        return `You are operating as ${roles.join(', ')} in this conversation. GEORGE should support you by helping you communicate, negotiate, present, and protect the path toward the desired outcome.`
+      }
+    }
+
+    return 'You are the person responsible for advancing the conversation toward the desired outcome. GEORGE should support your judgment, communication, and execution without taking authority away from you.'
+  }
+
   if (/\b(how much|cost|price|pricing|brilliant cost|subscription|tier)\b/i.test(lowerTranscript)) {
     return 'I would not give you an invented price. The right answer is to scope the deployment, define the level of support required, and price BRILLIANT against the operational value and implementation requirements of the pilot.'
   }
@@ -105,13 +137,18 @@ function buildVerifiedResponse(input: {
   return cleanAuthorityText(input.fallback || '') || 'I would separate what we know, what we can measure, and what evidence is required before making the claim.'
 }
 
-function violatesResponseAuthority(text: string) {
+function asksAboutUserPerspective(text?: string) {
+  return /\b(what outcome am i|what is my outcome|what am i trying to achieve|who am i in this meeting|what is my role|what role am i|what responsibility do i carry)\b/i.test(String(text || ''))
+}
+
+function violatesResponseAuthority(text: string, transcript?: string) {
   const clean = text.toLowerCase()
 
   return (
     /\b(i am|i'm)\s+(george|george live|an ai|a conversational ai)\b/i.test(text) ||
     /\b(ai assistant|conversational ai|virtual assistant|human-like conversation|empathetic responses)\b/i.test(clean) ||
-    /\b(as an ai|i can help|i am here to)\b/i.test(clean)
+    /\b(as an ai|i can help|i am here to)\b/i.test(clean) ||
+    (asksAboutUserPerspective(transcript) && /\b(i am|i'm|this is)\s+george\b/i.test(clean))
   )
 }
 
@@ -277,7 +314,7 @@ export function finalizeGeorgeActionCueAuthority(input: {
     const text = cleanAuthorityText(input.actionCue.cue)
     if (!text) return input.actionCue
 
-    const replacementText = violatesResponseAuthority(text)
+    const replacementText = violatesResponseAuthority(text, input.actionCue.evidence?.transcript)
       ? repairResponseAuthority({
           text,
           transcript: input.actionCue.evidence?.transcript,
