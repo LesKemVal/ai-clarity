@@ -58,16 +58,14 @@ assert(
   'Delivery metrics should use preserved delivery turnId when available'
 )
 assert(
-  liveHubGroqSource.includes('violatesResponseOutcomeContract'),
-  'LIVE hub Groq response mode should have deterministic outcome guard'
+  !liveHubGroqSource.includes('repairResponseCandidate') &&
+    !liveHubGroqSource.includes('violatesResponseOutcomeContract'),
+  'LIVE hub Groq should generate candidates only; response repair belongs to core authority'
 )
 assert(
-  liveHubGroqSource.includes('GEORGE is operational intelligence'),
-  'LIVE hub response repair should preserve GEORGE operational intelligence doctrine'
-)
-assert(
-  liveHubGroqSource.includes('repaired: Boolean(rawCue && cue && cue !== rawCue)'),
-  'LIVE hub Groq guard should report repaired response candidates'
+  actionCueAuthoritySource.includes('buildVerifiedResponse') &&
+    actionCueAuthoritySource.includes('violatesResponseQuality'),
+  'Core authority should own verified response repair and quality gating'
 )
 assert(
   actionCueAuthoritySource.includes('violatesResponseAuthority'),
