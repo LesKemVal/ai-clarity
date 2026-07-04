@@ -21,6 +21,8 @@ const liveHubGroqSource = readFileSync(`${root}/live-hub/src/llm/groq-fast-lane.
 const actionCueAuthoritySource = readFileSync(`${root}/lib/george/core/verification/action-cue-authority.ts`, 'utf8')
 const operationalUnderstandingSource = readFileSync(`${root}/lib/george/core/operational-understanding.ts`, 'utf8')
 const liveExecutionSource = readFileSync(`${root}/lib/george/core/live-execution.ts`, 'utf8')
+const liveFinalTranscriptAdapterSourceText = readFileSync(`${root}/lib/george/live-runtime/live-final-transcript-adapter.ts`, 'utf8')
+const liveAwarenessReconciliationSource = readFileSync(`${root}/lib/george/live-runtime/live-awareness-reconciliation.ts`, 'utf8')
 const liveHubStreamSource = readFileSync(`${root}/live-hub/src/stt/deepgram-stream.ts`, 'utf8')
 const liveHubProtocolSource = readFileSync(`${root}/live-hub/src/types/protocol.ts`, 'utf8')
 const runtimePacketSource = readFileSync(`${root}/live-hub/src/george/runtime-packet.ts`, 'utf8')
@@ -178,6 +180,22 @@ assert(
   liveExecutionSource.includes('buildGeorgeOperationalUnderstanding') &&
     liveExecutionSource.includes('understanding.operationalObjective'),
   'LIVE execution should use synthesized operational objective'
+)
+
+assert(
+  liveAwarenessReconciliationSource.includes('persistentSignals') &&
+    liveAwarenessReconciliationSource.includes('signalCounts'),
+  'LIVE awareness reconciliation should produce persistent signals'
+)
+assert(
+  liveFinalTranscriptAdapterSourceText.includes('persistentSignals?: string[]') &&
+    liveFinalTranscriptAdapterSourceText.includes('persistentSignals: input.persistentSignals'),
+  'LIVE final transcript adapter should pass persistent signals into core execution'
+)
+assert(
+  liveExecutionSource.includes('persistentSignals?: string[]') &&
+    liveExecutionSource.includes('persistentSignals: input.persistentSignals'),
+  'LIVE core execution should pass persistent signals into operational understanding'
 )
 assert(
   actionCueAuthoritySource.includes("category: 'operational_answer'") &&
