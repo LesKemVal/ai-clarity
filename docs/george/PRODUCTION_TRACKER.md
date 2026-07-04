@@ -302,6 +302,8 @@ Validated:
 - Cue overfire language was reduced in `live-hub/src/george/cue-patterns.ts`.
 
 Current production focus:
+- Continue reducing orchestration inside `app/george/page.tsx` through behavior-preserving runtime extractions.
+- Preserve stable ownership boundaries between Presentation, LIVE Runtime, GEORGE Core, Prompt Contract, Generation, Verification, and Delivery.
 - Validate executive-quality response behavior against enterprise briefing questions.
 - Confirm no generic fallback appears when evidence/relevance/usefulness repair is possible.
 - Confirm clear product questions do not trigger unnecessary clarification cues.

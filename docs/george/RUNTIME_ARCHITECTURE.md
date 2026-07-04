@@ -205,6 +205,16 @@ Delivery owns voice, visual, silent, suppression, timing, modality, and revision
 
 Delivery may not alter operational meaning.
 
+
+LIVE awareness processing is owned by `lib/george/live-runtime/live-awareness-pipeline.ts`.
+
+The pipeline owns:
+- awareness fragment accumulation
+- awareness reconciliation
+- overlap recovery
+
+`app/george/page.tsx` retains only transient UI/runtime state (buffer references and diagnostics) and delegates awareness processing to the runtime pipeline.
+
 Runtime metrics own event naming, latency timing, correlation, and latency contract inspection.
 
 `app/george/page.tsx` must remain thin. Prefer bridges, runtime adapters, conversation runtime modules, behavior tests, and focused modules.
