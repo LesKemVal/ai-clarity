@@ -40,8 +40,14 @@ export function buildGeorgeOperationalUnderstanding(
     .filter(Boolean)
     .join(' ')
 
+  const hasCommercialAudienceSignal =
+    /\b(strategic partner|investor|investment|licensing|partnership|due diligence|commercialization|enterprise)\b/i.test(context)
+
+  const hasCommercialEvidenceSignal =
+    /\b(proof|evidence|pilot|customer|revenue|deployment|integration|scale|security|privacy|risk|concern|objection|confidence)\b/i.test(context)
+
   const hasStrategicCommercializationSignal =
-    /\b(strategic partner|investor|investment|licensing|partnership|due diligence|commercialization|pilot|enterprise)\b/i.test(context)
+    hasCommercialAudienceSignal && hasCommercialEvidenceSignal
 
   const synthesizedObjective = hasStrategicCommercializationSignal
     ? 'create enough confidence in GEORGE as operational intelligence that the conversation advances toward partnership, licensing, investment, or continued due diligence'
