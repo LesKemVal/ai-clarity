@@ -199,6 +199,8 @@ GEORGE Core owns operational judgment, evidence, authority, continuation, respon
 
 Groq fast lane proposes candidate language only. It must not own GEORGE doctrine, verified response repair, or final replacement.
 
+Canonical LIVE doctrine lives in `lib/george/core/live-reasoning-doctrine.ts`. Root-side reasoning consumers may import it directly; Hub-side prompt contracts must not cross project boundaries until shared packaging is explicit.
+
 Delivery owns voice, visual, silent, suppression, timing, modality, and revision execution.
 
 Delivery may not alter operational meaning.
