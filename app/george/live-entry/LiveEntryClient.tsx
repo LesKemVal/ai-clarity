@@ -4163,10 +4163,10 @@ Anything I should keep in mind?
                 Brief GEORGE
               </span>
               <span className="mt-1 block text-[12px] leading-5 text-white/52">
-                Brief GEORGE before entering LIVE.
+                Brief GEORGE when your conversation requires complexity or specific context.
               </span>
               <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                Ideal when you have time before a negotiation, board meeting, presentation, interview, investor meeting, or any conversation where preparation improves judgment, timing, and execution.
+                Negotiations • Presentations • Board Meetings • Investor Meetings • Performance Reviews • Interviews • You Decide
               </span>
             </button>
 
