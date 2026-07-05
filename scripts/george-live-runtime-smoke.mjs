@@ -113,10 +113,12 @@ assert(outcomeReviewSource.includes('bestAvailablePath'), 'Outcome Review should
 assert(outcomeReviewSource.includes('assistanceOptions'), 'Outcome Review should produce post-LIVE assistance options')
 assert(outcomeReviewSource.includes('internalNotes'), 'Outcome Review should preserve operational notes for package learning')
 
-assert(recordPanelSource.includes('Post-LIVE operational memory'), 'Conversation Record panel should be post-LIVE operational memory')
+assert(recordPanelSource.includes('LIVE Complete'), 'After LIVE panel should open with LIVE complete framing')
+assert(recordPanelSource.includes("Let's see what actually happened."), 'After LIVE panel should frame the debrief as GEORGE analysis')
 assert(recordPanelSource.includes('Outcome Review'), 'Conversation Record panel should surface Outcome Review')
 assert(recordPanelSource.includes('Learning'), 'Conversation Record panel should surface promoted learning')
-assert(recordPanelSource.includes('Future actions'), 'Conversation Record panel should surface future actions')
+assert(recordPanelSource.includes('Recommended next move'), 'After LIVE panel should surface recommended next move')
+assert(recordPanelSource.includes('Transcript Intelligence'), 'After LIVE panel should surface transcript intelligence')
 assert(recordPanelSource.includes('Transcript evidence:'), 'Conversation Record panel should label transcript evidence availability')
 assert(!recordPanelSource.includes('Transcript viewer'), 'Conversation Record panel should not become a transcript viewer')
 

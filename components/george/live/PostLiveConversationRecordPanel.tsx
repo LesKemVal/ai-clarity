@@ -69,10 +69,10 @@ export function PostLiveConversationRecordPanel({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FF0C7]/72">
-            Conversation Record
+            LIVE Complete
           </p>
           <h2 className="mt-1 text-[15px] font-medium text-[#F4F7FB]/86">
-            Post-LIVE operational memory
+            Let's see what actually happened.
           </h2>
         </div>
 
@@ -102,7 +102,7 @@ export function PostLiveConversationRecordPanel({
       </div>
 
       <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
-        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Summary</p>
+        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE Analysis</p>
         <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">{label(record.summary)}</p>
       </div>
 
@@ -145,7 +145,7 @@ export function PostLiveConversationRecordPanel({
 
       {transcriptHighlights.length > 0 && (
         <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
-          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Transcript highlights</p>
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Transcript Intelligence</p>
           <div className="mt-2 space-y-2">
             {transcriptHighlights.map((item) => {
               const isConcern = item.kind === 'concern'
@@ -173,7 +173,7 @@ export function PostLiveConversationRecordPanel({
       )}
 
       <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
-        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Future actions</p>
+        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Recommended next move</p>
         {futureActions.length > 0 ? (
           <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[#DCEBFF]/72">
             {futureActions.map((action) => (
@@ -181,7 +181,7 @@ export function PostLiveConversationRecordPanel({
             ))}
           </ul>
         ) : (
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/46">No future action has been promoted yet.</p>
+          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/46">No next move has been promoted yet.</p>
         )}
       </div>
 
