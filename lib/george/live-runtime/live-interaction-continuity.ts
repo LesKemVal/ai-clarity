@@ -95,11 +95,46 @@ function buildLiveTranscriptHighlights(params: {
   return highlights.slice(0, 8)
 }
 
+function desiredOutcomeKind(outcome: string) {
+  const text = outcome.toLowerCase()
+
+  if (/investor|investment|funding|partner|licensing|pilot|customer|sale|deal|contract|enterprise/.test(text)) {
+    return 'commercial'
+  }
+
+  if (/interview|job|offer|hired|candidate|recruiter/.test(text)) {
+    return 'career'
+  }
+
+  if (/doctor|medical|appointment|diagnosis|treatment|symptom|medication/.test(text)) {
+    return 'medical'
+  }
+
+  return 'general'
+}
+
+function prioritizeDebriefObservation(kind: string, label: string) {
+  if (kind === 'commercial') {
+    if (/Future opportunity|Next executable opportunity|Signals surfaced|Concerns surfaced/.test(label)) return 0.18
+  }
+
+  if (kind === 'career') {
+    if (/What changed|Concerns surfaced|Next executable opportunity/.test(label)) return 0.16
+  }
+
+  if (kind === 'medical') {
+    if (/Concerns surfaced|Next executable opportunity|What changed/.test(label)) return 0.16
+  }
+
+  return 0
+}
+
 function buildOperationalDebrief(params: {
   outcomeReview: LiveOutcomeObservation
   highlights: LiveTranscriptHighlight[]
 }): LiveOperationalDebrief {
   const review = params.outcomeReview
+  const outcomeKind = desiredOutcomeKind(review.desiredOutcome)
   const signalCount = params.highlights.filter((item) => item.kind === 'signal').length
   const concernCount = params.highlights.filter((item) => item.kind === 'concern').length
 
@@ -139,15 +174,24 @@ function buildOperationalDebrief(params: {
           importance: 0.68,
         }
       : null,
-  ].filter(Boolean) as LiveOperationalDebrief['observations']
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item)).map((item) => ({
+    ...item,
+    importance: item.importance + prioritizeDebriefObservation(outcomeKind, item.label),
+  }))
 
   observations.sort((a, b) => b.importance - a.importance)
 
   return {
     summary:
-      review.bestAvailablePath ||
-      review.currentState ||
-      'GEORGE preserved the interaction evidence for future preparation.',
+      outcomeKind === 'commercial' && review.bestAvailablePath
+        ? review.bestAvailablePath
+        : outcomeKind === 'career' && review.currentState
+          ? review.currentState
+          : outcomeKind === 'medical' && concernCount
+            ? 'Important concerns surfaced. GEORGE preserved them for the next preparation.'
+            : review.bestAvailablePath ||
+              review.currentState ||
+              'GEORGE preserved the interaction evidence for future preparation.',
     observations: observations.slice(0, 6),
   }
 }

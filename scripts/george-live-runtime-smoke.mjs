@@ -161,6 +161,9 @@ assert(interactionContinuitySource.includes('const conversationRecord = buildCon
 assert(interactionContinuitySource.includes('conversationPackage: updatedPackage'), 'Interaction Continuity should return updated Conversation Package')
 assert(interactionContinuitySource.includes('operationalDebrief'), 'Interaction Continuity should return Operational Debrief')
 assert(interactionContinuitySource.includes('transcriptHighlights'), 'Interaction Continuity should return transcript highlights')
+assert(interactionContinuitySource.includes('desiredOutcomeKind'), 'Interaction Continuity should classify debrief by desired outcome')
+assert(interactionContinuitySource.includes('prioritizeDebriefObservation'), 'Interaction Continuity should prioritize debrief observations by outcome')
+
 /*
 assert(continuity.conversationRecord.transcriptEvidenceAvailable, 'Interaction Continuity should preserve transcript evidence availability')
 assert(updated.liveSummaries.length === 1, 'Interaction Continuity should hand summary into Conversation Package')
