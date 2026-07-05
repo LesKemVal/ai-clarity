@@ -1,4 +1,12 @@
 import { readFileSync } from 'node:fs'
+<<<<<<< HEAD
+=======
+import {
+  createConversationPackage,
+  updateAfterLive,
+  buildConversationRecord,
+} from '../lib/george/conversation-packages/index.mjs'
+>>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -8,7 +16,12 @@ const root = process.cwd()
 const pageSource = readFileSync(`${root}/app/george/page.tsx`, 'utf8')
 const panelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusPanel.tsx`, 'utf8')
 const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-outcome-review.ts`, 'utf8')
+<<<<<<< HEAD
 const interactionContinuitySource = readFileSync(`${root}/lib/george/live-runtime/live-interaction-continuity.ts`, 'utf8')
+=======
+const opportunityContinuitySource = readFileSync(`${root}/lib/george/live-runtime/opportunity-continuity.ts`, 'utf8')
+const packageRuntimeSource = readFileSync(`${root}/lib/george/conversation-packages/runtime.mjs`, 'utf8')
+>>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
@@ -113,8 +126,26 @@ assert(outcomeReviewSource.includes('bestAvailablePath'), 'Outcome Review should
 assert(outcomeReviewSource.includes('assistanceOptions'), 'Outcome Review should produce post-LIVE assistance options')
 assert(outcomeReviewSource.includes('internalNotes'), 'Outcome Review should preserve operational notes for package learning')
 
+<<<<<<< HEAD
 assert(recordPanelSource.includes('LIVE Complete'), 'After LIVE panel should open with LIVE complete framing')
 assert(recordPanelSource.includes("Let's see what actually happened."), 'After LIVE panel should frame the debrief as GEORGE analysis')
+=======
+assert(opportunityContinuitySource.includes('buildOpportunityContinuity'), 'Opportunity Continuity should expose runtime builder')
+assert(opportunityContinuitySource.includes('Live to fight another day.'), 'Opportunity Continuity should preserve doctrine')
+assert(opportunityContinuitySource.includes('opportunityState'), 'Opportunity Continuity should determine opportunity state')
+assert(opportunityContinuitySource.includes('executionDecision'), 'Opportunity Continuity should determine execution decision')
+assert(opportunityContinuitySource.includes('waitingStrategicallyCorrect'), 'Opportunity Continuity should decide whether waiting is strategic')
+assert(opportunityContinuitySource.includes('noFollowUpStrategicallyCorrect'), 'Opportunity Continuity should decide when not to follow up')
+assert(opportunityContinuitySource.includes('decisionMakerRequired'), 'Opportunity Continuity should detect decision-maker requirements')
+assert(opportunityContinuitySource.includes('preparationCarryForward'), 'Opportunity Continuity should prepare carry-forward state')
+
+assert(packageRuntimeSource.includes('opportunityContinuityFromLiveResult'), 'Interaction Continuity should consume Opportunity Continuity output')
+assert(packageRuntimeSource.includes("source: 'opportunity_continuity'"), 'Conversation Package should persist Opportunity Continuity as memory')
+assert(packageRuntimeSource.includes('latestOpportunityContinuity'), 'Conversation Record should expose latest Opportunity Continuity')
+assert(packageRuntimeSource.includes('learningFromOpportunityContinuity'), 'Opportunity Continuity should promote learning for future execution')
+
+assert(recordPanelSource.includes('Post-LIVE operational memory'), 'Conversation Record panel should be post-LIVE operational memory')
+>>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 assert(recordPanelSource.includes('Outcome Review'), 'Conversation Record panel should surface Outcome Review')
 assert(recordPanelSource.includes('Learning'), 'Conversation Record panel should surface promoted learning')
 assert(recordPanelSource.includes('Recommended next move'), 'After LIVE panel should surface recommended next move')
@@ -222,5 +253,56 @@ assert(
     actionCueAuthoritySource.includes('Verified from operational understanding.'),
   'Verified Response replacements should be marked as operational answers'
 )
+
+const opportunityContinuity = {
+  doctrine: 'Live to fight another day.',
+  opportunityState: 'transfers',
+  executionDecision: 'seek_decision_maker',
+  confidence: 86,
+  opportunitySurvived: true,
+  desiredOutcomeStillAchievable: true,
+  nextExecutableOpportunity: 'Prepare the path to the decision maker and preserve the current contact as access.',
+  timing: 'now',
+  preservedLeverage: ['Access was preserved.', 'A decision-maker path surfaced.'],
+  evidenceStillRequired: ['Confirm the actual decision maker and path to reach them.'],
+  decisionMakerKnowledge: 'Another decision maker likely matters before the opportunity can advance.',
+  objectiveEvolution: 'No stronger replacement objective was detected.',
+  preparationCarryForward: {
+    opportunityState: 'transfers',
+    nextExecutableOpportunity: 'Prepare the path to the decision maker and preserve the current contact as access.',
+    preservedLeverage: ['Access was preserved.', 'A decision-maker path surfaced.'],
+    evidenceStillRequired: ['Confirm the actual decision maker and path to reach them.'],
+    decisionMakerKnowledge: 'Another decision maker likely matters before the opportunity can advance.',
+    waitingState: 'No deliberate waiting state was detected.',
+    followUpTiming: 'Follow up now while access and context are warm.',
+    objectiveEvolution: 'No stronger replacement objective was detected.',
+  },
+}
+
+const updatedWithOpportunity = updateAfterLive(pkg, {
+  outcomeReview: {
+    desiredOutcome: 'secure investor follow-up',
+    observedProgress: 'improving',
+    confidence: 82,
+    currentState: 'Advancing toward the desired outcome.',
+    observedChange: 'Investor requested implementation material.',
+    availablePaths: ['Original outcome remains available.'],
+    bestAvailablePath: 'Respond directly and move toward the next commitment.',
+    assistanceOptions: ['Prepare follow-up.', 'Prepare requested materials.'],
+    internalNotes: 'Investor requested materials and the follow-up path remained open.',
+  },
+  opportunityContinuity,
+}, { timestamp: '2026-07-02T01:10:00.000Z' })
+
+const record = buildConversationRecord(updatedWithOpportunity, { timestamp: '2026-07-02T01:11:00.000Z' })
+
+assert(updatedWithOpportunity.opportunityContinuity.length === 1, 'LIVE runtime should hand Opportunity Continuity into package memory')
+assert(updatedWithOpportunity.opportunityContinuity[0].source === 'opportunity_continuity', 'Opportunity Continuity package memory should keep source')
+assert(updatedWithOpportunity.opportunityContinuity[0].opportunityState === 'transfers', 'Opportunity Continuity should preserve opportunity state')
+assert(updatedWithOpportunity.opportunityContinuity[0].executionDecision === 'seek_decision_maker', 'Opportunity Continuity should preserve execution decision')
+assert(updatedWithOpportunity.learning.some((item) => item.source === 'opportunity_continuity'), 'Opportunity Continuity should promote learning')
+assert(updatedWithOpportunity.futureActions.includes(opportunityContinuity.nextExecutableOpportunity), 'Opportunity Continuity should promote next executable opportunity')
+assert(record.latestOpportunityContinuity?.opportunityState === 'transfers', 'Conversation Record should expose latest Opportunity Continuity')
+assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityState === 'transfers', 'Conversation Record should preserve Preparation carry-forward')
 
 console.log('GEORGE LIVE runtime smoke passed')
