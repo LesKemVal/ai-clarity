@@ -1744,3 +1744,14 @@ select {
 [data-george-normal-hero] .george-utility-copy-loop div {
   max-width: none;
 }
+
+[data-george-normal-hero] .george-utility-copy-loop {
+  display: block;
+  width: min(92vw, 760px);
+  max-width: none;
+  text-align: left;
+}
+
+[data-george-normal-hero] .george-utility-copy-loop div {
+  max-width: none;
+}
