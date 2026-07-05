@@ -3554,7 +3554,7 @@ const beginProofOfAwareness = async () => {
                         {communicationStyle}
                       </div>
                       <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                        I’ll shape support around this communication style during LIVE.
+                        I’ll shape support around this speaking style during LIVE.
                       </div>
                     </div>
 
@@ -3576,7 +3576,7 @@ const beginProofOfAwareness = async () => {
                       Communication
                     </div>
                     <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                      Choose the communication style that feels most natural to you.
+                      Choose the speaking style that feels most natural to you.
                     </p>
 
                     <div className="mt-4 grid gap-2 sm:grid-cols-3">
