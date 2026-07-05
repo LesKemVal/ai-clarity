@@ -1,4 +1,5 @@
 import type { LiveOutcomeObservation } from './live-outcome-review'
+import { buildOutcomeConsistency, type OutcomeConsistencyDecision } from './outcome-consistency'
 
 export type OpportunityContinuityState =
   | 'continues'
@@ -36,6 +37,8 @@ export type OpportunityHealth = {
 
 export type OpportunityContinuityInput = {
   desiredOutcome?: string | null
+  secondaryOutcome?: string | null
+  secondaryObjective?: string | null
   transcript?: string | null
   outcomeReview?: LiveOutcomeObservation | null
   conversationRecord?: {
@@ -88,6 +91,7 @@ export type OpportunityContinuityDecision = {
   reasoning: string
   opportunityHealth: OpportunityHealth
   outcomeEffect: OpportunityOutcomeEffect
+  outcomeConsistency: OutcomeConsistencyDecision
   preparationCarryForward: {
     opportunityState: OpportunityContinuityState
     nextExecutableOpportunity: string
@@ -99,6 +103,7 @@ export type OpportunityContinuityDecision = {
     objectiveEvolution: string
     opportunityHealth: OpportunityHealth
     outcomeEffect: OpportunityOutcomeEffect
+    outcomeConsistency: OutcomeConsistencyDecision
   }
 }
 
@@ -424,6 +429,19 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
     (desiredOutcomeEvolved ? 2 : 0)
   )
 
+  const secondaryOutcome =
+    normalizeText(input.secondaryOutcome) ||
+    normalizeText(input.secondaryObjective) ||
+    normalizeText(outcomeReview?.possibleSecondaryOutcome)
+
+  const outcomeConsistency = buildOutcomeConsistency({
+    desiredOutcome,
+    secondaryOutcome,
+    possibleSecondaryOutcome: outcomeReview?.possibleSecondaryOutcome,
+    objectiveEvolution,
+    roomSignal: combinedSignal,
+  })
+
   const outcomeEffect =
     executionDecision === 'follow_up' ||
     executionDecision === 'prepare_next_conversation' ||
@@ -486,6 +504,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
     ].join(' '),
     opportunityHealth,
     outcomeEffect,
+    outcomeConsistency,
     preparationCarryForward: {
       opportunityState,
       nextExecutableOpportunity,
@@ -497,6 +516,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
       objectiveEvolution,
       opportunityHealth,
       outcomeEffect,
+      outcomeConsistency,
     },
   }
 }

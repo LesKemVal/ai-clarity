@@ -15,6 +15,7 @@ const panelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusP
 const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-outcome-review.ts`, 'utf8')
 const interactionContinuitySource = readFileSync(`${root}/lib/george/live-runtime/live-interaction-continuity.ts`, 'utf8')
 const opportunityContinuitySource = readFileSync(`${root}/lib/george/live-runtime/opportunity-continuity.ts`, 'utf8')
+const outcomeConsistencySource = readFileSync(`${root}/lib/george/live-runtime/outcome-consistency.ts`, 'utf8')
 const packageRuntimeSource = readFileSync(`${root}/lib/george/conversation-packages/runtime.mjs`, 'utf8')
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
@@ -133,6 +134,11 @@ assert(opportunityContinuitySource.includes('decisionMakerRequired'), 'Opportuni
 assert(opportunityContinuitySource.includes('preparationCarryForward'), 'Opportunity Continuity should prepare carry-forward state')
 assert(opportunityContinuitySource.includes('opportunityHealth'), 'Opportunity Continuity should produce structured opportunity health')
 assert(opportunityContinuitySource.includes('outcomeEffect'), 'Opportunity Continuity should classify whether the move improves, preserves, reduces, or leaves unknown progress toward the desired outcome')
+assert(outcomeConsistencySource.includes('buildOutcomeConsistency'), 'Outcome Consistency should expose runtime builder')
+assert(outcomeConsistencySource.includes('preserveBothViable'), 'Outcome Consistency should decide whether both outcomes can remain viable')
+assert(outcomeConsistencySource.includes('userAuthorityRequired'), 'Outcome Consistency should defer outcome priority to user authority')
+assert(outcomeConsistencySource.includes('GEORGE must not silently replace'), 'Outcome Consistency should protect user authority over desired outcomes')
+assert(opportunityContinuitySource.includes('outcomeConsistency'), 'Opportunity Continuity should consume Outcome Consistency')
 assert(opportunityContinuitySource.includes('momentum'), 'Opportunity Continuity health should track momentum')
 assert(opportunityContinuitySource.includes('optionality'), 'Opportunity Continuity health should track optionality')
 assert(opportunityContinuitySource.includes('authority'), 'Opportunity Continuity health should track authority')
@@ -265,6 +271,17 @@ const opportunityContinuity = {
   decisionMakerKnowledge: 'Another decision maker likely matters before the opportunity can advance.',
   objectiveEvolution: 'No stronger replacement objective was detected.',
   outcomeEffect: 'improves',
+  outcomeConsistency: {
+    primaryOutcome: 'secure investor follow-up',
+    secondaryOutcome: 'Strategic partner introduction may be available.',
+    consistency: 'compatible',
+    preserveBothViable: true,
+    userAuthorityRequired: false,
+    contradiction: '',
+    availablePaths: ['Pursue the primary desired outcome while preserving the secondary outcome.'],
+    bestAvailablePath: 'Advance the desired outcome while keeping the secondary outcome viable.',
+    reasoning: 'The declared outcomes appear operationally compatible.',
+  },
   opportunityHealth: {
     momentum: 'strong',
     trust: 'usable',
@@ -285,6 +302,17 @@ const opportunityContinuity = {
     followUpTiming: 'Follow up now while access and context are warm.',
     objectiveEvolution: 'No stronger replacement objective was detected.',
     outcomeEffect: 'improves',
+    outcomeConsistency: {
+      primaryOutcome: 'secure investor follow-up',
+      secondaryOutcome: 'Strategic partner introduction may be available.',
+      consistency: 'compatible',
+      preserveBothViable: true,
+      userAuthorityRequired: false,
+      contradiction: '',
+      availablePaths: ['Pursue the primary desired outcome while preserving the secondary outcome.'],
+      bestAvailablePath: 'Advance the desired outcome while keeping the secondary outcome viable.',
+      reasoning: 'The declared outcomes appear operationally compatible.',
+    },
     opportunityHealth: {
       momentum: 'strong',
       trust: 'usable',
@@ -330,6 +358,7 @@ assert(record.latestOpportunityContinuity?.opportunityState === 'transfers', 'Co
 assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityState === 'transfers', 'Conversation Record should preserve Preparation carry-forward')
 assert(record.latestOpportunityContinuity?.opportunityHealth?.momentum === 'strong', 'Conversation Record should preserve Opportunity Health')
 assert(record.latestOpportunityContinuity?.outcomeEffect === 'improves', 'Conversation Record should preserve Opportunity outcome effect')
+assert(record.latestOpportunityContinuity?.outcomeConsistency?.consistency === 'compatible', 'Conversation Record should preserve Outcome Consistency')
 assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityHealth?.momentum === 'strong', 'Preparation carry-forward should preserve Opportunity Health')
 
 console.log('GEORGE LIVE runtime smoke passed')
