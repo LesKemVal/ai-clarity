@@ -1,12 +1,9 @@
 import { readFileSync } from 'node:fs'
-<<<<<<< HEAD
-=======
 import {
   createConversationPackage,
   updateAfterLive,
   buildConversationRecord,
 } from '../lib/george/conversation-packages/index.mjs'
->>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -16,12 +13,9 @@ const root = process.cwd()
 const pageSource = readFileSync(`${root}/app/george/page.tsx`, 'utf8')
 const panelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusPanel.tsx`, 'utf8')
 const outcomeReviewSource = readFileSync(`${root}/lib/george/live-runtime/live-outcome-review.ts`, 'utf8')
-<<<<<<< HEAD
 const interactionContinuitySource = readFileSync(`${root}/lib/george/live-runtime/live-interaction-continuity.ts`, 'utf8')
-=======
 const opportunityContinuitySource = readFileSync(`${root}/lib/george/live-runtime/opportunity-continuity.ts`, 'utf8')
 const packageRuntimeSource = readFileSync(`${root}/lib/george/conversation-packages/runtime.mjs`, 'utf8')
->>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
@@ -126,10 +120,9 @@ assert(outcomeReviewSource.includes('bestAvailablePath'), 'Outcome Review should
 assert(outcomeReviewSource.includes('assistanceOptions'), 'Outcome Review should produce post-LIVE assistance options')
 assert(outcomeReviewSource.includes('internalNotes'), 'Outcome Review should preserve operational notes for package learning')
 
-<<<<<<< HEAD
 assert(recordPanelSource.includes('LIVE Complete'), 'After LIVE panel should open with LIVE complete framing')
 assert(recordPanelSource.includes("Let's see what actually happened."), 'After LIVE panel should frame the debrief as GEORGE analysis')
-=======
+
 assert(opportunityContinuitySource.includes('buildOpportunityContinuity'), 'Opportunity Continuity should expose runtime builder')
 assert(opportunityContinuitySource.includes('Live to fight another day.'), 'Opportunity Continuity should preserve doctrine')
 assert(opportunityContinuitySource.includes('opportunityState'), 'Opportunity Continuity should determine opportunity state')
@@ -143,9 +136,6 @@ assert(packageRuntimeSource.includes('opportunityContinuityFromLiveResult'), 'In
 assert(packageRuntimeSource.includes("source: 'opportunity_continuity'"), 'Conversation Package should persist Opportunity Continuity as memory')
 assert(packageRuntimeSource.includes('latestOpportunityContinuity'), 'Conversation Record should expose latest Opportunity Continuity')
 assert(packageRuntimeSource.includes('learningFromOpportunityContinuity'), 'Opportunity Continuity should promote learning for future execution')
-
-assert(recordPanelSource.includes('Post-LIVE operational memory'), 'Conversation Record panel should be post-LIVE operational memory')
->>>>>>> 1476f9d (Protect opportunity continuity runtime smoke)
 assert(recordPanelSource.includes('Outcome Review'), 'Conversation Record panel should surface Outcome Review')
 assert(recordPanelSource.includes('Learning'), 'Conversation Record panel should surface promoted learning')
 assert(recordPanelSource.includes('Recommended next move'), 'After LIVE panel should surface recommended next move')
@@ -278,6 +268,11 @@ const opportunityContinuity = {
     objectiveEvolution: 'No stronger replacement objective was detected.',
   },
 }
+
+const pkg = createConversationPackage({
+  desiredOutcome: 'secure investor follow-up',
+  conversationType: 'investor meeting',
+}, { timestamp: '2026-07-02T01:00:00.000Z' })
 
 const updatedWithOpportunity = updateAfterLive(pkg, {
   outcomeReview: {
