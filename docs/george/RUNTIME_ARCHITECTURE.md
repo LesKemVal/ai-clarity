@@ -391,3 +391,28 @@ Doctrine:
 - OpenAI/Groq proposes. GEORGE decides.
 - Do not move reasoning into `app/george/page.tsx`.
 
+## Next Production Runtime: Opportunity Continuity
+
+The next production runtime should be:
+
+`lib/george/live-runtime/opportunity-continuity.ts`
+
+It should sit immediately after Interaction Continuity:
+
+LIVE
+↓
+Outcome Review
+↓
+Interaction Continuity
+↓
+Opportunity Continuity
+↓
+Conversation Package
+↓
+Preparation Runtime
+
+Opportunity Continuity owns the doctrine: live to fight another day.
+
+It determines whether the opportunity continues, changes form, pauses, transfers to another decision maker, becomes dormant, or ends. If the opportunity continues, GEORGE should preserve the best executable path toward the user's desired outcome.
+
+This is not simple follow-up logic. It should decide whether the user should wait, follow up, deliberately not follow up, seek another decision maker, preserve access, change the next objective, or treat the opportunity as closed.
