@@ -21,6 +21,7 @@ export type OpportunityContinuityExecutionDecision =
   | 'gather_missing_evidence'
 
 export type OpportunityHealthLevel = 'strong' | 'usable' | 'weak' | 'unknown'
+export type OpportunityOutcomeEffect = 'improves' | 'preserves' | 'reduces' | 'unknown'
 
 export type OpportunityHealth = {
   momentum: OpportunityHealthLevel
@@ -86,6 +87,7 @@ export type OpportunityContinuityDecision = {
   objectiveEvolution: string
   reasoning: string
   opportunityHealth: OpportunityHealth
+  outcomeEffect: OpportunityOutcomeEffect
   preparationCarryForward: {
     opportunityState: OpportunityContinuityState
     nextExecutableOpportunity: string
@@ -96,6 +98,7 @@ export type OpportunityContinuityDecision = {
     followUpTiming: string
     objectiveEvolution: string
     opportunityHealth: OpportunityHealth
+    outcomeEffect: OpportunityOutcomeEffect
   }
 }
 
@@ -421,6 +424,20 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
     (desiredOutcomeEvolved ? 2 : 0)
   )
 
+  const outcomeEffect =
+    executionDecision === 'follow_up' ||
+    executionDecision === 'prepare_next_conversation' ||
+    executionDecision === 'seek_decision_maker' ||
+    executionDecision === 'reframe_objective'
+      ? 'improves'
+      : executionDecision === 'wait' ||
+          executionDecision === 'preserve_access' ||
+          executionDecision === 'do_not_follow_up'
+        ? 'preserves'
+        : executionDecision === 'close_out'
+          ? 'reduces'
+          : 'unknown'
+
   const waitingState = waitingStrategicallyCorrect
     ? 'Waiting is an active execution decision.'
     : timing === 'none'
@@ -468,6 +485,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
       nextExecutableOpportunity,
     ].join(' '),
     opportunityHealth,
+    outcomeEffect,
     preparationCarryForward: {
       opportunityState,
       nextExecutableOpportunity,
@@ -478,6 +496,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
       followUpTiming,
       objectiveEvolution,
       opportunityHealth,
+      outcomeEffect,
     },
   }
 }
