@@ -45,8 +45,8 @@ import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
-import { buildLiveOutcomeObservation, type LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
-import { buildLiveInteractionContinuity } from '@/lib/george/live-runtime/live-interaction-continuity'
+import type { LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
+import { buildLiveInteractionContinuity, buildLiveOutcomeReview } from '@/lib/george/live-runtime/live-interaction-continuity'
 import { PostLiveConversationRecordPanel } from '@/components/george/live/PostLiveConversationRecordPanel'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
@@ -1793,7 +1793,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         readActiveLiveRuntimeSupport()?.purview?.line ||
         getActiveLiveDesiredOutcomeTitle('LIVE Conversation')
 
-      const observation = buildLiveOutcomeObservation({
+      const observation = buildLiveOutcomeReview({
         desiredOutcome,
         transcript: messagesRef.current.map((message) => message.content).join('\n'),
         supportSummary: record.summary,
@@ -1822,7 +1822,7 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
     }
 
     if (!observation) {
-      observation = buildLiveOutcomeObservation({
+      observation = buildLiveOutcomeReview({
         desiredOutcome: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
         transcript: messagesRef.current.map((message) => message.content).join('\n'),
         supportSummary: usage?.summary || '',

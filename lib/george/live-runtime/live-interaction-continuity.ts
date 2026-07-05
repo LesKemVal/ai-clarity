@@ -6,6 +6,20 @@ import {
 } from '../conversation-packages/index.mjs'
 import type { OutcomeGovernorSnapshot } from '../live-voice/runtime/outcome-governor'
 
+export function buildLiveOutcomeReview(params: {
+  desiredOutcome: string
+  transcript: string
+  supportSummary?: string
+  outcomeGovernor?: OutcomeGovernorSnapshot | null
+}) {
+  return buildLiveOutcomeObservation({
+    desiredOutcome: params.desiredOutcome,
+    transcript: params.transcript,
+    supportSummary: params.supportSummary || '',
+    outcomeGovernor: params.outcomeGovernor || null,
+  })
+}
+
 export function buildLiveInteractionContinuity(params: {
   desiredOutcome: string
   conversationContext: string
@@ -17,7 +31,7 @@ export function buildLiveInteractionContinuity(params: {
 }) {
   const outcomeReview =
     params.outcomeReview ||
-    buildLiveOutcomeObservation({
+    buildLiveOutcomeReview({
       desiredOutcome: params.desiredOutcome,
       transcript: params.transcript,
       supportSummary: params.supportSummary || '',
