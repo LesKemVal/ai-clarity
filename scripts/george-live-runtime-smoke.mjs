@@ -155,8 +155,10 @@ const continuity = buildLiveInteractionContinuity({
 const updated = continuity.conversationPackage
 
 */
-assert(interactionContinuitySource.includes('conversationRecord: buildConversationRecord(updatedPackage)'), 'Interaction Continuity should build Conversation Record')
+assert(interactionContinuitySource.includes('const conversationRecord = buildConversationRecord(updatedPackage)'), 'Interaction Continuity should build Conversation Record')
 assert(interactionContinuitySource.includes('conversationPackage: updatedPackage'), 'Interaction Continuity should return updated Conversation Package')
+assert(interactionContinuitySource.includes('operationalDebrief'), 'Interaction Continuity should return Operational Debrief')
+assert(interactionContinuitySource.includes('transcriptHighlights'), 'Interaction Continuity should return transcript highlights')
 /*
 assert(continuity.conversationRecord.transcriptEvidenceAvailable, 'Interaction Continuity should preserve transcript evidence availability')
 assert(updated.liveSummaries.length === 1, 'Interaction Continuity should hand summary into Conversation Package')

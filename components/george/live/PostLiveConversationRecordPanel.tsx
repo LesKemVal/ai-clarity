@@ -16,6 +16,21 @@ type ConversationRecordProjection = {
     evidence?: string
   } | null
   futureActions?: string[]
+  operationalDebrief?: {
+    summary?: string
+    observations?: Array<{
+      label?: string
+      detail?: string
+      importance?: number
+    }>
+  }
+  transcriptHighlights?: Array<{
+    kind?: 'signal' | 'concern'
+    label?: string
+    excerpt?: string
+    reason?: string
+    recommendedUse?: string
+  }>
   relevantDocumentation?: unknown[]
   transcriptEvidenceAvailable?: boolean
 }
@@ -39,6 +54,12 @@ export function PostLiveConversationRecordPanel({
   onClose,
 }: PostLiveConversationRecordPanelProps) {
   const futureActions = list(record.futureActions)
+  const debriefObservations = Array.isArray(record.operationalDebrief?.observations)
+    ? record.operationalDebrief.observations
+    : []
+  const transcriptHighlights = Array.isArray(record.transcriptHighlights)
+    ? record.transcriptHighlights
+    : []
   const documentationCount = Array.isArray(record.relevantDocumentation)
     ? record.relevantDocumentation.length
     : 0
@@ -103,6 +124,53 @@ export function PostLiveConversationRecordPanel({
           </p>
         </div>
       </div>
+
+      {(record.operationalDebrief?.summary || debriefObservations.length > 0) && (
+        <div className="mt-3 rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.04] p-3">
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">DeBriefing</p>
+          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/76">
+            {label(record.operationalDebrief?.summary, 'GEORGE preserved the interaction evidence for future preparation.')}
+          </p>
+          {debriefObservations.length > 0 && (
+            <ul className="mt-2 space-y-1 text-[11px] leading-5 text-[#DCEBFF]/56">
+              {debriefObservations.map((item) => (
+                <li key={`${item.label}-${item.detail}`}>
+                  <span className="text-[#BFD9FF]/72">{label(item.label, 'Observation')}:</span> {label(item.detail, '')}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {transcriptHighlights.length > 0 && (
+        <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Transcript highlights</p>
+          <div className="mt-2 space-y-2">
+            {transcriptHighlights.map((item) => {
+              const isConcern = item.kind === 'concern'
+              return (
+                <div
+                  key={`${item.kind}-${item.label}-${item.excerpt}`}
+                  className={isConcern
+                    ? "rounded-[0.8rem] border border-[#FFB4B4]/[0.18] bg-[#FFB4B4]/[0.055] p-2"
+                    : "rounded-[0.8rem] border border-[#8FB6FF]/[0.2] bg-[#8FB6FF]/[0.06] p-2"}
+                >
+                  <p className={isConcern
+                    ? "text-[9px] uppercase tracking-[0.16em] text-[#FFB4B4]/70"
+                    : "text-[9px] uppercase tracking-[0.16em] text-[#8FB6FF]/72"}
+                  >
+                    {isConcern ? 'Concern' : 'Signal'} · {label(item.label, 'Operational moment')}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-5 text-[#F4F7FB]/76">“{label(item.excerpt, 'Transcript evidence pending')}”</p>
+                  <p className="mt-1 text-[11px] leading-5 text-[#DCEBFF]/52">{label(item.reason, '')}</p>
+                  <p className="mt-1 text-[11px] leading-5 text-[#DCEBFF]/46">{label(item.recommendedUse, '')}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
         <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Future actions</p>
