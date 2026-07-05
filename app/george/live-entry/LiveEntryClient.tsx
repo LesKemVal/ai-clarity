@@ -3544,7 +3544,7 @@ const beginProofOfAwareness = async () => {
 
             {!liveBriefingExpandedSupportPanel && (
               <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
-                {liveBriefingCommunicationConfirmed || !liveBriefingExpandedSupportPanel ? (
+                {liveBriefingCommunicationConfirmed ? (
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
