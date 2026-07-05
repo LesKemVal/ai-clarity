@@ -4057,6 +4057,23 @@ requestAnimationFrame(() => {
 
   const tagline = `I will not contradict the Holy Bible (KJV).`
 
+  const homepageHeroSequence = [
+    'GEORGE is a real-time conversation assistant.',
+    'Choose the outcome you want.',
+    'Choose your audio device.',
+    'Audio Glasses — read support without looking away.',
+    'Earbuds — hear short cues and responses privately.',
+  ]
+  const [homepageHeroStep, setHomepageHeroStep] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHomepageHeroStep((step) => (step + 1) % homepageHeroSequence.length)
+    }, 2200)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
   const heroTitle = useMemo(() => {
     const now = new Date()
     const month = String(now.getMonth() + 1).padStart(2, '0')
@@ -6450,10 +6467,18 @@ return (
               'Start with your desired outcome.'
             ) : (
               <>
-                <span className="block min-h-[2.6em] max-w-[280px] text-[15px] leading-[1.3] text-[#D7DBE4]/72 sm:max-w-[420px]">
-                  {typedPreparationTagline}
-                  <span className="ml-1 animate-pulse text-[#D7DBE4]/48">|</span>
+                <span className="block min-h-[2.8em] max-w-[300px] text-[15px] leading-[1.35] text-[#D7DBE4]/72 sm:max-w-[440px]">
+                  <span key={homepageHeroStep} className="inline-block animate-[georgeHomepageHeroFade_2.2s_ease-in-out_both]">
+                    {homepageHeroSequence[homepageHeroStep]}
+                  </span>
                 </span>
+                <style jsx>{`
+                  @keyframes georgeHomepageHeroFade {
+                    0% { opacity: 0; transform: translateY(4px); }
+                    18%, 76% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-4px); }
+                  }
+                `}</style>
               </>
             )}
           </p>
