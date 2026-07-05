@@ -4123,21 +4123,9 @@ Anything I should keep in mind?
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE</div>
 
-          <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
-            Take GEORGE into the room.
+          <h1 className="mt-8 text-[38px] font-light uppercase leading-none tracking-[0.44em] text-[#D7DCFF]/82 sm:text-[44px]">
+            LIVE
           </h1>
-
-          <div className="mt-3 space-y-3 text-[14px] leading-6 text-white/46">
-            <p>
-              LIVE supports conversations while they're happening. GEORGE recognizes and interprets changing objectives, pressure, hesitation, opportunities, objections, and other meaningful signals while providing support when it can still improve the outcome.
-            </p>
-            <p>
-              A transcript can tell you what happened after the conversation.
-            </p>
-            <p className="font-semibold text-[#D7DCFF]/72">
-              LIVE helps while the conversation still matters.
-            </p>
-          </div>
 
           <div className="mt-5 grid gap-2">
             <button
