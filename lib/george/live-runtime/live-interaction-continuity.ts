@@ -1,4 +1,5 @@
 import { buildLiveOutcomeObservation, type LiveOutcomeObservation } from './live-outcome-review'
+import { buildOpportunityContinuity } from './opportunity-continuity'
 import {
   createConversationPackage,
   updateAfterLive,
@@ -238,6 +239,19 @@ export function buildLiveInteractionContinuity(params: {
     highlights: transcriptHighlights,
   })
 
+  const opportunityContinuity = buildOpportunityContinuity({
+    desiredOutcome: outcomeReview.desiredOutcome,
+    transcript: params.transcript,
+    outcomeReview,
+    transcriptHighlights: transcriptHighlights.map((highlight) => ({
+      type: highlight.kind === 'signal' ? 'operational_signal' : 'concern',
+      label: highlight.label,
+      text: highlight.excerpt,
+      whyItMattered: highlight.reason,
+      effect: highlight.recommendedUse,
+    })),
+  })
+
   const pkg = createConversationPackage({
     desiredOutcome: outcomeReview.desiredOutcome,
     conversationType: 'LIVE',
@@ -257,6 +271,7 @@ export function buildLiveInteractionContinuity(params: {
         }
       : undefined,
     outcomeReview,
+    opportunityContinuity,
   })
 
   const conversationRecord = buildConversationRecord(updatedPackage)

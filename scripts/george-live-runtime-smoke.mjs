@@ -182,6 +182,8 @@ const continuity = buildLiveInteractionContinuity({
 const updated = continuity.conversationPackage
 
 */
+assert(interactionContinuitySource.includes('buildOpportunityContinuity'), 'Interaction Continuity should build Opportunity Continuity')
+assert(interactionContinuitySource.includes('opportunityContinuity,'), 'Interaction Continuity should pass Opportunity Continuity into package update')
 assert(interactionContinuitySource.includes('const conversationRecord = buildConversationRecord(updatedPackage)'), 'Interaction Continuity should build Conversation Record')
 assert(interactionContinuitySource.includes('conversationPackage: updatedPackage'), 'Interaction Continuity should return updated Conversation Package')
 assert(interactionContinuitySource.includes('operationalDebrief'), 'Interaction Continuity should return Operational Debrief')
