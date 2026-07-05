@@ -46,7 +46,7 @@ import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import { buildLiveOutcomeObservation, type LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
-import { createConversationPackage, updateAfterLive, buildConversationRecord } from '@/lib/george/conversation-packages/index.mjs'
+import { buildLiveInteractionContinuity } from '@/lib/george/live-runtime/live-interaction-continuity'
 import { PostLiveConversationRecordPanel } from '@/components/george/live/PostLiveConversationRecordPanel'
 import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
@@ -1842,28 +1842,17 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
         window.localStorage.setItem('GEORGE_LAST_LIVE_OUTCOME_OBSERVATION', JSON.stringify(liveOutcomeReview))
 
         const summary = window.localStorage.getItem('george_last_live_runtime_summary') || ''
-        const pkg = createConversationPackage({
+        const continuity = buildLiveInteractionContinuity({
           desiredOutcome: liveOutcomeReview.desiredOutcome,
-          conversationType: 'LIVE',
           conversationContext: getActiveLiveDesiredOutcomeTitle('LIVE Conversation'),
-          conversations: messagesRef.current.length
-            ? [{ type: 'live_transcript_evidence', count: messagesRef.current.length }]
-            : [],
-        })
-
-        const updatedPackage = updateAfterLive(pkg, {
-          summary: summary
-            ? {
-                id: 'last-live-summary',
-                type: 'live_summary',
-                summary,
-                suggestedNextAction: liveOutcomeReview.bestAvailablePath || '',
-              }
-            : undefined,
+          transcript: messagesRef.current.map((message) => message.content).join('\n'),
+          transcriptEvidenceCount: messagesRef.current.length,
+          supportSummary: summary,
+          outcomeGovernor: outcomeGovernorSnapshot,
           outcomeReview: liveOutcomeReview,
         })
 
-        const record = buildConversationRecord(updatedPackage)
+        const record = continuity.conversationRecord
         window.localStorage.setItem('GEORGE_LAST_CONVERSATION_RECORD', JSON.stringify(record))
         setLastConversationRecord(record)
         setShowConversationRecord(true)
