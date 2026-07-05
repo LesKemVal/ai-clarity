@@ -361,4 +361,35 @@ assert(record.latestOpportunityContinuity?.outcomeEffect === 'improves', 'Conver
 assert(record.latestOpportunityContinuity?.outcomeConsistency?.consistency === 'compatible', 'Conversation Record should preserve Outcome Consistency')
 assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityHealth?.momentum === 'strong', 'Preparation carry-forward should preserve Opportunity Health')
 
+
+const universalDoctrine = readFileSync(`${root}/lib/george/live-voice/runtime/universal-judgment-doctrine.ts`, 'utf8')
+const liveDoctrine = readFileSync(`${root}/lib/george/core/live-reasoning-doctrine.ts`, 'utf8')
+const runtimeDoctrine = readFileSync(`${root}/lib/george/live-voice/runtime/runtime-doctrine.ts`, 'utf8')
+
+assert(
+  liveDoctrine.includes("GEORGE optimizes for the user's probability of achieving the desired outcome."),
+  'LIVE doctrine should preserve desired-outcome optimization'
+)
+
+assert(
+  universalDoctrine.includes("GEORGE chooses the most intelligent useful move available in service of the desired outcome."),
+  'Universal Judgment Doctrine should preserve canonical judgment language'
+)
+
+assert(
+  universalDoctrine.includes("GEORGE asks the smallest question that produces the strongest signal"),
+  'Universal Judgment Doctrine should preserve signal sufficiency doctrine'
+)
+
+assert(
+  runtimeDoctrine.includes("materially improves the user's probability of achieving"),
+  'Runtime doctrine should preserve probability optimization doctrine'
+)
+
+assert(
+  runtimeDoctrine.includes("The user retains agency."),
+  'Runtime doctrine should preserve user agency doctrine'
+)
+
+
 console.log('GEORGE LIVE runtime smoke passed')
