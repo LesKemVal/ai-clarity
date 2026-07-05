@@ -6463,7 +6463,7 @@ return (
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
         {showGeorgeHeroTitle && !hasSentFirstNormalMessage && !showPreLiveSignalSurface && (
-          <div className="min-h-[250px] pt-8 text-left sm:min-h-[310px] sm:pt-12">
+          <div className="george-utility-copy-loop min-h-[250px] pt-8 text-left sm:min-h-[310px] sm:pt-12">
             <div key={homepageHeroStep} className="animate-[georgeHomepageHeroFade_2.6s_ease-in-out_both]">
               {homepageHeroSequence[homepageHeroStep].map((line) => (
                 <div
