@@ -4058,11 +4058,13 @@ requestAnimationFrame(() => {
   const tagline = `I will not contradict the Holy Bible (KJV).`
 
   const homepageHeroSequence = [
-    'GEORGE is a real-time conversation assistant.',
-    'Choose the outcome you want.',
-    'Choose your audio device.',
-    'Audio Glasses — read support without looking away.',
-    'Earbuds — hear short cues and responses privately.',
+    ['REAL-TIME', 'CONVERSATION', 'ASSISTANT'],
+    ['CHOOSE', 'THE', 'OUTCOME'],
+    ['INTERVIEWS', 'NEGOTIATIONS', 'PRESENTATIONS'],
+    ['BOARD MEETINGS', 'INVESTOR MEETINGS', 'REVIEWS'],
+    ['AUDIO GLASSES', 'RECOMMENDED'],
+    ['EARBUDS', 'PRIVATE AUDIO'],
+    ['ASK GEORGE', 'OR', 'ENTER LIVE'],
   ]
   const [homepageHeroStep, setHomepageHeroStep] = useState(0)
 
@@ -6460,28 +6462,31 @@ return (
 
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
-        {showGeorgeHeroTitle && <h1 className='mb-4'>GEORGE</h1>}
-        {showGeorgeHeroTagline && !hasSentFirstNormalMessage && (
-          <p>
-            {showPreLiveSignalSurface ? (
-              'Start with your desired outcome.'
-            ) : (
-              <>
-                <span className="block min-h-[2.8em] max-w-[300px] text-[15px] leading-[1.35] text-[#D7DBE4]/72 sm:max-w-[440px]">
-                  <span key={homepageHeroStep} className="inline-block animate-[georgeHomepageHeroFade_2.2s_ease-in-out_both]">
-                    {homepageHeroSequence[homepageHeroStep]}
-                  </span>
-                </span>
-                <style jsx>{`
-                  @keyframes georgeHomepageHeroFade {
-                    0% { opacity: 0; transform: translateY(4px); }
-                    18%, 76% { opacity: 1; transform: translateY(0); }
-                    100% { opacity: 0; transform: translateY(-4px); }
-                  }
-                `}</style>
-              </>
-            )}
-          </p>
+        {showGeorgeHeroTitle && !hasSentFirstNormalMessage && !showPreLiveSignalSurface && (
+          <div className="min-h-[250px] pt-8 text-left sm:min-h-[310px] sm:pt-12">
+            <div key={homepageHeroStep} className="animate-[georgeHomepageHeroFade_2.6s_ease-in-out_both]">
+              {homepageHeroSequence[homepageHeroStep].map((line) => (
+                <div
+                  key={line}
+                  className="text-[40px] font-black uppercase leading-[0.88] tracking-[-0.055em] text-white/92 sm:text-[70px] md:text-[84px]"
+                >
+                  {line}
+                </div>
+              ))}
+            </div>
+
+            <style jsx>{`
+              @keyframes georgeHomepageHeroFade {
+                0% { opacity: 0; transform: translateY(12px); filter: blur(2px); }
+                15%, 78% { opacity: 1; transform: translateY(0); filter: blur(0); }
+                100% { opacity: 0; transform: translateY(-10px); filter: blur(2px); }
+              }
+            `}</style>
+          </div>
+        )}
+
+        {showGeorgeHeroTagline && !hasSentFirstNormalMessage && showPreLiveSignalSurface && (
+          <p>Start with your desired outcome.</p>
         )}
 
         {showPreLiveSignalSurface && (
