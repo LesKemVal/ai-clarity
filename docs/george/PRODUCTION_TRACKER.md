@@ -247,6 +247,14 @@ Outcome Review
 
 ↓
 
+Interaction Continuity
+
+↓
+
+Opportunity Continuity
+
+↓
+
 Conversation Package
 
 ↓
@@ -320,11 +328,13 @@ Doctrine:
 - OpenAI/Groq proposes. GEORGE decides.
 - Do not move reasoning into `app/george/page.tsx`.
 
-## Next Production Priority: Opportunity Continuity Runtime
+## Implemented Production Runtime Owner: Opportunity Continuity
 
-Next runtime target:
+Implemented runtime owner:
 
 `lib/george/live-runtime/opportunity-continuity.ts`
+
+Opportunity Continuity is wired after Interaction Continuity and is protected by `george:live-runtime:smoke`.
 
 Opportunity Continuity owns the after-LIVE question:
 
