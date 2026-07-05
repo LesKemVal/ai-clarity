@@ -87,6 +87,8 @@ Preparation Runtime consumes Conversation Packages, Conversation Records, relate
 
 Conversation Record remains a projection of operational memory rather than a separate runtime.
 
+Interaction Continuity is the production owner for after-LIVE composition. `lib/george/live-runtime/live-interaction-continuity.ts` composes Outcome Review, Conversation Package update, and Conversation Record output after LIVE. Older post-conversation intelligence helpers remain behavior-protected primitives unless and until they are explicitly routed through Interaction Continuity.
+
 No duplicate operational memory runtime exists.
 
 ## Architecture Flow

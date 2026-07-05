@@ -261,6 +261,8 @@ This loop is implemented, smoke-tested, documented, and now surfaced in Brief Ro
 
 Conversation Records and related Conversation Packages can influence future preparation through the existing Preparation Runtime.
 
+Interaction Continuity now owns after-LIVE composition through `lib/george/live-runtime/live-interaction-continuity.ts`. `page.tsx` calls this runtime owner instead of composing Conversation Packages and Conversation Records directly.
+
 Related Conversation Packages are now selected through deterministic Preparation Runtime ranking before ingestion, with bounded package count and selection metadata exposed for inspection.
 
 End-to-end LIVE telemetry now supports passing the same LIVE `turnId` from hub cue delivery into hub voice playback without adding page-owned lifecycle logic.
