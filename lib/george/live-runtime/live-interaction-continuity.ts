@@ -3,8 +3,8 @@ import {
   createConversationPackage,
   updateAfterLive,
   buildConversationRecord,
-} from '@/lib/george/conversation-packages/index.mjs'
-import type { OutcomeGovernorSnapshot } from '@/lib/george/live-voice/runtime/outcome-governor'
+} from '../conversation-packages/index.mjs'
+import type { OutcomeGovernorSnapshot } from '../live-voice/runtime/outcome-governor'
 
 export function buildLiveInteractionContinuity(params: {
   desiredOutcome: string
