@@ -3548,7 +3548,7 @@ const beginProofOfAwareness = async () => {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                        Communication selected
+                        Speaking Style selected
                       </div>
                       <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
                         {communicationStyle}
@@ -3622,7 +3622,7 @@ const beginProofOfAwareness = async () => {
               </div>
             )}
 
-            {!liveBriefingExpandedSupportPanel && (
+            {!liveBriefingExpandedSupportPanel && !liveRecoveryAcknowledged && (
               <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
                 ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
