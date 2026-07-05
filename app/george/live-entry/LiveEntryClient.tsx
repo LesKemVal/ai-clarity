@@ -4124,8 +4124,23 @@ Anything I should keep in mind?
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE</div>
 
           <h1 className="mt-8 text-[38px] font-light uppercase leading-none tracking-[0.44em] text-[#D7DCFF]/82 sm:text-[44px]">
-            LIVE
+            <span className="inline-block animate-[liveWordPulse_3.8s_ease-in-out_infinite]">
+              LIVE
+            </span>
           </h1>
+
+          <style jsx>{`
+            @keyframes liveWordPulse {
+              0%, 100% {
+                opacity: 0.72;
+                text-shadow: 0 0 0 rgba(215, 220, 255, 0);
+              }
+              50% {
+                opacity: 0.96;
+                text-shadow: 0 0 18px rgba(174, 182, 255, 0.22);
+              }
+            }
+          `}</style>
 
           <div className="mt-5 grid gap-2">
             <button
