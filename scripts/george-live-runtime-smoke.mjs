@@ -131,6 +131,10 @@ assert(opportunityContinuitySource.includes('waitingStrategicallyCorrect'), 'Opp
 assert(opportunityContinuitySource.includes('noFollowUpStrategicallyCorrect'), 'Opportunity Continuity should decide when not to follow up')
 assert(opportunityContinuitySource.includes('decisionMakerRequired'), 'Opportunity Continuity should detect decision-maker requirements')
 assert(opportunityContinuitySource.includes('preparationCarryForward'), 'Opportunity Continuity should prepare carry-forward state')
+assert(opportunityContinuitySource.includes('opportunityHealth'), 'Opportunity Continuity should produce structured opportunity health')
+assert(opportunityContinuitySource.includes('momentum'), 'Opportunity Continuity health should track momentum')
+assert(opportunityContinuitySource.includes('optionality'), 'Opportunity Continuity health should track optionality')
+assert(opportunityContinuitySource.includes('authority'), 'Opportunity Continuity health should track authority')
 
 assert(packageRuntimeSource.includes('opportunityContinuityFromLiveResult'), 'Interaction Continuity should consume Opportunity Continuity output')
 assert(packageRuntimeSource.includes("source: 'opportunity_continuity'"), 'Conversation Package should persist Opportunity Continuity as memory')
@@ -257,6 +261,16 @@ const opportunityContinuity = {
   evidenceStillRequired: ['Confirm the actual decision maker and path to reach them.'],
   decisionMakerKnowledge: 'Another decision maker likely matters before the opportunity can advance.',
   objectiveEvolution: 'No stronger replacement objective was detected.',
+  opportunityHealth: {
+    momentum: 'strong',
+    trust: 'usable',
+    credibility: 'strong',
+    access: 'usable',
+    optionality: 'strong',
+    evidence: 'usable',
+    authority: 'strong',
+    urgency: 'strong',
+  },
   preparationCarryForward: {
     opportunityState: 'transfers',
     nextExecutableOpportunity: 'Prepare the path to the decision maker and preserve the current contact as access.',
@@ -266,6 +280,16 @@ const opportunityContinuity = {
     waitingState: 'No deliberate waiting state was detected.',
     followUpTiming: 'Follow up now while access and context are warm.',
     objectiveEvolution: 'No stronger replacement objective was detected.',
+    opportunityHealth: {
+      momentum: 'strong',
+      trust: 'usable',
+      credibility: 'strong',
+      access: 'usable',
+      optionality: 'strong',
+      evidence: 'usable',
+      authority: 'strong',
+      urgency: 'strong',
+    },
   },
 }
 
@@ -299,5 +323,7 @@ assert(updatedWithOpportunity.learning.some((item) => item.source === 'opportuni
 assert(updatedWithOpportunity.futureActions.includes(opportunityContinuity.nextExecutableOpportunity), 'Opportunity Continuity should promote next executable opportunity')
 assert(record.latestOpportunityContinuity?.opportunityState === 'transfers', 'Conversation Record should expose latest Opportunity Continuity')
 assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityState === 'transfers', 'Conversation Record should preserve Preparation carry-forward')
+assert(record.latestOpportunityContinuity?.opportunityHealth?.momentum === 'strong', 'Conversation Record should preserve Opportunity Health')
+assert(record.latestOpportunityContinuity?.preparationCarryForward?.opportunityHealth?.momentum === 'strong', 'Preparation carry-forward should preserve Opportunity Health')
 
 console.log('GEORGE LIVE runtime smoke passed')

@@ -20,6 +20,19 @@ export type OpportunityContinuityExecutionDecision =
   | 'close_out'
   | 'gather_missing_evidence'
 
+export type OpportunityHealthLevel = 'strong' | 'usable' | 'weak' | 'unknown'
+
+export type OpportunityHealth = {
+  momentum: OpportunityHealthLevel
+  trust: OpportunityHealthLevel
+  credibility: OpportunityHealthLevel
+  access: OpportunityHealthLevel
+  optionality: OpportunityHealthLevel
+  evidence: OpportunityHealthLevel
+  authority: OpportunityHealthLevel
+  urgency: OpportunityHealthLevel
+}
+
 export type OpportunityContinuityInput = {
   desiredOutcome?: string | null
   transcript?: string | null
@@ -72,6 +85,7 @@ export type OpportunityContinuityDecision = {
   decisionMakerKnowledge: string
   objectiveEvolution: string
   reasoning: string
+  opportunityHealth: OpportunityHealth
   preparationCarryForward: {
     opportunityState: OpportunityContinuityState
     nextExecutableOpportunity: string
@@ -81,6 +95,7 @@ export type OpportunityContinuityDecision = {
     waitingState: string
     followUpTiming: string
     objectiveEvolution: string
+    opportunityHealth: OpportunityHealth
   }
 }
 
@@ -103,6 +118,13 @@ function countSignals(text: string, signals: string[]): number {
 
 function boundConfidence(value: number): number {
   return Math.max(0, Math.min(95, Math.round(value)))
+}
+
+function opportunityHealthLevel(strong: boolean, usable: boolean, weak: boolean): OpportunityHealthLevel {
+  if (strong) return 'strong'
+  if (usable) return 'usable'
+  if (weak) return 'weak'
+  return 'unknown'
 }
 
 function uniqueStrings(items: string[]): string[] {
@@ -328,6 +350,49 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
     ? 'The desired outcome may have changed form; preserve the original outcome while confirming the better executable path.'
     : 'No stronger replacement objective was detected.'
 
+  const opportunityHealth = {
+    momentum: opportunityHealthLevel(
+      reviewProgress === 'improving' || positiveCount >= 2,
+      reviewProgress === 'stable' || positiveCount === 1 || opportunitySurvived,
+      reviewProgress === 'declining' || noFollowUpCount > positiveCount
+    ),
+    trust: opportunityHealthLevel(
+      trustIncreased,
+      accessPreserved || positiveCount > 0,
+      noFollowUpCount > 0 && !accessPreserved
+    ),
+    credibility: opportunityHealthLevel(
+      credibilityImproved,
+      reviewProgress === 'stable' || positiveCount > 0,
+      reviewProgress === 'declining'
+    ),
+    access: opportunityHealthLevel(
+      accessPreserved && appointmentRealistic,
+      accessPreserved,
+      noFollowUpStrategicallyCorrect
+    ),
+    optionality: opportunityHealthLevel(
+      desiredOutcomeEvolved || decisionMakerRequired || preservedLeverage.length >= 3,
+      opportunitySurvived || accessPreserved,
+      opportunityState === 'ends'
+    ),
+    evidence: opportunityHealthLevel(
+      credibilityImproved || includesAny(combinedSignal, ['proof', 'evidence', 'materials', 'deck', 'proposal']),
+      evidenceStillRequired.length <= 1 && opportunitySurvived,
+      evidenceStillRequired.length > 2 || opportunityState === 'unknown'
+    ),
+    authority: opportunityHealthLevel(
+      decisionMakerRequired && accessPreserved,
+      decisionMakerRequired || accessPreserved,
+      !accessPreserved && opportunitySurvived
+    ),
+    urgency: opportunityHealthLevel(
+      timing === 'now',
+      timing === 'next_appointment' || timing === 'wait',
+      timing === 'none' || timing === 'only_if_reopened'
+    ),
+  }
+
   const nextExecutableOpportunity =
     executionDecision === 'do_not_follow_up'
       ? 'Do not follow up unless the other party reopens access or the user supplies new signal.'
@@ -402,6 +467,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
       `Execution decision: ${executionDecision}.`,
       nextExecutableOpportunity,
     ].join(' '),
+    opportunityHealth,
     preparationCarryForward: {
       opportunityState,
       nextExecutableOpportunity,
@@ -411,6 +477,7 @@ export function buildOpportunityContinuity(input: OpportunityContinuityInput = {
       waitingState,
       followUpTiming,
       objectiveEvolution,
+      opportunityHealth,
     },
   }
 }
