@@ -80,7 +80,7 @@ export function buildGeorgeOperationalUnderstanding(
 
   const operationalObjective =
     objectiveSource === 'default'
-      ? "observe the conversation, preserve credibility, preserve optionality, and infer the user's likely objective from accumulating signals"
+      ? "observe the conversation, preserve credibility and optionality, and support the user while the objective becomes clear through accumulating signals"
       : synthesizedObjective
 
   const persistentSignalSummary = persistentSignals.length
