@@ -3737,15 +3737,15 @@ const beginProofOfAwareness = async () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                  Conversation objective confirmed
+                  Final check confirmed
                 </div>
                 <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                  {selectedLiveRoomObjective ? selectedLiveRoomObjective.label : 'Primary outcome only'}
+                  {selectedLiveRoomObjective ? selectedLiveRoomObjective.label : 'No additional objective'}
                 </div>
                 <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
                   {selectedLiveRoomObjective
-                    ? 'GEORGE will watch this without replacing the primary outcome.'
-                    : 'GEORGE will focus on the desired outcome and adapt as useful signal appears.'}
+                    ? 'GEORGE will keep this room signal in mind without treating it as required.'
+                    : 'GEORGE will listen, preserve credibility, and support the room as useful signal appears.'}
                 </div>
               </div>
 
@@ -3760,7 +3760,8 @@ const beginProofOfAwareness = async () => {
           </div>
         )}
 
-        <div className={`${liveReadyAccepted ? 'hidden' : ''} mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]`}>
+        {!liveReadyAccepted && (
+        <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
 Final check
           </div>
@@ -3883,12 +3884,10 @@ Anything I should keep in mind?
               : 'No intangible objective selected. GEORGE will focus on the desired outcome and adapt if useful signal appears.'}
           </div>
         </div>
+        )}
 
-        <label className={`${liveReadyAccepted ? 'hidden' : ''} mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
-          liveReadyAccepted
-            ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
-            : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
-        }`}>
+        {!liveReadyAccepted && (
+        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.52] px-4 py-3 text-[#D7DBE4]/58 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]">
           <input
             type="checkbox"
             checked={liveReadyAccepted}
@@ -3897,9 +3896,12 @@ Anything I should keep in mind?
           />
 
           <span className="text-[12px] leading-5">
-I understand. I'm ready to begin.
+{selectedLiveRoomObjective
+              ? `I understand that GEORGE will keep “${selectedLiveRoomObjective.label}” in mind during this room without treating it as required or replacing the primary outcome.`
+              : 'I understand that I do not need to add anything else. GEORGE will listen, preserve credibility, and support me as the room develops.'}
           </span>
         </label>
+        )}
 
         <AwakeButton active={liveReadinessComplete} onClick={() => startLive(false, editableResources, true)}>
           Now we go to work
