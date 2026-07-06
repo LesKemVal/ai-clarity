@@ -4058,13 +4058,24 @@ requestAnimationFrame(() => {
   const tagline = `I will not contradict the Holy Bible (KJV).`
 
   const homepageHeroSequence = [
-    ['REAL-TIME', 'CONVERSATION', 'ASSISTANT'],
-    ['CHOOSE', 'THE', 'OUTCOME'],
-    ['INTERVIEWS', 'NEGOTIATIONS', 'PRESENTATIONS'],
-    ['BOARD MEETINGS', 'INVESTOR MEETINGS', 'REVIEWS'],
-    ['AUDIO GLASSES', 'RECOMMENDED'],
-    ['EARBUDS', 'PRIVATE AUDIO'],
-    ['ASK GEORGE', 'OR', 'ENTER LIVE'],
+    'Build a business plan',
+    'Help me think it through',
+    'Create a pitch deck',
+    'Review this document',
+    'Build a stronger strategy',
+    'Analyze this opportunity',
+    'Compare my options',
+    'Plan the next steps',
+    'Solve this problem',
+    'Strengthen this proposal',
+    'Prepare for the interview',
+    'Improve this presentation',
+    'Review this contract',
+    'Write a better response',
+    'Organize my thinking',
+    'Research this topic',
+    'Turn ideas into action',
+    'Make this decision easier',
   ]
   const [homepageHeroStep, setHomepageHeroStep] = useState(0)
 
@@ -6463,23 +6474,19 @@ return (
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
         {showGeorgeHeroTitle && !hasSentFirstNormalMessage && !showPreLiveSignalSurface && (
-          <div className="george-utility-copy-loop min-h-[250px] pt-8 text-left sm:min-h-[310px] sm:pt-12">
-            <div key={homepageHeroStep} className="animate-[georgeHomepageHeroFade_2.6s_ease-in-out_both]">
-              {homepageHeroSequence[homepageHeroStep].map((line) => (
-                <div
-                  key={line}
-                  className="text-[40px] font-black uppercase leading-[0.88] tracking-[-0.055em] text-white/92 sm:text-[70px] md:text-[84px]"
-                >
-                  {line}
-                </div>
-              ))}
+          <div className="george-utility-copy-loop min-h-[120px] pt-8 text-left sm:min-h-[150px] sm:pt-12">
+            <div
+              key={homepageHeroStep}
+              className="inline-flex animate-[georgeHomepageHeroFade_2.8s_ease-in-out_both] rounded-[1rem] border border-[#8FB6C9]/24 bg-[#8FB6C9]/[0.075] px-4 py-3 text-[17px] font-semibold leading-6 tracking-[-0.015em] text-[#E8EEFF]/92 shadow-[0_18px_48px_rgba(40,70,180,0.14)] backdrop-blur-xl sm:px-5 sm:py-3.5 sm:text-[22px]"
+            >
+              {homepageHeroSequence[homepageHeroStep]}
             </div>
 
             <style jsx>{`
               @keyframes georgeHomepageHeroFade {
-                0% { opacity: 0; transform: translateY(12px); filter: blur(2px); }
-                15%, 78% { opacity: 1; transform: translateY(0); filter: blur(0); }
-                100% { opacity: 0; transform: translateY(-10px); filter: blur(2px); }
+                0% { opacity: 0; filter: blur(2px); }
+                16%, 78% { opacity: 1; filter: blur(0); }
+                100% { opacity: 0; filter: blur(2px); }
               }
             `}</style>
           </div>
