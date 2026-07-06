@@ -14,7 +14,7 @@ const heroSequences = [
   },
   {
     title: ['DESIRED', 'OUTCOME'],
-    lines: ['Get hired', 'Raise capital', 'Close the deal', 'Win the contract', 'Preserve trust', 'Improve performance', 'You Decide'],
+    lines: ['Get hired', 'Raise capital', 'Close the deal', 'Win the contract', 'Preserve trust', 'Improve performance', 'Your Desired Outcome'],
   },
   {
     title: ['GET STARTED'],
@@ -127,16 +127,6 @@ export function HomeHeroSequence() {
         </div>
 
         <div className="absolute inset-x-5 bottom-5 z-40">
-          <div className="mb-4 text-center">
-            <div className="text-[10px] uppercase tracking-[0.30em] text-white/30">
-              Powered by
-            </div>
-
-            <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/44">
-              OpenAI • Groq • Deepgram • Cartesia
-            </div>
-          </div>
-
           <div className="mx-auto max-w-[760px] rounded-[26px] border border-white/12 bg-black/42 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.62)] backdrop-blur-xl sm:p-5">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
