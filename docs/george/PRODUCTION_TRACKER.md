@@ -253,27 +253,23 @@ Do not collapse these concepts:
 - Surfacing: GEORGE should mention or suggest a capability now.
 - Execution: GEORGE should start or apply a capability now.
 
-Current inspection finding:
+Current implemented capability owners:
 
-Capability ownership is scattered across LIVE Entry, LIVE runtime support metadata, runtime recommendation modules, pricing estimates, and LIVE execution consumers.
+- Resource estimation and documentation recommendations: `lib/george/capabilities/live-entry-resources.ts`
+- LIVE support panel metadata: `lib/george/capabilities/live-support-panels.ts`
+- Stable LIVE execution capability IDs and derivation: `lib/george/capabilities/live-capability-registry.ts`
+- Runtime authority merge: `lib/george/live-runtime/live-runtime-authority.ts`
+- Runtime execution: LIVE governor and LIVE runtime consumers
 
-Initial classification:
+Current production boundary:
 
-- Capability definition owner: not canonical yet
-- Capability metadata owner: currently split between LIVE Entry and LIVE runtime support types
-- Capability availability owner: unclear
-- Capability surfacing owner: runtime recommendation / trajectory modules
-- Capability execution owner: LIVE governor and LIVE runtime consumers
-- Capability pricing / estimate owner: LIVE Entry estimate functions, with runtime usage interpretation later
-- Capability delivery-overlay owner: LIVE Entry creates, runtime consumes
+- Resource preparation remains separate from execution capability identity.
+- `selectedCapabilityIds` should represent stable execution capability IDs.
+- `selectedCapabilities` may continue carrying selected resource/support descriptors where existing runtime transport expects them.
+- LIVE governor remains the execution owner.
+- Capability surfacing remains contextual and should not become automatic execution.
 
-Potential consolidation target:
-
-- `lib/george/capabilities/`
-
-Do not move capability code until inspection proves the correct canonical boundary.
-
-First extraction must preserve the distinction between availability, surfacing, and execution.
+Do not collapse resource preparation, capability availability, capability surfacing, and capability execution into one owner.
 
 
 ## Working Rules

@@ -261,26 +261,23 @@ Capability governance must separate availability, surfacing, and execution.
 
 These should not collapse into one owner.
 
-Current implementation status:
+Current implemented capability layer:
 
-- LIVE Entry currently contains capability-like recommendations, resource estimates, selected capability identifiers, support style selection, and delivery-overlay creation.
-- LIVE runtime support types carry selected capability identifiers, selected capability metadata, cost estimates, purview, and delivery overlays.
-- LIVE runtime consumers may apply selected capability identifiers to execution behavior.
-- Runtime recommendation modules may surface capabilities when they plausibly improve the current objective.
+- `lib/george/capabilities/live-entry-resources.ts` owns LIVE Entry resource estimation and documentation recommendations.
+- `lib/george/capabilities/live-support-panels.ts` owns LIVE support panel IDs, labels, and explanatory metadata.
+- `lib/george/capabilities/live-capability-registry.ts` owns stable LIVE execution capability IDs and derives applicable execution capabilities from room context.
 
 Production boundary:
 
-- Capability definitions and metadata should move toward a canonical capability layer.
-- Capability availability should be determined declaratively.
-- Capability surfacing should remain contextual and judgment-based.
-- Capability execution should remain owned by the runtime that applies the capability.
-- Pricing and estimate logic should not be scattered across UI and runtime indefinitely.
+- Resource preparation is not execution capability identity.
+- Support presentation is not execution capability identity.
+- `selectedCapabilityIds` should carry stable execution capability IDs.
+- Resource descriptors should remain in resource estimate / support descriptor fields.
+- LIVE runtime authority may merge capability metadata for session transport.
+- LIVE governor remains the owner of actual capability execution.
+- Capability surfacing remains contextual and judgment-based; surfacing does not imply execution.
 
-Likely consolidation target:
-
-- `lib/george/capabilities/`
-
-No capability consolidation should happen until the audit confirms the correct canonical owner and migration path.
+Do not collapse availability, surfacing, and execution into one owner.
 
 
 ## LIVE Runtime Ownership
