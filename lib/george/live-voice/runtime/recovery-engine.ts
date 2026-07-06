@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type RecoveryState =
   | 'stable'
@@ -15,6 +15,7 @@ export type RecoveryInput = {
   powerFrame?: string
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   interruptionRisk?: number
+  signals?: ConversationSignalState
 }
 
 export type RecoveryDecision = {
@@ -27,7 +28,7 @@ export type RecoveryDecision = {
 class GeorgeRecoveryEngine {
   detect(input: RecoveryInput): RecoveryDecision {
     const text = input.text.toLowerCase()
-    const signals = detectConversationSignals(text)
+    const signals = input.signals || detectConversationSignals(text)
 
     if (signals.has('defensive_language')) {
       return {

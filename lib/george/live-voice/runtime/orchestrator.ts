@@ -116,6 +116,7 @@ export function orchestrateLiveTurn(
     powerFrame: powerState.frame,
     emotionalVelocity: velocityState.velocity,
     interruptionRisk: nextPacket.interruptionRisk,
+    signals: conversationSignals,
   })
 
   const salvageObjective = selectSalvageObjective({
