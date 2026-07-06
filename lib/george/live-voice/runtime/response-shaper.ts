@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type ResponseShapeInput = {
   volley: string
@@ -20,6 +20,7 @@ export type ResponseShapeInput = {
   responseCompression?: string
   deliveryBehavior?: string
   intervention?: string
+  signals?: ConversationSignalState
 }
 
 export type ResponseShapeResult = {
@@ -67,7 +68,7 @@ class GeorgeResponseShaper {
     }
 
     const transcript = (input.transcript || '').toLowerCase()
-    const signals = detectConversationSignals(transcript)
+    const signals = input.signals || detectConversationSignals(transcript)
     const [role, rolePressure] = input.strongestRolePressure ?? ['neutral', 0]
 
     if (role === 'authority' && rolePressure > 1.2) {

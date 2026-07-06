@@ -330,6 +330,7 @@ export function orchestrateLiveTurn(
     responseCompression: nextPacket.responseCompression,
     deliveryBehavior: nextPacket.deliveryBehavior,
     intervention: nextPacket.intervention,
+    signals: conversationSignals,
   })
 
   nextPacket.volley = shapedResponse.volley
