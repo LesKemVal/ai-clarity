@@ -242,6 +242,40 @@ Preparation Runtime owns pre-execution package, document, and context preparatio
 The chat route only assembles reasoning context for the current model call.
 
 
+
+## Capability Governance Audit
+
+Capability governance is now an active production audit area.
+
+Do not collapse these concepts:
+
+- Availability: the user can use a capability.
+- Surfacing: GEORGE should mention or suggest a capability now.
+- Execution: GEORGE should start or apply a capability now.
+
+Current inspection finding:
+
+Capability ownership is scattered across LIVE Entry, LIVE runtime support metadata, runtime recommendation modules, pricing estimates, and LIVE execution consumers.
+
+Initial classification:
+
+- Capability definition owner: not canonical yet
+- Capability metadata owner: currently split between LIVE Entry and LIVE runtime support types
+- Capability availability owner: unclear
+- Capability surfacing owner: runtime recommendation / trajectory modules
+- Capability execution owner: LIVE governor and LIVE runtime consumers
+- Capability pricing / estimate owner: LIVE Entry estimate functions, with runtime usage interpretation later
+- Capability delivery-overlay owner: LIVE Entry creates, runtime consumes
+
+Potential consolidation target:
+
+- `lib/george/capabilities/`
+
+Do not move capability code until inspection proves the correct canonical boundary.
+
+First extraction must preserve the distinction between availability, surfacing, and execution.
+
+
 ## Working Rules
 
 No page.tsx bloat.

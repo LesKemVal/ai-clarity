@@ -250,6 +250,39 @@ First extraction should be behavior-neutral:
 Do not confuse runtime note composition with Preparation Runtime. Runtime note composition prepares the current model-call context. Preparation Runtime prepares operational context before execution from Conversation Packages, Conversation Records, related packages, learning, documentation, future actions, and known context.
 
 
+
+## Capability Governance Boundary
+
+Capability governance must separate availability, surfacing, and execution.
+
+- Availability means the user can use a capability.
+- Surfacing means GEORGE should mention or suggest the capability now.
+- Execution means GEORGE should start or apply the capability now.
+
+These should not collapse into one owner.
+
+Current implementation status:
+
+- LIVE Entry currently contains capability-like recommendations, resource estimates, selected capability identifiers, support style selection, and delivery-overlay creation.
+- LIVE runtime support types carry selected capability identifiers, selected capability metadata, cost estimates, purview, and delivery overlays.
+- LIVE runtime consumers may apply selected capability identifiers to execution behavior.
+- Runtime recommendation modules may surface capabilities when they plausibly improve the current objective.
+
+Production boundary:
+
+- Capability definitions and metadata should move toward a canonical capability layer.
+- Capability availability should be determined declaratively.
+- Capability surfacing should remain contextual and judgment-based.
+- Capability execution should remain owned by the runtime that applies the capability.
+- Pricing and estimate logic should not be scattered across UI and runtime indefinitely.
+
+Likely consolidation target:
+
+- `lib/george/capabilities/`
+
+No capability consolidation should happen until the audit confirms the correct canonical owner and migration path.
+
+
 ## LIVE Runtime Ownership
 
 Presentation owns controls and visualization.
