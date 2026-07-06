@@ -3,28 +3,39 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const heroStatements = [
-  'REAL-TIME CONVERSATION ASSISTANT',
-  'CHOOSE THE OUTCOME',
-  'ASK GEORGE',
-  'ENTER LIVE',
-  'INTERVIEWS • NEGOTIATIONS • PRESENTATIONS',
-  'BOARD MEETINGS • INVESTOR MEETINGS • PERFORMANCE REVIEWS',
-  'AUDIO GLASSES (Recommended)',
-  'EARBUDS (Private audio)',
+const heroSequences = [
+  {
+    title: ['REAL-TIME', 'CONVERSATION ASSISTANT'],
+    lines: ['Interviews', 'Negotiations', 'Presentations', 'Board Meetings', 'Investor Meetings', 'Performance Reviews', 'You Decide'],
+  },
+  {
+    title: ['CONNECT AUDIO GLASSES', 'BY BLUETOOTH'],
+    lines: ['Read support without looking away', 'Hear support discreetly', 'Stay present'],
+  },
+  {
+    title: ['DESIRED', 'OUTCOME'],
+    lines: ['Get hired', 'Raise capital', 'Close the deal', 'Win the contract', 'Preserve trust', 'Improve performance', 'You Decide'],
+  },
+  {
+    title: ['GET STARTED'],
+    lines: [],
+    final: true,
+  },
 ]
 
 export function HomeHeroSequence() {
   const router = useRouter()
-  const [statementIndex, setStatementIndex] = useState(0)
+  const [sequenceIndex, setSequenceIndex] = useState(0)
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setStatementIndex((index) => (index + 1) % heroStatements.length)
-    }, 2600)
+      setSequenceIndex((index) => (index + 1) % heroSequences.length)
+    }, 10800)
 
     return () => window.clearInterval(timer)
   }, [])
+
+  const activeSequence = heroSequences[sequenceIndex]
 
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
@@ -51,27 +62,66 @@ export function HomeHeroSequence() {
           </div>
 
           <div
-            key={statementIndex}
-            className="animate-[homeHeroStatement_2.6s_ease-in-out_both] font-mono text-[44px] font-black uppercase leading-[0.92] tracking-[-0.075em] text-white/92 sm:text-[78px] md:text-[104px]"
+            key={sequenceIndex}
+            className={`animate-[homeHeroTitleCycle_10.8s_ease-in-out_both] ${activeSequence.final ? 'pb-[120px] sm:pb-[104px]' : ''}`}
           >
-            {heroStatements[statementIndex]}
+            <div className={`${activeSequence.final ? 'text-center' : 'text-left'} max-w-[1120px] font-mono text-[42px] font-black uppercase leading-[0.9] tracking-[-0.075em] text-white/94 sm:text-[76px] md:text-[102px]`}>
+              {activeSequence.title.map((line) => (
+                <div key={line}>{line}</div>
+              ))}
+            </div>
+
+            {!activeSequence.final && (
+              <div className="mt-8 grid gap-3">
+                {activeSequence.lines.map((line, index) => (
+                  <div
+                    key={`${activeSequence.title.join('-')}-${line}`}
+                    className="font-mono text-[17px] font-semibold uppercase leading-[1.05] tracking-[0.12em] text-[#8FB6C9]/82 opacity-0 sm:text-[27px] md:text-[33px]"
+                    style={{
+                      animation: 'homeHeroLineCycle 10.8s ease-in-out both',
+                      animationDelay: `${0.8 + index * 0.72}s`,
+                    }}
+                  >
+                    {line}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <style jsx>{`
-            @keyframes homeHeroStatement {
+            @keyframes homeHeroTitleCycle {
               0% {
                 opacity: 0;
-                transform: translateY(-18px);
+                transform: translateY(-14px);
                 filter: blur(2px);
               }
-              15%, 76% {
+              8%, 82% {
                 opacity: 1;
                 transform: translateY(0);
                 filter: blur(0);
               }
               100% {
                 opacity: 0;
-                transform: translateY(18px);
+                transform: translateY(16px);
+                filter: blur(2px);
+              }
+            }
+
+            @keyframes homeHeroLineCycle {
+              0%, 8% {
+                opacity: 0;
+                transform: translateY(-10px);
+                filter: blur(2px);
+              }
+              15%, 62% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+              }
+              82%, 100% {
+                opacity: 0;
+                transform: translateY(14px);
                 filter: blur(2px);
               }
             }
