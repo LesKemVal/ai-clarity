@@ -24,6 +24,7 @@ import { prepareConversationFromPackage } from '@/lib/george/preparation/runtime
 import { getConversationResponsibilityOptions } from '@/lib/george/live-entry/responsibility-options'
 import { estimateResources, estimateWithResources, getPrepDocumentPrompt, type ResourceEstimate } from '@/lib/george/capabilities/live-entry-resources'
 import { LIVE_SUPPORT_PANELS, type LiveBriefingSupportPanelId } from '@/lib/george/capabilities/live-support-panels'
+import { deriveLiveCapabilityIds } from '@/lib/george/capabilities/live-capability-registry'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -1974,6 +1975,14 @@ const mandatoryLiveSignals = useMemo(() => {
       ...(prepDocument ? [prepDocumentPrompt.resource] : []),
     ]))
     const finalEstimate = skipPrep ? resourceEstimate : estimateWithResources(resourceEstimate, finalResources)
+    const selectedCapabilityIds = deriveLiveCapabilityIds({
+      conversationType,
+      audienceType,
+      userPosition,
+      objective,
+      knownContext,
+      resources: finalResources,
+    })
 
     const liveRoomObjectiveLabels: Record<LiveRoomObjectiveOptionId, string> = {
       project_strength: 'Project strength',
@@ -2027,7 +2036,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
     const runtimeSupport = {
       selectedCapacityCents: finalEstimate.estimatedCents,
-      selectedCapabilityIds: finalResources,
+      selectedCapabilityIds,
       selectedCapabilities: finalResources,
       baseRuntimeCents: finalEstimate.estimatedCents,
       capacityCents: finalEstimate.estimatedCents,
@@ -2091,7 +2100,7 @@ const mandatoryLiveSignals = useMemo(() => {
       skipPrep,
       runtimeSupport,
       selectedCapacityCents: finalEstimate.estimatedCents,
-      selectedCapabilityIds: finalResources,
+      selectedCapabilityIds,
       estimatedCents: finalEstimate.estimatedCents,
       compactPrep: true,
       prepRoomProfile,
