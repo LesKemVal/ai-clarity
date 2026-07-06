@@ -141,10 +141,6 @@ export function HomeHeroSequence() {
             <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-white/46">
               OpenAI • Groq • Deepgram • Cartesia
             </div>
-
-            <div className="mt-8 text-[14px] text-white/58">
-              Choose how you want to work with GEORGE.
-            </div>
           </div>
 
           <div className="mx-auto max-w-[760px] rounded-[26px] border border-white/12 bg-black/42 p-4 shadow-[0_24px_90px_rgba(0,0,0,0.62)] backdrop-blur-xl sm:p-5">
