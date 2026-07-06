@@ -11,6 +11,7 @@ import { rankSignals } from '@/lib/george/runtime/signal-ranking'
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
 import { normalizeConversationSignals } from '@/lib/george/runtime/operational-signal-normalizer'
+import { interpretOperationalSignalsForArbitration } from '@/lib/george/runtime/operational-signal-interpreter'
 
 export function buildGeorgeCoreInterpretation(input: {
   transcript: string
@@ -122,7 +123,10 @@ export function buildGeorgeCoreInterpretation(input: {
     ).toFixed(3)
   )
 
+  const interpretedArbitrationFacts = interpretOperationalSignalsForArbitration(operationalSignals)
+
   const signalArbitration = arbitrateRuntimeSignals({
+    ...interpretedArbitrationFacts,
     explicitUserSignal: userHasRequestedHelp,
     objectiveRisk: ['protect_position', 'buy_time', 'context_recovery'].includes(outcomeGovernor.move),
     livePressure: roomAnalysis.pressure === 'authority' || roomAnalysis.pressure === 'high',
