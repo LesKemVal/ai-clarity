@@ -7,6 +7,7 @@ import type { OutcomeGovernorSnapshot } from '@/lib/george/live-voice/runtime/ou
 import type { SignalSufficiencyResult } from '@/lib/george/runtime/signal-sufficiency'
 import type { RankedSignal } from '@/lib/george/runtime/signal-ranking'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
+import type { OperationalSignal } from '@/lib/george/runtime/operational-signals'
 
 export type GeorgeCoreInterpretation = {
   speakerIntent?: LiveSpeakerIntentResult
@@ -20,6 +21,7 @@ export type GeorgeCoreInterpretation = {
   signalSufficiency?: SignalSufficiencyResult
   rankedSignals?: RankedSignal[]
   signalArbitration?: RuntimeSignalArbitration
+  operationalSignals?: OperationalSignal[]
   operationalReadiness?: 'sufficient' | 'needs_signal'
   operationalConfidence?: number
   source: 'george_core_interpretation'

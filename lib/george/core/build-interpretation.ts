@@ -10,6 +10,7 @@ import { evaluateSignalSufficiency } from '@/lib/george/runtime/signal-sufficien
 import { rankSignals } from '@/lib/george/runtime/signal-ranking'
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildGeorgeOperationalUnderstanding } from '@/lib/george/core/operational-understanding'
+import { normalizeConversationSignals } from '@/lib/george/runtime/operational-signal-normalizer'
 
 export function buildGeorgeCoreInterpretation(input: {
   transcript: string
@@ -36,6 +37,7 @@ export function buildGeorgeCoreInterpretation(input: {
   const signalText = [operationalObjective, input.knownContext, context].filter(Boolean).join('\n')
 
   const conversationSignals = detectConversationSignals(context)
+  const operationalSignals = normalizeConversationSignals(conversationSignals)
 
   const speakerIntent = classifyLiveSpeakerIntent({
     transcript: text,
@@ -141,6 +143,7 @@ export function buildGeorgeCoreInterpretation(input: {
     signalSufficiency,
     rankedSignals,
     signalArbitration,
+    operationalSignals,
     operationalReadiness: signalSufficiency.sufficient ? 'sufficient' : 'needs_signal',
     operationalConfidence,
   })
