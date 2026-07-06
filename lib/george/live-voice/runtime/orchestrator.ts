@@ -26,6 +26,7 @@ import { georgeLiveRuntimeEvents } from './runtime-events'
 import { transcriptBuffer } from './transcript-buffer'
 import { georgeSilenceDetector } from './silence-detector'
 import { determineOpportunityState } from './opportunity-state'
+import { detectConversationSignals } from './conversation-signals'
 
 export type OrchestratorPacket = {
   speaker: 'other_party' | 'user' | 'george_instruction' | 'unclear'
@@ -74,6 +75,8 @@ export function orchestrateLiveTurn(
   const nextPacket = { ...input.packet }
   void runtimeConfig
 
+  const conversationSignals = detectConversationSignals(text)
+
   nextPacket.confidence =
     georgeConfidenceEngine.compute({
       interruptionRisk: nextPacket.interruptionRisk,
@@ -95,6 +98,7 @@ export function orchestrateLiveTurn(
     roomPressure: nextPacket.roomPressure,
     interruptionRisk: nextPacket.interruptionRisk,
     emotionalVelocity: velocityState.velocity,
+    signals: conversationSignals,
   })
 
   const trajectoryState = georgeTrajectoryEngine.evaluate({

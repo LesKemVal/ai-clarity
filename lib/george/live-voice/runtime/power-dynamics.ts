@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type PowerFrame =
   | 'balanced'
@@ -14,6 +14,7 @@ export type PowerDynamicsInput = {
   roomPressure?: 'low' | 'moderate' | 'high' | 'authority'
   interruptionRisk?: number
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
+  signals?: ConversationSignalState
 }
 
 export type PowerDynamicsState = {
@@ -25,7 +26,7 @@ export type PowerDynamicsState = {
 class GeorgePowerDynamics {
   analyze(input: PowerDynamicsInput): PowerDynamicsState {
     const text = input.text.toLowerCase()
-    const signals = detectConversationSignals(text)
+    const signals = input.signals || detectConversationSignals(text)
     let score = 0.5
 
     if (input.roomPressure === 'authority') {
