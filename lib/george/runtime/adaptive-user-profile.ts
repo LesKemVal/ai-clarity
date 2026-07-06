@@ -117,13 +117,15 @@ export function buildAdaptiveUserProfileNote(
   profile: AdaptiveUserProfile
 ) {
   return `
-ADAPTIVE USER PROFILE
-- Treat these as probabilistic tendencies, not permanent truths.
-- Recalibrate continuously from runtime evidence.
+OPERATIONAL PROFILE EVIDENCE
+- Treat these as current-session evidence about how GEORGE may work effectively with this user.
+- These are probabilistic tendencies, not permanent truths or immutable constraints.
+- Use them to inform reasoning; do not let them replace reasoning.
+- Recalibrate continuously from runtime evidence, current objective, room pressure, and explicit user direction.
 - Do not patronize the user.
 - Do not permanently simplify intelligence because of temporary overload.
 
-Observed confidence tendencies:
+Current evidence tendencies:
 - concise delivery preference: ${profile.conciseDeliveryPreference.toFixed(2)}
 - repeatable line affinity: ${profile.repeatableLineAffinity.toFixed(2)}
 - abstract reasoning tolerance: ${profile.abstractReasoningTolerance.toFixed(2)}
@@ -132,7 +134,7 @@ Observed confidence tendencies:
 - tactical cue retention: ${profile.tacticalCueRetention.toFixed(2)}
 - layered explanation tolerance: ${profile.layeredExplanationTolerance.toFixed(2)}
 
-Use these to shape:
+Use this evidence to shape:
 - pacing
 - density
 - tactical depth
