@@ -21,6 +21,8 @@ export function LiveHubShadowBridge({
 }: LiveHubShadowBridgeProps) {
   const lastForwardedTranscriptRef = useRef('')
   const lastTurnIdRef = useRef('')
+  const pendingFinalTranscriptRef = useRef('')
+  const finalTranscriptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!active) return
     if (!isGeorgeLiveHubEnabled()) return
@@ -73,22 +75,55 @@ export function LiveHubShadowBridge({
 
     const clean = String(transcript || '').trim()
     if (!clean) return
-    if (lastForwardedTranscriptRef.current === clean) return
 
-    lastForwardedTranscriptRef.current = clean
+    const forwardTranscript = (text: string, isFinal: boolean) => {
+      if (!text) return
+      if (lastForwardedTranscriptRef.current === text) return
 
-    console.info('[LIVE][hub][shadow] forwarding transcript', {
-      text: clean,
-      isFinal: transcriptFinal,
-    })
+      lastForwardedTranscriptRef.current = text
 
-    const turnId = `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    lastTurnIdRef.current = turnId
+      console.info('[LIVE][hub][shadow] forwarding transcript', {
+        text,
+        isFinal,
+      })
 
-    markRuntimeEvent(turnId, 'transcript_input')
+      const turnId = `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      lastTurnIdRef.current = turnId
 
-    getGeorgeLiveHubRuntimeAdapter().sendTranscript(clean, transcriptFinal, turnId, context.deliveryStyle)
-    markRuntimeEvent(turnId, 'hub_transcript_sent')
+      markRuntimeEvent(turnId, 'transcript_input')
+
+      getGeorgeLiveHubRuntimeAdapter().sendTranscript(text, isFinal, turnId, context.deliveryStyle)
+      markRuntimeEvent(turnId, 'hub_transcript_sent')
+    }
+
+    if (!transcriptFinal) {
+      forwardTranscript(clean, false)
+      return
+    }
+
+    pendingFinalTranscriptRef.current = [pendingFinalTranscriptRef.current, clean]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    if (finalTranscriptTimerRef.current) {
+      clearTimeout(finalTranscriptTimerRef.current)
+    }
+
+    finalTranscriptTimerRef.current = setTimeout(() => {
+      const finalText = pendingFinalTranscriptRef.current.trim()
+      pendingFinalTranscriptRef.current = ''
+      finalTranscriptTimerRef.current = null
+      forwardTranscript(finalText, true)
+    }, 275)
+
+    return () => {
+      if (finalTranscriptTimerRef.current) {
+        clearTimeout(finalTranscriptTimerRef.current)
+        finalTranscriptTimerRef.current = null
+      }
+    }
   }, [active, transcript, transcriptFinal, context.deliveryStyle])
 
   return null
