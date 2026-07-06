@@ -43,6 +43,14 @@ Once participation and permission exist, GEORGE does its job: observe the room, 
 
 Support style changes delivery, not judgment.
 
+Normal GEORGE and LIVE share the same reasoning philosophy; execution constraints differ.
+
+Normal GEORGE prepares, plans, analyzes, creates, reviews, decides, and helps the user advance work before execution. LIVE executes under real-time constraints where timing, brevity, latency, and room signals matter more urgently.
+
+Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, and operational value. The difference is not intelligence. The difference is operating conditions.
+
+Normal GEORGE now has a reasoning lane governor at `lib/george/runtime/normal-reasoning-governor.ts`. The governor routes normal work into immediate, operational, or strategic lanes before model selection so simple work can remain fast while consequential work receives deeper judgment.
+
 Users organize work around outcomes.
 
 GEORGE organizes work around Conversation Packages.

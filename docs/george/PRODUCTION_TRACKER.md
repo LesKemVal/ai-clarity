@@ -44,6 +44,12 @@ GEORGE requires user participation and permission. Once participation and permis
 
 Support style changes delivery, not judgment.
 
+Normal GEORGE and LIVE share the same reasoning philosophy; execution constraints differ.
+
+Normal GEORGE prepares and advances work before execution. LIVE executes under real-time constraints. Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, and operational value.
+
+Normal GEORGE now routes normal work through `lib/george/runtime/normal-reasoning-governor.ts`, classifying work into immediate, operational, or strategic lanes before model selection.
+
 Communication precedes execution.
 
 Conversation is execution.
@@ -192,6 +198,8 @@ Runtime metrics helpers own event naming, timing, and correlation.
 - Inspect real LIVE latency logs and optimize the slowest measured segment first.
 - Continue production hardening through modular smoke suites.
 - Continue portability and runtime extraction where page orchestration grows.
+- Continue improving Normal GEORGE reasoning lane classification beyond word heuristics toward signal-based operational assessment.
+- Preserve the doctrine that Normal GEORGE and LIVE share reasoning philosophy while differing by execution constraints.
 
 ## Working Rules
 
