@@ -52,7 +52,8 @@ export function buildGeorgeCoreInterpretation(input: {
   const objectiveHypothesis = inferObjectiveHypothesis(
     [operationalObjective, input.room, input.knownContext, text]
       .filter(Boolean)
-      .join(' ')
+      .join(' '),
+    { signals: conversationSignals }
   )
   const objective = objectiveHypothesis.objective
 

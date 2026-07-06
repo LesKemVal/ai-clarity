@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type LiveObjectiveId =
   | 'stay_safe'
@@ -68,9 +68,12 @@ export type LiveObjectiveHypothesis = {
   source: 'keyword_signal' | 'conversation_signal' | 'fallback'
 }
 
-export function inferObjectiveHypothesis(text: string): LiveObjectiveHypothesis {
+export function inferObjectiveHypothesis(
+  text: string,
+  options: { signals?: ConversationSignalState } = {}
+): LiveObjectiveHypothesis {
   const clean = text.toLowerCase()
-  const signals = detectConversationSignals(clean)
+  const signals = options.signals || detectConversationSignals(clean)
 
   if (/officer|license|registration|insurance|pulled you over|id\b/.test(clean)) {
     return {
