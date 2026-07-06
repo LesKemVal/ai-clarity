@@ -148,6 +148,7 @@ export function orchestrateLiveTurn(
     recovery: recoveryState.state,
     powerFrame: powerState.frame,
     emotionalVelocity: velocityState.velocity,
+    signals: conversationSignals,
   })
 
   const dominantRoleState = transcriptBuffer.getDominantRole()

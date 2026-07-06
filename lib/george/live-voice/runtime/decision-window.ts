@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type DecisionWindowAction =
   | 'speak_now'
@@ -19,6 +19,7 @@ export type DecisionWindowInput = {
   recovery?: string
   powerFrame?: string
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
+  signals?: ConversationSignalState
 }
 
 export type DecisionWindow = {
@@ -30,7 +31,7 @@ export type DecisionWindow = {
 class GeorgeDecisionWindow {
   evaluate(input: DecisionWindowInput): DecisionWindow {
     const text = input.text.toLowerCase()
-    const signals = detectConversationSignals(text)
+    const signals = input.signals || detectConversationSignals(text)
     const confidence = input.confidence ?? 0.5
     const interruptionRisk = input.interruptionRisk ?? 0
 
