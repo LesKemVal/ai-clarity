@@ -66,6 +66,7 @@ import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/georg
 import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
+import { composeRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -900,25 +901,29 @@ LANGUAGE MODE: SPANISH
       liveScenario,
     })
 
+    const runtimeContextBlock = composeRuntimeContext([
+      liveRuntimeContext,
+      shelvedCampaignRuntimeNote,
+      individualLiveContextNote,
+      runtimeAdapterNote,
+      earbudRuntimeNote,
+      runtimeSignalArbitrationNote,
+      arbitrationResponseShapeNote,
+      adaptiveUserProfileNote,
+      durableBehavioralMemoryNote,
+      runtimeOutcomeLearningNote,
+      continuityRestorationNote,
+      judgmentSurfaceNote,
+      liveRecommendationNote,
+      trajectoryNote,
+      responseShapeNote,
+      continuityGovernanceNote,
+      outputGovernanceNote,
+      presentationAuthorityNote,
+    ])
+
     const systemContent = languageRule + modeBlock +
-      (liveRuntimeContext ? `\n\n${liveRuntimeContext}\n\n` : '') +
-      (shelvedCampaignRuntimeNote ? `\n\n${shelvedCampaignRuntimeNote}\n\n` : '') +
-      (individualLiveContextNote ? `\n\n${individualLiveContextNote}\n\n` : '') +
-      (runtimeAdapterNote ? `\n\n${runtimeAdapterNote}\n\n` : '') +
-      (earbudRuntimeNote ? `\n\n${earbudRuntimeNote}\n\n` : '') +
-      (runtimeSignalArbitrationNote ? `\n\n${runtimeSignalArbitrationNote}\n\n` : '') +
-      (arbitrationResponseShapeNote ? `\n\n${arbitrationResponseShapeNote}\n\n` : '') +
-      (adaptiveUserProfileNote ? `\n\n${adaptiveUserProfileNote}\n\n` : '') +
-      (durableBehavioralMemoryNote ? `\n\n${durableBehavioralMemoryNote}\n\n` : '') +
-      (runtimeOutcomeLearningNote ? `\n\n${runtimeOutcomeLearningNote}\n\n` : '') +
-      (continuityRestorationNote ? `\n\n${continuityRestorationNote}\n\n` : '') +
-      (judgmentSurfaceNote ? `\n\n${judgmentSurfaceNote}\n\n` : '') +
-      (liveRecommendationNote ? `\n\n${liveRecommendationNote}\n\n` : '') +
-      (trajectoryNote ? `\n\n${trajectoryNote}\n\n` : '') +
-      (responseShapeNote ? `\n\n${responseShapeNote}\n\n` : '') +
-      (continuityGovernanceNote ? `\n\n${continuityGovernanceNote}\n\n` : '') +
-      (outputGovernanceNote ? `\n\n${outputGovernanceNote}\n\n` : '') +
-      (presentationAuthorityNote ? `\n\n${presentationAuthorityNote}\n\n` : '') +
+      runtimeContextBlock +
       SYSTEM_PROMPT(
         voiceMode,
         isFirstSession,
