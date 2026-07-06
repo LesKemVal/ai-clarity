@@ -73,6 +73,7 @@ const HELP_ITEMS: Array<{
 ]
 
 
+
 export default function HelpPage() {
   const [open, setOpen] = useState<HelpSection>('george')
   const active = HELP_ITEMS.find((item) => item.id === open) || HELP_ITEMS[0]
