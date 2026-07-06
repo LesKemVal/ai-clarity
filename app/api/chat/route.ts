@@ -65,6 +65,7 @@ import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-con
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
+import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -679,13 +680,19 @@ export async function POST(req: Request) {
       (m) => m.role === 'user' && (Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
     )
 
-    const model = hasImageInput
-      ? (process.env.OPENAI_MODEL_VISION || 'gpt-4o')
-      : tier === 'brilliant'
-        ? (process.env.OPENAI_MODEL_BRILLIANT || 'gpt-5')
-        : tier === 'intelligent'
-        ? (process.env.OPENAI_MODEL_INTELLIGENT || 'gpt-4o')
-        : (process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini')
+    const latestUserTextForReasoning =
+      recentMessages
+        .slice()
+        .reverse()
+        .find((message) => message.role === 'user')?.content || ''
+
+    const normalReasoning = resolveNormalGeorgeReasoning({
+      userText: latestUserTextForReasoning,
+      tier,
+      hasImageInput,
+    })
+
+    const model = normalReasoning.model
 
     
     const languageRule =
