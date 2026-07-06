@@ -304,6 +304,30 @@ Its structured fields are canonical:
 Portable clients, including mobile, desktop, API, audio-only devices, and glasses-capable clients, should consume the structured preparation contract first and render their own presentation layer when needed.
 
 
+
+## Runtime Context Composer
+
+`lib/george/runtime/runtime-context-composer.ts` is a behavior-neutral formatting utility.
+
+It accepts an ordered collection of runtime context blocks, filters empty values, preserves caller order, joins the blocks, and returns the composed runtime context.
+
+The composer owns formatting only.
+
+It never owns:
+
+- reasoning
+- doctrine
+- runtime policy
+- semantic interpretation
+- ordering decisions
+- priority
+- deduplication
+
+Runtime note producers remain authoritative for content and meaning.
+
+Orchestration layers determine which notes are included and in what order.
+
+
 ## LIVE Runtime Ownership
 
 Presentation owns controls and visualization.
