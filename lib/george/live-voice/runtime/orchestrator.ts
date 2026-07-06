@@ -162,6 +162,7 @@ export function orchestrateLiveTurn(
     decisionAction: decisionWindow.action,
     memoryWindow: runtimeConfig.memoryWindow,
     dominantRole: dominantRoleState.role,
+    signals: conversationSignals,
   })
 
   const strongestRolePressure = Object.entries(pressureMemory.rolePressure).reduce(

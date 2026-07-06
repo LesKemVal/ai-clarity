@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type PressureMemoryInput = {
   text: string
@@ -9,6 +9,7 @@ export type PressureMemoryInput = {
   decisionAction?: string
   memoryWindow?: number
   dominantRole?: string | null
+  signals?: ConversationSignalState
 }
 
 export type PressureMemoryState = {
@@ -65,7 +66,7 @@ class GeorgePressureMemory {
 
   update(input: PressureMemoryInput): PressureMemoryState {
     const text = input.text.toLowerCase()
-    const signals = detectConversationSignals(text)
+    const signals = input.signals || detectConversationSignals(text)
     const persistentMemory =
       input.memoryWindow && input.memoryWindow >= 10
 
