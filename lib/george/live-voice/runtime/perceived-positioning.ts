@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type PerceivedPositioningState = {
   perception: 'strengthening' | 'stable' | 'weakening' | 'at_risk'
@@ -18,9 +18,10 @@ export function assessPerceivedPositioning(input: {
   emotionalVelocity?: string
   roomPressure?: string
   interruptionRisk?: number
+  signals?: ConversationSignalState
 }): PerceivedPositioningState {
   const text = input.text.toLowerCase()
-  const signals = detectConversationSignals(text)
+  const signals = input.signals || detectConversationSignals(text)
 
   let score = 0.5
   const reasons: string[] = []

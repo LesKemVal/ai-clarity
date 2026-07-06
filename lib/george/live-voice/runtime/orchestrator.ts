@@ -137,6 +137,7 @@ export function orchestrateLiveTurn(
     emotionalVelocity: velocityState.velocity,
     roomPressure: nextPacket.roomPressure,
     interruptionRisk: nextPacket.interruptionRisk,
+    signals: conversationSignals,
   })
 
   const decisionWindow = georgeDecisionWindow.evaluate({
