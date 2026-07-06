@@ -43,7 +43,7 @@ export default function TosPage() {
           </h1>
 
           <p className="mt-6 max-w-[680px] text-[18px] leading-8 text-white/62 md:text-[21px]">
-            These terms govern your use of GEORGE, BRANESx, and related pages, tools, subscriptions, and services.
+            Use GEORGE responsibly. GEORGE can help you reason, plan, prepare, communicate, and execute, but you remain responsible for your decisions and actions.
           </p>
         </section>
 
@@ -67,7 +67,7 @@ export default function TosPage() {
           </div>
 
           <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/62">
-            GEORGE can support thinking, structure, preparation, communication, and execution. The user remains the decision-maker and bears responsibility for action, timing, conduct, and outcome.
+            GEORGE supports the work. You remain the authority.
           </p>
         </section>
       </div>

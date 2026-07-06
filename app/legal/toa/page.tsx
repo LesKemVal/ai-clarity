@@ -59,7 +59,7 @@ export default function TOAPage() {
           </h1>
 
           <p className="mt-6 max-w-[680px] text-[18px] leading-8 text-white/62 md:text-[21px]">
-            GEORGE is built to help people think clearly, decide faster, prepare better, and move with direction.
+            Access gives you the ability to use GEORGE as an operational workspace. Use it responsibly and keep final judgment with yourself.
           </p>
         </section>
 
@@ -83,7 +83,7 @@ export default function TOAPage() {
           </div>
 
           <p className="mt-3 max-w-[760px] text-[17px] leading-8 text-white/62">
-            GEORGE may assist with clarity, planning, preparation, and execution support. Authority remains with the user.
+            GEORGE supports the work. You remain the authority.
           </p>
         </section>
       </div>
