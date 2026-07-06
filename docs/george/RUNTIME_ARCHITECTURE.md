@@ -216,6 +216,40 @@ Current behavior test:
 
 The behavior suite includes this scenario through `scripts/george-behavior-suite.mjs`.
 
+
+## Chat Route Orchestration Boundary
+
+`app/api/chat/route.ts` is an orchestration surface, not a canonical reasoning owner.
+
+The chat route may assemble the request for the current model call. It must not become the owner of runtime doctrine, preparation context, memory policy, Operational Profile rules, capability governance, or LIVE authority.
+
+Current boundary:
+
+- Chat route: request assembly and current model-call orchestration.
+- Preparation Runtime: pre-execution package, document, and context preparation.
+- Conversation Packages: long-lived operational work.
+- Operational Profile: user-level portable adaptation evidence.
+- Reasoning Governor: Normal GEORGE lane and model routing.
+- LIVE runtime: real-time execution constraints and session authority.
+
+Future extraction target:
+
+- `lib/george/runtime/reasoning-context-composer.ts`
+
+First extraction should be behavior-neutral:
+
+- accept named runtime note strings
+- filter empty notes
+- preserve ordering
+- join consistently
+- return one runtime context block
+- do not change prompt doctrine
+- do not change model routing
+- do not move Preparation Runtime ownership
+
+Do not confuse runtime note composition with Preparation Runtime. Runtime note composition prepares the current model-call context. Preparation Runtime prepares operational context before execution from Conversation Packages, Conversation Records, related packages, learning, documentation, future actions, and known context.
+
+
 ## LIVE Runtime Ownership
 
 Presentation owns controls and visualization.

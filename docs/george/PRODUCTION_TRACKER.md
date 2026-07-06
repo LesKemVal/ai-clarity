@@ -204,6 +204,44 @@ Runtime metrics helpers own event naming, timing, and correlation.
 - Continue improving Normal GEORGE reasoning lane classification beyond word heuristics toward signal-based operational assessment.
 - Preserve the doctrine that Normal GEORGE and LIVE share reasoning philosophy while differing by execution constraints.
 
+
+## Chat Route Boundary
+
+`app/api/chat/route.ts` is an orchestration surface, not a canonical reasoning owner.
+
+`/api/chat` may assemble the request. It must not become the owner of runtime doctrine, preparation context, memory policy, Operational Profile rules, capability governance, or LIVE authority.
+
+Current assessment:
+
+- The chat route is acceptable as a composition/orchestration layer.
+- It is nearing an ownership boundary because it manually assembles many runtime notes into the current model call.
+- It should remain thin enough to call canonical runtime modules and assemble their outputs.
+- GEORGE's judgment rules, continuity policy, Operational Profile behavior, capability surfacing, and preparation ownership must remain in canonical runtime modules.
+
+Future extraction target:
+
+- `lib/george/runtime/reasoning-context-composer.ts`
+
+First extraction must be behavior-neutral:
+
+- accept named runtime note strings
+- filter empty notes
+- preserve ordering
+- join consistently
+- return one runtime context block
+- do not change prompt doctrine
+- do not change model routing
+- do not move Preparation Runtime ownership
+
+Boundary warning:
+
+Do not confuse runtime note composition with Preparation Runtime.
+
+Preparation Runtime owns pre-execution package, document, and context preparation.
+
+The chat route only assembles reasoning context for the current model call.
+
+
 ## Working Rules
 
 No page.tsx bloat.
