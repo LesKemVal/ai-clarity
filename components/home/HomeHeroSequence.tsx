@@ -18,7 +18,7 @@ const heroSequences = [
   },
   {
     title: ['GET STARTED'],
-    lines: [],
+    lines: ['Reason • Plan • Execute'],
     final: true,
   },
 ]
@@ -71,22 +71,20 @@ export function HomeHeroSequence() {
               ))}
             </div>
 
-            {!activeSequence.final && (
-              <div className="mt-8 grid gap-3">
-                {activeSequence.lines.map((line, index) => (
-                  <div
-                    key={`${activeSequence.title.join('-')}-${line}`}
-                    className="font-mono text-[17px] font-semibold uppercase leading-[1.05] tracking-[0.12em] text-[#8FB6C9]/82 opacity-0 sm:text-[27px] md:text-[33px]"
-                    style={{
-                      animation: 'homeHeroLineCycle 10.8s ease-in-out both',
-                      animationDelay: `${0.8 + index * 0.72}s`,
-                    }}
-                  >
-                    {line}
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className={`${activeSequence.final ? 'mt-7' : 'mt-8'} grid gap-3`}>
+              {activeSequence.lines.map((line, index) => (
+                <div
+                  key={`${activeSequence.title.join('-')}-${line}`}
+                  className={`${activeSequence.final ? 'text-center' : ''} font-mono text-[17px] font-semibold uppercase leading-[1.05] tracking-[0.12em] text-[#8FB6C9]/82 opacity-0 sm:text-[27px] md:text-[33px]`}
+                  style={{
+                    animation: 'homeHeroLineCycle 10.8s ease-in-out both',
+                    animationDelay: `${activeSequence.final ? 0.55 : 0.8 + index * 0.72}s`,
+                  }}
+                >
+                  {line}
+                </div>
+              ))}
+            </div>
           </div>
 
           <style jsx>{`
@@ -129,16 +127,12 @@ export function HomeHeroSequence() {
         </div>
 
         <div className="absolute inset-x-5 bottom-5 z-40">
-          <div className="mb-10 text-center">
-            <div className="font-mono text-[18px] font-semibold uppercase tracking-[0.34em] text-white/82">
-              Reason • Plan • Execute
-            </div>
-
-            <div className="mt-5 text-[11px] uppercase tracking-[0.30em] text-white/34">
+          <div className="mb-4 text-center">
+            <div className="text-[10px] uppercase tracking-[0.30em] text-white/30">
               Powered by
             </div>
 
-            <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-white/46">
+            <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/44">
               OpenAI • Groq • Deepgram • Cartesia
             </div>
           </div>
