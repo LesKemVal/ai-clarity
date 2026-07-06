@@ -280,6 +280,30 @@ Production boundary:
 Do not collapse availability, surfacing, and execution into one owner.
 
 
+
+## Preparation Runtime Contract Boundary
+
+Preparation Runtime produces a structured operational preparation model.
+
+Its structured fields are canonical:
+
+- desired outcome
+- known context
+- missing signals
+- reusable documentation
+- documentation suggestions
+- risks
+- opportunities
+- related Conversation Package selection
+- confidence
+- sufficiency to begin
+- preparation latency
+
+`preparationBrief` is a convenience summary for presentation surfaces. It should not become the only preparation artifact consumed by future clients.
+
+Portable clients, including mobile, desktop, API, audio-only devices, and glasses-capable clients, should consume the structured preparation contract first and render their own presentation layer when needed.
+
+
 ## LIVE Runtime Ownership
 
 Presentation owns controls and visualization.

@@ -272,6 +272,30 @@ Current production boundary:
 Do not collapse resource preparation, capability availability, capability surfacing, and capability execution into one owner.
 
 
+
+## Preparation Runtime Contract
+
+Preparation Runtime owns pre-execution operational context assembly.
+
+Canonical structured output includes:
+
+- desired outcome
+- known context
+- missing signals
+- reusable documentation
+- documentation suggestions
+- risks
+- opportunities
+- related Conversation Package selection
+- confidence
+- sufficiency to begin
+- preparation latency
+
+`preparationBrief` is a convenience render, not the canonical preparation contract.
+
+Portable clients should consume structured fields first. UI or briefing layers may display `preparationBrief`, but must not depend on it as the only source of preparation truth.
+
+
 ## Working Rules
 
 No page.tsx bloat.
