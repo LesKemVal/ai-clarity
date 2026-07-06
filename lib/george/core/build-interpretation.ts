@@ -67,6 +67,7 @@ export function buildGeorgeCoreInterpretation(input: {
         : roomAnalysis.emotionalTemperature > 0.55
           ? 'rising'
           : 'stable',
+    signals: conversationSignals,
   })
 
   const activeOutcome = deriveActiveOutcome({

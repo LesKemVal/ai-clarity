@@ -1,4 +1,4 @@
-import { detectConversationSignals } from './conversation-signals'
+import { detectConversationSignals, type ConversationSignalState } from './conversation-signals'
 
 export type Trajectory =
   | 'positive'
@@ -16,6 +16,7 @@ export type TrajectoryInput = {
   interruptionRisk?: number
   emotionalVelocity?: 'stable' | 'rising' | 'spiking'
   powerFrame?: string
+  signals?: ConversationSignalState
 }
 
 export type TrajectoryState = {
@@ -28,7 +29,7 @@ export type TrajectoryState = {
 class GeorgeTrajectoryEngine {
   evaluate(input: TrajectoryInput): TrajectoryState {
     const text = input.text.toLowerCase()
-    const signals = detectConversationSignals(text)
+    const signals = input.signals || detectConversationSignals(text)
 
     if (input.roomPressure === 'authority') {
       return {
