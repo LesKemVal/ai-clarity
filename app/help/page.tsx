@@ -87,13 +87,17 @@ export default function HelpPage() {
               Operational Help
             </div>
 
-            <h1 className="mt-4 max-w-2xl font-serif text-[42px] leading-[0.98] tracking-[-0.06em] text-white md:text-[64px]">
-              Use GEORGE by giving him the room.
+            <h1 className="mt-4 max-w-3xl font-mono text-[42px] font-black uppercase leading-[0.9] tracking-[-0.075em] text-white md:text-[72px]">
+              HELP
             </h1>
+
+            <div className="mt-6 font-mono text-[17px] font-semibold uppercase leading-[1.05] tracking-[0.12em] text-[#8FB6C9]/82 md:text-[28px]">
+              Understand what GEORGE can help you accomplish.
+            </div>
           </div>
 
-          <p className="max-w-2xl self-end text-[18px] leading-8 text-white/62 md:text-[21px]">
-            Upload the material that matters, set the outcome, then bring GEORGE into moments where timing, pressure, language, and delivery affect what happens next.
+          <p className="max-w-2xl self-end text-[17px] leading-8 text-white/62 md:text-[20px]">
+            Plan, prepare, review, decide, and move toward your desired outcome with clearer judgment and better communication.
           </p>
         </section>
 
@@ -133,7 +137,7 @@ export default function HelpPage() {
                   {active.index} — {active.label}
                 </div>
 
-                <h2 className="mt-4 font-serif text-[34px] leading-[1.02] tracking-[-0.055em] text-white md:text-[48px]">
+                <h2 className="mt-4 font-mono text-[30px] font-black uppercase leading-[0.96] tracking-[-0.055em] text-white md:text-[44px]">
                   {active.title}
                 </h2>
               </div>

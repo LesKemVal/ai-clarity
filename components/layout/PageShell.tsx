@@ -166,14 +166,14 @@ export default function PageShell({
             </div>
 
             {(eyebrow || title) && (
-              <div className="mb-6 space-y-1.5 md:mb-7">
+              <div className="mb-8 border-b border-white/[0.06] pb-8 md:mb-10 md:pb-10">
                 {eyebrow && (
-                  <p className="text-[10px] uppercase tracking-[0.14em] text-white/30">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-[#8FB6C9]/72">
                     {eyebrow}
                   </p>
                 )}
                 {title && (
-                  <h1 className="max-w-4xl text-[34px] font-semibold tracking-[-0.05em] text-white/92 md:text-[48px] lg:text-[56px]">
+                  <h1 className="mt-4 max-w-5xl font-mono text-[42px] font-black uppercase leading-[0.9] tracking-[-0.075em] text-white/94 md:text-[68px] lg:text-[86px]">
                     {title}
                   </h1>
                 )}

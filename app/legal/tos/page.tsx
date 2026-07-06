@@ -38,7 +38,7 @@ export default function TosPage() {
             Legal
           </div>
 
-          <h1 className="mt-4 font-serif text-[44px] leading-[0.98] tracking-[-0.06em] text-white md:text-[68px]">
+          <h1 className="mt-4 font-mono text-[42px] font-black uppercase leading-[0.9] tracking-[-0.075em] text-white md:text-[72px]">
             Terms of Service
           </h1>
 
