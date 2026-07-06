@@ -4,7 +4,7 @@ import { HomeHeroSequence } from '@/components/home/HomeHeroSequence'
 
 const impactCards = [
   {
-    title: 'Low-income and under-served communities',
+    title: 'Aspirational Support',
     body: 'A person should not lose a job, contract, loan, or opportunity because they did not grow up around corporate language, investor language, banking language, or interview coaching. GEORGE helps people structure answers, catch pressure, respond clearly, and stay in the conversation when one conversation can change the path forward.',
   },
   {
@@ -19,7 +19,7 @@ const impactCards = [
 
 const scenarioCards = [
   {
-    title: 'Young Black and Hispanic founders',
+    title: 'Under-served Founder Communities',
     body: 'GEORGE can help founders handle skeptical investor questions, translate VC language, protect confidence, and pivot risk-heavy questioning back toward traction, growth, proof, and market opportunity.',
   },
   {
@@ -49,7 +49,7 @@ export default function HomePage() {
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">LIVE Support</p>
-              <h1 className="mt-4 max-w-3xl font-serif text-[44px] leading-[0.95] tracking-[-0.06em] sm:text-[68px]">
+              <h1 className="mt-4 max-w-3xl font-mono text-[38px] font-black uppercase leading-[0.92] tracking-[-0.075em] sm:text-[62px]">
                 Help while the conversation is happening.
               </h1>
             </div>
@@ -79,7 +79,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
             <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Point blank</p>
-            <h2 className="mt-4 font-serif text-[38px] leading-[1] tracking-[-0.05em] sm:text-[58px]">
+            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[50px]">
               GEORGE helps people communicate when communication decides the opportunity.
             </h2>
           </div>
@@ -99,7 +99,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Briefing matters</p>
-            <h2 className="mt-4 font-serif text-[38px] leading-[1] tracking-[-0.05em] sm:text-[56px]">
+            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
               The room, your role, and the outcome change the support.
             </h2>
           </div>
@@ -140,7 +140,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1fr]">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Technology</p>
-            <h2 className="mt-4 font-serif text-[38px] leading-[1] tracking-[-0.05em] sm:text-[56px]">
+            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
               Built for speed because late help is not help.
             </h2>
           </div>
