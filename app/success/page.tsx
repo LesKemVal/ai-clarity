@@ -5,8 +5,8 @@ import PageShell from '@/components/layout/PageShell'
 export default function SuccessPage() {
   return (
     <PageShell
-      title="You’re in."
-      eyebrow="Access active"
+      title="Access granted"
+      eyebrow="Access"
       backToGeorge
       withSidebar={false}
     >
@@ -14,15 +14,15 @@ export default function SuccessPage() {
         <section className="rounded-[1rem] border border-white/[0.06] bg-white/[0.018] p-5 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
-              You’re in.
+              Access is active.
             </p>
 
             <p className="text-sm leading-7 text-neutral-300 md:text-base">
-              Your access is active. GEORGE can now restore continuity on this device and support the level of operational awareness you selected.
+              GEORGE can now restore continuity on this device and support the level of operational awareness you selected.
             </p>
 
             <p className="text-sm text-white">
-              Continue now, or bring GEORGE closer to the way you work.
+              Continue with GEORGE, or shape how GEORGE supports your work.
             </p>
           </div>
         </section>

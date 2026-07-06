@@ -5,7 +5,7 @@ import PageShell from '@/components/layout/PageShell'
 export default function CancelPage() {
   return (
     <PageShell
-      title="Nothing was submitted"
+      title="Access cancelled"
       eyebrow="Access"
       backToGeorge
       withSidebar={false}
@@ -14,11 +14,11 @@ export default function CancelPage() {
         <section className="rounded-[1rem] border border-white/[0.045] bg-white/[0.018]/60 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.45)] md:p-8">
           <div className="space-y-4">
             <p className="text-lg font-medium text-white">
-              No problem.
+              Nothing changed.
             </p>
 
             <p className="text-sm leading-7 text-neutral-400 md:text-base">
-              Nothing was submitted. You can return to GEORGE now or restore access and continuity when you are ready.
+              No access change was submitted. You can return to GEORGE or restore access when you are ready.
             </p>
           </div>
         </section>
