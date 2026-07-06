@@ -316,17 +316,6 @@ export function finalizeGeorgeActionCueAuthority(input: {
       fallback: '',
     })
 
-    if (verifiedBriefingResponse) {
-      markRuntimeEvent(input.actionCue.turnId || text, 'core_authority_replaced')
-      return {
-        ...input.actionCue,
-        cue: verifiedBriefingResponse,
-        reason: 'Verified from operational understanding.',
-        category: 'operational_answer',
-        confidence: Math.max(input.actionCue.confidence, 0.72),
-      }
-    }
-
     const replacementText = violatesResponseAuthority(text, input.actionCue.evidence?.transcript)
       ? repairResponseAuthority({
           text,
@@ -400,7 +389,8 @@ export function finalizeGeorgeActionCueAuthority(input: {
         input.context?.briefingKnowledge,
       ].join(' '),
     })) {
-      const qualityReplacement = buildVerifiedResponse({
+      const usedVerifiedQualityReplacement = Boolean(verifiedBriefingResponse)
+      const qualityReplacement = verifiedBriefingResponse || buildVerifiedResponse({
         transcript: input.actionCue.evidence?.transcript,
         objective: input.actionCue.evidence?.objective || input.context?.objective,
         room: input.actionCue.evidence?.room || input.context?.room,
@@ -427,6 +417,13 @@ export function finalizeGeorgeActionCueAuthority(input: {
       return {
         ...input.actionCue,
         cue: qualityReplacement,
+        ...(usedVerifiedQualityReplacement
+          ? {
+              reason: 'Verified from operational understanding.',
+              category: 'operational_answer' as const,
+              confidence: Math.max(input.actionCue.confidence, 0.72),
+            }
+          : {}),
       }
     }
 
@@ -434,7 +431,8 @@ export function finalizeGeorgeActionCueAuthority(input: {
     const evidenceAuthority = violatesEvidenceAuthority(text, evidence)
 
     if (evidenceAuthority.violates) {
-      const safeReplacement = safeResponseEvidenceReplacement({
+      const usedVerifiedEvidenceReplacement = Boolean(verifiedBriefingResponse)
+      const safeReplacement = verifiedBriefingResponse || safeResponseEvidenceReplacement({
         transcript: input.actionCue.evidence?.transcript,
         objective: input.actionCue.evidence?.objective || input.context?.objective,
         room: input.actionCue.evidence?.room || input.context?.room,
