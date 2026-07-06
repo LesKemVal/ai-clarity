@@ -87,14 +87,15 @@ export function buildDurableBehavioralMemoryNote(
   if (!selected.length) return ''
 
   return `
-DURABLE BEHAVIORAL MEMORY EVALUATION
-- Treat this as a persistence gate, not automatic memory.
+OPERATIONAL MEMORY CANDIDATE EVIDENCE
+- Treat this as present reasoning evidence, not memory ownership.
+- This module does not persist user memory, own continuity, or rewrite the Operational Profile.
 - Do not convert one moment into a permanent user trait.
 - Temporary pressure does not equal permanent limitation.
-- Persist only repeated, useful, user-serving patterns.
+- Persistence belongs only to authorized continuity systems, Conversation Packages, and Operational Profile doctrine.
 - Recalibrate when future behavior contradicts the pattern.
 - Current likely memory candidates:
 ${selected.map((item) => `  - ${item.kind} (${item.confidence.toFixed(2)}): ${item.reason}`).join('\n')}
-- Use this to shape response behavior now; durable storage should require explicit product support or repeated signal.
+- Use this to shape response behavior now only when it materially improves the present objective.
 `.trim()
 }
