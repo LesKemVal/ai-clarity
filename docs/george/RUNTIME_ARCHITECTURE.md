@@ -27,6 +27,9 @@ Do not return to a single monolithic behavioral suite.
 
 ## Runtime Doctrine
 
+Operational Profile ownership, adaptive defaults, privacy boundaries, and portability doctrine are defined in `docs/george/OPERATIONAL_PROFILE.md`.
+
+
 GEORGE is not a chatbot.
 
 GEORGE is an operational intelligence runtime.

@@ -22,6 +22,9 @@ Prioritize:
 
 ## Product Philosophy
 
+Operational Profile doctrine is production authority and maintained separately in `docs/george/OPERATIONAL_PROFILE.md`.
+
+
 GEORGE is not a chatbot.
 
 GEORGE is operational intelligence.
