@@ -296,6 +296,40 @@ Canonical structured output includes:
 Portable clients should consume structured fields first. UI or briefing layers may display `preparationBrief`, but must not depend on it as the only source of preparation truth.
 
 
+
+## Signal Interpretation Ownership
+
+GEORGE should reason from signals, not only words.
+
+Current canonical structure:
+
+- `lib/george/core/build-interpretation.ts` owns core interpretation aggregation.
+- `lib/george/core/interpretation.ts` owns the interpretation contract.
+- Signal-specific producers own their local signal rules.
+- Runtime consumers should prefer the `GeorgeCoreInterpretation` snapshot when available.
+
+Current signal producers include:
+
+- signal sufficiency
+- signal ranking
+- runtime signal arbitration
+- conversation signal detection
+- room analysis
+- speaker intent
+- objective hypothesis
+- trajectory
+- active outcome
+- outcome governor
+
+Boundary rule:
+
+Do not move all signal logic into the aggregation layer.
+
+The aggregation layer combines producer outputs. It does not become a giant reasoning owner.
+
+Word and phrase heuristics are acceptable as evidence, but they must not become final authority. Future work should continue normalizing lexical cues into signal objects before aggregation.
+
+
 ## Working Rules
 
 No page.tsx bloat.

@@ -328,6 +328,40 @@ Runtime note producers remain authoritative for content and meaning.
 Orchestration layers determine which notes are included and in what order.
 
 
+
+## Signal Interpretation Boundary
+
+GEORGE reasons from signals, not only words.
+
+Current canonical interpretation structure:
+
+- `lib/george/core/build-interpretation.ts` is the core interpretation aggregation layer.
+- `lib/george/core/interpretation.ts` defines the `GeorgeCoreInterpretation` contract.
+- Signal-specific modules remain responsible for local signal production and interpretation.
+- Runtime consumers should prefer the structured interpretation snapshot when available.
+
+The aggregation layer may combine:
+
+- conversation signals
+- speaker intent
+- room analysis
+- objective hypothesis
+- trajectory
+- active outcome
+- outcome movement
+- signal sufficiency
+- ranked signals
+- runtime signal arbitration
+- operational readiness
+- operational confidence
+
+The aggregation layer owns combination, not doctrine ownership.
+
+Do not turn `build-interpretation.ts` into a giant reasoning owner.
+
+Word and phrase heuristics may provide evidence, but final operational judgment should increasingly come from normalized signal objects and aggregated interpretation.
+
+
 ## LIVE Runtime Ownership
 
 Presentation owns controls and visualization.
