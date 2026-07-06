@@ -4057,7 +4057,7 @@ requestAnimationFrame(() => {
 
   const tagline = `I will not contradict the Holy Bible (KJV).`
 
-  const homepageHeroSequence = [
+    const homepageHeroSequence = [
     'Build a business plan',
     'Help me think it through',
     'Create a pitch deck',
@@ -6474,10 +6474,14 @@ return (
       <div className="george-utility-instrument">
         <div className="george-utility-line" />
         {showGeorgeHeroTitle && !hasSentFirstNormalMessage && !showPreLiveSignalSurface && (
-          <div className="george-utility-copy-loop min-h-[120px] pt-8 text-left sm:min-h-[150px] sm:pt-12">
+          <div className="george-utility-copy-loop min-h-[170px] pt-8 text-left sm:min-h-[210px] sm:pt-12">
+            <h1 className="mb-8 text-[42px] font-semibold tracking-[-0.06em] text-white sm:text-[64px]">
+              Ask GEORGE
+            </h1>
+
             <div
               key={homepageHeroStep}
-              className="inline-flex animate-[georgeHomepageHeroFade_2.8s_ease-in-out_both] rounded-[1rem] border border-[#8FB6C9]/24 bg-[#8FB6C9]/[0.075] px-4 py-3 text-[17px] font-semibold leading-6 tracking-[-0.015em] text-[#E8EEFF]/92 shadow-[0_18px_48px_rgba(40,70,180,0.14)] backdrop-blur-xl sm:px-5 sm:py-3.5 sm:text-[22px]"
+              className="inline-flex animate-[georgeHomepageHeroFade_2.8s_ease-in-out_both] rounded-[22px] bg-[#4E7CFF]/20 px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(78,124,255,0.18)] backdrop-blur-xl sm:px-8 sm:py-5 sm:text-[34px]"
             >
               {homepageHeroSequence[homepageHeroStep]}
             </div>
