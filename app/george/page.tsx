@@ -6,6 +6,7 @@ import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
 import { normalizeBrandSpeech } from '@/lib/george/live-voice/spoken-text'
 import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
+import { determineLiveVoiceSpeed } from '@/lib/george/live-delivery/voice-speed-policy'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -4241,7 +4242,13 @@ requestAnimationFrame(() => {
             mode: activeCampaign ? 'campaign' : 'normal',
             forceClose,
             input: speechText,
-            speed: voiceSpeed,
+            speed: liveMode
+              ? determineLiveVoiceSpeed({
+                  deliveryStyle: liveDeliveryStyle,
+                  text,
+                  receiverProfile: voiceOn ? 'audio_visual' : 'visual_only',
+                }).speed
+              : voiceSpeed,
             tier: currentTier,
             voice: voiceType,
           }),
