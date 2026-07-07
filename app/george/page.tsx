@@ -4372,6 +4372,11 @@ if (activePromptContext || activePromptLabel) {
           },
         })
 
+        try {
+          audioRef.current?.pause()
+          audioRef.current = null
+        } catch {}
+
         audioRef.current = playback.audio
         stopBridgeSpeech()
         await playback.play()
