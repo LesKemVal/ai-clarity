@@ -81,6 +81,8 @@ export async function POST(req: NextRequest) {
             }),
           })
 
+    let audio: ArrayBuffer | null = null
+
     if (!res.ok) {
       const body = await res.text()
 
@@ -90,10 +92,47 @@ export async function POST(req: NextRequest) {
         body,
       })
 
-      return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
+      if (res.status === 402 && process.env.OPENAI_API_KEY) {
+        const fallback = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini-tts',
+            voice: 'ash',
+            input: text,
+            response_format: 'mp3',
+            speed: 1.08,
+          }),
+        })
+
+        if (!fallback.ok) {
+          const fallbackBody = await fallback.text().catch(() => '')
+
+          console.warn('[LIVE][tts][fallback-failed]', {
+            provider: 'openai',
+            status: fallback.status,
+            body: fallbackBody,
+          })
+
+          return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
+        }
+
+        console.info('[LIVE][tts][fallback-used]', {
+          from: provider,
+          to: 'openai',
+          reason: 'provider_quota_exceeded',
+        })
+
+        audio = await fallback.arrayBuffer()
+      } else {
+        return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
+      }
     }
 
-    const audio = await res.arrayBuffer()
+    audio = audio || await res.arrayBuffer()
 
     return new Response(audio, {
       headers: {
