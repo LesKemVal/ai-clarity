@@ -271,6 +271,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
         const turnId = ensureTurnId()
 
         if (payload?.is_final || payload?.speech_final) {
+          if (!sentFirstAudioChunk) {
+            sentFirstAudioChunk = true
+            markRuntimeEvent(turnId, 'first_audio_chunk_sent')
+          }
+
           markRuntimeEvent(turnId, 'deepgram_final')
 
           const assembledTranscript = mergeSttUtterance(pendingFinalTranscript, transcript)
@@ -291,6 +296,11 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
           sentFirstAudioChunk = false
           startRuntimeTurn(currentTurnId)
         } else {
+          if (!sentFirstAudioChunk) {
+            sentFirstAudioChunk = true
+            markRuntimeEvent(turnId, 'first_audio_chunk_sent')
+          }
+
           markRuntimeEvent(turnId, 'deepgram_interim')
           handlers.onPartial?.(transcript.trim())
         }
