@@ -82,10 +82,14 @@ export async function POST(req: NextRequest) {
           })
 
     if (!res.ok) {
+      const body = await res.text()
+
       console.warn('[LIVE][tts][provider-failed]', {
         provider,
         status: res.status,
+        body,
       })
+
       return NextResponse.json({ error: 'TTS request failed' }, { status: res.status })
     }
 
