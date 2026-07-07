@@ -2022,7 +2022,16 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
       // Resume will return later only after it is scoped to verified LIVE sessions.
       const existingLive = null
 
-      const liveSetup: LivePrepSetup | null = consumePreparedLiveSetup()
+      const liveSetup: LivePrepSetup | null =
+        consumePreparedLiveSetup() ||
+        (() => {
+          try {
+            const raw = window.localStorage.getItem('george_live_setup_active')
+            return raw ? (JSON.parse(raw) as LivePrepSetup) : null
+          } catch {
+            return null
+          }
+        })()
 
       markLiveRuntimeStarted()
       persistActiveLiveRuntimeSupport(liveSetup)
