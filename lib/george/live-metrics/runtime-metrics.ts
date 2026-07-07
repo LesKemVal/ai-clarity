@@ -54,7 +54,7 @@ export function markRuntimeEvent(
   const timeline = [...(turnEvents.get(turnId) || []), event]
   turnEvents.set(turnId, timeline)
 
-  const contract = validateLatencyTimeline(timeline)
+  const contract = validateLatencyTimeline(timeline, turnId)
 
   console.info('[LIVE][metrics]', {
     event,
@@ -83,7 +83,7 @@ export function getRuntimeTurnTimeline(turnId: string) {
 }
 
 export function getRuntimeTurnLatencyContract(turnId: string) {
-  return validateLatencyTimeline(getRuntimeTurnTimeline(turnId))
+  return validateLatencyTimeline(getRuntimeTurnTimeline(turnId), turnId)
 }
 
 export function resetRuntimeTurnMetrics(turnId?: string) {
