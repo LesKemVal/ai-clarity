@@ -3579,9 +3579,9 @@ Final check
 
           <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
             <p>Is there anything else?</p>
-            <p>Users instinctively try to talk to me, which I understand. But you're not supposed to.</p>
-            <p>Talk normally to everyone else.</p>
-            <p>I'll adapt.</p>
+            <p>Talk naturally to everyone else. Stay focused on your objective.</p>
+            <p>Use what helps. Ignore what doesn't.</p>
+            <p>I'll adapt my support while we're live. Afterward, I'll show you what changed, why it changed, whether it appeared to help, and ask what you want me to remember.</p>
           </div>
 
           <div className="mt-5 text-[10px] uppercase tracking-[0.22em] text-white/28">

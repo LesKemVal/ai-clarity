@@ -118,9 +118,12 @@ export function PostLiveConversationRecordPanel({
         </div>
 
         <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
-          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/42">Learning</p>
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/42">Working Together</p>
           <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">
-            {label(record.latestLearning?.learning, 'No promoted learning yet')}
+            {label(record.latestLearning?.learning, 'No promoted partnership learning yet')}
+          </p>
+          <p className="mt-2 text-[11px] leading-5 text-[#DCEBFF]/46">
+            GEORGE should explain what changed during LIVE, why it changed, whether it appeared to help, and ask what should be remembered.
           </p>
         </div>
       </div>
