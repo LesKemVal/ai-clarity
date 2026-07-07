@@ -98,7 +98,9 @@ export function useLiveAudioRuntime({
       return
     }
 
-    runtimeRef.current?.stop()
+    if (runtimeRef.current) {
+      runtimeRef.current.stop()
+    }
 
     runtimeRef.current = createLiveAudioRuntime({
       onStatus: (nextStatus) => {
@@ -123,7 +125,7 @@ export function useLiveAudioRuntime({
     })
 
     void runtimeRef.current.start()
-  }, [])
+  }, [updateStatus])
 
   useEffect(() => {
     if (!enabled) {
