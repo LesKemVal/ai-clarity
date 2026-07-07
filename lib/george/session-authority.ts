@@ -53,13 +53,16 @@ export function readCachedGeorgeSessionAuthority(): GeorgeSessionAuthority {
   try {
     const email = (window.localStorage.getItem('george_email') || '').trim().toLowerCase()
     const tier = normalizeTier(window.localStorage.getItem('george_tier'))
+    const founderVerified = window.localStorage.getItem('george_founder_access') === 'server-verified'
+    const liveAccess = tier === 'intelligent' || tier === 'brilliant'
+    const restoredEmail = email || (founderVerified && liveAccess ? 'founder:local-restore' : '')
 
     return rememberAuthority({
-      authenticated: false,
+      authenticated: Boolean(restoredEmail && liveAccess),
       tier,
-      liveAccess: false,
-      email,
-      source: email ? 'local-hint' : undefined,
+      liveAccess,
+      email: restoredEmail,
+      source: founderVerified ? 'founder' : restoredEmail ? 'local-hint' : undefined,
     })
   } catch {
     return unauthenticatedAuthority()
