@@ -6,6 +6,8 @@ import {
   buildConversationRecord,
 } from '../conversation-packages/index.mjs'
 import type { OutcomeGovernorSnapshot } from '../live-voice/runtime/outcome-governor'
+import { evaluateLearningCandidates, promoteLearningCandidates } from '../learning/runtime.mjs'
+
 
 export type LiveTranscriptHighlight = {
   kind: 'signal' | 'concern'
@@ -285,7 +287,17 @@ export function buildLiveInteractionContinuity(params: {
       : [],
   })
 
+  const learningCandidates = evaluateLearningCandidates({
+    desiredOutcome: outcomeReview.desiredOutcome,
+    evidenceCandidates: behaviorHypotheses,
+  })
+
+  const promotedLearning = promoteLearningCandidates(
+    learningCandidates
+  )
+
   const updatedPackage = updateAfterLive(pkg, {
+    learning: promotedLearning,
     summary: params.supportSummary
       ? {
           id: 'last-live-summary',
