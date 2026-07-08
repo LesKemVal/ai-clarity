@@ -11,10 +11,13 @@ type BxPageHeaderProps = {
 
 export default function BxPageHeader({
   backHref = '/george',
-  backLabel = 'GEORGE',
+  backLabel = 'BACK',
   onBack,
   rightSlot,
 }: BxPageHeaderProps) {
+  const backClass =
+    'rounded-[0.72rem] border border-[#8FB6C9]/45 bg-[#1B2C36] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF] shadow-[0_0_18px_rgba(143,182,201,0.12)] transition hover:border-[#8FB6C9]/65 hover:bg-[#223947] hover:text-white'
+
   return (
     <header className="relative mb-5 flex items-center justify-between">
       <div className="flex min-w-0 items-center gap-3">
@@ -23,15 +26,11 @@ export default function BxPageHeader({
         </Link>
 
         {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="rounded-[0.62rem] border border-[#8FB6C9]/50 bg-[#8FB6C9] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#071016] shadow-[0_0_18px_rgba(143,182,201,0.18)] transition hover:bg-[#A7C8D8] hover:text-black"
-          >
+          <button type="button" onClick={onBack} className={backClass}>
             {backLabel}
           </button>
         ) : (
-          <Link href={backHref} className="rounded-[0.62rem] border border-[#8FB6C9]/50 bg-[#8FB6C9] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#071016] shadow-[0_0_18px_rgba(143,182,201,0.18)] transition hover:bg-[#A7C8D8] hover:text-black">
+          <Link href={backHref} className={backClass}>
             {backLabel}
           </Link>
         )}
