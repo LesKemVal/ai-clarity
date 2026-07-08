@@ -130,6 +130,26 @@ function prioritizeDebriefObservation(kind: string, label: string) {
   return 0
 }
 
+
+function deriveBehaviorHypotheses(observations: Array<{label:string;detail:string}>) {
+  return observations.map((item) => ({
+    type: 'communication_pattern',
+    evidence: item.detail,
+    hypothesis:
+      item.label === 'Signals surfaced'
+        ? 'User may benefit from proactive operational support.'
+      : item.label === 'Concerns surfaced'
+        ? 'User may benefit from earlier risk signaling.'
+      : item.label === 'Next executable opportunity'
+        ? 'User may benefit from execution-oriented guidance.'
+      : 'Additional runtime evidence required before adapting long-term support.',
+    confidence: 0.42,
+    outcomeRelevant: true,
+    futureUseful: true,
+  }))
+}
+
+
 function buildOperationalDebrief(params: {
   outcomeReview: LiveOutcomeObservation
   highlights: LiveTranscriptHighlight[]
@@ -239,6 +259,10 @@ export function buildLiveInteractionContinuity(params: {
     highlights: transcriptHighlights,
   })
 
+  const behaviorHypotheses = deriveBehaviorHypotheses(
+    operationalDebrief.observations
+  )
+
   const opportunityContinuity = buildOpportunityContinuity({
     desiredOutcome: outcomeReview.desiredOutcome,
     transcript: params.transcript,
@@ -284,6 +308,7 @@ export function buildLiveInteractionContinuity(params: {
     conversationRecord: {
       ...conversationRecord,
       operationalDebrief,
+      behaviorHypotheses,
       transcriptHighlights,
     },
   }
