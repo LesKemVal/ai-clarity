@@ -3204,15 +3204,15 @@ const beginProofOfAwareness = async () => {
             <button
               type="button"
               onClick={() => setLiveBriefingStep(1)}
-              className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+              className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
             >
               Back
             </button>
           </div>
 
           <div className="mt-3 space-y-3">
-            <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
-              <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+            <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
+              <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
                 Receiver selected
               </div>
               <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
@@ -3233,7 +3233,7 @@ const beginProofOfAwareness = async () => {
                       onClick={() => setActiveReceiverProfile(panel.id)}
                       className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
                         active
-                          ? 'border-emerald-300/[0.24] bg-emerald-300/[0.055]'
+                          ? 'border-[#8FB6C9]/[0.24] bg-[#8FB6C9]/[0.055]'
                           : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
                       }`}
                     >
@@ -3244,7 +3244,7 @@ const beginProofOfAwareness = async () => {
                         {panel.line}
                       </span>
                       {active && (
-                        <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                        <span className="mt-3 block border-l border-[#8FB6C9]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                           {panel.detail}
                         </span>
                       )}
@@ -3258,7 +3258,7 @@ const beginProofOfAwareness = async () => {
               {liveBriefingCommunicationConfirmed ? (
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+                    <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
                       Speaking Style selected
                     </div>
                     <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
@@ -3276,7 +3276,7 @@ const beginProofOfAwareness = async () => {
                       setLiveRecoveryAcknowledged(false)
                       setLiveBriefingCapabilitiesConfirmed(false)
                     }}
-                    className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+                    className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
                   >
                     Edit
                   </button>
@@ -3314,7 +3314,7 @@ const beginProofOfAwareness = async () => {
                           }}
                           className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
                             active
-                              ? 'border-emerald-300/[0.24] bg-emerald-300/[0.055]'
+                              ? 'border-[#8FB6C9]/[0.24] bg-[#8FB6C9]/[0.055]'
                               : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
                           }`}
                         >
@@ -3437,20 +3437,23 @@ const beginProofOfAwareness = async () => {
 
     return (
       <PanelShell label="BRIEF ROOM · FINAL CHECK" title="Before we begin" stage={3}>
-          <div className="mb-3 flex justify-start">
-              <button
-                type="button"
-                onClick={() => setLiveBriefingStep(2)}
-                className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
-              >
-                Back
-              </button>
+          <div className="mb-3 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setLiveBriefingStep(2)}
+              className="rounded-[0.65rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.12] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#D7DCFF]/78 transition hover:border-[#8FB6C9]/44 hover:bg-[#8FB6C9]/[0.18] hover:text-white"
+            >
+              ← Back
+            </button>
+            <div className="text-[9px] uppercase tracking-[0.22em] text-[#8FB6C9]/62">
+              Brief Room · Final Check
+            </div>
           </div>
         {liveReadyAccepted && (
-          <div className="mt-5 rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
+          <div className="mt-5 rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+                <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
                   Final check confirmed
                 </div>
                 <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
@@ -3466,7 +3469,7 @@ const beginProofOfAwareness = async () => {
               <button
                 type="button"
                 onClick={() => confirmReadyRoomAcknowledgement(false)}
-                className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+                className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
               >
                 Edit
               </button>
@@ -3508,7 +3511,7 @@ Anything I should keep in mind?
                   <div className="flex items-start gap-3">
                     <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                       active
-                        ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                        ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
                         : 'bg-white/[0.14]'
                     }`} />
 
@@ -3535,7 +3538,7 @@ Anything I should keep in mind?
                     Additional intangible objectives.
                   </span>
                 </span>
-                <span className="text-[11px] uppercase tracking-[0.18em] text-white/30 group-open:text-emerald-100/56">
+                <span className="text-[11px] uppercase tracking-[0.18em] text-white/30 group-open:text-[#D7DCFF]/56">
                   {moreOpen ? 'Open' : 'More'}
                 </span>
               </summary>
@@ -3557,7 +3560,7 @@ Anything I should keep in mind?
                       <div className="flex items-start gap-3">
                         <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                           active
-                            ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                            ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
                             : 'bg-white/[0.14]'
                         }`} />
 
@@ -3744,7 +3747,7 @@ Anything I should keep in mind?
                     <div className="flex items-start gap-3">
                       <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                         active
-                          ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                          ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
                           : 'bg-white/[0.14]'
                       }`} />
 
@@ -3759,7 +3762,7 @@ Anything I should keep in mind?
                         <span className={`block overflow-hidden transition-all duration-300 ${
                           open ? 'max-h-44 opacity-100' : 'max-h-0 opacity-0'
                         }`}>
-                          <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                          <span className="mt-3 block border-l border-[#8FB6C9]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                             {option.detail}
                           </span>
                         </span>
@@ -3800,7 +3803,7 @@ Anything I should keep in mind?
                       <input
                         value={quickLiveSteeringPhrases[row.key] || ''}
                         onChange={(event) => updateQuickLiveSteeringPhrase(row.key, event.target.value)}
-                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-emerald-400/24 focus:bg-emerald-400/[0.035]"
+                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-[#8FB6C9]/24 focus:bg-[#8FB6C9]/[0.035]"
                       />
                     </label>
                   ))}
