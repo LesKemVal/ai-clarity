@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import BxPageHeader from '@/components/BxPageHeader'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { legacyAssistModeFromSupportStyle, normalizeLiveSupportStyle, type LiveSupportStyle } from '@/lib/george/live-runtime/support-style'
 import { getActiveSessionForMode, getSessionsForMode, setActiveSessionIdForMode } from '@/lib/george/session/store'
@@ -68,20 +69,6 @@ declare global {
 type SelectOption = {
   label: string
   helper?: string
-}
-
-function LiveEntryPopupBackControl() {
-  return (
-    <div className="mb-5 flex items-center justify-start">
-      <button
-        type="button"
-        onClick={() => window.history.back()}
-        className="rounded-[0.72rem] border border-[#8FB6C9]/38 bg-[#8FB6C9]/[0.18] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/88 transition hover:border-[#8FB6C9]/58 hover:bg-[#8FB6C9]/[0.26] hover:text-white"
-      >
-        ← Back
-      </button>
-    </div>
-  )
 }
 
 
@@ -427,7 +414,16 @@ function PanelShell({
   return (
     <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
       <div className="relative z-10 w-full max-w-[640px]">
-        <LiveEntryPopupBackControl />
+        <div className="mb-5 flex items-center gap-4">
+          <BxPageHeader backLabel="" />
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
+          >
+            Back
+          </button>
+        </div>
 
         <section
           className="relative mt-4 w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none  sm:p-6"
@@ -2651,7 +2647,16 @@ const beginProofOfAwareness = async () => {
       <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-black px-4 py-8 text-white">
 
         <div className="relative z-10 w-full max-w-[920px]">
-          <LiveEntryPopupBackControl />
+          <div className="mb-5 flex items-center gap-4">
+          <BxPageHeader backLabel="" />
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
+          >
+            Back
+          </button>
+        </div>
 
           <section className="relative w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none sm:p-6">
             <Image
@@ -3248,7 +3253,7 @@ const beginProofOfAwareness = async () => {
 
       return (
         <PanelShell
-          label="← BACK · BRIEF ROOM"
+          label="BRIEF ROOM · MECHANICS"
           title="Mechanics"
           stage={2}
         >
@@ -3499,7 +3504,7 @@ const beginProofOfAwareness = async () => {
 
     return (
       <PanelShell
-          label="← BACK · BRIEF ROOM · FINAL CHECK"
+          label="BRIEF ROOM · FINAL CHECK"
           title="Before we begin"
           stage={3}
         >
@@ -3767,7 +3772,16 @@ Anything I should keep in mind?
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
         <div className="relative z-30 mx-auto w-full max-w-[640px]">
-          <LiveEntryPopupBackControl />
+          <div className="mb-5 flex items-center gap-4">
+          <BxPageHeader backLabel="" />
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
+          >
+            Back
+          </button>
+        </div>
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
@@ -3885,7 +3899,16 @@ Anything I should keep in mind?
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
-        <LiveEntryPopupBackControl />
+        <div className="mb-5 flex items-center gap-4">
+          <BxPageHeader backLabel="" />
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
+          >
+            Back
+          </button>
+        </div>
 
       </div>
 
