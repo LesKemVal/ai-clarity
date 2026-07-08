@@ -67,6 +67,19 @@ assert(
   deliveryBridgeSource.includes("markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')"),
   'Delivery metrics should use preserved delivery turnId when available'
 )
+
+assert(
+  deliveryBridgeSource.includes('composeGeorgeSupportBehavior'),
+  'LIVE delivery bridge should route unsafe Response fallback through behavior composer'
+)
+assert(
+  deliveryBridgeSource.includes('behavior-fallback'),
+  'LIVE delivery bridge should log behavior fallback decisions'
+)
+assert(
+  deliveryBridgeSource.includes('Buy a second. Ask them to clarify what they mean.'),
+  'Response fallback should provide useful bridge/cue instead of silence'
+)
 assert(
   !liveHubGroqSource.includes('repairResponseCandidate') &&
     !liveHubGroqSource.includes('violatesResponseOutcomeContract'),
