@@ -790,6 +790,7 @@ export default function LiveEntryClient() {
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
   const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('visual_only')
+  const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] = useState<'receiver' | 'speaking' | null>('receiver')
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingCommunicationConfirmed, setLiveBriefingCommunicationConfirmed] = useState(false)
   const [showQuickLiveSetup, setShowQuickLiveSetup] = useState(false)
@@ -3165,6 +3166,7 @@ const beginProofOfAwareness = async () => {
         setLiveBriefingSupportAccepted(true)
         setLiveRecoveryAcknowledged(false)
         setLiveBriefingCapabilitiesConfirmed(false)
+        setLiveBriefingOpenMechanicsPanel(null)
 
         try {
           window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', profile)
@@ -3199,17 +3201,11 @@ const beginProofOfAwareness = async () => {
       }
 
       return (
-        <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
-          <div className="mb-3 flex justify-start">
-            <button
-              type="button"
-              onClick={() => setLiveBriefingStep(1)}
-              className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
-            >
-              Back
-            </button>
-          </div>
-
+        <PanelShell
+          label="← BACK · BRIEF ROOM"
+          title="Mechanics"
+          stage={2}
+        >
           <div className="mt-3 space-y-3">
             <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
@@ -3222,7 +3218,16 @@ const beginProofOfAwareness = async () => {
                 Tell GEORGE how you will receive support. Guidance stays adaptive internally.
               </div>
 
-              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              <button
+                type="button"
+                onClick={() => setLiveBriefingOpenMechanicsPanel(liveBriefingOpenMechanicsPanel === 'receiver' ? null : 'receiver')}
+                className="mt-3 rounded-[0.65rem] border border-[#8FB6C9]/18 bg-[#8FB6C9]/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#D7DCFF]/72 transition hover:border-[#8FB6C9]/34 hover:bg-[#8FB6C9]/[0.10]"
+              >
+                {liveBriefingOpenMechanicsPanel === 'receiver' ? 'Collapse' : 'Change'}
+              </button>
+
+              {liveBriefingOpenMechanicsPanel === 'receiver' && (
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
                 {LIVE_RECEIVER_PROFILE_PANELS.map((panel) => {
                   const active = activeReceiverPanel.id === panel.id
 
@@ -3251,7 +3256,8 @@ const beginProofOfAwareness = async () => {
                     </button>
                   )
                 })}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
@@ -3275,13 +3281,14 @@ const beginProofOfAwareness = async () => {
                       setLiveBriefingCommunicationConfirmed(false)
                       setLiveRecoveryAcknowledged(false)
                       setLiveBriefingCapabilitiesConfirmed(false)
+                      setLiveBriefingOpenMechanicsPanel('speaking')
                     }}
-                    className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
+                    className="shrink-0 rounded-[0.65rem] border border-[#8FB6C9]/24 bg-[#8FB6C9]/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-[#D7DCFF]/66 transition hover:border-[#8FB6C9]/38 hover:bg-[#8FB6C9]/[0.14] hover:text-white"
                   >
                     Edit
                   </button>
                 </div>
-              ) : (
+              ) : liveBriefingOpenMechanicsPanel === 'speaking' ? (
                 <>
                   <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
                     Communication
@@ -3307,6 +3314,7 @@ const beginProofOfAwareness = async () => {
                             setLiveBriefingCommunicationConfirmed(true)
                             setLiveRecoveryAcknowledged(false)
                             setLiveBriefingCapabilitiesConfirmed(false)
+                            setLiveBriefingOpenMechanicsPanel(null)
 
                             try {
                               window.localStorage.setItem('george_live_communication_style', label)
@@ -3329,6 +3337,14 @@ const beginProofOfAwareness = async () => {
                     })}
                   </div>
                 </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setLiveBriefingOpenMechanicsPanel('speaking')}
+                  className="w-full rounded-[0.72rem] border border-[#8FB6C9]/18 bg-[#8FB6C9]/[0.05] px-3 py-2.5 text-left text-[11px] font-semibold text-[#D7DCFF]/72 transition hover:border-[#8FB6C9]/34 hover:bg-[#8FB6C9]/[0.09]"
+                >
+                  Choose Speaking Style
+                </button>
               )}
             </div>
 
@@ -3436,19 +3452,11 @@ const beginProofOfAwareness = async () => {
       )
 
     return (
-      <PanelShell label="BRIEF ROOM · FINAL CHECK" title="Before we begin" stage={3}>
-          <div className="mb-3 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setLiveBriefingStep(2)}
-              className="rounded-[0.65rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.12] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#D7DCFF]/78 transition hover:border-[#8FB6C9]/44 hover:bg-[#8FB6C9]/[0.18] hover:text-white"
-            >
-              ← Back
-            </button>
-            <div className="text-[9px] uppercase tracking-[0.22em] text-[#8FB6C9]/62">
-              Brief Room · Final Check
-            </div>
-          </div>
+      <PanelShell
+          label="← BACK · BRIEF ROOM · FINAL CHECK"
+          title="Before we begin"
+          stage={3}
+        >
         {liveReadyAccepted && (
           <div className="mt-5 rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
