@@ -1,6 +1,7 @@
 import type { LiveTranscriptControllerAction } from './live-transcript-controller'
 import type { LiveTranscriptDecision } from './transcript-routing'
 import { georgeLiveRuntimeEvents } from '../live-voice/runtime/runtime-events'
+import { currentLiveSpokenSentence } from './spoken-memory'
 
 export type LiveActionAuthorityVerdict =
   | 'allow'
@@ -110,7 +111,16 @@ export function authorizeLiveTranscriptAction(params: {
     action.type === 'speak' &&
     !String(params.lastSpokenLine || '').trim()
   ) {
-    return emit(make('block', { type: 'ignore' }, 'Speak action requires a remembered last spoken line.', 0.86))
+    const currentSentence = currentLiveSpokenSentence({
+      lastSpokenLine: params.lastSpokenLine,
+    })
+
+    const actionWithCurrentSentence = {
+      type: 'ignore',
+      currentSentence,
+    } as LiveTranscriptControllerAction
+
+    return emit(make('block', actionWithCurrentSentence, 'Speak action requires a remembered last spoken line.', 0.86))
   }
 
   if (action.type === 'start_buy_time') {

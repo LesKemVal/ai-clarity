@@ -26,3 +26,18 @@ export function rememberLiveSpokenLine(params: {
     recentSpokenLines: [...previous, line].slice(-limit),
   }
 }
+
+
+export function currentLiveSpokenSentence(params: {
+  lastSpokenLine?: string
+}) {
+  const line = String(params.lastSpokenLine || '').replace(/\s+/g, ' ').trim()
+  if (!line) return ''
+
+  const sentences = line
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+
+  return sentences.at(-1) || line
+}
