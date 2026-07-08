@@ -122,7 +122,11 @@ export function applyLiveFinalTranscriptExecution(execution: ReturnType<typeof r
     }
   }
 
-  if (authority.action.type === 'speak') {
+  if (
+    authority.action.type === 'repeat_tail' ||
+    authority.action.type === 'sentence_recovery' ||
+    authority.action.type === 'speak'
+  ) {
     return {
       shouldLogIgnored: false,
       shouldStartBuyTime: false,
