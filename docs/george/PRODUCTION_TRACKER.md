@@ -66,6 +66,55 @@ Communication precedes execution.
 
 Conversation is execution.
 
+
+
+## Production Update — LIVE Partnership Runtime / Recovery / Learning
+
+Latest validated production work added the LIVE Partnership Runtime foundation without introducing a second runtime or moving ownership into `app/george/page.tsx`.
+
+Validated additions:
+
+- LIVE Support Behavior Composer added in `lib/george/live-runtime/support-behavior-composer.ts`.
+- Response-mode unsafe local placeholder no longer falls to silence; delivery bridge now routes fallback through the Behavior Composer and provides bridge/cue support.
+- Repeat-tail and sentence-recovery behaviors are first-class LIVE recovery actions.
+- Spoken memory now exposes the current LIVE sentence and can resolve only the missing tail from the user's approximate spoken line.
+- LIVE transcript controller can emit `repeat_tail` and `sentence_recovery`.
+- LIVE final transcript adapter executes recovery actions through the normal speak path.
+- Runtime smoke protects response fallback, repeat-tail routing, controller recovery actions, and adapter execution.
+- LIVE operational behavior hypotheses are derived in `lib/george/live-runtime/live-interaction-continuity.ts`.
+- Behavior hypotheses are evaluated through the existing Learning Runtime and promoted through existing Conversation Package learning flow.
+- Adaptive profile can now accept promoted learning hypotheses as learning signals.
+- Preparation Runtime exposes and returns `profileLearningSignals` from promoted communication-pattern learning.
+- Deepgram STT pipeline verified end-to-end after transient websocket failure: token issued, microphone opened, websocket opened, recorder started, audio chunks sent, interim transcript received, final transcript received.
+
+Current validated chain:
+
+Signals → Behavior Composer → Delivery / Recovery → LIVE Interaction Continuity → Learning Runtime → Conversation Package → Preparation Runtime → Adaptive Profile evidence.
+
+Ownership remains:
+
+- Behavior Composer owns temporary support behavior composition.
+- Delivery Bridge owns delivery routing only.
+- Spoken Memory owns last-line/current-sentence/tail recovery helpers.
+- Transcript Controller owns local action resolution.
+- Final Transcript Adapter owns action-to-application conversion.
+- LIVE Interaction Continuity owns post-LIVE operational hypotheses.
+- Learning Runtime owns evaluation and promotion decisions.
+- Conversation Packages own persisted promoted learning.
+- Preparation Runtime owns future-context assembly from packages.
+- Operational Profile remains doctrine/evidence; no direct runtime writes.
+
+Production rule confirmed:
+
+GEORGE observes behavior as evidence, reasons about why it may improve or fail to improve the user's probability of achieving the desired outcome, adapts temporarily during LIVE, and promotes learning only through existing learning/conversation-package paths.
+
+Known near-term hardening:
+
+- Improve LIVE audio hook error normalization so websocket/Event failures are logged as useful production diagnostics instead of `[object Event]`.
+- Confirm the canonical runtime consumer for `profileLearningSignals` before wiring further.
+- Continue reducing `page.tsx` ownership only when a canonical module exists.
+- Run real-room LIVE test covering voice + visual + response fallback + repeat-tail + sentence recovery.
+
 ## Architecture Discipline
 
 Page/UI owns:

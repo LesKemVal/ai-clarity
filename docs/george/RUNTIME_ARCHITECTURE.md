@@ -442,6 +442,49 @@ Behavior coverage:
 
 - `scripts/george-behavior/speech-synchronization.mjs`
 
+
+
+## LIVE Partnership Runtime Recovery Chain
+
+LIVE now has a canonical support behavior composition layer.
+
+This does not create another runtime. It consolidates how LIVE chooses the shape of support while preserving existing owners.
+
+Canonical flow:
+
+LIVE signals / transcript → transcript routing → LIVE transcript controller → support behavior composer → delivery bridge / final transcript adapter → voice, visual, silent, or recovery output → LIVE interaction continuity → Learning Runtime → Conversation Package → Preparation Runtime.
+
+Support Behavior Composer owner: `lib/george/live-runtime/support-behavior-composer.ts`.
+
+The composer decides temporary support behaviors: cue, bridge, completion, sentence_recovery, repeat_tail, full_response, and silence.
+
+It must not generate language. It must not persist learning. It must not write the Operational Profile. It answers only: what support behavior is most useful right now?
+
+Recovery ownership:
+
+- `lib/george/live-runtime/spoken-memory.ts` owns remembered LIVE line, current LIVE sentence, and repeat-tail extraction.
+- `lib/george/live-runtime/live-transcript-controller.ts` owns local recovery action resolution.
+- `lib/george/live-runtime/live-final-transcript-adapter.ts` owns converting approved recovery actions into speak/send/start-buy-time application behavior.
+
+Response fallback:
+
+Response mode must not fall silent when a full safe response is unavailable. The delivery bridge routes unsafe local Response placeholders through the Behavior Composer and provides a useful bridge/cue fallback.
+
+Learning boundary:
+
+The system must distinguish observed behavior, operational hypothesis, temporary LIVE adaptation, promoted learning, and permanent Operational Profile evidence. Behavior observations do not directly become learning. LIVE Interaction Continuity derives operational hypotheses. Learning Runtime evaluates and promotes candidates. Conversation Packages store promoted learning. Preparation Runtime exposes promoted communication-pattern learning as `profileLearningSignals`.
+
+Portability direction:
+
+The recent recovery and learning work improves portability because support behavior, recovery, learning promotion, and preparation signals are now represented in canonical modules rather than page-level logic. Do not move this logic into `app/george/page.tsx`.
+
+Current open hardening:
+
+- Normalize LIVE audio/STT websocket errors into useful diagnostics.
+- Confirm the canonical runtime consumer for `profileLearningSignals`.
+- Add post-LIVE report details for what GEORGE adjusted, why, whether it appeared to help, and whether the user wants GEORGE to remember it.
+- Continue real-room testing against voice, visual, fallback, repeat-tail, and sentence-recovery paths.
+
 ## Learning Runtime Target
 
 Learning is evidence-driven, not memory-driven.
