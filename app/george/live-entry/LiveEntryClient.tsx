@@ -417,14 +417,11 @@ function PanelShell({
     <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
       <div className="relative z-10 w-full max-w-[640px]">
         <div className="mb-5 flex items-center gap-4">
-          <BxPageHeader backLabel="" />
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
-          >
-            Back
-          </button>
+          <BxPageHeader
+          backLabel="BACK"
+          onBack={onBack}
+          backHref="/george"
+        />
         </div>
 
         <section
@@ -2651,13 +2648,6 @@ const beginProofOfAwareness = async () => {
         <div className="relative z-10 w-full max-w-[920px]">
           <div className="mb-5 flex items-center gap-4">
           <BxPageHeader backLabel="" />
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
-          >
-            Back
-          </button>
         </div>
 
           <section className="relative w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none sm:p-6">
@@ -3778,13 +3768,6 @@ Anything I should keep in mind?
         <div className="relative z-30 mx-auto w-full max-w-[640px]">
           <div className="mb-5 flex items-center gap-4">
           <BxPageHeader backLabel="" />
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
-          >
-            Back
-          </button>
         </div>
         </div>
 
@@ -3905,13 +3888,6 @@ Anything I should keep in mind?
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
         <div className="mb-5 flex items-center gap-4">
           <BxPageHeader backLabel="" />
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="rounded-[0.72rem] border border-[#8FB6C9]/42 bg-[#8FB6C9]/[0.20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F2F4FF]/90 transition hover:border-[#8FB6C9]/62 hover:bg-[#8FB6C9]/[0.30] hover:text-white"
-          >
-            Back
-          </button>
         </div>
 
       </div>
