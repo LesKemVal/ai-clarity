@@ -35,6 +35,10 @@ export function adaptUserProfile(
     userText: string
     earbudActive?: boolean
     pressureHigh?: boolean
+    learningSignals?: Array<{
+      hypothesis?: string
+      confidence?: number
+    }>
   }
 ): AdaptiveUserProfile {
   const text = input.userText.toLowerCase()
@@ -108,6 +112,34 @@ export function adaptUserProfile(
       'up',
       0.05
     )
+  }
+
+  for (const signal of input.learningSignals || []) {
+    const hypothesis = String(signal.hypothesis || '').toLowerCase()
+
+    if (hypothesis.includes('concise')) {
+      next.conciseDeliveryPreference = adjust(
+        next.conciseDeliveryPreference,
+        'up',
+        0.04
+      )
+    }
+
+    if (hypothesis.includes('completion')) {
+      next.repeatableLineAffinity = adjust(
+        next.repeatableLineAffinity,
+        'up',
+        0.04
+      )
+    }
+
+    if (hypothesis.includes('risk')) {
+      next.calmPressurePreference = adjust(
+        next.calmPressurePreference,
+        'up',
+        0.03
+      )
+    }
   }
 
   return next
