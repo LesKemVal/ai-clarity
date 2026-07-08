@@ -23,7 +23,7 @@ import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/liv
 import { prepareConversationFromPackage } from '@/lib/george/preparation/runtime.mjs'
 import { getConversationResponsibilityOptions } from '@/lib/george/live-entry/responsibility-options'
 import { estimateResources, estimateWithResources, getPrepDocumentPrompt, type ResourceEstimate } from '@/lib/george/capabilities/live-entry-resources'
-import { LIVE_SUPPORT_PANELS, type LiveBriefingSupportPanelId } from '@/lib/george/capabilities/live-support-panels'
+import { LIVE_RECEIVER_PROFILE_PANELS, type LiveBriefingSupportPanelId, type LiveReceiverProfilePanelId } from '@/lib/george/capabilities/live-support-panels'
 import { deriveLiveCapabilityIds } from '@/lib/george/capabilities/live-capability-registry'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
@@ -789,6 +789,7 @@ export default function LiveEntryClient() {
   const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
+  const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('visual_only')
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingCommunicationConfirmed, setLiveBriefingCommunicationConfirmed] = useState(false)
   const [showQuickLiveSetup, setShowQuickLiveSetup] = useState(false)
@@ -2066,6 +2067,7 @@ const mandatoryLiveSignals = useMemo(() => {
       recoveryConstraints: liveRecoveryConstraints,
       supportStyle,
       deliveryStyle: supportStyle,
+      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only') : 'visual_only'),
     }
 
     const liveSetup = {
@@ -2107,13 +2109,16 @@ const mandatoryLiveSignals = useMemo(() => {
       recoveryConstraints: liveRecoveryConstraints,
       supportStyle,
       deliveryStyle: supportStyle,
+      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only') : 'visual_only'),
       createdAt: Date.now(),
     }
 
     window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', supportStyle)
     window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', supportStyle)
-    window.localStorage.setItem('george_live_entry_support_preference', supportStyle)
-    window.localStorage.setItem('george_live_entry_support_default', supportStyle)
+    window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+    window.localStorage.setItem('george_live_entry_receiver_profile', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+    window.localStorage.setItem('george_live_entry_support_preference', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+    window.localStorage.setItem('george_live_entry_support_default', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
 
     if (!bypassBriefing) {
@@ -3147,34 +3152,43 @@ const beginProofOfAwareness = async () => {
           ? window.localStorage.getItem('george_live_entry_support_preference')
           : null
 
-      const validStoredSupportPreference =
-        storedSupportPreference === 'advice' ||
-        storedSupportPreference === 'completion' ||
-        storedSupportPreference === 'response' ||
-        storedSupportPreference === 'presentation' ||
-        storedSupportPreference === 'steering'
+      const validStoredReceiverProfile =
+        storedSupportPreference === 'visual_only' ||
+        storedSupportPreference === 'audio_only' ||
+        storedSupportPreference === 'audio_visual'
           ? storedSupportPreference
           : null
 
-      const activeSupportStyle =
-        liveBriefingActiveSupportStyle ||
-        liveBriefingExpandedSupportPanel ||
-        validStoredSupportPreference ||
-        recommendedSupportPanel.id
+      const activeReceiverProfile =
+        selectedReceiverProfile ||
+        validStoredReceiverProfile ||
+        'visual_only'
 
-      const activeSupportPanel =
-        supportPanels.find((panel) => panel.id === activeSupportStyle) || recommendedSupportPanel
+      const activeReceiverPanel =
+        LIVE_RECEIVER_PROFILE_PANELS.find((panel) => panel.id === activeReceiverProfile) ||
+        LIVE_RECEIVER_PROFILE_PANELS[0]
 
-      const setActiveSupportStyle = (style: LiveBriefingSupportPanelId) => {
-        setLiveBriefingActiveSupportStyle(style)
-        setSelectedSupportStyle(normalizeLiveSupportStyle(toRuntimeSupportStyle(style)))
+      const setActiveReceiverProfile = (profile: LiveReceiverProfilePanelId) => {
+        setSelectedReceiverProfile(profile)
+        setLiveBriefingSupportAccepted(true)
+        setLiveRecoveryAcknowledged(false)
+        setLiveBriefingCapabilitiesConfirmed(false)
 
         try {
-          const runtimeSupportStyle = toRuntimeSupportStyle(style)
-          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', runtimeSupportStyle)
-          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', runtimeSupportStyle)
-          window.localStorage.setItem('george_live_entry_support_preference', style)
-          window.localStorage.setItem('george_live_entry_support_default', style)
+          window.localStorage.setItem('george_live_entry_support_preference', profile)
+          window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', profile)
+          window.localStorage.setItem('george_live_entry_receiver_profile', profile)
+          window.dispatchEvent(new Event('george-live-receiver-profile-change'))
+        } catch {}
+      }
+
+      const activeSupportPanel = recommendedSupportPanel
+
+      const setActiveSupportStyle = (_style: LiveBriefingSupportPanelId) => {
+        setSelectedSupportStyle(normalizeLiveSupportStyle(toRuntimeSupportStyle('advice')))
+        try {
+          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', 'advice')
+          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', 'advice')
         } catch {}
       }
 
@@ -3232,26 +3246,36 @@ const beginProofOfAwareness = async () => {
         try {
           window.localStorage.setItem('george_live_entry_steering_seen', '1')
           window.localStorage.setItem('george_live_entry_privacy_acknowledged', '1')
-          window.localStorage.setItem('george_live_entry_support_default', activeSupportPanel.id)
-          window.localStorage.setItem('george_live_entry_support_preference', activeSupportPanel.id)
+          window.localStorage.setItem('george_live_entry_receiver_profile', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+          window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+          window.localStorage.setItem('george_live_entry_support_preference', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
         } catch {}
       }
 
       return (
         <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
+          <div className="mb-3 flex justify-start">
+              <button
+                type="button"
+                onClick={() => setLiveBriefingStep(1)}
+                className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+              >
+                Back
+              </button>
+          </div>
           <div className="mt-3 space-y-3">
             {!liveBriefingExpandedSupportPanel && (
               <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                      Support selected
+                      Receiver selected
                     </div>
                     <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                      {activeSupportPanel.label}
+                      {activeReceiverPanel.label}
                     </div>
                     <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                      {activeSupportPanel.defaultLine || activeSupportPanel.body || 'GEORGE will use this support style in LIVE.'}
+                      {activeReceiverPanel.line}
                     </div>
                   </div>
 
@@ -3276,13 +3300,13 @@ const beginProofOfAwareness = async () => {
               </div>
 
               <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                Here's how I can support you. Choose what feels most natural to you.
+                Choose how you will receive GEORGE during LIVE.
               </p>
 
               <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
-                {LIVE_SUPPORT_PANELS.map((panel) => {
-                  const active = activeSupportStyle === panel.id
-                  const open = activeSupportStyle === panel.id
+                {LIVE_RECEIVER_PROFILE_PANELS.map((panel) => {
+                  const active = activeReceiverProfile === panel.id
+                  const open = activeReceiverProfile === panel.id
 
                   return (
                     <button
@@ -3290,19 +3314,13 @@ const beginProofOfAwareness = async () => {
                       type="button"
                       onMouseDown={(event) => {
                         event.preventDefault()
-                        setActiveSupportStyle(panel.id)
-                        setLiveBriefingSupportAccepted(true)
+                        setActiveReceiverProfile(panel.id)
                         setLiveBriefingCommunicationConfirmed(false)
-                        setLiveRecoveryAcknowledged(false)
-                        setLiveBriefingCapabilitiesConfirmed(false)
                         setLiveBriefingExpandedSupportPanel(null)
                       }}
                       onClick={() => {
-                        setActiveSupportStyle(panel.id)
-                        setLiveBriefingSupportAccepted(true)
+                        setActiveReceiverProfile(panel.id)
                         setLiveBriefingCommunicationConfirmed(false)
-                        setLiveRecoveryAcknowledged(false)
-                        setLiveBriefingCapabilitiesConfirmed(false)
                         setLiveBriefingExpandedSupportPanel(null)
                       }}
                       className="w-full py-3 text-left"
@@ -3331,10 +3349,10 @@ const beginProofOfAwareness = async () => {
 
                             <span className="mt-3 block rounded-[0.72rem] border border-white/[0.045] bg-white/[0.018] px-3 py-2">
                               <span className="block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/24">
-                                What I can do here
+                                How this changes delivery
                               </span>
                               <span className="mt-2 block space-y-1.5">
-                                {supportCapabilityLines(panel.id).map((line) => (
+                                {[panel.detail].map((line) => (
                                   <span key={line} className="block text-[11px] leading-4 text-[#D7DBE4]/46">
                                     · {line}
                                   </span>
@@ -3543,6 +3561,15 @@ const beginProofOfAwareness = async () => {
 
     return (
       <PanelShell label="BRIEF ROOM · FINAL CHECK" title="Before we begin" stage={3}>
+          <div className="mb-3 flex justify-start">
+              <button
+                type="button"
+                onClick={() => setLiveBriefingStep(2)}
+                className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+              >
+                Back
+              </button>
+          </div>
         {liveReadyAccepted && (
           <div className="mt-5 rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
