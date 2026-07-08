@@ -390,11 +390,13 @@ function PanelShell({
   label,
   title,
   stage,
+  onBack,
   children,
 }: {
   label: string
   title: string
   stage: 1 | 2 | 3
+  onBack?: () => void
   children: React.ReactNode
 }) {
   const stageGlow =
@@ -3256,6 +3258,7 @@ const beginProofOfAwareness = async () => {
           label="BRIEF ROOM · MECHANICS"
           title="Mechanics"
           stage={2}
+          onBack={() => setLiveBriefingStep(1)}
         >
           <div className="mt-3 space-y-3">
             <div className="rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
@@ -3507,6 +3510,7 @@ const beginProofOfAwareness = async () => {
           label="BRIEF ROOM · FINAL CHECK"
           title="Before we begin"
           stage={3}
+          onBack={() => setLiveBriefingStep(2)}
         >
         {liveReadyAccepted && (
           <div className="mt-5 rounded-[0.82rem] border border-[#8FB6C9]/[0.16] bg-[#8FB6C9]/[0.045] px-4 py-3">
