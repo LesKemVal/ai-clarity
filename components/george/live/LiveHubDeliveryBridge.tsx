@@ -6,6 +6,7 @@ import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runti
 import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
 import { evaluateGeorgeDeliveryCommitment } from '@/lib/george/live-delivery/delivery-commitment'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { composeGeorgeSupportBehavior } from '@/lib/george/live-runtime/support-behavior-composer'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryCue, GeorgeDeliveryMode, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
@@ -62,8 +63,34 @@ export function LiveHubDeliveryBridge({
         /^(clarify before answering\.?|ask for clarification\.?|clarify\.?)/i.test(resolvedDeliveryCue.text.trim())
 
       if (responseModePlaceholder) {
-        markRuntimeEvent(resolvedDeliveryCue.turnId || resolvedDeliveryCue.text, 'delivery_duplicate_suppressed')
-        return
+        const behaviorDecision = composeGeorgeSupportBehavior({
+          desiredOutcome: context.objective,
+          deliveryStyle,
+          hasSafeResponse: false,
+        })
+
+        const fallbackCue = {
+          ...resolvedDeliveryCue,
+          text: behaviorDecision.behaviors.includes('bridge')
+            ? 'Buy a second. Ask them to clarify what they mean.'
+            : 'Clarify before answering.',
+          reason: behaviorDecision.reason,
+          category: 'operational_guidance' as const,
+          confidence: Math.max(resolvedDeliveryCue.confidence || 0, 0.7),
+          priority: Math.max(resolvedDeliveryCue.priority || 0, 7),
+        }
+
+        console.info('[LIVE][hub][delivery][behavior-fallback]', {
+          behaviors: behaviorDecision.behaviors,
+          reason: behaviorDecision.reason,
+          fallbackCue,
+        })
+
+        resolvedDeliveryCue.text = fallbackCue.text
+        resolvedDeliveryCue.reason = fallbackCue.reason
+        resolvedDeliveryCue.category = fallbackCue.category
+        resolvedDeliveryCue.confidence = fallbackCue.confidence
+        resolvedDeliveryCue.priority = fallbackCue.priority
       }
 
       const deliveryKey = resolvedDeliveryCue.turnId || resolvedDeliveryCue.text
