@@ -627,41 +627,57 @@ It determines whether the opportunity continues, changes form, pauses, transfers
 
 This is not simple follow-up logic. It should decide whether the user should wait, follow up, deliberately not follow up, seek another decision maker, preserve access, change the next objective, or treat the opportunity as closed.
 
+## Visual-Only, Audio-Only, and Audio-Visual LIVE Delivery
 
-## Visual-Only vs Audio Behavior Reassessment
+Receiver profile changes delivery behavior, not reasoning ownership.
 
-Visual-only LIVE support should not be treated as audio support without sound.
+The same support behavior should originate from the same runtime decision. GEORGE must not run duplicate reasoning for audio and visual surfaces.
 
-Audio support is sequential and high-cognitive-load. It should remain concise, repeatable, and recoverable because the user must hear, retain, and speak while staying present in the room.
+### visual_only
 
-Visual-only support can carry more structure because the user can glance, choose, ignore, or return to the text without waiting for playback. Visual-only support may therefore support:
+Visual-only support can carry richer, more persistent support because the user can glance, choose, ignore, and return to it without waiting for playback.
 
-- slightly longer response lines
-- compact structured alternatives
-- bridge plus suggested line
-- visible recovery text
-- persistent cue cards
-- lower urgency than audio playback
-- less interruption risk
+Visual-only delivery should support:
 
-Audio behavior should prioritize:
+- richer persistent support
+- hierarchy
+- bullets and cards
+- longer guidance when useful
+- glance-and-return reading
+- clear separation between cue, bridge, recovery, and full response
 
-- shortest useful phrase
+### audio_only
+
+Audio-only support is sequential, interruptible, repeatable, and higher cognitive load.
+
+Audio should generally favor short, recoverable guidance, but shortness is not law. The governing qualifier is always what is most likely to improve the user's probability of achieving the user's desired outcome.
+
+Audio-only delivery should support:
+
+- sequential delivery
+- interruption handling
 - repeat-tail
 - sentence recovery
-- bridge cues
-- low cognitive load
-- fast recovery if user loses the line
+- repeatable wording
+- low cognitive load where that improves outcome
+- longer lines only when likely to improve the user's successful outcome
 
-Visual behavior should prioritize:
+### audio_visual
 
-- readable positioning
-- persistent availability
-- skimmable wording
-- outcome-relevant structure
-- clear separation between cue, bridge, and full response
-- support the user can use or ignore without disrupting speech
+Audio-visual support should treat audio as the immediate steering layer and visual as the persistent reference layer.
 
-Next production step:
+Both layers must originate from the same support behavior without duplicate reasoning.
 
-Inspect `LiveHubVisualCueBridge`, delivery routing, receiver profile handling, and support behavior composer before patching. Then separate audio and visual delivery policies without creating another runtime. The Behavior Composer should continue deciding the support behavior; delivery policy should decide how that behavior is rendered for audio, visual, or audio_visual receivers.
+Audio should carry the fastest useful steering signal.
+
+Visual should preserve the persistent reference, structure, or fuller line the user may need to glance back to.
+
+### Production rule
+
+Behavior Composer decides the support behavior.
+
+Delivery policy decides how that support behavior is rendered for `visual_only`, `audio_only`, or `audio_visual`.
+
+Do not create another runtime.
+Do not duplicate reasoning between audio and visual.
+Do not move this logic into `app/george/page.tsx`.
