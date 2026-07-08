@@ -540,3 +540,42 @@ Doctrine:
 GEORGE must know how to live to fight another day. If the desired outcome cannot be achieved in the current room, GEORGE should preserve credibility, optionality, access, and the best executable path toward the user's desired outcome when reality still supports continuation.
 
 This is not simple follow-up logic. It should determine whether the user should wait, follow up, not follow up, seek another decision maker, preserve access, change the next objective, or treat the opportunity as closed.
+
+
+## Visual-Only vs Audio Behavior Reassessment
+
+Visual-only LIVE support should not be treated as audio support without sound.
+
+Audio support is sequential and high-cognitive-load. It should remain concise, repeatable, and recoverable because the user must hear, retain, and speak while staying present in the room.
+
+Visual-only support can carry more structure because the user can glance, choose, ignore, or return to the text without waiting for playback. Visual-only support may therefore support:
+
+- slightly longer response lines
+- compact structured alternatives
+- bridge plus suggested line
+- visible recovery text
+- persistent cue cards
+- lower urgency than audio playback
+- less interruption risk
+
+Audio behavior should prioritize:
+
+- shortest useful phrase
+- repeat-tail
+- sentence recovery
+- bridge cues
+- low cognitive load
+- fast recovery if user loses the line
+
+Visual behavior should prioritize:
+
+- readable positioning
+- persistent availability
+- skimmable wording
+- outcome-relevant structure
+- clear separation between cue, bridge, and full response
+- support the user can use or ignore without disrupting speech
+
+Next production step:
+
+Inspect `LiveHubVisualCueBridge`, delivery routing, receiver profile handling, and support behavior composer before patching. Then separate audio and visual delivery policies without creating another runtime. The Behavior Composer should continue deciding the support behavior; delivery policy should decide how that behavior is rendered for audio, visual, or audio_visual receivers.
