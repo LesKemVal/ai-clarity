@@ -79,6 +79,20 @@ assert(
   'Final transcript adapter should execute sentence_recovery'
 )
 
+
+assert(
+  controllerSource.includes('getLiveSpokenTail'),
+  'Controller should resolve repeat_tail from spoken memory'
+)
+assert(
+  controllerSource.includes("type: 'repeat_tail', text: tail"),
+  'Controller should emit repeat_tail with only the missing tail'
+)
+assert(
+  controllerSource.includes("type: 'sentence_recovery', text: currentSentence"),
+  'Controller should fall back to sentence_recovery when no tail is available'
+)
+
 assert(
   controllerSource.includes("type: 'repeat_tail'"),
   'Controller should expose repeat_tail action'
