@@ -797,7 +797,7 @@ export default function LiveEntryClient() {
   const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
-  const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('visual_only')
+  const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('audio_only')
   const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] = useState<'receiver' | 'speaking' | null>('receiver')
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingCommunicationConfirmed, setLiveBriefingCommunicationConfirmed] = useState(false)
@@ -2076,7 +2076,7 @@ const mandatoryLiveSignals = useMemo(() => {
       recoveryConstraints: liveRecoveryConstraints,
       supportStyle,
       deliveryStyle: supportStyle,
-      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only') : 'visual_only'),
+      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only') : 'visual_only'),
     }
 
     const liveSetup = {
@@ -2118,16 +2118,16 @@ const mandatoryLiveSignals = useMemo(() => {
       recoveryConstraints: liveRecoveryConstraints,
       supportStyle,
       deliveryStyle: supportStyle,
-      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only') : 'visual_only'),
+      receiverProfile: (typeof window !== 'undefined' ? (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only') : 'visual_only'),
       createdAt: Date.now(),
     }
 
     window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', supportStyle)
     window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', supportStyle)
-    window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
-    window.localStorage.setItem('george_live_entry_receiver_profile', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
-    window.localStorage.setItem('george_live_entry_support_preference', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
-    window.localStorage.setItem('george_live_entry_support_default', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+    window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only'))
+    window.localStorage.setItem('george_live_entry_receiver_profile', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only'))
+    window.localStorage.setItem('george_live_entry_support_preference', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only'))
+    window.localStorage.setItem('george_live_entry_support_default', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'audio_only'))
     window.localStorage.setItem('george_live_assist_mode', liveAssistMode)
 
     if (!bypassBriefing) {
@@ -3198,7 +3198,7 @@ const beginProofOfAwareness = async () => {
       const activeReceiverProfile =
         selectedReceiverProfile ||
         validStoredReceiverProfile ||
-        'visual_only'
+        'audio_only'
 
       const activeReceiverPanel =
         LIVE_RECEIVER_PROFILE_PANELS.find((panel) => panel.id === activeReceiverProfile) ||
