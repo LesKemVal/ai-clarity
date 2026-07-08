@@ -11,6 +11,16 @@ const tail = composeGeorgeSupportBehavior({
 assert.deepEqual(tail.behaviors, ['repeat_tail'])
 assert.equal(tail.temporary, true)
 
+const sentenceRecovery = composeGeorgeSupportBehavior({
+  userAppearsToBeShadowing: true,
+  userLostPlace: true,
+  hasCurrentSentence: true,
+  hasSafeResponse: true,
+})
+
+assert.deepEqual(sentenceRecovery.behaviors, ['sentence_recovery'])
+assert.equal(sentenceRecovery.temporary, true)
+
 const takeover = composeGeorgeSupportBehavior({
   userTookOverNaturally: true,
   hasHighConfidenceCompletion: false,

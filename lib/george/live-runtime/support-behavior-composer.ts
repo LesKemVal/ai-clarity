@@ -13,10 +13,12 @@ export type GeorgeSupportBehaviorComposerInput = {
   userSpeaking?: boolean
   userAppearsToBeShadowing?: boolean
   userMissedEnding?: boolean
+  userLostPlace?: boolean
   userTookOverNaturally?: boolean
   roomPressure?: 'low' | 'medium' | 'high'
   hasSafeResponse?: boolean
   hasHighConfidenceCompletion?: boolean
+  hasCurrentSentence?: boolean
 }
 
 export type GeorgeSupportBehaviorDecision = {
@@ -45,6 +47,14 @@ export function composeGeorgeSupportBehavior(
       behaviors: ['repeat_tail'],
       temporary: true,
       reason: 'User appears synchronized but missed the sentence ending; provide only the missing tail.',
+    }
+  }
+
+  if (input.userAppearsToBeShadowing && input.userLostPlace && input.hasCurrentSentence) {
+    return {
+      behaviors: ['sentence_recovery'],
+      temporary: true,
+      reason: 'User appears to have lost place while shadowing; repeat the current sentence before resuming support.',
     }
   }
 
