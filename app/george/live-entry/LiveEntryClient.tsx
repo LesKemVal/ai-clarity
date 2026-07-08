@@ -3137,26 +3137,18 @@ const beginProofOfAwareness = async () => {
     }
 
     if (liveBriefingStep === 2) {
-      const supportPanels = buildLiveBriefingSupportPanels({
-        room: roomLabel,
-        audience: audienceLabel,
-        objective: objectiveLabel,
-        position: positionLabel,
-      })
-
-      const recommendedSupportPanel =
-        supportPanels.find((panel) => panel.id === 'advice') || supportPanels[0]
-
-      const storedSupportPreference =
+      const storedReceiverProfile =
         typeof window !== 'undefined'
-          ? window.localStorage.getItem('george_live_entry_support_preference')
+          ? window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') ||
+            window.localStorage.getItem('george_live_entry_receiver_profile') ||
+            window.localStorage.getItem('george_live_entry_support_preference')
           : null
 
       const validStoredReceiverProfile =
-        storedSupportPreference === 'visual_only' ||
-        storedSupportPreference === 'audio_only' ||
-        storedSupportPreference === 'audio_visual'
-          ? storedSupportPreference
+        storedReceiverProfile === 'visual_only' ||
+        storedReceiverProfile === 'audio_only' ||
+        storedReceiverProfile === 'audio_visual'
+          ? storedReceiverProfile
           : null
 
       const activeReceiverProfile =
@@ -3175,61 +3167,13 @@ const beginProofOfAwareness = async () => {
         setLiveBriefingCapabilitiesConfirmed(false)
 
         try {
-          window.localStorage.setItem('george_live_entry_support_preference', profile)
           window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', profile)
           window.localStorage.setItem('george_live_entry_receiver_profile', profile)
-          window.dispatchEvent(new Event('george-live-receiver-profile-change'))
-        } catch {}
-      }
-
-      const activeSupportPanel = recommendedSupportPanel
-
-      const setActiveSupportStyle = (_style: LiveBriefingSupportPanelId) => {
-        setSelectedSupportStyle(normalizeLiveSupportStyle(toRuntimeSupportStyle('advice')))
-        try {
+          window.localStorage.setItem('george_live_entry_support_preference', profile)
           window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', 'advice')
           window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', 'advice')
+          window.dispatchEvent(new Event('george-live-receiver-profile-change'))
         } catch {}
-      }
-
-      const georgeSupportItems = buildOutcomeTestedBriefingSupport({
-        room: roomLabel,
-        audience: audienceLabel,
-        objective: objectiveLabel,
-        observedReality: knownContext,
-        previousPattern: '',
-      })
-
-      const supportCapabilityLines = (style: LiveBriefingSupportPanelId) => {
-        const outcome = objectiveLabel || 'your desired outcome'
-        const signalLines = georgeSupportItems.map((item) => item.line).slice(0, 2)
-
-        const styleLines =
-          style === 'completion'
-            ? [
-                'finish explanations without losing momentum',
-                'recover your train of thought after pressure or interruption',
-                `keep continuation aligned with ${outcome}`,
-              ]
-            : style === 'response'
-              ? [
-                  'shape answers to questions, pressure, or objections',
-                  'give you wording you can use, revise, shorten, or ignore',
-                  `keep responses tied to ${outcome}`,
-                ]
-              : style === 'presentation'
-                ? [
-                    'organize longer explanations into a clear sequence',
-                    'help you regroup if the room interrupts or drifts',
-                    `keep delivery pointed toward ${outcome}`,
-                  ]
-                : [
-                    'adjust your posture, timing, pacing, or next move',
-                    'surface a short question, cue, or line when it materially helps',
-                    `protect movement toward ${outcome}`,
-                  ]
-
-        return [...styleLines, ...signalLines].slice(0, 5)
       }
 
       const liveTierLabel = String(tier || 'smart').toUpperCase()
@@ -3246,36 +3190,82 @@ const beginProofOfAwareness = async () => {
         try {
           window.localStorage.setItem('george_live_entry_steering_seen', '1')
           window.localStorage.setItem('george_live_entry_privacy_acknowledged', '1')
-          window.localStorage.setItem('george_live_entry_receiver_profile', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
-          window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
-          window.localStorage.setItem('george_live_entry_support_preference', (window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE') || window.localStorage.getItem('george_live_entry_receiver_profile') || 'visual_only'))
+          window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', activeReceiverPanel.id)
+          window.localStorage.setItem('george_live_entry_receiver_profile', activeReceiverPanel.id)
+          window.localStorage.setItem('george_live_entry_support_preference', activeReceiverPanel.id)
+          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', 'advice')
+          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', 'advice')
         } catch {}
       }
 
       return (
         <PanelShell label="BRIEF ROOM · MECHANICS" title="Mechanics" stage={2}>
           <div className="mb-3 flex justify-start">
-              <button
-                type="button"
-                onClick={() => setLiveBriefingStep(1)}
-                className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
-              >
-                Back
-              </button>
+            <button
+              type="button"
+              onClick={() => setLiveBriefingStep(1)}
+              className="rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
+            >
+              Back
+            </button>
           </div>
+
           <div className="mt-3 space-y-3">
-            {!liveBriefingExpandedSupportPanel && (
-              <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
+            <div className="rounded-[0.82rem] border border-emerald-300/[0.16] bg-emerald-300/[0.045] px-4 py-3">
+              <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
+                Receiver selected
+              </div>
+              <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
+                {activeReceiverPanel.label}
+              </div>
+              <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
+                Tell GEORGE how you will receive support. Guidance stays adaptive internally.
+              </div>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {LIVE_RECEIVER_PROFILE_PANELS.map((panel) => {
+                  const active = activeReceiverPanel.id === panel.id
+
+                  return (
+                    <button
+                      key={panel.id}
+                      type="button"
+                      onClick={() => setActiveReceiverProfile(panel.id)}
+                      className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
+                        active
+                          ? 'border-emerald-300/[0.24] bg-emerald-300/[0.055]'
+                          : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
+                      }`}
+                    >
+                      <span className="block text-[11px] font-semibold text-[#F2F4FF]/78">
+                        {panel.label}
+                      </span>
+                      <span className="mt-1 block text-[10px] leading-4 text-white/36">
+                        {panel.line}
+                      </span>
+                      {active && (
+                        <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                          {panel.detail}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
+              {liveBriefingCommunicationConfirmed ? (
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                      Receiver selected
+                      Speaking Style selected
                     </div>
                     <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                      {activeReceiverPanel.label}
+                      {communicationStyle}
                     </div>
                     <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                      {activeReceiverPanel.line}
+                      I’ll shape support around this speaking style during LIVE.
                     </div>
                   </div>
 
@@ -3285,174 +3275,64 @@ const beginProofOfAwareness = async () => {
                       setLiveBriefingCommunicationConfirmed(false)
                       setLiveRecoveryAcknowledged(false)
                       setLiveBriefingCapabilitiesConfirmed(false)
-                      setLiveBriefingExpandedSupportPanel(activeSupportPanel.id)
                     }}
                     className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
                   >
                     Edit
                   </button>
                 </div>
-              </div>
-            )}
-            <div className={`${liveBriefingExpandedSupportPanel ? '' : 'hidden'} rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4`}>
-              <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
-                Recommended
-              </div>
+              ) : (
+                <>
+                  <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
+                    Communication
+                  </div>
+                  <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
+                    Choose the speaking style that feels most natural to you.
+                  </p>
 
-              <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                Choose how you will receive GEORGE during LIVE.
-              </p>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                    {[
+                      ['Adaptive', 'Recommended'],
+                      ['Executive', 'Concise and composed'],
+                      ['Conversational', 'Natural and direct'],
+                    ].map(([label, helper]) => {
+                      const active = communicationStyle === label
 
-              <div className="mt-4 divide-y divide-white/[0.055] border-t border-white/[0.055]">
-                {LIVE_RECEIVER_PROFILE_PANELS.map((panel) => {
-                  const active = activeReceiverProfile === panel.id
-                  const open = activeReceiverProfile === panel.id
+                      return (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => {
+                            setCommunicationStyle(label)
+                            setLiveBriefingCommunicationConfirmed(true)
+                            setLiveRecoveryAcknowledged(false)
+                            setLiveBriefingCapabilitiesConfirmed(false)
 
-                  return (
-                    <button
-                      key={panel.id}
-                      type="button"
-                      onMouseDown={(event) => {
-                        event.preventDefault()
-                        setActiveReceiverProfile(panel.id)
-                        setLiveBriefingCommunicationConfirmed(false)
-                        setLiveBriefingExpandedSupportPanel(null)
-                      }}
-                      onClick={() => {
-                        setActiveReceiverProfile(panel.id)
-                        setLiveBriefingCommunicationConfirmed(false)
-                        setLiveBriefingExpandedSupportPanel(null)
-                      }}
-                      className="w-full py-3 text-left"
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
-                          active
-                            ? 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.50)]'
-                            : 'bg-white/[0.14]'
-                        }`} />
-
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
-                            {panel.label}
+                            try {
+                              window.localStorage.setItem('george_live_communication_style', label)
+                            } catch {}
+                          }}
+                          className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
+                            active
+                              ? 'border-emerald-300/[0.24] bg-emerald-300/[0.055]'
+                              : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
+                          }`}
+                        >
+                          <span className="block text-[11px] font-semibold text-[#F2F4FF]/78">
+                            {label}
                           </span>
-                          <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
-                            {panel.line}
+                          <span className="mt-1 block text-[10px] leading-4 text-white/36">
+                            {helper}
                           </span>
-
-                          <span className={`block overflow-hidden transition-all duration-300 ${
-                            open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                          }`}>
-                            <span className="mt-3 block border-l border-emerald-400/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
-                              {panel.detail}
-                            </span>
-
-                            <span className="mt-3 block rounded-[0.72rem] border border-white/[0.045] bg-white/[0.018] px-3 py-2">
-                              <span className="block text-[9px] font-semibold uppercase tracking-[0.18em] text-white/24">
-                                How this changes delivery
-                              </span>
-                              <span className="mt-2 block space-y-1.5">
-                                {[panel.detail].map((line) => (
-                                  <span key={line} className="block text-[11px] leading-4 text-[#D7DBE4]/46">
-                                    · {line}
-                                  </span>
-                                ))}
-                              </span>
-                              <span className="mt-2 block text-[10.5px] leading-4 text-white/28">
-                                The better I understand the conversation, the better I can support you.
-                              </span>
-                            </span>
-                          </span>
-                        </span>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
             </div>
 
-            {!liveBriefingExpandedSupportPanel && (
-              <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
-                {liveBriefingCommunicationConfirmed ? (
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-[9px] uppercase tracking-[0.24em] text-emerald-100/46">
-                        Speaking Style selected
-                      </div>
-                      <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                        {communicationStyle}
-                      </div>
-                      <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                        I’ll shape support around this speaking style during LIVE.
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setLiveBriefingCommunicationConfirmed(false)
-                        setLiveRecoveryAcknowledged(false)
-                        setLiveBriefingCapabilitiesConfirmed(false)
-                      }}
-                      className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-emerald-100/20 hover:text-emerald-100/78"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/48">
-                      Communication
-                    </div>
-                    <p className="mt-2 text-[13px] leading-5 text-[#D7DBE4]/64">
-                      Choose the speaking style that feels most natural to you.
-                    </p>
-
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                      {[
-                        ['Adaptive', 'Recommended'],
-                        ['Executive', 'Concise and composed'],
-                        ['Conversational', 'Natural and direct'],
-                      ].map(([label, helper]) => {
-                        const active = communicationStyle === label
-
-                        return (
-                          <button
-                            key={label}
-                            type="button"
-                            onClick={() => {
-                              setCommunicationStyle(label)
-                              setLiveBriefingCommunicationConfirmed(true)
-                              setLiveRecoveryAcknowledged(false)
-                              setLiveBriefingCapabilitiesConfirmed(false)
-
-                              try {
-                                window.localStorage.setItem('george_live_communication_style', label)
-                              } catch {}
-                            }}
-                            className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
-                              active
-                                ? 'border-emerald-300/[0.24] bg-emerald-300/[0.055]'
-                                : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
-                            }`}
-                          >
-                            <span className="block text-[11px] font-semibold text-[#F2F4FF]/78">
-                              {label}
-                            </span>
-                            <span className="mt-1 block text-[10px] leading-4 text-white/36">
-                              {helper}
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {!liveBriefingExpandedSupportPanel && !liveRecoveryAcknowledged && (
-              <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
+            <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
                 ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
                 : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
@@ -3485,8 +3365,7 @@ const beginProofOfAwareness = async () => {
                   Privacy
                 </button>
               </span>
-              </label>
-            )}
+            </label>
 
             <div className="grid gap-2 sm:grid-cols-2">
               <button
@@ -3514,9 +3393,6 @@ const beginProofOfAwareness = async () => {
         </PanelShell>
       )
     }
-
-
-
 
 
     const confirmReadyRoomAcknowledgement = (checked: boolean) => {
