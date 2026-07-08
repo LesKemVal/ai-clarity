@@ -27,6 +27,7 @@ const scenarios = [
   ['Pressure recovery', './george-behavior/pressure-recovery.mjs'],
   ['Adaptive delivery evidence', './george-behavior/adaptive-delivery-evidence.mjs'],
   ['LIVE voice speed policy', './george-behavior/live-voice-speed-policy.mjs'],
+  ['Support behavior composer', './george-behavior/support-behavior-composer.mjs'],
   ['Speech synchronization', './george-behavior/speech-synchronization.mjs'],
   ['Conversation package identification', './george-behavior/conversation-package-identification.mjs'],
   ['Conversation package manager', './george-behavior/conversation-package-manager.mjs'],
