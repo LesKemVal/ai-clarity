@@ -1,4 +1,5 @@
 import { compressLiveLine } from './line-transforms'
+import { currentLiveSpokenSentence, getLiveSpokenTail } from './spoken-memory'
 import { getBuyTimeDurationMs, type LiveTranscriptDecision } from './transcript-routing'
 
 export type LiveTranscriptControllerAction =
@@ -32,10 +33,21 @@ export function resolveLiveTranscriptDecision(params: {
   }
 
   if (decision.content === 'repeat_last_line') {
-    const lastLine = String(params.lastSpokenLine || '').trim()
+    const tail = getLiveSpokenTail({
+      lastSpokenLine: params.lastSpokenLine,
+      approximateUserLine: params.transcript,
+    })
 
-    return lastLine
-      ? { type: 'speak', text: lastLine }
+    if (tail) {
+      return { type: 'repeat_tail', text: tail }
+    }
+
+    const currentSentence = currentLiveSpokenSentence({
+      lastSpokenLine: params.lastSpokenLine,
+    })
+
+    return currentSentence
+      ? { type: 'sentence_recovery', text: currentSentence }
       : { type: 'ignore' }
   }
 

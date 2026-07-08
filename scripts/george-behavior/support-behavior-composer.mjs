@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { composeGeorgeSupportBehavior } from '../../lib/george/live-runtime/support-behavior-composer.ts'
+import { getLiveSpokenTail, currentLiveSpokenSentence } from '../../lib/george/live-runtime/spoken-memory.ts'
 
 const tail = composeGeorgeSupportBehavior({
   userAppearsToBeShadowing: true,
@@ -44,3 +45,17 @@ const response = composeGeorgeSupportBehavior({
 assert.deepEqual(response.behaviors, ['full_response'])
 
 console.log('GEORGE support behavior composer passed')
+
+
+assert.equal(
+  currentLiveSpokenSentence({ lastSpokenLine: 'First sentence. The primary advantage is execution.' }),
+  'The primary advantage is execution.'
+)
+
+assert.equal(
+  getLiveSpokenTail({
+    lastSpokenLine: 'The primary advantage is execution.',
+    approximateUserLine: 'The primary advantage is',
+  }),
+  'execution.'
+)

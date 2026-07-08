@@ -41,3 +41,21 @@ export function currentLiveSpokenSentence(params: {
 
   return sentences.at(-1) || line
 }
+
+
+export function getLiveSpokenTail(params: {
+  lastSpokenLine?: string
+  approximateUserLine?: string
+}) {
+  const last = currentLiveSpokenSentence({ lastSpokenLine: params.lastSpokenLine })
+  const heard = String(params.approximateUserLine || '').replace(/\s+/g, ' ').trim()
+
+  if (!last || !heard) return ''
+
+  const normalizedLast = last.toLowerCase()
+  const normalizedHeard = heard.toLowerCase()
+
+  if (!normalizedLast.startsWith(normalizedHeard)) return ''
+
+  return last.slice(heard.length).trim()
+}
