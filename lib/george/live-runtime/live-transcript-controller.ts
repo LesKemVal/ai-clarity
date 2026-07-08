@@ -4,6 +4,8 @@ import { getBuyTimeDurationMs, type LiveTranscriptDecision } from './transcript-
 export type LiveTranscriptControllerAction =
   | { type: 'ignore' }
   | { type: 'start_buy_time'; durationMs: number }
+  | { type: 'repeat_tail'; text: string }
+  | { type: 'sentence_recovery'; text: string }
   | { type: 'speak'; text: string }
   | { type: 'send'; text: string }
 

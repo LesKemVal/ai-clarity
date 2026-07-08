@@ -19,6 +19,7 @@ const outcomeConsistencySource = readFileSync(`${root}/lib/george/live-runtime/o
 const packageRuntimeSource = readFileSync(`${root}/lib/george/conversation-packages/runtime.mjs`, 'utf8')
 const recordPanelSource = readFileSync(`${root}/components/george/live/PostLiveConversationRecordPanel.tsx`, 'utf8')
 const liveReasoningSource = readFileSync(`${root}/lib/george/live-voice/live-reasoning.ts`, 'utf8')
+const controllerSource = readFileSync(`${root}/lib/george/live-runtime/live-transcript-controller.ts`, 'utf8')
 const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
 const liveHubAdapterSource = readFileSync(`${root}/lib/george/live-hub/live-runtime-adapter.ts`, 'utf8')
 const liveFinalTranscriptAdapterSource = readFileSync(`${root}/lib/george/live-runtime/live-final-transcript-adapter.ts`, 'utf8')
@@ -66,6 +67,15 @@ assert(
 assert(
   deliveryBridgeSource.includes("markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')"),
   'Delivery metrics should use preserved delivery turnId when available'
+)
+
+assert(
+  controllerSource.includes("type: 'repeat_tail'"),
+  'Controller should expose repeat_tail action'
+)
+assert(
+  controllerSource.includes("type: 'sentence_recovery'"),
+  'Controller should expose sentence_recovery action'
 )
 
 assert(
