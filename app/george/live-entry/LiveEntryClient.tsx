@@ -3872,7 +3872,13 @@ Anything I should keep in mind?
 
           <style jsx>{`
             @keyframes liveEntryLineStep {
-              0%, 10% { transform: translateY(0); }
+              0%, 14% { transform: translateY(28px); }
+              20%, 34% { transform: translateY(-8px); }
+              40%, 54% { transform: translateY(-44px); }
+              60%, 74% { transform: translateY(-80px); }
+              80%, 94% { transform: translateY(-116px); }
+              100% { transform: translateY(-152px); }
+            }
               16%, 26% { transform: translateY(-34px); }
               32%, 42% { transform: translateY(-68px); }
               48%, 58% { transform: translateY(-102px); }
@@ -4015,35 +4021,41 @@ Anything I should keep in mind?
         <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_12%,black_78%,transparent)]">
           <div className="relative h-[154px] overflow-hidden md:h-[250px]">
             <div className="absolute inset-0 animate-[liveEntryScenarioOne_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
-                <div className="text-[#D7DBE4]/62">VC: Why now?</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
-                <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Anchor demand signal.</div>
-                <div className="text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
+              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
+              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
+                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+                  <div className="text-[#D7DBE4]/62">VC: Why now?</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Anchor demand signal.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
+                </div>
               </div>
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioTwo_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
-              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
-                <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
-                <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Ask for term limit.</div>
-                <div className="text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
+              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
+              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
+                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+                  <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Ask for term limit.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
+                </div>
               </div>
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioThree_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
-              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
-                <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
-                <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
-                <div className="text-[#D7DCFF]/78">GEORGE: Anchor measurable result.</div>
-                <div className="text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
+              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
+              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
+                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+                  <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
+                  <div className="text-[#D7DCFF]/78">GEORGE: Anchor measurable result.</div>
+                  <div className="text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
+                </div>
               </div>
             </div>
           </div>
