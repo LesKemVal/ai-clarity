@@ -795,6 +795,7 @@ export default function LiveEntryClient() {
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<LiveRecoveryOptionId[]>(DEFAULT_LIVE_RECOVERY_SELECTION)
   const [liveRecoveryAcknowledged, setLiveRecoveryAcknowledged] = useState(false)
+  const [liveRecoveryAcknowledgementOpen, setLiveRecoveryAcknowledgementOpen] = useState(false)
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
   const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('audio_only')
@@ -3351,40 +3352,65 @@ const beginProofOfAwareness = async () => {
               )}
             </div>
 
-            <label className={`flex cursor-pointer items-start gap-3 rounded-[0.82rem] border px-4 py-3 transition ${
+            <div className={`rounded-[0.82rem] border px-4 py-3 transition ${
               liveRecoveryAcknowledged
                 ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
-                : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
+                : liveRecoveryAcknowledgementOpen
+                  ? 'border-[#D7DCFF]/18 bg-[#D7DCFF]/[0.035] text-[#D7DBE4]/72'
+                  : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
             }`}>
-              <input
-                type="checkbox"
-                checked={liveRecoveryAcknowledged}
-                onChange={(event) => {
-                  if (event.target.checked) {
-                    confirmPrivacyAndContinue()
-                    return
-                  }
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={liveRecoveryAcknowledged}
+                  onChange={(event) => {
+                    if (event.target.checked && !liveRecoveryAcknowledgementOpen) {
+                      setLiveRecoveryAcknowledgementOpen(true)
+                      setLiveRecoveryAcknowledged(false)
+                      setLiveBriefingCapabilitiesConfirmed(false)
+                      return
+                    }
 
-                  setLiveRecoveryAcknowledged(false)
-                  setLiveBriefingCapabilitiesConfirmed(false)
-                }}
-                className="mt-1 h-4 w-4 accent-[#D7DCFF]"
-              />
+                    if (event.target.checked) {
+                      confirmPrivacyAndContinue()
+                      return
+                    }
 
-              <span className="text-[12px] leading-5">
-                I understand that GEORGE is {liveTierLabel}, but I am the final authority. If GEORGE&apos;s support doesn&apos;t fit the conversation, I may ignore it, revise it, or take another approach. I understand GEORGE will adapt its support as it learns what works best for me and the conversation while helping me {liveObjectiveLabel}.{' '}
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    window.open('/privacy', '_blank')
+                    setLiveRecoveryAcknowledged(false)
+                    setLiveBriefingCapabilitiesConfirmed(false)
                   }}
-                  className="text-[#D7DCFF]/72 underline underline-offset-4"
-                >
-                  Privacy
-                </button>
-              </span>
-            </label>
+                  className="mt-1 h-4 w-4 accent-[#D7DCFF]"
+                />
+
+                <span className="text-[12px] leading-5">
+                  <span className="block font-semibold text-[#F2F4FF]/82">
+                    GEORGE complements your judgment, communication style, and effort.
+                  </span>
+
+                  {!liveRecoveryAcknowledgementOpen && !liveRecoveryAcknowledged && (
+                    <span className="mt-1 block text-[#D7DBE4]/50">
+                      Check once to review. Check again to acknowledge.
+                    </span>
+                  )}
+                </span>
+              </label>
+
+              {(liveRecoveryAcknowledgementOpen || liveRecoveryAcknowledged) && (
+                <div className="mt-3 border-l border-[#D7DCFF]/18 pl-3 text-[12px] leading-5 text-[#D7DBE4]/64">
+                  I understand that GEORGE is {liveTierLabel}, but I remain the final authority. GEORGE supports me by adapting how it listens, responds, and delivers help based on the mechanics I choose. If GEORGE&apos;s support does not fit the conversation, I may ignore it, revise it, or take another approach. GEORGE complements my effort; it does not replace my responsibility.{' '}
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      window.open('/privacy', '_blank')
+                    }}
+                    className="text-[#D7DCFF]/72 underline underline-offset-4"
+                  >
+                    Privacy
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
               <button
