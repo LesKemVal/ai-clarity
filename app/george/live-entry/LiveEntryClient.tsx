@@ -3871,6 +3871,20 @@ Anything I should keep in mind?
           </h1>
 
           <style jsx>{`
+            @keyframes liveEntryTickerScroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+
+            @keyframes liveEntryScenarioStack {
+              0%, 27% { transform: translateY(0); opacity: 1; }
+              31%, 33% { transform: translateY(-34%); opacity: 0.72; }
+              36%, 61% { transform: translateY(-34%); opacity: 1; }
+              65%, 67% { transform: translateY(-68%); opacity: 0.72; }
+              70%, 95% { transform: translateY(-68%); opacity: 1; }
+              100% { transform: translateY(0); opacity: 1; }
+            }
+
             @keyframes liveWordPulse {
               0%, 100% {
                 opacity: 0.72;
@@ -3946,6 +3960,41 @@ Anything I should keep in mind?
           </div>
 
         </section>
+
+
+      <div className="pointer-events-none fixed inset-x-0 bottom-5 z-[40] px-5 md:inset-x-auto md:bottom-auto md:right-8 md:top-[132px] md:w-[320px] lg:right-12 xl:right-16">
+        <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#03070C]/86 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.36)] backdrop-blur-xl [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(180deg,transparent,black_10%,black_90%,transparent)]">
+          <div className="mb-2 text-[9px] font-semibold uppercase tracking-[0.20em] text-[#8FB6C9]/72">
+            LIVE audio demo
+          </div>
+
+          <div className="relative h-[48px] overflow-hidden md:h-[168px]">
+            <div className="md:animate-[liveEntryScenarioStack_24s_ease-in-out_infinite]">
+              <div className="h-[56px] md:h-[168px]">
+                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">VC Meeting</div>
+                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
+                  VC: Why now? · GEORGE: Lead with timing. · YOU: The market changed after Q2. · GEORGE: Anchor demand signal. · YOU: Customers are already pulling us forward.
+                </div>
+              </div>
+
+              <div className="h-[56px] md:h-[168px]">
+                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Influencer Contract</div>
+                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
+                  BRAND: We need exclusivity. · GEORGE: Protect optionality. · YOU: I can offer category exclusivity. · GEORGE: Ask for term limit. · YOU: Tie it to 60 days and performance.
+                </div>
+              </div>
+
+              <div className="h-[56px] md:h-[168px]">
+                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Interview</div>
+                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
+                  INTERVIEWER: Why should we trust your judgment? · GEORGE: Pause. Lead with outcome. · YOU: The strongest proof is what changed after I took ownership. · GEORGE: Anchor measurable result.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
         {tier === 'smart' && (
           <p className="mt-2 text-center text-[12px] leading-5 text-[#D7DBE4]/36">
