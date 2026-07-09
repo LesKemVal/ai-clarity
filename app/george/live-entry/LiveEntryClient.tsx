@@ -538,7 +538,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Guidance',
+        label: 'Adaptive support',
         defaultLine: 'Default: observational advice.',
         body: 'In this room, I may help you notice objections, timing pressure, hesitation, leverage, or movement toward terms.',
         examples: [
@@ -579,7 +579,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Guidance',
+        label: 'Adaptive support',
         defaultLine: 'Default: answer-shaping advice.',
         body: 'In this room, I may help you notice when the interviewer wants an example, when an answer is too broad, or when to return to the question.',
         examples: [
@@ -620,7 +620,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Guidance',
+        label: 'Adaptive support',
         defaultLine: 'Default: clarification advice.',
         body: 'In this room, I may help you notice when a question remains unanswered, when the next step is unclear, or when details should be repeated.',
         examples: [
@@ -661,7 +661,7 @@ function buildLiveBriefingSupportPanels({
     return [
       {
         id: 'advice',
-        label: 'Guidance',
+        label: 'Adaptive support',
         defaultLine: 'Default: leverage advice.',
         body: 'In this room, I may help you notice pressure, concessions, unclear terms, or moments where asking another question is stronger than answering.',
         examples: [
@@ -701,7 +701,7 @@ function buildLiveBriefingSupportPanels({
   return [
     {
       id: 'advice',
-      label: 'Guidance',
+      label: 'Adaptive support',
       defaultLine: 'Default: observational advice.',
       body: 'In this room, I may help you notice confusion, pressure, drift, unanswered questions, or moments where the conversation should return to the objective.',
       examples: [
@@ -1302,7 +1302,7 @@ export default function LiveEntryClient() {
 
     Reality constrains strategy.
 
-    Guidance prioritizes truth.
+    Support prioritizes truth.
   */
 
 const mandatoryLiveSignals = useMemo(() => {
@@ -2608,39 +2608,6 @@ const beginProofOfAwareness = async () => {
           }
         : null
 
-  const goBackThroughLiveEntryPopups = () => {
-    if (liveBriefingStep === 3) {
-      setLiveBriefingStep(2)
-      return
-    }
-
-    if (liveBriefingStep === 2) {
-      setLiveBriefingStep(1)
-      return
-    }
-  }
-
-  const LiveEntryPopupBackControl = () => {
-    const canGoBack = liveBriefingStep === 2 || liveBriefingStep === 3
-
-    return (
-      <div className="mb-5 flex items-center justify-start">
-        <button
-          type="button"
-          disabled={!canGoBack}
-          onClick={goBackThroughLiveEntryPopups}
-          className={`rounded-[0.72rem] border px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] transition ${
-            canGoBack
-              ? 'border-[#8FB6C9]/38 bg-[#8FB6C9]/[0.18] text-[#D7DCFF]/88 hover:border-[#8FB6C9]/58 hover:bg-[#8FB6C9]/[0.26] hover:text-white'
-              : 'border-[#8FB6C9]/22 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/54'
-          }`}
-        >
-          {canGoBack ? '← Back' : 'GEORGE'}
-        </button>
-      </div>
-    )
-  }
-
   if (liveEntryQuestionSurface) {
     return (
       <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-black px-4 py-8 text-white">
@@ -3259,7 +3226,7 @@ const beginProofOfAwareness = async () => {
                 {activeReceiverPanel.label}
               </div>
               <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                Tell GEORGE how you will receive support. Guidance stays adaptive internally.
+                Tell GEORGE how you will receive support. GEORGE adapts guidance automatically based on the room.
               </div>
 
               <button
