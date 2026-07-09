@@ -67,7 +67,7 @@ import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-aware
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 import { resolveLiveIntentRuntime } from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolveDomainRuntime } from '@/lib/george/runtime/domain-router'
-import { detectLiveFriction } from '@/lib/george/live-runtime/live-friction'
+import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -5267,7 +5267,7 @@ responseTimerRef.current = setTimeout(() => {
 
   const text = liveTranscript || ""
   const friction = detectLiveFriction(text)
-  const score = scoreFriction(text)
+  const score = scoreLiveFriction(text)
 
   if (!friction) return
 
