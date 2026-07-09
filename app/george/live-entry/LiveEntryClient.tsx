@@ -3872,7 +3872,14 @@ Anything I should keep in mind?
 
           <style jsx>{`
             @keyframes liveEntryConversationRise {
-              0% { transform: translateY(48px); }
+              0%, 14% { transform: translateY(20px); }
+              16%, 30% { transform: translateY(-18px); }
+              32%, 46% { transform: translateY(-56px); }
+              48%, 62% { transform: translateY(-94px); }
+              64%, 78% { transform: translateY(-132px); }
+              80%, 94% { transform: translateY(-170px); }
+              100% { transform: translateY(-210px); }
+            }
               100% { transform: translateY(-520px); }
             }
 
@@ -3977,43 +3984,43 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none fixed inset-x-0 bottom-5 z-[40] px-5 md:inset-x-auto md:bottom-auto md:right-8 md:top-[132px] md:w-[320px] lg:right-12 xl:right-16">
-        <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#03070C]/86 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.36)] backdrop-blur-xl [mask-image:linear-gradient(180deg,transparent,black_14%,black_84%,transparent)]">
+      <div className="pointer-events-none fixed inset-x-0 bottom-[120px] z-[40] px-6 md:inset-x-auto md:bottom-auto md:right-[calc(50vw-610px)] md:top-[160px] md:w-[300px] lg:right-[calc(50vw-650px)] xl:right-[calc(50vw-690px)]">
+        <div className="overflow-hidden bg-black/0 px-2 py-2 [mask-image:linear-gradient(180deg,transparent,black_18%,black_78%,transparent)]">
           <div className="mb-2 text-[9px] font-semibold uppercase tracking-[0.20em] text-[#8FB6C9]/72">
-            LIVE audio demo
+            VC Meeting
           </div>
 
-          <div className="relative h-[116px] overflow-hidden md:h-[260px]">
+          <div className="relative h-[104px] overflow-hidden md:h-[230px]">
             <div className="absolute inset-0 animate-[liveEntryScenarioFade_30s_linear_infinite]">
               <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">VC Meeting</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">VC: Why now?</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Lead with timing.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor demand signal.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">VC: Why now?</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Lead with timing.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor demand signal.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
               </div>
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioFadeTwo_30s_linear_infinite]">
               <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Influencer Contract</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Protect optionality.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Ask for term limit.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Protect optionality.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Ask for term limit.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
               </div>
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioFadeThree_30s_linear_infinite]">
               <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Interview</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Pause. Lead with outcome.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
-                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor measurable result.</div>
-                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Pause. Lead with outcome.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
+                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor measurable result.</div>
+                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
               </div>
             </div>
           </div>
