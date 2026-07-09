@@ -2867,7 +2867,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
 
     const setupMessage: Message = {
       role: 'assistant',
-      content: 'Quick LIVE or Full Brief?\n\nQuick LIVE uses this conversation and only asks for what is missing. Full Brief gives me more room to prepare before you enter LIVE.',
+      content: 'Quick LIVE or Full Brief?\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
       source: 'system_override',
     }
 
@@ -4593,7 +4593,7 @@ setTimeout(() => {
             ...(userMessage ? [userMessage] : []),
             {
               role: 'assistant',
-              content: 'Choose Quick LIVE or Full Brief. Quick LIVE uses this conversation and only asks for what is missing. Full Brief gives me more room to prepare.',
+              content: 'Choose Quick LIVE or Full Brief.\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
               source: 'system_override',
             },
           ]
