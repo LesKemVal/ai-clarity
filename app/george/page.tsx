@@ -1660,6 +1660,60 @@ const [savePopupUpward, setSavePopupUpward] = useState(true)
   const [showRecentFolders, setShowRecentFolders] = useState(false)
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(null)
 const [lastDomain, setLastDomain] = useState<string | null>(null)
+const liveBarMessages = useMemo(() => {
+  const recentUser = messages
+    .slice()
+    .reverse()
+    .find((message) => message.role === 'user')?.content || ''
+
+  const base = activePromptContext === 'pre_live_signal_ready'
+    ? ['Tap LIVE and we’ll go.', 'Ready when you are.', 'I have enough to support you.']
+    : ['Prepare this conversation for LIVE.', 'Quick LIVE or Full Brief.', 'I’ll use this session as signal.']
+
+  if (/interview|hiring|job|candidate/i.test(recentUser)) {
+    return activePromptContext === 'pre_live_signal_ready'
+      ? ['Tap LIVE and we’ll enter the interview.', 'I’ll help you answer clearly.', 'Ready when you are.']
+      : ['Prepare this interview for LIVE.', 'I’ll track role, proof, and timing.', 'Quick LIVE or Full Brief.']
+  }
+
+  if (/investor|pitch|raise|funding|capital/i.test(recentUser)) {
+    return activePromptContext === 'pre_live_signal_ready'
+      ? ['Tap LIVE and we’ll enter the room.', 'I’ll help you anchor value.', 'Ready when you are.']
+      : ['Prepare this investor conversation.', 'I’ll track proof, risk, and close.', 'Quick LIVE or Full Brief.']
+  }
+
+  if (/negotiat|deal|terms|price|contract/i.test(recentUser)) {
+    return activePromptContext === 'pre_live_signal_ready'
+      ? ['Tap LIVE and we’ll negotiate.', 'I’ll help you protect position.', 'Ready when you are.']
+      : ['Prepare this negotiation for LIVE.', 'I’ll track leverage and next move.', 'Quick LIVE or Full Brief.']
+  }
+
+  return base
+}, [activePromptContext, messages])
+
+const [liveBarMessageIndex, setLiveBarMessageIndex] = useState(0)
+const [liveBarTypedText, setLiveBarTypedText] = useState('')
+
+useEffect(() => {
+  if (!liveBarMessages.length) return
+  const timer = window.setInterval(() => {
+    setLiveBarMessageIndex((prev) => (prev + 1) % liveBarMessages.length)
+  }, 5200)
+  return () => window.clearInterval(timer)
+}, [liveBarMessages.length])
+
+useEffect(() => {
+  const message = liveBarMessages[liveBarMessageIndex % liveBarMessages.length] || ''
+  setLiveBarTypedText('')
+  let i = 0
+  const timer = window.setInterval(() => {
+    i += 1
+    setLiveBarTypedText(message.slice(0, i))
+    if (i >= message.length) window.clearInterval(timer)
+  }, 28)
+  return () => window.clearInterval(timer)
+}, [liveBarMessageIndex, liveBarMessages])
+
   const [memoryVersion, setMemoryVersion] = useState(0)
   const [toastMessage, setToastMessage] = useState('')
   const [showToast, setShowToast] = useState(false)
@@ -5629,7 +5683,7 @@ return (
 
 @keyframes georgeLiveTicker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-@keyframes georgeLiveScenarioStack {
+@keyframes georgeLiveBarShimmer {\n  0% { transform: translateX(0); opacity: 0; }\n  18% { opacity: 1; }\n  45% { transform: translateX(380%); opacity: 0; }\n  100% { transform: translateX(380%); opacity: 0; }\n}\n\n@keyframes georgeLiveScenarioStack {
   0%, 27% { transform: translateY(0); opacity: 1; }
   31%, 33% { transform: translateY(-34%); opacity: 0.72; }
   36%, 61% { transform: translateY(-34%); opacity: 1; }
@@ -8397,19 +8451,21 @@ Continue from here, tell me what changed, or start fresh.`
 
       openLiveEntryFromMessage(latestAssistant || messagesRef.current[messagesRef.current.length - 1])
     }}
-    className={`mb-2 w-full rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
+    className={`relative mb-2 w-full overflow-hidden rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
       activePromptContext === 'pre_live_signal_ready'
         ? 'border-[#4E7CFF]/50 bg-[#4E7CFF]/[0.16] shadow-[0_0_34px_rgba(78,124,255,0.18)]'
         : 'border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.08] hover:bg-[#4E7CFF]/[0.12]'
     }`}
   >
-    <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
+    <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[0.9rem]">
+      <span className="absolute inset-y-0 left-[-45%] w-[38%] animate-[georgeLiveBarShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.16] to-transparent" />
+    </span>
+    <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
       LIVE
     </div>
     <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/68">
-      {activePromptContext === 'pre_live_signal_ready'
-        ? 'Tap LIVE and we’ll go.'
-        : 'Prepare this conversation for LIVE.'}
+      {liveBarTypedText}
+      <span className="ml-0.5 opacity-60">|</span>
     </div>
   </button>
 )}
