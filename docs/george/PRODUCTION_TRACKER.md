@@ -595,3 +595,8 @@ Delivery policy decides how that support behavior is rendered for `visual_only`,
 Do not create another runtime.
 Do not duplicate reasoning between audio and visual.
 Do not move this logic into `app/george/page.tsx`.
+
+
+## Receiver profile delivery
+
+LIVE support behavior is adaptive internally. The user no longer selects fixed Guidance modes in the LIVE room. The user selects how support is received: Audio, Visual, or Audio + Visual. Audio remains the default receiver profile. Mic/listening control remains separate from audio output and receiver profile. Speaking Style remains user-facing.

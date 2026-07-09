@@ -6029,6 +6029,8 @@ return (
     <>
       <style>{`${georgeAmbientPulseStyles}
 
+@keyframes georgeLiveTicker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
 @keyframes georgeComposerCursorBlink {
   0%, 46% { opacity: 0.72; }
   47%, 100% { opacity: 0; }
@@ -8754,6 +8756,22 @@ Continue from here, tell me what changed, or start fresh.`
             >
               New LIVE
             </button>
+
+            <div className="mt-2 overflow-hidden rounded-[0.82rem] border border-[#8FB6C9]/[0.10] bg-[#8FB6C9]/[0.035] px-3 py-2">
+              <div className="mb-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8FB6C9]/70">
+                LIVE audio demo
+              </div>
+              <div className="relative h-5 overflow-hidden text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62">
+                <div className="absolute whitespace-nowrap animate-[georgeLiveTicker_18s_linear_infinite]">
+                  INTERVIEWER: Why should we trust your judgment? &nbsp; · &nbsp;
+                  GEORGE: Pause. Lead with outcome. &nbsp; · &nbsp;
+                  YOU: The strongest proof is what changed after I took ownership. &nbsp; · &nbsp;
+                  GEORGE: Anchor measurable result. &nbsp; · &nbsp;
+                  YOU: We reduced delays, improved follow-through, and kept the team aligned. &nbsp; · &nbsp;
+                  GEORGE: Ask if they want the example.
+                </div>
+              </div>
+            </div>
 
             <button
               type="button"
