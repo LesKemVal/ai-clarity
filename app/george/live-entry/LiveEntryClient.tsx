@@ -3871,44 +3871,11 @@ Anything I should keep in mind?
           </h1>
 
           <style jsx>{`
-            @keyframes liveEntryLineStep {
-              0%, 14% { transform: translateY(28px); }
-              20%, 34% { transform: translateY(-8px); }
-              40%, 54% { transform: translateY(-44px); }
-              60%, 74% { transform: translateY(-80px); }
-              80%, 94% { transform: translateY(-116px); }
-              100% { transform: translateY(-152px); }
-            }
-              16%, 26% { transform: translateY(-34px); }
-              32%, 42% { transform: translateY(-68px); }
-              48%, 58% { transform: translateY(-102px); }
-              64%, 74% { transform: translateY(-136px); }
-              80%, 90% { transform: translateY(-170px); }
-              100% { transform: translateY(-170px); }
-            }
-              15%, 27% { transform: translateY(-10px); }
-              30%, 42% { transform: translateY(-44px); }
-              45%, 57% { transform: translateY(-78px); }
-              60%, 72% { transform: translateY(-112px); }
-              75%, 87% { transform: translateY(-146px); }
-              90%, 100% { transform: translateY(-180px); }
-            }
-
-            @keyframes liveEntryScenarioOne {
-              0%, 30% { opacity: 1; }
-              32%, 100% { opacity: 0; }
-            }
-
-            @keyframes liveEntryScenarioTwo {
-              0%, 31% { opacity: 0; }
-              33%, 63% { opacity: 1; }
-              65%, 100% { opacity: 0; }
-            }
-
-            @keyframes liveEntryScenarioThree {
-              0%, 64% { opacity: 0; }
-              66%, 96% { opacity: 1; }
-              98%, 100% { opacity: 0; }
+            @keyframes liveEntryScenarioTrack {
+              0%, 25% { transform: translateY(0); }
+              34%, 58% { transform: translateY(-210px); }
+              67%, 91% { transform: translateY(-420px); }
+              100% { transform: translateY(0); }
             }
 
             @keyframes liveEntryTitleGlow {
@@ -4018,12 +3985,12 @@ Anything I should keep in mind?
 
         </section>
       <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+250px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+270px)] xl:left-[calc(50vw+290px)]">
-        <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_12%,black_78%,transparent)]">
-          <div className="relative h-[154px] overflow-hidden md:h-[250px]">
-            <div className="absolute inset-0 animate-[liveEntryScenarioOne_30s_linear_infinite]">
-              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
-                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+        <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_10%,black_82%,transparent)]">
+          <div className="relative h-[174px] overflow-hidden md:h-[210px]">
+            <div className="absolute left-0 right-0 top-0 animate-[liveEntryScenarioTrack_30s_cubic-bezier(0.22,1,0.36,1)_infinite]">
+              <div className="h-[210px]">
+                <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
                   <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
@@ -4031,12 +3998,10 @@ Anything I should keep in mind?
                   <div className="text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
                 </div>
               </div>
-            </div>
 
-            <div className="absolute inset-0 animate-[liveEntryScenarioTwo_30s_linear_infinite]">
-              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
-              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
-                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+              <div className="h-[210px]">
+                <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
                   <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
@@ -4044,12 +4009,10 @@ Anything I should keep in mind?
                   <div className="text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
                 </div>
               </div>
-            </div>
 
-            <div className="absolute inset-0 animate-[liveEntryScenarioThree_30s_linear_infinite]">
-              <div className="relative z-10 animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
-              <div className="absolute left-0 right-0 top-[44px] bottom-0 overflow-hidden [mask-image:linear-gradient(180deg,transparent,black_18%,black_82%,transparent)]">
-                <div className="absolute left-0 right-0 animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
+              <div className="h-[210px]">
+                <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
                   <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
@@ -4061,7 +4024,6 @@ Anything I should keep in mind?
           </div>
         </div>
       </div>
-
 
         {tier === 'smart' && (
           <p className="mt-2 text-center text-[12px] leading-5 text-[#D7DBE4]/36">
