@@ -3338,7 +3338,7 @@ const beginProofOfAwareness = async () => {
                   type="checkbox"
                   checked={liveRecoveryAcknowledged}
                   onChange={(event) => {
-                    if (event.target.checked && !liveRecoveryAcknowledgementOpen) {
+                    if (!liveRecoveryAcknowledgementOpen) {
                       setLiveRecoveryAcknowledgementOpen(true)
                       setLiveRecoveryAcknowledged(false)
                       setLiveBriefingCapabilitiesConfirmed(false)
