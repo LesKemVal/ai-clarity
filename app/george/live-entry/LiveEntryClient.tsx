@@ -3871,42 +3871,44 @@ Anything I should keep in mind?
           </h1>
 
           <style jsx>{`
-            @keyframes liveEntryConversationRise {
-              0%, 14% { transform: translateY(20px); }
-              16%, 30% { transform: translateY(-18px); }
-              32%, 46% { transform: translateY(-56px); }
-              48%, 62% { transform: translateY(-94px); }
-              64%, 78% { transform: translateY(-132px); }
-              80%, 94% { transform: translateY(-170px); }
-              100% { transform: translateY(-210px); }
-            }
-              100% { transform: translateY(-520px); }
+            @keyframes liveEntryLineStep {
+              0%, 12% { transform: translateY(38px); }
+              15%, 27% { transform: translateY(0); }
+              30%, 42% { transform: translateY(-38px); }
+              45%, 57% { transform: translateY(-76px); }
+              60%, 72% { transform: translateY(-114px); }
+              75%, 87% { transform: translateY(-152px); }
+              90%, 100% { transform: translateY(-190px); }
             }
 
-            @keyframes liveEntryScenarioFade {
+            @keyframes liveEntryScenarioOne {
               0%, 30% { opacity: 1; }
-              33%, 63% { opacity: 0; }
-              66%, 96% { opacity: 0; }
-              100% { opacity: 1; }
+              32%, 100% { opacity: 0; }
             }
 
-            @keyframes liveEntryScenarioFadeTwo {
-              0%, 30% { opacity: 0; }
+            @keyframes liveEntryScenarioTwo {
+              0%, 31% { opacity: 0; }
               33%, 63% { opacity: 1; }
-              66%, 100% { opacity: 0; }
+              65%, 100% { opacity: 0; }
             }
 
-            @keyframes liveEntryScenarioFadeThree {
-              0%, 63% { opacity: 0; }
+            @keyframes liveEntryScenarioThree {
+              0%, 64% { opacity: 0; }
               66%, 96% { opacity: 1; }
-              100% { opacity: 0; }
+              98%, 100% { opacity: 0; }
             }
 
-            31%, 33% { transform: translateY(-34%); opacity: 0.72; }
-              36%, 61% { transform: translateY(-34%); opacity: 1; }
-              65%, 67% { transform: translateY(-68%); opacity: 0.72; }
-              70%, 95% { transform: translateY(-68%); opacity: 1; }
-              100% { transform: translateY(0); opacity: 1; }
+            @keyframes liveEntryTitleGlow {
+              0%, 8% {
+                opacity: 1;
+                transform: scale(1.06);
+                text-shadow: 0 0 22px rgba(143,182,201,0.62);
+              }
+              18%, 100% {
+                opacity: 0.72;
+                transform: scale(1);
+                text-shadow: 0 0 0 rgba(143,182,201,0);
+              }
             }
 
             @keyframes liveWordPulse {
@@ -3984,43 +3986,39 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none fixed inset-x-0 bottom-[120px] z-[40] px-6 md:inset-x-auto md:bottom-auto md:right-[calc(50vw-610px)] md:top-[160px] md:w-[300px] lg:right-[calc(50vw-650px)] xl:right-[calc(50vw-690px)]">
-        <div className="overflow-hidden bg-black/0 px-2 py-2 [mask-image:linear-gradient(180deg,transparent,black_18%,black_78%,transparent)]">
-          <div className="mb-2 text-[9px] font-semibold uppercase tracking-[0.20em] text-[#8FB6C9]/72">
-            VC Meeting
-          </div>
-
-          <div className="relative h-[104px] overflow-hidden md:h-[230px]">
-            <div className="absolute inset-0 animate-[liveEntryScenarioFade_30s_linear_infinite]">
-              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
-                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">VC Meeting</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">VC: Why now?</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Lead with timing.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor demand signal.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
+      <div className="pointer-events-none fixed inset-x-0 bottom-[72px] z-[40] px-6 md:inset-x-auto md:bottom-auto md:left-[calc(50vw+300px)] md:top-[150px] md:w-[300px] lg:left-[calc(50vw+330px)] xl:left-[calc(50vw+360px)]">
+        <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_12%,black_78%,transparent)]">
+          <div className="relative h-[138px] overflow-hidden md:h-[250px]">
+            <div className="absolute inset-0 animate-[liveEntryScenarioOne_30s_linear_infinite]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
+              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="text-[#D7DBE4]/62">VC: Why now?</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
+                <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Anchor demand signal.</div>
+                <div className="text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
               </div>
             </div>
 
-            <div className="absolute inset-0 animate-[liveEntryScenarioFadeTwo_30s_linear_infinite]">
-              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
-                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Influencer Contract</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Protect optionality.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Ask for term limit.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
+            <div className="absolute inset-0 animate-[liveEntryScenarioTwo_30s_linear_infinite]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
+              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
+                <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Ask for term limit.</div>
+                <div className="text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
               </div>
             </div>
 
-            <div className="absolute inset-0 animate-[liveEntryScenarioFadeThree_30s_linear_infinite]">
-              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
-                <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Interview</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Pause. Lead with outcome.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
-                <div className="text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor measurable result.</div>
-                <div className="text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
+            <div className="absolute inset-0 animate-[liveEntryScenarioThree_30s_linear_infinite]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
+              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
+                <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
+                <div className="text-[#D7DCFF]/78">GEORGE: Anchor measurable result.</div>
+                <div className="text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
               </div>
             </div>
           </div>
