@@ -2078,57 +2078,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
 
 
 
-const detectTriggerIntent = (text: string) => {
-  const lower = text.toLowerCase()
-
-  if (
-    lower.includes("what's the word") ||
-    lower.includes("whats the word") ||
-    lower.includes("word i'm looking for") ||
-    lower.includes("word im looking for")
-  ) {
-    return "word"
-  }
-
-  if (lower.includes("what should i say") || lower.includes("how do i say")) {
-    return "line"
-  }
-
-  if (
-    lower.includes("to be clear") ||
-    lower.includes("to clarify") ||
-    lower.includes("what i mean is") ||
-    lower.includes("i mean") ||
-    lower.includes("let me put it another way") ||
-    lower.includes("say that better") ||
-    lower.includes("clean that up") ||
-    lower.includes("give me the word") ||
-    lower.includes("what's the word") ||
-    lower.includes("whats the word") ||
-    lower.includes("what's a better word") ||
-    lower.includes("whats a better word")
-  ) {
-    return "reword"
-  }
-
-  if (lower.includes("give me a second") || lower.includes("hold on")) {
-    return "cue"
-  }
-
-  if (lower.includes("help me here")) {
-    return "urgent"
-  }
-
-  if (lower.includes("stay with me") || lower.includes("just listen")) {
-    return "listen"
-  }
-
-  return null
-}
-
-
-
-// LEGACY LIVE GOVERNOR BRIDGE.
 // This powers the older injectGovernedLiveCue() path through /api/george/live/govern.
 // It is not part of the active Deepgram transcript -> router -> controller -> action-authority path.
 // Preserve until Pro LIVE / legacy cue governance is fully classified.
