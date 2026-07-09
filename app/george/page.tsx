@@ -5949,7 +5949,7 @@ return (
                     </div>
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="hidden justify-end">
                     <button
                       type="button"
                       onClick={handleShareGeorge}
