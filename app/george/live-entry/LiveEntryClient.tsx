@@ -430,7 +430,7 @@ function PanelShell({
           
 
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[9px] uppercase tracking-[0.32em] text-[#4E7CFF]/58">
+            <div className="text-[9px] uppercase tracking-[0.32em] text-[#D7DBE4]/52">
               {label}
             </div>
 
@@ -2623,7 +2623,7 @@ const beginProofOfAwareness = async () => {
           <div className="relative z-30 max-w-[640px]">
 
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#4E7CFF]/54">
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#D7DBE4]/52">
               {liveEntryQuestionSurface.kicker}
             </div>
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
@@ -2647,7 +2647,7 @@ const beginProofOfAwareness = async () => {
               )}
             </div>
 
-            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#4E7CFF]/72' : 'text-white/42'}`}>
+            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#D7DBE4]/64' : 'text-white/42'}`}>
               {liveEntryQuestionSurface.helper}
             </div>
 
