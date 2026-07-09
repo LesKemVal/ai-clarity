@@ -3984,7 +3984,7 @@ Anything I should keep in mind?
             <button
               type="button"
               onClick={() => { window.location.href = "/george" }}
-              className="rounded-[0.95rem] border border-[#6F86FF]/40 bg-[#4169E1] px-4 py-3 text-left text-white shadow-[0_0_26px_rgba(65,105,225,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
+              className="rounded-[0.95rem] border border-[#6F86FF]/40 bg-[#4169E1] px-4 py-2.5 text-left text-white shadow-[0_0_26px_rgba(65,105,225,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
                 Ask GEORGE
@@ -3992,8 +3992,8 @@ Anything I should keep in mind?
               <span className="mt-1 block text-[12px] leading-5 text-white/78">
                 Think before you enter LIVE.
               </span>
-              <span className="mt-2 block text-[12px] leading-5 text-white/58">
-                Plan your objective, prepare responses, organize information, anticipate objections, and decide your next move before the conversation begins.
+              <span className="mt-3 inline-flex items-center text-[12px] font-medium tracking-[0.08em] text-white">
+                Plan with GEORGE →
               </span>
             </button>
 
