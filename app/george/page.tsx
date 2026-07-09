@@ -30,7 +30,8 @@ import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCac
 import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
-import { appendFollowUp, buildEvaluationResponse, buildTrainingFollowThrough, buildTrainingIntakeOverride, detectTrainingTrack, evaluateCDL, evaluateCNA, evaluateDrivers, evaluateGED, extractAnswers, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
+import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
+import { resolveTrainingRuntime } from '@/lib/george/runtime/training-runtime'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 import {
@@ -4613,46 +4614,22 @@ setTimeout(() => {
 
       
 
-      const answers = extractAnswers(text)
-      if (answers.length >= 3) {
-        const track = detectTrainingTrack(text)
+      const trainingRuntime = resolveTrainingRuntime({
+        text,
+        activePromptContext,
+      })
 
-        if (track === 'drivers') {
-          const result = evaluateDrivers(answers)
-          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
-          return buildEvaluationResponse(result)
-        }
-
-        if (track === 'cdl') {
-          const result = evaluateCDL(answers)
-          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
-          return buildEvaluationResponse(result)
-        }
-
-        if (track === 'ged') {
-          const result = evaluateGED(answers)
-          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
-          return buildEvaluationResponse(result)
-        }
-
-        if (track === 'cna') {
-          const result = evaluateCNA(answers)
-          setLastGuidedLine(result.score === result.total ? "You’re solid. Move forward." : `You got ${result.score}/${result.total}. Fix weak points and try again.`)
-          return buildEvaluationResponse(result)
-        }
+      if (trainingRuntime.guidedLine) {
+        setLastGuidedLine(trainingRuntime.guidedLine)
       }
 
-
-const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptContext)
-      if (trainingFollowThrough) {
-        firstResponseOverride = trainingFollowThrough
+      if (trainingRuntime.response) {
+        return trainingRuntime.response
       }
 
-      const trainingOverride = buildTrainingIntakeOverride(text)
-      if (!firstResponseOverride && trainingOverride) {
-        firstResponseOverride = trainingOverride
+      if (trainingRuntime.override) {
+        firstResponseOverride = trainingRuntime.override
       }
-
 
 
       if ((forceLive || liveMode) && isLiveIdentityQuestion(text)) {
