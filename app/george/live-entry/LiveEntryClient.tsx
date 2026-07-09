@@ -3999,11 +3999,11 @@ Anything I should keep in mind?
         </section>
       <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+250px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+270px)] xl:left-[calc(50vw+290px)]">
         <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_10%,black_82%,transparent)]">
-          <div className="relative h-[174px] overflow-hidden md:h-[210px]">
+          <div className="relative h-[174px] overflow-hidden md:h-[260px]">
             <div className="absolute left-0 right-0 top-0 animate-[liveEntryScenarioTrack_90s_linear_infinite]">
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
@@ -4014,7 +4014,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
@@ -4025,7 +4025,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
@@ -4036,7 +4036,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Sales Call</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">CLIENT: Why is this worth changing for?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Tie pain to cost.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The real cost is delay.</div>
@@ -4047,7 +4047,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Board Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">BOARD: What changed this quarter?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with signal.</div>
                   <div className="text-[#D7DBE4]/62">YOU: Retention improved while acquisition slowed.</div>
@@ -4058,7 +4058,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Performance Review</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">MANAGER: Where did you struggle?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Own it, then show correction.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I missed the signal early.</div>
@@ -4069,7 +4069,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Difficult Conversation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">THEM: That is not fair.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lower temperature.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I hear that.</div>
@@ -4080,7 +4080,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Presentation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">AUDIENCE: What should we remember?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Repeat the frame.</div>
                   <div className="text-[#D7DBE4]/62">YOU: The point is simple.</div>
@@ -4091,7 +4091,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Customer Support</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">CUSTOMER: I am frustrated.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Acknowledge first.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I understand why.</div>
@@ -4102,7 +4102,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">You Decide</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">ROOM: The conversation shifts.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Whatever the conversation, GEORGE has you covered.</div>
                   <div className="text-[#D7DBE4]/62">YOU: I know where to go next.</div>
@@ -4111,7 +4111,7 @@ Anything I should keep in mind?
 
               <div className="h-[210px]">
                 <div className="text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[11px]">
+                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
                 </div>
