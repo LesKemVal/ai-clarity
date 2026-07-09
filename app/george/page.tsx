@@ -8395,40 +8395,6 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 
-{(showLiveChooser || showLiveQuickMenu || showPreLiveSignalSurface || (!(forceLive || liveMode) && !showMobileHero)) && (
-  <div className="pointer-events-none fixed inset-x-0 bottom-[96px] z-[48] px-4 md:inset-x-auto md:bottom-auto md:right-8 md:top-[132px] md:w-[320px] lg:right-12 xl:right-16">
-    <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#03070C]/86 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.36)] backdrop-blur-xl [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(180deg,transparent,black_10%,black_90%,transparent)]">
-      <div className="mb-2 text-[9px] font-semibold uppercase tracking-[0.20em] text-[#8FB6C9]/72">
-        LIVE audio demo
-      </div>
-
-      <div className="relative h-[48px] overflow-hidden md:h-[168px]">
-        <div className="md:animate-[georgeLiveScenarioStack_24s_ease-in-out_infinite]">
-          <div className="h-[56px] md:h-[168px]">
-            <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">VC Meeting</div>
-            <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[georgeLiveTicker_22s_linear_infinite] md:whitespace-normal md:animate-none md:space-y-1 md:leading-5">
-              VC: Why now? · GEORGE: Lead with timing. · YOU: The market changed after Q2. · GEORGE: Anchor demand signal. · YOU: Customers are already pulling us forward.
-            </div>
-          </div>
-
-          <div className="h-[56px] md:h-[168px]">
-            <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Influencer Contract</div>
-            <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[georgeLiveTicker_22s_linear_infinite] md:whitespace-normal md:animate-none md:space-y-1 md:leading-5">
-              BRAND: We need exclusivity. · GEORGE: Protect optionality. · YOU: I can offer category exclusivity. · GEORGE: Ask for term limit. · YOU: Tie it to 60 days and performance.
-            </div>
-          </div>
-
-          <div className="h-[56px] md:h-[168px]">
-            <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Interview</div>
-            <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[georgeLiveTicker_22s_linear_infinite] md:whitespace-normal md:animate-none md:space-y-1 md:leading-5">
-              INTERVIEWER: Why should we trust your judgment? · GEORGE: Pause. Lead with outcome. · YOU: The strongest proof is what changed after I took ownership. · GEORGE: Anchor measurable result.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
 
 
 <div className={`${(forceLive || liveMode) ? 'fixed bottom-[96px] left-0 right-0 mx-auto' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
