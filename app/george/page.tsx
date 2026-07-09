@@ -6341,7 +6341,17 @@ return (
   if (message.role === 'assistant' && clean === greeting.trim()) return false
   return true
 }) : (messages.some((message) => message.role === 'user') ? messages : []))
-  .filter((m) => m.role !== 'system')
+  .filter((m, index) => {
+    if (m.role === 'system') return false
+    if (
+      !(forceLive || liveMode) &&
+      index === messages.findIndex((message) => message.role === 'user') &&
+      /^are you ready, george\??$/i.test(String(m.content || '').trim())
+    ) {
+      return false
+    }
+    return true
+  })
   .map((m, i, visibleMessages) => {
     const latestAssistantIndex = visibleMessages.map((msg) => msg.role).lastIndexOf('assistant')
     const firstAssistantIndex = visibleMessages.findIndex((msg) => msg.role === 'assistant')
