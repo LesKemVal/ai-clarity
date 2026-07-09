@@ -68,7 +68,7 @@ export function PostLiveConversationRecordPanel({
     <section className="pointer-events-auto w-full max-w-[720px] rounded-[1.25rem] border border-white/[0.07] bg-[#05070B]/88 p-4 text-[#DCEBFF]/72 shadow-[0_24px_90px_rgba(0,0,0,0.52),inset_0_1px_0_rgba(255,255,255,0.035)]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FF0C7]/72">
+          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FB6C9]/72">
             LIVE Complete
           </p>
           <h2 className="mt-1 text-[15px] font-medium text-[#F4F7FB]/86">
@@ -107,8 +107,8 @@ export function PostLiveConversationRecordPanel({
       </div>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        <div className="rounded-[0.95rem] border border-[#8FF0C7]/[0.12] bg-[#8FF0C7]/[0.045] p-3">
-          <p className="text-[9px] uppercase tracking-[0.18em] text-[#8FF0C7]/54">Outcome Review</p>
+        <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/54">Outcome Review</p>
           <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/76">
             {label(record.latestOutcome?.currentState || record.latestOutcome?.observedProgress)}
           </p>

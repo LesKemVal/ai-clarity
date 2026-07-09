@@ -89,7 +89,7 @@ export function RelevantDocumentationPanel({
         </div>
 
         {document && !reading && (
-          <div className="shrink-0 rounded-full border border-emerald-300/[0.14] bg-emerald-300/[0.06] px-2.5 py-1 text-[8px] uppercase tracking-[0.14em] text-emerald-100/68">
+          <div className="shrink-0 rounded-full border border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.06] px-2.5 py-1 text-[8px] uppercase tracking-[0.14em] text-[#D7DCFF]/68">
             Ready
           </div>
         )}

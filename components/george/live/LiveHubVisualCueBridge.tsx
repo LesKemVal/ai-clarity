@@ -154,7 +154,7 @@ export function LiveHubVisualCueBridge({
 
       {active && visualCue && receiverProfile !== 'audio_only' && (
         <div className="pointer-events-none fixed bottom-[236px] left-6 right-6 z-[9999] md:left-8 md:right-auto md:w-[440px]">
-          <div className="rounded-2xl border border-emerald-300/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-emerald-950/20 backdrop-blur-xl">
+          <div className="rounded-2xl border border-[#8FB6C9]/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-[#8FB6C9]/20 backdrop-blur-xl">
             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
               GEORGE
             </div>

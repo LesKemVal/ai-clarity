@@ -108,7 +108,7 @@ export default function LiveContinuationTestPage() {
           <div className="mt-4 grid gap-3 text-sm">
             <div className="flex justify-between border-b border-white/10 pb-2">
               <span className="text-white/50">Candidate</span>
-              <span className={result.candidate ? 'text-emerald-300' : 'text-white'}>
+              <span className={result.candidate ? 'text-[#8FB6C9]' : 'text-white'}>
                 {String(result.candidate)}
               </span>
             </div>

@@ -8018,11 +8018,11 @@ if (liveMode) {
 
         <div className="space-y-3">
           {liveOutcomeReview.milestone && (
-            <div className="rounded-[0.75rem] border border-emerald-400/14 bg-emerald-400/[0.045] px-3 py-2">
+            <div className="rounded-[0.75rem] border border-[#8FB6C9]/14 bg-[#8FB6C9]/[0.045] px-3 py-2">
               <div className="text-[9px] uppercase tracking-[0.18em] text-[#D7DCFF]/44">
                 Milestone
               </div>
-              <div className="mt-1 text-[12px] leading-5 text-emerald-50/74">
+              <div className="mt-1 text-[12px] leading-5 text-[#D7DCFF]/74">
                 {liveOutcomeReview.milestone.replace(/^Milestone:\s*/i, '')}
               </div>
             </div>
@@ -8033,7 +8033,7 @@ if (liveMode) {
             <input
               value={liveOutcomeReview.desiredOutcome}
               onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, desiredOutcome: event.target.value })}
-              className="mt-1 w-full rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+              className="mt-1 w-full rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] text-[#D7DBE4]/72 outline-none focus:border-[#8FB6C9]/24"
             />
           </label>
 
@@ -8047,7 +8047,7 @@ if (liveMode) {
                   onClick={() => setLiveOutcomeReview({ ...liveOutcomeReview, observedProgress: state })}
                   className={`rounded-[0.6rem] border px-2 py-1.5 text-left text-[10px] uppercase tracking-[0.12em] transition ${
                     liveOutcomeReview.observedProgress === state
-                      ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-[#D7DCFF]/78'
+                      ? 'border-[#8FB6C9]/24 bg-[#8FB6C9]/[0.06] text-[#D7DCFF]/78'
                       : 'border-white/[0.055] bg-black/[0.14] text-white/34 hover:text-white/62'
                   }`}
                 >
@@ -8077,7 +8077,7 @@ if (liveMode) {
               value={liveOutcomeReview.possibleSecondaryOutcome}
               onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, possibleSecondaryOutcome: event.target.value })}
               rows={2}
-              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-[#8FB6C9]/24"
             />
           </label>
 
@@ -8087,7 +8087,7 @@ if (liveMode) {
               value={liveOutcomeReview.notes}
               onChange={(event) => setLiveOutcomeReview({ ...liveOutcomeReview, notes: event.target.value })}
               rows={2}
-              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-emerald-400/24"
+              className="mt-1 w-full resize-none rounded-[0.65rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/72 outline-none focus:border-[#8FB6C9]/24"
             />
           </label>
         </div>
@@ -8436,7 +8436,7 @@ Continue from here, tell me what changed, or start fresh.`
     <div className="flex justify-between gap-2">
 
       {([
-        ['WIN', '✓ Won', 'text-green-400'],
+        ['WIN', '✓ Won', 'text-[#8FB6C9]'],
         ['LOSS', '✗ Lost', 'text-red-400'],
         ['FOLLOW_UP', '↻ Follow-up', 'text-yellow-400'],
       ] as const).map(([signal, label, colorClass]) => (

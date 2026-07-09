@@ -3531,7 +3531,7 @@ Anything I should keep in mind?
                   <div className="flex items-start gap-3">
                     <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                       active
-                        ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                        ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(143,182,201,0.50)]'
                         : 'bg-white/[0.14]'
                     }`} />
 
@@ -3580,7 +3580,7 @@ Anything I should keep in mind?
                       <div className="flex items-start gap-3">
                         <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                           active
-                            ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                            ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(143,182,201,0.50)]'
                             : 'bg-white/[0.14]'
                         }`} />
 
@@ -3769,7 +3769,7 @@ Anything I should keep in mind?
                     <div className="flex items-start gap-3">
                       <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                         active
-                          ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(52,211,153,0.50)]'
+                          ? 'bg-[#8FB6C9] shadow-[0_0_10px_rgba(143,182,201,0.50)]'
                           : 'bg-white/[0.14]'
                       }`} />
 
