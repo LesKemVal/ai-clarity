@@ -67,6 +67,7 @@ import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-aware
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 import { resolveLiveIntentRuntime } from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolveDomainRuntime } from '@/lib/george/runtime/domain-router'
+import { detectLiveFriction } from '@/lib/george/live-runtime/live-friction'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -2076,35 +2077,6 @@ const [lastDomain, setLastDomain] = useState<string | null>(null)
   
 
 
-const scoreFriction = (text: string) => {
-  const lower = text.toLowerCase()
-  let score = 0
-
-  if (lower.includes("not sure") || lower.includes("not certain")) score += 2
-  if (lower.includes("won’t work") || lower.includes("wont work")) score += 3
-  if (lower.includes("we usually don’t") || lower.includes("we usually dont")) score += 2
-  if (lower.includes("what do you want to do")) score += 3
-  if (lower.includes("where do we go from here")) score += 3
-  if (lower.includes("maybe")) score += 1
-  if (lower.includes("i guess")) score += 1
-
-  return score
-}
-
-const detectFriction = (text: string) => {
-  const lower = text.toLowerCase()
-
-  return (
-    lower.includes("that won’t work") ||
-    lower.includes("that wont work") ||
-    lower.includes("i’m not sure") ||
-    lower.includes("im not sure") ||
-    lower.includes("we usually don’t") ||
-    lower.includes("we usually dont") ||
-    lower.includes("what do you want to do") ||
-    lower.includes("where do we go from here")
-  )
-}
 
 const detectTriggerIntent = (text: string) => {
   const lower = text.toLowerCase()
@@ -5294,7 +5266,7 @@ responseTimerRef.current = setTimeout(() => {
   }
 
   const text = liveTranscript || ""
-  const friction = detectFriction(text)
+  const friction = detectLiveFriction(text)
   const score = scoreFriction(text)
 
   if (!friction) return
