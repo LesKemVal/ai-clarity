@@ -3871,14 +3871,31 @@ Anything I should keep in mind?
           </h1>
 
           <style jsx>{`
-            @keyframes liveEntryTickerScroll {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
+            @keyframes liveEntryConversationRise {
+              0% { transform: translateY(48px); }
+              100% { transform: translateY(-520px); }
             }
 
-            @keyframes liveEntryScenarioStack {
-              0%, 27% { transform: translateY(0); opacity: 1; }
-              31%, 33% { transform: translateY(-34%); opacity: 0.72; }
+            @keyframes liveEntryScenarioFade {
+              0%, 30% { opacity: 1; }
+              33%, 63% { opacity: 0; }
+              66%, 96% { opacity: 0; }
+              100% { opacity: 1; }
+            }
+
+            @keyframes liveEntryScenarioFadeTwo {
+              0%, 30% { opacity: 0; }
+              33%, 63% { opacity: 1; }
+              66%, 100% { opacity: 0; }
+            }
+
+            @keyframes liveEntryScenarioFadeThree {
+              0%, 63% { opacity: 0; }
+              66%, 96% { opacity: 1; }
+              100% { opacity: 0; }
+            }
+
+            31%, 33% { transform: translateY(-34%); opacity: 0.72; }
               36%, 61% { transform: translateY(-34%); opacity: 1; }
               65%, 67% { transform: translateY(-68%); opacity: 0.72; }
               70%, 95% { transform: translateY(-68%); opacity: 1; }
@@ -3960,35 +3977,43 @@ Anything I should keep in mind?
           </div>
 
         </section>
-
-
       <div className="pointer-events-none fixed inset-x-0 bottom-5 z-[40] px-5 md:inset-x-auto md:bottom-auto md:right-8 md:top-[132px] md:w-[320px] lg:right-12 xl:right-16">
-        <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#03070C]/86 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.36)] backdrop-blur-xl [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)] md:[mask-image:linear-gradient(180deg,transparent,black_10%,black_90%,transparent)]">
+        <div className="overflow-hidden rounded-[1rem] border border-[#8FB6C9]/[0.12] bg-[#03070C]/86 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.36)] backdrop-blur-xl [mask-image:linear-gradient(180deg,transparent,black_14%,black_84%,transparent)]">
           <div className="mb-2 text-[9px] font-semibold uppercase tracking-[0.20em] text-[#8FB6C9]/72">
             LIVE audio demo
           </div>
 
-          <div className="relative h-[48px] overflow-hidden md:h-[168px]">
-            <div className="md:animate-[liveEntryScenarioStack_24s_ease-in-out_infinite]">
-              <div className="h-[56px] md:h-[168px]">
+          <div className="relative h-[116px] overflow-hidden md:h-[260px]">
+            <div className="absolute inset-0 animate-[liveEntryScenarioFade_30s_linear_infinite]">
+              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">VC Meeting</div>
-                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
-                  VC: Why now? · GEORGE: Lead with timing. · YOU: The market changed after Q2. · GEORGE: Anchor demand signal. · YOU: Customers are already pulling us forward.
-                </div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">VC: Why now?</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Lead with timing.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor demand signal.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
               </div>
+            </div>
 
-              <div className="h-[56px] md:h-[168px]">
+            <div className="absolute inset-0 animate-[liveEntryScenarioFadeTwo_30s_linear_infinite]">
+              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Influencer Contract</div>
-                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
-                  BRAND: We need exclusivity. · GEORGE: Protect optionality. · YOU: I can offer category exclusivity. · GEORGE: Ask for term limit. · YOU: Tie it to 60 days and performance.
-                </div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Protect optionality.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Ask for term limit.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
               </div>
+            </div>
 
-              <div className="h-[56px] md:h-[168px]">
+            <div className="absolute inset-0 animate-[liveEntryScenarioFadeThree_30s_linear_infinite]">
+              <div className="absolute left-0 right-0 animate-[liveEntryConversationRise_10s_linear_infinite] space-y-2">
                 <div className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/70">Interview</div>
-                <div className="mt-1 whitespace-nowrap text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/62 animate-[liveEntryTickerScroll_22s_linear_infinite] md:whitespace-normal md:animate-none md:leading-5">
-                  INTERVIEWER: Why should we trust your judgment? · GEORGE: Pause. Lead with outcome. · YOU: The strongest proof is what changed after I took ownership. · GEORGE: Anchor measurable result.
-                </div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Pause. Lead with outcome.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
+                <div className="rounded-[0.62rem] bg-[#8FB6C9]/[0.06] px-2 py-1 text-[10px] leading-4 text-[#D7DCFF]/72">GEORGE: Anchor measurable result.</div>
+                <div className="rounded-[0.62rem] bg-white/[0.025] px-2 py-1 text-[10px] leading-4 text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
               </div>
             </div>
           </div>
