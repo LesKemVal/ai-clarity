@@ -17,13 +17,13 @@ export default function BxPageHeader({
 }: BxPageHeaderProps) {
   const showBack = Boolean(backLabel)
   const backClass =
-    'rounded-[0.58rem] border border-[#6F86FF]/40 bg-[#4169E1] px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.20em] text-white shadow-[0_0_18px_rgba(65,105,225,0.24)] transition hover:bg-[#5478F0] hover:text-white'
+    'inline-flex h-[26px] items-center justify-center rounded-[0.46rem] border border-[#6F86FF]/35 bg-[#4169E1] px-2.5 text-[8.5px] font-semibold uppercase leading-none tracking-[0.16em] text-white shadow-[0_0_14px_rgba(65,105,225,0.22)] transition hover:bg-[#5478F0] hover:text-white'
 
   return (
     <header className="relative mb-5 flex items-center justify-between">
-      <div className="flex min-w-0 items-center gap-4">
-        <Link href="/" aria-label="Go to BRANESx home" className="group flex h-[64px] w-[64px] shrink-0 items-center justify-center">
-          <img src="/logofav.png" alt="Bx" className="h-[58px] w-[58px] object-contain opacity-[0.96] transition group-hover:opacity-100" />
+      <div className="flex min-w-0 items-center gap-3">
+        <Link href="/" aria-label="Go to BRANESx home" className="group flex h-[58px] w-[58px] shrink-0 items-center justify-center">
+          <img src="/logofav.png" alt="Bx" className="h-[52px] w-[52px] object-contain opacity-[0.96] transition group-hover:opacity-100" />
         </Link>
 
         {showBack && onBack ? (
