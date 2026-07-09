@@ -64,6 +64,7 @@ import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
+import { resolveLiveIntentRuntime } from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolveDomainRuntime } from '@/lib/george/runtime/domain-router'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -4715,170 +4716,60 @@ const trainingFollowThrough = buildTrainingFollowThrough(text, activePromptConte
           }
 
       if (!liveMode && activePromptContext === 'live_intent_bridge') {
-        const lower = text.trim().toLowerCase()
-        const noIntent = /^(no|nah|not now|cancel|accident|wrong|mistake|nevermind|never mind)\b/.test(lower)
-        const yesIntent = /^(yes|yeah|yep|correct|right|that|this|do it|continue|live)\b/.test(lower)
-
-        if (noIntent) {
-          try {
-            window.localStorage.removeItem('GEORGE_LIVE_INTENT_STAGE')
-            window.localStorage.removeItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
-          } catch {}
-
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            { role: 'assistant', content: 'No problem. We’ll stay here.' },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setActivePromptContext(null)
-          setActivePromptLabel(null)
-          setInput('')
-          setIsThinking(false)
-          return
-        }
-
         let sourceContext: any = null
         try {
           sourceContext = JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT') || 'null')
         } catch {}
 
-        const stage = window.localStorage.getItem('GEORGE_LIVE_INTENT_STAGE') || 'confirm_intent'
+        const liveIntentResult = resolveLiveIntentRuntime({
+          text,
+          stage: window.localStorage.getItem('GEORGE_LIVE_INTENT_STAGE') || 'confirm_intent',
+          sourceContext,
+        })
 
-        if (stage === 'confirm_intent') {
-          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_relation')
+        if (liveIntentResult.clearStage) {
+          try {
+            window.localStorage.removeItem('GEORGE_LIVE_INTENT_STAGE')
+          } catch {}
+        }
 
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: yesIntent
-                ? 'Good. Is LIVE for this session, or a different room you’re walking into?'
-                : 'I can do that. Is LIVE for this session, or a different room you’re walking into?',
-            },
-          ]
+        if (liveIntentResult.clearSourceContext) {
+          try {
+            window.localStorage.removeItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
+          } catch {}
+        }
 
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
+        if (liveIntentResult.nextStage) {
+          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', liveIntentResult.nextStage)
+        }
+
+        if (liveIntentResult.preLiveSignals) {
+          window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(liveIntentResult.preLiveSignals))
+        }
+
+        if (liveIntentResult.navigateToLiveEntry) {
+          window.location.href = '/george/live-entry?source=message'
           return
         }
 
-        if (stage === 'confirm_relation') {
-          const relatedToThis = /\b(this|same|here|yes|yeah|yep|related|current|conversation|session|thread)\b/.test(lower)
+        const next: Message[] = [
+          ...messagesRef.current,
+          ...(userMessage ? [userMessage] : []),
+          { role: 'assistant', content: liveIntentResult.assistantContent },
+        ]
 
-          if (relatedToThis && sourceContext?.summary) {
-            const source = String(sourceContext.summary || '').toLowerCase()
-            const direction =
-              /reg cf|cf-spv|broker|dealer|portal|capital|investor|raise|funding/.test(source)
-                ? 'Select structure and vendor path'
-                : /interview|hiring|candidate/.test(source)
-                  ? 'Prepare the room and answer clearly'
-                  : /negotiation|terms|price|deal/.test(source)
-                    ? 'Protect position and move toward terms'
-                    : 'Carry this session into LIVE'
+        setMessages(next)
+        messagesRef.current = next
 
-            const signals = {
-              role: '',
-              counterparty: '',
-              desiredOutcome: direction,
-              sourceContext: String(sourceContext.summary || '').slice(0, 700),
-            }
-
-            window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(signals))
-            window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_preview')
-
-            const next: Message[] = [
-              ...messagesRef.current,
-              ...(userMessage ? [userMessage] : []),
-              {
-                role: 'assistant',
-                content: `I think I have enough.\n\nSession: current GEORGE session\nDirection: ${direction}\n\nSay “confirm” and I’ll prepare the room.`,
-              },
-            ]
-
-            setMessages(next)
-            messagesRef.current = next
-            setInput('')
-            setIsThinking(false)
-            return
-          }
-
-          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'collect_signal')
-
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: 'Tell me the room and the outcome. For example: “interview with hiring manager — get the offer.”',
-            },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
-          return
+        if (liveIntentResult.clearPromptContext) {
+          setActivePromptContext(null)
+          setActivePromptLabel(null)
         }
 
-        if (stage === 'collect_signal') {
-          const signals = {
-            role: '',
-            counterparty: '',
-            desiredOutcome: text.trim(),
-            sourceContext: sourceContext?.summary || '',
-          }
-
-          window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(signals))
-          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_preview')
-
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: `I think I have enough.\n\nDirection: ${text.trim()}\n\nSay “confirm” and I’ll prepare the room.`,
-            },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
-          return
-        }
-
-        if (stage === 'confirm_preview') {
-          if (/\b(confirm|yes|yeah|yep|continue|go|start|preview)\b/.test(lower)) {
-            try {
-              window.localStorage.removeItem('GEORGE_LIVE_INTENT_STAGE')
-            } catch {}
-            window.location.href = '/george/live-entry?source=message'
-            return
-          }
-
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: 'Say “confirm” when you want me to prepare the room.',
-            },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
-          return
-        }
+        setInput('')
+        setIsThinking(false)
+        return
       }
-
 
       if (!firstResponseOverride && domainRuntime.firstResponseOverride) {
         firstResponseOverride = domainRuntime.firstResponseOverride
