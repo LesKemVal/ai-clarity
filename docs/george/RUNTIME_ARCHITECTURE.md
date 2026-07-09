@@ -681,3 +681,13 @@ Delivery policy decides how that support behavior is rendered for `visual_only`,
 Do not create another runtime.
 Do not duplicate reasoning between audio and visual.
 Do not move this logic into `app/george/page.tsx`.
+
+## LIVE response and guidance ownership
+
+LIVE response governance belongs to `lib/george/live-voice/runtime/response-shaper.ts`.
+
+LIVE guidance/profile behavior belongs to `lib/george/live-runtime/live-guidance.ts`.
+
+`app/george/page.tsx` may call these runtime owners as part of UI wiring, but must not own response governance, LIVE guidance doctrine, support behavior, or signal interpretation.
+
+This preserves portability: LIVE behavior can move across UI surfaces because the behavior lives in runtime modules, not the page.

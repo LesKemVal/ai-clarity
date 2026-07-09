@@ -597,6 +597,19 @@ Do not duplicate reasoning between audio and visual.
 Do not move this logic into `app/george/page.tsx`.
 
 
+## Portability update — LIVE response and guidance ownership
+
+Recent validated work moved active LIVE behavior out of `app/george/page.tsx` into canonical runtime owners.
+
+- LIVE response governance now belongs to `lib/george/live-voice/runtime/response-shaper.ts`.
+- LIVE guidance/profile behavior now belongs to `lib/george/live-runtime/live-guidance.ts`.
+- `app/george/page.tsx` imports and wires these behaviors; it does not own the behavior.
+- `lib/george/conversation-engine.ts` is reduced further toward legacy/compatibility utility status.
+
+Production rule reaffirmed:
+
+`page.tsx` owns visibility and wiring. Runtime modules own behavior.
+
 ## Receiver profile delivery
 
 LIVE support behavior is adaptive internally. The user no longer selects fixed Guidance modes in the LIVE room. The user selects how support is received: Audio, Visual, or Audio + Visual. Audio remains the default receiver profile. Mic/listening control remains separate from audio output and receiver profile. Speaking Style remains user-facing.
