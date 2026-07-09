@@ -3109,33 +3109,7 @@ const beginProofOfAwareness = async () => {
             Continue
           </AwakeButton>
 
-          {liveBriefingReadyToContinue && (
-            <div className="mt-4 border-t border-white/[0.05] pt-4">
-              <div className="text-[10px] uppercase tracking-[0.24em] text-white/24">
-                Qualified shortcut
-              </div>
 
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => setLiveBriefingStep(3)}
-                  className="rounded-[0.72rem] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-[#4E7CFF]/28 hover:bg-[#4E7CFF]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
-                >
-                  Skip to Proof
-                </button>
-
-                {canBeginLiveFromBriefing && (
-                  <button
-                    type="button"
-                    onClick={() => startLive(false, editableResources, true)}
-                    className="rounded-[0.72rem] border border-[#4E7CFF]/28 bg-[#4E7CFF]/[0.055] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#D7DCFF]/78 transition hover:border-[#4E7CFF]/42 hover:bg-[#4E7CFF]/[0.09] hover:text-white active:scale-[0.98]"
-                  >
-                    Begin LIVE
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
         </PanelShell>
       )
     }
