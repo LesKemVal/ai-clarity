@@ -401,16 +401,16 @@ function PanelShell({
 }) {
   const stageGlow =
     stage === 1
-      ? 'rgba(111,134,255,0.08)'
+      ? 'rgba(65,105,225,0.08)'
       : stage === 2
-        ? 'rgba(111,134,255,0.12)'
+        ? 'rgba(65,105,225,0.12)'
         : 'rgba(174,182,255,0.16)'
 
   const stageBorder =
     stage === 1
       ? 'border-white/[0.055]'
       : stage === 2
-        ? 'border-[#6F86FF]/[0.12]'
+        ? 'border-[#4169E1]/[0.12]'
         : 'border-[#AEB6FF]/[0.18]'
 
   return (
@@ -430,7 +430,7 @@ function PanelShell({
           
 
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[9px] uppercase tracking-[0.32em] text-[#6F86FF]/58">
+            <div className="text-[9px] uppercase tracking-[0.32em] text-[#4169E1]/58">
               {label}
             </div>
 
@@ -466,7 +466,7 @@ function AwakeButton({
       onClick={onClick}
       className={`mt-5 w-full rounded-[1rem] border px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
         active
-          ? 'border-[#6F86FF]/55 bg-[#6F86FF]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(111,134,255,0.20)] hover:bg-[#6F86FF]/[0.15] hover:text-white active:scale-[0.98]'
+          ? 'border-[#4169E1]/55 bg-[#4169E1]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(65,105,225,0.20)] hover:bg-[#4169E1]/[0.15] hover:text-white active:scale-[0.98]'
           : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
       }`}
     >
@@ -2630,7 +2630,7 @@ const beginProofOfAwareness = async () => {
           <div className="relative z-30 max-w-[640px]">
 
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#6F86FF]/54">
+            <div className="text-[10px] uppercase tracking-[0.28em] text-[#4169E1]/54">
               {liveEntryQuestionSurface.kicker}
             </div>
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
@@ -2654,7 +2654,7 @@ const beginProofOfAwareness = async () => {
               )}
             </div>
 
-            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#6F86FF]/72' : 'text-white/42'}`}>
+            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#4169E1]/72' : 'text-white/42'}`}>
               {liveEntryQuestionSurface.helper}
             </div>
 
@@ -2688,7 +2688,7 @@ const beginProofOfAwareness = async () => {
                         onClick={() => toggleConversationResponsibility(option)}
                         className={`rounded-full border px-3 py-2 text-[11px] transition ${
                           active
-                            ? 'border-[#6F86FF]/42 bg-[#6F86FF]/[0.12] text-white'
+                            ? 'border-[#4169E1]/42 bg-[#4169E1]/[0.12] text-white'
                             : disabled
                               ? 'cursor-not-allowed border-white/[0.035] bg-white/[0.012] text-white/20'
                               : 'border-white/[0.065] bg-white/[0.018] text-white/48 hover:border-[#D7DCFF]/20 hover:text-white/72'
@@ -2709,7 +2709,7 @@ const beginProofOfAwareness = async () => {
                     value={customConversationResponsibility}
                     onChange={(event) => setCustomConversationResponsibility(event.target.value)}
                     autoFocus
-                    className="mt-4 w-full border-0 border-b border-[#6F86FF]/22 bg-transparent px-0 py-3 text-[16px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#6F86FF]/46"
+                    className="mt-4 w-full border-0 border-b border-[#4169E1]/22 bg-transparent px-0 py-3 text-[16px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4169E1]/46"
                     placeholder="write another responsibility..."
                   />
                 )}
@@ -2727,7 +2727,7 @@ const beginProofOfAwareness = async () => {
                   }
                 }}
                 autoFocus
-                className="mt-6 w-full border-0 border-b border-[#6F86FF]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#6F86FF]/46"
+                className="mt-6 w-full border-0 border-b border-[#4169E1]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4169E1]/46"
                 placeholder="say it here..."
               />
             )}
@@ -2737,7 +2737,7 @@ const beginProofOfAwareness = async () => {
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
                 onClick={() => { unlockLiveEntryVoice(); liveEntryQuestionSurface.submit() }}
-                className="rounded-[0.95rem] border border-[#6F86FF]/35 bg-[#6F86FF]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#6F86FF]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
+                className="rounded-[0.95rem] border border-[#4169E1]/35 bg-[#4169E1]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#4169E1]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
               >
                 {liveEntryQuestionSurface.primaryAction}
               </button>
@@ -2850,7 +2850,7 @@ const beginProofOfAwareness = async () => {
           </p>
           <a
             href="/george"
-            className="mt-5 block rounded-[0.82rem] border border-[#6F86FF]/[0.16] bg-[#6F86FF]/[0.08] px-4 py-3 text-center text-[13px] font-semibold text-[#D7DCFF]/86 transition hover:bg-[#6F86FF]/[0.14] hover:text-white"
+            className="mt-5 block rounded-[0.82rem] border border-[#4169E1]/[0.16] bg-[#4169E1]/[0.08] px-4 py-3 text-center text-[13px] font-semibold text-[#D7DCFF]/86 transition hover:bg-[#4169E1]/[0.14] hover:text-white"
           >
             Return to GEORGE
           </a>
@@ -2977,7 +2977,7 @@ const beginProofOfAwareness = async () => {
           title="Prepare Briefing"
           stage={1}
         >
-          <div className="mt-4 space-y-2 rounded-[0.9rem] border border-[#6F86FF]/[0.10] bg-black/22 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
+          <div className="mt-4 space-y-2 rounded-[0.9rem] border border-[#4169E1]/[0.10] bg-black/22 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
             <div className="text-[11.5px] leading-5 text-[#D7DBE4]/52">
               Review the briefing. The more accurate the signal, the better GEORGE can support timing, judgment, and execution.
             </div>
@@ -2989,7 +2989,7 @@ const beginProofOfAwareness = async () => {
                 disabled={briefingInputsLocked}
                 onChange={(event) => updateBriefingObjective(event.target.value)}
                 rows={1}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
                 placeholder={objectiveLabel}
               />
             </label>
@@ -3001,7 +3001,7 @@ const beginProofOfAwareness = async () => {
                   value={userPosition}
                   disabled={briefingInputsLocked}
                   onChange={(event) => setUserPosition(event.target.value)}
-                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
                   placeholder={positionLabel}
                 />
               </label>
@@ -3012,7 +3012,7 @@ const beginProofOfAwareness = async () => {
                   value={audienceType}
                   disabled={briefingInputsLocked}
                   onChange={(event) => setAudienceType(event.target.value)}
-                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
                   placeholder={audienceLabel}
                 />
               </label>
@@ -3025,7 +3025,7 @@ const beginProofOfAwareness = async () => {
                 disabled={briefingInputsLocked}
                 onChange={(event) => updateBriefingRoomSignal(event.target.value)}
                 rows={2}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
                 placeholder={observation}
               />
             </label>
@@ -3037,7 +3037,7 @@ const beginProofOfAwareness = async () => {
                 value={secondaryPosition}
                 onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
                 rows={1}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
                 placeholder="Optional. If empty, GEORGE treats this signal as inconclusive."
               />
               <div className="mt-1 text-[10px] leading-4 text-white/24">
@@ -3057,7 +3057,7 @@ const beginProofOfAwareness = async () => {
             )}
 
             {(briefingPreparation?.sufficientToBegin || briefingPreparation?.knownContext?.length > 0) && (
-              <div className="rounded-[0.82rem] border border-[#6F86FF]/[0.10] bg-[#6F86FF]/[0.035] px-3 py-3">
+              <div className="rounded-[0.82rem] border border-[#4169E1]/[0.10] bg-[#4169E1]/[0.035] px-3 py-3">
                 <div className="text-[9px] uppercase tracking-[0.22em] text-[#D7DCFF]/45">
                   Preparation memory
                 </div>
@@ -3088,14 +3088,14 @@ const beginProofOfAwareness = async () => {
 
           <label className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-2.5 transition ${
             liveBriefingToaAccepted
-              ? 'border-[#D7DCFF]/70 bg-[#6F86FF]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.28)]'
-              : 'border-[#6F86FF]/36 bg-[#6F86FF]/[0.035]'
+              ? 'border-[#D7DCFF]/70 bg-[#4169E1]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.28)]'
+              : 'border-[#4169E1]/36 bg-[#4169E1]/[0.035]'
           }`}>
             <input
               type="checkbox"
               checked={liveBriefingToaAccepted}
               onChange={(event) => { unlockLiveEntryVoice(); setLiveBriefingToaAccepted(event.target.checked) }}
-              className="mt-1 h-4 w-4 accent-[#6F86FF]"
+              className="mt-1 h-4 w-4 accent-[#4169E1]"
             />
             <span className="text-[12.5px] leading-5 text-[#D7DBE4]/72">
               I’ve reviewed this briefing. It accurately reflects what I want GEORGE to understand before entering LIVE.{' '}
@@ -3126,7 +3126,7 @@ const beginProofOfAwareness = async () => {
                 <button
                   type="button"
                   onClick={() => setLiveBriefingStep(3)}
-                  className="rounded-[0.72rem] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-[#6F86FF]/28 hover:bg-[#6F86FF]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                  className="rounded-[0.72rem] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-[#4169E1]/28 hover:bg-[#4169E1]/[0.055] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
                 >
                   Skip to Proof
                 </button>
@@ -3135,7 +3135,7 @@ const beginProofOfAwareness = async () => {
                   <button
                     type="button"
                     onClick={() => startLive(false, editableResources, true)}
-                    className="rounded-[0.72rem] border border-[#6F86FF]/28 bg-[#6F86FF]/[0.055] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#D7DCFF]/78 transition hover:border-[#6F86FF]/42 hover:bg-[#6F86FF]/[0.09] hover:text-white active:scale-[0.98]"
+                    className="rounded-[0.72rem] border border-[#4169E1]/28 bg-[#4169E1]/[0.055] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#D7DCFF]/78 transition hover:border-[#4169E1]/42 hover:bg-[#4169E1]/[0.09] hover:text-white active:scale-[0.98]"
                   >
                     Begin LIVE
                   </button>
@@ -3218,7 +3218,7 @@ const beginProofOfAwareness = async () => {
           onBack={() => setLiveBriefingStep(1)}
         >
           <div className="mt-3 space-y-3">
-            <div className="rounded-[0.82rem] border border-[#6F86FF]/[0.16] bg-[#6F86FF]/[0.045] px-4 py-3">
+            <div className="rounded-[0.82rem] border border-[#4169E1]/[0.16] bg-[#4169E1]/[0.045] px-4 py-3">
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
                 Receiver selected
               </div>
@@ -3232,7 +3232,7 @@ const beginProofOfAwareness = async () => {
               <button
                 type="button"
                 onClick={() => setLiveBriefingOpenMechanicsPanel(liveBriefingOpenMechanicsPanel === 'receiver' ? null : 'receiver')}
-                className="mt-3 rounded-[0.65rem] border border-[#6F86FF]/18 bg-[#6F86FF]/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#D7DCFF]/72 transition hover:border-[#6F86FF]/34 hover:bg-[#6F86FF]/[0.10]"
+                className="mt-3 rounded-[0.65rem] border border-[#4169E1]/18 bg-[#4169E1]/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#D7DCFF]/72 transition hover:border-[#4169E1]/34 hover:bg-[#4169E1]/[0.10]"
               >
                 {liveBriefingOpenMechanicsPanel === 'receiver' ? 'Collapse' : 'Change'}
               </button>
@@ -3249,7 +3249,7 @@ const beginProofOfAwareness = async () => {
                       onClick={() => setActiveReceiverProfile(panel.id)}
                       className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
                         active
-                          ? 'border-[#6F86FF]/[0.24] bg-[#6F86FF]/[0.055]'
+                          ? 'border-[#4169E1]/[0.24] bg-[#4169E1]/[0.055]'
                           : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
                       }`}
                     >
@@ -3260,7 +3260,7 @@ const beginProofOfAwareness = async () => {
                         {panel.line}
                       </span>
                       {active && (
-                        <span className="mt-3 block border-l border-[#6F86FF]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                        <span className="mt-3 block border-l border-[#4169E1]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                           {panel.detail}
                         </span>
                       )}
@@ -3294,7 +3294,7 @@ const beginProofOfAwareness = async () => {
                       setLiveBriefingCapabilitiesConfirmed(false)
                       setLiveBriefingOpenMechanicsPanel('speaking')
                     }}
-                    className="shrink-0 rounded-[0.65rem] border border-[#6F86FF]/24 bg-[#6F86FF]/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-[#D7DCFF]/66 transition hover:border-[#6F86FF]/38 hover:bg-[#6F86FF]/[0.14] hover:text-white"
+                    className="shrink-0 rounded-[0.65rem] border border-[#4169E1]/24 bg-[#4169E1]/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-[#D7DCFF]/66 transition hover:border-[#4169E1]/38 hover:bg-[#4169E1]/[0.14] hover:text-white"
                   >
                     Edit
                   </button>
@@ -3333,7 +3333,7 @@ const beginProofOfAwareness = async () => {
                           }}
                           className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
                             active
-                              ? 'border-[#6F86FF]/[0.24] bg-[#6F86FF]/[0.055]'
+                              ? 'border-[#4169E1]/[0.24] bg-[#4169E1]/[0.055]'
                               : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
                           }`}
                         >
@@ -3352,7 +3352,7 @@ const beginProofOfAwareness = async () => {
                 <button
                   type="button"
                   onClick={() => setLiveBriefingOpenMechanicsPanel('speaking')}
-                  className="w-full rounded-[0.72rem] border border-[#6F86FF]/18 bg-[#6F86FF]/[0.05] px-3 py-2.5 text-left text-[11px] font-semibold text-[#D7DCFF]/72 transition hover:border-[#6F86FF]/34 hover:bg-[#6F86FF]/[0.09]"
+                  className="w-full rounded-[0.72rem] border border-[#4169E1]/18 bg-[#4169E1]/[0.05] px-3 py-2.5 text-left text-[11px] font-semibold text-[#D7DCFF]/72 transition hover:border-[#4169E1]/34 hover:bg-[#4169E1]/[0.09]"
                 >
                   Choose Speaking Style
                 </button>
@@ -3470,7 +3470,7 @@ const beginProofOfAwareness = async () => {
           onBack={() => setLiveBriefingStep(2)}
         >
         {liveReadyAccepted && (
-          <div className="mt-5 rounded-[0.82rem] border border-[#6F86FF]/[0.16] bg-[#6F86FF]/[0.045] px-4 py-3">
+          <div className="mt-5 rounded-[0.82rem] border border-[#4169E1]/[0.16] bg-[#4169E1]/[0.045] px-4 py-3">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
@@ -3531,7 +3531,7 @@ Anything I should keep in mind?
                   <div className="flex items-start gap-3">
                     <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                       active
-                        ? 'bg-[#6F86FF] shadow-[0_0_10px_rgba(111,134,255,0.50)]'
+                        ? 'bg-[#4169E1] shadow-[0_0_10px_rgba(65,105,225,0.50)]'
                         : 'bg-white/[0.14]'
                     }`} />
 
@@ -3580,7 +3580,7 @@ Anything I should keep in mind?
                       <div className="flex items-start gap-3">
                         <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                           active
-                            ? 'bg-[#6F86FF] shadow-[0_0_10px_rgba(111,134,255,0.50)]'
+                            ? 'bg-[#4169E1] shadow-[0_0_10px_rgba(65,105,225,0.50)]'
                             : 'bg-white/[0.14]'
                         }`} />
 
@@ -3610,7 +3610,7 @@ Anything I should keep in mind?
                 onChange={(event) => setCustomLiveRoomObjective(event.target.value)}
                 rows={3}
                 placeholder="What should GEORGE help surface, reinforce, confirm, learn, or acquire?"
-                className="mt-2 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#6F86FF]/42 focus:bg-[#6F86FF]/[0.035]"
+                className="mt-2 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#4169E1]/42 focus:bg-[#4169E1]/[0.035]"
               />
             </label>
           )}
@@ -3769,7 +3769,7 @@ Anything I should keep in mind?
                     <div className="flex items-start gap-3">
                       <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
                         active
-                          ? 'bg-[#6F86FF] shadow-[0_0_10px_rgba(111,134,255,0.50)]'
+                          ? 'bg-[#4169E1] shadow-[0_0_10px_rgba(65,105,225,0.50)]'
                           : 'bg-white/[0.14]'
                       }`} />
 
@@ -3784,7 +3784,7 @@ Anything I should keep in mind?
                         <span className={`block overflow-hidden transition-all duration-300 ${
                           open ? 'max-h-44 opacity-100' : 'max-h-0 opacity-0'
                         }`}>
-                          <span className="mt-3 block border-l border-[#6F86FF]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
+                          <span className="mt-3 block border-l border-[#4169E1]/24 pl-3 text-[11px] leading-5 text-[#D7DBE4]/52">
                             {option.detail}
                           </span>
                         </span>
@@ -3825,7 +3825,7 @@ Anything I should keep in mind?
                       <input
                         value={quickLiveSteeringPhrases[row.key] || ''}
                         onChange={(event) => updateQuickLiveSteeringPhrase(row.key, event.target.value)}
-                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-[#6F86FF]/24 focus:bg-[#6F86FF]/[0.035]"
+                        className="w-full rounded-[0.58rem] border border-white/[0.055] bg-black/[0.20] px-2.5 py-2 text-[12px] leading-5 text-[#D7DBE4]/70 outline-none transition placeholder:text-white/20 focus:border-[#4169E1]/24 focus:bg-[#4169E1]/[0.035]"
                       />
                     </label>
                   ))}
@@ -3836,7 +3836,7 @@ Anything I should keep in mind?
             <button
               type="button"
               onClick={startQuickLive}
-              className="mt-5 w-full rounded-[0.95rem] border border-[#6F86FF]/35 bg-[#6F86FF]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#6F86FF]/[0.12] hover:text-white active:scale-[0.98]"
+              className="mt-5 w-full rounded-[0.95rem] border border-[#4169E1]/35 bg-[#4169E1]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#4169E1]/[0.12] hover:text-white active:scale-[0.98]"
             >
               Let&apos;s go to work
             </button>
@@ -3903,7 +3903,7 @@ Anything I should keep in mind?
             <button
               type="button"
               onClick={openQuickLiveSetup}
-              className="rounded-[0.95rem] border border-[#6F86FF]/28 bg-[#6F86FF]/[0.07] px-4 py-3 text-left transition hover:border-[#6F86FF]/44 hover:bg-[#6F86FF]/[0.11] active:scale-[0.99]"
+              className="rounded-[0.95rem] border border-[#4169E1]/28 bg-[#4169E1]/[0.07] px-4 py-3 text-left transition hover:border-[#4169E1]/44 hover:bg-[#4169E1]/[0.11] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
                 Quick LIVE
@@ -3947,7 +3947,7 @@ Anything I should keep in mind?
             <button
               type="button"
               onClick={() => { window.location.href = "/george" }}
-              className="rounded-[0.95rem] border border-[#6F86FF]/40 bg-[#4169E1] px-4 py-2.5 text-left text-white shadow-[0_0_26px_rgba(65,105,225,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
+              className="rounded-[0.95rem] border border-[#4169E1]/40 bg-[#4169E1] px-4 py-2.5 text-left text-white shadow-[0_0_26px_rgba(65,105,225,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
                 Ask GEORGE
@@ -4093,7 +4093,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="text-[17px] font-semibold uppercase tracking-[0.22em] text-[#6F86FF]/82 md:text-[16px]">VC Meeting</div>
+                <div className="text-[17px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/82 md:text-[16px]">VC Meeting</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
