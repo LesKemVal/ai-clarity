@@ -3884,24 +3884,10 @@ Anything I should keep in mind?
               90%, 97% { transform: translateY(-1890px); }
               100% { transform: translateY(-2100px); }
             }
-              34%, 58% { transform: translateY(-210px); }
-              67%, 91% { transform: translateY(-420px); }
-              100% { transform: translateY(0); }
-            }
 
             @keyframes liveEntryTitleGlow {
-              0%, 10% {
-                transform: scale(1.08);
-              }
-              18%, 100% {
-                transform: scale(1);
-              }
-            }
-              18%, 100% {
-                opacity: 0.72;
-                transform: scale(1);
-                text-shadow: 0 0 0 rgba(143,182,201,0);
-              }
+              0%, 10% { transform: scale(1.06); }
+              18%, 100% { transform: scale(1); }
             }
 
             @keyframes liveWordPulse {
@@ -3997,9 +3983,9 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+250px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+270px)] xl:left-[calc(50vw+290px)]">
+      <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+365px)] md:top-[180px] md:w-[380px] lg:left-[calc(50vw+380px)] xl:left-[calc(50vw+400px)]">
         <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_10%,black_82%,transparent)]">
-          <div className="relative h-[174px] overflow-hidden md:h-[260px]">
+          <div className="relative h-[174px] overflow-hidden md:h-[280px]">
             <div className="absolute left-0 right-0 top-0 animate-[liveEntryScenarioTrack_90s_linear_infinite]">
               <div className="h-[210px]">
                 <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
