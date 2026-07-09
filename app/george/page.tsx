@@ -2844,7 +2844,8 @@ const startLiveAudioRuntime = liveAudioRuntime.start
     }
 
     try {
-      window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_intent')
+      window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'choose_briefing_depth')
+      window.localStorage.setItem('GEORGE_PRE_LIVE_FROM_MESSAGE', '1')
       window.localStorage.setItem(
         'GEORGE_PRE_LIVE_SOURCE_CONTEXT',
         JSON.stringify({
@@ -2861,49 +2862,17 @@ const startLiveAudioRuntime = liveAudioRuntime.start
     setShowNormalUtilityMenu(null)
     setShowPromptMenu(false)
     setActivePromptLabel('LIVE')
-    setActivePromptContext('live_intent_bridge')
+    setActivePromptContext('live_message_bar_setup')
     setContextTurnCount(0)
 
-    const liveBridge = (() => {
-      try {
-        const lowered = content.toLowerCase()
-
-        const hasAny = (signals: string[]) =>
-          signals.some((signal) => lowered.includes(signal))
-
-        if (hasAny(['investor', 'pitch', 'raise', 'capital', 'fundraising', 'funding', 'deck', 'market', 'mass market'])) {
-          return "Later, you may decide to meet with investors.\n\nBesides you, who knows this opportunity better?\n\nI've helped shape the positioning, challenge assumptions, and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-        }
-
-        if (hasAny(['interview', 'candidate', 'resume', 'hiring', 'recruiter', 'job offer'])) {
-          return "Eventually, preparation becomes the interview itself.\n\nBesides you, who better understands the work you've done to get here?\n\nI've helped organize your thinking and prepare for the questions ahead.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-        }
-
-        if (hasAny(['doctor', 'appointment', 'symptom', 'medical', 'diagnosis', 'treatment', 'clinic'])) {
-          return "We've already organized your concerns and prepared the questions you wanted answered.\n\nBesides you, who has followed this situation more closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-        }
-
-        if (hasAny(['negotiat', 'offer', 'counteroffer', 'contract', 'terms', 'deal', 'leverage'])) {
-          return "We've already explored the tradeoffs.\n\nBesides you, who better understands what matters most?\n\nI've helped clarify priorities and prepare for difficult moments.\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-        }
-
-        if (hasAny(['meeting', 'client', 'customer', 'board', 'presentation', 'sales call', 'call', 'conversation'])) {
-          return "This may eventually move from preparation into a real conversation.\n\nBesides you, who has followed the work this closely?\n\nIf the conversation moves into the room, I'll be ready. Just ask when you're ready, or tap LIVE in the sidebar."
-        }
-      } catch {}
-
-      return `LIVE can support this conversation in real time if you decide to take GEORGE into the room.
-
-[LIVE]`
-    })()
-
-    const bridgeMessage: Message = {
+    const setupMessage: Message = {
       role: 'assistant',
-      content: liveBridge,
+      content: 'Quick LIVE or Full Brief?\n\nQuick LIVE uses this conversation and only asks for what is missing. Full Brief gives me more room to prepare before you enter LIVE.',
+      source: 'system_override',
     }
 
     setMessages((prev) => {
-      const next = [...prev, bridgeMessage]
+      const next = [...prev, setupMessage]
       messagesRef.current = next
       return next
     })
@@ -4613,6 +4582,100 @@ setTimeout(() => {
             imageDataUrl: pendingImage?.dataUrl || null,
           }
 
+      if (!liveMode && activePromptContext === 'live_message_bar_setup') {
+        const lower = text.trim().toLowerCase()
+        const wantsFull = /full|brief|deep|more|complete/.test(lower)
+        const wantsQuick = /quick|fast|use this|yes|live/.test(lower)
+
+        if (!wantsFull && !wantsQuick) {
+          const next: Message[] = [
+            ...messagesRef.current,
+            ...(userMessage ? [userMessage] : []),
+            {
+              role: 'assistant',
+              content: 'Choose Quick LIVE or Full Brief. Quick LIVE uses this conversation and only asks for what is missing. Full Brief gives me more room to prepare.',
+              source: 'system_override',
+            },
+          ]
+
+          setMessages(next)
+          messagesRef.current = next
+          setInput('')
+          setIsThinking(false)
+          return
+        }
+
+        if (wantsFull) {
+          startLiveSignalAcquisition()
+          setIsThinking(false)
+          return
+        }
+
+        try {
+          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_current_session')
+        } catch {}
+
+        setActivePromptContext('live_message_context_confirm')
+        setActivePromptLabel('LIVE')
+
+        const next: Message[] = [
+          ...messagesRef.current,
+          ...(userMessage ? [userMessage] : []),
+          {
+            role: 'assistant',
+            content: 'I\'ve been preparing with you already. Rather than start over, I can use everything we\'ve discussed so far in a LIVE conversation.\n\nIs that accurate?\n\nReply Yes, or tell me what to change.',
+            source: 'system_override',
+          },
+        ]
+
+        setMessages(next)
+        messagesRef.current = next
+        setInput('')
+        setIsThinking(false)
+        return
+      }
+
+      if (!liveMode && activePromptContext === 'live_message_context_confirm') {
+        const lower = text.trim().toLowerCase()
+        const confirmed = /^(yes|yeah|yep|correct|accurate|use it|use this)\b/.test(lower)
+
+        if (!confirmed) {
+          try {
+            const raw = window.localStorage.getItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
+            const current = raw ? JSON.parse(raw) : {}
+            window.localStorage.setItem(
+              'GEORGE_PRE_LIVE_SOURCE_CONTEXT',
+              JSON.stringify({
+                ...current,
+                correction: text.trim(),
+                correctedAt: Date.now(),
+              })
+            )
+          } catch {}
+
+          const next: Message[] = [
+            ...messagesRef.current,
+            ...(userMessage ? [userMessage] : []),
+            {
+              role: 'assistant',
+              content: 'Got it. I updated the briefing context. I’ll only ask for what I still need before LIVE.',
+              source: 'system_override',
+            },
+          ]
+
+          setMessages(next)
+          messagesRef.current = next
+          setInput('')
+          setIsThinking(false)
+          startLiveSignalAcquisition()
+          return
+        }
+
+        startLiveSignalAcquisition()
+        setIsThinking(false)
+        return
+      }
+
       if (!liveMode && activePromptContext === 'live_intent_bridge') {
         let sourceContext: any = null
         try {
@@ -5450,6 +5513,27 @@ useEffect(() => {
         window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
         window.localStorage.setItem('george_start_new_live', '1')
       } catch {}
+
+      let fromMessageLive = false
+      try {
+        fromMessageLive = window.localStorage.getItem('GEORGE_PRE_LIVE_FROM_MESSAGE') === '1'
+      } catch {}
+
+      if (fromMessageLive) {
+        const readyMessage: Message = {
+          role: 'assistant',
+          content: 'I have what I need to support you in the room. Tap LIVE and we’ll go. If you want to keep briefing me first, keep typing.',
+          source: 'system_override',
+        }
+
+        setMessages((prev) => {
+          const next = [...prev, readyMessage]
+          messagesRef.current = next
+          return next
+        })
+
+        return true
+      }
 
       window.setTimeout(() => {
         window.location.href = '/george/live-entry?source=signal'
@@ -6538,8 +6622,20 @@ I am listening now. Speak naturally. I will respond ${
 
             <button
               type="button"
-              onClick={() => openLiveEntryFromMessage(m)}
-              className="px-1 py-1 text-[11px] text-[#8FB6C9]/62 transition hover:text-[#D7DCFF] active:text-white"
+              onClick={() => {
+                try {
+                  if (window.localStorage.getItem('GEORGE_PRE_LIVE_FROM_MESSAGE') === '1' && activePromptContext === 'pre_live_signal_ready') {
+                    window.location.href = '/george/live-entry?source=message'
+                    return
+                  }
+                } catch {}
+                openLiveEntryFromMessage(m)
+              }}
+              className={`rounded-[0.55rem] border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
+                activePromptContext === 'pre_live_signal_ready'
+                  ? 'border-[#4E7CFF]/42 bg-[#4E7CFF]/[0.12] text-[#D7DCFF] hover:bg-[#4E7CFF]/[0.18] active:text-white'
+                  : 'border-[#4E7CFF]/24 bg-[#4E7CFF]/[0.055] text-[#8FB6C9]/78 hover:text-[#D7DCFF] active:text-white'
+              }`}
             >
               LIVE
             </button>
