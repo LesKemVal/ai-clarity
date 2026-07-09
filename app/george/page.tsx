@@ -6620,26 +6620,6 @@ I am listening now. Speak naturally. I will respond ${
               Share
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  if (window.localStorage.getItem('GEORGE_PRE_LIVE_FROM_MESSAGE') === '1' && activePromptContext === 'pre_live_signal_ready') {
-                    window.location.href = '/george/live-entry?source=message'
-                    return
-                  }
-                } catch {}
-                openLiveEntryFromMessage(m)
-              }}
-              className={`rounded-[0.55rem] border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
-                activePromptContext === 'pre_live_signal_ready'
-                  ? 'border-[#4E7CFF]/42 bg-[#4E7CFF]/[0.12] text-[#D7DCFF] hover:bg-[#4E7CFF]/[0.18] active:text-white'
-                  : 'border-[#4E7CFF]/24 bg-[#4E7CFF]/[0.055] text-[#8FB6C9]/78 hover:text-[#D7DCFF] active:text-white'
-              }`}
-            >
-              LIVE
-            </button>
-
               </>
             )}
 
@@ -8398,6 +8378,42 @@ Continue from here, tell me what changed, or start fresh.`
 
 
 <div className={`${(forceLive || liveMode) ? 'fixed bottom-[96px] left-0 right-0 mx-auto' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+
+{!(forceLive || liveMode) && !showMobileHero && messagesRef.current.some((message) => message.role === 'assistant') && (
+  <button
+    type="button"
+    onClick={() => {
+      try {
+        if (window.localStorage.getItem('GEORGE_PRE_LIVE_FROM_MESSAGE') === '1' && activePromptContext === 'pre_live_signal_ready') {
+          window.location.href = '/george/live-entry?source=message'
+          return
+        }
+      } catch {}
+
+      const latestAssistant = messagesRef.current
+        .slice()
+        .reverse()
+        .find((message) => message.role === 'assistant')
+
+      openLiveEntryFromMessage(latestAssistant || messagesRef.current[messagesRef.current.length - 1])
+    }}
+    className={`mb-2 w-full rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
+      activePromptContext === 'pre_live_signal_ready'
+        ? 'border-[#4E7CFF]/50 bg-[#4E7CFF]/[0.16] shadow-[0_0_34px_rgba(78,124,255,0.18)]'
+        : 'border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.08] hover:bg-[#4E7CFF]/[0.12]'
+    }`}
+  >
+    <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
+      LIVE
+    </div>
+    <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/68">
+      {activePromptContext === 'pre_live_signal_ready'
+        ? 'Tap LIVE and we’ll go.'
+        : 'Prepare this conversation for LIVE.'}
+    </div>
+  </button>
+)}
+
 
                     <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
 
