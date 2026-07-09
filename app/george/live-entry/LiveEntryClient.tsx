@@ -3884,9 +3884,6 @@ Anything I should keep in mind?
               90%, 97% { transform: translateY(-1890px); }
               100% { transform: translateY(-2100px); }
             }
-
-            @keyframes liveEntryTitleGlow {
-              0%, 10% { transform: scale(1.06); }
               18%, 100% { transform: scale(1); }
             }
 
@@ -3988,7 +3985,7 @@ Anything I should keep in mind?
           <div className="relative h-[174px] overflow-hidden md:h-[280px]">
             <div className="absolute left-0 right-0 top-0 animate-[liveEntryScenarioTrack_90s_linear_infinite]">
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">VC Meeting</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
@@ -3999,7 +3996,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Negotiation</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
@@ -4010,7 +4007,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Job Interview</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
@@ -4021,7 +4018,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Sales Call</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Sales Call</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">CLIENT: Why is this worth changing for?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Tie pain to cost.</div>
@@ -4032,7 +4029,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Board Meeting</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Board Meeting</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">BOARD: What changed this quarter?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lead with signal.</div>
@@ -4043,7 +4040,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Performance Review</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Performance Review</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">MANAGER: Where did you struggle?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Own it, then show correction.</div>
@@ -4054,7 +4051,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Difficult Conversation</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Difficult Conversation</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">THEM: That is not fair.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Lower temperature.</div>
@@ -4065,7 +4062,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Presentation</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Presentation</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">AUDIENCE: What should we remember?</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Repeat the frame.</div>
@@ -4076,7 +4073,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Customer Support</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Customer Support</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">CUSTOMER: I am frustrated.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Acknowledge first.</div>
@@ -4087,7 +4084,7 @@ Anything I should keep in mind?
               </div>
 
               <div className="h-[210px]">
-                <div className="animate-[liveEntryTitleGlow_9s_ease-out_infinite] text-[17px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">You Decide</div>
+                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">You Decide</div>
                 <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
                   <div className="text-[#D7DBE4]/62">ROOM: The conversation shifts.</div>
                   <div className="text-[#D7DCFF]/78">GEORGE: Whatever the conversation, GEORGE has you covered.</div>
