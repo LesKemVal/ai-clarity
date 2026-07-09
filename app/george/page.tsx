@@ -5911,7 +5911,7 @@ return (
           } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-10 md:pb-0 xl:px-16`}>
             <header className={`fixed top-0 left-0 right-0 flex justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200 ${"z-50"}`}>
               
-              {!(forceLive || liveMode) && !showMobileHero && (
+              {false && !(forceLive || liveMode) && !showMobileHero && (
                 <div
                   data-mobile-george-center
                   className="pointer-events-none absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#D7DBE4]/62 md:hidden"
@@ -6354,7 +6354,7 @@ return (
       className={`w-full min-w-0 space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
-        className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15px] md:text-[15.5px] landscape:text-[16px] ${(forceLive || liveMode) ? 'leading-[1.66]' : 'leading-[1.62]'} landscape:leading-7 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
+        className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.72]' : 'leading-[1.68]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
           m.role === 'user'
             ? (liveMode
               ? 'max-w-[82%] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
