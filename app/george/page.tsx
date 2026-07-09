@@ -1397,44 +1397,73 @@ const [suggestedSignal, setSuggestedSignal] = useState(0)
       : 'advice'
   }
   const [liveDeliveryStyle, setLiveDeliveryStyle] = useState<'cue' | 'advice' | 'line' | 'response' | 'expandedLine' | 'continue'>(getInitialLiveDeliveryStyle)
-  const liveSupportOptions: Array<{ id: typeof liveDeliveryStyle; label: string }> = [
-    { id: 'advice', label: 'Cue' },
-    { id: 'continue', label: 'Continuation' },
-    { id: 'response', label: 'Response' },
-    { id: 'expandedLine', label: 'Presentation' },
-  ]
-  const activeLiveSupportLabel =
-    liveSupportOptions.find((option) => option.id === liveDeliveryStyle)?.label || 'Cue'
-  const activeLiveCommunicationStyle =
-    (() => {
-      try {
-        const setup = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || 'null')
-        return (
-          String(setup?.communicationStyle || '').trim() ||
-          String(window.localStorage.getItem('george_live_communication_style') || '').trim() ||
-          'Adaptive'
-        )
-      } catch {
-        return 'Adaptive'
-      }
-    })()
-  const [showLiveSteeringReference, setShowLiveSteeringReference] = useState(false)
-  const selectLiveSupportStyle = (style: typeof liveDeliveryStyle) => {
-    setLiveDeliveryStyle(style)
+
+  type GeorgeLiveReceiverProfile = 'audio_only' | 'visual_only' | 'audio_visual'
+
+  const normalizeLiveReceiverProfile = (value: unknown): GeorgeLiveReceiverProfile | null => {
+    return value === 'audio_only' || value === 'visual_only' || value === 'audio_visual'
+      ? value
+      : null
+  }
+
+  const getInitialLiveReceiverProfile = (): GeorgeLiveReceiverProfile => {
+    if (typeof window === 'undefined') return 'audio_only'
+
+    return (
+      normalizeLiveReceiverProfile(window.localStorage.getItem('GEORGE_LIVE_RECEIVER_PROFILE')) ||
+      normalizeLiveReceiverProfile(window.localStorage.getItem('george_live_entry_receiver_profile')) ||
+      'audio_only'
+    )
+  }
+
+  const [liveReceiverProfile, setLiveReceiverProfile] = useState<GeorgeLiveReceiverProfile>(getInitialLiveReceiverProfile)
+
+  const getActiveLiveCommunicationStyle = () => {
+    try {
+      const setup = JSON.parse(window.localStorage.getItem('GEORGE_LIVE_SETUP') || 'null')
+      return (
+        String(setup?.communicationStyle || '').trim() ||
+        String(window.localStorage.getItem('george_live_communication_style') || '').trim() ||
+        'Adaptive'
+      )
+    } catch {
+      return 'Adaptive'
+    }
+  }
+
+  const activeLiveReceiverProfileLabel =
+    liveReceiverProfile === 'audio_visual'
+      ? 'Audio + Visual'
+      : liveReceiverProfile === 'visual_only'
+        ? 'Visual'
+        : 'Audio'
+
+  const cycleLiveReceiverProfile = () => {
+    const nextProfile =
+      liveReceiverProfile === 'audio_only'
+        ? 'visual_only'
+        : liveReceiverProfile === 'visual_only'
+          ? 'audio_visual'
+          : 'audio_only'
+
+    setLiveReceiverProfile(nextProfile)
 
     try {
-      window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', style)
-      window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', style)
+      window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', nextProfile)
+      window.localStorage.setItem('george_live_entry_receiver_profile', nextProfile)
+      window.dispatchEvent(new Event('george-live-receiver-profile-change'))
     } catch {}
-  }
 
-  const cycleLiveSupportStyle = () => {
-    const currentIndex = liveSupportOptions.findIndex((option) => option.id === liveDeliveryStyle)
-    const nextOption = liveSupportOptions[(currentIndex + 1) % liveSupportOptions.length] || liveSupportOptions[0]
-    if (!nextOption) return
-
-    selectLiveSupportStyle(nextOption.id)
+    setToastMessage(
+      nextProfile === 'audio_visual'
+        ? 'Receiver: Audio + Visual'
+        : nextProfile === 'visual_only'
+          ? 'Receiver: Visual'
+          : 'Receiver: Audio'
+    )
+    setShowToast(true)
   }
+const [showLiveSteeringReference, setShowLiveSteeringReference] = useState(false)
 const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
   const resolvedDeliveryMode =
     activeCampaign?.deliveryMode ||
@@ -6053,7 +6082,7 @@ return (
           deliveryStyle: liveDeliveryStyle,
         }}
         voiceEnabled={voiceOn}
-        receiverProfile={voiceOn ? 'audio_visual' : 'visual_only'}
+        receiverProfile={liveReceiverProfile}
         onSpeakCue={(cue, turnId) => speakText(cue, { source: 'hub', turnId })}
       />
       <div id="george-app-content" className="mx-auto flex min-h-[100dvh] w-full max-w-[1600px] overflow-x-hidden">
@@ -6238,11 +6267,7 @@ return (
                   aria-label="Open GEORGE sidebar"
                   title="Open"
                 >
-                  {hasSentFirstNormalMessage ? (
-                    <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-95" />
-                  ) : (
-                    '←'
-                  )}
+                  <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-95" />
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -6365,7 +6390,7 @@ return (
     <div className="pointer-events-none fixed left-0 right-0 top-[54px] z-[37] h-[340px] bg-gradient-to-b from-[#000000] via-[#000000]/100 via-[82%] to-[#000000]/0" />
     <div className="pointer-events-none fixed left-0 right-0 top-[96px] z-[160] flex justify-center px-4 pointer-events-none">
     <div ref={liveStatusStackRef} className="w-full max-w-[430px] md:max-w-[720px] xl:max-w-[860px]">
-      <LiveRoomStatusPanel
+<LiveRoomStatusPanel
         isListening={isListening}
         liveRoomActive={liveRoomActive}
         voiceOn={voiceOn}
@@ -6374,8 +6399,8 @@ return (
         chairLabel={liveRuntimeSupport?.chair || 'User'}
         objectiveLabel={liveRuntimeSupport?.objective || 'Outcome pending'}
         steeringLabels={getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room).slice(0, 3) as [string, string, string]}
-        activeSupportLabel={activeLiveSupportLabel}
-        communicationStyle={activeLiveCommunicationStyle}
+        receiverProfileLabel={activeLiveReceiverProfileLabel}
+        communicationStyle={getActiveLiveCommunicationStyle()}
         onRoomToggle={() => {
           const nextEnabled = !liveGeorgeEnabled
           setLiveGeorgeEnabled(nextEnabled)
@@ -6412,11 +6437,11 @@ return (
           setToastMessage('LIVE paused')
           setShowToast(true)
         }}
-        onSupportPressed={() => {
-          cycleLiveSupportStyle()
+        onReceiverPressed={() => {
+          cycleLiveReceiverProfile()
         }}
         onCommunicationPressed={() => {
-          setToastMessage(`Communication: ${activeLiveCommunicationStyle}`)
+          setToastMessage(`Communication: ${getActiveLiveCommunicationStyle()}`)
           setShowToast(true)
         }}
         onConversationPressed={() => {
@@ -6442,6 +6467,7 @@ return (
           setShowToast(true)
         }}
       />
+
     </div>
   </div>
   </>
@@ -6899,7 +6925,7 @@ I am listening now. Speak naturally. I will respond ${
           }}
           className={`ml-1 flex items-center justify-center rounded-full px-1 py-1 transition ${
             feedback[i] === 'up'
-              ? 'text-[#8FF0C7]/82'
+              ? 'text-[#8FB6C9]/82'
               : 'text-[#D7DBE4]/42 hover:text-[#D7DBE4]/78'
           }`}
           aria-label="This GEORGE support type helped"
@@ -7559,7 +7585,7 @@ if (liveMode) {
             }}
             className={`flex h-9 items-center justify-center px-1.5 text-[12px] font-medium tracking-[0.12em] transition ${
               voiceOn
-                ? 'text-emerald-100/72 hover:text-emerald-100'
+                ? 'text-[#D7DCFF]/72 hover:text-[#D7DCFF]'
                 : 'text-[#D7DBE4]/46 hover:text-[#D7DBE4]/78'
             }`}
             aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
@@ -7908,8 +7934,8 @@ if (liveMode) {
 
       <div className="divide-y divide-white/[0.055] border-y border-white/[0.055]">
         {[
-          ['Support', activeLiveSupportLabel],
-          ['Communication', activeLiveCommunicationStyle],
+          ['Receiver', activeLiveReceiverProfileLabel],
+          ['Communication', getActiveLiveCommunicationStyle()],
           ['Language Assist', 'Automatic'],
           ['Voice', voiceOn ? 'Audio On' : 'Muted'],
           ['Conversation', liveRoomActive ? 'Active' : 'Inactive'],
@@ -7982,7 +8008,7 @@ if (liveMode) {
         <div className="space-y-3">
           {liveOutcomeReview.milestone && (
             <div className="rounded-[0.75rem] border border-emerald-400/14 bg-emerald-400/[0.045] px-3 py-2">
-              <div className="text-[9px] uppercase tracking-[0.18em] text-emerald-100/44">
+              <div className="text-[9px] uppercase tracking-[0.18em] text-[#D7DCFF]/44">
                 Milestone
               </div>
               <div className="mt-1 text-[12px] leading-5 text-emerald-50/74">
@@ -8010,7 +8036,7 @@ if (liveMode) {
                   onClick={() => setLiveOutcomeReview({ ...liveOutcomeReview, observedProgress: state })}
                   className={`rounded-[0.6rem] border px-2 py-1.5 text-left text-[10px] uppercase tracking-[0.12em] transition ${
                     liveOutcomeReview.observedProgress === state
-                      ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-emerald-100/78'
+                      ? 'border-emerald-400/24 bg-emerald-400/[0.06] text-[#D7DCFF]/78'
                       : 'border-white/[0.055] bg-black/[0.14] text-white/34 hover:text-white/62'
                   }`}
                 >
@@ -8609,7 +8635,7 @@ Continue from here, tell me what changed, or start fresh.`
         className={`inline-flex items-center gap-2 px-1 py-1 text-[10px] font-medium uppercase tracking-[0.2em] ${voiceOn ? 'text-[#D7DBE4]/72' : 'text-[#D7DBE4]/38'} ${operationalMotion.hoverText} ${operationalMotion.press}`}
         aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
       >
-        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-emerald-200/70 shadow-[0_0_10px_rgba(110,231,183,0.28)]' : 'bg-white/24'}`} />
+        <span className={`h-1.5 w-1.5 rounded-full ${voiceOn ? 'bg-[#8FB6C9]/70 shadow-[0_0_10px_rgba(143,182,201,0.28)]' : 'bg-white/24'}`} />
         {voiceOn ? 'MUTE' : 'UNMUTE'}
       </button>
 
@@ -8641,23 +8667,23 @@ Continue from here, tell me what changed, or start fresh.`
             <button
               type="button"
               onClick={() => {
-                setToastMessage(`Support: ${activeLiveSupportLabel}`)
+                setToastMessage(`Receiver: ${activeLiveReceiverProfileLabel}`)
                 setShowToast(true)
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
             >
-              Support · {activeLiveSupportLabel}
+              Receiver · {activeLiveReceiverProfileLabel}
             </button>
 
             <button
               type="button"
               onClick={() => {
-                setToastMessage(`Communication: ${activeLiveCommunicationStyle}`)
+                setToastMessage(`Communication: ${getActiveLiveCommunicationStyle()}`)
                 setShowToast(true)
               }}
               className="block w-full py-1.5 text-left text-[11px] uppercase tracking-[0.16em] text-white/52 transition hover:text-white active:scale-[0.98]"
             >
-              Communication · {activeLiveCommunicationStyle}
+              Communication · {getActiveLiveCommunicationStyle()}
             </button>
 
             <button
@@ -8903,10 +8929,10 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         <div className="absolute right-2 bottom-full mb-2 flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={cycleLiveSupportStyle}
-                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-emerald-100/[0.18] hover:text-emerald-100/78 active:scale-[0.98]"
+                            onClick={cycleLiveReceiverProfile}
+                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#D7DCFF]/[0.18] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
                           >
-                            {activeLiveSupportLabel}
+                            {activeLiveReceiverProfileLabel}
                           </button>
 
                           <div className="relative">

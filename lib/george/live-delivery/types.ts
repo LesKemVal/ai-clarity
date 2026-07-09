@@ -11,7 +11,13 @@ export type GeorgeLiveDeliveryStyle =
   | 'expandedLine'
   | 'continue'
 
+export type GeorgeLiveReceiverProfile =
+  | 'visual_only'
+  | 'audio_only'
+  | 'audio_visual'
+
 export const DEFAULT_GEORGE_LIVE_DELIVERY_STYLE: GeorgeLiveDeliveryStyle = 'advice'
+export const DEFAULT_GEORGE_LIVE_RECEIVER_PROFILE: GeorgeLiveReceiverProfile = 'audio_only'
 
 export type GeorgeDeliveryCue = {
   turnId?: string
@@ -29,6 +35,7 @@ export type GeorgeDeliveryCue = {
 export type GeorgeDeliveryContext = {
   voiceEnabled?: boolean
   deliveryStyle?: GeorgeLiveDeliveryStyle
+  receiverProfile?: GeorgeLiveReceiverProfile
   room?: string
   objective?: string
   knownContext?: string
