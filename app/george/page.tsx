@@ -6346,7 +6346,7 @@ return (
     if (
       !(forceLive || liveMode) &&
       index === messages.findIndex((message) => message.role === 'user') &&
-      /^are you ready, george\??$/i.test(String(m.content || '').trim())
+      /^are you ready[,]?\s+george[?!.]*$/i.test(String(m.content || '').trim())
     ) {
       return false
     }
