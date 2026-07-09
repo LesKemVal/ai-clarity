@@ -3399,14 +3399,6 @@ const beginProofOfAwareness = async () => {
               >
                 Continue
               </button>
-
-              <button
-                type="button"
-                onClick={() => startLive(false, editableResources, true)}
-                className="rounded-[0.75rem] border border-white/[0.06] bg-transparent px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/36 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/72"
-              >
-                Begin LIVE
-              </button>
             </div>
           </div>
         </PanelShell>
