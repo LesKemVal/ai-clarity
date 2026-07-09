@@ -3872,7 +3872,14 @@ Anything I should keep in mind?
 
           <style jsx>{`
             @keyframes liveEntryLineStep {
-              0%, 12% { transform: translateY(24px); }
+              0%, 10% { transform: translateY(0); }
+              16%, 26% { transform: translateY(-34px); }
+              32%, 42% { transform: translateY(-68px); }
+              48%, 58% { transform: translateY(-102px); }
+              64%, 74% { transform: translateY(-136px); }
+              80%, 90% { transform: translateY(-170px); }
+              100% { transform: translateY(-170px); }
+            }
               15%, 27% { transform: translateY(-10px); }
               30%, 42% { transform: translateY(-44px); }
               45%, 57% { transform: translateY(-78px); }
@@ -3977,12 +3984,14 @@ Anything I should keep in mind?
                 Ask GEORGE
               </span>
               <span className="mt-1 block text-[12px] leading-5 text-white/78">
-                Plan before entering LIVE.
+                Think before you enter LIVE.
               </span>
               <span className="mt-2 block text-[12px] leading-5 text-white/58">
-                Use normal GEORGE to think through the room, sharpen your objective, prepare answers, or organize what matters before the conversation begins.
+                Plan your objective, prepare responses, organize information, anticipate objections, and decide your next move before the conversation begins.
               </span>
-            </button>\n\n            {hasLiveSession && (
+            </button>
+
+            {hasLiveSession && (
               <button
                 type="button"
                 onClick={() => setShowResumeConversationList(true)}
@@ -4002,12 +4011,12 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none relative z-[12] mt-5 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+340px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+350px)] xl:left-[calc(50vw+365px)]">
+      <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+250px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+270px)] xl:left-[calc(50vw+290px)]">
         <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_12%,black_78%,transparent)]">
-          <div className="relative h-[168px] overflow-hidden md:h-[250px]">
+          <div className="relative h-[154px] overflow-hidden md:h-[250px]">
             <div className="absolute inset-0 animate-[liveEntryScenarioOne_30s_linear_infinite]">
               <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-              <div className="absolute left-0 right-0 top-[64px] animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
+              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
                 <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
@@ -4018,7 +4027,7 @@ Anything I should keep in mind?
 
             <div className="absolute inset-0 animate-[liveEntryScenarioTwo_30s_linear_infinite]">
               <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
-              <div className="absolute left-0 right-0 top-[64px] animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
+              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
                 <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
@@ -4029,7 +4038,7 @@ Anything I should keep in mind?
 
             <div className="absolute inset-0 animate-[liveEntryScenarioThree_30s_linear_infinite]">
               <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
-              <div className="absolute left-0 right-0 top-[64px] animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
+              <div className="absolute left-0 right-0 top-[42px] animate-[liveEntryLineStep_10s_cubic-bezier(0.22,1,0.36,1)_infinite] space-y-2.5 text-[12px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
                 <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
