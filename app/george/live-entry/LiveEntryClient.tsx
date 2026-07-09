@@ -464,7 +464,7 @@ function AwakeButton({
       type="button"
       disabled={!active}
       onClick={onClick}
-      className={`mt-5 w-full rounded-[1rem] border px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
+      className={`mt-5 w-full rounded-[1rem] border px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition ${
         active
           ? 'border-[#8FB6C9]/55 bg-[#8FB6C9]/[0.10] text-[#D7DCFF]/90 shadow-[0_0_28px_rgba(143,182,201,0.20)] hover:bg-[#8FB6C9]/[0.15] hover:text-white active:scale-[0.98]'
           : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
@@ -2659,7 +2659,7 @@ const beginProofOfAwareness = async () => {
             </div>
 
             {!liveEntryQuestionSurface.readinessMessage && liveEntryQuestionSurface.example && (
-              <div className="mt-5 rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
+              <div className="mt-5 rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-2.5">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
                   Example
                 </div>
@@ -3727,7 +3727,7 @@ Anything I should keep in mind?
     }
 
     return (
-      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-[260px] pt-5 text-white sm:px-5 sm:pb-24 sm:pt-6">
         <div className="pointer-events-none absolute inset-0 bg-black" />
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
@@ -3739,7 +3739,7 @@ Anything I should keep in mind?
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
-          <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
+          <section className="rounded-[1.05rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.014),rgba(255,255,255,0.004))] p-3 shadow-[0_12px_34px_rgba(0,0,0,0.18)] sm:p-4">
             <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">QUICK LIVE</div>
 
             <h1 className="mt-2 text-[30px] font-semibold leading-[1.08] tracking-[-0.045em] text-white/92 md:text-[40px]">
@@ -3864,7 +3864,7 @@ Anything I should keep in mind?
         <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE</div>
 
-          <h1 className="mt-8 text-[38px] font-light uppercase leading-none tracking-[0.44em] text-[#D7DCFF]/82 sm:text-[44px]">
+          <h1 className="mt-6 text-[34px] font-light uppercase leading-none tracking-[0.44em] text-[#D7DCFF]/82 sm:text-[44px]">
             <span className="inline-block animate-[liveWordPulse_3.8s_ease-in-out_infinite]">
               LIVE
             </span>
@@ -3923,7 +3923,7 @@ Anything I should keep in mind?
             }
           `}</style>
 
-          <div className="mt-5 grid gap-2">
+          <div className="mt-4 grid gap-2">
             <button
               type="button"
               onClick={openQuickLiveSetup}
@@ -3986,12 +3986,12 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none fixed inset-x-0 bottom-[72px] z-[40] px-6 md:inset-x-auto md:bottom-auto md:left-[calc(50vw+300px)] md:top-[150px] md:w-[300px] lg:left-[calc(50vw+330px)] xl:left-[calc(50vw+360px)]">
+      <div className="pointer-events-none fixed inset-x-0 bottom-[132px] z-[40] px-8 md:inset-x-auto md:bottom-auto md:left-[calc(50vw+340px)] md:top-[154px] md:w-[300px] lg:left-[calc(50vw+350px)] xl:left-[calc(50vw+365px)]">
         <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_12%,black_78%,transparent)]">
-          <div className="relative h-[138px] overflow-hidden md:h-[250px]">
+          <div className="relative h-[152px] overflow-hidden md:h-[250px]">
             <div className="absolute inset-0 animate-[liveEntryScenarioOne_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
-              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">VC Meeting</div>
+              <div className="absolute left-0 right-0 top-11 animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">VC: Why now?</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
                 <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
@@ -4001,8 +4001,8 @@ Anything I should keep in mind?
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioTwo_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
-              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Negotiation</div>
+              <div className="absolute left-0 right-0 top-11 animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
                 <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
@@ -4012,8 +4012,8 @@ Anything I should keep in mind?
             </div>
 
             <div className="absolute inset-0 animate-[liveEntryScenarioThree_30s_linear_infinite]">
-              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[14px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
-              <div className="absolute left-0 right-0 top-8 animate-[liveEntryLineStep_10s_steps(1,end)_infinite] space-y-3 text-[12px] leading-5 md:text-[11px]">
+              <div className="animate-[liveEntryTitleGlow_10s_ease-out_infinite] text-[16px] font-semibold uppercase tracking-[0.22em] text-[#8FB6C9]/82 md:text-[16px]">Job Interview</div>
+              <div className="absolute left-0 right-0 top-11 animate-[liveEntryLineStep_10s_ease-in-out_infinite] space-y-3 text-[13px] leading-5 md:text-[11px]">
                 <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
                 <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
                 <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
