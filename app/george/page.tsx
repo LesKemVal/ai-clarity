@@ -21,8 +21,6 @@ import DesktopOperationalSurface from '@/components/george/DesktopOperationalSur
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
-import { getSteering } from '@/lib/george/steering'
-import { getGoalState, type GoalState } from '@/lib/george/goal-engine'
 import { buildBrilliantLiveTriggerResponse } from '@/lib/george/conversation-engine'
 import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-runtime/live-guidance'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
@@ -2381,15 +2379,6 @@ const redeemFounderCode = async () => {
   const [showPersonalizeModal, setShowPersonalizeModal] = useState(false)
   const [draftProfileName, setDraftProfileName] = useState('')
 
-  const [steeringHint, setSteeringHint] = useState<null | {
-    signal: string | null
-    label: string
-    reason: string
-    pulse: boolean
-  }>(null)
-  const [goalState, setGoalState] = useState<GoalState | null>(null)
-
-
   // FULL GEORGE WINDOW SYSTEM
   const [isFullMode, setIsFullMode] = useState(false)
   const [windowEndsAt, setWindowEndsAt] = useState<number | null>(null)
@@ -4673,21 +4662,6 @@ setTimeout(() => {
 })
       }
       setMessages(updatedMessages)
-
-      if (!liveMode) {
-        const steer = getSteering({
-          userText: text,
-          tier: currentTier,
-          conversationMode,
-        })
-        setSteeringHint(steer)
-
-        const goal = getGoalState({
-          userText: text,
-          tier: currentTier,
-        })
-        setGoalState(goal)
-      }
 
       messagesRef.current = updatedMessages
       setInput('')
