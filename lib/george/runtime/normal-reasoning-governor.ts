@@ -28,8 +28,8 @@ function scoreComplexity(userText: string) {
     reasons.push('moderate request length')
   }
 
-  if (/\b(strategy|negotiate|negotiation|investor|contract|terms|risk|decision|tradeoff|business plan|pitch deck|board|presentation|interview|proposal|roadmap|market|pricing|deal|offer|counteroffer)\b/i.test(lower)) {
-    score += 2
+  if (/\b(strategy|negotiate|negotiation|investor|contract|terms|risk|decision|tradeoff|business plan|pitch deck|board|presentation|interview|proposal|roadmap|market|pricing|deal|offer|counteroffer|crowdfunding|fundraising|capital raise|broker dealer|non-accredited|reg cf|regulation crowdfunding|reg a|reg d)\b/i.test(lower)) {
+    score += 3
     reasons.push('consequential work')
   }
 
@@ -79,7 +79,11 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
           ? (process.env.OPENAI_MODEL_BRILLIANT || process.env.OPENAI_MODEL || 'gpt-5')
           : tier === 'intelligent'
             ? (process.env.OPENAI_MODEL_INTELLIGENT || process.env.OPENAI_MODEL || 'gpt-4o')
-            : (process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini'),
+            : (
+              process.env.OPENAI_MODEL_INTELLIGENT ||
+              process.env.OPENAI_MODEL ||
+              'gpt-4o'
+            ),
       reason,
     }
   }
@@ -88,11 +92,9 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
     return {
       lane,
       model:
-        tier === 'brilliant'
-          ? (process.env.OPENAI_MODEL_INTELLIGENT || process.env.OPENAI_MODEL || 'gpt-4o')
-          : tier === 'intelligent'
-            ? (process.env.OPENAI_MODEL_INTELLIGENT || process.env.OPENAI_MODEL || 'gpt-4o')
-            : (process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini'),
+        process.env.OPENAI_MODEL_INTELLIGENT ||
+        process.env.OPENAI_MODEL ||
+        'gpt-4o',
       reason,
     }
   }
