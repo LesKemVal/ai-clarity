@@ -6371,8 +6371,8 @@ return (
         className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.72]' : 'leading-[1.68]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'max-w-[82%] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
-              : 'max-w-[min(82%,34rem)] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.07] bg-[linear-gradient(180deg,rgba(20,32,48,0.42),rgba(9,14,22,0.28))] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
+              ? 'ml-auto self-end max-w-[82%] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
+              : 'mr-auto self-start max-w-[min(82%,34rem)] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.07] bg-[linear-gradient(180deg,rgba(20,32,48,0.42),rgba(9,14,22,0.28))] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
             : (liveMode
               ? 'max-w-full text-left rounded-[1.15rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
               : 'message-assistant max-w-full text-left px-1 py-2')
