@@ -4930,16 +4930,7 @@ setTimeout(() => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: directResponse
-            ? [
-                ...updatedMessages,
-                {
-                  role: 'system',
-                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + directResponse,
-                  source: 'system_override'
-                }
-              ]
-            : updatedMessages,
+            messages: updatedMessages,
             voiceMode: liveMode ? voiceOn : false,
             liveRuntimeContext: liveRuntimePrefix || null,
             isFirstSession: updatedMessages.length <= 2,
@@ -4986,11 +4977,11 @@ setTimeout(() => {
 
         const constrained = isSmart && isHeavy
 
-        let finalContent = directResponse ?? (constrained
+        let finalContent = constrained
           ? `I can help with the next useful step.
 
 Tell me the outcome you want, and I’ll help you move toward it.`
-          : data.message)
+          : data.message
 
         if (!constrained && typeof finalContent === 'string') {
           if (conversationMode === 'brilliant_negotiation') {
