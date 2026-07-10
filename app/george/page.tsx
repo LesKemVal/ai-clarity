@@ -64,7 +64,11 @@ import { rememberLiveSpokenLine } from '@/lib/george/live-runtime/spoken-memory'
 import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-awareness-buffer'
 import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
-import { resolveLiveIntentRuntime } from '@/lib/george/live-runtime/live-intent-runtime'
+import {
+  resolveLiveIntentRuntime,
+  resolveLiveMessageBarSetup,
+  resolveLiveMessageContextConfirmation,
+} from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
 
@@ -4620,47 +4624,32 @@ setTimeout(() => {
           }
 
       if (!liveMode && activePromptContext === 'live_message_bar_setup') {
-        const lower = text.trim().toLowerCase()
-        const wantsFull = /full|brief|deep|more|complete/.test(lower)
-        const wantsQuick = /quick|fast|use this|yes|live/.test(lower)
+        const liveMessageBarResolution = resolveLiveMessageBarSetup({ text })
 
-        if (!wantsFull && !wantsQuick) {
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: 'Choose Quick LIVE or Full Brief.\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
-              source: 'system_override',
-            },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
-          return
-        }
-
-        if (wantsFull) {
+        if (liveMessageBarResolution.mode === 'start_full_brief') {
           startLiveSignalAcquisition()
           setIsThinking(false)
           return
         }
 
-        try {
-          window.localStorage.setItem('GEORGE_LIVE_INTENT_STAGE', 'confirm_current_session')
-        } catch {}
+        if (liveMessageBarResolution.mode === 'confirm_current_session') {
+          try {
+            window.localStorage.setItem(
+              'GEORGE_LIVE_INTENT_STAGE',
+              liveMessageBarResolution.nextStage
+            )
+          } catch {}
 
-        setActivePromptContext('live_message_context_confirm')
-        setActivePromptLabel('LIVE')
+          setActivePromptContext(liveMessageBarResolution.nextPromptContext)
+          setActivePromptLabel('LIVE')
+        }
 
         const next: Message[] = [
           ...messagesRef.current,
           ...(userMessage ? [userMessage] : []),
           {
             role: 'assistant',
-            content: 'I\'ve been preparing with you already. Rather than start over, I can use everything we\'ve discussed so far in a LIVE conversation.\n\nIs that accurate?\n\nReply Yes, or tell me what to change.',
+            content: liveMessageBarResolution.assistantContent,
             source: 'system_override',
           },
         ]
@@ -4673,18 +4662,20 @@ setTimeout(() => {
       }
 
       if (!liveMode && activePromptContext === 'live_message_context_confirm') {
-        const lower = text.trim().toLowerCase()
-        const confirmed = /^(yes|yeah|yep|correct|accurate|use it|use this)\b/.test(lower)
+        const contextConfirmation =
+          resolveLiveMessageContextConfirmation({ text })
 
-        if (!confirmed) {
+        if (contextConfirmation.mode === 'correct_current_session') {
           try {
-            const raw = window.localStorage.getItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
+            const raw =
+              window.localStorage.getItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
             const current = raw ? JSON.parse(raw) : {}
+
             window.localStorage.setItem(
               'GEORGE_PRE_LIVE_SOURCE_CONTEXT',
               JSON.stringify({
                 ...current,
-                correction: text.trim(),
+                correction: contextConfirmation.correction,
                 correctedAt: Date.now(),
               })
             )
@@ -4695,7 +4686,7 @@ setTimeout(() => {
             ...(userMessage ? [userMessage] : []),
             {
               role: 'assistant',
-              content: 'Got it. I updated the briefing context. I’ll only ask for what I still need before LIVE.',
+              content: contextConfirmation.assistantContent,
               source: 'system_override',
             },
           ]

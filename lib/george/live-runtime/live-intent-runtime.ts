@@ -25,6 +25,86 @@ export type LiveIntentRuntimeResult = {
   clearPromptContext?: boolean
 }
 
+export type LiveMessageBarResolution =
+  | {
+      mode: 'choose_briefing'
+      assistantContent: string
+    }
+  | {
+      mode: 'start_full_brief'
+    }
+  | {
+      mode: 'confirm_current_session'
+      assistantContent: string
+      nextPromptContext: 'live_message_context_confirm'
+      nextStage: 'confirm_current_session'
+    }
+  | {
+      mode: 'accept_current_session'
+    }
+  | {
+      mode: 'correct_current_session'
+      correction: string
+      assistantContent: string
+    }
+
+export function resolveLiveMessageBarSetup(input: {
+  text: string
+}): Extract<
+  LiveMessageBarResolution,
+  { mode: 'choose_briefing' | 'start_full_brief' | 'confirm_current_session' }
+> {
+  const lower = String(input.text || '').trim().toLowerCase()
+  const wantsFull = /\b(full|brief|deep|more|complete)\b/.test(lower)
+  const wantsQuick = /\b(quick|fast|use this|yes|live)\b/.test(lower)
+
+  if (!wantsFull && !wantsQuick) {
+    return {
+      mode: 'choose_briefing',
+      assistantContent:
+        'Choose Quick LIVE or Full Brief.\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
+    }
+  }
+
+  if (wantsFull) {
+    return {
+      mode: 'start_full_brief',
+    }
+  }
+
+  return {
+    mode: 'confirm_current_session',
+    assistantContent:
+      'I’ve been preparing with you already. Rather than start over, I can use everything we’ve discussed so far in a LIVE conversation.\n\nIs that accurate?\n\nReply Yes, or tell me what to change.',
+    nextPromptContext: 'live_message_context_confirm',
+    nextStage: 'confirm_current_session',
+  }
+}
+
+export function resolveLiveMessageContextConfirmation(input: {
+  text: string
+}): Extract<
+  LiveMessageBarResolution,
+  { mode: 'accept_current_session' | 'correct_current_session' }
+> {
+  const correction = String(input.text || '').trim()
+  const confirmed =
+    /^(yes|yeah|yep|correct|accurate|use it|use this)\b/i.test(correction)
+
+  if (confirmed) {
+    return {
+      mode: 'accept_current_session',
+    }
+  }
+
+  return {
+    mode: 'correct_current_session',
+    correction,
+    assistantContent:
+      'Got it. I updated the briefing context. I’ll only ask for what I still need before LIVE.',
+  }
+}
+
 export function resolveLiveIntentRuntime(input: {
   text: string
   stage?: string | null
