@@ -2061,16 +2061,6 @@ useEffect(() => {
         (entry) => (entry as PerformanceNavigationTiming).type === 'reload'
       )
 
-    if (browserReload) {
-      window.localStorage.removeItem(GEORGE_LAST_NORMAL_DRAFT)
-      skipNextTypewriterRef.current = true
-      restoredMessagesSignatureRef.current = ''
-      setMessages([])
-      messagesRef.current = []
-      normalSessionWriteReadyRef.current = true
-      return
-    }
-
     const activeSession = findGeorgeSessionToRestore({
       mode: 'normal',
       subscriberEmail,
@@ -2405,11 +2395,6 @@ const redeemFounderCode = async () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-
-    // Session bootstrap owns initial hydration only.
-    // Profile, tier, prompt-context, and conversation-mode changes must not
-    // destructively re-bootstrap an active Normal conversation.
-    if (!forceLive && normalSessionBootedRef.current) return
 
     const params = new URLSearchParams(window.location.search)
     const continuityToken = params.get('continuity')
