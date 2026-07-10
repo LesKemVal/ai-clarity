@@ -31,7 +31,6 @@ import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeS
 import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
-import { resolveTrainingRuntime } from '@/lib/george/runtime/training-runtime'
 import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 import {
@@ -66,7 +65,7 @@ import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-aware
 import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 import { resolveLiveIntentRuntime } from '@/lib/george/live-runtime/live-intent-runtime'
-import { resolveDomainRuntime } from '@/lib/george/runtime/domain-router'
+import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -4486,26 +4485,6 @@ const handleSend = useCallback(
         }
       })()
 
-      const domainRuntime = resolveDomainRuntime({
-        text,
-        activeMemoryFolder,
-        previousUserMessages: messagesRef.current
-          .filter((message) => message.role === 'user')
-          .map((message) => message.content || ''),
-      })
-
-      const domain = domainRuntime.detectedDomain
-      const activeDomain = domainRuntime.domain
-      const domainPrefix = domainRuntime.domainPrefix
-      let firstResponseOverride: string | null = null
-
-      // persist domain only when explicitly detected from current text
-      if (domain) {
-        setLastDomain(domain)
-      } else if (lastDomain && activeDomain === null) {
-        setLastDomain(null)
-      }
-
       const brilliantLiveTrigger = liveMode
         ? buildBrilliantLiveTriggerResponse(
             text,
@@ -4548,21 +4527,35 @@ setTimeout(() => {
 
       
 
-      const trainingRuntime = resolveTrainingRuntime({
+      const preProviderResolution = resolvePreProviderSend({
         text,
         activePromptContext,
+        activeMemoryFolder,
+        previousUserMessages: messagesRef.current
+          .filter((message) => message.role === 'user')
+          .map((message) => message.content || ''),
       })
 
-      if (trainingRuntime.guidedLine) {
-        setLastGuidedLine(trainingRuntime.guidedLine)
+      const detectedDomain = preProviderResolution.metadata.detectedDomain
+      const activeDomain = preProviderResolution.metadata.activeDomain
+      const providerSystemContext = preProviderResolution.systemContext || ''
+      const directResponse =
+        preProviderResolution.mode === 'direct'
+          ? preProviderResolution.response
+          : null
+
+      if (detectedDomain) {
+        setLastDomain(detectedDomain)
+      } else if (lastDomain && activeDomain === null) {
+        setLastDomain(null)
       }
 
-      if (trainingRuntime.response) {
-        return trainingRuntime.response
+      if (preProviderResolution.guidedLine) {
+        setLastGuidedLine(preProviderResolution.guidedLine)
       }
 
-      if (trainingRuntime.override) {
-        firstResponseOverride = trainingRuntime.override
+      if (preProviderResolution.mode === 'return') {
+        return preProviderResolution.response
       }
 
 
@@ -4776,10 +4769,6 @@ setTimeout(() => {
         return
       }
 
-      if (!firstResponseOverride && domainRuntime.firstResponseOverride) {
-        firstResponseOverride = domainRuntime.firstResponseOverride
-      }
-
       const liveRuntimePrefix = buildLiveRuntimeContext({
         liveMode,
         runtimeSupport: liveRuntimeSupport || null,
@@ -4789,7 +4778,9 @@ setTimeout(() => {
 
       const updatedMessages = [
         ...messagesRef.current,
-        ...(!liveMode && domainPrefix ? [{ role: 'system', content: domainPrefix } as Message] : []),
+        ...(!liveMode && providerSystemContext
+          ? [{ role: 'system', content: providerSystemContext } as Message]
+          : []),
         ...(liveRuntimePrefix ? [{ role: 'system', content: liveRuntimePrefix, source: 'system_override' } as Message] : []),
         ...(userMessage ? [userMessage] : [])
       ]
@@ -4851,11 +4842,11 @@ setTimeout(() => {
 
 
       try {
-        if (firstResponseOverride) {
+        if (directResponse) {
           stopBridgeSpeech()
         const assistantMessage: Message = {
             role: 'assistant',
-            content: firstResponseOverride,
+            content: directResponse,
             constrained: false,
           }
 
@@ -4939,12 +4930,12 @@ setTimeout(() => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: firstResponseOverride
+            messages: directResponse
             ? [
                 ...updatedMessages,
                 {
                   role: 'system',
-                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + firstResponseOverride,
+                  content: "You must respond with this exact guidance and tone. Do not generalize, soften, or replace it:\n\nI can be direct—even brash. Stay with me, and you can succeed.\n\n" + directResponse,
                   source: 'system_override'
                 }
               ]
@@ -4995,7 +4986,7 @@ setTimeout(() => {
 
         const constrained = isSmart && isHeavy
 
-        let finalContent = firstResponseOverride ?? (constrained
+        let finalContent = directResponse ?? (constrained
           ? `I can help with the next useful step.
 
 Tell me the outcome you want, and I’ll help you move toward it.`
