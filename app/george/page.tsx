@@ -6362,9 +6362,7 @@ return (
     <div
       key={i}
       className={`mx-auto w-full max-w-[760px] min-w-0 space-y-1 flex flex-col ${
-        m.role === 'user' && (forceLive || liveMode)
-          ? 'items-end'
-          : 'items-start'
+        m.role === 'user' ? 'items-end' : 'items-start'
       }`}
     >
       <div
@@ -6372,7 +6370,7 @@ return (
           m.role === 'user'
             ? (liveMode
               ? 'ml-auto self-end max-w-[82%] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
-              : 'mr-auto self-start max-w-[min(82%,34rem)] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.07] bg-[linear-gradient(180deg,rgba(20,32,48,0.42),rgba(9,14,22,0.28))] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
+              : 'message-user ml-auto self-end max-w-[min(82%,34rem)] text-left rounded-[1.05rem] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
             : (liveMode
               ? 'max-w-full text-left rounded-[1.15rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
               : 'message-assistant max-w-full text-left px-1 py-2')
