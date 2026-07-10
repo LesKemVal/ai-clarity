@@ -5420,13 +5420,12 @@ responseTimerRef.current = setTimeout(() => {
               ? 'Voice is on.'
               : 'Voice is off.'
 
-  const hasVisibleThread = messages.some((m) => {
-    if (m.role === 'system') return false
-    const clean = (m.content || '').trim()
-    if (!clean) return false
-    if (m.role === 'assistant' && clean === greeting.trim()) return false
-    return m.role === 'user'
+  const normalConversationStarted = messages.some((message) => {
+    if (message.role !== 'user') return false
+    return String(message.content || '').trim().length > 0
   })
+
+  const hasVisibleThread = normalConversationStarted
 
   useEffect(() => {
     if (hasSentFirstNormalMessage) return
@@ -5451,16 +5450,22 @@ responseTimerRef.current = setTimeout(() => {
 
   const hasDraftInput = input.trim().length > 0
   const isPreLiveSignalAcquisition = activePromptContext === 'pre_live_signal_acquisition'
-  const showConversation = hasDraftInput || liveMode || (hasVisibleThread && !isPreLiveSignalAcquisition)
-  const normalUserTurnCount = messages.filter((message) => message.role === 'user').length
-  const showMobileHero = !(forceLive || liveMode) && normalUserTurnCount === 0
+  const showConversation =
+    hasDraftInput ||
+    liveMode ||
+    (normalConversationStarted && !isPreLiveSignalAcquisition)
+
+  const showMobileHero =
+    !(forceLive || liveMode) &&
+    !normalConversationStarted
+
   const showGeorgeHeroTitle = true
-  const showGeorgeHeroTagline = normalUserTurnCount === 0
-  const showGeorgeSupportCopy = normalUserTurnCount === 0
-  const hasUserMessageForSurface = messages.some((message) => message.role === 'user')
+  const showGeorgeHeroTagline = !normalConversationStarted
+  const showGeorgeSupportCopy = !normalConversationStarted
+  const hasUserMessageForSurface = normalConversationStarted
 
   const shouldKeepHeroVisible =
-    normalUserTurnCount === 0
+    !normalConversationStarted
 
   const showIdleGeorgeSurface =
     showMobileHero &&
@@ -6340,7 +6345,7 @@ return (
   const clean = (message.content || '').trim()
   if (message.role === 'assistant' && clean === greeting.trim()) return false
   return true
-}) : (messages.some((message) => message.role === 'user') ? messages : []))
+}) : (normalConversationStarted ? messages : []))
   .filter((m, index) => {
     if (m.role === 'system') return false
     if (
