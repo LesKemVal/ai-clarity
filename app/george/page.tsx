@@ -31,7 +31,12 @@ import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeS
 import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
 import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
 import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
-import { getSuggestedPromptsFromMessages, samePromptSet } from '@/lib/george/prompts/suggested-prompts'
+import {
+  getPostResponseSuggestedPrompts,
+  getReroutePrompt,
+  getSuggestedPromptsFromMessages,
+  samePromptSet,
+} from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 import {
   applyPreparedRuntimeMemory,
@@ -4296,144 +4301,6 @@ if (activePromptContext || activePromptLabel) {
     [interactionMode, isIOS, voiceOn, voiceSpeed, currentTier, liveMode]
   )
 
-  const generateReroutePrompt = (input: string, response: string, messages: any[]) => {
-    const recent = messages.slice(-6).map((m: any) => m.content).join(' ').toLowerCase()
-    const current = `${input} ${response}`.toLowerCase()
-
-    const weakSignals = [
-      /i don't know/,
-      /not sure/,
-      /maybe/,
-      /stuck/,
-      /confused/,
-      /overwhelmed/,
-      /nothing works/,
-      /i need money/,
-      /make money fast/,
-      /build an app and also/,
-      /too many things/,
-      /all over the place/,
-    ]
-
-    const matched = weakSignals.some((pattern) => pattern.test(current) || pattern.test(recent))
-
-    if (!matched) return null
-
-    return {
-      label: 'New strategy',
-      text: 'New strategy',
-      context: 'reroute',
-    }
-  }
-
-  const generatePrompts = (input: string, response: string, messages: any[]) => {
-    const prompts: PromptSelection[] = []
-
-    const recent = messages.slice(-4).map(m => m.content).join(' ').toLowerCase()
-    const constrainedResponse =
-      currentTier === 'smart' &&
-      /i’m going to give you the right direction here, but i’m not carrying this fully in this mode/i.test(response)
-
-    if (constrainedResponse) {
-      prompts.push({
-        label: 'Work around this',
-        text: 'Give me the best workaround you can carry in Smart.',
-        context: 'smart_workaround',
-      })
-
-      prompts.push({
-        label: 'Lighter version',
-        text: 'Break this into the lighter version you can carry right now.',
-        context: 'smart_lighter_version',
-      })
-
-      prompts.push({
-        label: 'Smaller first move',
-        text: 'What is the strongest first move you can give me in this mode?',
-        context: 'smart_first_move',
-      })
-
-      prompts.push({
-        label: 'Make G. Intelligent',
-        text: 'Take me to Intelligent level support.',
-        context: 'upgrade_intelligent',
-      })
-
-      prompts.push({
-        label: 'Pricing',
-        text: 'Show me the upgrade path for deeper support.',
-        context: 'upgrade_topup',
-      })
-
-      return prompts
-    }
-
-    if (/build|app|product|platform/i.test(input) || /build|app|product/.test(recent)) {
-      prompts.push({
-        label: 'Define user',
-        text: 'Who is the exact user for this?',
-        context: 'clarify audience',
-      })
-
-      prompts.push({
-        label: 'Core problem',
-        text: 'What is the one core problem this solves?',
-        context: 'focus problem',
-      })
-    }
-
-    if (/money|income|revenue|make money/i.test(input) || /money|income/.test(recent)) {
-      prompts.push({
-        label: 'Fast revenue',
-        text: 'What is the fastest way to get paid for this?',
-        context: 'monetization',
-      })
-    }
-
-    if (prompts.length === 0) {
-      prompts.push({
-        label: 'Next step',
-        text: 'What is the next step from here?',
-        context: 'progress',
-      })
-    }
-
-    if (prompts.length < 5) {
-      const fallbackPrompts = [
-        {
-          label: 'Clarify goal',
-          text: 'What are we actually trying to achieve here?',
-          context: 'clarity',
-        },
-        {
-          label: 'Constraints',
-          text: 'What constraints matter most here?',
-          context: 'constraints',
-        },
-        {
-          label: 'Clarify',
-          text: 'Can we simplify this into one clear move?',
-          context: 'simplify',
-        },
-        {
-          label: 'Better question',
-          text: 'What is the better question to ask right now?',
-          context: 'better_question',
-        },
-      ]
-
-      fallbackPrompts.forEach((prompt) => {
-        if (prompts.length < 5 && !prompts.some((p) => p.label === prompt.label)) {
-          prompts.push(prompt)
-        }
-      })
-    }
-
-    return prompts
-  }
-
-  
-
   // DEV: ACTIVATE FULL MODE (2 HOURS)
   const activateFullMode = () => {
     const twoHours = 2 * 60 * 60 * 1000
@@ -5027,17 +4894,12 @@ ${finalContent}`
           return next
         })
 
-        const rawPrompts = generatePrompts(input, assistantMessage.content, messagesRef.current)
-
-// FILTER LOW-SIGNAL / GENERIC PROMPTS
-const newPrompts = rawPrompts.filter(p => {
-  const label = p.label.toLowerCase()
-
-if (label.includes('next step') && rawPrompts.length > 3) return false
-if (label.includes('clarify goal') && rawPrompts.length > 4) return false
-
-return true
-})
+        const newPrompts = getPostResponseSuggestedPrompts({
+          userInput: text,
+          assistantResponse: assistantMessage.content,
+          messages: messagesRef.current,
+          tier: currentTier,
+        })
         setSuggestedPrompts((prev) => {
           let merged = [...prev, ...newPrompts]
 
@@ -5054,7 +4916,11 @@ return true
         setSuggestedSignal(Date.now())
         setRerouteSignal(Date.now())
 
-        const reroute = generateReroutePrompt(input, assistantMessage.content, messagesRef.current)
+        const reroute = getReroutePrompt({
+          userInput: text,
+          assistantResponse: assistantMessage.content,
+          messages: messagesRef.current,
+        })
         setReroutePrompt(reroute)
         if (reroute) {
           setRerouteSignal(Date.now())

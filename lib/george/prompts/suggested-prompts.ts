@@ -80,3 +80,175 @@ export function samePromptSet(a: PromptSelection[], b: PromptSelection[]) {
     item.context === b[index]?.context
   )
 }
+
+export function getPostResponseSuggestedPrompts(input: {
+  userInput: string
+  assistantResponse: string
+  messages: PromptMessage[]
+  tier: 'smart' | 'intelligent' | 'brilliant'
+}): PromptSelection[] {
+  const prompts: PromptSelection[] = []
+
+  const recent = input.messages
+    .slice(-4)
+    .map((message) => message.content)
+    .join(' ')
+    .toLowerCase()
+
+  const constrainedResponse =
+    input.tier === 'smart' &&
+    /i’m going to give you the right direction here, but i’m not carrying this fully in this mode/i.test(
+      input.assistantResponse
+    )
+
+  if (constrainedResponse) {
+    return [
+      {
+        label: 'Work around this',
+        text: 'Give me the best workaround you can carry in Smart.',
+        context: 'smart_workaround',
+      },
+      {
+        label: 'Lighter version',
+        text: 'Break this into the lighter version you can carry right now.',
+        context: 'smart_lighter_version',
+      },
+      {
+        label: 'Smaller first move',
+        text: 'What is the strongest first move you can give me in this mode?',
+        context: 'smart_first_move',
+      },
+      {
+        label: 'Make G. Intelligent',
+        text: 'Take me to Intelligent level support.',
+        context: 'upgrade_intelligent',
+      },
+      {
+        label: 'Pricing',
+        text: 'Show me the upgrade path for deeper support.',
+        context: 'upgrade_topup',
+      },
+    ]
+  }
+
+  if (
+    /build|app|product|platform/i.test(input.userInput) ||
+    /build|app|product/.test(recent)
+  ) {
+    prompts.push(
+      {
+        label: 'Define user',
+        text: 'Who is the exact user for this?',
+        context: 'clarify audience',
+      },
+      {
+        label: 'Core problem',
+        text: 'What is the one core problem this solves?',
+        context: 'focus problem',
+      }
+    )
+  }
+
+  if (
+    /money|income|revenue|make money/i.test(input.userInput) ||
+    /money|income/.test(recent)
+  ) {
+    prompts.push({
+      label: 'Fast revenue',
+      text: 'What is the fastest way to get paid for this?',
+      context: 'monetization',
+    })
+  }
+
+  if (prompts.length === 0) {
+    prompts.push({
+      label: 'Next step',
+      text: 'What is the next step from here?',
+      context: 'progress',
+    })
+  }
+
+  const fallbackPrompts: PromptSelection[] = [
+    {
+      label: 'Clarify goal',
+      text: 'What are we actually trying to achieve here?',
+      context: 'clarity',
+    },
+    {
+      label: 'Constraints',
+      text: 'What constraints matter most here?',
+      context: 'constraints',
+    },
+    {
+      label: 'Clarify',
+      text: 'Can we simplify this into one clear move?',
+      context: 'simplify',
+    },
+    {
+      label: 'Better question',
+      text: 'What is the better question to ask right now?',
+      context: 'better_question',
+    },
+  ]
+
+  for (const prompt of fallbackPrompts) {
+    if (
+      prompts.length < 5 &&
+      !prompts.some((candidate) => candidate.label === prompt.label)
+    ) {
+      prompts.push(prompt)
+    }
+  }
+
+  return prompts.filter((prompt) => {
+    const label = prompt.label.toLowerCase()
+
+    if (label.includes('next step') && prompts.length > 3) return false
+    if (label.includes('clarify goal') && prompts.length > 4) return false
+
+    return true
+  })
+}
+
+export function getReroutePrompt(input: {
+  userInput: string
+  assistantResponse: string
+  messages: PromptMessage[]
+}): PromptSelection | null {
+  const recent = input.messages
+    .slice(-6)
+    .map((message) => message.content)
+    .join(' ')
+    .toLowerCase()
+
+  const current =
+    `${input.userInput} ${input.assistantResponse}`.toLowerCase()
+
+  const weakSignals = [
+    /i don't know/,
+    /not sure/,
+    /maybe/,
+    /stuck/,
+    /confused/,
+    /overwhelmed/,
+    /nothing works/,
+    /i need money/,
+    /make money fast/,
+    /build an app and also/,
+    /too many things/,
+    /all over the place/,
+  ]
+
+  const matched = weakSignals.some(
+    (pattern) => pattern.test(current) || pattern.test(recent)
+  )
+
+  return matched
+    ? {
+        label: 'New strategy',
+        text: 'New strategy',
+        context: 'reroute',
+      }
+    : null
+}
+
