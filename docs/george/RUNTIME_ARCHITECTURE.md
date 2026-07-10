@@ -52,7 +52,27 @@ Normal GEORGE prepares, plans, analyzes, creates, reviews, decides, and helps th
 
 Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, and operational value. The difference is not intelligence. The difference is operating conditions.
 
-Normal GEORGE now has a reasoning lane governor at `lib/george/runtime/normal-reasoning-governor.ts`. The governor routes normal work into immediate, operational, or strategic lanes before model selection so simple work can remain fast while consequential work receives deeper judgment.
+Normal GEORGE now has a reasoning lane governor at `lib/george/runtime/normal-reasoning-governor.ts`. The governor routes normal work into immediate, operational, or strategic lanes before provider and model selection so simple work can remain fast while consequential work receives deeper judgment.
+
+Normal text-provider execution is owned by `lib/george/runtime/provider/normal-provider.ts` and called by `app/api/chat/route.ts`.
+
+Provider boundary:
+
+- The governor chooses lane, provider, and model.
+- The provider adapter performs the assigned inference.
+- `app/api/chat/route.ts` remains the canonical owner of the assembled GEORGE system context and response-governance pipeline.
+- Groq may execute only explicitly safe, low-consequence Normal transformations.
+- OpenAI remains the provider for contextual, ambiguous, operational, strategic, image, and consequential reasoning.
+- The LIVE Hub Groq fast lane remains separate LIVE execution plumbing and must not be imported as Normal reasoning authority.
+- Providers do not own GEORGE identity, doctrine, memory, continuity, judgment, or delivery policy.
+- Provider failure must degrade to the shared OpenAI baseline without creating a second response path visible to the user.
+
+Tier/model doctrine:
+
+- GEORGE is the same operational intelligence across Smart, Intelligent, Brilliant, Normal, and LIVE.
+- Smart and Intelligent share a competent Normal reasoning baseline.
+- Brilliant may use the latest model for consequential Normal work.
+- Tier differences belong in reasoning budget, depth, continuity, tools, usage limits, and LIVE access—not basic competence.
 
 Users organize work around outcomes.
 

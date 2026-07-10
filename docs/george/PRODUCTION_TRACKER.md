@@ -60,7 +60,20 @@ Normal GEORGE and LIVE share the same reasoning philosophy; execution constraint
 
 Normal GEORGE prepares and advances work before execution. LIVE executes under real-time constraints. Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, and operational value.
 
-Normal GEORGE now routes normal work through `lib/george/runtime/normal-reasoning-governor.ts`, classifying work into immediate, operational, or strategic lanes before model selection.
+Normal GEORGE now routes normal work through `lib/george/runtime/normal-reasoning-governor.ts`, classifying work into immediate, operational, or strategic lanes before provider and model selection.
+
+Normal provider execution is owned by `lib/george/runtime/provider/normal-provider.ts` and invoked from `app/api/chat/route.ts`.
+
+Current Normal provider policy:
+
+- Safe, explicit, low-consequence transformations may use the Groq fast lane.
+- Context-dependent, ambiguous, operational, strategic, image, and consequential work remains on OpenAI.
+- Short wording alone does not qualify work for Groq.
+- Groq receives GEORGE's assembled system context but does not own identity, memory, doctrine, continuity, or final governance.
+- Groq failure or missing configuration falls back to the shared OpenAI baseline.
+- Smart and Intelligent share the same competent Normal model baseline.
+- Brilliant may use the latest model for operational and strategic work.
+- Tier distinctions change depth, continuity, usage, tooling, and LIVE access—not GEORGE's basic competence or identity.
 
 Communication precedes execution.
 
