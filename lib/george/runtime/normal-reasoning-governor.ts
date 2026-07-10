@@ -1,7 +1,10 @@
 export type NormalGeorgeReasoningLane = 'immediate' | 'operational' | 'strategic'
 
+export type NormalGeorgeProvider = 'openai' | 'groq'
+
 export type NormalGeorgeReasoningDecision = {
   lane: NormalGeorgeReasoningLane
+  provider: NormalGeorgeProvider
   model: string
   reason: string
 }
@@ -10,6 +13,15 @@ type NormalGeorgeReasoningInput = {
   userText: string
   tier: string
   hasImageInput: boolean
+}
+
+function isSafeNormalFastLaneRequest(userText: string) {
+  const text = String(userText || '').trim()
+  const words = text.split(/\s+/).filter(Boolean).length
+
+  if (!text || words > 120) return false
+
+  return /\b(rewrite|grammar|format|shorten|summarize|bullet|fix (?:this )?typo|clean this up|make this clearer|make this shorter|proofread|correct the spelling|change the tone|translate)\b/i.test(text)
 }
 
 function scoreComplexity(userText: string) {
@@ -69,6 +81,7 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
   if (input.hasImageInput) {
     return {
       lane: 'strategic',
+      provider: 'openai',
       model:
         input.tier === 'brilliant'
           ? latestModel
@@ -90,12 +103,23 @@ export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput):
         ? 'operational'
         : 'immediate'
 
+  const useGroqFastLane =
+    lane === 'immediate' &&
+    isSafeNormalFastLaneRequest(input.userText) &&
+    Boolean(process.env.GROQ_API_KEY?.trim())
+
   return {
     lane,
-    model:
-      tier === 'brilliant' && lane !== 'immediate'
+    provider: useGroqFastLane ? 'groq' : 'openai',
+    model: useGroqFastLane
+      ? (process.env.GROQ_NORMAL_FAST_MODEL ||
+          process.env.GROQ_FAST_MODEL ||
+          'llama-3.1-8b-instant')
+      : tier === 'brilliant' && lane !== 'immediate'
         ? latestModel
         : sharedBaselineModel,
-    reason,
+    reason: useGroqFastLane
+      ? `${reason}; safe normal fast lane`
+      : reason,
   }
 }
