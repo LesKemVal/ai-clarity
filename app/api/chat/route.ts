@@ -66,6 +66,7 @@ import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/georg
 import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
+import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { composeRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 
 const openai = new OpenAI({
@@ -1003,20 +1004,49 @@ ${dynamicRuntimeBlocks}`
 
       reply = (response as any).output_text?.trim() || ''
     } else {
-      const completion = await openai.chat.completions.create({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content: systemContent,
-          },
-          ...recentMessages.map((m) =>
-            ({ role: m.role, content: m.content } as any)
-          ),
-        ],
-      })
+      const providerMessages = recentMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }))
 
-      reply = completion.choices?.[0]?.message?.content?.trim() || ''
+      if (normalReasoning.provider === 'groq') {
+        try {
+          reply =
+            (await runNormalTextCompletion({
+              provider: normalReasoning.provider,
+              model,
+              systemContent,
+              messages: providerMessages,
+            })) || ''
+        } catch (error) {
+          console.warn(
+            '[GEORGE][normal-fast-lane] Groq failed; falling back to OpenAI.',
+            error instanceof Error ? error.message : error
+          )
+        }
+      }
+
+      if (!reply) {
+        const completion = await openai.chat.completions.create({
+          model:
+            normalReasoning.provider === 'groq'
+              ? (
+                  process.env.OPENAI_MODEL_INTELLIGENT ||
+                  process.env.OPENAI_MODEL ||
+                  'gpt-4o'
+                )
+              : model,
+          messages: [
+            {
+              role: 'system',
+              content: systemContent,
+            },
+            ...providerMessages,
+          ],
+        })
+
+        reply = completion.choices?.[0]?.message?.content?.trim() || ''
+      }
     }
 
     if (!reply) {
