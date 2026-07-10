@@ -21,7 +21,6 @@ import DesktopOperationalSurface from '@/components/george/DesktopOperationalSur
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
-import { buildBrilliantLiveTriggerResponse } from '@/lib/george/conversation-engine'
 import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-runtime/live-guidance'
 import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
@@ -595,13 +594,13 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
     : hour < 18 ? "Good afternoon."
     : "Good evening."
 
-  const firstTimeGreeting = `An intelligent utility for decisions, preparation, and words that matter.` 
+  const firstTimeGreeting = `An intelligent utility for decisions, preparation, and words that matter.`
 
   // Normal GEORGE opens with continuity posture.
   // Scope: non-LIVE normal sessions only.
   // This is behavioral orientation, not session restoration.
   // Saved conversations, LIVE Conversations, and room prep continuation remain handled by pickers.
-  const earlyUserGreeting = `Continue current direction\nor switch projects?` 
+  const earlyUserGreeting = `Continue current direction\nor switch projects?`
 
   const greetingPool = [
     `${timeGreeting} Most distractions are noise. What matters today?`,
@@ -1052,9 +1051,9 @@ const showLiveGeorgeFlame = hasLiveGeorgeAccess && tierSignalPhase === 1
 const tieredStarterPrompts = useMemo<PromptSelection[]>(() => {
     if (currentTier === 'brilliant') {
       return [
-        
-        
-        
+
+
+
       ]
     }
 
@@ -1346,7 +1345,7 @@ const [liveGeorgeEnabled, setLiveGeorgeEnabled] = useState(true)
     (voiceOn ? 'audio' : 'text')
   const [voiceSpeed, setVoiceSpeed] = useState(1.2)
   const [voiceType, setVoiceType] = useState('ash')
-  
+
 
 const [otherSpeaking, setOtherSpeaking] = useState(false)
 const [lastTranscriptTime, setLastTranscriptTime] = useState(0)
@@ -2124,7 +2123,7 @@ useEffect(() => {
     return
   }, [profileName, currentTier])
 
-  
+
 
 
 
@@ -2508,7 +2507,7 @@ const redeemFounderCode = async () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    
+
 const savedContext = window.localStorage.getItem('george_active_context')
     const savedLabel = window.localStorage.getItem('george_active_label')
     const savedVoice = window.localStorage.getItem('george_voice')
@@ -2581,7 +2580,7 @@ function getMessagesSignature(items: Message[]) {
     return () => clearInterval(interval)
   }, [messages])
 
-  
+
 const lastSpeechTsRef = useRef<number>(0)
 const responseTimerRef = useRef<any>(null)
 
@@ -2696,7 +2695,7 @@ const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
     onFinalTranscript: processLiveFinalTranscript,
     onError: processLiveAudioError,
   })
-  
+
   const liveDeliveryStyleHydratedRef = useRef(false)
 
   useEffect(() => {
@@ -3767,7 +3766,7 @@ requestAnimationFrame(() => {
           ? "Help me understand the legal issue clearly and cautiously."
           : folder === 'Funding'
           ? "Help me think clearly about funding and show me the strongest path."
-          : "Help me find the strongest next move." 
+          : "Help me find the strongest next move."
 
       setInput(prompt)
 
@@ -4345,47 +4344,7 @@ const handleSend = useCallback(
         }
       })()
 
-      const brilliantLiveTrigger = liveMode
-        ? buildBrilliantLiveTriggerResponse(
-            text,
-            currentTier,
-            activePromptContext,
-            conversationMode
-          )
-        : null
-      if (brilliantLiveTrigger) {
-        setConversationSignal('LIVE cue')
-        setAdaptiveCueLabel('Guidance update')
-        setLastGuidedLine('Brilliant live cue used.')
-        setInput('')
-        setInterimTranscript('')
-        if (textareaRef.current) {
-          textareaRef.current.focus()
-        }
 
-        const userMessage: Message = {
-          role: 'user',
-          content: text,
-        }
-
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: brilliantLiveTrigger,
-        }
-
-        const nextMessages: Message[] = [...messagesRef.current, userMessage, assistantMessage]
-        setMessages(nextMessages)
-setTimeout(() => {
-  setShowOutcomeBar(true)
-  setLastOutcomeContext("post_call")
-}, 1200)
-
-
-        messagesRef.current = nextMessages
-        return
-      }
-
-      
 
       const preProviderResolution = resolvePreProviderSend({
         text,
@@ -5063,7 +5022,7 @@ if (outcomeSignal) {
         }
 
         const livePrompt = clean
-        
+
 responseTimerRef.current = setTimeout(() => {
   const now = Date.now()
   const delta = now - lastSpeechTsRef.current
@@ -5461,8 +5420,8 @@ return (
   47%, 100% { opacity: 0; }
 }
 `}</style>
-  
-        
+
+
 
     <main className={`app-shell george-mobile-root pb-[120px] min-h-[100dvh] w-full overflow-x-hidden bg-[#000000] text-neutral-100 ${isAndroid ? "android-runtime android-sharp" : ""}`}>
 
@@ -5674,7 +5633,7 @@ return (
               : 'pt-[68px] md:pt-[78px]'
           } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-10 md:pb-0 xl:px-16`}>
             <header className={`fixed top-0 left-0 right-0 flex justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200 ${"z-50"}`}>
-              
+
               {false && !(forceLive || liveMode) && !showMobileHero && (
                 <div
                   data-mobile-george-center
@@ -5804,7 +5763,7 @@ return (
               </div>
             </header>
 
-            
+
 
 {!(forceLive || liveMode) && !showMobileHero && (
   <div className="pointer-events-none fixed left-0 right-0 top-[52px] z-[34] h-[132px] bg-gradient-to-b from-[#000000] via-[#000000]/100 via-[72%] to-transparent md:hidden" />
@@ -5936,7 +5895,7 @@ return (
         ? "pt-3 md:pt-14"
         : "pt-10 md:pt-6"
 } ${(showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
-  
+
 
 {showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
   <section
@@ -6052,7 +6011,7 @@ return (
     <TypingPrescriptionSurface />
   )}
 
-  
+
 
   {!liveMode && unfinishedTrajectories.length > 0 && !hasDraftInput && (
     <div className="pointer-events-auto fixed inset-x-0 top-[96px] z-[62] mx-auto w-full max-w-[430px] px-5 md:hidden">
@@ -6414,7 +6373,7 @@ I am listening now. Speak naturally. I will respond ${
       </div>
     </div>
 
-    
+
 
   </div>
 )}
@@ -6652,7 +6611,7 @@ I am listening now. Speak naturally. I will respond ${
     </div>
     )
   })}
-  
+
 {showScrollHint && (
   <div className="fixed bottom-[calc(184px+env(safe-area-inset-bottom))] left-1/2 z-[90] -translate-x-1/2 transition-opacity duration-200">
     <button
@@ -6756,10 +6715,10 @@ I am listening now. Speak naturally. I will respond ${
 </div>
 
 
-            
+
 
             <div className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'contents' : 'relative w-full flex-col bg-transparent flex transition duration-200 z-20'}`}>
-              
+
 
               <div className="hidden">
                 <LiveFooterControls
@@ -7036,7 +6995,7 @@ if (liveMode) {
           </button>
         )}
 
-        
+
         </>
       )}
 
@@ -7219,7 +7178,7 @@ if (liveMode) {
               type="button"
               onClick={() => {
                 if (currentTier !== 'brilliant') {
-                  
+
                   setShowToast(true)
                   return
                 }
@@ -7228,7 +7187,7 @@ if (liveMode) {
               }}
               className="block w-full py-1 text-left text-sm text-neutral-300 transition hover:text-[#D7DBE4]"
             >
-              
+
             </button>
 
             <button
@@ -7797,7 +7756,7 @@ Continue from here, tell me what changed, or start fresh.`
                       ? 'bg-white/[0.026] text-[#D7DBE4]/72'
                       : 'bg-white/[0.022] text-[#D7DBE4]/52'
                   }`}>
-                    
+
                   </span>
                 </div>
 
@@ -7856,7 +7815,7 @@ Continue from here, tell me what changed, or start fresh.`
 
 </div>
 
-              
+
 {showOutcomeBar && (
   <div className="fixed bottom-[140px] left-0 right-0 z-[80] mx-auto w-[calc(100%-24px)] max-w-[600px] rounded-xl border border-white/[0.05] bg-black/72 -[10px] px-5 py-4 ">
 
@@ -7954,7 +7913,7 @@ Continue from here, tell me what changed, or start fresh.`
                 </>
               )}
 
-              
+
 
 
 <style jsx global>{`
