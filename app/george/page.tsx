@@ -6361,7 +6361,7 @@ return (
     return (
     <div
       key={i}
-      className={`w-full min-w-0 space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
+      className={`mx-auto w-full max-w-[760px] min-w-0 space-y-1 flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
     >
       <div
         className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.72]' : 'leading-[1.68]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
