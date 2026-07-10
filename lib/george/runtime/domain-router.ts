@@ -129,7 +129,8 @@ Ask one sharp question that reveals what is actually holding them back.
 
 Credit type detected: ${creditType || 'unknown'}\nUser intent: ${creditIntent || 'unknown'}\nTradeline guidance: ${tradelineAdvice || 'evaluate case by case'}`
 
-    const multiProblem = /interview|job|boss|meeting|business|income|car|transportation|relationship|court|doctor/i.test(text)
+    const multiProblem =
+      /\b(interview|job|boss|meeting|business|income|car|transportation|relationship|court|doctor)\b/i.test(text)
 
     if (/maxed|maxed|balance|balances|utilization/i.test(text) && !multiProblem) {
       firstResponseOverride = 'Your cards being maxed out is the issue. Tradelines will not fix that. Bring each card under 30%—under 10% if possible. Paydown or balance shifting is the move. I can help you build a paydown plan, or I can show you the fastest way to lower utilization without adding new debt.'

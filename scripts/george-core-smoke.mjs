@@ -18,6 +18,7 @@ import { georgeTrajectoryEngine } from '${process.cwd()}/lib/george/live-voice/r
 import { buildGeorgeCoreInterpretation } from '${process.cwd()}/lib/george/core/build-interpretation'
 import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core/live-execution'
 import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
+import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -187,6 +188,76 @@ assert(
   smartStrategic.provider === 'openai',
   'strategic work must remain on OpenAI'
 )
+
+const ordinarySend = resolvePreProviderSend({
+  text: 'Help me think through this decision.',
+  activePromptContext: null,
+  activeMemoryFolder: null,
+  previousUserMessages: [],
+})
+
+assert(
+  ordinarySend.mode === 'provider',
+  'ordinary Normal work should continue to provider generation'
+)
+
+const creditContextSend = resolvePreProviderSend({
+  text: 'How can I improve my credit score?',
+  activePromptContext: null,
+  activeMemoryFolder: null,
+  previousUserMessages: [],
+})
+
+assert(
+  creditContextSend.mode === 'provider_with_context',
+  'credit work without an authoritative override should attach domain context'
+)
+
+assert(
+  Boolean(creditContextSend.systemContext),
+  'provider-with-context resolution should include domain context'
+)
+
+assert(
+  creditContextSend.metadata.detectedDomain === 'credit',
+  'pre-provider resolution should preserve detected domain metadata'
+)
+
+const domainDirectSend = resolvePreProviderSend({
+  text: 'My credit cards are maxed out and I was thinking about tradelines.',
+  activePromptContext: null,
+  activeMemoryFolder: null,
+  previousUserMessages: [],
+})
+
+assert(
+  domainDirectSend.mode === 'direct',
+  'authoritative domain guidance should resolve as a direct response'
+)
+
+assert(
+  domainDirectSend.mode !== 'direct' || domainDirectSend.authority === 'domain',
+  'domain direct response should identify domain authority'
+)
+
+const trainingSend = resolvePreProviderSend({
+  text: 'I need help preparing for my GED.',
+  activePromptContext: 'training_ged',
+  activeMemoryFolder: null,
+  previousUserMessages: [],
+})
+
+assert(
+  trainingSend.metadata.activeDomain === 'ged',
+  'training and domain evidence should remain available in one portable result'
+)
+
+if (trainingSend.mode === 'direct') {
+  assert(
+    trainingSend.authority === 'training',
+    'training override must retain precedence over a domain override'
+  )
+}
 
 console.log('GEORGE core smoke passed')
 `)
