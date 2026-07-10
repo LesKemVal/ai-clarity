@@ -17,6 +17,7 @@ import { inferObjectiveFromText, LIVE_OBJECTIVES } from '${process.cwd()}/lib/ge
 import { georgeTrajectoryEngine } from '${process.cwd()}/lib/george/live-voice/runtime/trajectory-engine'
 import { buildGeorgeCoreInterpretation } from '${process.cwd()}/lib/george/core/build-interpretation'
 import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core/live-execution'
+import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -104,6 +105,54 @@ const execution = resolveGeorgeCoreLiveExecution({
 })
 assert(execution.authority.verdict === 'allow', 'core execution should allow clean transcript action')
 assert(execution.authority.action.type === 'send', 'core execution should produce send action')
+
+const smartStrategic = resolveNormalGeorgeReasoning({
+  userText: 'Build a crowdfunding strategy using my broker dealer to reach non-accredited investors.',
+  tier: 'smart',
+  hasImageInput: false,
+})
+
+const intelligentStrategic = resolveNormalGeorgeReasoning({
+  userText: 'Build a crowdfunding strategy using my broker dealer to reach non-accredited investors.',
+  tier: 'intelligent',
+  hasImageInput: false,
+})
+
+const brilliantStrategic = resolveNormalGeorgeReasoning({
+  userText: 'Build a crowdfunding strategy using my broker dealer to reach non-accredited investors.',
+  tier: 'brilliant',
+  hasImageInput: false,
+})
+
+assert(smartStrategic.lane === 'strategic', 'consequential crowdfunding work should use strategic reasoning')
+assert(
+  smartStrategic.model === intelligentStrategic.model,
+  'Smart and Intelligent must share the same competent baseline model'
+)
+assert(!/mini/i.test(smartStrategic.model), 'Smart must not use a mini competence floor')
+assert(
+  brilliantStrategic.model !== '' &&
+  brilliantStrategic.lane === 'strategic',
+  'Brilliant strategic work must resolve through the latest-model policy'
+)
+
+const smartImmediate = resolveNormalGeorgeReasoning({
+  userText: 'Fix this typo.',
+  tier: 'smart',
+  hasImageInput: false,
+})
+
+const intelligentImmediate = resolveNormalGeorgeReasoning({
+  userText: 'Fix this typo.',
+  tier: 'intelligent',
+  hasImageInput: false,
+})
+
+assert(smartImmediate.lane === 'immediate', 'simple work should retain the immediate lane')
+assert(
+  smartImmediate.model === intelligentImmediate.model,
+  'Smart and Intelligent immediate work must share the same baseline model'
+)
 
 console.log('GEORGE core smoke passed')
 `)
