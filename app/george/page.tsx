@@ -2406,6 +2406,11 @@ const redeemFounderCode = async () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    // Session bootstrap owns initial hydration only.
+    // Profile, tier, prompt-context, and conversation-mode changes must not
+    // destructively re-bootstrap an active Normal conversation.
+    if (!forceLive && normalSessionBootedRef.current) return
+
     const params = new URLSearchParams(window.location.search)
     const continuityToken = params.get('continuity')
     const tierParam = params.get('tier')
