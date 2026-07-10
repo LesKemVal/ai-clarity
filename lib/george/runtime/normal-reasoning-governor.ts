@@ -55,53 +55,47 @@ function scoreComplexity(userText: string) {
 }
 
 export function resolveNormalGeorgeReasoning(input: NormalGeorgeReasoningInput): NormalGeorgeReasoningDecision {
+  const sharedBaselineModel =
+    process.env.OPENAI_MODEL_INTELLIGENT ||
+    process.env.OPENAI_MODEL ||
+    'gpt-4o'
+
+  const latestModel =
+    process.env.OPENAI_MODEL_BRILLIANT ||
+    process.env.OPENAI_MODEL_LATEST ||
+    process.env.OPENAI_MODEL ||
+    'gpt-5'
+
   if (input.hasImageInput) {
     return {
       lane: 'strategic',
-      model: process.env.OPENAI_MODEL_VISION || 'gpt-4o',
+      model:
+        input.tier === 'brilliant'
+          ? latestModel
+          : process.env.OPENAI_MODEL_VISION || sharedBaselineModel,
       reason: 'image input requires vision-capable reasoning',
     }
   }
 
   const { score, reason } = scoreComplexity(input.userText)
-  const tier = input.tier === 'brilliant' || input.tier === 'intelligent' ? input.tier : 'smart'
+  const tier =
+    input.tier === 'brilliant' || input.tier === 'intelligent'
+      ? input.tier
+      : 'smart'
 
   const lane: NormalGeorgeReasoningLane =
-    score >= 3 ? 'strategic' :
-    score >= 1 ? 'operational' :
-    'immediate'
-
-  if (lane === 'strategic') {
-    return {
-      lane,
-      model:
-        tier === 'brilliant'
-          ? (process.env.OPENAI_MODEL_BRILLIANT || process.env.OPENAI_MODEL || 'gpt-5')
-          : tier === 'intelligent'
-            ? (process.env.OPENAI_MODEL_INTELLIGENT || process.env.OPENAI_MODEL || 'gpt-4o')
-            : (
-              process.env.OPENAI_MODEL_INTELLIGENT ||
-              process.env.OPENAI_MODEL ||
-              'gpt-4o'
-            ),
-      reason,
-    }
-  }
-
-  if (lane === 'operational') {
-    return {
-      lane,
-      model:
-        process.env.OPENAI_MODEL_INTELLIGENT ||
-        process.env.OPENAI_MODEL ||
-        'gpt-4o',
-      reason,
-    }
-  }
+    score >= 3
+      ? 'strategic'
+      : score >= 1
+        ? 'operational'
+        : 'immediate'
 
   return {
     lane,
-    model: process.env.OPENAI_MODEL_SMART || 'gpt-4o-mini',
+    model:
+      tier === 'brilliant' && lane !== 'immediate'
+        ? latestModel
+        : sharedBaselineModel,
     reason,
   }
 }
