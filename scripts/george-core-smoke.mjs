@@ -151,7 +151,41 @@ const intelligentImmediate = resolveNormalGeorgeReasoning({
 assert(smartImmediate.lane === 'immediate', 'simple work should retain the immediate lane')
 assert(
   smartImmediate.model === intelligentImmediate.model,
-  'Smart and Intelligent immediate work must share the same baseline model'
+  'Smart and Intelligent immediate work must share the same provider policy'
+)
+
+const contextualShortQuestion = resolveNormalGeorgeReasoning({
+  userText: 'Am I wrong?',
+  tier: 'smart',
+  hasImageInput: false,
+})
+
+assert(
+  contextualShortQuestion.provider === 'openai',
+  'short context-dependent questions must not automatically enter the Groq fast lane'
+)
+
+const safeRewrite = resolveNormalGeorgeReasoning({
+  userText: 'Rewrite this sentence and make it clearer.',
+  tier: 'smart',
+  hasImageInput: false,
+})
+
+if (process.env.GROQ_API_KEY) {
+  assert(
+    safeRewrite.provider === 'groq',
+    'safe transformations should use Groq when configured'
+  )
+} else {
+  assert(
+    safeRewrite.provider === 'openai',
+    'Normal reasoning should remain on OpenAI when Groq is unavailable'
+  )
+}
+
+assert(
+  smartStrategic.provider === 'openai',
+  'strategic work must remain on OpenAI'
 )
 
 console.log('GEORGE core smoke passed')
