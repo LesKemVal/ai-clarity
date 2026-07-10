@@ -6385,7 +6385,11 @@ return (
                 className="mb-2 max-h-40 w-full rounded-[1rem] max-w-full border border-white/[0.05] object-cover"
               />
             )}
-            <span className="block max-w-full break-words [overflow-wrap:anywhere]">{m.content}</span>
+            <span
+              className="block max-w-full break-words [overflow-wrap:anywhere] text-white opacity-100"
+            >
+              {m.content}
+            </span>
           </>
         )}
       </div>
