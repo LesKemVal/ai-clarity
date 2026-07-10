@@ -4803,41 +4803,6 @@ setTimeout(() => {
 
         let finalContent = data.message
 
-        if (typeof finalContent === 'string') {
-          if (conversationMode === 'brilliant_negotiation') {
-            finalContent = finalContent
-              .split('. ')
-              .map((s: string) => s.trim())
-              .filter(Boolean)
-              .map((s) => (s.length > 120 ? s.slice(0, 120).trim() : s))
-              .join('. ')
-          }
-
-          if (conversationMode === 'brilliant_lecture') {
-            finalContent = `Let’s break this down step by step.
-
-${finalContent}`
-          }
-
-          if (conversationMode === 'brilliant_speech') {
-            finalContent = finalContent
-              .split('. ')
-              .map((s: string) => s.trim())
-              .filter(Boolean)
-              .join('.\n')
-          }
-
-          if (conversationMode === 'brilliant_everyday') {
-            finalContent = finalContent
-          }
-
-          if (conversationMode === 'brilliant_tutor') {
-            finalContent = `Explain this to someone else as you go:
-
-${finalContent}`
-          }
-        }
-
         if (typeof finalContent === 'string' && liveMode) {
           finalContent = governLiveResponse(finalContent, {
             audio: voiceOn,
