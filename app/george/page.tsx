@@ -4827,21 +4827,9 @@ setTimeout(() => {
           throw new Error(data?.error || `Request failed (${res.status})`)
         }
 
-        const isSmart = currentTier === 'smart'
+        let finalContent = data.message
 
-        const isHeavy =
-          text.length > 120 ||
-          /plan|build|strategy|business|system|step by step|full|complete|execute/i.test(text)
-
-        const constrained = isSmart && isHeavy
-
-        let finalContent = constrained
-          ? `I can help with the next useful step.
-
-Tell me the outcome you want, and I’ll help you move toward it.`
-          : data.message
-
-        if (!constrained && typeof finalContent === 'string') {
+        if (typeof finalContent === 'string') {
           if (conversationMode === 'brilliant_negotiation') {
             finalContent = finalContent
               .split('. ')
@@ -4876,14 +4864,17 @@ ${finalContent}`
           }
         }
 
-        if (!constrained && typeof finalContent === 'string' && liveMode) {
-          finalContent = governLiveResponse(finalContent, { audio: voiceOn, userText: text })
+        if (typeof finalContent === 'string' && liveMode) {
+          finalContent = governLiveResponse(finalContent, {
+            audio: voiceOn,
+            userText: text,
+          })
         }
 
         const assistantMessage: Message = {
           role: 'assistant',
           content: finalContent,
-          constrained,
+          constrained: false,
         }
         assistantRevealedRef.current = false
 
