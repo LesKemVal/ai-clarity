@@ -6366,7 +6366,7 @@ return (
     return (
     <div
       key={i}
-      className={`mx-auto w-full max-w-[760px] min-w-0 space-y-1 flex flex-col ${
+      className={`mx-auto w-[calc(100vw-1.5rem)] max-w-[760px] min-w-0 space-y-1 flex flex-col md:w-full ${
         m.role === 'user' ? 'items-end' : 'items-start'
       }`}
     >
