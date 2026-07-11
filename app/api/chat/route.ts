@@ -75,6 +75,7 @@ import { buildConversationStrategyNote } from '@/lib/george/runtime/conversation
 import { buildConversationMoveDefinitionNote } from '@/lib/george/runtime/conversation-move-library'
 import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
 import { resolveOperationalResourceMonitor } from '@/lib/george/runtime/operational-resource-monitor'
+import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '@/lib/george/runtime/execution-policy'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -965,6 +966,17 @@ LANGUAGE MODE: SPANISH
       liveRecommendationPresentation,
     })
 
+    const executionPolicy = resolveGeorgeExecutionPolicy({
+      runtime: currentRuntime,
+      voiceMode,
+      strategy: operationalJudgment.conversationStrategy,
+      moveDefinition: operationalJudgment.conversationStrategy.definition,
+      operationalJudgment,
+      outcomeEvolution,
+      operationalResourceMonitor,
+    })
+    const executionPolicyNote = buildExecutionPolicyNote(executionPolicy)
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -1026,6 +1038,7 @@ LANGUAGE MODE: SPANISH
       outcomeEvolutionNote,
       conversationStrategyNote,
       conversationMoveDefinitionNote,
+      executionPolicyNote,
       contextFramingNote,
       liveRecommendationPresentationNote,
       responseShapeNote,

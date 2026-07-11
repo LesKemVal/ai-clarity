@@ -28,6 +28,7 @@ import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, r
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
+import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
 
@@ -567,6 +568,7 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
   outcomeEvolutionNote: 'OUTCOME EVOLUTION',
   conversationStrategyNote: 'CONVERSATION STRATEGY',
   conversationMoveDefinitionNote: 'CONVERSATION MOVE',
+  executionPolicyNote: 'EXECUTION POLICY',
   contextFramingNote: 'CONTEXT FRAMING',
   liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
   responseShapeNote: 'RESPONSE SHAPE',
@@ -579,7 +581,8 @@ assert(
     governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('OUTCOME EVOLUTION') &&
     governedRuntimeContext.indexOf('OUTCOME EVOLUTION') < governedRuntimeContext.indexOf('CONVERSATION STRATEGY') &&
     governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONVERSATION MOVE') &&
-    governedRuntimeContext.indexOf('CONVERSATION MOVE') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
+    governedRuntimeContext.indexOf('CONVERSATION MOVE') < governedRuntimeContext.indexOf('EXECUTION POLICY') &&
+    governedRuntimeContext.indexOf('EXECUTION POLICY') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
     governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
     governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
@@ -713,6 +716,52 @@ const operationalResourceMonitor = resolveOperationalResourceMonitor({
 assert(operationalResourceMonitor.resources.length > 0, 'operational resource monitor should surface at least one high-value resource')
 assert(operationalResourceMonitor.resources.length <= 3, 'operational resource monitor should remain bounded')
 assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
+
+const normalExecutionPolicy = resolveGeorgeExecutionPolicy({
+  runtime: 'normal_george',
+  voiceMode: false,
+  strategy: operationalJudgment.conversationStrategy,
+  moveDefinition: operationalJudgment.conversationStrategy.definition,
+  operationalJudgment,
+  outcomeEvolution: phaseEvolution,
+  operationalResourceMonitor,
+})
+assert(normalExecutionPolicy.source === 'execution_policy', 'execution policy should expose canonical ownership')
+assert(normalExecutionPolicy.deliveryPreference === 'text', 'Normal execution policy should preserve text delivery')
+assert(buildExecutionPolicyNote(normalExecutionPolicy).includes('EXECUTION POLICY'), 'execution policy should expose a governed runtime note')
+
+const liveQuestionStrategy = resolveGeorgeConversationStrategy({
+  action: 'execute_live_move',
+  currentRuntime: 'live_george',
+  latestUserText: 'They raised a concern but the specific issue is unclear.',
+  judgmentSurface: {
+    decisionSurface: 'execute',
+    signalSufficiency: 'sufficient',
+    shouldAcquireSignal: false,
+    instruction: '',
+  },
+  trajectory: {
+    currentMove: outcomeState.immediateOutcome,
+    likelyNextMoves: ['execute'],
+    potentialFutureNeeds: ['live'],
+    confidence: 0.72,
+  },
+  outcomeState,
+})
+const liveQuestionPolicy = resolveGeorgeExecutionPolicy({
+  runtime: 'live_george',
+  voiceMode: true,
+  strategy: liveQuestionStrategy,
+  moveDefinition: liveQuestionStrategy.definition,
+  operationalJudgment: { ...operationalJudgment, conversationStrategy: liveQuestionStrategy },
+  outcomeEvolution: phaseEvolution,
+  operationalResourceMonitor,
+})
+assert(liveQuestionPolicy.executionType === 'suggested_question', 'question moves should resolve to suggested-question execution')
+assert(liveQuestionPolicy.explanationDepth === 'minimal', 'LIVE execution should remain minimal')
+assert(liveQuestionPolicy.deliveryPreference === 'audio_visual', 'LIVE voice execution should support audio and visual delivery')
+assert(liveQuestionPolicy.assumptionHandling === 'offer_adaptable_alternative', 'assumption-sensitive moves should expose adaptable execution')
+assert(liveQuestionPolicy.repetitionPolicy === 'suppress_duplicate_live_recommendation', 'execution policy should suppress repeated LIVE recommendations')
 
 console.log('GEORGE core smoke passed')
 `)
