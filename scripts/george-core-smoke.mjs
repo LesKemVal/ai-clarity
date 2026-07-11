@@ -20,6 +20,7 @@ import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core
 import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
+import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -239,6 +240,20 @@ assert(
 assert(
   domainDirectSend.mode !== 'direct' || domainDirectSend.authority === 'domain',
   'domain direct response should identify domain authority'
+)
+
+const governedRuntimeContext = buildGovernedRuntimeContext({
+  liveRuntimeContext: 'LIVE CONTEXT',
+  runtimeAdapterNote: 'RUNTIME ADAPTER',
+  responseShapeNote: 'RESPONSE SHAPE',
+  outputGovernanceNote: 'OUTPUT GOVERNANCE',
+})
+
+assert(
+  governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
+    governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
+    governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
+  'governed runtime context should preserve canonical composition order'
 )
 
 const coursesExpandResponse = resolveCoursesExpandResponse()

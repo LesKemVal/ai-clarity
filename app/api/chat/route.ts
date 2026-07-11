@@ -67,7 +67,7 @@ import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/g
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
-import { composeRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
+import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -920,7 +920,7 @@ LANGUAGE MODE: SPANISH
       liveScenario,
     })
 
-    const runtimeContextBlock = composeRuntimeContext([
+    const runtimeContextBlock = buildGovernedRuntimeContext({
       liveRuntimeContext,
       shelvedCampaignRuntimeNote,
       individualLiveContextNote,
@@ -939,7 +939,7 @@ LANGUAGE MODE: SPANISH
       continuityGovernanceNote,
       outputGovernanceNote,
       presentationAuthorityNote,
-    ])
+    })
 
     const systemContent = languageRule + modeBlock +
       runtimeContextBlock +
