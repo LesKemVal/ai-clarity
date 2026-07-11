@@ -24,7 +24,7 @@ import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
-import { buildContextFramingPresentationNote } from '${process.cwd()}/lib/george/chat/presentation-authority'
+import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -409,11 +409,60 @@ assert(
   'presentation authority should render resolved context framing statements'
 )
 
+const liveRecommendationPresentation = resolveLiveRecommendationPresentation({
+  liveSupport: operationalJudgment.liveSupport,
+  latestUserText: 'The meeting starts in five minutes. I have my audio glasses with me.',
+  voiceMode: false,
+})
+
+assert(liveRecommendationPresentation.show, 'imminent execution should surface the LIVE presentation notice')
+assert(
+  liveRecommendationPresentation.receiverLabel === 'audio glasses',
+  'LIVE presentation should use the known receiver profile'
+)
+assert(
+  liveRecommendationPresentation.contextLabel === 'Your meeting',
+  'LIVE presentation should preserve the current execution context'
+)
+
+const liveRecommendationPresentationNote = buildLiveRecommendationPresentationNote(
+  liveRecommendationPresentation
+)
+
+assert(
+  liveRecommendationPresentationNote.includes('After Context Framing and before preparation guidance'),
+  'presentation authority should place the LIVE notice after context framing'
+)
+
+const presentedLiveRecommendation = enforceLiveRecommendationPresentation({
+  reply:
+    'Current Situation\\n' +
+    'Objective: Engage the investor with confidence and clarity.\\n' +
+    'Pressure: Real-time pressure now as the meeting is imminent.\\n' +
+    'Priority: Deliver a compelling opener to capture interest quickly.\\n' +
+    'Unknown: How familiar the investor is with your business details.\\n\\n' +
+    'Preparation\\n' +
+    'Open with the strongest proof.',
+  presentation: liveRecommendationPresentation,
+  contextFraming: preparationFraming,
+})
+
+assert(
+  presentedLiveRecommendation.indexOf('Current Situation') < presentedLiveRecommendation.indexOf('LIVE Available') &&
+    presentedLiveRecommendation.indexOf('LIVE Available') < presentedLiveRecommendation.indexOf('Preparation'),
+  'LIVE notice should render between context framing and preparation'
+)
+assert(
+  presentedLiveRecommendation.includes('audio glasses') && presentedLiveRecommendation.includes('Your meeting is imminent'),
+  'LIVE notice should preserve receiver and room context'
+)
+
 const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',
   runtimeAdapterNote: 'RUNTIME ADAPTER',
   operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
   contextFramingNote: 'CONTEXT FRAMING',
+  liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
   responseShapeNote: 'RESPONSE SHAPE',
   outputGovernanceNote: 'OUTPUT GOVERNANCE',
 })
@@ -422,7 +471,8 @@ assert(
   governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
     governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
     governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
-    governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
+    governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
+    governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
   'governed runtime context should preserve canonical composition order'
 )

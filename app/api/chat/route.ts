@@ -55,7 +55,7 @@ import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtim
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 
-import { determinePresentationMode, buildContextFramingPresentationNote, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
+import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, buildPresentationAuthorityNote, determinePresentationMode, enforceLiveRecommendationPresentation, enforcePresentationMode, resolveLiveRecommendationPresentation } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
@@ -901,6 +901,16 @@ LANGUAGE MODE: SPANISH
     const contextFramingNote =
       buildContextFramingPresentationNote(contextFraming)
 
+    const liveRecommendationPresentation =
+      resolveLiveRecommendationPresentation({
+        liveSupport: operationalJudgment.liveSupport,
+        latestUserText: latestUserRaw,
+        voiceMode,
+      })
+
+    const liveRecommendationPresentationNote =
+      buildLiveRecommendationPresentationNote(liveRecommendationPresentation)
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -960,6 +970,7 @@ LANGUAGE MODE: SPANISH
       trajectoryNote,
       operationalJudgmentNote,
       contextFramingNote,
+      liveRecommendationPresentationNote,
       responseShapeNote,
       continuityGovernanceNote,
       outputGovernanceNote,
@@ -1089,6 +1100,12 @@ ${dynamicRuntimeBlocks}`
       reply,
       presentationMode,
       latestUserText,
+    })
+
+    reply = enforceLiveRecommendationPresentation({
+      reply,
+      presentation: liveRecommendationPresentation,
+      contextFraming,
     })
 
     reply = appendPostResponseNotices({
