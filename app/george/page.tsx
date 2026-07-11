@@ -4660,14 +4660,6 @@ const handleSend = useCallback(
           return
         }
 
-        const campaignContextActive =
-          !liveMode &&
-          (
-            activePromptContext?.includes('conversation') ||
-            activePromptContext?.includes('professional') ||
-            activePromptContext?.includes('brilliant_live')
-          )
-
         const liveFastPath = liveMode
           ? tryLiveFastPath({
               input: text,
@@ -4727,14 +4719,6 @@ const handleSend = useCallback(
             isFirstSession: updatedMessages.length <= 2,
             promptContext: liveMode ? (activePromptContext || 'manual_live') : activePromptContext,
             promptLabel: activePromptLabel,
-            activeCampaign: activeCampaign && campaignContextActive
-              ? {
-                  ...activeCampaign,
-                  assistTone,
-                  deliveryMode: activeCampaign.deliveryMode || 'text',
-                }
-              : null,
-            campaignDefaultsEnabled: campaignContextActive ? (activeCampaign?.defaultAnswersEnabled ?? true) : false,
             contextTurnCount,
             tier: currentTier,
             language,
