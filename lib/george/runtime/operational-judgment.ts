@@ -8,6 +8,7 @@ import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recom
 import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
+import { resolveGeorgeConversationStrategy, type GeorgeConversationStrategy } from '@/lib/george/runtime/conversation-strategy'
 
 export type OperationalJudgmentAction =
   | 'warn_and_move'
@@ -33,6 +34,7 @@ export type OperationalJudgment = {
   agency: RuntimeSignalArbitration['agency']
   confidence: number
   outcomeState: GeorgeOutcomeState
+  conversationStrategy: GeorgeConversationStrategy
   smallestSignal?: string
   liveSupport: LiveSupportJudgment
   rationale: string[]
@@ -50,6 +52,7 @@ export type OperationalJudgmentInput = {
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
   outcomeState: GeorgeOutcomeState
+  latestUserText: string
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
@@ -64,6 +67,15 @@ export function resolveOperationalJudgment(
       (input.intentState.objectiveState === 'clear' ? 0.2 : 0.08)
   )
 
+  const conversationStrategy = resolveGeorgeConversationStrategy({
+    action,
+    currentRuntime: input.currentRuntime,
+    latestUserText: input.latestUserText,
+    judgmentSurface: input.judgmentSurface,
+    trajectory: input.trajectory,
+    outcomeState: input.outcomeState,
+  })
+
   return {
     action,
     decisionSurface: input.judgmentSurface.decisionSurface,
@@ -74,6 +86,7 @@ export function resolveOperationalJudgment(
     agency: input.runtimeArbitration.agency,
     confidence,
     outcomeState: input.outcomeState,
+    conversationStrategy,
     smallestSignal:
       action === 'acquire_smallest_signal'
         ? input.judgmentSurface.smallestSignal
@@ -224,6 +237,10 @@ OPERATIONAL JUDGMENT
 - Immediate outcome: ${judgment.outcomeState.immediateOutcome}
 - Outcome phase: ${judgment.outcomeState.phase}
 - Outcome confidence: ${judgment.outcomeState.confidence.toFixed(2)}
+- Conversation move: ${judgment.conversationStrategy.move}
+- Conversation purpose: ${judgment.conversationStrategy.purpose}
+- Conversation strategy confidence: ${judgment.conversationStrategy.confidence.toFixed(2)}
+- User retains final in-room discretion: yes
 - LIVE support posture: ${judgment.liveSupport.posture}
 - LIVE recommendation strength: ${judgment.liveSupport.strength}
 - Explain LIVE on request: ${judgment.liveSupport.explainOnRequest ? 'yes' : 'no'}

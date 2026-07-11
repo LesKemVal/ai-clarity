@@ -22,6 +22,7 @@ import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
+import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
@@ -333,6 +334,7 @@ const operationalJudgment = resolveOperationalJudgment({
   },
   liveRecommendationEvidence,
   outcomeState,
+  latestUserText: 'The investor is pushing for more control before committing.',
 })
 
 assert(
@@ -343,6 +345,48 @@ assert(
 assert(
   operationalJudgment.outcomeState === outcomeState,
   'operational judgment should consume the canonical outcome state without reconstructing it'
+)
+
+assert(
+  operationalJudgment.conversationStrategy.move === 'anchor',
+  'objective protection should select an outcome-preserving conversational move'
+)
+
+assert(
+  operationalJudgment.conversationStrategy.userDiscretionRequired,
+  'conversation strategy should preserve the user as the final in-room authority'
+)
+
+const clarificationStrategy = resolveGeorgeConversationStrategy({
+  action: 'execute_live_move',
+  currentRuntime: 'live_george',
+  latestUserText: 'They say the valuation is too high, but they may already have explained why.',
+  judgmentSurface: {
+    decisionSurface: 'execute',
+    signalSufficiency: 'sufficient',
+    shouldAcquireSignal: false,
+    instruction: '',
+  },
+  trajectory: {
+    currentMove: outcomeState.immediateOutcome,
+    likelyNextMoves: [],
+    potentialFutureNeeds: [],
+    confidence: 0.68,
+  },
+  outcomeState,
+})
+
+assert(
+  clarificationStrategy.move === 'probe',
+  'a live objection should permit a diagnostic conversational move without mandating a line'
+)
+
+const conversationStrategyNote = buildConversationStrategyNote(clarificationStrategy)
+assert(
+  conversationStrategyNote.includes('final in-room authority') &&
+    conversationStrategyNote.includes('do not repeat a canned line') &&
+    conversationStrategyNote.includes('already supplied'),
+  'conversation strategy should expose assumptions and preserve user discretion'
 )
 
 assert(
@@ -489,6 +533,7 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',
   runtimeAdapterNote: 'RUNTIME ADAPTER',
   operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
+  conversationStrategyNote: 'CONVERSATION STRATEGY',
   contextFramingNote: 'CONTEXT FRAMING',
   liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
   responseShapeNote: 'RESPONSE SHAPE',
@@ -498,7 +543,8 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
 assert(
   governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
     governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
-    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
+    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('CONVERSATION STRATEGY') &&
+    governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
     governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
     governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),

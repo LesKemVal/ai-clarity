@@ -13,6 +13,7 @@ export type GovernedRuntimeContextInput = {
   judgmentSurfaceNote?: string | null
   trajectoryNote?: string | null
   operationalJudgmentNote?: string | null
+  conversationStrategyNote?: string | null
   contextFramingNote?: string | null
   liveRecommendationPresentationNote?: string | null
   responseShapeNote?: string | null
@@ -49,6 +50,7 @@ export function buildGovernedRuntimeContext(input: GovernedRuntimeContextInput) 
     input.judgmentSurfaceNote,
     input.trajectoryNote,
     input.operationalJudgmentNote,
+    input.conversationStrategyNote,
     input.contextFramingNote,
     input.liveRecommendationPresentationNote,
     input.responseShapeNote,

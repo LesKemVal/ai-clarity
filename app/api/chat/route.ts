@@ -70,6 +70,7 @@ import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reason
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
+import { buildConversationStrategyNote } from '@/lib/george/runtime/conversation-strategy'
 import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
 
 const openai = new OpenAI({
@@ -896,10 +897,14 @@ LANGUAGE MODE: SPANISH
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
       outcomeState,
+      latestUserText: latestUserRaw,
     })
 
     const operationalJudgmentNote =
       buildOperationalJudgmentNote(operationalJudgment)
+
+    const conversationStrategyNote =
+      buildConversationStrategyNote(operationalJudgment.conversationStrategy)
 
     const contextFraming = resolveContextFraming({
       runtime: currentRuntime,
@@ -979,6 +984,7 @@ LANGUAGE MODE: SPANISH
       judgmentSurfaceNote,
       trajectoryNote,
       operationalJudgmentNote,
+      conversationStrategyNote,
       contextFramingNote,
       liveRecommendationPresentationNote,
       responseShapeNote,
