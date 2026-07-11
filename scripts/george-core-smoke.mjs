@@ -22,6 +22,7 @@ import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
+import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -243,6 +244,14 @@ assert(
   'domain direct response should identify domain authority'
 )
 
+const liveRecommendationEvidence = evaluateLiveRecommendationEvidence({
+  latestUserText: 'I am walking into an investor meeting right now.',
+  signalSufficiency: 'sufficient',
+  currentRuntime: 'normal_george',
+  pressureHigh: true,
+  objectiveKnown: true,
+})
+
 const operationalJudgment = resolveOperationalJudgment({
   currentRuntime: 'normal_george',
   intentState: {
@@ -302,11 +311,17 @@ const operationalJudgment = resolveOperationalJudgment({
     tacticalCueRetention: 0.5,
     layeredExplanationTolerance: 0.5,
   },
+  liveRecommendationEvidence,
 })
 
 assert(
   operationalJudgment.action === 'protect_objective',
   'operational judgment should synthesize evidence into one governing action'
+)
+
+assert(
+  operationalJudgment.liveSupport.posture === 'recommend',
+  'operational judgment should own the LIVE recommendation decision'
 )
 
 const operationalJudgmentNote = buildOperationalJudgmentNote(operationalJudgment)

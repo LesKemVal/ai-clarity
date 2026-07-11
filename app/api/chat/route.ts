@@ -63,7 +63,7 @@ import { evaluateDurableBehavioralMemory } from '@/lib/george/runtime/durable-be
 import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
-import { evaluateLiveRecommendation, buildLiveRecommendationNote } from '@/lib/george/runtime/live-recommendation-governor'
+import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
@@ -858,7 +858,7 @@ LANGUAGE MODE: SPANISH
 
     const judgmentSurfaceNote = buildJudgmentSurfaceNote(judgmentSurface)
 
-    const liveRecommendation = evaluateLiveRecommendation({
+    const liveRecommendationEvidence = evaluateLiveRecommendationEvidence({
       latestUserText: latestUserRaw,
       signalSufficiency: judgmentSurface.signalSufficiency,
       currentRuntime,
@@ -866,7 +866,6 @@ LANGUAGE MODE: SPANISH
       objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
     })
 
-    const liveRecommendationNote = buildLiveRecommendationNote(liveRecommendation)
 
     const trajectoryAssessment = assessTrajectory({
       latestUserText: latestUserRaw,
@@ -885,6 +884,7 @@ LANGUAGE MODE: SPANISH
       continuityRestoration,
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
+      liveRecommendationEvidence,
     })
 
     const operationalJudgmentNote =
@@ -946,7 +946,6 @@ LANGUAGE MODE: SPANISH
       runtimeOutcomeLearningNote,
       continuityRestorationNote,
       judgmentSurfaceNote,
-      liveRecommendationNote,
       trajectoryNote,
       operationalJudgmentNote,
       responseShapeNote,

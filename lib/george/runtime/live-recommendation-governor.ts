@@ -1,12 +1,6 @@
 import type { SignalSufficiency } from './judgment-surface'
 
-export type LiveRecommendationStrength =
-  | 'none'
-  | 'soft'
-  | 'recommend'
-  | 'strong'
-
-export type LiveRecommendationInput = {
+export type LiveRecommendationEvidenceInput = {
   latestUserText: string
   signalSufficiency: SignalSufficiency
   currentRuntime?: string
@@ -14,25 +8,23 @@ export type LiveRecommendationInput = {
   objectiveKnown?: boolean
 }
 
-export type LiveRecommendationState = {
-  shouldRecommendLive: boolean
-  shouldSurfaceEarbud: boolean
-  shouldExplainLive: boolean
-  strength: LiveRecommendationStrength
+export type LiveRecommendationEvidence = {
+  alreadyLive: boolean
+  signalUsable: boolean
   executionImminent: boolean
   conversationPressure: boolean
   trajectorySignal: boolean
-  reason: string
-  instruction: string
+  hasConversationOutcome: boolean
+  pressureHigh: boolean
 }
 
 function hasAny(text: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(text))
 }
 
-export function evaluateLiveRecommendation(
-  input: LiveRecommendationInput
-): LiveRecommendationState {
+export function evaluateLiveRecommendationEvidence(
+  input: LiveRecommendationEvidenceInput
+): LiveRecommendationEvidence {
   const t = String(input.latestUserText || '').toLowerCase().trim()
   const alreadyLive = input.currentRuntime === 'live_george'
 
@@ -102,81 +94,16 @@ export function evaluateLiveRecommendation(
     input.signalSufficiency === 'sufficient' ||
     input.signalSufficiency === 'needs-smallest-signal'
 
-  const shouldRecommendLive =
-    !alreadyLive &&
-    signalUsable &&
-    executionImminent &&
-    conversationPressure
-
   const hasConversationOutcome =
-    Boolean(input.objectiveKnown) &&
-    conversationPressure
-
-  const shouldSurfaceEarbud =
-    !alreadyLive &&
-    signalUsable &&
-    hasConversationOutcome
-
-  const shouldExplainLive =
-    shouldSurfaceEarbud &&
-    !shouldRecommendLive
-
-  const strength: LiveRecommendationStrength =
-    !shouldRecommendLive ? 'none' :
-    input.signalSufficiency === 'sufficient' && Boolean(input.pressureHigh) ? 'strong' :
-    input.signalSufficiency === 'sufficient' ? 'recommend' :
-    'soft'
-
-  const reason =
-    shouldRecommendLive
-      ? 'The situation appears to be moving from planning into real-time human execution pressure.'
-      : shouldExplainLive
-        ? 'GEORGE has enough outcome and conversation signal to understand that LIVE may help if this moves into the room.'
-        : alreadyLive
-          ? 'Already in LIVE mode.'
-          : !signalUsable
-            ? 'Signal is not sufficient enough to explain LIVE usefully yet.'
-            : !trajectorySignal && !conversationPressure
-              ? 'Trajectory does not yet indicate a realistic future live benefit.'
-              : 'LIVE recommendation threshold not met.'
-
-  const instruction =
-    shouldRecommendLive
-      ? strength === 'strong'
-        ? 'LIVE RECOMMENDATION GOVERNOR: The user appears to be entering real-time execution pressure. Offer LIVE as available support without selling it. Ask simply if they want GEORGE in the room.'
-        : 'LIVE RECOMMENDATION GOVERNOR: Offer LIVE as optional execution support only if the user is about to enter the room. Do not upsell and do not auto-route.'
-      : shouldExplainLive
-        ? 'LIVE RECOMMENDATION GOVERNOR: LIVE may be surfaced as a quiet execution capability marker. Explain LIVE only once when the user taps or asks. Frame it as support for a specific conversation or desired outcome, not as the next required move.'
-        : 'LIVE RECOMMENDATION GOVERNOR: Do not recommend LIVE. Continue normal GEORGE support.'
+    Boolean(input.objectiveKnown) && conversationPressure
 
   return {
-    shouldRecommendLive,
-    shouldSurfaceEarbud,
-    shouldExplainLive,
-    strength,
+    alreadyLive,
+    signalUsable,
     executionImminent,
     conversationPressure,
     trajectorySignal,
-    reason,
-    instruction,
+    hasConversationOutcome,
+    pressureHigh: Boolean(input.pressureHigh),
   }
-}
-
-export function buildLiveRecommendationNote(state: LiveRecommendationState) {
-  return `
-LIVE RECOMMENDATION GOVERNOR
-- Recommend LIVE: ${state.shouldRecommendLive ? 'yes' : 'no'}
-- Surface LIVE: ${state.shouldSurfaceEarbud ? 'yes' : 'no'}
-- Explain LIVE: ${state.shouldExplainLive ? 'yes' : 'no'}
-- Strength: ${state.strength}
-- Execution imminent: ${state.executionImminent ? 'yes' : 'no'}
-- Conversation pressure: ${state.conversationPressure ? 'yes' : 'no'}
-- Trajectory signal: ${state.trajectorySignal ? 'yes' : 'no'}
-- Reason: ${state.reason}
-- Rule: The LIVE tag appearing does not mean LIVE is next.
-- Rule: The LIVE tag appears only when GEORGE has enough outcome and conversation signal to understand that LIVE may be useful.
-- Rule: Do not explain LIVE when GEORGE only understands the topic. Explain LIVE when GEORGE understands the user's trajectory.
-- Rule: The user retains agency. GEORGE may surface or explain LIVE, but must not push or auto-route the user into LIVE.
-- ${state.instruction}
-`.trim()
 }

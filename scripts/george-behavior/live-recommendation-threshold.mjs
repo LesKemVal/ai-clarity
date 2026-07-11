@@ -1,57 +1,47 @@
 import assert from 'node:assert'
-import { evaluateLiveRecommendation } from '../../lib/george/runtime/live-recommendation-governor.ts'
+import { evaluateLiveRecommendationEvidence } from '../../lib/george/runtime/live-recommendation-governor.ts'
+import { resolveLiveSupportJudgment } from '../../lib/george/runtime/operational-judgment.ts'
+
+function judge(input) {
+  const evidence = evaluateLiveRecommendationEvidence(input)
+  return resolveLiveSupportJudgment(evidence, input.signalSufficiency)
+}
 
 export function run() {
-  const topicOnly = evaluateLiveRecommendation({
+  const topicOnly = judge({
     latestUserText: 'I am building a product for founders and customers.',
     signalSufficiency: 'sufficient',
     objectiveKnown: false,
   })
 
-  assert.equal(
-    topicOnly.shouldSurfaceEarbud,
-    false,
-    'LIVE should not surface from topic interest alone.'
-  )
+  assert.equal(topicOnly.posture, 'none', 'LIVE should not surface from topic interest alone.')
 
-  const outcomeButNoConversation = evaluateLiveRecommendation({
+  const outcomeButNoConversation = judge({
     latestUserText: 'I want to get funded eventually.',
     signalSufficiency: 'sufficient',
     objectiveKnown: true,
   })
 
-  assert.equal(
-    outcomeButNoConversation.shouldSurfaceEarbud,
-    false,
-    'LIVE should not surface until there is conversation signal.'
-  )
+  assert.equal(outcomeButNoConversation.posture, 'none', 'LIVE should not surface until there is conversation signal.')
 
-  const conversationOutcome = evaluateLiveRecommendation({
+  const conversationOutcome = judge({
     latestUserText: 'I have an investor meeting and I want a follow-up.',
     signalSufficiency: 'sufficient',
     objectiveKnown: true,
   })
 
-  assert.equal(
-    conversationOutcome.shouldSurfaceEarbud,
-    true,
-    'LIVE should surface when outcome and conversation signal are present.'
-  )
+  assert.equal(conversationOutcome.posture, 'surface', 'LIVE should surface when outcome and conversation signal are present.')
+  assert.equal(conversationOutcome.explainOnRequest, true, 'quiet LIVE surfacing should explain only on request.')
 
-  assert.equal(
-    conversationOutcome.shouldRecommendLive,
-    false,
-    'LIVE should surface quietly unless execution pressure is imminent.'
-  )
-
-  const imminent = evaluateLiveRecommendation({
+  const imminent = judge({
     latestUserText: 'I am walking into an investor meeting right now and I want a follow-up.',
     signalSufficiency: 'sufficient',
     objectiveKnown: true,
     pressureHigh: true,
   })
 
-  assert.equal(imminent.shouldRecommendLive, true)
+  assert.equal(imminent.posture, 'recommend')
+  assert.equal(imminent.strength, 'strong')
 
   return true
 }

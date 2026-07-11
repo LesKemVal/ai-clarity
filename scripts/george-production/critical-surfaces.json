@@ -260,7 +260,7 @@
     },
     {
       "path": "lib/george/runtime/live-recommendation-governor.ts",
-      "role": "Controls when GEORGE may surface or recommend LIVE from Normal GEORGE.",
+      "role": "Detects evidence that Operational Judgment uses to decide whether LIVE may surface or be recommended from Normal GEORGE.",
       "targetedBehavior": [
         "scripts/george-behavior/live-recommendation-threshold.mjs"
       ],
@@ -268,7 +268,7 @@
       "invariants": [
         "LIVE does not surface from topic interest alone",
         "LIVE requires outcome and conversation signal before surfacing",
-        "LIVE recommendation requires imminent execution pressure",
+        "Operational Judgment recommends LIVE only when evidence shows imminent execution pressure",
         "LIVE is user-facing language; hardware labels are implementation details"
       ]
     }

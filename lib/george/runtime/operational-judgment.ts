@@ -3,6 +3,7 @@ import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-pro
 import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
+import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
@@ -16,6 +17,14 @@ export type OperationalJudgmentAction =
   | 'advance_outcome'
   | 'clarify_direction'
 
+export type LiveSupportJudgment = {
+  posture: 'none' | 'surface' | 'recommend'
+  explainOnRequest: boolean
+  strength: 'none' | 'soft' | 'recommend' | 'strong'
+  reason: string
+  instruction: string
+}
+
 export type OperationalJudgment = {
   action: OperationalJudgmentAction
   decisionSurface: JudgmentSurfaceState['decisionSurface']
@@ -23,6 +32,7 @@ export type OperationalJudgment = {
   agency: RuntimeSignalArbitration['agency']
   confidence: number
   smallestSignal?: string
+  liveSupport: LiveSupportJudgment
   rationale: string[]
   source: 'operational_judgment'
 }
@@ -36,6 +46,7 @@ export type OperationalJudgmentInput = {
   continuityRestoration: ContinuityRestorationState
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
+  liveRecommendationEvidence: LiveRecommendationEvidence
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
@@ -63,8 +74,73 @@ export function resolveOperationalJudgment(
       action === 'acquire_smallest_signal'
         ? input.judgmentSurface.smallestSignal
         : undefined,
+    liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence, input.judgmentSurface.signalSufficiency),
     rationale: buildRationale(input, action),
     source: 'operational_judgment',
+  }
+}
+
+
+export function resolveLiveSupportJudgment(
+  evidence: LiveRecommendationEvidence,
+  signalSufficiency: JudgmentSurfaceState['signalSufficiency']
+): LiveSupportJudgment {
+  const shouldRecommend =
+    !evidence.alreadyLive &&
+    evidence.signalUsable &&
+    evidence.executionImminent &&
+    evidence.conversationPressure
+
+  const shouldSurface =
+    !evidence.alreadyLive &&
+    evidence.signalUsable &&
+    evidence.hasConversationOutcome
+
+  if (shouldRecommend) {
+    const strength =
+      signalSufficiency === 'sufficient' && evidence.pressureHigh
+        ? 'strong'
+        : signalSufficiency === 'sufficient'
+          ? 'recommend'
+          : 'soft'
+
+    return {
+      posture: 'recommend',
+      explainOnRequest: false,
+      strength,
+      reason:
+        'The situation appears to be moving from planning into real-time human execution pressure.',
+      instruction:
+        strength === 'strong'
+          ? 'The user appears to be entering real-time execution pressure. Offer LIVE as available support without selling it. Ask simply if they want GEORGE in the room.'
+          : 'Offer LIVE as optional execution support only if the user is about to enter the room. Do not upsell and do not auto-route.',
+    }
+  }
+
+  if (shouldSurface) {
+    return {
+      posture: 'surface',
+      explainOnRequest: true,
+      strength: 'none',
+      reason:
+        'GEORGE has enough outcome and conversation signal to understand that LIVE may help if this moves into the room.',
+      instruction:
+        'LIVE may be surfaced as a quiet execution capability marker. Explain LIVE only once when the user taps or asks. Frame it as support for a specific conversation or desired outcome, not as the next required move.',
+    }
+  }
+
+  return {
+    posture: 'none',
+    explainOnRequest: false,
+    strength: 'none',
+    reason: evidence.alreadyLive
+      ? 'Already in LIVE mode.'
+      : !evidence.signalUsable
+        ? 'Signal is not sufficient enough to explain LIVE usefully yet.'
+        : !evidence.trajectorySignal && !evidence.conversationPressure
+          ? 'Trajectory does not yet indicate a realistic future live benefit.'
+          : 'LIVE recommendation threshold not met.',
+    instruction: 'Do not recommend LIVE. Continue normal GEORGE support.',
   }
 }
 
@@ -140,11 +216,17 @@ OPERATIONAL JUDGMENT
 - Delivery density: ${judgment.delivery}
 - Agency posture: ${judgment.agency}
 - Judgment confidence: ${judgment.confidence.toFixed(2)}
+- LIVE support posture: ${judgment.liveSupport.posture}
+- LIVE recommendation strength: ${judgment.liveSupport.strength}
+- Explain LIVE on request: ${judgment.liveSupport.explainOnRequest ? 'yes' : 'no'}
+- LIVE support reason: ${judgment.liveSupport.reason}
+- LIVE support instruction: ${judgment.liveSupport.instruction}
 ${judgment.smallestSignal ? `- Acquire only this signal: ${judgment.smallestSignal}` : '- Additional signal is not required before the first useful move.'}
 - Evidence: ${judgment.rationale.join('; ')}
 - This is the single operational synthesis for the current turn.
 - Evidence producers inform this judgment; they do not independently govern the response.
 - Response shaping and output governance must execute this judgment without creating a competing posture.
+- LIVE may be surfaced quietly when outcome and conversation signal are present. Recommend it only when execution pressure is imminent. Never upsell or auto-route.
 - Preserve explicit user direction, safety boundaries, and LIVE authority.
 `.trim()
 }
