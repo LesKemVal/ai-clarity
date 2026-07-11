@@ -21,6 +21,7 @@ import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtim
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
+import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -242,16 +243,91 @@ assert(
   'domain direct response should identify domain authority'
 )
 
+const operationalJudgment = resolveOperationalJudgment({
+  currentRuntime: 'normal_george',
+  intentState: {
+    operational: true,
+    exploratory: false,
+    actionable: true,
+    pressureLevel: 'medium',
+    objectiveState: 'clear',
+    narrowingReadiness: 0.7,
+    continuityDependency: 0.1,
+    liveRisk: false,
+    emotionalLoad: 0.1,
+    cadenceAvoid: [],
+    bottleneck: { label: 'execution', confidence: 'high' },
+    liveScenario: { active: false, type: 'none' },
+    source: 'passive_aggregator',
+  },
+  runtimeArbitration: {
+    winner: 'objective_protection',
+    posture: 'protect_objective',
+    delivery: 'structured',
+    agency: 'user_decides',
+    note: '',
+  },
+  judgmentSurface: {
+    decisionSurface: 'execute',
+    signalSufficiency: 'sufficient',
+    shouldAcquireSignal: false,
+    instruction: '',
+  },
+  trajectory: {
+    currentMove: 'advance the stated outcome',
+    likelyNextMoves: ['execute'],
+    potentialFutureNeeds: [],
+    confidence: 0.68,
+  },
+  continuityRestoration: {
+    active: false,
+    confidence: 'low',
+    revealStyle: 'none',
+    instruction: '',
+  },
+  outcomeSignals: {
+    clarityImproved: 0.4,
+    overloadDetected: 0.1,
+    userConfidenceImproved: 0.4,
+    pressureReduced: 0.4,
+    leverageImproved: 0.4,
+    executionLikelihood: 0.7,
+  },
+  adaptiveProfile: {
+    conciseDeliveryPreference: 0.5,
+    repeatableLineAffinity: 0.5,
+    abstractReasoningTolerance: 0.5,
+    calmPressurePreference: 0.5,
+    leverageProtectionPreference: 0.5,
+    tacticalCueRetention: 0.5,
+    layeredExplanationTolerance: 0.5,
+  },
+})
+
+assert(
+  operationalJudgment.action === 'protect_objective',
+  'operational judgment should synthesize evidence into one governing action'
+)
+
+const operationalJudgmentNote = buildOperationalJudgmentNote(operationalJudgment)
+
+assert(
+  operationalJudgmentNote.includes('single operational synthesis'),
+  'operational judgment note should declare one governing synthesis'
+)
+
 const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',
   runtimeAdapterNote: 'RUNTIME ADAPTER',
+  operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
   responseShapeNote: 'RESPONSE SHAPE',
   outputGovernanceNote: 'OUTPUT GOVERNANCE',
 })
 
 assert(
   governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
-    governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
+    governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
+    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
   'governed runtime context should preserve canonical composition order'
 )

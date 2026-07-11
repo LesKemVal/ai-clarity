@@ -68,6 +68,7 @@ import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/traj
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
+import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -875,7 +876,19 @@ LANGUAGE MODE: SPANISH
 
     const trajectoryNote = buildTrajectoryNote(trajectoryAssessment)
 
+    const operationalJudgment = resolveOperationalJudgment({
+      currentRuntime,
+      intentState: passiveIntentState,
+      runtimeArbitration,
+      judgmentSurface,
+      trajectory: trajectoryAssessment,
+      continuityRestoration,
+      outcomeSignals: runtimeOutcomeSignals,
+      adaptiveProfile: adaptiveUserProfile,
+    })
 
+    const operationalJudgmentNote =
+      buildOperationalJudgmentNote(operationalJudgment)
 
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
@@ -935,6 +948,7 @@ LANGUAGE MODE: SPANISH
       judgmentSurfaceNote,
       liveRecommendationNote,
       trajectoryNote,
+      operationalJudgmentNote,
       responseShapeNote,
       continuityGovernanceNote,
       outputGovernanceNote,
