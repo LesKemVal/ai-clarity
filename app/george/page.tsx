@@ -4801,10 +4801,7 @@ const handleSend = useCallback(
       } finally {
         setIsThinking(false)
 
-        if (
-          activePromptContext?.startsWith('professional_') ||
-          activePromptContext?.startsWith('brilliant_')
-        ) {
+        if (!liveMode && voiceOn) {
           setTimeout(() => {
             startListening()
           }, 700)
