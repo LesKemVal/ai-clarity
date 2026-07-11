@@ -32,6 +32,8 @@ export function evaluateLiveRecommendationEvidence(
     hasAny(t, [
       /\bright now\b/,
       /\bin \d+\s?(minutes?|mins?|hours?)\b/,
+      /\b(?:meeting|call|interview|presentation|negotiation|session)\s+(?:starts?|begins?|kicks? off)\s+in\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:minutes?|mins?|hours?)\b/,
+      /\b(?:meeting|call|interview|presentation|negotiation|session)\s+is\s+in\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:minutes?|mins?|hours?)\b/,
       /\babout to\b/,
       /\bwalking into\b/,
       /\bi'?m in\b/,

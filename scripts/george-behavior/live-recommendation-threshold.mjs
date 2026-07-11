@@ -33,6 +33,18 @@ export function run() {
   assert.equal(conversationOutcome.posture, 'surface', 'LIVE should surface when outcome and conversation signal are present.')
   assert.equal(conversationOutcome.explainOnRequest, true, 'quiet LIVE surfacing should explain only on request.')
 
+  const naturalImminentStart = judge({
+    latestUserText: 'The meeting starts in five minutes. I have my earbuds with me.',
+    signalSufficiency: 'sufficient',
+    objectiveKnown: true,
+  })
+
+  assert.equal(
+    naturalImminentStart.posture,
+    'recommend',
+    'Natural imminent-start phrasing should recommend LIVE.'
+  )
+
   const imminent = judge({
     latestUserText: 'I am walking into an investor meeting right now and I want a follow-up.',
     signalSufficiency: 'sufficient',
