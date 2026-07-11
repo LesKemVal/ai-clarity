@@ -55,7 +55,7 @@ import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtim
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 
-import { determinePresentationMode, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
+import { determinePresentationMode, buildContextFramingPresentationNote, buildPresentationAuthorityNote, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
@@ -69,6 +69,7 @@ import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reason
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
+import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -890,6 +891,16 @@ LANGUAGE MODE: SPANISH
     const operationalJudgmentNote =
       buildOperationalJudgmentNote(operationalJudgment)
 
+    const contextFraming = resolveContextFraming({
+      runtime: currentRuntime,
+      latestUserText: latestUserRaw,
+      voiceMode,
+      operationalJudgment,
+    })
+
+    const contextFramingNote =
+      buildContextFramingPresentationNote(contextFraming)
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -948,6 +959,7 @@ LANGUAGE MODE: SPANISH
       judgmentSurfaceNote,
       trajectoryNote,
       operationalJudgmentNote,
+      contextFramingNote,
       responseShapeNote,
       continuityGovernanceNote,
       outputGovernanceNote,

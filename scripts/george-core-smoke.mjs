@@ -23,6 +23,8 @@ import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtim
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
+import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
+import { buildContextFramingPresentationNote } from '${process.cwd()}/lib/george/chat/presentation-authority'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -331,10 +333,53 @@ assert(
   'operational judgment note should declare one governing synthesis'
 )
 
+const preparationFraming = resolveContextFraming({
+  runtime: 'normal_george',
+  latestUserText: 'I have an investor meeting tomorrow and need to preserve control.',
+  voiceMode: false,
+  operationalJudgment,
+})
+
+assert(preparationFraming.show, 'high-value preparation should show context framing')
+assert(preparationFraming.title === 'Current Situation', 'Normal preparation should use Current Situation')
+assert(preparationFraming.items.length === 4, 'context framing should contain exactly four orientation items')
+
+const liveFraming = resolveContextFraming({
+  runtime: 'live_george',
+  latestUserText: 'They are pushing for a second board seat right now.',
+  voiceMode: false,
+  operationalJudgment,
+})
+
+assert(liveFraming.title === 'What Matters Now', 'LIVE visual framing should use What Matters Now')
+
+const audioLiveFraming = resolveContextFraming({
+  runtime: 'live_george',
+  latestUserText: 'They are pushing for a second board seat right now.',
+  voiceMode: true,
+  operationalJudgment,
+})
+
+assert(!audioLiveFraming.show, 'LIVE audio should suppress visual context framing')
+
+const simpleFraming = resolveContextFraming({
+  runtime: 'normal_george',
+  latestUserText: 'Fix this typo.',
+  voiceMode: false,
+  operationalJudgment,
+})
+
+assert(!simpleFraming.show, 'simple tasks should suppress context framing')
+
+const contextFramingNote = buildContextFramingPresentationNote(preparationFraming)
+assert(contextFramingNote.includes('Current Situation'), 'presentation authority should render the selected framing title')
+assert(contextFramingNote.includes('Objective, Pressure, Priority, Avoid'), 'presentation authority should preserve framing item order')
+
 const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',
   runtimeAdapterNote: 'RUNTIME ADAPTER',
   operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
+  contextFramingNote: 'CONTEXT FRAMING',
   responseShapeNote: 'RESPONSE SHAPE',
   outputGovernanceNote: 'OUTPUT GOVERNANCE',
 })
@@ -342,7 +387,8 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
 assert(
   governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
     governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
-    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
+    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
+    governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
   'governed runtime context should preserve canonical composition order'
 )

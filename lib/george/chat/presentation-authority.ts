@@ -1,5 +1,6 @@
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
 import type { GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
+import type { ContextFraming } from '@/lib/george/runtime/context-framing'
 
 export type GeorgePresentationMode =
   | 'conversational'
@@ -14,6 +15,22 @@ type Input = {
   explicitRequest?: string | null
   voiceMode?: boolean
   runtimeAdapter?: GeorgeRuntimeAdapter | null
+}
+
+
+export function buildContextFramingPresentationNote(framing: ContextFraming) {
+  if (!framing.show || framing.items.length === 0) return ''
+
+  return `
+CONTEXT FRAMING
+- Begin the response with the heading: ${framing.title}
+- Under that heading, render exactly these items in this order: ${framing.items.map((item) => item.label).join(', ')}.
+${framing.items.map((item) => `- ${item.label}: ${item.focus}`).join('\n')}
+- Keep each item to one concise sentence grounded in the user's actual situation.
+- This framing presents the governing judgment; it must not add a competing recommendation.
+- Do not expose internal reasoning, confidence calculations, evidence lists, or chain-of-thought.
+- After the framing, continue with the useful guidance.
+`.trim()
 }
 
 export function determinePresentationMode(input: Input): GeorgePresentationMode {
