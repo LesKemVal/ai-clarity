@@ -1,99 +1,232 @@
+import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
+import {
+  buildContextFramingPresentationNote,
+  buildLiveRecommendationPresentationNote,
+  resolveLiveRecommendationPresentation,
+  type LiveRecommendationPresentation,
+} from '@/lib/george/chat/presentation-authority'
+import {
+  resolveGeorgeOutcomeState,
+  type GeorgeOutcomeState,
+} from '@/lib/george/live-voice/runtime/active-outcome'
+import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
+import {
+  buildConversationMoveDefinitionNote,
+  type GeorgeConversationMoveDefinition,
+} from '@/lib/george/runtime/conversation-move-library'
+import {
+  buildConversationStrategyNote,
+  type GeorgeConversationStrategy,
+} from '@/lib/george/runtime/conversation-strategy'
+import { resolveContextFraming, type ContextFraming } from '@/lib/george/runtime/context-framing'
+import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
+import {
+  buildExecutionPolicyNote,
+  resolveGeorgeExecutionPolicy,
+  type GeorgeExecutionPolicy,
+} from '@/lib/george/runtime/execution-policy'
+import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
+import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
+import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
+import {
+  buildOperationalJudgmentNote,
+  resolveOperationalJudgment,
+  type OperationalJudgment,
+} from '@/lib/george/runtime/operational-judgment'
+import {
+  resolveOperationalResourceMonitor,
+  type OperationalResourceMonitorState,
+} from '@/lib/george/runtime/operational-resource-monitor'
+import {
+  buildOutcomeEvolutionNote,
+  evolveGeorgeOutcomeState,
+  type OutcomeEvolution,
+} from '@/lib/george/runtime/outcome-evolution'
+import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
+import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
+import {
+  assessTrajectory,
+  buildTrajectoryNote,
+  type TrajectoryAssessment,
+} from '@/lib/george/runtime/trajectory-engine'
+
 export const GEORGE_RUNTIME_PIPELINE = {
   purpose:
-    'Inactive architecture model. Defines the future canonical GEORGE runtime flow before active integration.',
-
+    'Active canonical coordinator for GEORGE runtime decisions. It sequences existing owners without absorbing their business logic.',
+  status: 'active',
   stages: [
-    {
-      id: 'signal_intake',
-      role: 'Read user message, source, mode, prompt context, tier, message history, and live state.',
-      may: ['observe', 'classify raw inputs'],
-      mayNot: ['decide final tone', 'override user agency', 'apply final output constraints'],
-      currentExamples: [
-        'latestUserRaw',
-        'latestUserSource',
-        'promptContext',
-        'tier',
-        'messages',
-      ],
-    },
-    {
-      id: 'intent_interpretation',
-      role: 'Translate raw signals into shared intent signals such as operational, exploratory, actionable, pressure_present, or objective_emerging.',
-      may: ['advise coordinators', 'reduce duplicate detection'],
-      mayNot: ['generate final behavior independently', 'replace runtime governance'],
-      currentExamples: [
-        'classifyControlState',
-        'scoreRuntimeSignals',
-        'detectLikelyBottleneck',
-        'detectLiveScenario',
-      ],
-    },
-    {
-      id: 'governance_coordination',
-      role: 'Apply immutable boundaries, operational ownership, continuity governance, output governance, and LIVE governance.',
-      may: ['constrain', 'coordinate', 'prioritize competing signals'],
-      mayNot: ['be bypassed by posture', 'be duplicated by downstream prompt layers'],
-      currentExamples: [
-        'continuityGovernanceNote',
-        'outputGovernanceNote',
-        'liveDisciplineBlock',
-        'runtime governance ownership map',
-      ],
-    },
-    {
-      id: 'posture_adaptation',
-      role: 'Select or blend elite posture expression based on intent, pressure, user readiness, and context.',
-      may: ['shape pacing', 'shape warmth', 'shape narrowing speed', 'shape authority expression', 'shape tactical density'],
-      mayNot: ['override immutable core', 'override LIVE timing', 'own safety boundaries', 'confiscate user agency'],
-      currentExamples: [
-        'future posture scaffolding',
-        'elite strategic',
-        'elite field operator',
-        'elite tactical whisper',
-      ],
-    },
-    {
-      id: 'response_shaping',
-      role: 'Decide surface format, density, compression, structure, and final delivery shape.',
-      may: ['coordinate final expression', 'apply compression', 'choose structure'],
-      mayNot: ['violate governance boundaries', 'ignore LIVE constraints'],
-      currentExamples: [
-        'getCurrentResponseShape',
-        'buildResponseShapeNote',
-        'delivery-foresight-block',
-      ],
-    },
-    {
-      id: 'model_generation',
-      role: 'Generate the actual assistant reply from the assembled system content and recent messages.',
-      may: ['produce answer', 'adapt language naturally'],
-      mayNot: ['invent authority over immutable core', 'ignore system constraints'],
-      currentExamples: [
-        'OpenAI chat completions',
-        'OpenAI responses for image input',
-      ],
-    },
-    {
-      id: 'post_response_governance',
-      role: 'Append capacity notices and intent-aware risk notices after generation when needed.',
-      may: ['append limited notices', 'protect users from high-risk misuse', 'signal continuity limits'],
-      mayNot: ['fire on mere keyword mentions', 'overwhelm ordinary answers', 'replace GEORGE tone with generic disclaimer tone'],
-      currentExamples: [
-        'appendPostResponseNotices',
-        'buildCapacityNotice',
-        'buildRiskNotice',
-      ],
-    },
+    'outcome_inference',
+    'outcome_evolution',
+    'trajectory_assessment',
+    'operational_judgment',
+    'conversation_strategy',
+    'conversation_move_resolution',
+    'context_framing',
+    'live_recommendation_presentation',
+    'operational_resource_monitor',
+    'execution_policy',
   ],
-
   ownershipPrinciple:
-    'One layer should coordinate a behavioral surface; other layers should inform. Avoid governance collisions.',
-
-  posturePrinciple:
-    'Posture is an adaptive expression layer, not a constitutional authority.',
-
+    'The pipeline coordinates. Each stage remains owned by its canonical module and may not be reimplemented here or downstream.',
   integrationRule:
-    'Do not activate new runtime stages until the owning coordinator and downstream effects are explicit and tested.',
+    'Route and UI consumers use the pipeline snapshot instead of independently recomputing runtime decisions.',
 } as const
 
 export type GeorgeRuntimePipeline = typeof GEORGE_RUNTIME_PIPELINE
+
+export type GeorgeRuntimePipelineInput = {
+  currentRuntime: CurrentGeorgeRuntime
+  latestUserText: string
+  previousUserText?: string
+  voiceMode: boolean
+  objectiveKnown: boolean
+  signalUsable: boolean
+  executionImminent: boolean
+  intentState: GeorgeIntentState
+  runtimeArbitration: RuntimeSignalArbitration
+  judgmentSurface: JudgmentSurfaceState
+  continuityRestoration: ContinuityRestorationState
+  outcomeSignals: RuntimeOutcomeSignals
+  adaptiveProfile: AdaptiveUserProfile
+  liveRecommendationEvidence: LiveRecommendationEvidence
+}
+
+export type GeorgeRuntimePipelineSnapshot = Readonly<{
+  inferredOutcomeState: GeorgeOutcomeState
+  outcomeEvolution: OutcomeEvolution
+  outcomeState: GeorgeOutcomeState
+  trajectoryAssessment: TrajectoryAssessment
+  operationalJudgment: OperationalJudgment
+  conversationStrategy: GeorgeConversationStrategy
+  conversationMoveDefinition: GeorgeConversationMoveDefinition
+  contextFraming: ContextFraming
+  liveRecommendationPresentation: LiveRecommendationPresentation
+  operationalResourceMonitor: OperationalResourceMonitorState
+  executionPolicy: GeorgeExecutionPolicy
+  notes: Readonly<{
+    outcomeEvolutionNote: string
+    trajectoryNote: string
+    operationalJudgmentNote: string
+    conversationStrategyNote: string
+    conversationMoveDefinitionNote: string
+    contextFramingNote: string
+    liveRecommendationPresentationNote: string
+    executionPolicyNote: string
+  }>
+  source: 'runtime_pipeline'
+}>
+
+export function resolveGeorgeRuntimePipeline(
+  input: GeorgeRuntimePipelineInput
+): GeorgeRuntimePipelineSnapshot {
+  const inferredOutcomeState = resolveGeorgeOutcomeState({
+    transcript: input.latestUserText,
+    objectiveKnown: input.objectiveKnown,
+    signalUsable: input.signalUsable,
+    executionImminent: input.executionImminent,
+  })
+
+  const previousOutcomeState = input.previousUserText
+    ? resolveGeorgeOutcomeState({
+        transcript: input.previousUserText,
+        objectiveKnown: true,
+        signalUsable: true,
+        executionImminent: false,
+      })
+    : null
+
+  const outcomeEvolution = evolveGeorgeOutcomeState({
+    previousState: previousOutcomeState,
+    inferredState: inferredOutcomeState,
+    latestUserText: input.latestUserText,
+    previousUserText: input.previousUserText,
+  })
+  const outcomeState = outcomeEvolution.state
+
+  const trajectoryAssessment = assessTrajectory({
+    latestUserText: input.latestUserText,
+    objectiveKnown: input.objectiveKnown,
+    signalUsable: input.signalUsable,
+    outcomeState,
+  })
+
+  const operationalJudgment = resolveOperationalJudgment({
+    currentRuntime: input.currentRuntime,
+    intentState: input.intentState,
+    runtimeArbitration: input.runtimeArbitration,
+    judgmentSurface: input.judgmentSurface,
+    trajectory: trajectoryAssessment,
+    continuityRestoration: input.continuityRestoration,
+    outcomeSignals: input.outcomeSignals,
+    adaptiveProfile: input.adaptiveProfile,
+    liveRecommendationEvidence: input.liveRecommendationEvidence,
+    outcomeState,
+    latestUserText: input.latestUserText,
+  })
+
+  const conversationStrategy = operationalJudgment.conversationStrategy
+  const conversationMoveDefinition = conversationStrategy.definition
+
+  const contextFraming = resolveContextFraming({
+    runtime: input.currentRuntime,
+    latestUserText: input.latestUserText,
+    voiceMode: input.voiceMode,
+    operationalJudgment,
+  })
+
+  const liveRecommendationPresentation = resolveLiveRecommendationPresentation({
+    liveSupport: operationalJudgment.liveSupport,
+    latestUserText: input.latestUserText,
+    voiceMode: input.voiceMode,
+  })
+
+  const operationalResourceMonitor = resolveOperationalResourceMonitor({
+    outcomeState,
+    conversationStrategy,
+    operationalJudgment,
+    trajectory: trajectoryAssessment,
+    liveRecommendationPresentation,
+  })
+
+  const executionPolicy = resolveGeorgeExecutionPolicy({
+    runtime: input.currentRuntime,
+    voiceMode: input.voiceMode,
+    strategy: conversationStrategy,
+    moveDefinition: conversationMoveDefinition,
+    operationalJudgment,
+    outcomeEvolution,
+    operationalResourceMonitor,
+  })
+
+  const notes = Object.freeze({
+    outcomeEvolutionNote: buildOutcomeEvolutionNote(outcomeEvolution),
+    trajectoryNote: buildTrajectoryNote(trajectoryAssessment),
+    operationalJudgmentNote: buildOperationalJudgmentNote(operationalJudgment),
+    conversationStrategyNote: buildConversationStrategyNote(conversationStrategy),
+    conversationMoveDefinitionNote: buildConversationMoveDefinitionNote(
+      conversationMoveDefinition,
+      conversationStrategy.assumptions
+    ),
+    contextFramingNote: buildContextFramingPresentationNote(contextFraming),
+    liveRecommendationPresentationNote: buildLiveRecommendationPresentationNote(
+      liveRecommendationPresentation
+    ),
+    executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
+  })
+
+  return Object.freeze({
+    inferredOutcomeState,
+    outcomeEvolution,
+    outcomeState,
+    trajectoryAssessment,
+    operationalJudgment,
+    conversationStrategy,
+    conversationMoveDefinition,
+    contextFraming,
+    liveRecommendationPresentation,
+    operationalResourceMonitor,
+    executionPolicy,
+    notes,
+    source: 'runtime_pipeline' as const,
+  })
+}

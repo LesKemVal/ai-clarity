@@ -64,18 +64,10 @@ import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-lear
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
-import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
-import { resolveGeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
-import { buildOutcomeEvolutionNote, evolveGeorgeOutcomeState } from '@/lib/george/runtime/outcome-evolution'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
-import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
-import { buildConversationStrategyNote } from '@/lib/george/runtime/conversation-strategy'
-import { buildConversationMoveDefinitionNote } from '@/lib/george/runtime/conversation-move-library'
-import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
-import { resolveOperationalResourceMonitor } from '@/lib/george/runtime/operational-resource-monitor'
-import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '@/lib/george/runtime/execution-policy'
+import { resolveGeorgeRuntimePipeline } from '@/lib/george/runtime/runtime-pipeline'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -874,108 +866,48 @@ LANGUAGE MODE: SPANISH
     })
 
 
-    const inferredOutcomeState = resolveGeorgeOutcomeState({
-      transcript: latestUserRaw,
-      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
-      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
-      executionImminent: liveRecommendationEvidence.executionImminent,
-    })
-
     const previousUserText = [...recentMessages]
       .reverse()
       .find((message) => message.role === 'user' && message.content !== latestUserRaw)
       ?.content || ''
 
-    const previousOutcomeState = previousUserText
-      ? resolveGeorgeOutcomeState({
-          transcript: previousUserText,
-          objectiveKnown: true,
-          signalUsable: true,
-          executionImminent: false,
-        })
-      : null
-
-    const outcomeEvolution = evolveGeorgeOutcomeState({
-      previousState: previousOutcomeState,
-      inferredState: inferredOutcomeState,
+    const runtimePipeline = resolveGeorgeRuntimePipeline({
+      currentRuntime,
       latestUserText: latestUserRaw,
       previousUserText,
-    })
-
-    const outcomeState = outcomeEvolution.state
-    const outcomeEvolutionNote = buildOutcomeEvolutionNote(outcomeEvolution)
-
-    const trajectoryAssessment = assessTrajectory({
-      latestUserText: latestUserRaw,
+      voiceMode,
       objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
       signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
-      outcomeState,
-    })
-
-    const trajectoryNote = buildTrajectoryNote(trajectoryAssessment)
-
-    const operationalJudgment = resolveOperationalJudgment({
-      currentRuntime,
+      executionImminent: liveRecommendationEvidence.executionImminent,
       intentState: passiveIntentState,
       runtimeArbitration,
       judgmentSurface,
-      trajectory: trajectoryAssessment,
       continuityRestoration,
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
-      outcomeState,
-      latestUserText: latestUserRaw,
     })
 
-    const operationalJudgmentNote =
-      buildOperationalJudgmentNote(operationalJudgment)
-
-    const conversationStrategyNote =
-      buildConversationStrategyNote(operationalJudgment.conversationStrategy)
-    const conversationMoveDefinitionNote = buildConversationMoveDefinitionNote(
-      operationalJudgment.conversationStrategy.definition,
-      operationalJudgment.conversationStrategy.assumptions
-    )
-
-    const contextFraming = resolveContextFraming({
-      runtime: currentRuntime,
-      latestUserText: latestUserRaw,
-      voiceMode,
-      operationalJudgment,
-    })
-
-    const contextFramingNote =
-      buildContextFramingPresentationNote(contextFraming)
-
-    const liveRecommendationPresentation =
-      resolveLiveRecommendationPresentation({
-        liveSupport: operationalJudgment.liveSupport,
-        latestUserText: latestUserRaw,
-        voiceMode,
-      })
-
-    const liveRecommendationPresentationNote =
-      buildLiveRecommendationPresentationNote(liveRecommendationPresentation)
-
-    const operationalResourceMonitor = resolveOperationalResourceMonitor({
-      outcomeState,
-      conversationStrategy: operationalJudgment.conversationStrategy,
-      operationalJudgment,
-      trajectory: trajectoryAssessment,
-      liveRecommendationPresentation,
-    })
-
-    const executionPolicy = resolveGeorgeExecutionPolicy({
-      runtime: currentRuntime,
-      voiceMode,
-      strategy: operationalJudgment.conversationStrategy,
-      moveDefinition: operationalJudgment.conversationStrategy.definition,
-      operationalJudgment,
+    const {
       outcomeEvolution,
+      outcomeState,
+      trajectoryAssessment,
+      operationalJudgment,
+      contextFraming,
+      liveRecommendationPresentation,
       operationalResourceMonitor,
-    })
-    const executionPolicyNote = buildExecutionPolicyNote(executionPolicy)
+      executionPolicy,
+      notes: {
+        outcomeEvolutionNote,
+        trajectoryNote,
+        operationalJudgmentNote,
+        conversationStrategyNote,
+        conversationMoveDefinitionNote,
+        contextFramingNote,
+        liveRecommendationPresentationNote,
+        executionPolicyNote,
+      },
+    } = runtimePipeline
 
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,

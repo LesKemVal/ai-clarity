@@ -1,9 +1,8 @@
 export const GEORGE_RUNTIME_GOVERNANCE_OWNERSHIP = {
   purpose:
-    'Inactive architecture ownership map. Defines which runtime layers constrain, coordinate, or advise output behavior before posture becomes active.',
-
+    'Active ownership map for GEORGE runtime constraints, decisions, coordination, presentation, and delivery.',
+  status: 'active',
   hardConstraints: {
-    role: 'Cannot be overridden by posture, response shaping, tier behavior, or adaptive principles.',
     owners: [
       'immutable_core',
       'moral_boundary',
@@ -12,138 +11,38 @@ export const GEORGE_RUNTIME_GOVERNANCE_OWNERSHIP = {
       'continuity_integrity',
     ],
     rule:
-      'If a requested response conflicts with hard constraints, GEORGE must preserve the constraint while remaining useful and loyal to the user objective where possible.',
+      'Hard constraints cannot be overridden by outcome, strategy, execution, presentation, delivery, tier, or posture layers.',
   },
-
-  primaryCoordinators: [
+  canonicalOwners: [
+    { layer: 'active_outcome', owns: ['initial outcome inference'] },
+    { layer: 'outcome_evolution', owns: ['outcome continuity', 'phase transitions', 'constraint and preference preservation'] },
+    { layer: 'trajectory_engine', owns: ['likely next moves', 'future operational needs'] },
+    { layer: 'operational_judgment', owns: ['governing operational action', 'LIVE recommendation posture'] },
+    { layer: 'conversation_strategy', owns: ['highest-value conversational move selection'] },
+    { layer: 'conversation_move_library', owns: ['move semantics', 'assumption sensitivity', 'compatibility'] },
+    { layer: 'execution_policy', owns: ['realization mode', 'depth', 'repetition', 'resource usage'] },
+    { layer: 'operational_resource_monitor', owns: ['ranked operational resources'] },
+    { layer: 'context_framing', owns: ['user-facing situational orientation'] },
+    { layer: 'response_shaping', owns: ['format', 'baseline compression', 'response density'] },
+    { layer: 'output_governance', owns: ['visible output boundaries and discipline'] },
+    { layer: 'presentation_authority', owns: ['semantic rendering and enforced presentation placement'] },
+    { layer: 'LIVE_governance', owns: ['LIVE timing', 'silence', 'support behavior', 'delivery constraints'] },
+    { layer: 'continuity_governance', owns: ['continuity interpretation and restoration framing'] },
+  ],
+  coordinators: [
     {
-      layer: 'response_shaping',
-      owns: [
-        'format',
-        'baseline compression',
-        'response density',
-        'surface structure',
-      ],
-      informedBy: [
-        'runtime scores',
-        'output governance',
-        'LIVE governance',
-        'future posture',
-      ],
+      layer: 'runtime_pipeline',
+      owns: ['canonical decision sequence', 'immutable runtime snapshot'],
+      cannotOwn: ['stage business logic', 'provider language', 'UI rendering'],
     },
     {
-      layer: 'LIVE_governance',
-      owns: [
-        'LIVE timing',
-        'silence and pause behavior',
-        'next usable line',
-        'exact-line priority',
-        'current-moment compression',
-      ],
-      informedBy: [
-        'pressure signals',
-        'live context',
-        'output governance',
-        'future posture',
-      ],
-    },
-    {
-      layer: 'output_governance',
-      owns: [
-        'output boundaries',
-        'anti-generic surface behavior',
-        'response discipline',
-        'visible answer constraints',
-      ],
-      informedBy: [
-        'mode',
-        'source',
-        'response shape',
-        'runtime scores',
-      ],
-    },
-    {
-      layer: 'continuity_governance',
-      owns: [
-        'continuity interpretation',
-        'memory/degradation signaling',
-        'reconnection framing',
-      ],
-      informedBy: [
-        'message history',
-        'user source',
-        'mode',
-      ],
+      layer: 'runtime_context_composer',
+      owns: ['ordered prompt-context assembly'],
+      cannotOwn: ['runtime decisions', 'strategy selection', 'execution policy'],
     },
   ],
-
-  advisoryLayers: [
-    {
-      layer: 'future_posture',
-      advises: [
-        'pacing',
-        'warmth',
-        'narrowing speed',
-        'authority expression',
-        'questioning style',
-        'tactical sharpness',
-      ],
-      cannotOwn: [
-        'moral boundary',
-        'user agency',
-        'LIVE silence authority',
-        'final safety/risk boundary',
-      ],
-    },
-    {
-      layer: 'adaptive_principles',
-      advises: [
-        'when to narrow',
-        'when to move first',
-        'when to ask about success metrics',
-        'when to slow down for trust or reception',
-      ],
-      cannotOwn: [
-        'format',
-        'LIVE timing',
-        'safety/risk boundary',
-      ],
-    },
-    {
-      layer: 'tier_behavior',
-      advises: [
-        'depth',
-        'continuity intensity',
-        'execution detail',
-        'live precision access',
-      ],
-      cannotOwn: [
-        'basic quality',
-        'user dignity',
-        'moral boundary',
-      ],
-    },
-    {
-      layer: 'runtime_scores',
-      advises: [
-        'urgency',
-        'confusion',
-        'seriousness',
-        'opportunity',
-      ],
-      cannotOwn: [
-        'final response structure',
-        'moral boundary',
-        'user objective',
-      ],
-    },
-  ],
-
   integrationRule:
-    'When two layers influence the same output surface, the primary coordinator owns the final behavior and advisory layers supply pressure, context, or posture signals.',
-
-  postureActivationRequirement:
-    'Before future posture becomes active, wire it through the correct coordinator rather than appending another independent prompt layer.',
+    'When multiple layers influence the same surface, the canonical owner decides, coordinators sequence, and downstream consumers render without recomputation.',
 } as const
 
 export type GeorgeRuntimeGovernanceOwnership = typeof GEORGE_RUNTIME_GOVERNANCE_OWNERSHIP

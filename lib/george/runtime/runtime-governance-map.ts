@@ -1,81 +1,51 @@
 export const GEORGE_RUNTIME_GOVERNANCE_MAP = {
   purpose:
-    'Inactive architecture map. Documents current runtime assembly order and governance collision boundaries before posture wiring.',
-
-  currentAssemblyOrder: [
-    'languageRule',
-    'modeBlock',
-    'shelvedCampaignRuntimeNote',
-    'individualLiveContextNote',
-    'responseShapeNote',
-    'continuityGovernanceNote',
-    'outputGovernanceNote',
-    'SYSTEM_PROMPT',
-    'messageSourceBlock',
-    'controlStateBlock',
-    'runtimeScoresBlock',
-    'scoreAwareSteeringBlock',
-    'conversationEngineRulesBlock',
-    'universalLiveOpeningBlock',
-    'liveDisciplineBlock',
-    'dynamicRuntimeBlocks',
+    'Active architecture map for canonical GEORGE runtime decision assembly and collision boundaries.',
+  status: 'active',
+  canonicalDecisionOrder: [
+    'outcome_inference',
+    'outcome_evolution',
+    'trajectory_assessment',
+    'operational_judgment',
+    'conversation_strategy',
+    'conversation_move_resolution',
+    'context_framing',
+    'live_recommendation_presentation',
+    'operational_resource_monitor',
+    'execution_policy',
+    'runtime_context_composition',
+    'model_generation',
+    'post_response_governance',
   ],
-
   collisionZones: [
     {
-      zone: 'length_and_compression',
-      influencedBy: [
-        'responseShapeNote',
-        'outputGovernanceNote',
-        'scoreAwareSteeringBlock',
-        'conversationEngineRulesBlock',
-        'liveDisciplineBlock',
-        'dynamicRuntimeBlocks',
-      ],
-      rule: 'Future posture must coordinate compression here, not add another independent compression layer.',
+      zone: 'outcome_ownership',
+      owner: 'active_outcome_and_outcome_evolution',
+      rule: 'Downstream systems consume canonical outcome state and may not independently replace it.',
     },
     {
-      zone: 'next_move_priority',
-      influencedBy: [
-        'SYSTEM_PROMPT',
-        'scoreAwareSteeringBlock',
-        'conversationEngineRulesBlock',
-        'liveDisciplineBlock',
-        'dynamicRuntimeBlocks',
-      ],
-      rule: 'Posture may shape next-move expression but should not override operational governance.',
+      zone: 'conversational_move',
+      owner: 'conversation_strategy_and_move_library',
+      rule: 'OpenAI realizes the selected move contextually but may not silently substitute another strategy.',
     },
     {
-      zone: 'continuity_and_memory',
-      influencedBy: [
-        'continuityGovernanceNote',
-        'postResponseCapacityNotice',
-      ],
-      rule: 'Future continuity changes should avoid duplicate warnings or degraded-memory language.',
+      zone: 'execution_realization',
+      owner: 'execution_policy',
+      rule: 'Presentation and delivery render the policy; they do not recompute it.',
     },
     {
-      zone: 'risk_disclaimer_surface',
-      influencedBy: ['postResponseRiskDisclaimer'],
-      rule: 'Legal and medical safety notices are appended after generation. If rewritten later, preserve safety while fitting GEORGE tone.',
+      zone: 'operational_resources',
+      owner: 'operational_resource_monitor',
+      rule: 'The UI renders ranked resources and does not create independent readiness or recommendation logic.',
     },
     {
-      zone: 'live_behavior',
-      influencedBy: [
-        'individualLiveContextNote',
-        'conversationEngineRulesBlock',
-        'universalLiveOpeningBlock',
-        'liveDisciplineBlock',
-        'dynamicRuntimeBlocks',
-      ],
-      rule: 'Do not wire posture into LIVE until it respects existing LIVE compression, silence, exact-line, and next-signal behavior.',
+      zone: 'runtime_coordination',
+      owner: 'runtime_pipeline',
+      rule: 'Routes coordinate upstream signal collection and consume one pipeline snapshot rather than reproducing the decision sequence.',
     },
   ],
-
-  postureIntegrationRule:
-    'Posture should become a coordinator over delivery, pacing, narrowing speed, warmth, compression, questioning style, and tactical sharpness. It should not become a parallel system fighting response shaping, output governance, or LIVE governance.',
-
   activeRule:
-    'Before adding posture to runtime, identify which existing governance layer owns each output decision. One owner should coordinate; other layers should inform.',
+    'One canonical owner decides each runtime surface. Coordinators sequence owners; consumers render their outputs.',
 } as const
 
 export type GeorgeRuntimeGovernanceMap = typeof GEORGE_RUNTIME_GOVERNANCE_MAP
