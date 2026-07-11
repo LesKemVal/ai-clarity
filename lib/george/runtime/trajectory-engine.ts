@@ -1,3 +1,5 @@
+import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
+
 export type TrajectoryAssessment = {
   currentMove: string
   likelyNextMoves: string[]
@@ -9,14 +11,15 @@ export function assessTrajectory(input: {
   latestUserText: string
   objectiveKnown?: boolean
   signalUsable?: boolean
+  outcomeState?: GeorgeOutcomeState
 }): TrajectoryAssessment {
   const text = String(input.latestUserText || '').toLowerCase()
   const moves: string[] = []
   const needs: string[] = []
 
-  let currentMove = input.objectiveKnown
+  let currentMove = input.outcomeState?.immediateOutcome || (input.objectiveKnown
     ? 'advance the stated outcome'
-    : 'acquire the desired outcome'
+    : 'acquire the desired outcome')
 
   if (/founder|startup|business|company|product/.test(text)) {
     currentMove = 'shape the business path'
@@ -54,7 +57,11 @@ export function assessTrajectory(input: {
     currentMove,
     likelyNextMoves: Array.from(new Set(moves)).slice(0, 3),
     potentialFutureNeeds: Array.from(new Set(needs)).slice(0, 5),
-    confidence: input.objectiveKnown && input.signalUsable ? 0.68 : 0.28,
+    confidence: input.outcomeState
+      ? Math.max(input.outcomeState.confidence, input.objectiveKnown && input.signalUsable ? 0.68 : 0.28)
+      : input.objectiveKnown && input.signalUsable
+        ? 0.68
+        : 0.28,
   }
 }
 

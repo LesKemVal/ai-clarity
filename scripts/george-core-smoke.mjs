@@ -9,7 +9,7 @@ const file = join(dir, 'smoke.ts')
 writeFileSync(file, `
 import { classifyLiveSpeakerIntent } from '${process.cwd()}/lib/george/live-voice/runtime/speaker-intent'
 import { buildSteeringContinuation } from '${process.cwd()}/lib/george/live-voice/runtime/steering-continuation'
-import { deriveActiveOutcome } from '${process.cwd()}/lib/george/live-voice/runtime/active-outcome'
+import { deriveActiveOutcome, resolveGeorgeOutcomeState } from '${process.cwd()}/lib/george/live-voice/runtime/active-outcome'
 import { georgeOutcomeGovernor } from '${process.cwd()}/lib/george/live-voice/runtime/outcome-governor'
 import { evaluateSignalSufficiency } from '${process.cwd()}/lib/george/runtime/signal-sufficiency'
 import { rankSignals } from '${process.cwd()}/lib/george/runtime/signal-ranking'
@@ -45,6 +45,23 @@ const steering = buildSteeringContinuation({
 })
 assert(steering.matched === true, 'steering continuation should match let me think')
 assert(steering.direction === 'buy_time', 'let me think should buy time')
+
+
+const outcomeState = resolveGeorgeOutcomeState({
+  transcript: 'I have an investor meeting tomorrow and need to preserve founder control.',
+  objectiveKnown: true,
+  signalUsable: true,
+})
+
+assert(
+  outcomeState.primaryOutcome.includes('financing') && outcomeState.immediateOutcome.length > 0,
+  'active outcome should own the canonical primary and immediate outcome state'
+)
+
+assert(
+  outcomeState.phase === 'preparation' && outcomeState.confidence >= 0.68,
+  'active outcome should own phase and confidence for downstream consumers'
+)
 
 const activeOutcome = deriveActiveOutcome({
   desiredOutcome: 'get the job offer',
@@ -286,7 +303,7 @@ const operationalJudgment = resolveOperationalJudgment({
     instruction: '',
   },
   trajectory: {
-    currentMove: 'advance the stated outcome',
+    currentMove: outcomeState.immediateOutcome,
     likelyNextMoves: ['execute'],
     potentialFutureNeeds: [],
     confidence: 0.68,
@@ -315,11 +332,17 @@ const operationalJudgment = resolveOperationalJudgment({
     layeredExplanationTolerance: 0.5,
   },
   liveRecommendationEvidence,
+  outcomeState,
 })
 
 assert(
   operationalJudgment.action === 'protect_objective',
   'operational judgment should synthesize evidence into one governing action'
+)
+
+assert(
+  operationalJudgment.outcomeState === outcomeState,
+  'operational judgment should consume the canonical outcome state without reconstructing it'
 )
 
 assert(
@@ -344,6 +367,10 @@ const preparationFraming = resolveContextFraming({
 assert(preparationFraming.show, 'high-value preparation should show context framing')
 assert(preparationFraming.title === 'Current Situation', 'Normal preparation should use Current Situation')
 assert(preparationFraming.items.length === 4, 'context framing should contain exactly four orientation items')
+assert(
+  preparationFraming.items[0]?.value === outcomeState.immediateOutcome,
+  'context framing should present the canonical outcome instead of inferring a competing objective'
+)
 assert(
   preparationFraming.items.some((item) => item.label === 'Pressure' && item.value.includes('execution') && item.value.includes('governance')),
   'context framing pressure should describe the external room dynamic'

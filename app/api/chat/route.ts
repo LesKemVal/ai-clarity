@@ -65,6 +65,7 @@ import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-con
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import { assessTrajectory, buildTrajectoryNote } from '@/lib/george/runtime/trajectory-engine'
+import { resolveGeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
@@ -868,10 +869,18 @@ LANGUAGE MODE: SPANISH
     })
 
 
+    const outcomeState = resolveGeorgeOutcomeState({
+      transcript: latestUserRaw,
+      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
+      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
+      executionImminent: liveRecommendationEvidence.executionImminent,
+    })
+
     const trajectoryAssessment = assessTrajectory({
       latestUserText: latestUserRaw,
       objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
       signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
+      outcomeState,
     })
 
     const trajectoryNote = buildTrajectoryNote(trajectoryAssessment)
@@ -886,6 +895,7 @@ LANGUAGE MODE: SPANISH
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
+      outcomeState,
     })
 
     const operationalJudgmentNote =

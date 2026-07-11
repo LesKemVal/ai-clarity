@@ -35,7 +35,7 @@ type Situation = 'investor' | 'interview' | 'negotiation' | 'executive' | 'diffi
 function buildFramingItems(text: string, judgment: OperationalJudgment): ContextFramingItem[] {
   const situation = classifySituation(text)
   const items: ContextFramingItem[] = [
-    { label: 'Objective', value: resolveObjective(text, situation) },
+    { label: 'Objective', value: judgment.outcomeState.immediateOutcome },
     { label: 'Pressure', value: resolvePressure(text, situation, judgment) },
     { label: 'Priority', value: resolvePriority(situation, judgment) },
   ]
@@ -54,16 +54,6 @@ function classifySituation(text: string): Situation {
   if (/\b(board|executive|leadership|strategy meeting)\b/i.test(text)) return 'executive'
   if (/\b(difficult conversation|conflict|employee|relationship|confront)\b/i.test(text)) return 'difficult_conversation'
   return 'general'
-}
-
-function resolveObjective(text: string, situation: Situation) {
-  if (situation === 'investor' && /\b(control|board|veto|governance|founder)\b/i.test(text) && /\b(execut|move fast|speed|aggressive)\b/i.test(text)) return 'Build investor confidence in execution while preserving founder control.'
-  if (situation === 'investor') return 'Advance the investment conversation without weakening strategic leverage.'
-  if (situation === 'interview') return 'Earn confidence in your fit, judgment, and ability to execute.'
-  if (situation === 'negotiation') return 'Improve the outcome without conceding leverage prematurely.'
-  if (situation === 'executive') return 'Move the decision forward with clarity, credibility, and control.'
-  if (situation === 'difficult_conversation') return 'Resolve the issue without losing clarity, dignity, or the relationship.'
-  return "Advance the user's stated outcome with the strongest reliable next move."
 }
 
 function resolvePressure(text: string, situation: Situation, judgment: OperationalJudgment) {

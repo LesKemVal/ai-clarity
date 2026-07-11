@@ -1,3 +1,4 @@
+import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
 import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
 import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
@@ -31,6 +32,7 @@ export type OperationalJudgment = {
   delivery: RuntimeSignalArbitration['delivery']
   agency: RuntimeSignalArbitration['agency']
   confidence: number
+  outcomeState: GeorgeOutcomeState
   smallestSignal?: string
   liveSupport: LiveSupportJudgment
   rationale: string[]
@@ -47,6 +49,7 @@ export type OperationalJudgmentInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  outcomeState: GeorgeOutcomeState
 }
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
@@ -70,6 +73,7 @@ export function resolveOperationalJudgment(
         : input.runtimeArbitration.delivery,
     agency: input.runtimeArbitration.agency,
     confidence,
+    outcomeState: input.outcomeState,
     smallestSignal:
       action === 'acquire_smallest_signal'
         ? input.judgmentSurface.smallestSignal
@@ -216,6 +220,10 @@ OPERATIONAL JUDGMENT
 - Delivery density: ${judgment.delivery}
 - Agency posture: ${judgment.agency}
 - Judgment confidence: ${judgment.confidence.toFixed(2)}
+- Primary outcome: ${judgment.outcomeState.primaryOutcome}
+- Immediate outcome: ${judgment.outcomeState.immediateOutcome}
+- Outcome phase: ${judgment.outcomeState.phase}
+- Outcome confidence: ${judgment.outcomeState.confidence.toFixed(2)}
 - LIVE support posture: ${judgment.liveSupport.posture}
 - LIVE recommendation strength: ${judgment.liveSupport.strength}
 - Explain LIVE on request: ${judgment.liveSupport.explainOnRequest ? 'yes' : 'no'}
