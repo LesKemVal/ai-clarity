@@ -4318,20 +4318,6 @@ const handleSend = useCallback(
 
       if (text && !(forceLive || liveMode)) setHasSentFirstNormalMessage(true)
 
-      const isConversationAssistContext =
-        activePromptContext?.startsWith('conversation_assist_')
-
-      const shouldForceNormalSend =
-        !liveMode &&
-        conversationMode !== 'manual_live' &&
-        isConversationAssistContext
-
-      if (shouldForceNormalSend) {
-
-        setActivePromptContext(null)
-        setActivePromptLabel(null)
-      }
-
       const liveRuntimeSetup = (() => {
         if (typeof window === 'undefined' || !liveMode) return null
 
@@ -4816,7 +4802,6 @@ const handleSend = useCallback(
         setIsThinking(false)
 
         if (
-          activePromptContext?.startsWith('conversation_assist_') ||
           activePromptContext?.startsWith('professional_') ||
           activePromptContext?.startsWith('brilliant_')
         ) {
@@ -6130,66 +6115,6 @@ return (
         </button>
       )}
 
-      {false && m.role === 'assistant' && m.content.includes('How should GEORGE assist?') && (
-        <div className="flex flex-wrap gap-2">
-          {[
-            ['Text Assist', 'Use Text Assist. Give me short onscreen guidance for this conversation.'],
-            ['LIVE', 'Use LIVE. Give me real-time support only when it is useful.'],
-            ['Full Sentence', 'Use Full Sentence Assist. Give me exact lines I can say in this conversation.'],
-            ['Silent Insight', 'Use Silent Insight. Only alert me when leverage, tone, or risk shifts.'],
-          ].map(([label, prompt]) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => {
-                const isAudioAssist = label === 'Audio Assist'
-                const isTextAssist = label === 'Text Assist'
-                const isFullSentence = label === 'Full Sentence'
-                const isSilentInsight = label === 'Silent Insight'
-
-                if (isAudioAssist) {
-                  setVoiceOn(true)
-                  setInteractionMode('speech')
-                  window.localStorage.setItem('george_voice', 'on')
-                  setTimeout(() => startListening(), 120)
-                }
-
-                if (isTextAssist || isFullSentence || isSilentInsight) {
-                  setVoiceOn(false)
-                  setInteractionMode('speech')
-                  window.localStorage.setItem('george_voice', 'off')
-                  setTimeout(() => startListening(), 120)
-                }
-
-                setActivePromptLabel(label)
-                setActivePromptContext(`conversation_assist_${label.toLowerCase().replace(/ /g, '_')}`)
-
-                const assistantMessage: Message = {
-                  role: 'assistant',
-                  content: `${label} active.
-
-I am listening now. Speak naturally. I will respond ${
-                    isAudioAssist
-                      ? 'through audio when help is useful.'
-                      : isFullSentence
-                      ? 'with exact lines you can say.'
-                      : isSilentInsight
-                      ? 'only when leverage, tone, or risk shifts.'
-                      : 'with short onscreen guidance.'
-                  }`,
-                }
-
-                const nextMessages = [...messagesRef.current, assistantMessage]
-                setMessages(nextMessages)
-                messagesRef.current = nextMessages
-              }}
-              className="rounded-full border border-white/[0.07] bg-white/[0.026] px-5 py-4 text-xs text-[#D7DBE4]/82 transition hover:border-white/[0.09] hover:bg-white/[0.026]"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
 
       {m.role === 'user' && !liveMode && (
         <div className="flex items-center gap-1.5 text-[#D7DBE4]/72">

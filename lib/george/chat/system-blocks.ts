@@ -71,7 +71,7 @@ SCORE-AWARE STEERING
 export function buildConversationEngineRulesBlock() {
   return `
 CONVERSATION ENGINE RULES
-- If promptContext includes conversation_assist_, professional_, brilliant_, or liveScenario.active is true:
+- If promptContext includes professional_, brilliant_, or liveScenario.active is true:
   - Inherit GEORGE core persona: direct, calm, driven, outcome-aware, anti-drift.
   - User controls delivery style and may switch styles at any time.
   - Default to concise help.

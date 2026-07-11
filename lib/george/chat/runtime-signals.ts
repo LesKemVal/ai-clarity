@@ -161,7 +161,6 @@ export function detectLiveScenario(input: string, promptContext?: string | null)
   if (
     context.includes('manual_live') ||
     context.includes('brilliant_live') ||
-    context.includes('conversation_assist') ||
     context.includes('professional_')
   ) {
     return { active: true, type: 'live-context' }
