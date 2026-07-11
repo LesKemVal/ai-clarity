@@ -25,6 +25,7 @@ import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${proc
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
+import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -475,6 +476,38 @@ assert(
     governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
   'governed runtime context should preserve canonical composition order'
+)
+
+const conversationalInvestorBridge = renderOperationalExcellenceOutput({
+  reply:
+    '"Lead with the traction milestone."\\n' +
+    '"Then explain the use of funds."\\n' +
+    '"If they push on governance, return to execution proof."',
+  presentationMode: 'conversational',
+  latestUserText: 'What should I say in the investor meeting?',
+})
+
+assert(
+  conversationalInvestorBridge.includes('most directly advances the outcome'),
+  'conversational bridge should adapt to the current human context'
+)
+assert(
+  !conversationalInvestorBridge.includes('compare the two numbers'),
+  'non-numeric conversations must not inherit the numeric dispute bridge'
+)
+
+const conversationalNumbersBridge = renderOperationalExcellenceOutput({
+  reply:
+    '"Let us compare the forecast assumptions."\\n' +
+    '"The source period is different."\\n' +
+    '"That does not change the decision."',
+  presentationMode: 'conversational',
+  latestUserText: 'What should I say when they challenge the revenue numbers?',
+})
+
+assert(
+  conversationalNumbersBridge.includes('source, timeframe, or assumption'),
+  'numeric disputes should preserve the evidence-focused conversational bridge'
 )
 
 const coursesExpandResponse = resolveCoursesExpandResponse()
