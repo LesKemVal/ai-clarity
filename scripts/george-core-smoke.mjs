@@ -25,6 +25,7 @@ import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${proc
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
+import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
 
@@ -608,6 +609,23 @@ if (trainingSend.mode === 'direct') {
     'training override must retain precedence over a domain override'
   )
 }
+
+
+const operationalResourceMonitor = resolveOperationalResourceMonitor({
+  outcomeState,
+  conversationStrategy: operationalJudgment.conversationStrategy,
+  operationalJudgment,
+  trajectory: {
+    currentMove: outcomeState.immediateOutcome,
+    likelyNextMoves: ['execute'],
+    potentialFutureNeeds: ['live'],
+    confidence: 0.68,
+  },
+  liveRecommendationPresentation,
+})
+assert(operationalResourceMonitor.resources.length > 0, 'operational resource monitor should surface at least one high-value resource')
+assert(operationalResourceMonitor.resources.length <= 3, 'operational resource monitor should remain bounded')
+assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
 
 console.log('GEORGE core smoke passed')
 `)

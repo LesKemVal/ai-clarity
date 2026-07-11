@@ -72,6 +72,7 @@ import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-contex
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote } from '@/lib/george/runtime/conversation-strategy'
 import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
+import { resolveOperationalResourceMonitor } from '@/lib/george/runtime/operational-resource-monitor'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -926,6 +927,14 @@ LANGUAGE MODE: SPANISH
     const liveRecommendationPresentationNote =
       buildLiveRecommendationPresentationNote(liveRecommendationPresentation)
 
+    const operationalResourceMonitor = resolveOperationalResourceMonitor({
+      outcomeState,
+      conversationStrategy: operationalJudgment.conversationStrategy,
+      operationalJudgment,
+      trajectory: trajectoryAssessment,
+      liveRecommendationPresentation,
+    })
+
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -1130,7 +1139,7 @@ ${dynamicRuntimeBlocks}`
       latestUserText,
     })
 
-    return NextResponse.json({ message: reply })
+    return NextResponse.json({ message: reply, operationalResourceMonitor })
   } catch (err: unknown) {
     console.error('Chat route error:', err)
 

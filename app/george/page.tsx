@@ -74,6 +74,7 @@ import {
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
+import type { OperationalResourceMonitorState } from '@/lib/george/runtime/operational-resource-monitor'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1666,11 +1667,18 @@ const [savePopupUpward, setSavePopupUpward] = useState(true)
   const [showRecentFolders, setShowRecentFolders] = useState(false)
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(null)
 const [lastDomain, setLastDomain] = useState<string | null>(null)
+const [operationalResourceMonitor, setOperationalResourceMonitor] = useState<OperationalResourceMonitorState | null>(null)
 const liveBarMessages = useMemo(() => {
   const recentUser = messages
     .slice()
     .reverse()
     .find((message) => message.role === 'user')?.content || ''
+
+  const monitorMessages = operationalResourceMonitor?.resources
+    .map((resource) => resource.value)
+    .filter(Boolean) || []
+
+  if (monitorMessages.length > 0) return monitorMessages
 
   const base = activePromptContext === 'pre_live_signal_ready'
     ? ['Tap LIVE and we’ll go.', 'Ready when you are.', 'I have enough to support you.']
@@ -1695,7 +1703,11 @@ const liveBarMessages = useMemo(() => {
   }
 
   return base
-}, [activePromptContext, messages])
+}, [activePromptContext, messages, operationalResourceMonitor])
+
+useEffect(() => {
+  if (messages.length === 0) setOperationalResourceMonitor(null)
+}, [messages.length])
 
 const [liveBarMessageIndex, setLiveBarMessageIndex] = useState(0)
 const [liveBarTypedText, setLiveBarTypedText] = useState('')
@@ -4586,6 +4598,8 @@ const handleSend = useCallback(
           console.error('/api/chat failed', { status: res.status, data })
           throw new Error(data?.error || `Request failed (${res.status})`)
         }
+
+        setOperationalResourceMonitor(data?.operationalResourceMonitor || null)
 
         let finalContent = data.message
 
@@ -7978,7 +7992,7 @@ Continue from here, tell me what changed, or start fresh.`
       <span className="absolute inset-y-0 left-[-45%] w-[38%] animate-[georgeLiveBarShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.16] to-transparent" />
     </span>
     <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
-      LIVE
+      {operationalResourceMonitor?.headline || 'LIVE'}
     </div>
     <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/68">
       {liveBarTypedText}
