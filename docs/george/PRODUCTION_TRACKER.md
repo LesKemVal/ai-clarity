@@ -626,3 +626,133 @@ Production rule reaffirmed:
 ## Receiver profile delivery
 
 LIVE support behavior is adaptive internally. The user no longer selects fixed Guidance modes in the LIVE room. The user selects how support is received: Audio, Visual, or Audio + Visual. Audio remains the default receiver profile. Mic/listening control remains separate from audio output and receiver profile. Speaking Style remains user-facing.
+
+## Validated Normal Portability Checkpoint — July 2026
+
+Current validated local HEAD:
+
+`78e2daf Remove legacy Brilliant LIVE trigger bypass`
+
+This production pass reduced behavioral ownership in `app/george/page.tsx` without introducing a second runtime or changing GEORGE's identity across Normal and LIVE.
+
+### Canonical pre-provider ownership
+
+`lib/george/runtime/pre-provider-send-resolution.ts` is the narrow canonical owner for pre-provider Normal send resolution.
+
+It composes:
+
+- `lib/george/runtime/domain-router.ts`
+- `lib/george/runtime/training-runtime.ts`
+
+It decides only:
+
+- training-versus-domain precedence
+- direct response versus provider generation
+- whether domain system context is attached
+- guided-line and domain metadata propagation
+- whether a behavioral result is authoritative
+
+It does not own LIVE response shaping, room interpretation, support style, delivery channel, outcome strategy, UI state, or provider transport.
+
+The portable boundary is:
+
+Page gathers inputs
+→ canonical runtime owners decide behavior
+→ pre-provider send resolution defines execution mode
+→ page applies UI effects and performs transport.
+
+### Explicit send semantics
+
+The former overloaded `firstResponseOverride` behavior has been replaced with explicit send-resolution modes:
+
+- `provider`
+- `provider_with_context`
+- `direct`
+- `return`
+
+`page.tsx` no longer decides training/domain precedence or injects provider instructions to reproduce direct responses.
+
+### Canonical prompt ownership
+
+`lib/george/prompts/suggested-prompts.ts` now owns:
+
+- post-response suggested-prompt generation
+- reroute-prompt detection
+- low-signal prompt filtering
+
+`page.tsx` may merge, deduplicate, limit, store, and render prompt results. It must not own prompt-selection behavior.
+
+### LIVE message-bar ownership
+
+`lib/george/live-runtime/live-intent-runtime.ts` now owns classification and response copy for:
+
+- `live_message_bar_setup`
+- `live_message_context_confirm`
+
+`page.tsx` retains effect application such as message mutation, local storage, navigation, and UI state.
+
+### Removed legacy and competing page behavior
+
+The validated pass removed:
+
+- legacy provider fallback for direct responses
+- page-owned training/domain precedence
+- page-owned Normal post-response prompt generation
+- page-owned reroute detection
+- page-level Smart response degradation
+- unused page steering and goal-state calculations
+- legacy Brilliant post-provider response transforms
+- legacy Brilliant LIVE canned-trigger bypass
+- the bypass's false `post_call` transition during an active LIVE exchange
+
+Smart and Intelligent retain the same competent baseline. Tier distinctions belong in depth, reasoning budget, continuity, tools, usage, and LIVE access—not basic competence.
+
+### `app/george/page.tsx` production purpose
+
+`app/george/page.tsx` is a mount, interaction, state, effect-application, and transport surface.
+
+It may gather user and UI inputs, invoke canonical runtime owners, apply returned UI effects, append and render messages, persist non-authoritative UI state, execute provider transport, pass through existing runtime identifiers, and mount LIVE bridges and surfaces.
+
+It must not become a reasoning engine, choose between competing behavioral owners, invent response doctrine, own LIVE support selection, own receiver delivery policy, own turn lifecycle, reinterpret authoritative runtime results, or create duplicate Normal or LIVE runtimes.
+
+### Validated tests
+
+At committed HEAD `78e2daf`:
+
+- GEORGE Core Smoke: passing
+- LIVE Entry Smoke: passing
+- Conversation Package Smoke: passing
+- LIVE Runtime Smoke: passing
+- Preparation Smoke: passing
+- Next.js production build: passing
+- `live-hub` TypeScript build: passing
+- `git diff --check`: passing
+- working tree: clean after validation
+
+The existing edge-runtime static-generation warning remains non-blocking.
+
+### Repository synchronization warning
+
+The local `live-hub-runtime` branch and `origin/live-hub-runtime` are diverged.
+
+Last observed divergence:
+
+- 135 local-only commits
+- 30 remote-only commits
+
+Do not run `git pull`.
+
+Remote reconciliation is a separate production task. Inspect remote-only commits individually before any merge, rebase, force push, or branch replacement.
+
+### Next production sequence
+
+1. Finish the remaining behavior-preserving `page.tsx` ownership audit.
+2. Confirm canonical ownership and complete the portability boundary.
+3. Only after ownership is clean, introduce one Operational Judgment owner above existing evidence producers.
+4. Simplify current model-call context and prompt assembly so downstream response shaping and providers consume one operational judgment.
+
+Operational Judgment is the next architectural phase, not a second reasoning engine.
+
+Production rule:
+
+One operational judgment. Many evidence producers. One governing owner.

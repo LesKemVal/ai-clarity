@@ -16,6 +16,7 @@ Current validation target:
 - LIVE Runtime Smoke: passing
 - Preparation Smoke: passing
 - Production Build: passing
+- `live-hub` TypeScript Build: passing
 
 Required command after every production change:
 
@@ -711,3 +712,85 @@ LIVE guidance/profile behavior belongs to `lib/george/live-runtime/live-guidance
 `app/george/page.tsx` may call these runtime owners as part of UI wiring, but must not own response governance, LIVE guidance doctrine, support behavior, or signal interpretation.
 
 This preserves portability: LIVE behavior can move across UI surfaces because the behavior lives in runtime modules, not the page.
+
+## Normal Pre-Provider Portability Boundary
+
+Normal GEORGE now has a narrow, portable pre-provider execution boundary.
+
+Canonical owner:
+
+- `lib/george/runtime/pre-provider-send-resolution.ts`
+
+Existing behavior owners composed by that boundary:
+
+- `lib/george/runtime/domain-router.ts`
+- `lib/george/runtime/training-runtime.ts`
+
+The resolver does not replace either owner. It makes their execution semantics explicit.
+
+Current modes:
+
+- `provider`: continue ordinary provider generation
+- `provider_with_context`: attach canonical domain context and continue provider generation
+- `direct`: render the authoritative runtime response and stop before provider transport
+- `return`: preserve an existing training-runtime return result
+
+The flow is:
+
+Page input collection
+↓
+Domain and training behavior owners
+↓
+Pre-provider send resolution
+↓
+Page effect application and transport
+↓
+Chat-route orchestration
+↓
+Response shape and output governance
+↓
+Provider
+
+`app/george/page.tsx` must consume this result without reinterpreting its authority.
+
+The page does not own training/domain precedence, direct-versus-provider behavior, authoritative override semantics, domain system-context doctrine, or provider instructions that reproduce direct responses.
+
+### Normal prompt behavior
+
+`lib/george/prompts/suggested-prompts.ts` owns current Normal prompt-selection behavior, including post-response suggestions and reroute detection.
+
+The page owns only UI state and presentation of those results.
+
+### Same GEORGE across operating modes
+
+Normal and LIVE continue to share one operational intelligence and reasoning philosophy.
+
+Normal optimizes toward clarity, preparation, and useful motion under non-real-time conditions.
+
+LIVE optimizes toward user competence, timing, room conditions, and outcome advancement under real-time constraints.
+
+Operating-mode differences must remain limited to constraints, delivery, timing, room behavior, and execution conditions. They must not create separate identity, memory, judgment philosophy, or user understanding.
+
+### Future Operational Judgment phase
+
+Do not introduce Operational Judgment until the portability boundary is clean.
+
+The future flow is:
+
+Signals
+↓
+Evidence producers
+↓
+Operational Judgment
+↓
+Response Shape
+↓
+Output Governance
+↓
+Provider
+
+Evidence producers may include Passive Intent, Runtime Interpretation, Judgment Surface, Trajectory, Outcome Learning, Continuity Restoration, and Adaptive User Profile.
+
+They produce evidence. They must not independently decide behavior.
+
+The future Operational Judgment owner will synthesize those streams into one operational decision. It must not become another model, prompt stack, runtime, or competing authority.
