@@ -72,6 +72,7 @@ import {
   resolveLiveMessageContextConfirmation,
 } from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
+import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
@@ -5594,7 +5595,7 @@ return (
                   { role: 'user', content: prompt.text, source: 'sidebar_prompt' },
                   {
                     role: 'assistant',
-                    content: "There are other courses not shown here. Some could help you now. Some may mean nothing right now. Some may even be boring to you. Tell me what you want to earn, fix, avoid, build, understand, or become—and I’ll point to what matters.",
+                    content: resolveCoursesExpandResponse(),
                     constrained: false,
                   },
                 ]

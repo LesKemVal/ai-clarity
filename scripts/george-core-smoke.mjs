@@ -19,6 +19,7 @@ import { buildGeorgeCoreInterpretation } from '${process.cwd()}/lib/george/core/
 import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core/live-execution'
 import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
+import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -238,6 +239,13 @@ assert(
 assert(
   domainDirectSend.mode !== 'direct' || domainDirectSend.authority === 'domain',
   'domain direct response should identify domain authority'
+)
+
+const coursesExpandResponse = resolveCoursesExpandResponse()
+
+assert(
+  coursesExpandResponse.includes('Tell me what you want to earn'),
+  'courses_expand response should remain owned by the training runtime'
 )
 
 const trainingSend = resolvePreProviderSend({

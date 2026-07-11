@@ -22,6 +22,10 @@ export type TrainingRuntimeResult = {
   }
 }
 
+export function resolveCoursesExpandResponse() {
+  return 'There are other courses not shown here. Some could help you now. Some may mean nothing right now. Some may even be boring to you. Tell me what you want to earn, fix, avoid, build, understand, or become—and I’ll point to what matters.'
+}
+
 export function resolveTrainingRuntime(input: {
   text: string
   activePromptContext: string | null
