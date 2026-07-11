@@ -356,6 +356,24 @@ assert(
   'context framing should contain resolved situational statements rather than writing instructions'
 )
 
+const investorUnknownFraming = resolveContextFraming({
+  runtime: 'normal_george',
+  latestUserText: 'I have an investor meeting tomorrow and need to preserve control.',
+  voiceMode: false,
+  operationalJudgment: {
+    ...operationalJudgment,
+    action: 'acquire_smallest_signal',
+    smallestSignal: 'the one fact that would change the next move',
+  },
+})
+
+assert(
+  investorUnknownFraming.items.some(
+    (item) => item.label === 'Unknown' && item.value.includes('pre-term-sheet')
+  ),
+  'context framing should resolve a generic investor unknown into the actual missing fact'
+)
+
 const liveFraming = resolveContextFraming({
   runtime: 'live_george',
   latestUserText: 'They are pushing for a second board seat right now.',

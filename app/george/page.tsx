@@ -5354,6 +5354,8 @@ return (
 
             setMessages([])
             messagesRef.current = []
+            setHasSentFirstNormalMessage(false)
+            setHomepageHeroStep(0)
             setInput('')
             setInterimTranscript('')
             setVoiceError('')

@@ -40,7 +40,7 @@ function buildFramingItems(text: string, judgment: OperationalJudgment): Context
     { label: 'Priority', value: resolvePriority(situation, judgment) },
   ]
   if (judgment.action === 'acquire_smallest_signal' && judgment.smallestSignal) {
-    items.push({ label: 'Unknown', value: normalizeSentence(judgment.smallestSignal) })
+    items.push({ label: 'Unknown', value: resolveUnknown(text, situation, judgment.smallestSignal) })
   } else {
     items.push({ label: 'Avoid', value: resolveAvoidance(situation, judgment) })
   }
@@ -102,6 +102,25 @@ function resolveAvoidance(situation: Situation, judgment: OperationalJudgment) {
   if (situation === 'difficult_conversation') return 'Do not let defensiveness or side issues replace the conversation that must happen.'
   if (judgment.delivery === 'short') return 'Do not bury the next move under explanation or competing options.'
   return 'Do not make a premature move that weakens the desired outcome.'
+}
+
+function resolveUnknown(text: string, situation: Situation, smallestSignal: string) {
+  const candidate = String(smallestSignal || '').trim().replace(/\s+/g, ' ')
+  const isGeneric = !candidate || /^(the )?(one|single|smallest) (fact|signal|detail|unknown)|decision-critical|would change the next move/i.test(candidate)
+
+  if (!isGeneric) return normalizeSentence(candidate)
+
+  if (situation === 'investor') {
+    if (!/\bterm sheet\b/i.test(text)) {
+      return 'Whether this discussion is pre-term-sheet or already in term-sheet negotiation.'
+    }
+    return 'Whether there is referenceable competing investor interest or committed capital.'
+  }
+  if (situation === 'interview') return 'Which capability or concern the interviewer is most likely to test.'
+  if (situation === 'negotiation') return 'Which term is truly non-negotiable for the other side.'
+  if (situation === 'executive') return 'Who owns the decision and what evidence they still require.'
+  if (situation === 'difficult_conversation') return 'What outcome the other person needs in order to move forward.'
+  return 'The specific fact that would materially change the next move.'
 }
 
 function normalizeSentence(value: string) {
