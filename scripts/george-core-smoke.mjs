@@ -343,6 +343,18 @@ const preparationFraming = resolveContextFraming({
 assert(preparationFraming.show, 'high-value preparation should show context framing')
 assert(preparationFraming.title === 'Current Situation', 'Normal preparation should use Current Situation')
 assert(preparationFraming.items.length === 4, 'context framing should contain exactly four orientation items')
+assert(
+  preparationFraming.items.some((item) => item.label === 'Pressure' && item.value.includes('execution') && item.value.includes('governance')),
+  'context framing pressure should describe the external room dynamic'
+)
+assert(
+  preparationFraming.items.some((item) => item.label === 'Priority' && item.value.includes('execution confidence') && !item.value.includes('Acquire')),
+  'context framing priority should state the governing objective rather than a follow-up question'
+)
+assert(
+  preparationFraming.items.every((item) => !/^(State|Name|Acquire|Do not invent context)/.test(item.value)),
+  'context framing should contain resolved situational statements rather than writing instructions'
+)
 
 const liveFraming = resolveContextFraming({
   runtime: 'live_george',
@@ -374,6 +386,10 @@ assert(!simpleFraming.show, 'simple tasks should suppress context framing')
 const contextFramingNote = buildContextFramingPresentationNote(preparationFraming)
 assert(contextFramingNote.includes('Current Situation'), 'presentation authority should render the selected framing title')
 assert(contextFramingNote.includes('Objective, Pressure, Priority, Avoid'), 'presentation authority should preserve framing item order')
+assert(
+  contextFramingNote.includes('Investor confidence in execution may determine how much governance control they seek.'),
+  'presentation authority should render resolved context framing statements'
+)
 
 const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',

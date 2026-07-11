@@ -2,25 +2,10 @@ import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-pol
 import type { OperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 
 export type ContextFramingTitle = 'Current Situation' | 'What Matters Now'
-
-export type ContextFramingItem = {
-  label: 'Objective' | 'Pressure' | 'Priority' | 'Avoid'
-  focus: string
-}
-
-export type ContextFraming = {
-  show: boolean
-  title: ContextFramingTitle
-  items: ContextFramingItem[]
-  source: 'context_framing'
-}
-
-export type ContextFramingInput = {
-  runtime: CurrentGeorgeRuntime
-  latestUserText: string
-  voiceMode?: boolean
-  operationalJudgment: OperationalJudgment
-}
+export type ContextFramingLabel = 'Objective' | 'Pressure' | 'Priority' | 'Leverage' | 'Risk' | 'Unknown' | 'Avoid' | 'Opportunity' | 'Constraint'
+export type ContextFramingItem = { label: ContextFramingLabel; value: string }
+export type ContextFraming = { show: boolean; title: ContextFramingTitle; items: ContextFramingItem[]; source: 'context_framing' }
+export type ContextFramingInput = { runtime: CurrentGeorgeRuntime; latestUserText: string; voiceMode?: boolean; operationalJudgment: OperationalJudgment }
 
 const HIGH_VALUE_SITUATION = /\b(interview|investor|investment|board|executive|negotiat|meeting|sales call|pitch|presentation|difficult conversation|conflict|legal|court|crisis|decision|offer|raise|promotion|objection|client|customer)\b/i
 const SIMPLE_TASK = /\b(rewrite|proofread|translate|summarize|spell|capital of|define|convert|calculate|fix this typo)\b/i
@@ -28,108 +13,99 @@ const SIMPLE_TASK = /\b(rewrite|proofread|translate|summarize|spell|capital of|d
 export function resolveContextFraming(input: ContextFramingInput): ContextFraming {
   const latestUserText = String(input.latestUserText || '').trim()
   const isLive = input.runtime === 'live_george'
-  const show = shouldShowContextFraming({
-    isLive,
-    voiceMode: Boolean(input.voiceMode),
-    latestUserText,
-    operationalJudgment: input.operationalJudgment,
-  })
-
+  const show = shouldShowContextFraming({ isLive, voiceMode: Boolean(input.voiceMode), latestUserText, operationalJudgment: input.operationalJudgment })
   return {
     show,
     title: isLive ? 'What Matters Now' : 'Current Situation',
-    items: show ? buildFramingItems(input.operationalJudgment) : [],
+    items: show ? buildFramingItems(latestUserText, input.operationalJudgment).slice(0, 4) : [],
     source: 'context_framing',
   }
 }
 
-function shouldShowContextFraming(input: {
-  isLive: boolean
-  voiceMode: boolean
-  latestUserText: string
-  operationalJudgment: OperationalJudgment
-}) {
+function shouldShowContextFraming(input: { isLive: boolean; voiceMode: boolean; latestUserText: string; operationalJudgment: OperationalJudgment }) {
   if (!input.latestUserText) return false
   if (input.isLive && input.voiceMode) return false
   if (SIMPLE_TASK.test(input.latestUserText)) return false
   if (input.isLive) return true
-
-  return (
-    HIGH_VALUE_SITUATION.test(input.latestUserText) ||
-    input.operationalJudgment.action === 'protect_objective' ||
-    input.operationalJudgment.action === 'restore_continuity' ||
-    input.operationalJudgment.action === 'warn_and_move'
-  )
+  return HIGH_VALUE_SITUATION.test(input.latestUserText) || input.operationalJudgment.action === 'protect_objective' || input.operationalJudgment.action === 'restore_continuity' || input.operationalJudgment.action === 'warn_and_move'
 }
 
-function buildFramingItems(
-  judgment: OperationalJudgment
-): ContextFramingItem[] {
-  return [
-    {
-      label: 'Objective',
-      focus: 'State the user\'s actual desired outcome from the current conversation context.',
-    },
-    {
-      label: 'Pressure',
-      focus: describePressure(judgment),
-    },
-    {
-      label: 'Priority',
-      focus: describePriority(judgment),
-    },
-    {
-      label: 'Avoid',
-      focus: describeAvoidance(judgment),
-    },
+type Situation = 'investor' | 'interview' | 'negotiation' | 'executive' | 'difficult_conversation' | 'general'
+
+function buildFramingItems(text: string, judgment: OperationalJudgment): ContextFramingItem[] {
+  const situation = classifySituation(text)
+  const items: ContextFramingItem[] = [
+    { label: 'Objective', value: resolveObjective(text, situation) },
+    { label: 'Pressure', value: resolvePressure(text, situation, judgment) },
+    { label: 'Priority', value: resolvePriority(situation, judgment) },
   ]
+  if (judgment.action === 'acquire_smallest_signal' && judgment.smallestSignal) {
+    items.push({ label: 'Unknown', value: normalizeSentence(judgment.smallestSignal) })
+  } else {
+    items.push({ label: 'Avoid', value: resolveAvoidance(situation, judgment) })
+  }
+  return items
 }
 
-function describePressure(judgment: OperationalJudgment) {
-  if (judgment.action === 'restore_continuity') {
-    return 'Name the unresolved prior commitment, thread, or dependency affecting the current move.'
-  }
-
-  if (judgment.action === 'acquire_smallest_signal') {
-    return 'Name the single missing fact preventing a reliable operational move.'
-  }
-
-  if (judgment.liveSupport.posture === 'recommend') {
-    return 'Name the real-time execution pressure or imminent room condition shaping the decision.'
-  }
-
-  return 'Name the main constraint, tradeoff, resistance, or uncertainty affecting the outcome.'
+function classifySituation(text: string): Situation {
+  if (/\b(investor|investment|venture|vc|fundrais|term sheet|board seat|valuation)\b/i.test(text)) return 'investor'
+  if (/\b(interview|interviewer|candidate|job offer|hiring)\b/i.test(text)) return 'interview'
+  if (/\b(negotiat|counteroffer|salary|compensation|terms|price)\b/i.test(text)) return 'negotiation'
+  if (/\b(board|executive|leadership|strategy meeting)\b/i.test(text)) return 'executive'
+  if (/\b(difficult conversation|conflict|employee|relationship|confront)\b/i.test(text)) return 'difficult_conversation'
+  return 'general'
 }
 
-function describePriority(judgment: OperationalJudgment) {
+function resolveObjective(text: string, situation: Situation) {
+  if (situation === 'investor' && /\b(control|board|veto|governance|founder)\b/i.test(text) && /\b(execut|move fast|speed|aggressive)\b/i.test(text)) return 'Build investor confidence in execution while preserving founder control.'
+  if (situation === 'investor') return 'Advance the investment conversation without weakening strategic leverage.'
+  if (situation === 'interview') return 'Earn confidence in your fit, judgment, and ability to execute.'
+  if (situation === 'negotiation') return 'Improve the outcome without conceding leverage prematurely.'
+  if (situation === 'executive') return 'Move the decision forward with clarity, credibility, and control.'
+  if (situation === 'difficult_conversation') return 'Resolve the issue without losing clarity, dignity, or the relationship.'
+  return "Advance the user's stated outcome with the strongest reliable next move."
+}
+
+function resolvePressure(text: string, situation: Situation, judgment: OperationalJudgment) {
+  if (situation === 'investor') return /\b(control|board|veto|governance)\b/i.test(text) ? 'Investor confidence in execution may determine how much governance control they seek.' : 'The investor must believe the execution case before commitment becomes credible.'
+  if (situation === 'interview') return 'The interviewer is testing whether your evidence supports the confidence you project.'
+  if (situation === 'negotiation') return 'The other side may use uncertainty or urgency to pull you into an early concession.'
+  if (situation === 'executive') return 'Decision confidence depends on whether the evidence, risks, and ownership are clear.'
+  if (situation === 'difficult_conversation') return 'Emotion and defensiveness can displace the issue that actually needs resolution.'
+  if (judgment.action === 'restore_continuity') return 'An unresolved prior commitment or dependency is shaping the current move.'
+  if (judgment.liveSupport.posture === 'recommend') return 'The situation is moving from preparation into real-time execution pressure.'
+  return 'A constraint, tradeoff, or resistance is affecting the desired outcome.'
+}
+
+function resolvePriority(situation: Situation, judgment: OperationalJudgment) {
+  if (situation === 'investor') return 'Strengthen execution confidence before governance becomes the negotiation.'
+  if (situation === 'interview') return 'Anchor your claims in specific evidence before expanding the story.'
+  if (situation === 'negotiation') return 'Clarify value and leverage before discussing concessions.'
+  if (situation === 'executive') return 'Make the decision, evidence, and ownership unmistakably clear.'
+  if (situation === 'difficult_conversation') return 'Keep the conversation on the real issue and the outcome you need.'
   switch (judgment.action) {
-    case 'warn_and_move':
-      return 'State the safest useful move that protects the user while preserving momentum.'
-    case 'restore_continuity':
-      return 'State what must be restored before the next move can be trusted.'
-    case 'acquire_smallest_signal':
-      return judgment.smallestSignal
-        ? `Acquire only this missing signal: ${judgment.smallestSignal}`
-        : 'Acquire only the smallest missing signal required to proceed.'
-    case 'protect_objective':
-      return 'State the move that best protects the user\'s desired outcome before tactics expand.'
-    case 'execute_live_move':
-      return 'State the single most useful move for the current room moment.'
-    case 'advance_outcome':
-      return 'State the strongest next move that advances the desired outcome.'
-    default:
-      return 'State what deserves attention first before broader guidance.'
+    case 'warn_and_move': return 'Protect the user while preserving the safest useful momentum.'
+    case 'restore_continuity': return 'Restore the unresolved thread before relying on the next move.'
+    case 'acquire_smallest_signal': return 'Resolve the single decision-critical unknown before expanding the plan.'
+    case 'protect_objective': return 'Protect the desired outcome before tactics or options expand.'
+    case 'execute_live_move': return 'Act on the single most useful move for the current room moment.'
+    case 'advance_outcome': return 'Advance the desired outcome with the strongest reliable next move.'
+    default: return 'Clarify what matters most before broader guidance.'
   }
 }
 
-function describeAvoidance(judgment: OperationalJudgment) {
-  if (judgment.action === 'acquire_smallest_signal') {
-    return 'Do not invent context or give a broad plan before the missing signal is known.'
-  }
+function resolveAvoidance(situation: Situation, judgment: OperationalJudgment) {
+  if (situation === 'investor') return 'Do not negotiate governance before establishing confidence in execution.'
+  if (situation === 'interview') return 'Do not substitute broad claims for evidence the interviewer can evaluate.'
+  if (situation === 'negotiation') return 'Do not negotiate against yourself or concede before the tradeoff is explicit.'
+  if (situation === 'executive') return 'Do not bury the decision under detail or leave ownership ambiguous.'
+  if (situation === 'difficult_conversation') return 'Do not let defensiveness or side issues replace the conversation that must happen.'
+  if (judgment.delivery === 'short') return 'Do not bury the next move under explanation or competing options.'
+  return 'Do not make a premature move that weakens the desired outcome.'
+}
 
-  if (judgment.delivery === 'short') {
-    return 'Do not bury the next move under explanation or multiple competing options.'
-  }
-
-  return 'Name the most likely premature move, distraction, or concession that could weaken the outcome.'
+function normalizeSentence(value: string) {
+  const text = String(value || '').trim().replace(/\s+/g, ' ')
+  if (!text) return 'One decision-critical fact is still missing.'
+  return /[.!?]$/.test(text) ? text : `${text}.`
 }

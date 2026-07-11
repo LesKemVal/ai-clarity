@@ -25,8 +25,8 @@ export function buildContextFramingPresentationNote(framing: ContextFraming) {
 CONTEXT FRAMING
 - Begin the response with the heading: ${framing.title}
 - Under that heading, render exactly these items in this order: ${framing.items.map((item) => item.label).join(', ')}.
-${framing.items.map((item) => `- ${item.label}: ${item.focus}`).join('\n')}
-- Keep each item to one concise sentence grounded in the user's actual situation.
+${framing.items.map((item) => `- ${item.label}: ${item.value}`).join('\n')}
+- Reproduce each item as the resolved situational statement provided.
 - This framing presents the governing judgment; it must not add a competing recommendation.
 - Do not expose internal reasoning, confidence calculations, evidence lists, or chain-of-thought.
 - After the framing, continue with the useful guidance.
