@@ -10,6 +10,7 @@ export type OperationalResourceType =
   | 'missing_signal'
   | 'strategy_reminder'
   | 'opportunity'
+  | 'outcome_conflict'
 
 export type OperationalResource = {
   type: OperationalResourceType
@@ -36,6 +37,18 @@ export function resolveOperationalResourceMonitor(input: {
   liveRecommendationPresentation: LiveRecommendationPresentation
 }): OperationalResourceMonitorState {
   const resources: OperationalResource[] = []
+
+  if ((input.outcomeState.stability ?? input.outcomeState.confidence) < 0.55 && input.outcomeState.constraints?.length) {
+    resources.push({
+      type: 'outcome_conflict',
+      title: 'Outcome tradeoff needs attention',
+      value: input.outcomeState.constraints[0],
+      reason: 'The latest signal may conflict with a previously established constraint.',
+      confidence: 1 - (input.outcomeState.stability ?? input.outcomeState.confidence),
+      actionableNow: true,
+      expiresWithContext: true,
+    })
+  }
 
   if (input.liveRecommendationPresentation.show) {
     resources.push({

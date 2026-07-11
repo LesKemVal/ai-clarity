@@ -10,6 +10,7 @@ writeFileSync(file, `
 import { classifyLiveSpeakerIntent } from '${process.cwd()}/lib/george/live-voice/runtime/speaker-intent'
 import { buildSteeringContinuation } from '${process.cwd()}/lib/george/live-voice/runtime/steering-continuation'
 import { deriveActiveOutcome, resolveGeorgeOutcomeState } from '${process.cwd()}/lib/george/live-voice/runtime/active-outcome'
+import { buildOutcomeEvolutionNote, evolveGeorgeOutcomeState } from '${process.cwd()}/lib/george/runtime/outcome-evolution'
 import { georgeOutcomeGovernor } from '${process.cwd()}/lib/george/live-voice/runtime/outcome-governor'
 import { evaluateSignalSufficiency } from '${process.cwd()}/lib/george/runtime/signal-sufficiency'
 import { rankSignals } from '${process.cwd()}/lib/george/runtime/signal-ranking'
@@ -534,6 +535,7 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
   liveRuntimeContext: 'LIVE CONTEXT',
   runtimeAdapterNote: 'RUNTIME ADAPTER',
   operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
+  outcomeEvolutionNote: 'OUTCOME EVOLUTION',
   conversationStrategyNote: 'CONVERSATION STRATEGY',
   contextFramingNote: 'CONTEXT FRAMING',
   liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
@@ -544,7 +546,8 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
 assert(
   governedRuntimeContext.indexOf('LIVE CONTEXT') < governedRuntimeContext.indexOf('RUNTIME ADAPTER') &&
     governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
-    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('CONVERSATION STRATEGY') &&
+    governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('OUTCOME EVOLUTION') &&
+    governedRuntimeContext.indexOf('OUTCOME EVOLUTION') < governedRuntimeContext.indexOf('CONVERSATION STRATEGY') &&
     governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
     governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
     governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
@@ -610,6 +613,59 @@ if (trainingSend.mode === 'direct') {
   )
 }
 
+
+
+const previousFinancingOutcome = resolveGeorgeOutcomeState({
+  desiredOutcome: 'Raise this round without giving up operational control',
+  transcript: 'I am preparing for an investor meeting.',
+  objectiveKnown: true,
+  signalUsable: true,
+})
+
+const executionOutcome = resolveGeorgeOutcomeState({
+  transcript: 'The meeting starts in five minutes and they may ask about board control.',
+  objectiveKnown: true,
+  signalUsable: true,
+  executionImminent: true,
+})
+
+const phaseEvolution = evolveGeorgeOutcomeState({
+  previousState: previousFinancingOutcome,
+  inferredState: executionOutcome,
+  latestUserText: 'The meeting starts in five minutes and they may ask about board control.',
+})
+assert(phaseEvolution.state.primaryOutcome === previousFinancingOutcome.primaryOutcome, 'phase evolution must preserve the primary outcome')
+assert(phaseEvolution.state.phase === 'execution', 'phase evolution should allow preparation to become execution')
+
+const constrainedEvolution = evolveGeorgeOutcomeState({
+  previousState: previousFinancingOutcome,
+  inferredState: executionOutcome,
+  latestUserText: 'I want to close this round without giving up operational control.',
+})
+assert((constrainedEvolution.state.constraints || []).some((item) => item.includes('without giving up operational control')), 'outcome evolution should preserve explicit constraints')
+
+const contradictionEvolution = evolveGeorgeOutcomeState({
+  previousState: constrainedEvolution.state,
+  inferredState: executionOutcome,
+  latestUserText: 'But I may agree to broad operational vetoes.',
+})
+assert(contradictionEvolution.kind === 'contradiction_detected', 'outcome evolution should detect a possible contradiction')
+assert(contradictionEvolution.state.primaryOutcome === constrainedEvolution.state.primaryOutcome, 'contradiction must not automatically replace the primary outcome')
+
+const replacementOutcome = resolveGeorgeOutcomeState({
+  desiredOutcome: 'Preserve the relationship and secure a second meeting',
+  transcript: 'My goal is now to preserve the relationship and secure a second meeting.',
+  objectiveKnown: true,
+  signalUsable: true,
+})
+const explicitReplacement = evolveGeorgeOutcomeState({
+  previousState: constrainedEvolution.state,
+  inferredState: replacementOutcome,
+  latestUserText: 'My goal is now to preserve the relationship and secure a second meeting.',
+})
+assert(explicitReplacement.kind === 'primary_replaced', 'explicit user direction should permit primary outcome replacement')
+assert(explicitReplacement.state.primaryOutcome === replacementOutcome.primaryOutcome, 'explicit replacement should adopt the new primary outcome')
+assert(buildOutcomeEvolutionNote(explicitReplacement).includes('OUTCOME EVOLUTION'), 'outcome evolution should expose a governed runtime note')
 
 const operationalResourceMonitor = resolveOperationalResourceMonitor({
   outcomeState,

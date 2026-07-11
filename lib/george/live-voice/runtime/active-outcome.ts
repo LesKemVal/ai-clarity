@@ -20,6 +20,9 @@ export type GeorgeOutcomeState = {
   supportingOutcomes: string[]
   confidence: number
   phase: GeorgeOutcomePhase
+  constraints?: string[]
+  preferences?: string[]
+  stability?: number
   source: 'active_outcome'
 }
 
@@ -173,6 +176,9 @@ export function resolveGeorgeOutcomeState(input: GeorgeOutcomeStateInput): Georg
     supportingOutcomes: deriveSupportingOutcomes(combined),
     confidence,
     phase: derivePhase(combined, Boolean(input.executionImminent)),
+    constraints: [],
+    preferences: [],
+    stability: confidence,
     source: 'active_outcome',
   }
 }
