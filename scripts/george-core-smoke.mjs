@@ -24,6 +24,7 @@ import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtim
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
+import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
@@ -383,6 +384,34 @@ assert(
   'a live objection should permit a diagnostic conversational move without mandating a line'
 )
 
+const moveDefinitions = listConversationMoveDefinitions()
+assert(moveDefinitions.length === 15, 'conversation move library should define every supported move')
+assert(
+  moveDefinitions.every((definition) => definition.liveCompatibility || definition.normalCompatibility),
+  'every conversational move should be compatible with at least one operating mode'
+)
+assert(
+  clarificationStrategy.definition.id === clarificationStrategy.move,
+  'conversation strategy should resolve its selected move through the canonical move library'
+)
+assert(
+  clarificationStrategy.definition.assumptionSensitivity === 'high',
+  'clarification should expose its high assumption sensitivity'
+)
+const clarificationMoveNote = buildConversationMoveDefinitionNote(
+  clarificationStrategy.definition,
+  clarificationStrategy.assumptions
+)
+assert(
+  clarificationMoveNote.includes('Do not use when') && clarificationMoveNote.includes('Current assumptions'),
+  'move definition notes should expose constraints and assumptions to the provider'
+)
+assert(
+  resolveConversationMoveDefinition('pause').liveCompatibility &&
+    !resolveConversationMoveDefinition('pause').normalCompatibility,
+  'pause should remain a LIVE-compatible move rather than a Normal default'
+)
+
 const conversationStrategyNote = buildConversationStrategyNote(clarificationStrategy)
 assert(
   conversationStrategyNote.includes('final in-room authority') &&
@@ -537,6 +566,7 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
   operationalJudgmentNote: 'OPERATIONAL JUDGMENT',
   outcomeEvolutionNote: 'OUTCOME EVOLUTION',
   conversationStrategyNote: 'CONVERSATION STRATEGY',
+  conversationMoveDefinitionNote: 'CONVERSATION MOVE',
   contextFramingNote: 'CONTEXT FRAMING',
   liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
   responseShapeNote: 'RESPONSE SHAPE',
@@ -548,7 +578,8 @@ assert(
     governedRuntimeContext.indexOf('RUNTIME ADAPTER') < governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') &&
     governedRuntimeContext.indexOf('OPERATIONAL JUDGMENT') < governedRuntimeContext.indexOf('OUTCOME EVOLUTION') &&
     governedRuntimeContext.indexOf('OUTCOME EVOLUTION') < governedRuntimeContext.indexOf('CONVERSATION STRATEGY') &&
-    governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
+    governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONVERSATION MOVE') &&
+    governedRuntimeContext.indexOf('CONVERSATION MOVE') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
     governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
     governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),

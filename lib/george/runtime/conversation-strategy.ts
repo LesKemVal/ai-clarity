@@ -2,6 +2,7 @@ import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-pol
 import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
+import { resolveConversationMoveDefinition, type GeorgeConversationMoveDefinition } from '@/lib/george/runtime/conversation-move-library'
 
 export type GeorgeConversationMove =
   | 'answer'
@@ -26,6 +27,7 @@ export type GeorgeConversationStrategy = {
   confidence: number
   assumptions: string[]
   userDiscretionRequired: true
+  definition: GeorgeConversationMoveDefinition
   source: 'conversation_strategy'
 }
 
@@ -112,6 +114,7 @@ export function resolveGeorgeConversationStrategy(
     confidence: clamp01(confidence),
     assumptions: [assumption],
     userDiscretionRequired: true,
+    definition: resolveConversationMoveDefinition(move),
     source: 'conversation_strategy',
   }
 }
@@ -123,6 +126,10 @@ export function buildConversationStrategyNote(
 CONVERSATION STRATEGY
 - Selected move: ${strategy.move}
 - Operational purpose: ${strategy.purpose}
+- Move definition: ${strategy.definition.purpose}
+- Use when: ${strategy.definition.whenToUse}
+- Do not use when: ${strategy.definition.whenNotToUse}
+- Assumption sensitivity: ${strategy.definition.assumptionSensitivity}
 - Strategy confidence: ${strategy.confidence.toFixed(2)}
 - Assumptions: ${strategy.assumptions.join('; ')}
 - User discretion is required: yes

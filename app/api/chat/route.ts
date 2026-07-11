@@ -72,6 +72,7 @@ import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-pr
 import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote } from '@/lib/george/runtime/conversation-strategy'
+import { buildConversationMoveDefinitionNote } from '@/lib/george/runtime/conversation-move-library'
 import { resolveContextFraming } from '@/lib/george/runtime/context-framing'
 import { resolveOperationalResourceMonitor } from '@/lib/george/runtime/operational-resource-monitor'
 
@@ -931,6 +932,10 @@ LANGUAGE MODE: SPANISH
 
     const conversationStrategyNote =
       buildConversationStrategyNote(operationalJudgment.conversationStrategy)
+    const conversationMoveDefinitionNote = buildConversationMoveDefinitionNote(
+      operationalJudgment.conversationStrategy.definition,
+      operationalJudgment.conversationStrategy.assumptions
+    )
 
     const contextFraming = resolveContextFraming({
       runtime: currentRuntime,
@@ -1020,6 +1025,7 @@ LANGUAGE MODE: SPANISH
       operationalJudgmentNote,
       outcomeEvolutionNote,
       conversationStrategyNote,
+      conversationMoveDefinitionNote,
       contextFramingNote,
       liveRecommendationPresentationNote,
       responseShapeNote,
