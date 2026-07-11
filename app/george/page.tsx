@@ -5352,10 +5352,8 @@ return (
               }
             } catch {}
 
-            setTimeout(() => {
-              setMessages([])
-              messagesRef.current = []
-            }, 250)
+            setMessages([])
+            messagesRef.current = []
             setInput('')
             setInterimTranscript('')
             setVoiceError('')
@@ -5366,6 +5364,14 @@ return (
             setRerouteSignal(0)
             setSuggestedPrompts([])
             setSuggestedSignal(0)
+            setExpandedMessages({})
+            setShowScrollHint(false)
+            userPinnedBottomRef.current = true
+
+            window.requestAnimationFrame(() => {
+              scrollHostRef.current?.scrollTo({ top: 0, behavior: 'auto' })
+              textareaRef.current?.focus()
+            })
           }}
           onPromptSelect={(prompt: PromptSelection) => {
               if (prompt.context === 'upgrade_intelligent' || prompt.context === 'upgrade_topup') {
