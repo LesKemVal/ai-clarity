@@ -366,6 +366,7 @@ export function resolveGeorgeRuntimePipeline(
   const providerRequest = measureStage('provider_request_assembly', () =>
     buildGeorgeProviderRequest({
       runtimeContextBlock,
+      latestUserText: input.latestUserText,
       prompt: input.providerPrompt,
     })
   )
@@ -401,6 +402,7 @@ export function resolveGeorgeRuntimePipeline(
 
 export function buildGeorgeProviderRequest(input: {
   runtimeContextBlock: string
+  latestUserText: string
   prompt: GeorgeProviderPromptInput
 }): GeorgeProviderRequest {
   const prompt = input.prompt
@@ -438,10 +440,52 @@ ${liveDiscipline}
 
 ${prompt.dynamicRuntimeBlocks}`
 
+  const contextualMessages = resolveProviderConversationMessages(
+    input.latestUserText,
+    prompt.recentMessages
+  )
+
   return Object.freeze({
     systemContent,
     messages: Object.freeze(
-      prompt.recentMessages.map((message) => Object.freeze({ ...message }))
+      contextualMessages.map((message) => Object.freeze({ ...message }))
     ),
   })
+}
+
+function resolveProviderConversationMessages(
+  latestUserText: string,
+  recentMessages: readonly GeorgeProviderMessage[]
+) {
+  if (!isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
+    return recentMessages
+  }
+
+  const latestUserMessageIndex = [...recentMessages]
+    .map((message, index) => ({ message, index }))
+    .reverse()
+    .find(({ message }) => message.role === 'user')?.index
+
+  if (latestUserMessageIndex === undefined) {
+    return recentMessages
+  }
+
+  return recentMessages.slice(latestUserMessageIndex)
+}
+
+function isStandaloneAmbiguousKnowledgeQuestion(text: string) {
+  const normalized = text.trim().replace(/\s+/g, ' ')
+  if (!normalized || normalized.length > 120) return false
+
+  const definitional =
+    /^(what is|what's|whats|define|what does .+ mean|explain)\b/i.test(normalized)
+
+  if (!definitional) return false
+
+  const explicitlyContextual =
+    /\b(this|that|these|those|it|they|them|their|the investor|our company|my company|the meeting|the deal|the round|the valuation)\b/i.test(
+      normalized
+    )
+
+  return !explicitlyContextual
 }

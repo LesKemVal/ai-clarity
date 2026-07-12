@@ -1012,6 +1012,7 @@ assert(
 
 const providerRequest = buildGeorgeProviderRequest({
   runtimeContextBlock: 'RUNTIME CONTEXT',
+  latestUserText: 'Continue the current request.',
   prompt: {
     languageRule: 'LANGUAGE',
     modeBlock: 'MODE',
@@ -1033,6 +1034,66 @@ assert(
   providerRequest.systemContent.split('RUNTIME CONTEXT').length - 1 === 1,
   'provider request should include governed runtime context exactly once'
 )
+
+const ambiguousKnowledgeRequest = buildGeorgeProviderRequest({
+  runtimeContextBlock: governedRuntimeContext,
+  latestUserText: 'What is dilution?',
+  prompt: {
+    languageRule: 'LANGUAGE',
+    modeBlock: 'MODE',
+    baseSystemPrompt: 'BASE',
+    messageSourceBlock: 'SOURCE',
+    controlStateBlock: 'CONTROL',
+    runtimeScoresBlock: 'SCORES',
+    scoreAwareSteeringBlock: 'STEERING',
+    conversationEngineRulesBlock: 'ENGINE',
+    universalLiveOpeningBlock: 'LIVE OPENING',
+    liveDisciplineBlock: 'LIVE DISCIPLINE',
+    dynamicRuntimeBlocks: 'DYNAMIC',
+    includeLiveDiscipline: false,
+    recentMessages: [
+      { role: 'user', content: 'Help me negotiate investor governance.' },
+      { role: 'assistant', content: 'Let us protect founder control.' },
+      { role: 'user', content: 'What is dilution?' },
+    ],
+  },
+})
+
+assert(
+  ambiguousKnowledgeRequest.messages.length === 1 &&
+    ambiguousKnowledgeRequest.messages[0]?.content === 'What is dilution?',
+  'standalone ambiguous knowledge questions should not inherit a forced interpretation from prior conversation'
+)
+
+const contextualKnowledgeRequest = buildGeorgeProviderRequest({
+  runtimeContextBlock: governedRuntimeContext,
+  latestUserText: 'What does that dilution mean for my company?',
+  prompt: {
+    languageRule: 'LANGUAGE',
+    modeBlock: 'MODE',
+    baseSystemPrompt: 'BASE',
+    messageSourceBlock: 'SOURCE',
+    controlStateBlock: 'CONTROL',
+    runtimeScoresBlock: 'SCORES',
+    scoreAwareSteeringBlock: 'STEERING',
+    conversationEngineRulesBlock: 'ENGINE',
+    universalLiveOpeningBlock: 'LIVE OPENING',
+    liveDisciplineBlock: 'LIVE DISCIPLINE',
+    dynamicRuntimeBlocks: 'DYNAMIC',
+    includeLiveDiscipline: false,
+    recentMessages: [
+      { role: 'user', content: 'The investor proposed issuing more shares.' },
+      { role: 'assistant', content: 'That could dilute existing holders.' },
+      { role: 'user', content: 'What does that dilution mean for my company?' },
+    ],
+  },
+})
+
+assert(
+  contextualKnowledgeRequest.messages.length === 3,
+  'explicitly contextual knowledge questions should preserve relevant conversation history'
+)
+
 assert(providerRequest.systemContent.includes('LIVE OPENING'), 'provider request should include LIVE opening guidance when enabled')
 assert(providerRequest.messages.length === 1, 'provider request should preserve recent provider messages')
 assert(Object.isFrozen(providerRequest), 'provider request should be immutable')
