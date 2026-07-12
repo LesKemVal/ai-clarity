@@ -150,11 +150,27 @@ ${reply}`.trim()
 export function buildContextFramingPresentationNote(framing: ContextFraming) {
   if (!framing.show || framing.items.length === 0) return ''
 
+  const resolvedContext = framing.items
+    .map((item) => `- ${item.label}: ${item.value}`)
+    .join('\n')
+
+  if (framing.title === 'Current Situation') {
+    return `
+CONTEXT FRAMING — INTERNAL
+${resolvedContext}
+- Use this context to improve the answer, sequencing, and judgment.
+- Do not render the heading or item labels to the user.
+- Do not reproduce this as a briefing block or cue sheet.
+- Respond naturally to the user's actual request.
+- Preserve the resolved objective and constraints without exposing internal reasoning.
+`.trim()
+  }
+
   return `
 CONTEXT FRAMING
 - Begin the response with the heading: ${framing.title}
 - Under that heading, render exactly these items in this order: ${framing.items.map((item) => item.label).join(', ')}.
-${framing.items.map((item) => `- ${item.label}: ${item.value}`).join('\n')}
+${resolvedContext}
 - Reproduce each item as the resolved situational statement provided.
 - This framing presents the governing judgment; it must not add a competing recommendation.
 - Do not expose internal reasoning, confidence calculations, evidence lists, or chain-of-thought.

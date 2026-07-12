@@ -510,11 +510,13 @@ const simpleFraming = resolveContextFraming({
 assert(!simpleFraming.show, 'simple tasks should suppress context framing')
 
 const contextFramingNote = buildContextFramingPresentationNote(preparationFraming)
-assert(contextFramingNote.includes('Current Situation'), 'presentation authority should render the selected framing title')
-assert(contextFramingNote.includes('Objective, Pressure, Priority, Avoid'), 'presentation authority should preserve framing item order')
 assert(
-  contextFramingNote.includes('Investor confidence in execution may determine how much governance control they seek.'),
-  'presentation authority should render resolved context framing statements'
+  contextFramingNote.includes('CONTEXT FRAMING — INTERNAL'),
+  'Normal context framing should remain internal'
+)
+assert(
+  contextFramingNote.includes('Do not render the heading or item labels to the user.'),
+  'Normal context framing should guide reasoning without forcing user-facing scaffolding'
 )
 
 const liveRecommendationPresentation = resolveLiveRecommendationPresentation({
@@ -640,17 +642,17 @@ const naturalNormalRealization = renderOperationalExcellenceOutput({
 })
 
 assert(
-  !/Current Situation|Objective:|Pressure:|Priority:|Avoid:|Leverage question:/i.test(
+  !/^\s*(Current Situation|Objective:|Pressure:|Priority:|Unknown:|Avoid:|LIVE Available|Strong path:|Meeting flow:|Quick signal:|Leverage question:)\s*/im.test(
     naturalNormalRealization
   ),
   'Normal realization should not expose internal briefing scaffolding'
 )
 
 assert(
-  /I wouldn't drop price yet\./i.test(naturalNormalRealization) &&
-    /I'd open with:/i.test(naturalNormalRealization) &&
-    /The key question is:/i.test(naturalNormalRealization),
-  'Normal realization should convert briefing phrasing into conversational guidance'
+  naturalNormalRealization.includes('Do not drop price yet.') &&
+    naturalNormalRealization.includes('Open with:') &&
+    naturalNormalRealization.includes('Is this about ownership or execution risk?'),
+  'Normal realization should preserve useful guidance without exposing internal framing'
 )
 
 const conversationalNumbersBridge = renderOperationalExcellenceOutput({
