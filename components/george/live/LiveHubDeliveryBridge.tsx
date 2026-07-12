@@ -72,8 +72,7 @@ export function LiveHubDeliveryBridge({
         const fallbackText =
           behaviorDecision.operationalResource === 'silence'
             ? ''
-            : behaviorDecision.operationalResource === 'cue' &&
-                behaviorDecision.behaviors.includes('bridge')
+            : behaviorDecision.operationalResource === 'cue'
               ? 'Buy a second. Ask them to clarify what they mean.'
               : 'Clarify before answering.'
 
@@ -88,7 +87,6 @@ export function LiveHubDeliveryBridge({
 
         console.info('[LIVE][hub][delivery][behavior-fallback]', {
           operationalResource: behaviorDecision.operationalResource,
-          behaviors: behaviorDecision.behaviors,
           reason: behaviorDecision.reason,
           fallbackCue,
         })

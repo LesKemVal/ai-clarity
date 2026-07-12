@@ -9,7 +9,7 @@ const tail = composeGeorgeSupportBehavior({
   hasSafeResponse: true,
 })
 
-assert.deepEqual(tail.behaviors, ['repeat_tail'])
+assert.deepEqual(tail.behaviors, ['repeat'])
 assert.equal(tail.temporary, true)
 
 const sentenceRecovery = composeGeorgeSupportBehavior({
@@ -19,7 +19,7 @@ const sentenceRecovery = composeGeorgeSupportBehavior({
   hasSafeResponse: true,
 })
 
-assert.deepEqual(sentenceRecovery.behaviors, ['sentence_recovery'])
+assert.deepEqual(sentenceRecovery.behaviors, ['recovery'])
 assert.equal(sentenceRecovery.temporary, true)
 
 const takeover = composeGeorgeSupportBehavior({

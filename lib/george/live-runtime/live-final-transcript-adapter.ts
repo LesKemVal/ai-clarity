@@ -123,8 +123,8 @@ export function applyLiveFinalTranscriptExecution(execution: ReturnType<typeof r
   }
 
   if (
-    authority.action.type === 'repeat_tail' ||
-    authority.action.type === 'sentence_recovery' ||
+    authority.action.type === 'repeat' ||
+    authority.action.type === 'recovery' ||
     authority.action.type === 'speak'
   ) {
     return {

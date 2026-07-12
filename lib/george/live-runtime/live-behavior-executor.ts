@@ -153,18 +153,5 @@ export function planLiveBehaviorExecution(
 function resolveOperationalResource(
   supportDecision?: GeorgeSupportBehaviorDecision
 ): GeorgeOperationalResource {
-  if (supportDecision?.operationalResource) {
-    return supportDecision.operationalResource
-  }
-
-  const behaviors = supportDecision?.behaviors || []
-
-  if (behaviors.includes('silence')) return 'silence'
-  if (behaviors.includes('repeat_tail')) return 'repeat'
-  if (behaviors.includes('sentence_recovery')) return 'recovery'
-  if (behaviors.includes('completion')) return 'continuation'
-  if (behaviors.includes('full_response')) return 'response'
-  if (behaviors.includes('cue')) return 'cue'
-
-  return 'cue'
+  return supportDecision?.operationalResource ?? 'cue'
 }

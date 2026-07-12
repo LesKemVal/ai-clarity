@@ -5,8 +5,8 @@ import { getBuyTimeDurationMs, type LiveTranscriptDecision } from './transcript-
 export type LiveTranscriptControllerAction =
   | { type: 'ignore' }
   | { type: 'start_buy_time'; durationMs: number }
-  | { type: 'repeat_tail'; text: string }
-  | { type: 'sentence_recovery'; text: string }
+  | { type: 'repeat'; text: string }
+  | { type: 'recovery'; text: string }
   | { type: 'speak'; text: string }
   | { type: 'send'; text: string }
 
@@ -39,7 +39,7 @@ export function resolveLiveTranscriptDecision(params: {
     })
 
     if (tail) {
-      return { type: 'repeat_tail', text: tail }
+      return { type: 'repeat', text: tail }
     }
 
     const currentSentence = currentLiveSpokenSentence({
@@ -47,7 +47,7 @@ export function resolveLiveTranscriptDecision(params: {
     })
 
     return currentSentence
-      ? { type: 'sentence_recovery', text: currentSentence }
+      ? { type: 'recovery', text: currentSentence }
       : { type: 'ignore' }
   }
 
