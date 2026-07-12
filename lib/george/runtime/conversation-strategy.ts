@@ -123,12 +123,15 @@ export function buildConversationStrategyNote(
   strategy: GeorgeConversationStrategy
 ) {
   return `
-CONVERSATION STRATEGY
-- Selected move: ${strategy.move}
+CONVERSATION STRATEGY KNOWLEDGE
+- Candidate move: ${strategy.move}
 - Operational purpose: ${strategy.purpose}
 - Strategy confidence: ${strategy.confidence.toFixed(2)}
-- Select language that realizes this move in the current conversation; do not replace it with a different move.
+- Treat this as supporting operational knowledge, not as a selected answer or mandatory response shape.
+- Reason from the current user utterance, active objective, and available evidence before deciding how to respond.
+- Use, adapt, or reject the candidate move when another response better serves the current conversation.
 - A question is a tactic only when asking it improves the interaction or resolves material ambiguity.
+- Do not expose the move label, strategy confidence, or runtime framing to the user.
 - This strategy does not replace the active outcome, Operational Judgment, support style, or delivery policy.
 `.trim()
 }

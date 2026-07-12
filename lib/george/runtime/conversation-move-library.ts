@@ -183,14 +183,16 @@ export function buildConversationMoveDefinitionNote(
   assumptions: string[]
 ) {
   return `
-CONVERSATION MOVE
-- Move: ${definition.id}
+CONVERSATION MOVE KNOWLEDGE
+- Candidate move: ${definition.id}
 - Purpose: ${definition.purpose}
 - Use when: ${definition.whenToUse}
 - Do not use when: ${definition.whenNotToUse}
 - Expected operational value: ${definition.expectedOperationalValue}
 - Assumption sensitivity: ${definition.assumptionSensitivity}
 - Current assumptions: ${assumptions.length > 0 ? assumptions.join('; ') : 'none'}
-- Realize the move contextually. Do not force a literal line when the available context does not support it.
+- Use this definition as reasoning support, not as a response template or instruction to force the candidate move.
+- Prefer the response that best fits the current utterance, active objective, evidence, and user authority.
+- Do not expose this runtime vocabulary to the user.
 `.trim()
 }

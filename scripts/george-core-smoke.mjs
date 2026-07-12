@@ -416,13 +416,26 @@ assert(
 
 const conversationStrategyNote = buildConversationStrategyNote(clarificationStrategy)
 assert(
-  conversationStrategyNote.includes('Selected move:') &&
+  conversationStrategyNote.includes('Candidate move:') &&
     conversationStrategyNote.includes('Operational purpose:') &&
     conversationStrategyNote.includes('Strategy confidence:') &&
+    conversationStrategyNote.includes('supporting operational knowledge') &&
+    conversationStrategyNote.includes('Use, adapt, or reject') &&
+    conversationStrategyNote.includes('current user utterance') &&
+    !conversationStrategyNote.includes('Selected move:') &&
+    !conversationStrategyNote.includes('do not replace it with a different move') &&
     !conversationStrategyNote.includes('Move definition:') &&
     !conversationStrategyNote.includes('Use when:') &&
     !conversationStrategyNote.includes('User discretion is required:'),
-  'conversation strategy note should remain concise and defer move semantics to canonical owners'
+  'conversation strategy note should provide supporting reasoning knowledge rather than mandate a selected response move'
+)
+
+assert(
+  clarificationMoveNote.includes('CONVERSATION MOVE KNOWLEDGE') &&
+    clarificationMoveNote.includes('reasoning support') &&
+    clarificationMoveNote.includes('not as a response template') &&
+    !clarificationMoveNote.includes('CONVERSATION MOVE\\n- Move:'),
+  'conversation move definitions should support reasoning without becoming retrieved response templates'
 )
 
 assert(
