@@ -961,6 +961,26 @@ assert(
   'canonical pipeline stage declarations should be unique'
 )
 
+assert(
+  qualifiedRuntimePipeline.timing.stages.length === GEORGE_RUNTIME_PIPELINE.stages.length,
+  'runtime latency qualification should record every declared pipeline stage'
+)
+assert(
+  qualifiedRuntimePipeline.timing.totalDurationMs >= 0,
+  'runtime latency qualification should expose total pipeline duration'
+)
+assert(
+  qualifiedRuntimePipeline.timing.stages.every(
+    (timing) => timing.durationMs >= 0 && GEORGE_RUNTIME_PIPELINE.stages.includes(timing.stage as any)
+  ),
+  'runtime latency qualification should expose valid non-negative stage timings'
+)
+assert(
+  Object.isFrozen(qualifiedRuntimePipeline.timing) &&
+    Object.isFrozen(qualifiedRuntimePipeline.timing.stages),
+  'runtime latency snapshot should remain immutable'
+)
+
 const providerRequest = buildGeorgeProviderRequest({
   runtimeContextBlock: 'RUNTIME CONTEXT',
   prompt: {

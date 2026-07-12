@@ -60,7 +60,9 @@ export const GEORGE_RUNTIME_PIPELINE = {
     'Active canonical coordinator for GEORGE runtime decisions. It sequences existing owners without absorbing their business logic.',
   status: 'active',
   stages: [
+    'provider_resolution',
     'outcome_inference',
+    'previous_outcome_inference',
     'outcome_evolution',
     'trajectory_assessment',
     'operational_judgment',
@@ -70,6 +72,9 @@ export const GEORGE_RUNTIME_PIPELINE = {
     'live_recommendation_presentation',
     'operational_resource_monitor',
     'execution_policy',
+    'runtime_note_assembly',
+    'runtime_context_assembly',
+    'provider_request_assembly',
   ],
   ownershipPrinciple:
     'The pipeline coordinates. Each stage remains owned by its canonical module and may not be reimplemented here or downstream.',
@@ -87,6 +92,16 @@ export type GeorgeProviderMessage = Readonly<{
 export type GeorgeProviderRequest = Readonly<{
   systemContent: string
   messages: readonly GeorgeProviderMessage[]
+}>
+
+export type GeorgeRuntimePipelineStageTiming = Readonly<{
+  stage: string
+  durationMs: number
+}>
+
+export type GeorgeRuntimePipelineTiming = Readonly<{
+  totalDurationMs: number
+  stages: readonly GeorgeRuntimePipelineStageTiming[]
 }>
 
 export type GeorgeProviderPromptInput = Readonly<{
@@ -123,6 +138,7 @@ export type GeorgeRuntimePipelineInput = {
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
   providerPrompt: GeorgeProviderPromptInput
+  onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
   governedContextNotes: Readonly<{
     liveRuntimeContext?: string | null
     shelvedCampaignRuntimeNote?: string | null
@@ -158,6 +174,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   runtimeContextBlock: string
   providerRequest: GeorgeProviderRequest
   providerResolution: NormalGeorgeReasoningDecision
+  timing: GeorgeRuntimePipelineTiming
   notes: Readonly<{
     outcomeEvolutionNote: string
     trajectoryNote: string
@@ -182,123 +199,183 @@ export function resolveGeorgeRuntimeProvider(input: {
 export function resolveGeorgeRuntimePipeline(
   input: GeorgeRuntimePipelineInput
 ): GeorgeRuntimePipelineSnapshot {
-  const providerResolution = resolveGeorgeRuntimeProvider({
-    userText: input.latestUserText,
-    tier: input.tier,
-    hasImageInput: input.hasImageInput,
-  })
+  const pipelineStartedAt = performance.now()
+  const stageTimings: GeorgeRuntimePipelineStageTiming[] = []
 
-  const inferredOutcomeState = resolveGeorgeOutcomeState({
-    transcript: input.latestUserText,
-    objectiveKnown: input.objectiveKnown,
-    signalUsable: input.signalUsable,
-    executionImminent: input.executionImminent,
-  })
+  const measureStage = <T>(stage: string, work: () => T): T => {
+    const startedAt = performance.now()
+    const result = work()
+    const timing = Object.freeze({
+      stage,
+      durationMs: Number((performance.now() - startedAt).toFixed(3)),
+    })
 
-  const previousOutcomeState = input.previousUserText
-    ? resolveGeorgeOutcomeState({
-        transcript: input.previousUserText,
-        objectiveKnown: true,
-        signalUsable: true,
-        executionImminent: false,
-      })
-    : null
+    stageTimings.push(timing)
+    input.onStageTiming?.(timing)
 
-  const outcomeEvolution = evolveGeorgeOutcomeState({
-    previousState: previousOutcomeState,
-    inferredState: inferredOutcomeState,
-    latestUserText: input.latestUserText,
-    previousUserText: input.previousUserText,
-  })
+    return result
+  }
+
+  const providerResolution = measureStage('provider_resolution', () =>
+    resolveGeorgeRuntimeProvider({
+      userText: input.latestUserText,
+      tier: input.tier,
+      hasImageInput: input.hasImageInput,
+    })
+  )
+
+  const inferredOutcomeState = measureStage('outcome_inference', () =>
+    resolveGeorgeOutcomeState({
+      transcript: input.latestUserText,
+      objectiveKnown: input.objectiveKnown,
+      signalUsable: input.signalUsable,
+      executionImminent: input.executionImminent,
+    })
+  )
+
+  const previousOutcomeState = measureStage('previous_outcome_inference', () =>
+    input.previousUserText
+      ? resolveGeorgeOutcomeState({
+          transcript: input.previousUserText,
+          objectiveKnown: true,
+          signalUsable: true,
+          executionImminent: false,
+        })
+      : null
+  )
+
+  const outcomeEvolution = measureStage('outcome_evolution', () =>
+    evolveGeorgeOutcomeState({
+      previousState: previousOutcomeState,
+      inferredState: inferredOutcomeState,
+      latestUserText: input.latestUserText,
+      previousUserText: input.previousUserText,
+    })
+  )
   const outcomeState = outcomeEvolution.state
 
-  const trajectoryAssessment = assessTrajectory({
-    latestUserText: input.latestUserText,
-    objectiveKnown: input.objectiveKnown,
-    signalUsable: input.signalUsable,
-    outcomeState,
+  const trajectoryAssessment = measureStage('trajectory_assessment', () =>
+    assessTrajectory({
+      latestUserText: input.latestUserText,
+      objectiveKnown: input.objectiveKnown,
+      signalUsable: input.signalUsable,
+      outcomeState,
+    })
+  )
+
+  const operationalJudgment = measureStage('operational_judgment', () =>
+    resolveOperationalJudgment({
+      currentRuntime: input.currentRuntime,
+      intentState: input.intentState,
+      runtimeArbitration: input.runtimeArbitration,
+      judgmentSurface: input.judgmentSurface,
+      trajectory: trajectoryAssessment,
+      continuityRestoration: input.continuityRestoration,
+      outcomeSignals: input.outcomeSignals,
+      adaptiveProfile: input.adaptiveProfile,
+      liveRecommendationEvidence: input.liveRecommendationEvidence,
+      outcomeState,
+      latestUserText: input.latestUserText,
+    })
+  )
+
+  const conversationStrategy = measureStage(
+    'conversation_strategy',
+    () => operationalJudgment.conversationStrategy
+  )
+  const conversationMoveDefinition = measureStage(
+    'conversation_move_resolution',
+    () => conversationStrategy.definition
+  )
+
+  const contextFraming = measureStage('context_framing', () =>
+    resolveContextFraming({
+      runtime: input.currentRuntime,
+      latestUserText: input.latestUserText,
+      voiceMode: input.voiceMode,
+      operationalJudgment,
+    })
+  )
+
+  const liveRecommendationPresentation = measureStage(
+    'live_recommendation_presentation',
+    () =>
+      resolveLiveRecommendationPresentation({
+        liveSupport: operationalJudgment.liveSupport,
+        latestUserText: input.latestUserText,
+        voiceMode: input.voiceMode,
+      })
+  )
+
+  const operationalResourceMonitor = measureStage(
+    'operational_resource_monitor',
+    () =>
+      resolveOperationalResourceMonitor({
+        outcomeState,
+        conversationStrategy,
+        operationalJudgment,
+        trajectory: trajectoryAssessment,
+        liveRecommendationPresentation,
+      })
+  )
+
+  const executionPolicy = measureStage('execution_policy', () =>
+    resolveGeorgeExecutionPolicy({
+      runtime: input.currentRuntime,
+      voiceMode: input.voiceMode,
+      strategy: conversationStrategy,
+      moveDefinition: conversationMoveDefinition,
+      operationalJudgment,
+      outcomeEvolution,
+      operationalResourceMonitor,
+    })
+  )
+
+  const notes = measureStage('runtime_note_assembly', () =>
+    Object.freeze({
+      outcomeEvolutionNote: buildOutcomeEvolutionNote(outcomeEvolution),
+      trajectoryNote: buildTrajectoryNote(trajectoryAssessment),
+      operationalJudgmentNote: buildOperationalJudgmentNote(operationalJudgment),
+      conversationStrategyNote: buildConversationStrategyNote(conversationStrategy),
+      conversationMoveDefinitionNote: buildConversationMoveDefinitionNote(
+        conversationMoveDefinition,
+        conversationStrategy.assumptions
+      ),
+      contextFramingNote: buildContextFramingPresentationNote(contextFraming),
+      liveRecommendationPresentationNote: buildLiveRecommendationPresentationNote(
+        liveRecommendationPresentation
+      ),
+      executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
+    })
+  )
+
+  const runtimeContextBlock = measureStage('runtime_context_assembly', () =>
+    buildGovernedRuntimeContext({
+      ...input.governedContextNotes,
+      trajectoryNote: notes.trajectoryNote,
+      operationalJudgmentNote: notes.operationalJudgmentNote,
+      outcomeEvolutionNote: notes.outcomeEvolutionNote,
+      conversationStrategyNote: notes.conversationStrategyNote,
+      conversationMoveDefinitionNote: notes.conversationMoveDefinitionNote,
+      executionPolicyNote: notes.executionPolicyNote,
+      contextFramingNote: notes.contextFramingNote,
+      liveRecommendationPresentationNote: notes.liveRecommendationPresentationNote,
+    })
+  )
+
+  const providerRequest = measureStage('provider_request_assembly', () =>
+    buildGeorgeProviderRequest({
+      runtimeContextBlock,
+      prompt: input.providerPrompt,
+    })
+  )
+
+  const timing = Object.freeze({
+    totalDurationMs: Number((performance.now() - pipelineStartedAt).toFixed(3)),
+    stages: Object.freeze([...stageTimings]),
   })
 
-  const operationalJudgment = resolveOperationalJudgment({
-    currentRuntime: input.currentRuntime,
-    intentState: input.intentState,
-    runtimeArbitration: input.runtimeArbitration,
-    judgmentSurface: input.judgmentSurface,
-    trajectory: trajectoryAssessment,
-    continuityRestoration: input.continuityRestoration,
-    outcomeSignals: input.outcomeSignals,
-    adaptiveProfile: input.adaptiveProfile,
-    liveRecommendationEvidence: input.liveRecommendationEvidence,
-    outcomeState,
-    latestUserText: input.latestUserText,
-  })
-
-  const conversationStrategy = operationalJudgment.conversationStrategy
-  const conversationMoveDefinition = conversationStrategy.definition
-
-  const contextFraming = resolveContextFraming({
-    runtime: input.currentRuntime,
-    latestUserText: input.latestUserText,
-    voiceMode: input.voiceMode,
-    operationalJudgment,
-  })
-
-  const liveRecommendationPresentation = resolveLiveRecommendationPresentation({
-    liveSupport: operationalJudgment.liveSupport,
-    latestUserText: input.latestUserText,
-    voiceMode: input.voiceMode,
-  })
-
-  const operationalResourceMonitor = resolveOperationalResourceMonitor({
-    outcomeState,
-    conversationStrategy,
-    operationalJudgment,
-    trajectory: trajectoryAssessment,
-    liveRecommendationPresentation,
-  })
-
-  const executionPolicy = resolveGeorgeExecutionPolicy({
-    runtime: input.currentRuntime,
-    voiceMode: input.voiceMode,
-    strategy: conversationStrategy,
-    moveDefinition: conversationMoveDefinition,
-    operationalJudgment,
-    outcomeEvolution,
-    operationalResourceMonitor,
-  })
-
-  const notes = Object.freeze({
-    outcomeEvolutionNote: buildOutcomeEvolutionNote(outcomeEvolution),
-    trajectoryNote: buildTrajectoryNote(trajectoryAssessment),
-    operationalJudgmentNote: buildOperationalJudgmentNote(operationalJudgment),
-    conversationStrategyNote: buildConversationStrategyNote(conversationStrategy),
-    conversationMoveDefinitionNote: buildConversationMoveDefinitionNote(
-      conversationMoveDefinition,
-      conversationStrategy.assumptions
-    ),
-    contextFramingNote: buildContextFramingPresentationNote(contextFraming),
-    liveRecommendationPresentationNote: buildLiveRecommendationPresentationNote(
-      liveRecommendationPresentation
-    ),
-    executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
-  })
-
-  const runtimeContextBlock = buildGovernedRuntimeContext({
-    ...input.governedContextNotes,
-    trajectoryNote: notes.trajectoryNote,
-    operationalJudgmentNote: notes.operationalJudgmentNote,
-    outcomeEvolutionNote: notes.outcomeEvolutionNote,
-    conversationStrategyNote: notes.conversationStrategyNote,
-    conversationMoveDefinitionNote: notes.conversationMoveDefinitionNote,
-    executionPolicyNote: notes.executionPolicyNote,
-    contextFramingNote: notes.contextFramingNote,
-    liveRecommendationPresentationNote: notes.liveRecommendationPresentationNote,
-  })
-
-  const providerRequest = buildGeorgeProviderRequest({
-    runtimeContextBlock,
-    prompt: input.providerPrompt,
-  })
+  console.info('[GEORGE][runtime][latency]', timing)
 
   return Object.freeze({
     inferredOutcomeState,
@@ -315,6 +392,7 @@ export function resolveGeorgeRuntimePipeline(
     runtimeContextBlock,
     providerRequest,
     providerResolution,
+    timing,
     notes,
     source: 'runtime_pipeline' as const,
   })
