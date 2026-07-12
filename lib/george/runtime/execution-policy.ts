@@ -206,9 +206,7 @@ EXECUTION POLICY
 - Assumption handling: ${policy.assumptionHandling}
 - Repetition policy: ${policy.repetitionPolicy}
 - Operational resource usage: ${policy.resourceUsage}
-- Selected conversational move: ${policy.strategyMove}
-- Purpose: ${policy.purpose}
-- Realize the selected move contextually. Do not replace it with a different strategy.
+- Realize the selected move supplied by Conversation Strategy; do not replace it with a different strategy.
 - When audience is user, speak directly with the user in a natural Normal GEORGE conversation. Ask direct questions when the move is ask, clarify, or probe; do not turn them into room scripts.
 - When audience is room_through_user, provide room-executable support for the user to carry into the room. Keep it brief, adaptable, and appropriate to the receiver profile.
 - Suggested language is optional and adaptable; never present a generated line as mandatory.

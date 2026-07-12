@@ -734,6 +734,12 @@ assert(normalExecutionPolicy.source === 'execution_policy', 'execution policy sh
 assert(normalExecutionPolicy.deliveryPreference === 'text', 'Normal execution policy should preserve text delivery')
 assert(normalExecutionPolicy.audience === 'user', 'Normal execution policy should address the user')
 assert(buildExecutionPolicyNote(normalExecutionPolicy).includes('EXECUTION POLICY'), 'execution policy should expose a governed runtime note')
+const normalExecutionPolicyNote = buildExecutionPolicyNote(normalExecutionPolicy)
+assert(
+  !normalExecutionPolicyNote.includes('Selected conversational move:') &&
+    !normalExecutionPolicyNote.includes('\\n- Purpose:'),
+  'execution policy note should not duplicate Conversation Strategy move or purpose'
+)
 
 const normalQuestionStrategy = resolveGeorgeConversationStrategy({
   action: 'acquire_smallest_signal',
