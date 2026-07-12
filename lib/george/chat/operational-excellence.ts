@@ -17,7 +17,11 @@ function stripLiveScaffolding(text: string) {
   return text
     .replace(/\s*\[(PAUSE|CALM|PEER|SINCERE|LOWER VOLUME|INQUISITIVE|SOFTEN|LISTEN|HOLD)\]\s*/gi, ' ')
     .replace(/^\s*(Say|Backup|Cue|Need|Method|Then|Use now|Use this|Say this|If wrong|If you’re wrong|If you're wrong|If you’re right|If you're right)\s*:?\s*/gim, '')
+    .replace(/^\s*(Current Situation|LIVE Available)\s*$/gim, '')
+    .replace(/^\s*(Objective|Pressure|Priority|Unknown|Avoid|Strong path|Meeting flow|Quick signal|Leverage question)\s*:\s*/gim, '')
     .replace(/^\s*[-•]\s+/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 function splitUsefulLines(text: string) {
