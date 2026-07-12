@@ -250,6 +250,10 @@ class GeorgeResponseShaper {
       reasons.push(`receiver realization:${input.receiver}`)
     }
 
+    if (input.receiver === 'audio') {
+      volley = this.shorten(volley, 16)
+    }
+
     if (input.operationalResource) {
       reasons.push(`operational resource:${input.operationalResource}`)
     }
