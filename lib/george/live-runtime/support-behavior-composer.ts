@@ -21,7 +21,17 @@ export type GeorgeSupportBehaviorComposerInput = {
   hasCurrentSentence?: boolean
 }
 
+export type GeorgeOperationalResource =
+  | 'cue'
+  | 'line'
+  | 'continuation'
+  | 'response'
+  | 'recovery'
+  | 'repeat'
+  | 'silence'
+
 export type GeorgeSupportBehaviorDecision = {
+  operationalResource: GeorgeOperationalResource
   behaviors: GeorgeSupportBehavior[]
   temporary: true
   reason: string
@@ -32,6 +42,7 @@ export function composeGeorgeSupportBehavior(
 ): GeorgeSupportBehaviorDecision {
   if (input.userTookOverNaturally && !input.hasHighConfidenceCompletion) {
     return {
+      operationalResource: 'silence',
       behaviors: ['silence'],
       temporary: true,
       reason: 'User has taken the floor naturally; GEORGE should not compete for control.',
@@ -44,6 +55,7 @@ export function composeGeorgeSupportBehavior(
     input.hasHighConfidenceCompletion
   ) {
     return {
+      operationalResource: 'repeat',
       behaviors: ['repeat_tail'],
       temporary: true,
       reason: 'User appears synchronized but missed the sentence ending; provide only the missing tail.',
@@ -52,6 +64,7 @@ export function composeGeorgeSupportBehavior(
 
   if (input.userAppearsToBeShadowing && input.userLostPlace && input.hasCurrentSentence) {
     return {
+      operationalResource: 'recovery',
       behaviors: ['sentence_recovery'],
       temporary: true,
       reason: 'User appears to have lost place while shadowing; repeat the current sentence before resuming support.',
@@ -60,6 +73,7 @@ export function composeGeorgeSupportBehavior(
 
   if (input.hasHighConfidenceCompletion && input.userSpeaking) {
     return {
+      operationalResource: 'continuation',
       behaviors: ['completion'],
       temporary: true,
       reason: 'High-confidence completion may preserve momentum without changing support mode.',
@@ -68,6 +82,7 @@ export function composeGeorgeSupportBehavior(
 
   if (!input.hasSafeResponse) {
     return {
+      operationalResource: 'cue',
       behaviors: ['bridge', 'cue'],
       temporary: true,
       reason: 'Full response is not safe or ready; provide useful support instead of silence.',
@@ -76,6 +91,7 @@ export function composeGeorgeSupportBehavior(
 
   if (input.deliveryStyle === 'response') {
     return {
+      operationalResource: 'response',
       behaviors: ['full_response'],
       temporary: true,
       reason: 'Response support is available and safe.',
@@ -83,6 +99,7 @@ export function composeGeorgeSupportBehavior(
   }
 
   return {
+    operationalResource: 'cue',
     behaviors: ['cue'],
     temporary: true,
     reason: 'Default to minimum useful support.',
