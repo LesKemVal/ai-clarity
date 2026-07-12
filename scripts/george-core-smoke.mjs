@@ -416,10 +416,13 @@ assert(
 
 const conversationStrategyNote = buildConversationStrategyNote(clarificationStrategy)
 assert(
-  conversationStrategyNote.includes('final in-room authority') &&
-    conversationStrategyNote.includes('do not repeat a canned line') &&
-    conversationStrategyNote.includes('already supplied'),
-  'conversation strategy should expose assumptions and preserve user discretion'
+  conversationStrategyNote.includes('Selected move:') &&
+    conversationStrategyNote.includes('Operational purpose:') &&
+    conversationStrategyNote.includes('Strategy confidence:') &&
+    !conversationStrategyNote.includes('Move definition:') &&
+    !conversationStrategyNote.includes('Use when:') &&
+    !conversationStrategyNote.includes('User discretion is required:'),
+  'conversation strategy note should remain concise and defer move semantics to canonical owners'
 )
 
 assert(

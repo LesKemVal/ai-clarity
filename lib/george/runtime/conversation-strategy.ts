@@ -126,18 +126,9 @@ export function buildConversationStrategyNote(
 CONVERSATION STRATEGY
 - Selected move: ${strategy.move}
 - Operational purpose: ${strategy.purpose}
-- Move definition: ${strategy.definition.purpose}
-- Use when: ${strategy.definition.whenToUse}
-- Do not use when: ${strategy.definition.whenNotToUse}
-- Assumption sensitivity: ${strategy.definition.assumptionSensitivity}
 - Strategy confidence: ${strategy.confidence.toFixed(2)}
-- Assumptions: ${strategy.assumptions.join('; ')}
-- User discretion is required: yes
-- Select language that realizes this move in the current conversation; do not repeat a canned line.
-- A question is a tactic only when asking it improves the interaction or reduces a material ambiguity.
-- Do not ask for information the room has already supplied or the user is likely to know has already been established.
-- If the move depends on an assumption GEORGE cannot verify, expose the dependency briefly or provide an adaptable alternative.
-- The user has final in-room authority and may use, adapt, or ignore the suggested move based on facts GEORGE cannot observe.
+- Select language that realizes this move in the current conversation; do not replace it with a different move.
+- A question is a tactic only when asking it improves the interaction or resolves material ambiguity.
 - This strategy does not replace the active outcome, Operational Judgment, support style, or delivery policy.
 `.trim()
 }
