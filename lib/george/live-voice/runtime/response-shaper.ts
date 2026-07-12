@@ -20,6 +20,8 @@ export type ResponseShapeInput = {
   responseCompression?: string
   deliveryBehavior?: string
   intervention?: string
+  operationalResource?: 'cue' | 'line' | 'continuation' | 'response' | 'recovery' | 'repeat' | 'silence'
+  receiver?: 'audio' | 'visual' | 'audio_visual'
   signals?: ConversationSignalState
 }
 
@@ -227,6 +229,31 @@ class GeorgeResponseShaper {
       reasons.push('policy proof delivery')
     }
 
+    const realization = resolvePostureRealization(input.posture)
+    volley = this.applyPostureRealization(volley, realization)
+    volley = this.applyReceiverRealization(
+      volley,
+      input.receiver,
+      input.operationalResource,
+      input.roomPressure
+    )
+
+    if (input.operationalResource === 'silence') {
+      volley = ''
+    }
+
+    reasons.push(
+      `posture realization:${realization.bridge}/${realization.hedge}/${realization.cadence}`
+    )
+
+    if (input.receiver) {
+      reasons.push(`receiver realization:${input.receiver}`)
+    }
+
+    if (input.operationalResource) {
+      reasons.push(`operational resource:${input.operationalResource}`)
+    }
+
     return {
       volley,
       cue,
@@ -235,6 +262,78 @@ class GeorgeResponseShaper {
       calmingLine,
       postureCue,
     }
+  }
+
+  private applyPostureRealization(
+    text: string,
+    realization: ReturnType<typeof resolvePostureRealization>
+  ) {
+    let shaped = text.replace(/\s+/g, ' ').trim()
+
+    if (realization.hedge === 'minimal' || realization.hedge === 'none') {
+      shaped = this.removeWeakConfidence(shaped)
+    }
+
+    if (realization.bridge === 'acknowledge' && !/^(that|i understand|i appreciate|fair)/i.test(shaped)) {
+      shaped = `I understand the concern. ${shaped}`
+    }
+
+    if (realization.bridge === 'relational' && !/^(i appreciate|thank you|that makes sense)/i.test(shaped)) {
+      shaped = `I appreciate you raising that. ${shaped}`
+    }
+
+    if (realization.bridge === 'context' && !/^(the key|the issue|the important point|here is)/i.test(shaped)) {
+      shaped = `The key point is this: ${shaped}`
+    }
+
+    if (realization.cadence === 'concise') {
+      shaped = this.shorten(shaped, 12)
+    }
+
+    if (realization.cadence === 'direct') {
+      shaped = this.shorten(this.removeWeakConfidence(shaped), 14)
+    }
+
+    if (realization.cadence === 'measured') {
+      shaped = shaped
+        .replace(/\bimmediately\b/gi, 'now')
+        .replace(/\burgently\b/gi, '')
+        .replace(/\bright now\b/gi, 'now')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
+
+    return shaped
+  }
+
+  private applyReceiverRealization(
+    text: string,
+    receiver?: ResponseShapeInput['receiver'],
+    resource?: ResponseShapeInput['operationalResource'],
+    roomPressure?: string
+  ) {
+    if (!text) return text
+
+    if (receiver === 'audio') {
+      const limit =
+        resource === 'cue' ? 7 :
+        resource === 'line' ? 14 :
+        resource === 'continuation' ? 16 :
+        resource === 'response' ? 22 :
+        12
+
+      return this.shorten(text, roomPressure === 'high' ? Math.min(limit, 10) : limit)
+    }
+
+    if (receiver === 'visual') {
+      return text.replace(/\s+/g, ' ').trim()
+    }
+
+    if (receiver === 'audio_visual' && roomPressure === 'high') {
+      return this.shorten(text, resource === 'response' ? 20 : 14)
+    }
+
+    return text
   }
 
   private shorten(text: string, maxWords: number) {
@@ -359,8 +458,16 @@ const DEFAULT_POSTURE_REALIZATION = {
   cadence: "balanced",
 } as const
 
+const POSTURE_ALIASES: Record<string, PostureKey> = {
+  directing: 'authority',
+  deferential: 'trust',
+  deescalating: 'calm',
+  calming: 'calm',
+}
+
 export function resolvePostureRealization(posture?: string) {
-  const key = (posture ?? "").toLowerCase() as PostureKey
+  const normalized = (posture ?? "").toLowerCase()
+  const key = (POSTURE_ALIASES[normalized] ?? normalized) as PostureKey
 
   return POSTURE_REALIZATION[key] ?? DEFAULT_POSTURE_REALIZATION
 }
