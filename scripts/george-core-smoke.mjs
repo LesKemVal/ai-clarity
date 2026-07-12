@@ -729,7 +729,38 @@ const normalExecutionPolicy = resolveGeorgeExecutionPolicy({
 })
 assert(normalExecutionPolicy.source === 'execution_policy', 'execution policy should expose canonical ownership')
 assert(normalExecutionPolicy.deliveryPreference === 'text', 'Normal execution policy should preserve text delivery')
+assert(normalExecutionPolicy.audience === 'user', 'Normal execution policy should address the user')
 assert(buildExecutionPolicyNote(normalExecutionPolicy).includes('EXECUTION POLICY'), 'execution policy should expose a governed runtime note')
+
+const normalQuestionStrategy = resolveGeorgeConversationStrategy({
+  action: 'acquire_smallest_signal',
+  currentRuntime: 'normal_george',
+  latestUserText: 'Help me prepare for the investor conversation.',
+  judgmentSurface: {
+    decisionSurface: 'acquire_signal',
+    signalSufficiency: 'insufficient',
+    shouldAcquireSignal: true,
+    instruction: '',
+  },
+  trajectory: {
+    currentMove: outcomeState.immediateOutcome,
+    likelyNextMoves: ['prepare'],
+    potentialFutureNeeds: ['live'],
+    confidence: 0.72,
+  },
+  outcomeState,
+})
+const normalQuestionPolicy = resolveGeorgeExecutionPolicy({
+  runtime: 'normal_george',
+  voiceMode: false,
+  strategy: normalQuestionStrategy,
+  moveDefinition: normalQuestionStrategy.definition,
+  operationalJudgment: { ...operationalJudgment, conversationStrategy: normalQuestionStrategy },
+  outcomeEvolution: phaseEvolution,
+  operationalResourceMonitor,
+})
+assert(normalQuestionPolicy.executionType === 'direct_question', 'Normal question moves should ask the user directly rather than generate room scripts')
+assert(buildExecutionPolicyNote(normalQuestionPolicy).includes('speak directly with the user'), 'Normal execution note should preserve user-facing conversation')
 
 const liveQuestionStrategy = resolveGeorgeConversationStrategy({
   action: 'execute_live_move',
@@ -759,6 +790,7 @@ const liveQuestionPolicy = resolveGeorgeExecutionPolicy({
   operationalResourceMonitor,
 })
 assert(liveQuestionPolicy.executionType === 'suggested_question', 'question moves should resolve to suggested-question execution')
+assert(liveQuestionPolicy.audience === 'room_through_user', 'LIVE execution should produce room-ready support through the user')
 assert(liveQuestionPolicy.explanationDepth === 'minimal', 'LIVE execution should remain minimal')
 assert(liveQuestionPolicy.deliveryPreference === 'audio_visual', 'LIVE voice execution should support audio and visual delivery')
 assert(liveQuestionPolicy.assumptionHandling === 'offer_adaptable_alternative', 'assumption-sensitive moves should expose adaptable execution')

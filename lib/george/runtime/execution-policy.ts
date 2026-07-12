@@ -7,6 +7,7 @@ import type { GeorgeConversationStrategy } from '@/lib/george/runtime/conversati
 
 export type GeorgeExecutionType =
   | 'answer'
+  | 'direct_question'
   | 'suggested_line'
   | 'suggested_question'
   | 'observation'
@@ -47,8 +48,11 @@ export type GeorgeResourceUsage =
   | 'support_selected_move'
   | 'surface_highest_value'
 
+export type GeorgeExecutionAudience = 'user' | 'room_through_user'
+
 export type GeorgeExecutionPolicy = {
   executionType: GeorgeExecutionType
+  audience: GeorgeExecutionAudience
   realizationMode: GeorgeRealizationMode
   explanationDepth: GeorgeExplanationDepth
   deliveryPreference: GeorgeDeliveryPreference
@@ -75,6 +79,7 @@ export function resolveGeorgeExecutionPolicy(
 ): GeorgeExecutionPolicy {
   const live = input.runtime === 'live_george'
   const executionType = resolveExecutionType(input.strategy.move, live)
+  const audience: GeorgeExecutionAudience = live ? 'room_through_user' : 'user'
   const realizationMode = resolveRealizationMode(executionType)
   const explanationDepth = resolveExplanationDepth(executionType, live)
   const deliveryPreference = resolveDeliveryPreference(live, input.voiceMode)
@@ -94,6 +99,7 @@ export function resolveGeorgeExecutionPolicy(
 
   return {
     executionType,
+    audience,
     realizationMode,
     explanationDepth,
     deliveryPreference,
@@ -110,6 +116,16 @@ function resolveExecutionType(
   move: GeorgeConversationStrategy['move'],
   live: boolean
 ): GeorgeExecutionType {
+  if (!live) {
+    if (move === 'ask' || move === 'clarify' || move === 'probe') {
+      return 'direct_question'
+    }
+    if (move === 'summarize') return 'summary'
+    if (move === 'explore') return 'preparation'
+    if (move === 'slow' || move === 'pause') return 'tactical_reminder'
+    return 'answer'
+  }
+
   if (move === 'ask' || move === 'clarify' || move === 'probe') {
     return 'suggested_question'
   }
@@ -129,8 +145,7 @@ function resolveExecutionType(
   if (move === 'summarize') return 'summary'
   if (move === 'explore') return 'preparation'
   if (move === 'slow' || move === 'pause') return 'tactical_reminder'
-  if (move === 'answer' && live) return 'live_cue'
-  return 'answer'
+  return 'live_cue'
 }
 
 function resolveRealizationMode(
@@ -184,6 +199,7 @@ export function buildExecutionPolicyNote(policy: GeorgeExecutionPolicy) {
   return `
 EXECUTION POLICY
 - Execution type: ${policy.executionType}
+- Audience: ${policy.audience}
 - Realization mode: ${policy.realizationMode}
 - Explanation depth: ${policy.explanationDepth}
 - Delivery preference: ${policy.deliveryPreference}
@@ -193,6 +209,8 @@ EXECUTION POLICY
 - Selected conversational move: ${policy.strategyMove}
 - Purpose: ${policy.purpose}
 - Realize the selected move contextually. Do not replace it with a different strategy.
+- When audience is user, speak directly with the user in a natural Normal GEORGE conversation. Ask direct questions when the move is ask, clarify, or probe; do not turn them into room scripts.
+- When audience is room_through_user, provide room-executable support for the user to carry into the room. Keep it brief, adaptable, and appropriate to the receiver profile.
 - Suggested language is optional and adaptable; never present a generated line as mandatory.
 - When assumptions are material, expose the dependency briefly or offer an adaptable alternative.
 - Do not repeat a LIVE recommendation that is already visible in the response or readiness surface.
