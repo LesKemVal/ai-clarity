@@ -626,6 +626,33 @@ assert(
   'non-numeric conversations must not inherit the numeric dispute bridge'
 )
 
+const naturalNormalRealization = renderOperationalExcellenceOutput({
+  reply:
+    'Current Situation\\n' +
+    'Objective: Identify the concern and protect the desired outcome.\\n' +
+    'Pressure: Investor confidence matters.\\n' +
+    'Priority: Strengthen execution confidence.\\n' +
+    'Avoid: Do not negotiate governance before establishing confidence.\\n' +
+    'Do not drop price yet. Open with: "Help me understand what is driving the concern."\\n' +
+    'Leverage question: Is this about ownership or execution risk?',
+  presentationMode: 'conversational',
+  latestUserText: 'The investor challenged our valuation. What should I do next?',
+})
+
+assert(
+  !/Current Situation|Objective:|Pressure:|Priority:|Avoid:|Leverage question:/i.test(
+    naturalNormalRealization
+  ),
+  'Normal realization should not expose internal briefing scaffolding'
+)
+
+assert(
+  /I wouldn't drop price yet\./i.test(naturalNormalRealization) &&
+    /I'd open with:/i.test(naturalNormalRealization) &&
+    /The key question is:/i.test(naturalNormalRealization),
+  'Normal realization should convert briefing phrasing into conversational guidance'
+)
+
 const conversationalNumbersBridge = renderOperationalExcellenceOutput({
   reply:
     '"Let us compare the forecast assumptions."\\n' +

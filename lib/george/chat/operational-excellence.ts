@@ -18,8 +18,18 @@ function stripLiveScaffolding(text: string) {
     .replace(/\s*\[(PAUSE|CALM|PEER|SINCERE|LOWER VOLUME|INQUISITIVE|SOFTEN|LISTEN|HOLD)\]\s*/gi, ' ')
     .replace(/^\s*(Say|Backup|Cue|Need|Method|Then|Use now|Use this|Say this|If wrong|If you’re wrong|If you're wrong|If you’re right|If you're right)\s*:?\s*/gim, '')
     .replace(/^\s*(Current Situation|LIVE Available)\s*$/gim, '')
-    .replace(/^\s*(Objective|Pressure|Priority|Unknown|Avoid|Strong path|Meeting flow|Quick signal|Leverage question)\s*:\s*/gim, '')
+    .replace(/^\s*(Objective|Pressure|Priority|Unknown|Avoid)\s*:\s*.*$/gim, '')
+    .replace(/^\s*Strong path\s*:\s*/gim, "Here's where I'd focus: ")
+    .replace(/^\s*Meeting flow\s*:\s*/gim, 'For the meeting, ')
+    .replace(/^\s*(Quick signal|Leverage question)\s*:\s*/gim, 'The key question is: ')
+    .replace(/\bDo not\s+([^.!?\n]+?)(\s+yet)?\./gi, (_, point, yet) => {
+      return `I wouldn't ${String(point).trim()}${yet ? ' yet' : ''}.`
+    })
+    .replace(/\bOpen with\s*:\s*/gi, "I'd open with: ")
+    .replace(/^\s*Keep\s+/gim, "I'd keep ")
+    .replace(/^\s*For ([^:\n]+)\s*:\s*/gim, 'If $1 comes up, ')
     .replace(/^\s*[-•]\s+/gm, '')
+    .replace(/[ \t]{2,}/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
