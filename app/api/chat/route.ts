@@ -898,6 +898,21 @@ LANGUAGE MODE: SPANISH
     const outputGovernanceNote = buildOutputGovernanceNote(outputGovernance)
     const presentationAuthorityNote = buildPresentationAuthorityNote(presentationMode)
 
+    const messageSourceBlock = buildMessageSourceBlock(latestUserSource)
+    const controlStateBlock = buildControlStateBlock(control)
+    const runtimeScoresBlock = buildRuntimeScoresBlock(scores)
+    const scoreAwareSteeringBlock = buildScoreAwareSteeringBlock()
+    const conversationEngineRulesBlock = buildConversationEngineRulesBlock()
+    const universalLiveOpeningBlock = currentRuntime === 'live_george' ? buildUniversalLiveOpeningBlock() : ''
+    const liveDisciplineBlock = currentRuntime === 'live_george' ? buildLiveDisciplineBlock() : ''
+    const dynamicRuntimeBlocks = buildDynamicRuntimeBlocks({
+      bottleneck,
+      cadenceAvoid,
+      builderSubtype,
+      tier,
+      liveScenario,
+    })
+
     const runtimePipeline = resolveGeorgeRuntimePipeline({
       currentRuntime,
       latestUserText: latestUserRaw,
@@ -913,6 +928,34 @@ LANGUAGE MODE: SPANISH
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
+      providerPrompt: {
+        languageRule,
+        modeBlock,
+        baseSystemPrompt: SYSTEM_PROMPT(
+          voiceMode,
+          isFirstSession,
+          promptContext,
+          promptLabel,
+          contextTurnCount,
+          tier
+        ),
+        messageSourceBlock,
+        controlStateBlock,
+        runtimeScoresBlock,
+        scoreAwareSteeringBlock,
+        conversationEngineRulesBlock,
+        universalLiveOpeningBlock,
+        liveDisciplineBlock,
+        dynamicRuntimeBlocks,
+        includeLiveDiscipline:
+          presentationMode === 'live' ||
+          presentationMode === 'cue_based' ||
+          presentationMode === 'compressed',
+        recentMessages: recentMessages.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+      },
       governedContextNotes: {
         liveRuntimeContext,
         shelvedCampaignRuntimeNote,
@@ -943,53 +986,10 @@ LANGUAGE MODE: SPANISH
       operationalResourceMonitor,
       executionPolicy,
       runtimeContextBlock,
+      providerRequest,
     } = runtimePipeline
 
-    const messageSourceBlock = buildMessageSourceBlock(latestUserSource)
-    const controlStateBlock = buildControlStateBlock(control)
-    const runtimeScoresBlock = buildRuntimeScoresBlock(scores)
-    const scoreAwareSteeringBlock = buildScoreAwareSteeringBlock()
-    const conversationEngineRulesBlock = buildConversationEngineRulesBlock()
-    const universalLiveOpeningBlock = currentRuntime === 'live_george' ? buildUniversalLiveOpeningBlock() : ''
-    const liveDisciplineBlock = currentRuntime === 'live_george' ? buildLiveDisciplineBlock() : ''
-    const dynamicRuntimeBlocks = buildDynamicRuntimeBlocks({
-      bottleneck,
-      cadenceAvoid,
-      builderSubtype,
-      tier,
-      liveScenario,
-    })
-
-    const systemContent = languageRule + modeBlock +
-      runtimeContextBlock +
-      SYSTEM_PROMPT(
-        voiceMode,
-        isFirstSession,
-        promptContext,
-        promptLabel,
-        contextTurnCount,
-        tier
-      ) + `
-
-${messageSourceBlock}
-
-${controlStateBlock}
-
-${runtimeScoresBlock}
-
-${scoreAwareSteeringBlock}
-
-${conversationEngineRulesBlock}
-
-
-
-${presentationMode === 'live' || presentationMode === 'cue_based' || presentationMode === 'compressed' ? universalLiveOpeningBlock : ''}
-
-${presentationMode === 'live' || presentationMode === 'cue_based' || presentationMode === 'compressed' ? liveDisciplineBlock : ''}
-
-
-
-${dynamicRuntimeBlocks}`
+    const { systemContent, messages: providerMessages } = providerRequest
 
     let reply = ''
 
@@ -1023,11 +1023,6 @@ ${dynamicRuntimeBlocks}`
 
       reply = (response as any).output_text?.trim() || ''
     } else {
-      const providerMessages = recentMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }))
-
       if (normalReasoning.provider === 'groq') {
         try {
           reply =
@@ -1035,7 +1030,10 @@ ${dynamicRuntimeBlocks}`
               provider: normalReasoning.provider,
               model,
               systemContent,
-              messages: providerMessages,
+              messages: providerMessages.map((message) => ({
+                role: message.role,
+                content: message.content,
+              })),
             })) || ''
         } catch (error) {
           console.warn(

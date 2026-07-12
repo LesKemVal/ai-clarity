@@ -31,6 +31,7 @@ import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/r
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
+import { buildGeorgeProviderRequest } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -762,6 +763,31 @@ assert(liveQuestionPolicy.explanationDepth === 'minimal', 'LIVE execution should
 assert(liveQuestionPolicy.deliveryPreference === 'audio_visual', 'LIVE voice execution should support audio and visual delivery')
 assert(liveQuestionPolicy.assumptionHandling === 'offer_adaptable_alternative', 'assumption-sensitive moves should expose adaptable execution')
 assert(liveQuestionPolicy.repetitionPolicy === 'suppress_duplicate_live_recommendation', 'execution policy should suppress repeated LIVE recommendations')
+
+
+const providerRequest = buildGeorgeProviderRequest({
+  runtimeContextBlock: 'RUNTIME CONTEXT',
+  prompt: {
+    languageRule: 'LANGUAGE',
+    modeBlock: 'MODE',
+    baseSystemPrompt: 'BASE',
+    messageSourceBlock: 'SOURCE',
+    controlStateBlock: 'CONTROL',
+    runtimeScoresBlock: 'SCORES',
+    scoreAwareSteeringBlock: 'STEERING',
+    conversationEngineRulesBlock: 'ENGINE',
+    universalLiveOpeningBlock: 'LIVE OPENING',
+    liveDisciplineBlock: 'LIVE DISCIPLINE',
+    dynamicRuntimeBlocks: 'DYNAMIC',
+    includeLiveDiscipline: true,
+    recentMessages: [{ role: 'user', content: 'Help me prepare.' }],
+  },
+})
+assert(providerRequest.systemContent.indexOf('RUNTIME CONTEXT') < providerRequest.systemContent.indexOf('BASE'), 'provider request should place governed runtime context before the base system prompt')
+assert(providerRequest.systemContent.includes('LIVE OPENING'), 'provider request should include LIVE opening guidance when enabled')
+assert(providerRequest.messages.length === 1, 'provider request should preserve recent provider messages')
+assert(Object.isFrozen(providerRequest), 'provider request should be immutable')
+assert(Object.isFrozen(providerRequest.messages), 'provider message collection should be immutable')
 
 console.log('GEORGE core smoke passed')
 `)

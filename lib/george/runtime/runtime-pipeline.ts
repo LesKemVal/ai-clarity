@@ -75,6 +75,32 @@ export const GEORGE_RUNTIME_PIPELINE = {
 
 export type GeorgeRuntimePipeline = typeof GEORGE_RUNTIME_PIPELINE
 
+export type GeorgeProviderMessage = Readonly<{
+  role: 'user' | 'assistant'
+  content: string
+}>
+
+export type GeorgeProviderRequest = Readonly<{
+  systemContent: string
+  messages: readonly GeorgeProviderMessage[]
+}>
+
+export type GeorgeProviderPromptInput = Readonly<{
+  languageRule: string
+  modeBlock: string
+  baseSystemPrompt: string
+  messageSourceBlock: string
+  controlStateBlock: string
+  runtimeScoresBlock: string
+  scoreAwareSteeringBlock: string
+  conversationEngineRulesBlock: string
+  universalLiveOpeningBlock: string
+  liveDisciplineBlock: string
+  dynamicRuntimeBlocks: string
+  includeLiveDiscipline: boolean
+  recentMessages: readonly GeorgeProviderMessage[]
+}>
+
 export type GeorgeRuntimePipelineInput = {
   currentRuntime: CurrentGeorgeRuntime
   latestUserText: string
@@ -90,6 +116,7 @@ export type GeorgeRuntimePipelineInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  providerPrompt: GeorgeProviderPromptInput
   governedContextNotes: Readonly<{
     liveRuntimeContext?: string | null
     shelvedCampaignRuntimeNote?: string | null
@@ -123,6 +150,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   operationalResourceMonitor: OperationalResourceMonitorState
   executionPolicy: GeorgeExecutionPolicy
   runtimeContextBlock: string
+  providerRequest: GeorgeProviderRequest
   notes: Readonly<{
     outcomeEvolutionNote: string
     trajectoryNote: string
@@ -246,6 +274,11 @@ export function resolveGeorgeRuntimePipeline(
     liveRecommendationPresentationNote: notes.liveRecommendationPresentationNote,
   })
 
+  const providerRequest = buildGeorgeProviderRequest({
+    runtimeContextBlock,
+    prompt: input.providerPrompt,
+  })
+
   return Object.freeze({
     inferredOutcomeState,
     outcomeEvolution,
@@ -259,7 +292,56 @@ export function resolveGeorgeRuntimePipeline(
     operationalResourceMonitor,
     executionPolicy,
     runtimeContextBlock,
+    providerRequest,
     notes,
     source: 'runtime_pipeline' as const,
+  })
+}
+
+
+export function buildGeorgeProviderRequest(input: {
+  runtimeContextBlock: string
+  prompt: GeorgeProviderPromptInput
+}): GeorgeProviderRequest {
+  const prompt = input.prompt
+  const liveOpening = prompt.includeLiveDiscipline
+    ? prompt.universalLiveOpeningBlock
+    : ''
+  const liveDiscipline = prompt.includeLiveDiscipline
+    ? prompt.liveDisciplineBlock
+    : ''
+
+  const systemContent =
+    prompt.languageRule +
+    prompt.modeBlock +
+    input.runtimeContextBlock +
+    prompt.baseSystemPrompt +
+    `
+
+${prompt.messageSourceBlock}
+
+${prompt.controlStateBlock}
+
+${prompt.runtimeScoresBlock}
+
+${prompt.scoreAwareSteeringBlock}
+
+${prompt.conversationEngineRulesBlock}
+
+
+
+${liveOpening}
+
+${liveDiscipline}
+
+
+
+${prompt.dynamicRuntimeBlocks}`
+
+  return Object.freeze({
+    systemContent,
+    messages: Object.freeze(
+      prompt.recentMessages.map((message) => Object.freeze({ ...message }))
+    ),
   })
 }
