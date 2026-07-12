@@ -55,7 +55,7 @@ import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtim
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 
-import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, buildPresentationAuthorityNote, determinePresentationMode, enforceLiveRecommendationPresentation, enforcePresentationMode, resolveLiveRecommendationPresentation } from '@/lib/george/chat/presentation-authority'
+import { buildPresentationAuthorityNote, determinePresentationMode, enforceLiveRecommendationPresentation, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
@@ -963,15 +963,9 @@ LANGUAGE MODE: SPANISH
     })
 
     const {
-      outcomeEvolution,
-      outcomeState,
-      trajectoryAssessment,
-      operationalJudgment,
       contextFraming,
       liveRecommendationPresentation,
       operationalResourceMonitor,
-      executionPolicy,
-      runtimeContextBlock,
       providerRequest,
       providerResolution,
     } = runtimePipeline
