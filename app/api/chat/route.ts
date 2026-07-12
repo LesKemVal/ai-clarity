@@ -64,7 +64,6 @@ import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-lear
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
-import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
 import { resolveGeorgeRuntimePipeline } from '@/lib/george/runtime/runtime-pipeline'
 
@@ -699,21 +698,6 @@ export async function POST(req: Request) {
       (m) => m.role === 'user' && (Boolean(m.imageDataUrl) || Boolean(m.imageDataUrls?.length))
     )
 
-    const latestUserTextForReasoning =
-      recentMessages
-        .slice()
-        .reverse()
-        .find((message) => message.role === 'user')?.content || ''
-
-    const normalReasoning = resolveNormalGeorgeReasoning({
-      userText: latestUserTextForReasoning,
-      tier,
-      hasImageInput,
-    })
-
-    const model = normalReasoning.model
-
-    
     const languageRule =
       language === 'ES'
         ? `
@@ -921,6 +905,8 @@ LANGUAGE MODE: SPANISH
       objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
       signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
       executionImminent: liveRecommendationEvidence.executionImminent,
+      tier,
+      hasImageInput,
       intentState: passiveIntentState,
       runtimeArbitration,
       judgmentSurface,
@@ -987,8 +973,10 @@ LANGUAGE MODE: SPANISH
       executionPolicy,
       runtimeContextBlock,
       providerRequest,
+      providerResolution,
     } = runtimePipeline
 
+    const model = providerResolution.model
     const { systemContent, messages: providerMessages } = providerRequest
 
     let reply = ''
@@ -1023,11 +1011,11 @@ LANGUAGE MODE: SPANISH
 
       reply = (response as any).output_text?.trim() || ''
     } else {
-      if (normalReasoning.provider === 'groq') {
+      if (providerResolution.provider === 'groq') {
         try {
           reply =
             (await runNormalTextCompletion({
-              provider: normalReasoning.provider,
+              provider: providerResolution.provider,
               model,
               systemContent,
               messages: providerMessages.map((message) => ({
@@ -1046,7 +1034,7 @@ LANGUAGE MODE: SPANISH
       if (!reply) {
         const completion = await openai.chat.completions.create({
           model:
-            normalReasoning.provider === 'groq'
+            providerResolution.provider === 'groq'
               ? (
                   process.env.OPENAI_MODEL_INTELLIGENT ||
                   process.env.OPENAI_MODEL ||

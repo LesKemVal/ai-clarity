@@ -27,6 +27,10 @@ import {
 } from '@/lib/george/runtime/execution-policy'
 import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
+import {
+  resolveNormalGeorgeReasoning,
+  type NormalGeorgeReasoningDecision,
+} from '@/lib/george/runtime/normal-reasoning-governor'
 import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import {
   buildOperationalJudgmentNote,
@@ -109,6 +113,8 @@ export type GeorgeRuntimePipelineInput = {
   objectiveKnown: boolean
   signalUsable: boolean
   executionImminent: boolean
+  tier: string
+  hasImageInput: boolean
   intentState: GeorgeIntentState
   runtimeArbitration: RuntimeSignalArbitration
   judgmentSurface: JudgmentSurfaceState
@@ -151,6 +157,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   executionPolicy: GeorgeExecutionPolicy
   runtimeContextBlock: string
   providerRequest: GeorgeProviderRequest
+  providerResolution: NormalGeorgeReasoningDecision
   notes: Readonly<{
     outcomeEvolutionNote: string
     trajectoryNote: string
@@ -164,9 +171,23 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   source: 'runtime_pipeline'
 }>
 
+export function resolveGeorgeRuntimeProvider(input: {
+  userText: string
+  tier: string
+  hasImageInput: boolean
+}): NormalGeorgeReasoningDecision {
+  return resolveNormalGeorgeReasoning(input)
+}
+
 export function resolveGeorgeRuntimePipeline(
   input: GeorgeRuntimePipelineInput
 ): GeorgeRuntimePipelineSnapshot {
+  const providerResolution = resolveGeorgeRuntimeProvider({
+    userText: input.latestUserText,
+    tier: input.tier,
+    hasImageInput: input.hasImageInput,
+  })
+
   const inferredOutcomeState = resolveGeorgeOutcomeState({
     transcript: input.latestUserText,
     objectiveKnown: input.objectiveKnown,
@@ -293,6 +314,7 @@ export function resolveGeorgeRuntimePipeline(
     executionPolicy,
     runtimeContextBlock,
     providerRequest,
+    providerResolution,
     notes,
     source: 'runtime_pipeline' as const,
   })

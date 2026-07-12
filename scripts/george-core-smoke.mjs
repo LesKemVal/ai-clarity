@@ -31,7 +31,7 @@ import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/r
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
-import { buildGeorgeProviderRequest } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
+import { buildGeorgeProviderRequest, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -763,6 +763,29 @@ assert(liveQuestionPolicy.explanationDepth === 'minimal', 'LIVE execution should
 assert(liveQuestionPolicy.deliveryPreference === 'audio_visual', 'LIVE voice execution should support audio and visual delivery')
 assert(liveQuestionPolicy.assumptionHandling === 'offer_adaptable_alternative', 'assumption-sensitive moves should expose adaptable execution')
 assert(liveQuestionPolicy.repetitionPolicy === 'suppress_duplicate_live_recommendation', 'execution policy should suppress repeated LIVE recommendations')
+
+
+const strategicProviderResolution = resolveGeorgeRuntimeProvider({
+  userText: 'Help me negotiate investor governance without losing operational control.',
+  tier: 'brilliant',
+  hasImageInput: false,
+})
+assert(
+  strategicProviderResolution.lane === 'strategic' &&
+    strategicProviderResolution.provider === 'openai',
+  'runtime pipeline should own strategic provider resolution'
+)
+
+const imageProviderResolution = resolveGeorgeRuntimeProvider({
+  userText: 'Analyze this image.',
+  tier: 'smart',
+  hasImageInput: true,
+})
+assert(
+  imageProviderResolution.provider === 'openai' &&
+    imageProviderResolution.lane === 'strategic',
+  'runtime pipeline should keep image requests on the vision-capable provider path'
+)
 
 
 const providerRequest = buildGeorgeProviderRequest({
