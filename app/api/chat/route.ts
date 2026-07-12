@@ -66,7 +66,6 @@ import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/georg
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import { resolveNormalGeorgeReasoning } from '@/lib/george/runtime/normal-reasoning-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
-import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 import { resolveGeorgeRuntimePipeline } from '@/lib/george/runtime/runtime-pipeline'
 
 const openai = new OpenAI({
@@ -871,44 +870,6 @@ LANGUAGE MODE: SPANISH
       .find((message) => message.role === 'user' && message.content !== latestUserRaw)
       ?.content || ''
 
-    const runtimePipeline = resolveGeorgeRuntimePipeline({
-      currentRuntime,
-      latestUserText: latestUserRaw,
-      previousUserText,
-      voiceMode,
-      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
-      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
-      executionImminent: liveRecommendationEvidence.executionImminent,
-      intentState: passiveIntentState,
-      runtimeArbitration,
-      judgmentSurface,
-      continuityRestoration,
-      outcomeSignals: runtimeOutcomeSignals,
-      adaptiveProfile: adaptiveUserProfile,
-      liveRecommendationEvidence,
-    })
-
-    const {
-      outcomeEvolution,
-      outcomeState,
-      trajectoryAssessment,
-      operationalJudgment,
-      contextFraming,
-      liveRecommendationPresentation,
-      operationalResourceMonitor,
-      executionPolicy,
-      notes: {
-        outcomeEvolutionNote,
-        trajectoryNote,
-        operationalJudgmentNote,
-        conversationStrategyNote,
-        conversationMoveDefinitionNote,
-        contextFramingNote,
-        liveRecommendationPresentationNote,
-        executionPolicyNote,
-      },
-    } = runtimePipeline
-
     const responseShape = getCurrentResponseShape({
       runtime: currentRuntime,
       pressureLevel: control.pressureLevel,
@@ -937,6 +898,53 @@ LANGUAGE MODE: SPANISH
     const outputGovernanceNote = buildOutputGovernanceNote(outputGovernance)
     const presentationAuthorityNote = buildPresentationAuthorityNote(presentationMode)
 
+    const runtimePipeline = resolveGeorgeRuntimePipeline({
+      currentRuntime,
+      latestUserText: latestUserRaw,
+      previousUserText,
+      voiceMode,
+      objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
+      signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
+      executionImminent: liveRecommendationEvidence.executionImminent,
+      intentState: passiveIntentState,
+      runtimeArbitration,
+      judgmentSurface,
+      continuityRestoration,
+      outcomeSignals: runtimeOutcomeSignals,
+      adaptiveProfile: adaptiveUserProfile,
+      liveRecommendationEvidence,
+      governedContextNotes: {
+        liveRuntimeContext,
+        shelvedCampaignRuntimeNote,
+        individualLiveContextNote,
+        runtimeAdapterNote,
+        earbudRuntimeNote,
+        runtimeSignalArbitrationNote,
+        arbitrationResponseShapeNote,
+        adaptiveUserProfileNote,
+        durableBehavioralMemoryNote,
+        runtimeOutcomeLearningNote,
+        continuityRestorationNote,
+        judgmentSurfaceNote,
+        responseShapeNote,
+        continuityGovernanceNote,
+        outputGovernanceNote,
+        presentationAuthorityNote,
+      },
+    })
+
+    const {
+      outcomeEvolution,
+      outcomeState,
+      trajectoryAssessment,
+      operationalJudgment,
+      contextFraming,
+      liveRecommendationPresentation,
+      operationalResourceMonitor,
+      executionPolicy,
+      runtimeContextBlock,
+    } = runtimePipeline
+
     const messageSourceBlock = buildMessageSourceBlock(latestUserSource)
     const controlStateBlock = buildControlStateBlock(control)
     const runtimeScoresBlock = buildRuntimeScoresBlock(scores)
@@ -950,33 +958,6 @@ LANGUAGE MODE: SPANISH
       builderSubtype,
       tier,
       liveScenario,
-    })
-
-    const runtimeContextBlock = buildGovernedRuntimeContext({
-      liveRuntimeContext,
-      shelvedCampaignRuntimeNote,
-      individualLiveContextNote,
-      runtimeAdapterNote,
-      earbudRuntimeNote,
-      runtimeSignalArbitrationNote,
-      arbitrationResponseShapeNote,
-      adaptiveUserProfileNote,
-      durableBehavioralMemoryNote,
-      runtimeOutcomeLearningNote,
-      continuityRestorationNote,
-      judgmentSurfaceNote,
-      trajectoryNote,
-      operationalJudgmentNote,
-      outcomeEvolutionNote,
-      conversationStrategyNote,
-      conversationMoveDefinitionNote,
-      executionPolicyNote,
-      contextFramingNote,
-      liveRecommendationPresentationNote,
-      responseShapeNote,
-      continuityGovernanceNote,
-      outputGovernanceNote,
-      presentationAuthorityNote,
     })
 
     const systemContent = languageRule + modeBlock +

@@ -44,6 +44,7 @@ import {
 } from '@/lib/george/runtime/outcome-evolution'
 import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
+import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
 import {
   assessTrajectory,
   buildTrajectoryNote,
@@ -89,6 +90,24 @@ export type GeorgeRuntimePipelineInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  governedContextNotes: Readonly<{
+    liveRuntimeContext?: string | null
+    shelvedCampaignRuntimeNote?: string | null
+    individualLiveContextNote?: string | null
+    runtimeAdapterNote?: string | null
+    earbudRuntimeNote?: string | null
+    runtimeSignalArbitrationNote?: string | null
+    arbitrationResponseShapeNote?: string | null
+    adaptiveUserProfileNote?: string | null
+    durableBehavioralMemoryNote?: string | null
+    runtimeOutcomeLearningNote?: string | null
+    continuityRestorationNote?: string | null
+    judgmentSurfaceNote?: string | null
+    responseShapeNote?: string | null
+    continuityGovernanceNote?: string | null
+    outputGovernanceNote?: string | null
+    presentationAuthorityNote?: string | null
+  }>
 }
 
 export type GeorgeRuntimePipelineSnapshot = Readonly<{
@@ -103,6 +122,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   liveRecommendationPresentation: LiveRecommendationPresentation
   operationalResourceMonitor: OperationalResourceMonitorState
   executionPolicy: GeorgeExecutionPolicy
+  runtimeContextBlock: string
   notes: Readonly<{
     outcomeEvolutionNote: string
     trajectoryNote: string
@@ -214,6 +234,18 @@ export function resolveGeorgeRuntimePipeline(
     executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
   })
 
+  const runtimeContextBlock = buildGovernedRuntimeContext({
+    ...input.governedContextNotes,
+    trajectoryNote: notes.trajectoryNote,
+    operationalJudgmentNote: notes.operationalJudgmentNote,
+    outcomeEvolutionNote: notes.outcomeEvolutionNote,
+    conversationStrategyNote: notes.conversationStrategyNote,
+    conversationMoveDefinitionNote: notes.conversationMoveDefinitionNote,
+    executionPolicyNote: notes.executionPolicyNote,
+    contextFramingNote: notes.contextFramingNote,
+    liveRecommendationPresentationNote: notes.liveRecommendationPresentationNote,
+  })
+
   return Object.freeze({
     inferredOutcomeState,
     outcomeEvolution,
@@ -226,6 +258,7 @@ export function resolveGeorgeRuntimePipeline(
     liveRecommendationPresentation,
     operationalResourceMonitor,
     executionPolicy,
+    runtimeContextBlock,
     notes,
     source: 'runtime_pipeline' as const,
   })
