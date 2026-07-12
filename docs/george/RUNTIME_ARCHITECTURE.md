@@ -55,18 +55,35 @@ Both modes reason from signals, evidence, user authority, desired outcome, credi
 
 Normal GEORGE now has a reasoning lane governor at `lib/george/runtime/normal-reasoning-governor.ts`. The governor routes normal work into immediate, operational, or strategic lanes before provider and model selection so simple work can remain fast while consequential work receives deeper judgment.
 
-Normal text-provider execution is owned by `lib/george/runtime/provider/normal-provider.ts` and called by `app/api/chat/route.ts`.
+Normal runtime coordination is owned by `lib/george/runtime/runtime-pipeline.ts`.
+
+The runtime pipeline coordinates, in canonical order:
+
+1. provider/lane resolution;
+2. active outcome inference;
+3. outcome evolution;
+4. trajectory assessment;
+5. operational judgment;
+6. conversation strategy and move resolution;
+7. context framing and LIVE viability presentation;
+8. operational resource ranking;
+9. execution policy;
+10. governed runtime-context assembly;
+11. provider request assembly.
+
+The pipeline returns one immutable runtime snapshot. Existing modules retain ownership of their own decisions; the pipeline coordinates only.
 
 Provider boundary:
 
-- The governor chooses lane, provider, and model.
-- The provider adapter performs the assigned inference.
-- `app/api/chat/route.ts` remains the canonical owner of the assembled GEORGE system context and response-governance pipeline.
+- `normal-reasoning-governor.ts` chooses lane, provider, and model.
+- `runtime-pipeline.ts` assembles the canonical provider request and provider resolution.
+- `normal-provider.ts` performs assigned Normal text-provider transport.
+- `app/api/chat/route.ts` owns HTTP, authentication, request parsing, image/file handling, provider invocation, fallback transport, streaming, and final response return.
 - Groq may execute only explicitly safe, low-consequence Normal transformations.
 - OpenAI remains the provider for contextual, ambiguous, operational, strategic, image, and consequential reasoning.
-- The LIVE Hub Groq fast lane remains separate LIVE execution plumbing and must not be imported as Normal reasoning authority.
-- Providers do not own GEORGE identity, doctrine, memory, continuity, judgment, or delivery policy.
-- Provider failure must degrade to the shared OpenAI baseline without creating a second response path visible to the user.
+- The LIVE Hub Groq fast lane remains separate LIVE execution plumbing and must not become Normal reasoning authority.
+- Providers do not own GEORGE identity, doctrine, memory, continuity, judgment, strategy, execution policy, or delivery policy.
+- Provider failure degrades to the shared OpenAI baseline without creating a second user-visible runtime.
 
 Tier/model doctrine:
 
@@ -86,6 +103,54 @@ Learning exists to improve future conversations.
 Relevant Documentation improves understanding.
 
 User authority remains primary.
+
+## Canonical Decision Architecture
+
+GEORGE uses shared intelligence with mode-specific realization.
+
+Canonical shared judgment path:
+
+Signals and words
+
+↓
+
+Canonical Outcome State
+
+↓
+
+Outcome Evolution
+
+↓
+
+Trajectory Assessment
+
+↓
+
+Operational Judgment
+
+↓
+
+Conversation Strategy
+
+↓
+
+Conversation Move Definition
+
+↓
+
+Execution Policy
+
+↓
+
+Mode-specific realization
+
+Normal realization speaks conversationally to the user. It can explain, ask, challenge, summarize, prepare, or provide a usable line when that resource materially improves the user's probability of success.
+
+LIVE realization equips the user to converse effectively with the room. It may deliver cues, questions, lines, continuations, complete responses, pauses, recovery, or repetition according to support adequacy, room context, receiver profile, and the user's selected support behavior.
+
+Normal and LIVE do not share identical response shape. They share outcome logic, judgment, strategy, and move semantics. Timing, audience, realization, cognitive load, interruption behavior, and delivery remain mode-specific.
+
+Adaptive LIVE support already owns escalation and recovery. A cue may remain sufficient; when user behavior signals that the cue is not translating into execution, existing support behavior can escalate toward a line, continuation, full response, or repeat/recovery behavior. No new adaptive-support runtime is required.
 
 ## Current Runtime Loop
 

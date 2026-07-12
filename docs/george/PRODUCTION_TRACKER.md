@@ -60,9 +60,21 @@ Normal GEORGE and LIVE share the same reasoning philosophy; execution constraint
 
 Normal GEORGE prepares and advances work before execution. LIVE executes under real-time constraints. Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, and operational value.
 
-Normal GEORGE now routes normal work through `lib/george/runtime/normal-reasoning-governor.ts`, classifying work into immediate, operational, or strategic lanes before provider and model selection.
+Normal GEORGE routes work through the promoted canonical runtime pipeline at `lib/george/runtime/runtime-pipeline.ts`.
 
-Normal provider execution is owned by `lib/george/runtime/provider/normal-provider.ts` and invoked from `app/api/chat/route.ts`.
+The pipeline coordinates existing canonical owners without absorbing their business logic:
+
+- canonical outcome inference and outcome evolution;
+- trajectory assessment;
+- operational judgment;
+- conversation strategy and move resolution;
+- execution policy;
+- operational resource monitoring;
+- context framing;
+- governed runtime-context assembly;
+- provider request and provider-resolution assembly.
+
+Normal provider transport remains owned by `lib/george/runtime/provider/normal-provider.ts` and is invoked by `app/api/chat/route.ts`. The route is now a transport adapter rather than a competing runtime coordinator.
 
 Current Normal provider policy:
 
@@ -80,6 +92,36 @@ Communication precedes execution.
 Conversation is execution.
 
 
+
+## Production Update — Canonical Normal Runtime Pipeline
+
+Validated production consolidation:
+
+- `lib/george/runtime/runtime-pipeline.ts` is the single Normal runtime coordinator.
+- `app/api/chat/route.ts` no longer owns runtime decision orchestration.
+- Canonical outcome state is owned by `lib/george/live-voice/runtime/active-outcome.ts`.
+- Outcome transitions are owned by `lib/george/runtime/outcome-evolution.ts`.
+- Operational judgment owns the highest-value action decision.
+- Conversation strategy selects the operational conversational move.
+- Conversation move definitions are owned by `lib/george/runtime/conversation-move-library.ts`.
+- Execution policy maps the shared strategy into mode-specific realization requirements.
+- Normal realization remains conversational and user-facing.
+- LIVE realization remains room-executable, timing-aware, and receiver-aware.
+- Operational resources are ranked by `lib/george/runtime/operational-resource-monitor.ts`.
+- Runtime context and provider request assembly occur once through the promoted pipeline.
+- Provider selection occurs once through the pipeline; provider transport remains outside it.
+- No `runtime-orchestrator.ts` was introduced because `runtime-pipeline.ts`, `runtime-governance-map.ts`, and `governance-ownership.ts` already own coordination and authority.
+- Redundant route runtime fields and presentation imports were removed after pipeline promotion.
+
+Validated production builds:
+
+- GEORGE Core Smoke: passing
+- Production build: passing
+- LIVE Hub TypeScript build: passing
+
+Architecture freeze:
+
+Do not add new runtime decision layers. Remaining work is deduplication, latency reduction, Normal/LIVE consumption parity, portability hardening, behavioral qualification, and documentation synchronization.
 
 ## Production Update — LIVE Partnership Runtime / Recovery / Learning
 
