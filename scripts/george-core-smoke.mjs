@@ -31,7 +31,7 @@ import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/r
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
-import { buildGeorgeProviderRequest, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
+import { buildGeorgeProviderRequest, GEORGE_RUNTIME_PIPELINE, resolveGeorgeRuntimePipeline, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
@@ -843,6 +843,123 @@ assert(
   'runtime pipeline should keep image requests on the vision-capable provider path'
 )
 
+
+
+const qualifiedRuntimePipeline = resolveGeorgeRuntimePipeline({
+  currentRuntime: 'normal_george',
+  latestUserText: 'I am walking into an investor meeting right now.',
+  previousUserText: 'Help me prepare for an investor meeting while preserving founder control.',
+  voiceMode: false,
+  objectiveKnown: true,
+  signalUsable: true,
+  executionImminent: true,
+  tier: 'brilliant',
+  hasImageInput: false,
+  intentState: {
+    operational: true,
+    exploratory: false,
+    actionable: true,
+    pressureLevel: 'medium',
+    objectiveState: 'clear',
+    narrowingReadiness: 0.7,
+    continuityDependency: 0.1,
+    liveRisk: false,
+    emotionalLoad: 0.1,
+    cadenceAvoid: [],
+    bottleneck: { label: 'execution', confidence: 'high' },
+    liveScenario: { active: false, type: 'none' },
+    source: 'passive_aggregator',
+  },
+  runtimeArbitration: {
+    winner: 'objective_protection',
+    posture: 'protect_objective',
+    delivery: 'structured',
+    agency: 'user_decides',
+    note: '',
+  },
+  judgmentSurface: {
+    decisionSurface: 'execute',
+    signalSufficiency: 'sufficient',
+    shouldAcquireSignal: false,
+    instruction: '',
+  },
+  continuityRestoration: {
+    active: false,
+    confidence: 'low',
+    revealStyle: 'none',
+    instruction: '',
+  },
+  outcomeSignals: {
+    clarityImproved: 0.4,
+    overloadDetected: 0.1,
+    userConfidenceImproved: 0.4,
+    pressureReduced: 0.4,
+    leverageImproved: 0.4,
+    executionLikelihood: 0.7,
+  },
+  adaptiveProfile: {
+    conciseDeliveryPreference: 0.5,
+    repeatableLineAffinity: 0.5,
+    abstractReasoningTolerance: 0.5,
+    calmPressurePreference: 0.5,
+    leverageProtectionPreference: 0.5,
+    tacticalCueRetention: 0.5,
+    layeredExplanationTolerance: 0.5,
+  },
+  liveRecommendationEvidence,
+  providerPrompt: {
+    languageRule: 'LANGUAGE',
+    modeBlock: 'MODE',
+    baseSystemPrompt: 'BASE',
+    messageSourceBlock: 'SOURCE',
+    controlStateBlock: 'CONTROL',
+    runtimeScoresBlock: 'SCORES',
+    scoreAwareSteeringBlock: 'STEERING',
+    conversationEngineRulesBlock: 'ENGINE',
+    universalLiveOpeningBlock: 'LIVE OPENING',
+    liveDisciplineBlock: 'LIVE DISCIPLINE',
+    dynamicRuntimeBlocks: 'DYNAMIC',
+    includeLiveDiscipline: true,
+    recentMessages: [{ role: 'user', content: 'Help me prepare.' }],
+  },
+  governedContextNotes: {
+    liveRuntimeContext: 'LIVE CONTEXT',
+    runtimeAdapterNote: 'RUNTIME ADAPTER',
+    responseShapeNote: 'RESPONSE SHAPE',
+    outputGovernanceNote: 'OUTPUT GOVERNANCE',
+  },
+})
+
+assert(qualifiedRuntimePipeline.source === 'runtime_pipeline', 'full runtime qualification should use the canonical pipeline')
+assert(Object.isFrozen(qualifiedRuntimePipeline), 'runtime pipeline snapshot should be immutable')
+assert(
+  qualifiedRuntimePipeline.operationalJudgment.outcomeState === qualifiedRuntimePipeline.outcomeState,
+  'Operational Judgment should consume the evolved canonical outcome state'
+)
+assert(
+  qualifiedRuntimePipeline.conversationStrategy === qualifiedRuntimePipeline.operationalJudgment.conversationStrategy,
+  'Conversation Strategy should be the strategy selected by Operational Judgment'
+)
+assert(
+  qualifiedRuntimePipeline.conversationMoveDefinition === qualifiedRuntimePipeline.conversationStrategy.definition,
+  'Conversation Move should resolve from the selected Conversation Strategy'
+)
+assert(
+  qualifiedRuntimePipeline.executionPolicy.strategyMove === qualifiedRuntimePipeline.conversationStrategy.move,
+  'Execution Policy should preserve the selected conversational move'
+)
+assert(
+  qualifiedRuntimePipeline.operationalResourceMonitor.source === 'operational_resource_monitor',
+  'Operational Resource Monitor should participate in the canonical pipeline'
+)
+assert(
+  qualifiedRuntimePipeline.providerRequest.systemContent.includes(qualifiedRuntimePipeline.runtimeContextBlock),
+  'Provider request should consume the canonical governed runtime context'
+)
+assert(
+  GEORGE_RUNTIME_PIPELINE.stages.length === new Set(GEORGE_RUNTIME_PIPELINE.stages).size,
+  'canonical pipeline stage declarations should be unique'
+)
 
 const providerRequest = buildGeorgeProviderRequest({
   runtimeContextBlock: 'RUNTIME CONTEXT',
