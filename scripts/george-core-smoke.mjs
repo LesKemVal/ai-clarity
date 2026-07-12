@@ -593,6 +593,21 @@ assert(
   'governed runtime context should preserve canonical composition order'
 )
 
+for (const canonicalNote of [
+  'OPERATIONAL JUDGMENT',
+  'OUTCOME EVOLUTION',
+  'CONVERSATION STRATEGY',
+  'CONVERSATION MOVE',
+  'EXECUTION POLICY',
+  'CONTEXT FRAMING',
+  'LIVE RECOMMENDATION PRESENTATION',
+]) {
+  assert(
+    governedRuntimeContext.split(canonicalNote).length - 1 === 1,
+    'governed runtime context should include ' + canonicalNote + ' exactly once'
+  )
+}
+
 const conversationalInvestorBridge = renderOperationalExcellenceOutput({
   reply:
     '"Lead with the traction milestone."\\n' +
@@ -848,6 +863,10 @@ const providerRequest = buildGeorgeProviderRequest({
   },
 })
 assert(providerRequest.systemContent.indexOf('RUNTIME CONTEXT') < providerRequest.systemContent.indexOf('BASE'), 'provider request should place governed runtime context before the base system prompt')
+assert(
+  providerRequest.systemContent.split('RUNTIME CONTEXT').length - 1 === 1,
+  'provider request should include governed runtime context exactly once'
+)
 assert(providerRequest.systemContent.includes('LIVE OPENING'), 'provider request should include LIVE opening guidance when enabled')
 assert(providerRequest.messages.length === 1, 'provider request should preserve recent provider messages')
 assert(Object.isFrozen(providerRequest), 'provider request should be immutable')
