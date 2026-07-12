@@ -341,6 +341,30 @@ class GeorgeResponseShaper {
   }
 }
 
+
+const POSTURE_REALIZATION = {
+  authority: { hedge: "minimal", bridge: "none", cadence: "direct" },
+  strength: { hedge: "minimal", bridge: "minimal", cadence: "concise" },
+  trust: { hedge: "light", bridge: "acknowledge", cadence: "balanced" },
+  warmth: { hedge: "light", bridge: "relational", cadence: "balanced" },
+  calm: { hedge: "light", bridge: "minimal", cadence: "measured" },
+  analytical: { hedge: "none", bridge: "context", cadence: "structured" },
+} as const
+
+type PostureKey = keyof typeof POSTURE_REALIZATION
+
+const DEFAULT_POSTURE_REALIZATION = {
+  hedge: "light",
+  bridge: "minimal",
+  cadence: "balanced",
+} as const
+
+export function resolvePostureRealization(posture?: string) {
+  const key = (posture ?? "").toLowerCase() as PostureKey
+
+  return POSTURE_REALIZATION[key] ?? DEFAULT_POSTURE_REALIZATION
+}
+
 export const georgeResponseShaper =
   new GeorgeResponseShaper()
 
