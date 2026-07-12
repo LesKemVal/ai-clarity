@@ -1012,10 +1012,7 @@ LANGUAGE MODE: SPANISH
               provider: providerResolution.provider,
               model,
               systemContent,
-              messages: providerMessages.map((message) => ({
-                role: message.role,
-                content: message.content,
-              })),
+              messages: providerMessages,
             })) || ''
         } catch (error) {
           console.warn(

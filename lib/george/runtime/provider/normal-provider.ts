@@ -11,7 +11,7 @@ type RunNormalTextCompletionInput = {
   provider: NormalGeorgeProvider
   model: string
   systemContent: string
-  messages: NormalProviderMessage[]
+  messages: readonly NormalProviderMessage[]
 }
 
 let groqClient: OpenAI | null | undefined
