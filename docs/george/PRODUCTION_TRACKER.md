@@ -8,17 +8,22 @@ Living project document. Update before moving to a new thread.
 
 ## Current Phase
 
-Production hardening and portability.
+Production Qualification.
+
+Architecture is largely complete. Current work qualifies production behavior, confirms runtime independence, optimizes measured bottlenecks, synchronizes production authority, and prepares the runtime for freeze.
 
 Do not redesign GEORGE.
 
 Prioritize:
+
+- behavioral qualification
 - reliability
-- portability
 - authority
-- latency
+- portability
+- measured latency
 - maintainability
 - correctness
+- runtime freeze readiness
 
 ## Product Philosophy
 
@@ -169,6 +174,101 @@ Known near-term hardening:
 - Confirm the canonical runtime consumer for `profileLearningSignals` before wiring further.
 - Continue reducing `page.tsx` ownership only when a canonical module exists.
 - Run real-room LIVE test covering voice + visual + response fallback + repeat-tail + sentence recovery.
+
+## Production Qualification Runtime Synchronization
+
+The implementation introduced by commits `4001ce0` through `92c7686` is now reflected in this tracker.
+
+Validated production direction:
+
+- `lib/george/runtime/runtime-pipeline.ts` owns the canonical runtime pipeline and its latency instrumentation.
+- Canonical posture realization converts runtime reasoning into receiver-appropriate support without creating a second reasoning pass.
+- LIVE operational resources use one canonical vocabulary across composition, execution, transcript handling, and delivery.
+- Support realization depends on both operational posture and receiver profile.
+- Legacy LIVE behavior aliases have been removed from the production path.
+- `lib/george/live-runtime/live-behavior-executor.ts` consumes canonical operational resources rather than maintaining a competing behavior vocabulary.
+- `lib/george/live-voice/runtime/response-shaper.ts` owns LIVE voice response shaping, including the one-breath audio constraint.
+- Normal realization is conversational rather than presentation-scaffolded.
+- Normal operational framing remains internal and informs reasoning instead of being exposed as runtime narration.
+- Standalone ambiguous questions preserve valid ambiguity unless current-turn evidence resolves the intended meaning.
+- Conversation history is evidence, not authority.
+- The current user utterance is authoritative for the present turn.
+
+### Canonical Realization Flow
+
+Normal production flow:
+
+Runtime reasoning
+
+↓
+
+Internal operational context
+
+↓
+
+OpenAI reasoning
+
+↓
+
+Natural conversational realization
+
+↓
+
+User
+
+LIVE production flow:
+
+Runtime signals and context
+
+↓
+
+Behavior decision
+
+↓
+
+Canonical posture and operational resources
+
+↓
+
+Receiver realization
+
+↓
+
+Delivery
+
+Posture and receiver realization do not create another intelligence, runtime, or reasoning authority. They determine how already-selected support is expressed under the active operating conditions.
+
+### Qualification Discipline
+
+Continue using the existing qualification suite. Do not create replacement qualifiers merely to accommodate current output.
+
+Every production change follows this sequence:
+
+1. Inspect the implementation.
+2. Identify the canonical owner or owners.
+3. Generate one single-purpose patch bundle.
+4. Apply it locally.
+5. Run prescribed validation.
+6. Post the results.
+7. Generate only the next corrective patch when needed.
+8. Commit only after clean build and successful qualification.
+9. Synchronize production documentation after validated behavioral change.
+
+Patch bundles must inspect current target structure before editing. They must use stable symbols, headings, patterns, or AST-aware changes where practical and fail precisely when the expected target is missing or ambiguous.
+
+### Remaining Production Gates
+
+In order:
+
+1. Continue behavioral qualification using the existing suite.
+2. Reduce premature operational-template selection.
+3. Improve reasoning-to-recommendation flow.
+4. Make the transition into LIVE feel like an operating-mode change rather than system status.
+5. Optimize only bottlenecks established by runtime measurements.
+6. Qualify portability and runtime independence.
+7. Freeze the production runtime after all protected builds and qualification checks remain green.
+
+Operational moves are supporting knowledge for reasoning. They must not become retrieved answers or substitute for current-turn judgment.
 
 ## Architecture Discipline
 

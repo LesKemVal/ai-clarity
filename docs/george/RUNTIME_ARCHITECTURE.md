@@ -8,23 +8,33 @@ This document reflects the current Production Runtime Phase. The codebase and be
 
 ## Validated Runtime State
 
-Current validation target:
+Current production phase:
 
-- GEORGE Core Smoke: passing
-- LIVE Entry Smoke: passing
-- Conversation Package Smoke: passing
-- LIVE Runtime Smoke: passing
-- Preparation Smoke: passing
-- Production Build: passing
-- `live-hub` TypeScript Build: passing
+- Production Qualification
+- architecture largely complete
+- runtime behavior under qualification
+- documentation synchronized to implementation through commit `92c7686`
+
+Current protected validation target:
+
+- GEORGE Core Smoke
+- LIVE Entry Smoke
+- Conversation Package Smoke
+- LIVE Runtime Smoke
+- LIVE Support Behavior Smoke
+- Preparation Smoke
+- existing behavioral qualification suite
+- Production Build
 
 Required command after every production change:
 
     npm run build
 
-`npm run build` executes all protected smoke suites before Next.js production build.
+`npm run build` executes the protected smoke suites before the Next.js production build.
 
-Do not return to a single monolithic behavioral suite.
+Do not weaken protected qualification to satisfy current implementation.
+
+Do not introduce duplicate qualifiers when the existing qualification suite already covers the behavior.
 
 ## Runtime Doctrine
 
@@ -151,6 +161,156 @@ LIVE realization equips the user to converse effectively with the room. It may d
 Normal and LIVE do not share identical response shape. They share outcome logic, judgment, strategy, and move semantics. Timing, audience, realization, cognitive load, interruption behavior, and delivery remain mode-specific.
 
 Adaptive LIVE support already owns escalation and recovery. A cue may remain sufficient; when user behavior signals that the cue is not translating into execution, existing support behavior can escalate toward a line, continuation, full response, or repeat/recovery behavior. No new adaptive-support runtime is required.
+
+## Canonical Runtime Realization
+
+The runtime now separates reasoning, internal operational context, realization, and delivery without creating competing authorities.
+
+Canonical Normal flow:
+
+Runtime pipeline
+
+↓
+
+Internal operational context
+
+↓
+
+OpenAI reasoning
+
+↓
+
+Natural conversational realization
+
+↓
+
+User
+
+Canonical LIVE flow:
+
+Runtime signal and transcript processing
+
+↓
+
+Support behavior decision
+
+↓
+
+Canonical operational posture and resources
+
+↓
+
+Receiver realization
+
+↓
+
+Delivery routing
+
+The runtime must reason before it realizes. Realization expresses selected support. It does not retrieve a canned answer, independently decide behavior, or create another reasoning pass.
+
+### Canonical Owners
+
+- `lib/george/runtime/runtime-pipeline.ts`
+  - canonical Normal runtime pipeline
+  - runtime-stage latency instrumentation
+  - assembly of internal operational context
+  - preservation of current-turn authority
+- `lib/george/chat/operational-excellence.ts`
+  - operational reasoning guidance supplied as internal knowledge
+- `lib/george/chat/presentation-authority.ts`
+  - natural realization authority
+  - suppression of user-visible runtime framing and presentation scaffolding
+- `lib/george/runtime/execution-policy.ts`
+  - execution constraints used by runtime realization
+- `lib/george/live-runtime/support-behavior-composer.ts`
+  - composition of LIVE support behavior from canonical runtime primitives
+- `lib/george/live-runtime/live-behavior-executor.ts`
+  - execution planning from canonical posture and operational resources
+- `lib/george/live-runtime/live-final-transcript-adapter.ts`
+  - adaptation of final transcripts into the canonical LIVE execution path
+- `lib/george/live-runtime/live-transcript-controller.ts`
+  - transcript execution control without duplicate support authority
+- `lib/george/live-voice/runtime/response-shaper.ts`
+  - receiver-aware LIVE response shaping
+  - one-breath audio realization
+- `components/george/live/LiveHubDeliveryBridge.tsx`
+  - bridge-level delivery dispatch
+  - no runtime reasoning or behavior-selection ownership
+
+`app/george/page.tsx` remains a mount, interaction, and pass-through surface. It must not become the owner of posture realization, receiver policy, runtime reasoning, operational resources, or turn lifecycle.
+
+### Canonical Operational Resources
+
+LIVE uses one canonical operational resource vocabulary across behavior composition, execution, transcript processing, and receiver realization.
+
+Legacy behavioral aliases are not separate supported concepts. They must not be reintroduced as compatibility-owned runtime authority.
+
+Operational resources describe the kind of support available after reasoning. They do not function as retrieved response templates.
+
+### Posture and Receiver Realization
+
+Posture represents how selected support should function under the current operational conditions.
+
+Receiver profile represents how that support can be delivered through the active surface.
+
+The two are related but distinct:
+
+- posture shapes the operational function of the response
+- receiver shapes its expression and delivery constraints
+
+Receiver realization may produce:
+
+- visual-only support that is structured, persistent, skimmable, and readable
+- audio-only support that is sequential, interruptible, repeatable, low-cognitive-load, and normally deliverable within one breath
+- audio-visual support where audio provides immediate steering and visual provides persistent reference
+
+One-breath audio is a realization constraint, not a universal reasoning limit. It must not truncate necessary reasoning before the appropriate receiver realization stage.
+
+### Normal Conversational Realization
+
+Normal GEORGE no longer exposes runtime framing, operational labels, or presentation scaffolding merely because those concepts informed reasoning.
+
+Internal operational context is evidence supplied to reasoning.
+
+The model should produce a natural answer that advances the user's objective.
+
+The intended flow is:
+
+Reasoning
+
+↓
+
+Recommendation
+
+Not:
+
+Operational label
+
+↓
+
+Checklist
+
+↓
+
+Checklist
+
+### Current-Turn and Ambiguity Authority
+
+Conversation history is evidence.
+
+The current user utterance is authoritative.
+
+A standalone ambiguous question must preserve plausible interpretations unless current-turn evidence resolves the intended meaning.
+
+Previous conversation context may inform judgment, but it must not silently force a narrow interpretation onto a new standalone question.
+
+### Runtime Latency Instrumentation
+
+The canonical runtime pipeline records latency at meaningful internal stages.
+
+Latency optimization must begin with measured runtime evidence.
+
+Do not introduce speculative shortcuts, duplicate fast lanes, or behavior changes merely to reduce assumed latency.
 
 ## Current Runtime Loop
 
