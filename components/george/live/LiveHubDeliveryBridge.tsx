@@ -69,11 +69,17 @@ export function LiveHubDeliveryBridge({
           hasSafeResponse: false,
         })
 
+        const fallbackText =
+          behaviorDecision.operationalResource === 'silence'
+            ? ''
+            : behaviorDecision.operationalResource === 'cue' &&
+                behaviorDecision.behaviors.includes('bridge')
+              ? 'Buy a second. Ask them to clarify what they mean.'
+              : 'Clarify before answering.'
+
         const fallbackCue = {
           ...resolvedDeliveryCue,
-          text: behaviorDecision.behaviors.includes('bridge')
-            ? 'Buy a second. Ask them to clarify what they mean.'
-            : 'Clarify before answering.',
+          text: fallbackText,
           reason: behaviorDecision.reason,
           category: 'operational_guidance' as const,
           confidence: Math.max(resolvedDeliveryCue.confidence || 0, 0.7),
@@ -81,6 +87,7 @@ export function LiveHubDeliveryBridge({
         }
 
         console.info('[LIVE][hub][delivery][behavior-fallback]', {
+          operationalResource: behaviorDecision.operationalResource,
           behaviors: behaviorDecision.behaviors,
           reason: behaviorDecision.reason,
           fallbackCue,
