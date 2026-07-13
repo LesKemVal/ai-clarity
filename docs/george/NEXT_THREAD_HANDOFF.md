@@ -1,6 +1,24 @@
 # GEORGE PRODUCTION CONTINUATION — NO DRIFT
 
-## First action
+Branch: `live-hub-runtime`
+
+Current validated HEAD:
+
+```text
+53ebf32 Compact Normal provider execution boundary
+0061367 Constrain outcome advancement to the smallest move
+7a6a0c8 Consolidate provider execution authority
+0c0b10e Add Normal execution posture
+4cc90b1 Add contextual conversation move variants
+55d69cd Evaluate signal value before acquisition
+ecddc12 Route opportunity questions through conversation strategy
+89522e0 Link opportunity preparation to active sessions
+9330392 Make opportunity card a generic registry consumer
+621cfe2 Register opportunity readiness capabilities
+4087527 Add opportunity readiness and shared preparation flow
+```
+
+## FIRST
 
 Read, in order:
 
@@ -9,234 +27,193 @@ Read, in order:
 3. `docs/george/OPERATIONAL_PROFILE.md`
 4. `docs/george/NEXT_THREAD_HANDOFF.md`
 
-Inspect implementation before changing anything.
-
-## Current branch and validated HEAD
-
-Branch:
-
-`live-hub-runtime`
-
-Current validated local HEAD:
-
-`78e2daf Remove legacy Brilliant LIVE trigger bypass`
-
-Do not run `git pull`.
-
-The local branch and `origin/live-hub-runtime` are diverged. Last observed:
-
-- 135 local-only commits
-- 30 remote-only commits
-
-Remote reconciliation is separate work. Inspect remote-only commits individually before any merge, rebase, force push, or branch replacement.
-
-## Production objective
-
-Complete GEORGE for production and portability.
+These documents are the production authorities after this synchronization.
 
 Do not redesign GEORGE.
-Do not introduce a second runtime.
-Do not create competing authority.
-Do not move reasoning into `app/george/page.tsx`.
-Do not add page-level behavioral patches when a canonical owner exists.
-Do not create a new owner merely because code can be moved.
 
-## Core doctrine
+Do not add another runtime, coordinator, reasoning layer, preparation system, authority block, or prompt architecture.
+
+Do not move reasoning into `app/george/page.tsx`.
+
+Do not confuse Normal and LIVE realization.
+
+Normal speaks to the user.
+
+LIVE supports the user in the room through the existing LIVE runtime, support-style, receiver, timing, response-shaping, and delivery owners.
+
+## PRODUCT DOCTRINE
 
 GEORGE is one operational intelligence.
 
-Normal and LIVE are operating modes, not separate intelligences.
+Normal prepares, reasons, plans, learns, and talks directly with the user.
 
-Normal GEORGE prepares, clarifies, plans, creates, analyzes, decides, and advances work before execution.
+LIVE executes in the room.
 
-LIVE executes under real-time constraints.
+Preparation is continuous and may happen naturally in Normal, through standalone LIVE Entry, or through another registered opportunity.
 
-Both modes reason from signals, evidence, user authority, desired outcome, credibility, timing, operational value, and the totality of the user's roles, rooms, conversations, and experience.
+Execution is intentional and remains owned by the existing execution gateway.
 
-The user chooses where to go.
+The user remains the final authority.
 
-GEORGE chooses the best available path to get there.
+The selected conversational move defines the maximum response scope for the current turn.
 
-GEORGE owns tactical trajectory within the authority the user has temporarily granted.
+Advancement means the smallest move that improves the operational state, not completing the entire likely project on every turn.
 
-GEORGE must behave differently when situations require it, but identity, memory, judgment philosophy, and user understanding remain unified.
+## CURRENT CANONICAL OWNERSHIP
 
-Support style changes delivery, not intelligence or judgment.
+### Opportunity readiness
 
-## Working discipline
+Canonical owner:
 
-Always inspect implementation and ownership first. Identify duplicate or competing behavior. Patch only the canonical owner. Keep one operational idea per commit. Build after every substantive change. Do not commit failed builds. Preserve established behavior unless the task explicitly removes verified legacy behavior. Synchronize production documentation after implementation. Keep the working tree clean. Prefer paste-ready terminal patches and do not require manual line editing.
+`lib/george/runtime/operational-resource-monitor.ts`
 
-Avoid giant patches, `page.tsx` bloat, duplicate runtimes, duplicate evidence authority, premature architecture, hidden behavior changes, moving logic twice, broad cleanup mixed with production behavior work, `set -e` in the owner's interactive Terminal, heredocs, and `git pull` on the diverged branch.
+The Opportunity Registry supports LIVE support, Pitch Deck, and Brief. The Normal bottom card remains a generic registry consumer. Preparation remains conversational and links to the active session.
 
-## Verified file ownership
+### Signal economy and conversation realization
 
-### `app/george/page.tsx`
+- `operational-judgment.ts` decides whether another signal is worth the conversational cost.
+- `conversation-strategy.ts` decides how to earn the signal.
+- `conversation-move-library.ts` owns contextual wording variants.
+- `execution-policy.ts` owns mode-specific realization.
+- `runtime-context-composer.ts` owns the consolidated provider-boundary authority.
+- `runtime-pipeline.ts` coordinates the canonical sequence and provider request.
+- `page.tsx` renders and routes only.
 
-Purpose:
+A signal may have many conversational realizations but one semantic meaning.
 
-- mount surface
-- UI and interaction
-- transient state
-- signal collection
-- invoking canonical owners
-- applying returned effects
-- message rendering and mutation
-- provider transport
-- bridge mounting
-- pass-through of existing runtime identifiers
+Do not ask merely to complete fields.
 
-It must not own reasoning doctrine, training/domain precedence, authoritative override semantics, LIVE support behavior, receiver delivery policy, turn lifecycle, response doctrine, provider-independent operational judgment, or duplicate runtime authority.
+### Normal execution posture
 
-### `lib/george/runtime/pre-provider-send-resolution.ts`
+Normal has a transient, derived execution posture:
 
-Canonical narrow owner for pre-provider Normal send execution.
+- planning
+- preparing
+- execution_imminent
+- recovering
 
-Composes:
+This is not a new runtime or persistent phase machine.
 
-- `lib/george/runtime/domain-router.ts`
-- `lib/george/runtime/training-runtime.ts`
+It changes only how Normal prepares the user.
 
-Owns training-versus-domain precedence, `provider`, `provider_with_context`, `direct`, and `return` semantics, domain context attachment, guided-line and metadata return, and authoritative direct-response resolution.
+It must never alter LIVE room-facing behavior, receiver realization, cue compression, timing, support behavior, or delivery policy.
 
-### `lib/george/prompts/suggested-prompts.ts`
+## COMPACT NORMAL PROVIDER BOUNDARY
 
-Canonical owner for message-based suggested prompts, post-response prompt generation, reroute detection, and low-signal prompt filtering.
+Validated commit:
 
-### `lib/george/live-runtime/live-intent-runtime.ts`
+`53ebf32 Compact Normal provider execution boundary`
 
-Canonical owner for pre-LIVE intent behavior, including message-bar setup classification and context confirmation copy.
+`buildGeorgeProviderRequest()` now receives `currentRuntime` explicitly.
 
-### LIVE canonical owners
+When a Normal turn already contains consolidated `PROVIDER EXECUTION AUTHORITY`, the provider request omits duplicated legacy base, operational, steering, dynamic, and conversation-engine guidance.
 
-Preserve:
+The compact Normal request preserves:
 
-- `lib/george/live-runtime/support-behavior-composer.ts`
-- `lib/george/live-runtime/live-support-behavior-pipeline.ts`
-- `lib/george/live-runtime/live-final-transcript-adapter.ts`
-- `lib/george/live-runtime/live-transcript-controller.ts`
-- `lib/george/live-runtime/live-fast-path.ts`
-- `lib/george/live-voice/runtime/response-shaper.ts`
-- `lib/george/live-runtime/live-runtime-context.ts`
-- `lib/george/live-delivery/*`
-- `components/george/live/LiveHubDeliveryBridge.tsx`
-- `components/george/live/LiveHubVisualCueBridge.tsx`
+- language requirements;
+- the Normal mode boundary;
+- applicable preparation-time LIVE availability/opening or discipline;
+- consolidated provider execution authority as the final block.
 
-Do not absorb these into Normal send resolution or a page-level helper.
+LIVE provider assembly is unchanged.
 
-### `app/api/chat/route.ts`
+Do not infer LIVE mode from `includeLiveDiscipline`; LIVE availability may surface during Normal preparation.
 
-Current model-call orchestration surface.
+Do not add another provider authority block.
 
-It may assemble canonical runtime outputs.
+Do not restore removed legacy guidance merely to make the provider appear more comprehensive.
 
-It must not become the owner of runtime doctrine, Operational Profile, preparation, memory policy, LIVE authority, operational judgment, or capability governance.
+## CURRENT VALIDATION
 
-## Validated portability work
+Implementation commit `53ebf32` passed:
 
-Recent validated commits:
+- `npm run george:core:smoke`
+- `npm run build`
+- `cd ~/ai-clarity/live-hub && npm run build`
+- `git diff --check`
 
-- `51c783c` — Add portable pre-provider send resolution
-- `e08a46e` — Route Normal sends through portable resolution
-- `377079a` — Remove legacy direct-response provider fallback
-- `37cd9c4` — Move LIVE message-bar behavior into runtime
-- `4685175` — Move Normal prompt generation into canonical owner
-- `6538ced` — Remove legacy Smart response degradation
-- `00bfd04` — Remove unused page steering and goal state
-- `0552364` — Remove legacy page response transforms
-- `78e2daf` — Remove legacy Brilliant LIVE trigger bypass
+The documentation recovery must also pass `git diff --check` and GEORGE Core Smoke before commit.
 
-Removed legacy behavior must not be reintroduced through another helper or compatibility path.
+`docs/george/OPERATIONAL_PROFILE.md` remains unchanged because this implementation did not alter Operational Profile doctrine.
 
-## Current validated tests
+## IMMEDIATE NEXT QUALIFICATION
 
-At HEAD `78e2daf`:
+Run the real Normal scenario:
 
-- GEORGE Core Smoke: PASS
-- LIVE Entry Smoke: PASS
-- Conversation Package Smoke: PASS
-- LIVE Runtime Smoke: PASS
-- Preparation Smoke: PASS
-- Next.js production build: PASS
-- `live-hub` TypeScript build: PASS
-- `git diff --check`: PASS
-- working tree: clean
+```text
+I need to prepare for an investor meeting.
+```
 
-## Next production direction — preserve this order
+Expected behavior:
 
-### 1. Finish the remaining `page.tsx` ownership audit
+GEORGE makes the smallest useful move that improves the operational state, such as narrowing the intended outcome.
 
-Inspect remaining `handleSend()` and nearby branches.
+It should not automatically create the deck, diligence pack, narrative, objections, and close.
 
-Classify each block as legitimate UI/effect/transport wiring, canonical runtime consumption, duplicate behavior, legacy behavior, or unowned behavior requiring a narrow existing-owner extraction.
+Also compare response latency against the pre-compaction behavior.
 
-Likely audit areas:
+If behavior still fails:
 
-- LIVE identity execution
-- prompt-context clearing
-- campaign-context detection
-- local-storage-derived runtime setup
-- direct-response effect application
-- hard-coded assistant copy
-- post-response UI lifecycle
-- any page branch that changes behavioral precedence or response authority
+1. inspect the actual compact provider request;
+2. confirm the selected move and execution policy reaching the provider;
+3. inspect provider realization;
+4. do not add another reasoning stage;
+5. do not add investor-specific rules;
+6. do not re-expand the provider prompt without evidence.
 
-Do not extract code merely because it exists in the page.
+## ENGINEERING WORKFLOW
 
-### 2. Confirm the full portability boundary
+The owner does not manually edit code.
 
-Target:
+Use downloadable Python audit or patch bundles.
 
-Page gathers inputs
-↓
-Canonical runtime owners decide
-↓
-Portable result defines execution
-↓
-Page applies UI effects and transport.
+Every terminal command must begin from or explicitly return to:
 
-Confirm no duplicate Normal runtime, no duplicate LIVE runtime, no response doctrine in the page, no independent evidence producer directly controls output, canonical owners are reusable outside the current page, and providers receive already-governed operational context.
+```bash
+cd ~/ai-clarity
+```
 
-### 3. Introduce Operational Judgment only after portability is clean
+Inspect ownership before patching.
 
-Future principle:
+Measure before removing.
 
-One operational judgment. Many evidence producers. One governing owner.
+Patch only canonical owners.
 
-Candidate evidence producers:
+Keep one operational idea per commit.
 
-- Passive Intent
-- Runtime Interpretation
-- Judgment Surface
-- Trajectory
-- Outcome Learning
-- Continuity Restoration
-- Adaptive User Profile
+Do not commit failed builds.
 
-They produce evidence. They must not independently decide behavior.
+After every implementation patch:
 
-The future Operational Judgment owner synthesizes evidence into one operational decision.
+```bash
+cd ~/ai-clarity
+npm run george:core:smoke
+npm run build
 
-It must not become a second reasoning engine, another prompt architecture, another runtime, a replacement for LIVE authority, a UI helper, or a provider-specific layer.
+cd ~/ai-clarity/live-hub
+npm run build
 
-### 4. Simplify model-call context and prompt assembly
+cd ~/ai-clarity
+git diff --check
+git status --short
+git diff --stat
+```
 
-After Operational Judgment exists:
+Documentation is synchronized only after implementation is validated.
 
-- response shape consumes the judgment
-- output governance consumes the judgment
-- provider selection remains governed by the reasoning lane/provider owner
-- provider executes rather than independently choosing posture
-- current model-call context stops concatenating semi-independent behavioral instructions that can conflict
+Audit and validation scripts should place exactly one clearly named ZIP on Desktop and should not leave an output folder beside it.
 
-Preserve Preparation Runtime, Conversation Package, Operational Profile, LIVE authority, and provider boundaries.
+## PRODUCTION DIRECTION
 
-## Immediate next action
+Priorities:
 
-Read the synchronized production documents.
-
-Then inspect the remaining behavioral branches in `app/george/page.tsx`, especially `handleSend()`, without patching until ownership is verified.
-
-One scope per commit.
+1. Qualify the compact provider boundary behaviorally.
+2. Confirm whether prompt compaction recovered latency.
+3. Preserve universal reasoning.
+4. Preserve Normal/LIVE separation.
+5. Qualify behavior across domains one scenario at a time.
+6. Keep builds green.
+7. Keep production authority synchronized.
+8. Continue portability hardening only after provider realization is reliable.
 
 No drift.

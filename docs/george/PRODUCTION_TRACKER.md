@@ -1,5 +1,64 @@
 # GEORGE Production Tracker
 
+<!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
+## Current Production Update — Compact Provider Boundary Qualification
+
+Current validated implementation HEAD:
+
+```text
+53ebf32 Compact Normal provider execution boundary
+0061367 Constrain outcome advancement to the smallest move
+7a6a0c8 Consolidate provider execution authority
+0c0b10e Add Normal execution posture
+4cc90b1 Add contextual conversation move variants
+55d69cd Evaluate signal value before acquisition
+ecddc12 Route opportunity questions through conversation strategy
+89522e0 Link opportunity preparation to active sessions
+9330392 Make opportunity card a generic registry consumer
+621cfe2 Register opportunity readiness capabilities
+4087527 Add opportunity readiness and shared preparation flow
+```
+
+Current canonical ownership remains:
+
+- Operational Judgment decides whether another signal is worth its conversational cost.
+- Conversation Strategy selects how to earn the signal.
+- Conversation Move Library owns contextual realizations.
+- Execution Policy owns mode-specific realization.
+- Operational Resource Monitor owns opportunity readiness.
+- Runtime Context Composer owns the consolidated `PROVIDER EXECUTION AUTHORITY`.
+- Runtime Pipeline coordinates the existing sequence and assembles the provider request.
+- `app/george/page.tsx` remains a rendering and routing surface.
+
+Current governing invariant:
+
+> The selected conversational move defines the maximum response scope for the current turn. Outcome advancement means the smallest move that improves the operational state, not completing the entire likely project on every turn.
+
+Commit `53ebf32` compacted the Normal provider boundary when consolidated provider authority is present. In that path, the provider no longer receives duplicated legacy base, operational, steering, dynamic, and conversation-engine guidance. LIVE provider assembly remains unchanged.
+
+Implementation validation passed:
+
+- GEORGE Core Smoke
+- production build
+- LIVE Hub TypeScript build
+- `git diff --check`
+
+The immediate production objective is now behavioral and latency qualification, not another provider-boundary architecture change.
+
+Qualification scenario:
+
+```text
+I need to prepare for an investor meeting.
+```
+
+Expected result:
+
+GEORGE makes the smallest useful move that improves the operational state, such as narrowing the intended outcome, instead of automatically producing a deck, diligence pack, narrative, objection package, and close.
+
+Do not add another reasoning stage, authority block, phase machine, prompt architecture, or investor-specific rule. If qualification still fails, inspect the actual compact provider request and provider realization before changing upstream reasoning.
+<!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_END -->
+
+
 Living project document. Update before moving to a new thread.
 
 ## Current Branch

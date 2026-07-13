@@ -1,5 +1,79 @@
 # GEORGE Runtime Architecture
 
+<!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
+## Provider-Boundary Authority — Current Validated State
+
+Current validated implementation HEAD:
+
+`53ebf32 Compact Normal provider execution boundary`
+
+The canonical reasoning pipeline remains:
+
+```text
+Outcome evolution
+        ↓
+Trajectory assessment
+        ↓
+Operational judgment
+        ↓
+Conversation strategy
+        ↓
+Conversation move knowledge
+        ↓
+Execution policy
+        ↓
+Operational resource / opportunity readiness
+        ↓
+Runtime context assembly
+        ↓
+Provider request assembly
+```
+
+No new runtime layer is authorized.
+
+For Normal GEORGE, `runtime-context-composer.ts` synthesizes the final realization contract into one `PROVIDER EXECUTION AUTHORITY` block.
+
+The selected conversational move defines the maximum response scope.
+
+`buildGeorgeProviderRequest()` in `runtime-pipeline.ts` now receives `currentRuntime` explicitly.
+
+When:
+
+- `currentRuntime === 'normal_george'`; and
+- the runtime context already contains consolidated provider authority;
+
+the provider request is compacted to preserve only:
+
+- language requirements;
+- the Normal operating-mode boundary;
+- any applicable preparation-time LIVE availability/opening or discipline;
+- the consolidated provider execution authority as the final governing block.
+
+That compact Normal path excludes duplicated legacy guidance already synthesized upstream, including the large base system prompt, message-source guidance, control-state guidance, runtime-score guidance, score-aware steering, dynamic runtime blocks, and conversation-engine rules.
+
+LIVE provider assembly is preserved. `includeLiveDiscipline` is not treated as proof that the current runtime is LIVE, because LIVE availability may be surfaced during Normal preparation.
+
+The architecture target is now implemented:
+
+```text
+Rich canonical reasoning upstream
+        ↓
+One compact provider realization contract
+        ↓
+Provider realization
+```
+
+The immediate architectural task is qualification, not expansion:
+
+- rerun the investor-preparation scenario;
+- compare perceived and measured latency;
+- confirm the provider faithfully realizes the narrow selected move;
+- inspect the actual compact request if behavior still fails.
+
+Do not restore legacy provider guidance merely to increase apparent helpfulness. Do not add another authority block or reasoning layer.
+<!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_END -->
+
+
 This document reflects the current Production Runtime Phase. The codebase and behavioral suite are ahead of older documentation; this file should be treated as authoritative only after the repository has passed the behavioral suite and production build.
 
 ## Current Branch
@@ -13,7 +87,7 @@ Current production phase:
 - Production Qualification
 - architecture largely complete
 - runtime behavior under qualification
-- documentation synchronized to implementation through commit `92c7686`
+- documentation synchronized to implementation through commit `53ebf32`
 
 Current protected validation target:
 
