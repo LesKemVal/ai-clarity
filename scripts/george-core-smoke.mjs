@@ -437,6 +437,39 @@ assert(
   'operational judgment should acquire a specific signal only when its expected value exceeds conversational cost'
 )
 
+const smallestMoveStrategy = resolveGeorgeConversationStrategy({
+  action: 'advance_outcome',
+  currentRuntime: 'normal_george',
+  latestUserText: 'Help me move this forward.',
+  judgmentSurface: {
+    decisionSurface: 'first_useful_move',
+    signalSufficiency: 'sufficient',
+    shouldAcquireSignal: false,
+    instruction: '',
+  },
+  trajectory: {
+    currentMove: 'advance the active outcome',
+    likelyNextMoves: ['continue'],
+    potentialFutureNeeds: [],
+    confidence: 0.8,
+  },
+  outcomeState: {
+    immediateOutcome: 'Move the active objective forward',
+    followOnOutcomes: [],
+    ultimateOutcome: 'Complete the objective',
+    confidence: 0.8,
+    source: 'inferred',
+  },
+})
+
+assert(
+  smallestMoveStrategy.move === 'answer' &&
+    smallestMoveStrategy.purpose.includes(
+      'smallest state-improving step'
+    ),
+  'Conversation Strategy should define default advancement as a proportionate state-improving move'
+)
+
 const clarificationStrategy = resolveGeorgeConversationStrategy({
   action: 'execute_live_move',
   currentRuntime: 'live_george',
@@ -777,6 +810,19 @@ assert(
   'Normal provider context should consolidate runtime conclusions into one authoritative realization brief while preserving durable context'
 )
 
+assert(
+  providerExecutionAuthority.includes(
+    'selected conversational move defines the maximum allowable scope'
+  ) &&
+    providerExecutionAuthority.includes(
+      'smallest move that improves the operational state'
+    ) &&
+    !providerExecutionAuthority.includes(
+      'complete the entire likely project on every turn'
+    ),
+  'provider authority should constrain outcome advancement to the smallest selected move rather than maximum helpfulness'
+)
+
 const conversationalInvestorBridge = renderOperationalExcellenceOutput({
   reply:
     '"Lead with the traction milestone."\\n' +
@@ -1038,6 +1084,13 @@ const normalQuestionPolicy = resolveGeorgeExecutionPolicy({
 })
 assert(normalQuestionPolicy.executionType === 'direct_question', 'Normal question moves should ask the user directly rather than generate room scripts')
 assert(buildExecutionPolicyNote(normalQuestionPolicy).includes('speak directly with the user'), 'Normal execution note should preserve user-facing conversation')
+
+assert(
+  buildExecutionPolicyNote(normalExecutionPolicy).includes(
+    'selected conversational move defines the maximum response scope'
+  ),
+  'Execution Policy should preserve move-bounded response scope as a universal realization invariant'
+)
 
 const imminentNormalPolicy = resolveGeorgeExecutionPolicy({
   runtime: 'normal_george',

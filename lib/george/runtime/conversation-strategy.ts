@@ -87,7 +87,8 @@ export function resolveGeorgeConversationStrategy(
     'The user may know room facts, prior statements, relationships, or constraints GEORGE cannot observe.'
 
   let move: GeorgeConversationMove = 'answer'
-  let purpose = 'Complete the immediate request while advancing the active outcome.'
+  let purpose =
+    'Complete the selected conversational move proportionately while advancing the active outcome through the smallest state-improving step.'
   let confidence = input.trajectory.confidence
 
   if (input.action === 'acquire_smallest_signal') {

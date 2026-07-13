@@ -84,7 +84,7 @@ export function resolveSignalAcquisitionMoveVariant(
 const MOVE_LIBRARY: Record<GeorgeConversationMove, GeorgeConversationMoveDefinition> = {
   answer: {
     id: 'answer',
-    purpose: 'Complete the immediate request with the minimum useful answer that still advances the active outcome.',
+    purpose: 'Answer the immediate request with the minimum sufficient response that advances the active outcome without exceeding the selected move.',
     whenToUse: 'The request is sufficiently clear and a direct response has more value than delaying for clarification.',
     whenNotToUse: 'A material ambiguity, contradiction, or room risk makes a direct answer likely to mislead or concede too much.',
     expectedOperationalValue: 'high',

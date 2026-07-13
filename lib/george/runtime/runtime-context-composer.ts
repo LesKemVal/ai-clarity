@@ -71,6 +71,8 @@ PROVIDER EXECUTION AUTHORITY
 - Highest-value opportunity: ${opportunity}
 - This block is the final realization authority at the provider boundary.
 - Obey the current user utterance and this operational conclusion over broader or older prompt guidance when realization instructions compete.
+- The selected conversational move defines the maximum allowable scope of this response.
+- Advancement means completing the smallest move that improves the operational state, not completing the entire likely project.
 - Do not replace the selected move with a generic consultant package, checklist, briefing framework, objection bundle, script, or multi-part plan unless the user explicitly asks for that form or the execution type requires it.
 - When signal acquisition is warranted, ask one natural question that earns only the smallest useful signal. Do not add a preparation package around it.
 - When signal acquisition is not warranted, do not ask merely to complete fields.
