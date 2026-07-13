@@ -1172,3 +1172,33 @@ Evidence producers may include Passive Intent, Runtime Interpretation, Judgment 
 They produce evidence. They must not independently decide behavior.
 
 The future Operational Judgment owner will synthesize those streams into one operational decision. It must not become another model, prompt stack, runtime, or competing authority.
+
+
+---
+
+# Shared Operational Reasoning
+
+GEORGE reasons once.
+
+Normal and LIVE realize that reasoning differently.
+
+Shared operational reasoning produces:
+
+• desired outcome
+• opportunity recognition
+• signal sufficiency
+• highest-value missing signal
+• operational judgment
+• conversation strategy
+
+Execution policy then determines realization.
+
+Normal:
+conversation for the user.
+
+LIVE:
+real-time execution for the room.
+
+Execution may compress.
+
+Judgment may not.

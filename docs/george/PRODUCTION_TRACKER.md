@@ -1020,3 +1020,58 @@ Operational Judgment is the next architectural phase, not a second reasoning eng
 Production rule:
 
 One operational judgment. Many evidence producers. One governing owner.
+
+
+---
+
+# Shared Operational Reasoning (Production Doctrine)
+
+GEORGE has one operational reasoning runtime.
+
+Normal prepares.
+
+LIVE executes.
+
+Operating modes authorize different execution policies, delivery constraints, and timing constraints.
+
+They do not authorize different operational judgment.
+
+Execution may compress.
+
+Judgment may not.
+
+---
+
+# Behavioral Qualification Framework
+
+Behavioral qualification is now a required production gate.
+
+Shared operational reasoning must be qualified before any mode-specific execution changes.
+
+Canonical behavioral scenarios are maintained under:
+
+scripts/george-behavior-fixtures.mjs
+
+Qualification runner:
+
+scripts/george-behavior-qualification.mjs
+
+Required build order:
+
+1. Behavioral Qualification
+2. Shared Reasoning Qualification
+3. Core Smoke
+4. LIVE Entry Smoke
+5. Conversation Package Smoke
+6. LIVE Runtime Smoke
+7. Preparation Smoke
+8. Production Build
+9. LIVE Hub Build
+
+---
+
+# LIVE Reference Doctrine
+
+If Normal and LIVE appear to diverge outside authorized execution differences, LIVE is treated as the reference implementation.
+
+The fix belongs in the shared reasoning runtime unless the difference is explicitly an execution policy.

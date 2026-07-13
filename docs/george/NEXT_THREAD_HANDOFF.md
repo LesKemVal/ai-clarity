@@ -217,3 +217,55 @@ Priorities:
 8. Continue portability hardening only after provider realization is reliable.
 
 No drift.
+
+
+---
+
+## Behavioral Qualification Phase
+
+Current production branch:
+
+live-hub-runtime
+
+Current production commits:
+
+96cdaee Add behavioral qualification framework
+
+fcc2883 Qualify shared preparation signal reasoning
+
+Behavioral qualification is now mandatory.
+
+Before changing shared reasoning:
+
+Run:
+
+npm run george:behavior:qualify
+
+npm run george:shared-reasoning:qualify
+
+Then:
+
+npm run build
+
+cd live-hub
+npm run build
+
+Engineering doctrine:
+
+Inspect first.
+
+Patch one canonical owner.
+
+Build.
+
+Qualify behavior.
+
+Synchronize documentation.
+
+Normal and LIVE share one operational reasoning runtime.
+
+Execution may compress.
+
+Judgment may not.
+
+LIVE is the behavioral reference implementation whenever shared reasoning appears to diverge outside authorized execution differences.
