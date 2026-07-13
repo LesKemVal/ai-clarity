@@ -58,6 +58,14 @@ export function buildJudgmentSurfaceState(input: JudgmentSurfaceInput): Judgment
   const hasSpecificContext = t.split(/\s+/).length >= 8
   const hasLiveSituation = hasAny(t, [/meeting/, /call/, /interview/, /room/, /they just/, /he just/, /she just/, /right now/])
   const hasOutcomeLanguage = hasAny(t, [/need to/, /trying to/, /want to/, /goal/, /outcome/, /close/, /win/, /protect/, /keep/])
+  const isPreparationRequest = hasAny(t, [
+    /\bprepare\b/,
+    /\bpreparing\b/,
+    /\bplan(?:ning)?\b/,
+    /\bget ready\b/,
+    /\bhelp me write\b/,
+    /\bteach me\b/,
+  ])
 
   const sufficientForJudgment =
     asksWhatToSay ||
@@ -72,6 +80,7 @@ export function buildJudgmentSurfaceState(input: JudgmentSurfaceInput): Judgment
   const smallestSignal =
     signalSufficiency === 'sufficient' ? undefined :
     !objectiveKnown && !hasOutcomeLanguage ? 'the desired outcome' :
+    isPreparationRequest ? 'the specific outcome this preparation needs to achieve' :
     decisionSurface === 'negotiate' ? 'the line you cannot cross' :
     decisionSurface === 'defend' ? 'what they are challenging: fact, method, motive, or consequence' :
     decisionSurface === 'deescalate' ? 'whether the objective is repair, boundary, or exit' :

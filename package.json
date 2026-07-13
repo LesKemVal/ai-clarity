@@ -12,7 +12,8 @@
     "george:live-entry:smoke": "node scripts/george-live-entry-smoke.mjs",
     "george:conversation-package:smoke": "node scripts/george-conversation-package-smoke.mjs",
     "george:live-runtime:smoke": "node scripts/george-live-runtime-smoke.mjs",
-    "george:preparation:smoke": "node scripts/george-preparation-smoke.mjs"
+    "george:preparation:smoke": "node scripts/george-preparation-smoke.mjs",
+    "george:shared-reasoning:qualify": "node scripts/george-shared-reasoning-qualification.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",
