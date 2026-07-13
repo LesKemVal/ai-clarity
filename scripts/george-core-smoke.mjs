@@ -22,7 +22,7 @@ import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtim
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
-import { buildOperationalJudgmentNote, resolveOperationalJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
+import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
@@ -303,7 +303,7 @@ const liveRecommendationEvidence = evaluateLiveRecommendationEvidence({
   objectiveKnown: true,
 })
 
-const operationalJudgment = resolveOperationalJudgment({
+const operationalJudgmentInput = {
   currentRuntime: 'normal_george',
   intentState: {
     operational: true,
@@ -365,7 +365,11 @@ const operationalJudgment = resolveOperationalJudgment({
   liveRecommendationEvidence,
   outcomeState,
   latestUserText: 'The investor is pushing for more control before committing.',
-})
+}
+
+const operationalJudgment = resolveOperationalJudgment(
+  operationalJudgmentInput
+)
 
 assert(
   operationalJudgment.action === 'protect_objective',
@@ -385,6 +389,52 @@ assert(
 assert(
   operationalJudgment.conversationStrategy.userDiscretionRequired,
   'conversation strategy should preserve the user as the final in-room authority'
+)
+
+assert(
+  !operationalJudgment.signalAcquisition.shouldAcquire &&
+    operationalJudgment.signalAcquisition.operationalValue === 'none',
+  'operational judgment should avoid unnecessary signal acquisition when current evidence is sufficient'
+)
+
+const materialSignalJudgment = resolveSignalAcquisitionJudgment({
+  currentRuntime: 'normal_george',
+  intentState: {
+    ...operationalJudgmentInput.intentState,
+    objectiveState: 'partial',
+  },
+  runtimeArbitration: {
+    ...operationalJudgmentInput.runtimeArbitration,
+    winner: 'objective_protection',
+    delivery: 'short',
+  },
+  judgmentSurface: {
+    decisionSurface: 'acquire_signal',
+    signalSufficiency: 'insufficient',
+    shouldAcquireSignal: true,
+    smallestSignal: 'the outcome that would make this conversation successful',
+    instruction: '',
+  },
+  trajectory: {
+    ...operationalJudgmentInput.trajectory,
+    confidence: 0.52,
+  },
+  continuityRestoration: operationalJudgmentInput.continuityRestoration,
+  outcomeSignals: {
+    ...operationalJudgmentInput.outcomeSignals,
+    overloadDetected: 0.1,
+  },
+  adaptiveProfile: operationalJudgmentInput.adaptiveProfile,
+  liveRecommendationEvidence,
+  outcomeState,
+  latestUserText: 'I need to prepare, but I have not said what success looks like.',
+})
+
+assert(
+  materialSignalJudgment.shouldAcquire &&
+    materialSignalJudgment.operationalValue === 'high' &&
+    materialSignalJudgment.conversationalCost === 'low',
+  'operational judgment should acquire a specific signal only when its expected value exceeds conversational cost'
 )
 
 const clarificationStrategy = resolveGeorgeConversationStrategy({

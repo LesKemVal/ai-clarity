@@ -27,6 +27,15 @@ export type LiveSupportJudgment = {
   instruction: string
 }
 
+export type SignalAcquisitionJudgment = {
+  shouldAcquire: boolean
+  operationalValue: 'none' | 'low' | 'medium' | 'high'
+  conversationalCost: 'low' | 'medium' | 'high'
+  requestedSignal?: string
+  reason: string
+}
+
+
 export type OperationalJudgment = {
   action: OperationalJudgmentAction
   decisionSurface: JudgmentSurfaceState['decisionSurface']
@@ -35,6 +44,7 @@ export type OperationalJudgment = {
   confidence: number
   outcomeState: GeorgeOutcomeState
   conversationStrategy: GeorgeConversationStrategy
+  signalAcquisition: SignalAcquisitionJudgment
   smallestSignal?: string
   liveSupport: LiveSupportJudgment
   rationale: string[]
@@ -57,10 +67,71 @@ export type OperationalJudgmentInput = {
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
 
+function classifySignalValue(value: number): SignalAcquisitionJudgment['operationalValue'] {
+  if (value >= 0.75) return 'high'
+  if (value >= 0.5) return 'medium'
+  if (value > 0) return 'low'
+  return 'none'
+}
+
+function classifySignalCost(value: number): SignalAcquisitionJudgment['conversationalCost'] {
+  if (value >= 0.65) return 'high'
+  if (value >= 0.35) return 'medium'
+  return 'low'
+}
+
+export function resolveSignalAcquisitionJudgment(
+  input: OperationalJudgmentInput
+): SignalAcquisitionJudgment {
+  const requestedSignal = String(
+    input.judgmentSurface.smallestSignal || ''
+  ).trim()
+
+  const operationalValue = clamp01(
+    (input.judgmentSurface.shouldAcquireSignal ? 0.45 : 0) +
+      (requestedSignal ? 0.2 : 0) +
+      (input.intentState.objectiveState === 'clear' ? 0 : 0.2) +
+      (input.trajectory.confidence < 0.65 ? 0.15 : 0)
+  )
+
+  const conversationalCost = clamp01(
+    (input.currentRuntime === 'live_george' ? 0.35 : 0.1) +
+      (input.outcomeSignals.overloadDetected >= 0.5 ? 0.35 : 0) +
+      (input.runtimeArbitration.delivery === 'structured' ? 0.15 : 0)
+  )
+
+  const blockedByHigherPriority =
+    input.runtimeArbitration.winner === 'safety_or_damage_risk' ||
+    input.runtimeArbitration.winner === 'continuity_restoration'
+
+  const shouldAcquire =
+    !blockedByHigherPriority &&
+    input.judgmentSurface.shouldAcquireSignal &&
+    Boolean(requestedSignal) &&
+    operationalValue >= conversationalCost + 0.1
+
+  return {
+    shouldAcquire,
+    operationalValue: classifySignalValue(operationalValue),
+    conversationalCost: classifySignalCost(conversationalCost),
+    requestedSignal: requestedSignal || undefined,
+    reason: blockedByHigherPriority
+      ? 'A higher-priority safety or continuity obligation outranks signal acquisition.'
+      : shouldAcquire
+        ? 'The missing signal is likely to materially improve judgment or execution at acceptable conversational cost.'
+        : !requestedSignal
+          ? 'No specific smallest useful signal has been identified.'
+          : operationalValue < conversationalCost + 0.1
+            ? 'The expected operational value does not justify the conversational cost this turn.'
+            : 'Additional signal is not required before the first useful move.',
+  }
+}
+
 export function resolveOperationalJudgment(
   input: OperationalJudgmentInput
 ): OperationalJudgment {
-  const action = resolveAction(input)
+  const signalAcquisition = resolveSignalAcquisitionJudgment(input)
+  const action = resolveAction(input, signalAcquisition)
   const confidence = clamp01(
     input.trajectory.confidence * 0.45 +
       (input.judgmentSurface.signalSufficiency === 'sufficient' ? 0.35 : 0.12) +
@@ -87,9 +158,10 @@ export function resolveOperationalJudgment(
     confidence,
     outcomeState: input.outcomeState,
     conversationStrategy,
+    signalAcquisition,
     smallestSignal:
-      action === 'acquire_smallest_signal'
-        ? input.judgmentSurface.smallestSignal
+      signalAcquisition.shouldAcquire
+        ? signalAcquisition.requestedSignal
         : undefined,
     liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence, input.judgmentSurface.signalSufficiency),
     rationale: buildRationale(input, action),
@@ -162,7 +234,8 @@ export function resolveLiveSupportJudgment(
 }
 
 function resolveAction(
-  input: OperationalJudgmentInput
+  input: OperationalJudgmentInput,
+  signalAcquisition: SignalAcquisitionJudgment
 ): OperationalJudgmentAction {
   if (input.runtimeArbitration.winner === 'safety_or_damage_risk') {
     return 'warn_and_move'
@@ -176,7 +249,7 @@ function resolveAction(
     return 'restore_continuity'
   }
 
-  if (input.judgmentSurface.shouldAcquireSignal) {
+  if (signalAcquisition.shouldAcquire) {
     return 'acquire_smallest_signal'
   }
 
@@ -237,6 +310,10 @@ OPERATIONAL JUDGMENT
 - Immediate outcome: ${judgment.outcomeState.immediateOutcome}
 - Outcome phase: ${judgment.outcomeState.phase}
 - Outcome confidence: ${judgment.outcomeState.confidence.toFixed(2)}
+- Signal acquisition warranted: ${judgment.signalAcquisition.shouldAcquire ? 'yes' : 'no'}
+- Signal operational value: ${judgment.signalAcquisition.operationalValue}
+- Signal conversational cost: ${judgment.signalAcquisition.conversationalCost}
+- Signal acquisition reason: ${judgment.signalAcquisition.reason}
 - LIVE support posture: ${judgment.liveSupport.posture}
 - LIVE recommendation strength: ${judgment.liveSupport.strength}
 - Explain LIVE on request: ${judgment.liveSupport.explainOnRequest ? 'yes' : 'no'}
