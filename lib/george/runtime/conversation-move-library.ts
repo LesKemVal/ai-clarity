@@ -11,6 +11,76 @@ export type GeorgeConversationMoveDefinition = {
   normalCompatibility: boolean
 }
 
+export type SignalAcquisitionMoveNeed =
+  | 'desired_outcome'
+  | 'audience_decision'
+  | 'brief_use'
+
+export type SignalAcquisitionMoveContext = {
+  signalNeed: SignalAcquisitionMoveNeed
+  phase?: 'early' | 'active' | 'preparation' | 'recovery'
+  pressure?: boolean
+  executive?: boolean
+}
+
+export type SignalAcquisitionMoveVariant = {
+  style:
+    | 'exploratory'
+    | 'clarifying'
+    | 'executive'
+    | 'recovery'
+    | 'preparation'
+  question: string
+}
+
+const SIGNAL_ACQUISITION_VARIANTS: Record<
+  SignalAcquisitionMoveNeed,
+  Record<SignalAcquisitionMoveVariant['style'], string>
+> = {
+  desired_outcome: {
+    exploratory: 'What are you hoping comes out of this?',
+    clarifying: 'If this goes well, what changes afterward?',
+    executive: 'What is the single outcome you want to protect?',
+    recovery: 'Before we go further, what result matters most?',
+    preparation: 'When you enter that conversation, what will success look like?',
+  },
+  audience_decision: {
+    exploratory: 'Who are you trying to reach, and what matters to them?',
+    clarifying: 'Who is this for, and what decision should it make easier?',
+    executive: 'Who is the decision-maker, and what must they conclude?',
+    recovery: 'Before we build further, who must this move and toward what decision?',
+    preparation: 'Who will see this, and what should it help them decide?',
+  },
+  brief_use: {
+    exploratory: 'Who needs this, and what would make it useful?',
+    clarifying: 'Who will use it, and what should become clearer afterward?',
+    executive: 'Who owns the decision, and what must the brief establish?',
+    recovery: 'Before we continue, who is the brief for and what must it resolve?',
+    preparation: 'Who will use the brief, and what should it help them understand or decide?',
+  },
+}
+
+export function resolveSignalAcquisitionMoveVariant(
+  context: SignalAcquisitionMoveContext
+): SignalAcquisitionMoveVariant {
+  const style: SignalAcquisitionMoveVariant['style'] =
+    context.phase === 'recovery'
+      ? 'recovery'
+      : context.executive
+        ? 'executive'
+        : context.pressure
+          ? 'clarifying'
+          : context.phase === 'early'
+            ? 'exploratory'
+            : 'preparation'
+
+  return {
+    style,
+    question: SIGNAL_ACQUISITION_VARIANTS[context.signalNeed][style],
+  }
+}
+
+
 const MOVE_LIBRARY: Record<GeorgeConversationMove, GeorgeConversationMoveDefinition> = {
   answer: {
     id: 'answer',

@@ -2,7 +2,11 @@ import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-pol
 import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
-import { resolveConversationMoveDefinition, type GeorgeConversationMoveDefinition } from '@/lib/george/runtime/conversation-move-library'
+import {
+  resolveConversationMoveDefinition,
+  resolveSignalAcquisitionMoveVariant,
+  type GeorgeConversationMoveDefinition,
+} from '@/lib/george/runtime/conversation-move-library'
 
 export type GeorgeConversationMove =
   | 'answer'
@@ -39,19 +43,22 @@ export type OpportunitySignalNeed =
 export type OpportunitySignalRequest = {
   sessionActivation: string
   signalNeed: OpportunitySignalNeed
+  phase?: 'early' | 'active' | 'preparation' | 'recovery'
+  pressure?: boolean
+  executive?: boolean
 }
 
 export function buildOpportunitySignalAcquisitionMessage(
   request: OpportunitySignalRequest
 ) {
-  const question =
-    request.signalNeed === 'desired_outcome'
-      ? 'What outcome matters most in the conversation you are preparing for?'
-      : request.signalNeed === 'audience_decision'
-        ? 'Who is this for, and what should it help them decide?'
-        : 'Who will use it, and what should it help them understand or decide?'
+  const variant = resolveSignalAcquisitionMoveVariant({
+    signalNeed: request.signalNeed,
+    phase: request.phase || 'preparation',
+    pressure: request.pressure,
+    executive: request.executive,
+  })
 
-  return `${request.sessionActivation}\n\n${question}`
+  return `${request.sessionActivation}\n\n${variant.question}`
 }
 
 export type GeorgeConversationStrategyInput = {

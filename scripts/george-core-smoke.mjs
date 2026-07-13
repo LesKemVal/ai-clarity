@@ -24,7 +24,7 @@ import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtim
 import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
-import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
+import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition, resolveSignalAcquisitionMoveVariant } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
@@ -511,6 +511,46 @@ assert(
     clarificationMoveNote.includes('not as a response template') &&
     !clarificationMoveNote.includes('CONVERSATION MOVE\\n- Move:'),
   'conversation move definitions should support reasoning without becoming retrieved response templates'
+)
+
+const exploratoryOutcomeSignal = resolveSignalAcquisitionMoveVariant({
+  signalNeed: 'desired_outcome',
+  phase: 'early',
+})
+const executiveOutcomeSignal = resolveSignalAcquisitionMoveVariant({
+  signalNeed: 'desired_outcome',
+  phase: 'active',
+  executive: true,
+})
+const recoveryOutcomeSignal = resolveSignalAcquisitionMoveVariant({
+  signalNeed: 'desired_outcome',
+  phase: 'recovery',
+})
+
+assert(
+  exploratoryOutcomeSignal.style === 'exploratory' &&
+    executiveOutcomeSignal.style === 'executive' &&
+    recoveryOutcomeSignal.style === 'recovery' &&
+    new Set([
+      exploratoryOutcomeSignal.question,
+      executiveOutcomeSignal.question,
+      recoveryOutcomeSignal.question,
+    ]).size === 3,
+  'one semantic signal should support multiple context-sensitive conversational realizations'
+)
+
+assert(
+  buildOpportunitySignalAcquisitionMessage({
+    sessionActivation: 'Let’s prepare LIVE support for this session.',
+    signalNeed: 'desired_outcome',
+    phase: 'recovery',
+  }).includes('Before we go further') &&
+    buildOpportunitySignalAcquisitionMessage({
+      sessionActivation: 'Let’s prepare LIVE support for this session.',
+      signalNeed: 'desired_outcome',
+      executive: true,
+    }).includes('single outcome'),
+  'Conversation Strategy should select the lowest-cost signal move while the move library owns the wording variants'
 )
 
 assert(
