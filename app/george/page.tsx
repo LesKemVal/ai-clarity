@@ -67,9 +67,10 @@ import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-aware
 import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 import {
+  resolveFirstMissingLivePreparationSignal,
+  resolveLivePreparationReadiness,
   resolveLiveIntentRuntime,
   resolveLiveMessageBarSetup,
-  resolveLiveMessageContextConfirmation,
 } from '@/lib/george/live-runtime/live-intent-runtime'
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
@@ -858,6 +859,30 @@ const [voiceError, setVoiceError] = useState('')
   const [preLiveSignalStep, setPreLiveSignalStep] = useState(0)
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>({})
   const [preLiveSignalComplete, setPreLiveSignalComplete] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    try {
+      const raw = window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS')
+      const parsed = raw ? JSON.parse(raw) : null
+
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        const hydrated = Object.fromEntries(
+          Object.entries(parsed)
+            .map(([key, value]) => [key, String(value || '').trim()])
+            .filter(([, value]) => Boolean(value))
+        )
+
+        setPreLiveSignals(hydrated)
+      }
+    } catch {}
+  }, [])
+
+  const livePreparationReadiness = useMemo(
+    () => resolveLivePreparationReadiness(preLiveSignals),
+    [preLiveSignals]
+  )
   const isManualLive =
     conversationMode === 'manual_live' ||
     activePromptContext === 'manual_live'
@@ -1674,15 +1699,34 @@ const liveBarMessages = useMemo(() => {
     .reverse()
     .find((message) => message.role === 'user')?.content || ''
 
-  const monitorMessages = operationalResourceMonitor?.resources
-    .map((resource) => resource.value)
-    .filter(Boolean) || []
+  const opportunity = operationalResourceMonitor?.opportunity
 
-  if (monitorMessages.length > 0) return monitorMessages
+  if (opportunity) {
+    return opportunity.thresholdMet
+      ? [
+          opportunity.suggestion,
+          `${opportunity.title} readiness · ${opportunity.readiness}%`,
+          opportunity.kind === 'live_support'
+            ? 'Tap to continue LIVE preparation.'
+            : 'Tap to keep preparing in this conversation.',
+        ]
+      : [
+          `${opportunity.title} readiness · ${opportunity.readiness}%`,
+          'Keep preparing in this conversation.',
+        ]
+  }
 
-  const base = activePromptContext === 'pre_live_signal_ready'
-    ? ['Tap LIVE and we’ll go.', 'Ready when you are.', 'I have enough to support you.']
-    : ['Prepare this conversation for LIVE.', 'Quick LIVE or Full Brief.', 'I’ll use this session as signal.']
+  const base = livePreparationReadiness.thresholdMet
+    ? [
+        `Ready to Go LIVE · ${livePreparationReadiness.percent}%`,
+        'Tap to continue from the first missing preparation step.',
+        'I can prepare you for this conversation.',
+      ]
+    : [
+        `LIVE readiness · ${livePreparationReadiness.percent}%`,
+        'I’m building the room, role, and outcome.',
+        'Tap LIVE when you want to continue preparation.',
+      ]
 
   if (/interview|hiring|job|candidate/i.test(recentUser)) {
     return activePromptContext === 'pre_live_signal_ready'
@@ -1703,7 +1747,13 @@ const liveBarMessages = useMemo(() => {
   }
 
   return base
-}, [activePromptContext, messages, operationalResourceMonitor])
+}, [
+  activePromptContext,
+  livePreparationReadiness.percent,
+  livePreparationReadiness.thresholdMet,
+  messages,
+  operationalResourceMonitor,
+])
 
 useEffect(() => {
   if (messages.length === 0) setOperationalResourceMonitor(null)
@@ -2920,7 +2970,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
 
     const setupMessage: Message = {
       role: 'assistant',
-      content: 'Quick LIVE or Full Brief?\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
+      content: 'I can prepare you for this conversation.\n\nQuick LIVE: Begin with what I already know. I’ll ask only for what is still missing.\n\nFull Brief: Keep preparing with me before we enter LIVE.',
       source: 'system_override',
     }
 
@@ -2943,17 +2993,71 @@ const startLiveAudioRuntime = liveAudioRuntime.start
     setShowConversationMenu(false)
     setShowNormalUtilityMenu(null)
     setActivePromptLabel('LIVE')
-    setActivePromptContext('live_signal_acquisition')
     setContextTurnCount(0)
 
+    let storedSignals: Record<string, string> = {}
+
+    try {
+      const raw = window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS')
+      const parsed = raw ? JSON.parse(raw) : null
+
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        storedSignals = Object.fromEntries(
+          Object.entries(parsed)
+            .map(([key, value]) => [key, String(value || '').trim()])
+            .filter(([, value]) => Boolean(value))
+        )
+      }
+    } catch {}
+
+    setPreLiveSignals(storedSignals)
+
+    const firstMissingKey =
+      resolveFirstMissingLivePreparationSignal(storedSignals)
+
+    if (!firstMissingKey) {
+      setPreLiveSignalStep(preLiveQuestions.length)
+      setPreLiveSignalComplete(true)
+      setShowPreLiveSignalSurface(true)
+      setActivePromptContext('pre_live_signal_ready')
+      setActivePromptLabel('LIVE Ready')
+
+      try {
+        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        window.localStorage.setItem('george_start_new_live', '1')
+      } catch {}
+
+      window.location.href = '/george/live-entry?source=signal'
+      return
+    }
+
+    const firstMissingIndex = preLiveQuestions.findIndex(
+      (question) => question.key === firstMissingKey
+    )
+
+    if (firstMissingIndex < 0) {
+      throw new Error(
+        `[GEORGE LIVE PREPARATION] Unknown preparation signal: ${firstMissingKey}`
+      )
+    }
+
+    setPreLiveSignalStep(firstMissingIndex)
+    setPreLiveSignalComplete(false)
+    setShowPreLiveSignalSurface(true)
+    setActivePromptContext('pre_live_signal_acquisition')
+    setActivePromptLabel(`Question ${firstMissingIndex + 1}`)
+
+    const question = preLiveQuestions[firstMissingIndex]
     const liveSignalMessage: Message = {
       role: 'assistant',
-      content:
-        "LIVE Entry.\n\nFirst, give me the signal I need to understand the room.\n\nWhat is your role in the conversation — your position or title?\n\nExamples: founder, candidate, patient, manager, investor, customer, or decision maker.",
+      content: `${question.kicker}.\n\n${question.question}\n\n${question.examples}`,
+      source: 'system_override',
     }
 
     setMessages((prev) => {
-      const visible = prev.filter((message) => String(message.content || '').trim() !== 'GEORGE')
+      const visible = prev.filter(
+        (message) => String(message.content || '').trim() !== 'GEORGE'
+      )
       const next = [...visible, liveSignalMessage]
       messagesRef.current = next
       return next
@@ -4302,16 +4406,10 @@ const handleSend = useCallback(
           return
         }
 
-        if (liveMessageBarResolution.mode === 'confirm_current_session') {
-          try {
-            window.localStorage.setItem(
-              'GEORGE_LIVE_INTENT_STAGE',
-              liveMessageBarResolution.nextStage
-            )
-          } catch {}
-
-          setActivePromptContext(liveMessageBarResolution.nextPromptContext)
-          setActivePromptLabel('LIVE')
+        if (liveMessageBarResolution.mode === 'accept_current_session') {
+          startLiveSignalAcquisition()
+          setIsThinking(false)
+          return
         }
 
         const next: Message[] = [
@@ -4327,49 +4425,6 @@ const handleSend = useCallback(
         setMessages(next)
         messagesRef.current = next
         setInput('')
-        setIsThinking(false)
-        return
-      }
-
-      if (!liveMode && activePromptContext === 'live_message_context_confirm') {
-        const contextConfirmation =
-          resolveLiveMessageContextConfirmation({ text })
-
-        if (contextConfirmation.mode === 'correct_current_session') {
-          try {
-            const raw =
-              window.localStorage.getItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
-            const current = raw ? JSON.parse(raw) : {}
-
-            window.localStorage.setItem(
-              'GEORGE_PRE_LIVE_SOURCE_CONTEXT',
-              JSON.stringify({
-                ...current,
-                correction: contextConfirmation.correction,
-                correctedAt: Date.now(),
-              })
-            )
-          } catch {}
-
-          const next: Message[] = [
-            ...messagesRef.current,
-            ...(userMessage ? [userMessage] : []),
-            {
-              role: 'assistant',
-              content: contextConfirmation.assistantContent,
-              source: 'system_override',
-            },
-          ]
-
-          setMessages(next)
-          messagesRef.current = next
-          setInput('')
-          setIsThinking(false)
-          startLiveSignalAcquisition()
-          return
-        }
-
-        startLiveSignalAcquisition()
         setIsThinking(false)
         return
       }
@@ -7968,6 +8023,25 @@ Continue from here, tell me what changed, or start fresh.`
   <button
     type="button"
     onClick={() => {
+      const opportunity = operationalResourceMonitor?.opportunity
+
+      if (opportunity && opportunity.kind !== 'live_support') {
+        const preparationMessage: Message = {
+          role: 'assistant',
+          content: opportunity.preparationQuestion,
+          source: 'system_override',
+        }
+
+        setMessages((prev) => {
+          const next = [...prev, preparationMessage]
+          messagesRef.current = next
+          return next
+        })
+        setInput('')
+        setSuggestedSignal(Date.now())
+        return
+      }
+
       try {
         if (window.localStorage.getItem('GEORGE_PRE_LIVE_FROM_MESSAGE') === '1' && activePromptContext === 'pre_live_signal_ready') {
           window.location.href = '/george/live-entry?source=message'
@@ -7983,7 +8057,8 @@ Continue from here, tell me what changed, or start fresh.`
       openLiveEntryFromMessage(latestAssistant || messagesRef.current[messagesRef.current.length - 1])
     }}
     className={`relative mb-2 w-full overflow-hidden rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
-      activePromptContext === 'pre_live_signal_ready'
+      (operationalResourceMonitor?.opportunity?.thresholdMet ||
+        livePreparationReadiness.thresholdMet)
         ? 'border-[#4E7CFF]/50 bg-[#4E7CFF]/[0.16] shadow-[0_0_34px_rgba(78,124,255,0.18)]'
         : 'border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.08] hover:bg-[#4E7CFF]/[0.12]'
     }`}
@@ -7992,7 +8067,11 @@ Continue from here, tell me what changed, or start fresh.`
       <span className="absolute inset-y-0 left-[-45%] w-[38%] animate-[georgeLiveBarShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.16] to-transparent" />
     </span>
     <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
-      {operationalResourceMonitor?.headline || 'LIVE'}
+      {operationalResourceMonitor?.opportunity
+        ? `${operationalResourceMonitor.opportunity.title.toUpperCase()} READINESS`
+        : livePreparationReadiness.thresholdMet
+          ? 'READY TO GO LIVE'
+          : 'OPPORTUNITY READINESS'}
     </div>
     <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/68">
       {liveBarTypedText}

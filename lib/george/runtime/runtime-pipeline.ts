@@ -406,19 +406,21 @@ export function buildGeorgeProviderRequest(input: {
   prompt: GeorgeProviderPromptInput
 }): GeorgeProviderRequest {
   const prompt = input.prompt
+  const preserveNormalAmbiguity =
+    !prompt.includeLiveDiscipline &&
+    isStandaloneAmbiguousKnowledgeQuestion(input.latestUserText)
   const liveOpening = prompt.includeLiveDiscipline
     ? prompt.universalLiveOpeningBlock
     : ''
   const liveDiscipline = prompt.includeLiveDiscipline
     ? prompt.liveDisciplineBlock
     : ''
-
-  const systemContent =
-    prompt.languageRule +
-    prompt.modeBlock +
-    input.runtimeContextBlock +
-    prompt.baseSystemPrompt +
-    `
+  const runtimeContextBlock = preserveNormalAmbiguity
+    ? ''
+    : input.runtimeContextBlock
+  const operationalPromptBlocks = preserveNormalAmbiguity
+    ? ''
+    : `
 
 ${prompt.messageSourceBlock}
 
@@ -428,17 +430,32 @@ ${prompt.runtimeScoresBlock}
 
 ${prompt.scoreAwareSteeringBlock}
 
+${prompt.dynamicRuntimeBlocks}`
+  const ambiguityAuthority = preserveNormalAmbiguity
+    ? `
+
+NORMAL AMBIGUITY AUTHORITY
+- The current question has multiple plausible meanings and does not identify a domain.
+- Do not inherit a domain from earlier conversation, preparation, projects, or operational context.
+- Preserve the ambiguity by briefly distinguishing the most common meanings or asking which meaning the user intends.
+- Do not choose one domain merely because it is operationally familiar.`
+    : ''
+
+  const systemContent =
+    prompt.languageRule +
+    prompt.modeBlock +
+    runtimeContextBlock +
+    prompt.baseSystemPrompt +
+    operationalPromptBlocks +
+    `
+
 ${prompt.conversationEngineRulesBlock}
 
-
+${ambiguityAuthority}
 
 ${liveOpening}
 
-${liveDiscipline}
-
-
-
-${prompt.dynamicRuntimeBlocks}`
+${liveDiscipline}`
 
   const contextualMessages = resolveProviderConversationMessages(
     input.latestUserText,
@@ -456,24 +473,41 @@ ${prompt.dynamicRuntimeBlocks}`
 function resolveProviderConversationMessages(
   latestUserText: string,
   recentMessages: readonly GeorgeProviderMessage[]
-) {
-  if (!isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
-    return recentMessages
+): readonly GeorgeProviderMessage[] {
+  const currentUserMessage = Object.freeze({
+    role: 'user' as const,
+    content: latestUserText,
+  })
+
+  if (isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
+    return Object.freeze([currentUserMessage])
   }
 
-  const latestUserMessageIndex = [...recentMessages]
+  const normalizedLatestUserText = normalizeProviderMessageContent(latestUserText)
+  const matchingCurrentTurnIndex = [...recentMessages]
     .map((message, index) => ({ message, index }))
     .reverse()
-    .find(({ message }) => message.role === 'user')?.index
+    .find(
+      ({ message }) =>
+        message.role === 'user' &&
+        normalizeProviderMessageContent(message.content) === normalizedLatestUserText
+    )?.index
 
-  if (latestUserMessageIndex === undefined) {
-    return recentMessages
+  if (matchingCurrentTurnIndex === undefined) {
+    return Object.freeze([...recentMessages, currentUserMessage])
   }
 
-  return recentMessages.slice(latestUserMessageIndex)
+  return Object.freeze([
+    ...recentMessages.slice(0, matchingCurrentTurnIndex),
+    currentUserMessage,
+  ])
 }
 
-function isStandaloneAmbiguousKnowledgeQuestion(text: string) {
+function normalizeProviderMessageContent(text: string) {
+  return text.trim().replace(/\s+/g, ' ')
+}
+
+export function isStandaloneAmbiguousKnowledgeQuestion(text: string) {
   const normalized = text.trim().replace(/\s+/g, ' ')
   if (!normalized || normalized.length > 120) return false
 

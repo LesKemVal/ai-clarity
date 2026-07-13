@@ -31,11 +31,35 @@ import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/r
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
-import { buildGeorgeProviderRequest, GEORGE_RUNTIME_PIPELINE, resolveGeorgeRuntimePipeline, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
+import { buildGeorgeProviderRequest, GEORGE_RUNTIME_PIPELINE, isStandaloneAmbiguousKnowledgeQuestion, resolveGeorgeRuntimePipeline, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
+import { buildNormalKnowledgeCoreBlock } from '${process.cwd()}/lib/george/chat/system-blocks'
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message)
 }
+
+const normalKnowledgeCore = buildNormalKnowledgeCoreBlock({
+  isFirstSession: true,
+})
+
+assert(
+  isStandaloneAmbiguousKnowledgeQuestion('What is dilution?') === true,
+  'standalone definitional knowledge questions should qualify for compact Normal knowledge reasoning'
+)
+assert(
+  isStandaloneAmbiguousKnowledgeQuestion('What is dilution in our company?') === false,
+  'explicitly contextual knowledge questions should remain on the full Normal reasoning path'
+)
+assert(
+  normalKnowledgeCore.includes('NORMAL KNOWLEDGE REASONING') &&
+    normalKnowledgeCore.includes('The audience is the user') &&
+    normalKnowledgeCore.includes('preserve that ambiguity') &&
+    normalKnowledgeCore.includes('Do not invent operational facts') &&
+    !normalKnowledgeCore.includes('LIVE guidance') &&
+    !normalKnowledgeCore.includes('Pro mode') &&
+    !normalKnowledgeCore.includes('RUNTIME SCORES'),
+  'compact Normal knowledge reasoning should preserve uncertainty without importing LIVE, Pro, or runtime steering doctrine'
+)
 
 const intent = classifyLiveSpeakerIntent({
   transcript: 'George, help me respond to that.',
@@ -776,6 +800,12 @@ const operationalResourceMonitor = resolveOperationalResourceMonitor({
 })
 assert(operationalResourceMonitor.resources.length > 0, 'operational resource monitor should surface at least one high-value resource')
 assert(operationalResourceMonitor.resources.length <= 3, 'operational resource monitor should remain bounded')
+assert(
+  operationalResourceMonitor.opportunity?.kind === 'live_support' &&
+    operationalResourceMonitor.opportunity.readiness >= 68 &&
+    operationalResourceMonitor.opportunity.thresholdMet,
+  'operational resource monitor should expose the highest-confidence readiness opportunity'
+)
 assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
 
 const normalExecutionPolicy = resolveGeorgeExecutionPolicy({
@@ -1067,15 +1097,52 @@ const ambiguousKnowledgeRequest = buildGeorgeProviderRequest({
     recentMessages: [
       { role: 'user', content: 'Help me negotiate investor governance.' },
       { role: 'assistant', content: 'Let us protect founder control.' },
-      { role: 'user', content: 'What is dilution?' },
     ],
   },
 })
 
 assert(
   ambiguousKnowledgeRequest.messages.length === 1 &&
+    ambiguousKnowledgeRequest.messages[0]?.role === 'user' &&
     ambiguousKnowledgeRequest.messages[0]?.content === 'What is dilution?',
   'standalone ambiguous knowledge questions should not inherit a forced interpretation from prior conversation'
+)
+assert(
+  ambiguousKnowledgeRequest.systemContent.includes('NORMAL AMBIGUITY AUTHORITY') &&
+    !ambiguousKnowledgeRequest.systemContent.includes(governedRuntimeContext) &&
+    !ambiguousKnowledgeRequest.systemContent.includes('SOURCE') &&
+    !ambiguousKnowledgeRequest.systemContent.includes('CONTROL') &&
+    !ambiguousKnowledgeRequest.systemContent.includes('SCORES') &&
+    !ambiguousKnowledgeRequest.systemContent.includes('STEERING') &&
+    !ambiguousKnowledgeRequest.systemContent.includes('DYNAMIC'),
+  'Normal ambiguous knowledge questions should suppress inherited operational context before provider reasoning'
+)
+
+const liveAmbiguousKnowledgeRequest = buildGeorgeProviderRequest({
+  runtimeContextBlock: governedRuntimeContext,
+  latestUserText: 'What is dilution?',
+  prompt: {
+    languageRule: 'LANGUAGE',
+    modeBlock: 'LIVE MODE',
+    baseSystemPrompt: 'BASE',
+    messageSourceBlock: 'SOURCE',
+    controlStateBlock: 'CONTROL',
+    runtimeScoresBlock: 'SCORES',
+    scoreAwareSteeringBlock: 'STEERING',
+    conversationEngineRulesBlock: 'ENGINE',
+    universalLiveOpeningBlock: 'LIVE OPENING',
+    liveDisciplineBlock: 'LIVE DISCIPLINE',
+    dynamicRuntimeBlocks: 'DYNAMIC',
+    includeLiveDiscipline: true,
+    recentMessages: [{ role: 'user', content: 'What is dilution?' }],
+  },
+})
+
+assert(
+  liveAmbiguousKnowledgeRequest.systemContent.includes(governedRuntimeContext) &&
+    liveAmbiguousKnowledgeRequest.systemContent.includes('LIVE DISCIPLINE') &&
+    !liveAmbiguousKnowledgeRequest.systemContent.includes('NORMAL AMBIGUITY AUTHORITY'),
+  'Normal ambiguity isolation must not alter LIVE execution context or discipline'
 )
 
 const contextualKnowledgeRequest = buildGeorgeProviderRequest({
@@ -1108,7 +1175,12 @@ assert(
 )
 
 assert(providerRequest.systemContent.includes('LIVE OPENING'), 'provider request should include LIVE opening guidance when enabled')
-assert(providerRequest.messages.length === 1, 'provider request should preserve recent provider messages')
+assert(
+  providerRequest.messages.length === 2 &&
+    providerRequest.messages.at(-1)?.role === 'user' &&
+    providerRequest.messages.at(-1)?.content === 'Continue the current request.',
+  'provider request should append the authoritative current user utterance when recent history does not contain it'
+)
 assert(Object.isFrozen(providerRequest), 'provider request should be immutable')
 assert(Object.isFrozen(providerRequest.messages), 'provider message collection should be immutable')
 

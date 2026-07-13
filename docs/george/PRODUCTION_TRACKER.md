@@ -112,7 +112,7 @@ Validated production consolidation:
 - Execution policy maps the shared strategy into mode-specific realization requirements.
 - Normal realization remains conversational and user-facing.
 - LIVE realization remains room-executable, timing-aware, and receiver-aware.
-- Operational resources are ranked by `lib/george/runtime/operational-resource-monitor.ts`.
+- Operational resources and the single highest-confidence opportunity-readiness recommendation are ranked by `lib/george/runtime/operational-resource-monitor.ts`.
 - Runtime context and provider request assembly occur once through the promoted pipeline.
 - Provider selection occurs once through the pipeline; provider transport remains outside it.
 - No `runtime-orchestrator.ts` was introduced because `runtime-pipeline.ts`, `runtime-governance-map.ts`, and `governance-ownership.ts` already own coordination and authority.
@@ -127,6 +127,69 @@ Validated production builds:
 Architecture freeze:
 
 Do not add new runtime decision layers. Remaining work is deduplication, latency reduction, Normal/LIVE consumption parity, portability hardening, behavioral qualification, and documentation synchronization.
+
+## Production Update — Opportunity Readiness
+
+The existing Operational Resource Monitor now owns opportunity-readiness evaluation for Normal GEORGE.
+
+This is not a new runtime and does not create a competing coordinator.
+
+Canonical owner:
+
+- `lib/george/runtime/operational-resource-monitor.ts`
+
+Current responsibility:
+
+- consume canonical outcome, trajectory, judgment, strategy, and LIVE-viability evidence;
+- evaluate supported opportunities such as LIVE support, pitch decks, and briefs;
+- select the single highest-confidence opportunity;
+- expose readiness percentage, threshold state, conversational preparation question, and execution label;
+- surface the opportunity through the Normal bottom operational card;
+- leave information gathering in conversation and execution in the existing capability gateway.
+
+Current implemented flow:
+
+Conversation
+
+↓
+
+Canonical Runtime Pipeline
+
+↓
+
+Operational Resource Monitor / Opportunity Readiness
+
+↓
+
+Bottom Operational Card
+
+↓
+
+Conversational preparation for missing information
+
+↓
+
+Existing execution gateway
+
+↓
+
+LIVE, pitch deck, brief, or another registered capability
+
+Production boundaries:
+
+- Opportunity readiness recommends one capability; it does not execute automatically.
+- The monitor never owns provider transport, UI rendering, artifact generation, LIVE execution, or delivery policy.
+- `app/george/page.tsx` renders returned readiness state and routes user actions only.
+- Normal conversation may fully or partially prepare a capability before execution.
+- LIVE Entry remains the correct standalone route for users who begin with LIVE.
+- When the user enters LIVE from Normal, existing preparation is reused and only missing LIVE preparation is requested.
+- LIVE response shaping, receiver realization, timing, recovery, and delivery remain unchanged.
+
+Validated qualification:
+
+- GEORGE Core Smoke: passing
+- Production build: passing
+- LIVE Hub TypeScript build: passing
 
 ## Production Update — LIVE Partnership Runtime / Recovery / Learning
 

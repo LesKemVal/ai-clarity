@@ -45,6 +45,7 @@ import {
   buildTierAwarenessBlock,
   buildOperationalModesBlock,
   buildPursuitAndPremiumResponseBlock,
+  buildNormalKnowledgeCoreBlock,
 } from '@/lib/george/chat/system-blocks'
 import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-foresight-block'
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
@@ -65,7 +66,10 @@ import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-con
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
 import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
-import { resolveGeorgeRuntimePipeline } from '@/lib/george/runtime/runtime-pipeline'
+import {
+  isStandaloneAmbiguousKnowledgeQuestion,
+  resolveGeorgeRuntimePipeline,
+} from '@/lib/george/runtime/runtime-pipeline'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -897,6 +901,21 @@ LANGUAGE MODE: SPANISH
       liveScenario,
     })
 
+    const useCompactNormalKnowledgePrompt =
+      currentRuntime === 'normal_george' &&
+      isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw)
+
+    const baseSystemPrompt = useCompactNormalKnowledgePrompt
+      ? buildNormalKnowledgeCoreBlock({ isFirstSession })
+      : SYSTEM_PROMPT(
+          voiceMode,
+          isFirstSession,
+          promptContext,
+          promptLabel,
+          contextTurnCount,
+          tier
+        )
+
     const runtimePipeline = resolveGeorgeRuntimePipeline({
       currentRuntime,
       latestUserText: latestUserRaw,
@@ -917,14 +936,7 @@ LANGUAGE MODE: SPANISH
       providerPrompt: {
         languageRule,
         modeBlock,
-        baseSystemPrompt: SYSTEM_PROMPT(
-          voiceMode,
-          isFirstSession,
-          promptContext,
-          promptLabel,
-          contextTurnCount,
-          tier
-        ),
+        baseSystemPrompt,
         messageSourceBlock,
         controlStateBlock,
         runtimeScoresBlock,
@@ -972,6 +984,7 @@ LANGUAGE MODE: SPANISH
 
     const model = providerResolution.model
     const { systemContent, messages: providerMessages } = providerRequest
+
 
     let reply = ''
 

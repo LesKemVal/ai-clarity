@@ -76,7 +76,7 @@ The runtime pipeline coordinates, in canonical order:
 5. operational judgment;
 6. conversation strategy and move resolution;
 7. context framing and LIVE viability presentation;
-8. operational resource ranking;
+8. operational resource ranking and opportunity-readiness selection;
 9. execution policy;
 10. governed runtime-context assembly;
 11. provider request assembly.
@@ -370,19 +370,27 @@ Conversation Preparation
 
 ↓
 
-Relevant Documentation
+Operational Resource Monitor / Opportunity Readiness
 
 ↓
 
-Conversation Readiness / Brief Room
+Bottom Operational Card
 
 ↓
 
-Preparation Runtime
+Conversational Preparation for Missing Information
 
 ↓
 
-LIVE
+Existing Execution Gateway
+
+↓
+
+Relevant Documentation / Preparation Runtime when required
+
+↓
+
+LIVE or another supported capability
 
 ↓
 
@@ -524,6 +532,77 @@ Production boundary:
 - Capability surfacing remains contextual and judgment-based; surfacing does not imply execution.
 
 Do not collapse availability, surfacing, and execution into one owner.
+
+
+
+## Opportunity Readiness Boundary
+
+Opportunity Readiness is an existing Operational Resource Monitor responsibility, not a new runtime layer.
+
+Canonical owner:
+
+- `lib/george/runtime/operational-resource-monitor.ts`
+
+The monitor consumes existing canonical evidence and returns one highest-confidence opportunity with:
+
+- capability kind;
+- user-facing title;
+- readiness percentage;
+- threshold state;
+- suggestion copy;
+- the next conversational preparation question;
+- execution label.
+
+Ownership chain:
+
+Conversation
+
+↓
+
+Runtime Pipeline
+
+↓
+
+Operational Resource Monitor / Opportunity Readiness
+
+↓
+
+Presentation surface
+
+↓
+
+Conversation gathers only missing information
+
+↓
+
+Existing execution gateway
+
+Opportunity Readiness owns selection and readiness state.
+
+It does not own:
+
+- general conversation reasoning;
+- provider routing or transport;
+- preparation-question rendering;
+- artifact generation;
+- LIVE mechanics, consent, or runtime execution;
+- response shaping;
+- receiver delivery policy;
+- UI animation or card rendering.
+
+Normal GEORGE may fully or partially prepare a capability through ordinary conversation. The bottom operational card may surface readiness and invite the user to continue preparation. When the readiness threshold is met, the card may offer execution while still allowing the user to keep preparing.
+
+The standalone `/george/live-entry` route remains the intentional entry path for users who start with LIVE. Normal GEORGE is an additional preparation path, not a replacement for LIVE Entry.
+
+For LIVE launched from Normal:
+
+- existing conversational preparation is reused;
+- LIVE preparation begins intentionally when the user chooses it;
+- the flow resumes at the first missing LIVE requirement;
+- redundant questions are skipped;
+- the existing LIVE runtime remains the sole execution owner.
+
+This boundary preserves one operational intelligence, one Normal runtime, one LIVE runtime, and one preparation contract.
 
 
 

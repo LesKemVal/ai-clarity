@@ -15,6 +15,56 @@ export type LiveIntentSignals = {
   sourceContext: string
 }
 
+export const LIVE_PREPARATION_SIGNAL_KEYS = [
+  'name',
+  'role',
+  'counterparty',
+  'desiredOutcome',
+  'acceptableOutcome',
+] as const
+
+export type LivePreparationSignalKey =
+  (typeof LIVE_PREPARATION_SIGNAL_KEYS)[number]
+
+export function resolveFirstMissingLivePreparationSignal(
+  signals: Record<string, unknown> | null | undefined
+): LivePreparationSignalKey | null {
+  const source = signals || {}
+
+  for (const key of LIVE_PREPARATION_SIGNAL_KEYS) {
+    if (!String(source[key] || '').trim()) return key
+  }
+
+  return null
+}
+
+
+export function resolveLivePreparationReadiness(
+  signals: Record<string, unknown> | null | undefined
+) {
+  const source = signals || {}
+  const requiredKeys = LIVE_PREPARATION_SIGNAL_KEYS
+  const completedKeys = requiredKeys.filter((key) =>
+    Boolean(String(source[key] || '').trim())
+  )
+  const percent = Math.round(
+    (completedKeys.length / requiredKeys.length) * 100
+  )
+
+  return Object.freeze({
+    completedKeys,
+    missingKeys: requiredKeys.filter(
+      (key) => !completedKeys.includes(key)
+    ),
+    percent,
+    thresholdMet:
+      Boolean(String(source.role || '').trim()) &&
+      Boolean(String(source.counterparty || '').trim()) &&
+      Boolean(String(source.desiredOutcome || '').trim()),
+    complete: completedKeys.length === requiredKeys.length,
+  })
+}
+
 export type LiveIntentRuntimeResult = {
   assistantContent: string
   nextStage?: LiveIntentStage | null
@@ -34,12 +84,6 @@ export type LiveMessageBarResolution =
       mode: 'start_full_brief'
     }
   | {
-      mode: 'confirm_current_session'
-      assistantContent: string
-      nextPromptContext: 'live_message_context_confirm'
-      nextStage: 'confirm_current_session'
-    }
-  | {
       mode: 'accept_current_session'
     }
   | {
@@ -52,7 +96,12 @@ export function resolveLiveMessageBarSetup(input: {
   text: string
 }): Extract<
   LiveMessageBarResolution,
-  { mode: 'choose_briefing' | 'start_full_brief' | 'confirm_current_session' }
+  {
+    mode:
+      | 'choose_briefing'
+      | 'start_full_brief'
+      | 'accept_current_session'
+  }
 > {
   const lower = String(input.text || '').trim().toLowerCase()
   const wantsFull = /\b(full|brief|deep|more|complete)\b/.test(lower)
@@ -62,7 +111,7 @@ export function resolveLiveMessageBarSetup(input: {
     return {
       mode: 'choose_briefing',
       assistantContent:
-        'Choose Quick LIVE or Full Brief.\n\nQuick LIVE: I’ll pick up signal as we go along, but I can still be useful.\n\nFull Brief: Brief me fully and I’ll prepare my support accordingly.',
+        'I can prepare you for this conversation.\n\nQuick LIVE: Begin with what I already know. I’ll ask only for what is still missing.\n\nFull Brief: Keep preparing with me before we enter LIVE.',
     }
   }
 
@@ -73,35 +122,7 @@ export function resolveLiveMessageBarSetup(input: {
   }
 
   return {
-    mode: 'confirm_current_session',
-    assistantContent:
-      'I’ve been preparing with you already. Rather than start over, I can use everything we’ve discussed so far in a LIVE conversation.\n\nIs that accurate?\n\nReply Yes, or tell me what to change.',
-    nextPromptContext: 'live_message_context_confirm',
-    nextStage: 'confirm_current_session',
-  }
-}
-
-export function resolveLiveMessageContextConfirmation(input: {
-  text: string
-}): Extract<
-  LiveMessageBarResolution,
-  { mode: 'accept_current_session' | 'correct_current_session' }
-> {
-  const correction = String(input.text || '').trim()
-  const confirmed =
-    /^(yes|yeah|yep|correct|accurate|use it|use this)\b/i.test(correction)
-
-  if (confirmed) {
-    return {
-      mode: 'accept_current_session',
-    }
-  }
-
-  return {
-    mode: 'correct_current_session',
-    correction,
-    assistantContent:
-      'Got it. I updated the briefing context. I’ll only ask for what I still need before LIVE.',
+    mode: 'accept_current_session',
   }
 }
 
@@ -158,7 +179,7 @@ export function resolveLiveIntentRuntime(input: {
           desiredOutcome: direction,
           sourceContext: String(sourceContext.summary || '').slice(0, 700),
         },
-        assistantContent: `I think I have enough.\n\nSession: current GEORGE session\nDirection: ${direction}\n\nSay “confirm” and I’ll prepare the room.`,
+        assistantContent: '',
       }
     }
 
@@ -177,21 +198,15 @@ export function resolveLiveIntentRuntime(input: {
         desiredOutcome: text,
         sourceContext: sourceContext?.summary || '',
       },
-      assistantContent: `I think I have enough.\n\nDirection: ${text}\n\nSay “confirm” and I’ll prepare the room.`,
+      assistantContent: '',
     }
   }
 
   if (stage === 'confirm_preview') {
-    if (/\b(confirm|yes|yeah|yep|continue|go|start|preview)\b/.test(lower)) {
-      return {
-        assistantContent: '',
-        clearStage: true,
-        navigateToLiveEntry: true,
-      }
-    }
-
     return {
-      assistantContent: 'Say “confirm” when you want me to prepare the room.',
+      assistantContent: '',
+      clearStage: true,
+      navigateToLiveEntry: true,
     }
   }
 
