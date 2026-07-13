@@ -37,6 +37,80 @@ export type OpportunityReadiness = {
   executionLabel: string
 }
 
+type OpportunityReadinessInput = {
+  outcomeState: GeorgeOutcomeState
+  conversationStrategy: GeorgeConversationStrategy
+  operationalJudgment: OperationalJudgment
+  trajectory: TrajectoryAssessment
+  liveRecommendationPresentation: LiveRecommendationPresentation
+}
+
+type OpportunityDefinition = {
+  kind: OpportunityReadinessKind
+  title: string
+  applies: (input: OpportunityReadinessInput) => boolean
+  confidence: (input: OpportunityReadinessInput) => number
+  suggestion: string
+  preparationQuestion: string
+  executionLabel: string
+  threshold: number
+}
+
+export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] =
+  Object.freeze([
+    {
+      kind: 'live_support',
+      title: 'LIVE',
+      applies: (input) =>
+        input.liveRecommendationPresentation.show ||
+        input.trajectory.potentialFutureNeeds.includes('live'),
+      confidence: (input) =>
+        input.liveRecommendationPresentation.show
+          ? input.operationalJudgment.liveSupport.strength === 'strong'
+            ? 0.92
+            : 0.78
+          : input.trajectory.confidence,
+      suggestion: 'You may be ready for LIVE support.',
+      preparationQuestion:
+        'What outcome matters most in the conversation you are preparing for?',
+      executionLabel: 'Tap to go LIVE',
+      threshold: 0.68,
+    },
+    {
+      kind: 'pitch_deck',
+      title: 'Pitch Deck',
+      applies: (input) =>
+        input.trajectory.potentialFutureNeeds.includes('deck'),
+      confidence: (input) =>
+        Math.max(
+          input.trajectory.confidence,
+          input.outcomeState.confidence
+        ),
+      suggestion: 'You may be ready for a pitch deck.',
+      preparationQuestion:
+        'Who is the pitch deck for, and what should it help them decide?',
+      executionLabel: 'Build Pitch Deck',
+      threshold: 0.68,
+    },
+    {
+      kind: 'brief',
+      title: 'Brief',
+      applies: (input) =>
+        input.trajectory.potentialFutureNeeds.includes('brief') &&
+        !input.trajectory.potentialFutureNeeds.includes('deck'),
+      confidence: (input) =>
+        Math.max(
+          input.trajectory.confidence,
+          input.outcomeState.confidence
+        ),
+      suggestion: 'You may be ready for a brief.',
+      preparationQuestion:
+        'Who will use the brief, and what should it help them understand or decide?',
+      executionLabel: 'Build Brief',
+      threshold: 0.68,
+    },
+  ])
+
 export type OperationalResourceMonitorState = {
   headline: string
   priority: string
@@ -45,79 +119,26 @@ export type OperationalResourceMonitorState = {
   source: 'operational_resource_monitor'
 }
 
-export function resolveOperationalResourceMonitor(input: {
-  outcomeState: GeorgeOutcomeState
-  conversationStrategy: GeorgeConversationStrategy
-  operationalJudgment: OperationalJudgment
-  trajectory: TrajectoryAssessment
-  liveRecommendationPresentation: LiveRecommendationPresentation
-}): OperationalResourceMonitorState {
+export function resolveOperationalResourceMonitor(
+  input: OpportunityReadinessInput
+): OperationalResourceMonitorState {
   const resources: OperationalResource[] = []
-  const opportunities: Array<OpportunityReadiness & { confidence: number }> = []
+  const opportunities = OPPORTUNITY_READINESS_REGISTRY
+    .filter((definition) => definition.applies(input))
+    .map((definition) => {
+      const confidence = definition.confidence(input)
 
-  if (
-    input.liveRecommendationPresentation.show ||
-    input.trajectory.potentialFutureNeeds.includes('live')
-  ) {
-    const confidence = input.liveRecommendationPresentation.show
-      ? input.operationalJudgment.liveSupport.strength === 'strong'
-        ? 0.92
-        : 0.78
-      : input.trajectory.confidence
-
-    opportunities.push({
-      kind: 'live_support',
-      title: 'LIVE',
-      readiness: Math.round(confidence * 100),
-      thresholdMet: confidence >= 0.68,
-      suggestion: 'You may be ready for LIVE support.',
-      preparationQuestion:
-        'What outcome matters most in the conversation you are preparing for?',
-      executionLabel: 'Tap to go LIVE',
-      confidence,
+      return {
+        kind: definition.kind,
+        title: definition.title,
+        readiness: Math.round(confidence * 100),
+        thresholdMet: confidence >= definition.threshold,
+        suggestion: definition.suggestion,
+        preparationQuestion: definition.preparationQuestion,
+        executionLabel: definition.executionLabel,
+        confidence,
+      }
     })
-  }
-
-  if (input.trajectory.potentialFutureNeeds.includes('deck')) {
-    const confidence = Math.max(
-      input.trajectory.confidence,
-      input.outcomeState.confidence
-    )
-
-    opportunities.push({
-      kind: 'pitch_deck',
-      title: 'Pitch Deck',
-      readiness: Math.round(confidence * 100),
-      thresholdMet: confidence >= 0.68,
-      suggestion: 'You may be ready for a pitch deck.',
-      preparationQuestion:
-        'Who is the pitch deck for, and what should it help them decide?',
-      executionLabel: 'Build Pitch Deck',
-      confidence,
-    })
-  }
-
-  if (
-    input.trajectory.potentialFutureNeeds.includes('brief') &&
-    !input.trajectory.potentialFutureNeeds.includes('deck')
-  ) {
-    const confidence = Math.max(
-      input.trajectory.confidence,
-      input.outcomeState.confidence
-    )
-
-    opportunities.push({
-      kind: 'brief',
-      title: 'Brief',
-      readiness: Math.round(confidence * 100),
-      thresholdMet: confidence >= 0.68,
-      suggestion: 'You may be ready for a brief.',
-      preparationQuestion:
-        'Who will use the brief, and what should it help them understand or decide?',
-      executionLabel: 'Build Brief',
-      confidence,
-    })
-  }
 
   if ((input.outcomeState.stability ?? input.outcomeState.confidence) < 0.55 && input.outcomeState.constraints?.length) {
     resources.push({

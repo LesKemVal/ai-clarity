@@ -27,7 +27,7 @@ import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
-import { resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
+import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
@@ -801,10 +801,38 @@ const operationalResourceMonitor = resolveOperationalResourceMonitor({
 assert(operationalResourceMonitor.resources.length > 0, 'operational resource monitor should surface at least one high-value resource')
 assert(operationalResourceMonitor.resources.length <= 3, 'operational resource monitor should remain bounded')
 assert(
+  OPPORTUNITY_READINESS_REGISTRY.length === 3 &&
+    new Set(OPPORTUNITY_READINESS_REGISTRY.map((item) => item.kind)).size ===
+      OPPORTUNITY_READINESS_REGISTRY.length,
+  'opportunity readiness should be registered once per capability'
+)
+assert(
   operationalResourceMonitor.opportunity?.kind === 'live_support' &&
     operationalResourceMonitor.opportunity.readiness >= 68 &&
     operationalResourceMonitor.opportunity.thresholdMet,
   'operational resource monitor should expose the highest-confidence readiness opportunity'
+)
+
+const pitchDeckOpportunityMonitor = resolveOperationalResourceMonitor({
+  outcomeState,
+  conversationStrategy: operationalJudgment.conversationStrategy,
+  operationalJudgment,
+  trajectory: {
+    currentMove: outcomeState.immediateOutcome,
+    likelyNextMoves: ['prepare'],
+    potentialFutureNeeds: ['deck', 'brief'],
+    confidence: 0.82,
+  },
+  liveRecommendationPresentation: {
+    ...liveRecommendationPresentation,
+    show: false,
+  },
+})
+
+assert(
+  pitchDeckOpportunityMonitor.opportunity?.kind === 'pitch_deck' &&
+    pitchDeckOpportunityMonitor.opportunity.thresholdMet,
+  'opportunity registry should prefer the more specific pitch deck capability over a generic brief'
 )
 assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
 
