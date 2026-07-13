@@ -416,6 +416,7 @@ export function resolveGeorgeRuntimePipeline(
 
   const providerRequest = measureStage('provider_request_assembly', () =>
     buildGeorgeProviderRequest({
+      currentRuntime: input.currentRuntime,
       runtimeContextBlock,
       latestUserText: input.latestUserText,
       prompt: input.providerPrompt,
@@ -452,6 +453,7 @@ export function resolveGeorgeRuntimePipeline(
 
 
 export function buildGeorgeProviderRequest(input: {
+  currentRuntime: CurrentGeorgeRuntime
   runtimeContextBlock: string
   latestUserText: string
   prompt: GeorgeProviderPromptInput
@@ -471,6 +473,9 @@ export function buildGeorgeProviderRequest(input: {
     : input.runtimeContextBlock
   const hasProviderExecutionAuthority =
     runtimeContextBlock.includes('PROVIDER EXECUTION AUTHORITY')
+  const compactNormalProviderBoundary =
+    input.currentRuntime === 'normal_george' &&
+    hasProviderExecutionAuthority
   const runtimeContextBeforeBase = hasProviderExecutionAuthority
     ? ''
     : runtimeContextBlock
@@ -500,13 +505,22 @@ NORMAL AMBIGUITY AUTHORITY
 - Do not choose one domain merely because it is operationally familiar.`
     : ''
 
-  const systemContent =
-    prompt.languageRule +
-    prompt.modeBlock +
-    runtimeContextBeforeBase +
-    prompt.baseSystemPrompt +
-    operationalPromptBlocks +
-    `
+  const systemContent = compactNormalProviderBoundary
+    ? prompt.languageRule +
+      prompt.modeBlock +
+      `
+
+${liveOpening}
+
+${liveDiscipline}
+
+${runtimeContextAfterDiscipline}`
+    : prompt.languageRule +
+      prompt.modeBlock +
+      runtimeContextBeforeBase +
+      prompt.baseSystemPrompt +
+      operationalPromptBlocks +
+      `
 
 ${prompt.conversationEngineRulesBlock}
 

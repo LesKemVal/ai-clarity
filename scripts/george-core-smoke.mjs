@@ -1329,6 +1329,16 @@ assert(
   'Normal provider execution authority should remain final even when LIVE availability is surfaced during Normal preparation'
 )
 assert(
+  !qualifiedRuntimePipeline.providerRequest.systemContent.includes('BASE') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('SOURCE') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('CONTROL') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('SCORES') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('STEERING') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('DYNAMIC') &&
+    !qualifiedRuntimePipeline.providerRequest.systemContent.includes('ENGINE'),
+  'Normal consolidated provider authority should replace redundant legacy provider guidance'
+)
+assert(
   GEORGE_RUNTIME_PIPELINE.stages.length === new Set(GEORGE_RUNTIME_PIPELINE.stages).size,
   'canonical pipeline stage declarations should be unique'
 )
@@ -1354,6 +1364,7 @@ assert(
 )
 
 const providerRequest = buildGeorgeProviderRequest({
+  currentRuntime: 'live_george',
   runtimeContextBlock: 'RUNTIME CONTEXT',
   latestUserText: 'Continue the current request.',
   prompt: {
@@ -1379,6 +1390,7 @@ assert(
 )
 
 const ambiguousKnowledgeRequest = buildGeorgeProviderRequest({
+  currentRuntime: 'normal_george',
   runtimeContextBlock: governedRuntimeContext,
   latestUserText: 'What is dilution?',
   prompt: {
@@ -1419,6 +1431,7 @@ assert(
 )
 
 const liveAmbiguousKnowledgeRequest = buildGeorgeProviderRequest({
+  currentRuntime: 'live_george',
   runtimeContextBlock: governedRuntimeContext,
   latestUserText: 'What is dilution?',
   prompt: {
@@ -1440,12 +1453,15 @@ const liveAmbiguousKnowledgeRequest = buildGeorgeProviderRequest({
 
 assert(
   liveAmbiguousKnowledgeRequest.systemContent.includes(governedRuntimeContext) &&
+    liveAmbiguousKnowledgeRequest.systemContent.includes('BASE') &&
+    liveAmbiguousKnowledgeRequest.systemContent.includes('ENGINE') &&
     liveAmbiguousKnowledgeRequest.systemContent.includes('LIVE DISCIPLINE') &&
     !liveAmbiguousKnowledgeRequest.systemContent.includes('NORMAL AMBIGUITY AUTHORITY'),
-  'Normal ambiguity isolation must not alter LIVE execution context or discipline'
+  'Normal provider compaction and ambiguity isolation must not alter LIVE provider guidance'
 )
 
 const contextualKnowledgeRequest = buildGeorgeProviderRequest({
+  currentRuntime: 'normal_george',
   runtimeContextBlock: governedRuntimeContext,
   latestUserText: 'What does that dilution mean for my company?',
   prompt: {
