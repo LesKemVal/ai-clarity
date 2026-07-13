@@ -803,8 +803,13 @@ assert(operationalResourceMonitor.resources.length <= 3, 'operational resource m
 assert(
   OPPORTUNITY_READINESS_REGISTRY.length === 3 &&
     new Set(OPPORTUNITY_READINESS_REGISTRY.map((item) => item.kind)).size ===
-      OPPORTUNITY_READINESS_REGISTRY.length,
-  'opportunity readiness should be registered once per capability'
+      OPPORTUNITY_READINESS_REGISTRY.length &&
+    OPPORTUNITY_READINESS_REGISTRY.every(
+      (item) =>
+        item.tapAction === 'continue_preparation' ||
+        item.tapAction === 'open_execution_gateway'
+    ),
+  'opportunity readiness should be registered once per capability with a declarative consumer action'
 )
 assert(
   operationalResourceMonitor.opportunity?.kind === 'live_support' &&

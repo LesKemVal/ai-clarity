@@ -1694,11 +1694,6 @@ const [savePopupUpward, setSavePopupUpward] = useState(true)
 const [lastDomain, setLastDomain] = useState<string | null>(null)
 const [operationalResourceMonitor, setOperationalResourceMonitor] = useState<OperationalResourceMonitorState | null>(null)
 const liveBarMessages = useMemo(() => {
-  const recentUser = messages
-    .slice()
-    .reverse()
-    .find((message) => message.role === 'user')?.content || ''
-
   const opportunity = operationalResourceMonitor?.opportunity
 
   if (opportunity) {
@@ -1706,9 +1701,9 @@ const liveBarMessages = useMemo(() => {
       ? [
           opportunity.suggestion,
           `${opportunity.title} readiness · ${opportunity.readiness}%`,
-          opportunity.kind === 'live_support'
-            ? 'Tap to continue LIVE preparation.'
-            : 'Tap to keep preparing in this conversation.',
+          opportunity.tapAction === 'open_execution_gateway'
+            ? opportunity.executionLabel
+            : 'Tap to continue preparing in this conversation.',
         ]
       : [
           `${opportunity.title} readiness · ${opportunity.readiness}%`,
@@ -1716,44 +1711,11 @@ const liveBarMessages = useMemo(() => {
         ]
   }
 
-  const base = livePreparationReadiness.thresholdMet
-    ? [
-        `Ready to Go LIVE · ${livePreparationReadiness.percent}%`,
-        'Tap to continue from the first missing preparation step.',
-        'I can prepare you for this conversation.',
-      ]
-    : [
-        `LIVE readiness · ${livePreparationReadiness.percent}%`,
-        'I’m building the room, role, and outcome.',
-        'Tap LIVE when you want to continue preparation.',
-      ]
-
-  if (/interview|hiring|job|candidate/i.test(recentUser)) {
-    return activePromptContext === 'pre_live_signal_ready'
-      ? ['Tap LIVE and we’ll enter the interview.', 'I’ll help you answer clearly.', 'Ready when you are.']
-      : ['Prepare this interview for LIVE.', 'I’ll track role, proof, and timing.', 'Quick LIVE or Full Brief.']
-  }
-
-  if (/investor|pitch|raise|funding|capital/i.test(recentUser)) {
-    return activePromptContext === 'pre_live_signal_ready'
-      ? ['Tap LIVE and we’ll enter the room.', 'I’ll help you anchor value.', 'Ready when you are.']
-      : ['Prepare this investor conversation.', 'I’ll track proof, risk, and close.', 'Quick LIVE or Full Brief.']
-  }
-
-  if (/negotiat|deal|terms|price|contract/i.test(recentUser)) {
-    return activePromptContext === 'pre_live_signal_ready'
-      ? ['Tap LIVE and we’ll negotiate.', 'I’ll help you protect position.', 'Ready when you are.']
-      : ['Prepare this negotiation for LIVE.', 'I’ll track leverage and next move.', 'Quick LIVE or Full Brief.']
-  }
-
-  return base
-}, [
-  activePromptContext,
-  livePreparationReadiness.percent,
-  livePreparationReadiness.thresholdMet,
-  messages,
-  operationalResourceMonitor,
-])
+  return [
+    'Opportunity readiness',
+    'Keep working with GEORGE. I’ll surface the strongest next capability when it becomes useful.',
+  ]
+}, [operationalResourceMonitor])
 
 useEffect(() => {
   if (messages.length === 0) setOperationalResourceMonitor(null)
@@ -8025,7 +7987,7 @@ Continue from here, tell me what changed, or start fresh.`
     onClick={() => {
       const opportunity = operationalResourceMonitor?.opportunity
 
-      if (opportunity && opportunity.kind !== 'live_support') {
+      if (opportunity?.tapAction === 'continue_preparation') {
         const preparationMessage: Message = {
           role: 'assistant',
           content: opportunity.preparationQuestion,
@@ -8057,8 +8019,7 @@ Continue from here, tell me what changed, or start fresh.`
       openLiveEntryFromMessage(latestAssistant || messagesRef.current[messagesRef.current.length - 1])
     }}
     className={`relative mb-2 w-full overflow-hidden rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
-      (operationalResourceMonitor?.opportunity?.thresholdMet ||
-        livePreparationReadiness.thresholdMet)
+      operationalResourceMonitor?.opportunity?.thresholdMet
         ? 'border-[#4E7CFF]/50 bg-[#4E7CFF]/[0.16] shadow-[0_0_34px_rgba(78,124,255,0.18)]'
         : 'border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.08] hover:bg-[#4E7CFF]/[0.12]'
     }`}
@@ -8069,9 +8030,7 @@ Continue from here, tell me what changed, or start fresh.`
     <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
       {operationalResourceMonitor?.opportunity
         ? `${operationalResourceMonitor.opportunity.title.toUpperCase()} READINESS`
-        : livePreparationReadiness.thresholdMet
-          ? 'READY TO GO LIVE'
-          : 'OPPORTUNITY READINESS'}
+        : 'OPPORTUNITY READINESS'}
     </div>
     <div className="mt-1 text-[12px] leading-5 text-[#D7DBE4]/68">
       {liveBarTypedText}

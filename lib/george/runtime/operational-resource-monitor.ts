@@ -27,6 +27,10 @@ export type OpportunityReadinessKind =
   | 'pitch_deck'
   | 'brief'
 
+export type OpportunityTapAction =
+  | 'continue_preparation'
+  | 'open_execution_gateway'
+
 export type OpportunityReadiness = {
   kind: OpportunityReadinessKind
   title: string
@@ -35,6 +39,7 @@ export type OpportunityReadiness = {
   suggestion: string
   preparationQuestion: string
   executionLabel: string
+  tapAction: OpportunityTapAction
 }
 
 type OpportunityReadinessInput = {
@@ -53,11 +58,11 @@ type OpportunityDefinition = {
   suggestion: string
   preparationQuestion: string
   executionLabel: string
+  tapAction: OpportunityTapAction
   threshold: number
 }
 
-export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] =
-  Object.freeze([
+export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = [
     {
       kind: 'live_support',
       title: 'LIVE',
@@ -74,6 +79,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] =
       preparationQuestion:
         'What outcome matters most in the conversation you are preparing for?',
       executionLabel: 'Tap to go LIVE',
+      tapAction: 'continue_preparation',
       threshold: 0.68,
     },
     {
@@ -90,6 +96,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] =
       preparationQuestion:
         'Who is the pitch deck for, and what should it help them decide?',
       executionLabel: 'Build Pitch Deck',
+      tapAction: 'continue_preparation',
       threshold: 0.68,
     },
     {
@@ -107,9 +114,10 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] =
       preparationQuestion:
         'Who will use the brief, and what should it help them understand or decide?',
       executionLabel: 'Build Brief',
+      tapAction: 'continue_preparation',
       threshold: 0.68,
     },
-  ])
+  ]
 
 export type OperationalResourceMonitorState = {
   headline: string
@@ -136,6 +144,7 @@ export function resolveOperationalResourceMonitor(
         suggestion: definition.suggestion,
         preparationQuestion: definition.preparationQuestion,
         executionLabel: definition.executionLabel,
+        tapAction: definition.tapAction,
         confidence,
       }
     })
@@ -227,6 +236,7 @@ export function resolveOperationalResourceMonitor(
           suggestion: opportunity.suggestion,
           preparationQuestion: opportunity.preparationQuestion,
           executionLabel: opportunity.executionLabel,
+          tapAction: opportunity.tapAction,
         }
       : null,
     resources: ranked,
