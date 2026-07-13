@@ -50,9 +50,17 @@ export type GeorgeResourceUsage =
 
 export type GeorgeExecutionAudience = 'user' | 'room_through_user'
 
+export type GeorgeNormalExecutionPosture =
+  | 'planning'
+  | 'preparing'
+  | 'execution_imminent'
+  | 'recovering'
+
+
 export type GeorgeExecutionPolicy = {
   executionType: GeorgeExecutionType
   audience: GeorgeExecutionAudience
+  normalPosture?: GeorgeNormalExecutionPosture
   realizationMode: GeorgeRealizationMode
   explanationDepth: GeorgeExplanationDepth
   deliveryPreference: GeorgeDeliveryPreference
@@ -72,16 +80,24 @@ export type GeorgeExecutionPolicyInput = {
   operationalJudgment: OperationalJudgment
   outcomeEvolution: OutcomeEvolution
   operationalResourceMonitor: OperationalResourceMonitorState
+  latestUserText: string
 }
 
 export function resolveGeorgeExecutionPolicy(
   input: GeorgeExecutionPolicyInput
 ): GeorgeExecutionPolicy {
   const live = input.runtime === 'live_george'
+  const normalPosture = live
+    ? undefined
+    : resolveNormalExecutionPosture(input)
   const executionType = resolveExecutionType(input.strategy.move, live)
   const audience: GeorgeExecutionAudience = live ? 'room_through_user' : 'user'
   const realizationMode = resolveRealizationMode(executionType)
-  const explanationDepth = resolveExplanationDepth(executionType, live)
+  const explanationDepth = resolveExplanationDepth(
+    executionType,
+    live,
+    normalPosture
+  )
   const deliveryPreference = resolveDeliveryPreference(live, input.voiceMode)
   const assumptionHandling = resolveAssumptionHandling(input.moveDefinition)
   const repetitionPolicy =
@@ -100,6 +116,7 @@ export function resolveGeorgeExecutionPolicy(
   return {
     executionType,
     audience,
+    normalPosture,
     realizationMode,
     explanationDepth,
     deliveryPreference,
@@ -110,6 +127,42 @@ export function resolveGeorgeExecutionPolicy(
     purpose: input.strategy.purpose,
     source: 'execution_policy',
   }
+}
+
+export function resolveNormalExecutionPosture(
+  input: GeorgeExecutionPolicyInput
+): GeorgeNormalExecutionPosture {
+  const text = String(input.latestUserText || '').toLowerCase()
+
+  if (
+    input.outcomeEvolution.kind === 'contradiction_detected' ||
+    input.operationalJudgment.action === 'restore_continuity' ||
+    input.operationalJudgment.action === 'warn_and_move'
+  ) {
+    return 'recovering'
+  }
+
+  const executionImminent =
+    /\b(about to|walking into|starts? in|begin(?:s|ning)? in|in \d+\s*(?:minute|minutes|hour|hours)|later today|this afternoon|this evening|tonight|tomorrow|meeting is today|call is today|interview is today)\b/i.test(
+      text
+    ) ||
+    /\b(already negotiating|already discussing terms|in the room|on the call)\b/i.test(
+      text
+    )
+
+  if (executionImminent) return 'execution_imminent'
+
+  if (
+    input.operationalResourceMonitor.opportunity?.thresholdMet ||
+    input.strategy.move === 'explore' ||
+    input.strategy.move === 'ask' ||
+    input.strategy.move === 'clarify' ||
+    input.strategy.move === 'probe'
+  ) {
+    return 'preparing'
+  }
+
+  return 'planning'
 }
 
 function resolveExecutionType(
@@ -164,10 +217,15 @@ function resolveRealizationMode(
 
 function resolveExplanationDepth(
   executionType: GeorgeExecutionType,
-  live: boolean
+  live: boolean,
+  normalPosture?: GeorgeNormalExecutionPosture
 ): GeorgeExplanationDepth {
   if (live || executionType === 'live_cue' || executionType === 'tactical_reminder') {
     return 'minimal'
+  }
+  if (normalPosture === 'execution_imminent') return 'minimal'
+  if (normalPosture === 'preparing' || normalPosture === 'recovering') {
+    return 'concise'
   }
   if (executionType === 'preparation' || executionType === 'comparison') {
     return 'expanded'
@@ -200,6 +258,7 @@ export function buildExecutionPolicyNote(policy: GeorgeExecutionPolicy) {
 EXECUTION POLICY
 - Execution type: ${policy.executionType}
 - Audience: ${policy.audience}
+- Normal execution posture: ${policy.normalPosture || 'not applicable'}
 - Realization mode: ${policy.realizationMode}
 - Explanation depth: ${policy.explanationDepth}
 - Delivery preference: ${policy.deliveryPreference}
@@ -208,6 +267,11 @@ EXECUTION POLICY
 - Operational resource usage: ${policy.resourceUsage}
 - Realize the selected move supplied by Conversation Strategy; do not replace it with a different strategy.
 - When audience is user, speak directly with the user in a natural Normal GEORGE conversation. Ask direct questions when the move is ask, clarify, or probe; do not turn them into room scripts.
+- Normal execution posture changes preparation for the user only. It never changes LIVE response shaping, room behavior, receiver realization, timing, or delivery.
+- In Normal planning posture, reason conversationally and avoid prematurely constructing a complete consultant package.
+- In Normal preparing posture, narrow the governing outcome and material constraints before generating openings, key-point lists, objection packages, closes, or scripts unless the user explicitly asks for them.
+- In Normal execution_imminent posture, stop broad planning. Acknowledge what the user is protecting, give the smallest immediately useful tactical preparation, and ask at most one question only when Operational Judgment says the missing signal is worth the cost.
+- In Normal recovering posture, stabilize the objective, resolve contradiction or drift, and help the user regain direction before expanding.
 - In Normal, keep internal runtime framing internal and answer the user's request as a coherent conversation.
 - Let the selected move, outcome, and available evidence determine the response structure; do not force a briefing block, cue sheet, or canned rhetorical pattern.
 - When audience is room_through_user, provide room-executable support for the user to carry into the room. Keep it brief, adaptable, and appropriate to the receiver profile.

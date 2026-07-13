@@ -29,7 +29,7 @@ import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
 import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
 import { buildOpportunitySignalAcquisitionMessage } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
-import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
+import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy, resolveNormalExecutionPosture } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
 import { buildGeorgeProviderRequest, GEORGE_RUNTIME_PIPELINE, isStandaloneAmbiguousKnowledgeQuestion, resolveGeorgeRuntimePipeline, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
@@ -956,6 +956,7 @@ const normalExecutionPolicy = resolveGeorgeExecutionPolicy({
   operationalJudgment,
   outcomeEvolution: phaseEvolution,
   operationalResourceMonitor,
+  latestUserText: 'Help me prepare for the investor conversation.',
 })
 assert(normalExecutionPolicy.source === 'execution_policy', 'execution policy should expose canonical ownership')
 assert(normalExecutionPolicy.deliveryPreference === 'text', 'Normal execution policy should preserve text delivery')
@@ -994,9 +995,54 @@ const normalQuestionPolicy = resolveGeorgeExecutionPolicy({
   operationalJudgment: { ...operationalJudgment, conversationStrategy: normalQuestionStrategy },
   outcomeEvolution: phaseEvolution,
   operationalResourceMonitor,
+  latestUserText: 'Help me prepare for the investor conversation.',
 })
 assert(normalQuestionPolicy.executionType === 'direct_question', 'Normal question moves should ask the user directly rather than generate room scripts')
 assert(buildExecutionPolicyNote(normalQuestionPolicy).includes('speak directly with the user'), 'Normal execution note should preserve user-facing conversation')
+
+const imminentNormalPolicy = resolveGeorgeExecutionPolicy({
+  runtime: 'normal_george',
+  voiceMode: false,
+  strategy: operationalJudgment.conversationStrategy,
+  moveDefinition: operationalJudgment.conversationStrategy.definition,
+  operationalJudgment,
+  outcomeEvolution: phaseEvolution,
+  operationalResourceMonitor,
+  latestUserText:
+    'They are pushing for more governance rights than I am comfortable with, and the meeting is tomorrow.',
+})
+
+assert(
+  imminentNormalPolicy.normalPosture === 'execution_imminent' &&
+    imminentNormalPolicy.audience === 'user' &&
+    imminentNormalPolicy.explanationDepth === 'minimal',
+  'Normal execution-imminent posture should become tactical for the user without adopting LIVE room-facing behavior'
+)
+assert(
+  buildExecutionPolicyNote(imminentNormalPolicy).includes(
+    'stop broad planning'
+  ) &&
+    buildExecutionPolicyNote(imminentNormalPolicy).includes(
+      'never changes LIVE response shaping'
+    ),
+  'Normal execution posture should explicitly preserve the Normal/LIVE realization boundary'
+)
+
+const livePostureIsolation = resolveNormalExecutionPosture({
+  runtime: 'normal_george',
+  voiceMode: false,
+  strategy: operationalJudgment.conversationStrategy,
+  moveDefinition: operationalJudgment.conversationStrategy.definition,
+  operationalJudgment,
+  outcomeEvolution: phaseEvolution,
+  operationalResourceMonitor,
+  latestUserText: 'The meeting starts in five minutes.',
+})
+
+assert(
+  livePostureIsolation === 'execution_imminent',
+  'Normal posture resolver should recognize imminent execution from current-turn evidence'
+)
 
 const liveQuestionStrategy = resolveGeorgeConversationStrategy({
   action: 'execute_live_move',
@@ -1024,6 +1070,7 @@ const liveQuestionPolicy = resolveGeorgeExecutionPolicy({
   operationalJudgment: { ...operationalJudgment, conversationStrategy: liveQuestionStrategy },
   outcomeEvolution: phaseEvolution,
   operationalResourceMonitor,
+  latestUserText: 'They raised a concern but the specific issue is unclear.',
 })
 assert(liveQuestionPolicy.executionType === 'suggested_question', 'question moves should resolve to suggested-question execution')
 assert(liveQuestionPolicy.audience === 'room_through_user', 'LIVE execution should produce room-ready support through the user')

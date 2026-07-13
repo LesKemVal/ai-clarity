@@ -328,6 +328,7 @@ export function resolveGeorgeRuntimePipeline(
       operationalJudgment,
       outcomeEvolution,
       operationalResourceMonitor,
+      latestUserText: input.latestUserText,
     })
   )
 
