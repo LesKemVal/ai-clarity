@@ -37,6 +37,7 @@ export type OpportunityReadiness = {
   readiness: number
   thresholdMet: boolean
   suggestion: string
+  sessionActivation: string
   preparationQuestion: string
   executionLabel: string
   tapAction: OpportunityTapAction
@@ -56,6 +57,7 @@ type OpportunityDefinition = {
   applies: (input: OpportunityReadinessInput) => boolean
   confidence: (input: OpportunityReadinessInput) => number
   suggestion: string
+  sessionActivation: string
   preparationQuestion: string
   executionLabel: string
   tapAction: OpportunityTapAction
@@ -76,6 +78,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
             : 0.78
           : input.trajectory.confidence,
       suggestion: 'You may be ready for LIVE support.',
+      sessionActivation: 'Let’s prepare LIVE support for this session.',
       preparationQuestion:
         'What outcome matters most in the conversation you are preparing for?',
       executionLabel: 'Tap to go LIVE',
@@ -93,6 +96,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
           input.outcomeState.confidence
         ),
       suggestion: 'You may be ready for a pitch deck.',
+      sessionActivation: 'Let’s prepare a pitch deck for this session.',
       preparationQuestion:
         'Who is the pitch deck for, and what should it help them decide?',
       executionLabel: 'Build Pitch Deck',
@@ -111,6 +115,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
           input.outcomeState.confidence
         ),
       suggestion: 'You may be ready for a brief.',
+      sessionActivation: 'Let’s prepare a brief for this session.',
       preparationQuestion:
         'Who will use the brief, and what should it help them understand or decide?',
       executionLabel: 'Build Brief',
@@ -125,6 +130,12 @@ export type OperationalResourceMonitorState = {
   opportunity: OpportunityReadiness | null
   resources: OperationalResource[]
   source: 'operational_resource_monitor'
+}
+
+export function buildOpportunitySessionPreparationMessage(
+  opportunity: OpportunityReadiness
+) {
+  return `${opportunity.sessionActivation}\n\n${opportunity.preparationQuestion}`
 }
 
 export function resolveOperationalResourceMonitor(
@@ -142,6 +153,7 @@ export function resolveOperationalResourceMonitor(
         readiness: Math.round(confidence * 100),
         thresholdMet: confidence >= definition.threshold,
         suggestion: definition.suggestion,
+        sessionActivation: definition.sessionActivation,
         preparationQuestion: definition.preparationQuestion,
         executionLabel: definition.executionLabel,
         tapAction: definition.tapAction,
@@ -234,6 +246,7 @@ export function resolveOperationalResourceMonitor(
           readiness: opportunity.readiness,
           thresholdMet: opportunity.thresholdMet,
           suggestion: opportunity.suggestion,
+          sessionActivation: opportunity.sessionActivation,
           preparationQuestion: opportunity.preparationQuestion,
           executionLabel: opportunity.executionLabel,
           tapAction: opportunity.tapAction,

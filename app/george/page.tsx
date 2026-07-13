@@ -75,7 +75,10 @@ import {
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
-import type { OperationalResourceMonitorState } from '@/lib/george/runtime/operational-resource-monitor'
+import {
+  buildOpportunitySessionPreparationMessage,
+  type OperationalResourceMonitorState,
+} from '@/lib/george/runtime/operational-resource-monitor'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -7990,9 +7993,29 @@ Continue from here, tell me what changed, or start fresh.`
       if (opportunity?.tapAction === 'continue_preparation') {
         const preparationMessage: Message = {
           role: 'assistant',
-          content: opportunity.preparationQuestion,
+          content: buildOpportunitySessionPreparationMessage(opportunity),
           source: 'system_override',
         }
+
+        const sessionId = getActiveSessionIdForMode('normal')
+
+        try {
+          window.localStorage.setItem(
+            'GEORGE_ACTIVE_SESSION_RESOURCE',
+            JSON.stringify({
+              sessionId: sessionId || null,
+              kind: opportunity.kind,
+              title: opportunity.title,
+              readiness: opportunity.readiness,
+              state: 'preparing',
+              linkedAt: Date.now(),
+            })
+          )
+        } catch {}
+
+        setActivePromptContext(`opportunity_preparation:${opportunity.kind}`)
+        setActivePromptLabel(opportunity.title)
+        setContextTurnCount(0)
 
         setMessages((prev) => {
           const next = [...prev, preparationMessage]

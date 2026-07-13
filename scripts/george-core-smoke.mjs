@@ -27,7 +27,7 @@ import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
-import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
+import { buildOpportunitySessionPreparationMessage, OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
@@ -838,6 +838,18 @@ assert(
   pitchDeckOpportunityMonitor.opportunity?.kind === 'pitch_deck' &&
     pitchDeckOpportunityMonitor.opportunity.thresholdMet,
   'opportunity registry should prefer the more specific pitch deck capability over a generic brief'
+)
+assert(
+  pitchDeckOpportunityMonitor.opportunity &&
+    buildOpportunitySessionPreparationMessage(
+      pitchDeckOpportunityMonitor.opportunity
+    ).includes('for this session') &&
+    buildOpportunitySessionPreparationMessage(
+      pitchDeckOpportunityMonitor.opportunity
+    ).includes(
+      pitchDeckOpportunityMonitor.opportunity.preparationQuestion
+    ),
+  'tapping an opportunity should link its preparation to the active session conversationally'
 )
 assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
 
