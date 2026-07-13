@@ -48,7 +48,11 @@ import {
 } from '@/lib/george/runtime/outcome-evolution'
 import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
-import { buildGovernedRuntimeContext } from '@/lib/george/runtime/runtime-context-composer'
+import {
+  buildGovernedRuntimeContext,
+  buildNormalProviderRuntimeContext,
+  buildProviderExecutionAuthority,
+} from '@/lib/george/runtime/runtime-context-composer'
 import {
   assessTrajectory,
   buildTrajectoryNote,
@@ -184,6 +188,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
     contextFramingNote: string
     liveRecommendationPresentationNote: string
     executionPolicyNote: string
+    providerExecutionAuthority: string
   }>
   source: 'runtime_pipeline'
 }>
@@ -347,21 +352,66 @@ export function resolveGeorgeRuntimePipeline(
         liveRecommendationPresentation
       ),
       executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
+      providerExecutionAuthority: buildProviderExecutionAuthority({
+        runtime: input.currentRuntime,
+        action: operationalJudgment.action,
+        strategyMove: conversationStrategy.move,
+        strategyPurpose: conversationStrategy.purpose,
+        executionType: executionPolicy.executionType,
+        audience: executionPolicy.audience,
+        normalPosture: executionPolicy.normalPosture,
+        explanationDepth: executionPolicy.explanationDepth,
+        assumptionHandling: executionPolicy.assumptionHandling,
+        repetitionPolicy: executionPolicy.repetitionPolicy,
+        signalShouldAcquire:
+          operationalJudgment.signalAcquisition.shouldAcquire,
+        requestedSignal:
+          operationalJudgment.signalAcquisition.requestedSignal,
+        signalReason: operationalJudgment.signalAcquisition.reason,
+        opportunityTitle: operationalResourceMonitor.opportunity?.title,
+        opportunityReadiness:
+          operationalResourceMonitor.opportunity?.readiness,
+        opportunityThresholdMet:
+          operationalResourceMonitor.opportunity?.thresholdMet,
+      }),
     })
   )
 
-  const runtimeContextBlock = measureStage('runtime_context_assembly', () =>
-    buildGovernedRuntimeContext({
-      ...input.governedContextNotes,
-      trajectoryNote: notes.trajectoryNote,
-      operationalJudgmentNote: notes.operationalJudgmentNote,
-      outcomeEvolutionNote: notes.outcomeEvolutionNote,
-      conversationStrategyNote: notes.conversationStrategyNote,
-      conversationMoveDefinitionNote: notes.conversationMoveDefinitionNote,
-      executionPolicyNote: notes.executionPolicyNote,
-      contextFramingNote: notes.contextFramingNote,
-      liveRecommendationPresentationNote: notes.liveRecommendationPresentationNote,
-    })
+  const runtimeContextBlock = measureStage(
+    'runtime_context_assembly',
+    () =>
+      input.currentRuntime === 'normal_george'
+        ? buildNormalProviderRuntimeContext({
+            providerExecutionAuthority:
+              notes.providerExecutionAuthority,
+            adaptiveUserProfileNote:
+              input.governedContextNotes.adaptiveUserProfileNote,
+            durableBehavioralMemoryNote:
+              input.governedContextNotes.durableBehavioralMemoryNote,
+            runtimeOutcomeLearningNote:
+              input.governedContextNotes.runtimeOutcomeLearningNote,
+            continuityRestorationNote:
+              input.governedContextNotes.continuityRestorationNote,
+            continuityGovernanceNote:
+              input.governedContextNotes.continuityGovernanceNote,
+            presentationAuthorityNote:
+              input.governedContextNotes.presentationAuthorityNote,
+          })
+        : buildGovernedRuntimeContext({
+            ...input.governedContextNotes,
+            trajectoryNote: notes.trajectoryNote,
+            operationalJudgmentNote:
+              notes.operationalJudgmentNote,
+            outcomeEvolutionNote: notes.outcomeEvolutionNote,
+            conversationStrategyNote:
+              notes.conversationStrategyNote,
+            conversationMoveDefinitionNote:
+              notes.conversationMoveDefinitionNote,
+            executionPolicyNote: notes.executionPolicyNote,
+            contextFramingNote: notes.contextFramingNote,
+            liveRecommendationPresentationNote:
+              notes.liveRecommendationPresentationNote,
+          })
   )
 
   const providerRequest = measureStage('provider_request_assembly', () =>
@@ -419,6 +469,14 @@ export function buildGeorgeProviderRequest(input: {
   const runtimeContextBlock = preserveNormalAmbiguity
     ? ''
     : input.runtimeContextBlock
+  const hasProviderExecutionAuthority =
+    runtimeContextBlock.includes('PROVIDER EXECUTION AUTHORITY')
+  const runtimeContextBeforeBase = hasProviderExecutionAuthority
+    ? ''
+    : runtimeContextBlock
+  const runtimeContextAfterDiscipline = hasProviderExecutionAuthority
+    ? runtimeContextBlock
+    : ''
   const operationalPromptBlocks = preserveNormalAmbiguity
     ? ''
     : `
@@ -445,7 +503,7 @@ NORMAL AMBIGUITY AUTHORITY
   const systemContent =
     prompt.languageRule +
     prompt.modeBlock +
-    runtimeContextBlock +
+    runtimeContextBeforeBase +
     prompt.baseSystemPrompt +
     operationalPromptBlocks +
     `
@@ -456,7 +514,9 @@ ${ambiguityAuthority}
 
 ${liveOpening}
 
-${liveDiscipline}`
+${liveDiscipline}
+
+${runtimeContextAfterDiscipline}`
 
   const contextualMessages = resolveProviderConversationMessages(
     input.latestUserText,

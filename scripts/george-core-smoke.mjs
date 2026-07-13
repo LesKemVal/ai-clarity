@@ -21,7 +21,7 @@ import { resolveGeorgeCoreLiveExecution } from '${process.cwd()}/lib/george/core
 import { resolveNormalGeorgeReasoning } from '${process.cwd()}/lib/george/runtime/normal-reasoning-governor'
 import { resolvePreProviderSend } from '${process.cwd()}/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '${process.cwd()}/lib/george/runtime/training-runtime'
-import { buildGovernedRuntimeContext } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
+import { buildGovernedRuntimeContext, buildNormalProviderRuntimeContext, buildProviderExecutionAuthority } from '${process.cwd()}/lib/george/runtime/runtime-context-composer'
 import { buildOperationalJudgmentNote, resolveOperationalJudgment, resolveSignalAcquisitionJudgment } from '${process.cwd()}/lib/george/runtime/operational-judgment'
 import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition, resolveSignalAcquisitionMoveVariant } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
@@ -738,6 +738,45 @@ for (const canonicalNote of [
   )
 }
 
+const providerExecutionAuthority = buildProviderExecutionAuthority({
+  runtime: 'normal_george',
+  action: 'protect_objective',
+  strategyMove: 'anchor',
+  strategyPurpose: 'Protect the active outcome.',
+  executionType: 'answer',
+  audience: 'user',
+  normalPosture: 'execution_imminent',
+  explanationDepth: 'minimal',
+  assumptionHandling: 'brief_dependency',
+  repetitionPolicy: 'avoid_restatement',
+  signalShouldAcquire: false,
+  signalReason: 'Current evidence is sufficient.',
+  opportunityTitle: 'LIVE',
+  opportunityReadiness: 84,
+  opportunityThresholdMet: true,
+})
+
+const normalProviderRuntimeContext = buildNormalProviderRuntimeContext({
+  providerExecutionAuthority,
+  adaptiveUserProfileNote: 'ADAPTIVE PROFILE',
+  durableBehavioralMemoryNote: 'DURABLE MEMORY',
+  runtimeOutcomeLearningNote: 'OUTCOME LEARNING',
+  continuityRestorationNote: 'CONTINUITY RESTORATION',
+  presentationAuthorityNote: 'PRESENTATION AUTHORITY',
+})
+
+assert(
+  normalProviderRuntimeContext.includes('PROVIDER EXECUTION AUTHORITY') &&
+    normalProviderRuntimeContext.includes('Audience: user') &&
+    normalProviderRuntimeContext.includes(
+      'Never adopt LIVE room-facing response style'
+    ) &&
+    normalProviderRuntimeContext.includes('ADAPTIVE PROFILE') &&
+    !normalProviderRuntimeContext.includes('CONVERSATION STRATEGY KNOWLEDGE') &&
+    !normalProviderRuntimeContext.includes('EXECUTION POLICY'),
+  'Normal provider context should consolidate runtime conclusions into one authoritative realization brief while preserving durable context'
+)
+
 const conversationalInvestorBridge = renderOperationalExcellenceOutput({
   reply:
     '"Lead with the traction milestone."\\n' +
@@ -1214,6 +1253,27 @@ assert(
 assert(
   qualifiedRuntimePipeline.providerRequest.systemContent.includes(qualifiedRuntimePipeline.runtimeContextBlock),
   'Provider request should consume the canonical governed runtime context'
+)
+assert(
+  qualifiedRuntimePipeline.runtimeContextBlock.includes(
+    'PROVIDER EXECUTION AUTHORITY'
+  ) &&
+    !qualifiedRuntimePipeline.runtimeContextBlock.includes(
+      'CONVERSATION STRATEGY KNOWLEDGE'
+    ) &&
+    !qualifiedRuntimePipeline.runtimeContextBlock.includes(
+      'EXECUTION POLICY'
+    ),
+  'Normal pipeline should send one consolidated runtime authority instead of overlapping reasoning notes'
+)
+assert(
+  qualifiedRuntimePipeline.providerRequest.systemContent.lastIndexOf(
+    'PROVIDER EXECUTION AUTHORITY'
+  ) >
+    qualifiedRuntimePipeline.providerRequest.systemContent.lastIndexOf(
+      'LIVE DISCIPLINE'
+    ),
+  'Normal provider execution authority should remain final even when LIVE availability is surfaced during Normal preparation'
 )
 assert(
   GEORGE_RUNTIME_PIPELINE.stages.length === new Set(GEORGE_RUNTIME_PIPELINE.stages).size,
