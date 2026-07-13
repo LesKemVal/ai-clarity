@@ -27,7 +27,8 @@ import { buildConversationStrategyNote, resolveGeorgeConversationStrategy } from
 import { buildConversationMoveDefinitionNote, listConversationMoveDefinitions, resolveConversationMoveDefinition } from '${process.cwd()}/lib/george/runtime/conversation-move-library'
 import { evaluateLiveRecommendationEvidence } from '${process.cwd()}/lib/george/runtime/live-recommendation-governor'
 import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/context-framing'
-import { buildOpportunitySessionPreparationMessage, OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
+import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
+import { buildOpportunitySignalAcquisitionMessage } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy } from '${process.cwd()}/lib/george/runtime/execution-policy'
 import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
@@ -841,15 +842,19 @@ assert(
 )
 assert(
   pitchDeckOpportunityMonitor.opportunity &&
-    buildOpportunitySessionPreparationMessage(
-      pitchDeckOpportunityMonitor.opportunity
-    ).includes('for this session') &&
-    buildOpportunitySessionPreparationMessage(
-      pitchDeckOpportunityMonitor.opportunity
-    ).includes(
-      pitchDeckOpportunityMonitor.opportunity.preparationQuestion
-    ),
-  'tapping an opportunity should link its preparation to the active session conversationally'
+    pitchDeckOpportunityMonitor.opportunity.signalNeed ===
+      'audience_decision' &&
+    buildOpportunitySignalAcquisitionMessage({
+      sessionActivation:
+        pitchDeckOpportunityMonitor.opportunity.sessionActivation,
+      signalNeed: pitchDeckOpportunityMonitor.opportunity.signalNeed,
+    }).includes('for this session') &&
+    buildOpportunitySignalAcquisitionMessage({
+      sessionActivation:
+        pitchDeckOpportunityMonitor.opportunity.sessionActivation,
+      signalNeed: pitchDeckOpportunityMonitor.opportunity.signalNeed,
+    }).includes('what should it help them decide'),
+  'Opportunity Readiness should declare the missing signal while Conversation Strategy realizes the question conversationally'
 )
 assert(operationalResourceMonitor.source === 'operational_resource_monitor', 'operational resource monitor should expose canonical ownership')
 

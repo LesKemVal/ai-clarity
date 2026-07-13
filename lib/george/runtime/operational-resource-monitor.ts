@@ -1,5 +1,8 @@
 import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
-import type { GeorgeConversationStrategy } from '@/lib/george/runtime/conversation-strategy'
+import type {
+  GeorgeConversationStrategy,
+  OpportunitySignalNeed,
+} from '@/lib/george/runtime/conversation-strategy'
 import type { OperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
 import type { LiveRecommendationPresentation } from '@/lib/george/chat/presentation-authority'
@@ -38,7 +41,7 @@ export type OpportunityReadiness = {
   thresholdMet: boolean
   suggestion: string
   sessionActivation: string
-  preparationQuestion: string
+  signalNeed: OpportunitySignalNeed
   executionLabel: string
   tapAction: OpportunityTapAction
 }
@@ -58,7 +61,7 @@ type OpportunityDefinition = {
   confidence: (input: OpportunityReadinessInput) => number
   suggestion: string
   sessionActivation: string
-  preparationQuestion: string
+  signalNeed: OpportunitySignalNeed
   executionLabel: string
   tapAction: OpportunityTapAction
   threshold: number
@@ -79,8 +82,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
           : input.trajectory.confidence,
       suggestion: 'You may be ready for LIVE support.',
       sessionActivation: 'Let’s prepare LIVE support for this session.',
-      preparationQuestion:
-        'What outcome matters most in the conversation you are preparing for?',
+      signalNeed: 'desired_outcome',
       executionLabel: 'Tap to go LIVE',
       tapAction: 'continue_preparation',
       threshold: 0.68,
@@ -97,8 +99,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
         ),
       suggestion: 'You may be ready for a pitch deck.',
       sessionActivation: 'Let’s prepare a pitch deck for this session.',
-      preparationQuestion:
-        'Who is the pitch deck for, and what should it help them decide?',
+      signalNeed: 'audience_decision',
       executionLabel: 'Build Pitch Deck',
       tapAction: 'continue_preparation',
       threshold: 0.68,
@@ -116,8 +117,7 @@ export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = 
         ),
       suggestion: 'You may be ready for a brief.',
       sessionActivation: 'Let’s prepare a brief for this session.',
-      preparationQuestion:
-        'Who will use the brief, and what should it help them understand or decide?',
+      signalNeed: 'brief_use',
       executionLabel: 'Build Brief',
       tapAction: 'continue_preparation',
       threshold: 0.68,
@@ -130,12 +130,6 @@ export type OperationalResourceMonitorState = {
   opportunity: OpportunityReadiness | null
   resources: OperationalResource[]
   source: 'operational_resource_monitor'
-}
-
-export function buildOpportunitySessionPreparationMessage(
-  opportunity: OpportunityReadiness
-) {
-  return `${opportunity.sessionActivation}\n\n${opportunity.preparationQuestion}`
 }
 
 export function resolveOperationalResourceMonitor(
@@ -154,7 +148,7 @@ export function resolveOperationalResourceMonitor(
         thresholdMet: confidence >= definition.threshold,
         suggestion: definition.suggestion,
         sessionActivation: definition.sessionActivation,
-        preparationQuestion: definition.preparationQuestion,
+        signalNeed: definition.signalNeed,
         executionLabel: definition.executionLabel,
         tapAction: definition.tapAction,
         confidence,
@@ -247,7 +241,7 @@ export function resolveOperationalResourceMonitor(
           thresholdMet: opportunity.thresholdMet,
           suggestion: opportunity.suggestion,
           sessionActivation: opportunity.sessionActivation,
-          preparationQuestion: opportunity.preparationQuestion,
+          signalNeed: opportunity.signalNeed,
           executionLabel: opportunity.executionLabel,
           tapAction: opportunity.tapAction,
         }

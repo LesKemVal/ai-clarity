@@ -31,6 +31,29 @@ export type GeorgeConversationStrategy = {
   source: 'conversation_strategy'
 }
 
+export type OpportunitySignalNeed =
+  | 'desired_outcome'
+  | 'audience_decision'
+  | 'brief_use'
+
+export type OpportunitySignalRequest = {
+  sessionActivation: string
+  signalNeed: OpportunitySignalNeed
+}
+
+export function buildOpportunitySignalAcquisitionMessage(
+  request: OpportunitySignalRequest
+) {
+  const question =
+    request.signalNeed === 'desired_outcome'
+      ? 'What outcome matters most in the conversation you are preparing for?'
+      : request.signalNeed === 'audience_decision'
+        ? 'Who is this for, and what should it help them decide?'
+        : 'Who will use it, and what should it help them understand or decide?'
+
+  return `${request.sessionActivation}\n\n${question}`
+}
+
 export type GeorgeConversationStrategyInput = {
   action:
     | 'warn_and_move'

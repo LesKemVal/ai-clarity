@@ -1,4 +1,5 @@
 'use client'
+import { buildOpportunitySignalAcquisitionMessage } from '@/lib/george/runtime/conversation-strategy'
 
 import { applyGovernedLiveCueRuntimeMemory } from '@/lib/george/live-runtime/governed-live-cue'
 
@@ -75,10 +76,7 @@ import {
 import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-resolution'
 import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
-import {
-  buildOpportunitySessionPreparationMessage,
-  type OperationalResourceMonitorState,
-} from '@/lib/george/runtime/operational-resource-monitor'
+import type { OperationalResourceMonitorState } from '@/lib/george/runtime/operational-resource-monitor'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -7993,7 +7991,10 @@ Continue from here, tell me what changed, or start fresh.`
       if (opportunity?.tapAction === 'continue_preparation') {
         const preparationMessage: Message = {
           role: 'assistant',
-          content: buildOpportunitySessionPreparationMessage(opportunity),
+          content: buildOpportunitySignalAcquisitionMessage({
+            sessionActivation: opportunity.sessionActivation,
+            signalNeed: opportunity.signalNeed,
+          }),
           source: 'system_override',
         }
 
