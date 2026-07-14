@@ -23,7 +23,7 @@ import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElem
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
 import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-runtime/live-guidance'
-import { createSession, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
+import { consumeFreshNormalBrowserSessionRequest, createSession, ensureGeorgeBrowserInstanceScope, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
@@ -1676,8 +1676,8 @@ const captureLiveEntryOptionalSignal = () => {
         window.localStorage.setItem(storageKey, JSON.stringify(cleaned))
       }
 
-      window.localStorage.removeItem('george_last_normal_draft')
-      window.localStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
+      window.sessionStorage.removeItem('george_last_normal_draft')
+      window.sessionStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
       window.localStorage.setItem(key, '1')
     } catch {
       window.localStorage.setItem(key, '1')
@@ -1961,7 +1961,7 @@ useEffect(() => {
           existingNormalMessages.length > 0 &&
           hasMeaningfulUserMessage(existingNormalMessages)
         ) {
-          window.localStorage.setItem(
+          window.sessionStorage.setItem(
             GEORGE_LAST_NORMAL_DRAFT,
             JSON.stringify({
               messages: existingNormalMessages,
@@ -2092,12 +2092,22 @@ useEffect(() => {
         (entry) => (entry as PerformanceNavigationTiming).type === 'reload'
       )
 
-    const activeSession = findGeorgeSessionToRestore({
-      mode: 'normal',
-      subscriberEmail,
-    })
+    const newBrowserInstance =
+      ensureGeorgeBrowserInstanceScope()
 
-    const transientDraft = readGeorgeNormalDraft(GEORGE_LAST_NORMAL_DRAFT)
+    const freshNormalEntryRequested =
+      consumeFreshNormalBrowserSessionRequest() || newBrowserInstance
+
+    const activeSession = freshNormalEntryRequested
+      ? null
+      : findGeorgeSessionToRestore({
+          mode: 'normal',
+          subscriberEmail,
+        })
+
+    const transientDraft = freshNormalEntryRequested
+      ? { restored: false as const, messages: [] }
+      : readGeorgeNormalDraft(GEORGE_LAST_NORMAL_DRAFT)
 
     if (transientDraft.restored) {
       const draftMessages = transientDraft.messages as Message[]
@@ -2871,7 +2881,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
     )
 
     if (normalMessages.length > 0 && hasUserMessage) {
-      window.localStorage.setItem(
+      window.sessionStorage.setItem(
         GEORGE_LAST_NORMAL_DRAFT,
         JSON.stringify({
           messages: normalMessages,
@@ -3066,7 +3076,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
     if (typeof window === 'undefined') return false
 
     try {
-      const rawDraft = window.localStorage.getItem(GEORGE_LAST_NORMAL_DRAFT)
+      const rawDraft = window.sessionStorage.getItem(GEORGE_LAST_NORMAL_DRAFT)
       const draft = rawDraft ? JSON.parse(rawDraft) : null
       const draftMessages = Array.isArray(draft?.messages) ? draft.messages : []
 
@@ -3528,7 +3538,7 @@ useEffect(() => {
 
     if (!hasUserMessage) return
 
-    window.localStorage.setItem(
+    window.sessionStorage.setItem(
       GEORGE_LAST_NORMAL_DRAFT,
       JSON.stringify({
         messages,
@@ -3538,6 +3548,8 @@ useEffect(() => {
         updatedAt: Date.now(),
       })
     )
+
+    window.localStorage.removeItem(GEORGE_LAST_NORMAL_DRAFT)
   }, [messages, liveMode, conversationMode, activePromptContext, currentTier])
 
   useEffect(() => {
@@ -3546,8 +3558,7 @@ useEffect(() => {
     if (liveMode || isManualLive) return
     if (!messages.length) return
 
-    const subscriberMetadata = getSubscriberSessionMetadata()
-    if (!subscriberMetadata) return
+    const subscriberMetadata = getSubscriberSessionMetadata() || {}
     updateActiveSessionMessages(messages, 'normal', subscriberMetadata)
   }, [messages, liveMode, conversationMode, activePromptContext])
 
@@ -4251,8 +4262,6 @@ const handleSend = useCallback(
     ) => {
       let text = (overrideText ?? input).trim()
 
-      if (text && !(forceLive || liveMode)) setHasSentFirstNormalMessage(true)
-
       const liveRuntimeSetup = (() => {
         if (typeof window === 'undefined' || !liveMode) return null
 
@@ -4339,6 +4348,23 @@ const handleSend = useCallback(
 
       if (!text && pendingImage) {
         text = `I uploaded image: ${pendingImage.name}. Describe the visible image briefly and help me use it. If a person appears, describe visible features only. Do not identify the person. Keep it concise.`
+      }
+
+      if (!(forceLive || liveMode) && !options?.hidden) {
+        const activeNormalSessionId = getActiveSessionIdForMode('normal')
+
+        if (!activeNormalSessionId) {
+          const subscriberMetadata = getSubscriberSessionMetadata() || {}
+
+          createSession(
+            'normal',
+            [],
+            'New Session',
+            subscriberMetadata
+          )
+        }
+
+        setHasSentFirstNormalMessage(true)
       }
 
       // allow override while thinking

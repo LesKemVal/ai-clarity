@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { requestFreshNormalBrowserSession } from '@/lib/george/session/store'
 
 const heroSequences = [
   {
@@ -24,22 +24,40 @@ const heroSequences = [
 ]
 
 export function HomeHeroSequence() {
-  const router = useRouter()
   const [sequenceIndex, setSequenceIndex] = useState(0)
 
   useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload()
+        return
+      }
+
+      setSequenceIndex(0)
+    }
+
+    window.addEventListener('pageshow', handlePageShow)
+
     const timer = window.setInterval(() => {
       setSequenceIndex((index) => (index + 1) % heroSequences.length)
     }, 10800)
 
-    return () => window.clearInterval(timer)
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow)
+      window.clearInterval(timer)
+    }
   }, [])
 
   const activeSequence = heroSequences[sequenceIndex]
 
+  const startNormal = () => {
+    requestFreshNormalBrowserSession()
+    window.location.href = '/george'
+  }
+
   const startLive = () => {
     window.localStorage.setItem('george_start_new_live', '1')
-    router.push('/george/live-entry?source=start')
+    window.location.href = '/george/live-entry?source=start'
   }
 
   return (
@@ -48,7 +66,7 @@ export function HomeHeroSequence() {
 
       <button
         type="button"
-        onClick={() => router.push('/george')}
+        onClick={startNormal}
         className="absolute left-5 top-5 z-40 flex h-[58px] w-[58px] items-center justify-center"
         aria-label="Open GEORGE"
       >
@@ -131,7 +149,7 @@ export function HomeHeroSequence() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
-                onClick={() => router.push('/george')}
+                onClick={startNormal}
                 className="group flex h-[56px] items-center justify-between rounded-[17px] bg-white px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.26em] text-black transition hover:-translate-y-[1px]"
               >
                 <span>Ask GEORGE <span className="text-black/45">(Prepare)</span></span>

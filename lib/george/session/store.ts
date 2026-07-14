@@ -41,15 +41,54 @@ export const GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY = 'GEORGE_ACTIVE_NORMAL_SESSION
 export const GEORGE_ACTIVE_LIVE_SESSION_ID_KEY = 'GEORGE_ACTIVE_LIVE_SESSION_ID'
 export const GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY = 'GEORGE_ACTIVE_CAMPAIGN_SESSION_ID'
 export const GEORGE_ACTIVE_MODE_KEY = 'GEORGE_ACTIVE_MODE'
+const GEORGE_FRESH_NORMAL_ENTRY_KEY = 'GEORGE_FRESH_NORMAL_ENTRY_V1'
+const GEORGE_BROWSER_INSTANCE_ID_KEY = 'GEORGE_BROWSER_INSTANCE_ID_V1'
+const GEORGE_BROWSER_WINDOW_NAME_PREFIX = 'george_browser_instance:'
+const GEORGE_DELETED_SESSION_IDS_KEY = 'GEORGE_DELETED_SESSION_IDS_V1'
 let hydratedFromServer = false
 
-async function fetchServerSessions() {
+function readDeletedSessionIds(): string[] {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const parsed = JSON.parse(
+      window.localStorage.getItem(GEORGE_DELETED_SESSION_IDS_KEY) || '[]'
+    )
+
+    return Array.isArray(parsed)
+      ? parsed.filter((value): value is string => typeof value === 'string')
+      : []
+  } catch {
+    return []
+  }
+}
+
+function writeDeletedSessionIds(ids: string[]) {
+  if (typeof window === 'undefined') return
+
+  window.localStorage.setItem(
+    GEORGE_DELETED_SESSION_IDS_KEY,
+    JSON.stringify([...new Set(ids)].slice(-100))
+  )
+}
+
+function rememberDeletedSessionId(id: string) {
+  writeDeletedSessionIds([...readDeletedSessionIds(), id])
+}
+
+function forgetDeletedSessionId(id: string) {
+  writeDeletedSessionIds(
+    readDeletedSessionIds().filter((deletedId) => deletedId !== id)
+  )
+}
+
+async function fetchServerSessions(): Promise<GeorgeStoredSession[] | null> {
   try {
     const response = await fetch('/api/george/sessions', {
       cache: 'no-store',
     })
 
-    if (!response.ok) return []
+    if (!response.ok) return null
 
     const data = await response.json()
 
@@ -57,7 +96,7 @@ async function fetchServerSessions() {
       ? data.sessions
       : []
   } catch {
-    return []
+    return null
   }
 }
 
@@ -70,9 +109,34 @@ export async function hydrateSessionsFromServer() {
 
   const sessions = await fetchServerSessions()
 
-  if (sessions.length > 0) {
-    safeWriteSessions(sessions)
+  if (sessions === null) return
+
+  const deletedIds = new Set(readDeletedSessionIds())
+  const localSessions = safeReadSessions().filter(
+    (session) => !deletedIds.has(session.id)
+  )
+  const serverSessions = sessions.filter(
+    (session) => !deletedIds.has(session.id)
+  )
+
+  const mergedById = new Map<string, GeorgeStoredSession>()
+
+  for (const session of [...serverSessions, ...localSessions]) {
+    const existing = mergedById.get(session.id)
+
+    if (!existing || session.updatedAt >= existing.updatedAt) {
+      mergedById.set(session.id, session)
+    }
   }
+
+  safeWriteSessions(
+    [...mergedById.values()].sort((a, b) => b.updatedAt - a.updatedAt)
+  )
+
+  const serverIds = new Set(sessions.map((session) => session.id))
+  writeDeletedSessionIds(
+    [...deletedIds].filter((id) => serverIds.has(id))
+  )
 }
 
 function syncSessionToServer(session: GeorgeStoredSession) {
@@ -119,54 +183,122 @@ export function getActiveSessionIdForMode(mode: GeorgeSessionMode) {
   if (typeof window === 'undefined') return null
 
   if (mode === 'live') {
-    return window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+    return window.sessionStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
   }
 
   if (mode === 'campaign') {
-    return window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+    return window.sessionStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
   }
 
-  return window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  return window.sessionStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
 }
 
 export function setActiveSessionIdForMode(mode: GeorgeSessionMode, id: string) {
   if (typeof window === 'undefined') return
 
   if (mode === 'live') {
-    window.localStorage.setItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY, id)
+    window.sessionStorage.setItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY, id)
   } else if (mode === 'campaign') {
-    window.localStorage.setItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY, id)
+    window.sessionStorage.setItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY, id)
   } else {
-    window.localStorage.setItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY, id)
+    window.sessionStorage.setItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY, id)
   }
 
-  window.localStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
+  window.sessionStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
 }
 
 export function getActiveSessionId() {
   if (typeof window === 'undefined') return null
-  return window.localStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  return window.sessionStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY)
 }
 
 export function setActiveSessionId(id: string) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
+  window.sessionStorage.setItem(GEORGE_ACTIVE_SESSION_ID_KEY, id)
 }
 
 export function getActiveMode(): GeorgeSessionMode {
   if (typeof window === 'undefined') return 'normal'
-  const mode = window.localStorage.getItem(GEORGE_ACTIVE_MODE_KEY)
+  const mode = window.sessionStorage.getItem(GEORGE_ACTIVE_MODE_KEY)
   return mode === 'live' || mode === 'campaign' ? mode : 'normal'
 }
 
 export function setActiveMode(mode: GeorgeSessionMode) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(GEORGE_ACTIVE_MODE_KEY, mode)
+  window.sessionStorage.setItem(GEORGE_ACTIVE_MODE_KEY, mode)
 }
 
 export function clearActiveMode() {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(GEORGE_ACTIVE_MODE_KEY, 'normal')
+  window.sessionStorage.setItem(GEORGE_ACTIVE_MODE_KEY, 'normal')
+}
+
+function createGeorgeBrowserInstanceId() {
+  try {
+    return crypto.randomUUID()
+  } catch {
+    return `browser_${Date.now()}_${Math.random().toString(36).slice(2)}`
+  }
+}
+
+function clearBrowserScopedNormalWorkspace() {
+  window.sessionStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  window.sessionStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  window.sessionStorage.removeItem('george_last_normal_draft')
+  window.sessionStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
+  window.sessionStorage.setItem(GEORGE_ACTIVE_MODE_KEY, 'normal')
+}
+
+export function ensureGeorgeBrowserInstanceScope() {
+  if (typeof window === 'undefined') return false
+
+  const storedInstanceId =
+    window.sessionStorage.getItem(GEORGE_BROWSER_INSTANCE_ID_KEY)
+
+  const windowInstanceId = window.name.startsWith(
+    GEORGE_BROWSER_WINDOW_NAME_PREFIX
+  )
+    ? window.name.slice(GEORGE_BROWSER_WINDOW_NAME_PREFIX.length)
+    : ''
+
+  if (windowInstanceId && storedInstanceId === windowInstanceId) {
+    return false
+  }
+
+  const nextInstanceId = createGeorgeBrowserInstanceId()
+
+  window.name = `${GEORGE_BROWSER_WINDOW_NAME_PREFIX}${nextInstanceId}`
+  window.sessionStorage.setItem(
+    GEORGE_BROWSER_INSTANCE_ID_KEY,
+    nextInstanceId
+  )
+
+  clearBrowserScopedNormalWorkspace()
+  return true
+}
+
+export function requestFreshNormalBrowserSession() {
+  if (typeof window === 'undefined') return
+
+  window.sessionStorage.setItem(GEORGE_FRESH_NORMAL_ENTRY_KEY, '1')
+}
+
+export function consumeFreshNormalBrowserSessionRequest() {
+  if (typeof window === 'undefined') return false
+
+  const requested =
+    window.sessionStorage.getItem(GEORGE_FRESH_NORMAL_ENTRY_KEY) === '1'
+
+  if (!requested) return false
+
+  window.sessionStorage.removeItem(GEORGE_FRESH_NORMAL_ENTRY_KEY)
+  window.sessionStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  window.sessionStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  window.sessionStorage.removeItem('george_last_normal_draft')
+  window.sessionStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
+  window.sessionStorage.setItem(GEORGE_ACTIVE_MODE_KEY, 'normal')
+
+  return true
 }
 
 export function normalizeSessionMode(mode: unknown): GeorgeSessionMode {
@@ -196,24 +328,29 @@ export function upsertSession(session: GeorgeStoredSession) {
 export function deleteSession(sessionId: string) {
   if (typeof window === 'undefined') return
 
+  rememberDeletedSessionId(sessionId)
+
   const sessions = safeReadSessions().filter((session) => session.id !== sessionId)
   safeWriteSessions(sessions)
 
-  if (window.localStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  if (window.sessionStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
   }
 
-  if (window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  if (window.sessionStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
   }
 
-  if (window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+  if (window.sessionStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
   }
 
-  if (window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+  if (window.sessionStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
   }
+
+  window.sessionStorage.removeItem('george_last_normal_draft')
+  window.sessionStorage.removeItem('GEORGE_LAST_NORMAL_DRAFT')
 
   deleteSessionFromServer(sessionId)
 }
@@ -252,20 +389,20 @@ export function archiveSession(sessionId: string, archived = true) {
 
   safeWriteSessions(sessions)
 
-  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
+  if (archived && window.sessionStorage.getItem(GEORGE_ACTIVE_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_SESSION_ID_KEY)
   }
 
-  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
+  if (archived && window.sessionStorage.getItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_NORMAL_SESSION_ID_KEY)
   }
 
-  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
+  if (archived && window.sessionStorage.getItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_LIVE_SESSION_ID_KEY)
   }
 
-  if (archived && window.localStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
-    window.localStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
+  if (archived && window.sessionStorage.getItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY) === sessionId) {
+    window.sessionStorage.removeItem(GEORGE_ACTIVE_CAMPAIGN_SESSION_ID_KEY)
   }
 }
 

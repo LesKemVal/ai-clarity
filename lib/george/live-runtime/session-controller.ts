@@ -1,7 +1,6 @@
 import {
   getActiveSessionForMode,
   getActiveSessionIdForMode,
-  getLatestSubscriberSession,
   setActiveMode,
   setActiveSessionIdForMode,
   upsertSession,
@@ -70,19 +69,12 @@ export function findGeorgeSessionToRestore(params: {
   mode: GeorgeSessionMode
   subscriberEmail?: string | null
 }) {
-  const activeSession = getActiveSessionForMode(params.mode)
+  void params.subscriberEmail
 
-  if (activeSession) {
-    return activeSession
-  }
-
-  const subscriberEmail = String(params.subscriberEmail || '').trim()
-
-  if (!subscriberEmail) {
-    return null
-  }
-
-  return getLatestSubscriberSession(subscriberEmail, params.mode)
+  // Automatic restoration is browser-scoped.
+  // Server history remains available for explicit user selection, but a browser
+  // without its own active-session key must begin with a new local workspace.
+  return getActiveSessionForMode(params.mode)
 }
 
 export function buildGeorgeSessionRestoreState(session: unknown) {
