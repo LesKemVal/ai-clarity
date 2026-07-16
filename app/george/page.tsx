@@ -5655,10 +5655,10 @@ return (
 
 
 {!(forceLive || liveMode) && !showMobileHero && (
-  <div className="pointer-events-none fixed left-0 right-0 top-[52px] z-[34] h-[132px] bg-gradient-to-b from-[#000000] via-[#000000]/100 via-[72%] to-transparent md:hidden" />
+  <div className="pointer-events-none fixed inset-x-0 top-[58px] z-[34] h-[58px] bg-gradient-to-b from-[#000000]/95 via-[#000000]/72 to-transparent md:hidden" />
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
-  <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-[54] h-[260px] bg-gradient-to-t from-[#000000] via-[#000000]/100 via-[66%] to-transparent xl:left-[280px]" />
+  <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[54] h-[280px] bg-gradient-to-t from-[#000000] via-[#000000]/100 via-[70%] to-transparent" />
 )}
 {(forceLive || liveMode) && !showLiveEntrySequence && (
   <>
@@ -5670,12 +5670,83 @@ return (
         liveRoomActive={liveRoomActive}
         voiceOn={voiceOn}
         isThinking={isThinking}
-        roomLabel={liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE room' : 'inactive')}
+        roomLabel={liveRuntimeSupport?.room || (liveRoomActive ? 'LIVE conversation' : 'inactive')}
         chairLabel={liveRuntimeSupport?.chair || 'User'}
         objectiveLabel={liveRuntimeSupport?.objective || 'Outcome pending'}
         steeringLabels={getLiveRuntimeSteeringLabels(liveRuntimeSupport?.room).slice(0, 3) as [string, string, string]}
         receiverProfileLabel={activeLiveReceiverProfileLabel}
         communicationStyle={getActiveLiveCommunicationStyle()}
+        onSupportSelected={(choice) => {
+          const nextStyle =
+            choice === 'cue'
+              ? 'cue'
+              : choice === 'line'
+                ? 'line'
+                : choice === 'response'
+                  ? 'response'
+                  : choice === 'presentation'
+                    ? 'expandedLine'
+                    : 'advice'
+
+          setLiveDeliveryStyle(nextStyle)
+          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', nextStyle)
+          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', nextStyle)
+          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_POLICY', choice)
+
+          try {
+            const activeSetup = JSON.parse(
+              window.localStorage.getItem('george_live_setup_active') || '{}'
+            )
+
+            window.localStorage.setItem(
+              'george_live_setup_active',
+              JSON.stringify({
+                ...activeSetup,
+                supportStyle: nextStyle,
+                deliveryStyle: nextStyle,
+                supportPolicy: choice,
+              })
+            )
+          } catch {}
+
+          setToastMessage(`Support: ${choice === 'adaptive' ? 'Adaptive' : choice}`)
+          setShowToast(true)
+        }}
+        onRewordSelected={(choice) => {
+          const nextStyle =
+            choice === 'natural'
+              ? 'Natural'
+              : choice.charAt(0).toUpperCase() + choice.slice(1)
+
+          try {
+            const setup = JSON.parse(
+              window.localStorage.getItem('GEORGE_LIVE_SETUP') || '{}'
+            )
+            window.localStorage.setItem(
+              'GEORGE_LIVE_SETUP',
+              JSON.stringify({ ...setup, communicationStyle: nextStyle })
+            )
+            window.localStorage.setItem('george_live_communication_style', nextStyle)
+            window.localStorage.setItem('GEORGE_LIVE_REWORD_POLICY', choice)
+          } catch {}
+
+          setToastMessage(`Communication: ${nextStyle}`)
+          setShowToast(true)
+        }}
+        onRepeatPressed={() => {
+          const lastLine = liveLastSpokenUtteranceRef.current.trim()
+
+          if (!lastLine) {
+            setToastMessage('No previous support to repeat.')
+            setShowToast(true)
+            return false
+          }
+
+          void speakText(lastLine)
+          setToastMessage('Repeating last line.')
+          setShowToast(true)
+          return true
+        }}
         onRoomToggle={() => {
           const nextEnabled = !liveGeorgeEnabled
           setLiveGeorgeEnabled(nextEnabled)
@@ -5707,9 +5778,16 @@ return (
           setShowToast(true)
         }}
         onPauseLive={() => {
-          stopListening()
-          setInterimTranscript('')
-          setToastMessage('LIVE paused')
+          if (isListening) {
+            stopListening()
+            setInterimTranscript('')
+            setToastMessage('LIVE paused')
+            setShowToast(true)
+            return
+          }
+
+          startListening()
+          setToastMessage('LIVE resumed')
           setShowToast(true)
         }}
         onReceiverPressed={() => {
