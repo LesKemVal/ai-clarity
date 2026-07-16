@@ -1,5 +1,7 @@
 'use client'
 
+import { ShareIcon } from '@/components/icons/ShareIcon'
+
 import { useMemo, useState } from 'react'
 
 const DEFAULT_SHARE_MESSAGE =
@@ -91,8 +93,8 @@ export default function SharePage() {
               onClick={nativeShare}
               className="rounded-[1rem] border border-[#8FB6C9]/28 bg-[#8FB6C9]/[0.09] px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86 transition hover:border-[#8FB6C9]/42 hover:bg-[#8FB6C9]/[0.14] hover:text-white active:scale-[0.98]"
             >
-              Share
-            </button>
+                <ShareIcon className="h-5 w-5" />
+              </button>
 
             <button
               type="button"

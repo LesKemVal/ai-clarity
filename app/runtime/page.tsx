@@ -80,7 +80,7 @@ function getProjectedUse(records: RuntimeRecord[]) {
       level: 'No LIVE runtime history yet',
       tier: 'Intelligent',
       reason: 'Start with Intelligent until LIVE becomes frequent or pressure-heavy.',
-      nextMonth: 'Unknown until GEORGE records a few LIVE rooms.',
+      nextMonth: 'Unknown until GEORGE records a few LIVE conversations.',
     }
   }
 
@@ -174,7 +174,7 @@ export default function RuntimePage() {
               LIVE Operational Record
             </p>
             <p className="text-sm leading-7 text-white/52">
-              Review recent LIVE rooms, continuity state, and the operating support GEORGE used during active conversations.
+              Review recent LIVE conversations, continuity state, and the operating support GEORGE used during active conversations.
             </p>
           </div>
 

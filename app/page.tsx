@@ -2,41 +2,79 @@
 
 import { HomeHeroSequence } from '@/components/home/HomeHeroSequence'
 
-const impactCards = [
+const supportModes = [
   {
-    title: 'Aspirational Support',
-    body: 'A person should not lose a job, contract, loan, or opportunity because they did not grow up around corporate language, investor language, banking language, or interview coaching. GEORGE helps people structure answers, catch pressure, respond clearly, and stay in the conversation when one conversation can change the path forward.',
+    title: 'Cue',
+    body: 'Minimal text alerts for subtle, timely nudges.',
   },
   {
-    title: 'People with speaking disabilities',
-    body: 'Some people know exactly what they mean but need more time, pacing support, word support, or structure under pressure. GEORGE can help turn intention into clear language without taking control away from the person speaking.',
+    title: 'Continuation',
+    body: 'Tailored language that helps you finish your thought clearly.',
+  },
+  {
+    title: 'Response',
+    body: 'A complete line you can repeat, adapt, shorten, or ignore.',
+  },
+  {
+    title: 'Advice',
+    body: 'A practical next move based on the room, pressure, and objective.',
+  },
+]
+
+const audienceCards = [
+  {
+    title: 'Professional advancement',
+    body: 'Support for critical interviews, investor pitches, contract negotiations, executive presentations, and other conversations where communication can influence a successful outcome.',
+  },
+  {
+    title: 'Speaking disabilities',
+    body: 'Support for pressure-induced blocks, word retrieval, pacing, sentence completion, and conversational flow—without taking control away from the person speaking.',
   },
   {
     title: 'Neurodivergent professionals',
-    body: 'ADHD, autism, anxiety, processing differences, and social pressure can make high-stakes conversations harder than the work itself. GEORGE helps with pacing, pauses, structure, recovery, and signals that may otherwise be missed.',
+    body: 'Support for ADHD, autism, anxiety, processing differences, cognitive overload, pacing, conversational pauses, and social signals that may otherwise be missed.',
   },
 ]
 
-const scenarioCards = [
+const impactCards = [
   {
-    title: 'Under-served Founder Communities',
-    body: 'GEORGE can help founders handle skeptical investor questions, translate VC language, protect confidence, and pivot risk-heavy questioning back toward traction, growth, proof, and market opportunity.',
+    title: 'Under-served founders',
+    body: 'Handle skeptical investor questions, defend strategy, translate metrics into familiar investor language, and redirect risk-heavy questioning toward traction, proof, growth, and market opportunity.',
   },
   {
     title: 'Main Street entrepreneurs',
-    body: 'A contractor, agency owner, salon operator, logistics company, or local business may be strong at the work but unfamiliar with banking, procurement, RFP panels, or corporate buying language. GEORGE helps them speak the language of the room.',
+    body: 'Bridge the gap between technical or trade expertise and the language used by banks, procurement teams, enterprise buyers, RFP panels, and corporate decision-makers.',
   },
   {
     title: 'Professionals and executives',
-    body: 'Interviews, boardrooms, reviews, negotiations, sales calls, and internal meetings reward clarity under pressure. GEORGE helps users respond, pause, reframe, and protect the desired outcome while the conversation is still alive.',
+    body: 'Maintain composure and clarity during interviews, board meetings, reviews, negotiations, sales calls, presentations, and critical internal alignment.',
   },
 ]
 
-const supportModes = [
-  ['Cue', 'Short signal. Minimum words. Useful when a small nudge is enough.'],
-  ['Continuation', 'You start the thought. GEORGE helps finish it cleanly.'],
-  ['Response', 'A complete line you can repeat, revise, shorten, or ignore.'],
-  ['Advice', 'A practical next move when the room needs judgment, not a script.'],
+const contextCards = [
+  {
+    title: 'Role calibration',
+    body: 'Founder, executive, candidate, salesperson, negotiator, contractor, parent, patient, or board member. Your role changes what authority you have and what useful support should sound like.',
+  },
+  {
+    title: 'Briefing integration',
+    body: 'Desired outcome, acceptable outcome, audience, pressure, risks, constraints, documents, and known context sharpen the guidance before the conversation begins.',
+  },
+]
+
+const technologyCards = [
+  {
+    title: 'Fast infrastructure',
+    body: 'OpenAI reasoning, Groq low-latency inference, and Deepgram real-time speech recognition support fast operational judgment while the conversation is still unfolding.',
+  },
+  {
+    title: 'Advanced voice technology',
+    body: 'Cartesia voice, Next.js, React, and TypeScript support reliable delivery across readable and audio-first receiver profiles.',
+  },
+  {
+    title: 'Future hardware',
+    body: 'GEORGE is designed to extend into discreet wearables, audio glasses, readable glasses, live briefing systems, and enterprise communication tools.',
+  },
 ]
 
 export default function HomePage() {
@@ -44,114 +82,227 @@ export default function HomePage() {
     <main className="min-h-screen bg-black text-white">
       <HomeHeroSequence />
 
-      <section className="border-t border-white/10 bg-[#050607] px-5 py-12 sm:px-8 sm:py-16">
+      <section className="border-t border-white/10 bg-black px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">LIVE Support</p>
-              <h1 className="mt-4 max-w-3xl font-mono text-[38px] font-black uppercase leading-[0.92] tracking-[-0.075em] sm:text-[62px]">
-                Help while the conversation is happening.
+              <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+                Communication intelligence
+              </p>
+
+              <h1 className="mt-4 max-w-4xl font-mono text-[36px] font-black uppercase leading-[0.92] tracking-[-0.07em] sm:text-[60px]">
+                Communication intelligence for high-stakes moments.
               </h1>
             </div>
 
             <div className="space-y-5 text-[16px] leading-8 text-white/72">
               <p>
-                GEORGE does not wait until the meeting, interview, pitch, or negotiation is over. GEORGE listens in real time, recognizes useful signals, and gives you a cue, line, continuation, or response while the outcome can still change.
+                GEORGE is real-time operational intelligence designed to help
+                you navigate, adapt, and succeed in critical conversations.
               </p>
+
               <p>
-                Forty-one cents of LIVE support in the right conversation could help someone get hired, close a deal, secure funding, win a contract, avoid a bad concession, or say the sentence they needed before the moment passed.
+                GEORGE supports you before, during, and after important
+                meetings—helping you prepare for the moment, recognize what is
+                happening, and protect your desired outcome.
+              </p>
+
+              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8FB6C9]">
+                <span>Prepare</span>
+                <span>Perform</span>
+                <span>Adapt</span>
+                <span>Improve outcomes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black px-5 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+            <div>
+              <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+                Real-time support
+              </p>
+
+              <h2 className="mt-4 max-w-3xl font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
+                Help while the outcome can still change.
+              </h2>
+            </div>
+
+            <div className="space-y-5 text-[16px] leading-8 text-white/70">
+              <p>
+                Typical AI tools summarize meetings after they end. GEORGE
+                analyzes live speech and operational signals while the
+                conversation is happening.
+              </p>
+
+              <p>
+                The support changes with the moment. Sometimes you need a brief
+                cue. Sometimes you need help finishing a thought, answering a
+                difficult question, or choosing the strongest next move.
               </p>
             </div>
           </div>
 
           <div className="mt-10 grid gap-4 md:grid-cols-4">
-            {supportModes.map(([title, body]) => (
-              <div key={title} className="rounded-[22px] border border-white/10 bg-white/[0.035] p-5">
-                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white/88">{title}</h3>
-                <p className="mt-4 text-[14px] leading-6 text-white/62">{body}</p>
-              </div>
+            {supportModes.map((mode) => (
+              <article
+                key={mode.title}
+                className="rounded-[22px] border border-white/10 bg-white/[0.035] p-5"
+              >
+                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white">
+                  {mode.title}
+                </h3>
+
+                <p className="mt-4 text-[14px] leading-6 text-white/62">
+                  {mode.body}
+                </p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-black px-5 py-12 sm:px-8 sm:py-16">
+      <section className="bg-black px-5 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-5xl">
+            <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+              Who we build for
+            </p>
+
+            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[50px]">
+              High-stakes communication should not block talented people from
+              life-changing opportunities.
+            </h2>
+          </div>
+
+          <div className="mt-10 grid gap-4 lg:grid-cols-3">
+            {audienceCards.map((card) => (
+              <article
+                key={card.title}
+                className="rounded-[26px] border border-white/10 bg-[#090A0B] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.3)]"
+              >
+                <h3 className="font-mono text-[13px] uppercase tracking-[0.22em] text-white">
+                  {card.title}
+                </h3>
+
+                <p className="mt-5 text-[15px] leading-7 text-white/68">
+                  {card.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black px-5 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+              Dynamic context adjustment
+            </p>
+
+            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
+              The room, your role, and the outcome change the support.
+            </h2>
+
+            <p className="mt-6 max-w-xl text-[16px] leading-8 text-white/68">
+              Useful communication guidance cannot be generic. GEORGE adapts
+              strategically to the role you occupy, the authority you have,
+              the audience in front of you, and the result you are trying to
+              achieve.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {contextCards.map((card) => (
+              <article
+                key={card.title}
+                className="rounded-[24px] border border-[#4E7CFF]/24 bg-[#4E7CFF]/[0.07] p-6"
+              >
+                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-[#AFC1FF]">
+                  {card.title}
+                </h3>
+
+                <p className="mt-4 text-[15px] leading-7 text-white/68">
+                  {card.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Point blank</p>
+            <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+              Impact areas
+            </p>
+
             <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[50px]">
-              GEORGE helps people communicate when communication decides the opportunity.
+              Built for people whose conversations have consequences.
             </h2>
           </div>
 
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {impactCards.map((card) => (
-              <article key={card.title} className="rounded-[26px] border border-white/10 bg-[#08090A] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-                <h3 className="font-mono text-[13px] uppercase tracking-[0.22em] text-white">{card.title}</h3>
-                <p className="mt-5 text-[15px] leading-7 text-white/68">{card.body}</p>
+              <article
+                key={card.title}
+                className="rounded-[26px] border border-white/10 bg-[#08090A] p-6"
+              >
+                <h3 className="font-mono text-[13px] uppercase tracking-[0.22em] text-white">
+                  {card.title}
+                </h3>
+
+                <p className="mt-5 text-[15px] leading-7 text-white/68">
+                  {card.body}
+                </p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#060708] px-5 py-12 sm:px-8 sm:py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Briefing matters</p>
-            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
-              The room, your role, and the outcome change the support.
-            </h2>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[24px] border border-white/10 bg-white/[0.035] p-6">
-              <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white">Role</h3>
-              <p className="mt-4 text-[15px] leading-7 text-white/66">
-                Founder, candidate, executive, salesperson, parent, patient, negotiator, board member, or contractor. Your role tells GEORGE what authority you have and what support should sound like.
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-white/10 bg-white/[0.035] p-6">
-              <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white">Briefing</h3>
-              <p className="mt-4 text-[15px] leading-7 text-white/66">
-                Desired outcome, acceptable outcome, audience, pressure, risks, documents, and constraints. Better briefing means sharper support when the conversation gets real.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-black px-5 py-12 sm:px-8 sm:py-16">
+      <section className="bg-black px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-7xl">
-          <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Where it can matter</p>
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {scenarioCards.map((card) => (
-              <article key={card.title} className="rounded-[26px] border border-white/10 bg-[#070809] p-6">
-                <h3 className="font-mono text-[13px] uppercase tracking-[0.22em] text-white">{card.title}</h3>
-                <p className="mt-5 text-[15px] leading-7 text-white/68">{card.body}</p>
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div>
+              <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+                Our technology
+              </p>
+
+              <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[50px]">
+                Late help is not help.
+              </h2>
+            </div>
+
+            <p className="text-[16px] leading-8 text-white/68">
+              GEORGE is optimized for fast support because guidance that
+              arrives after the moment has passed has little operational
+              value. The infrastructure is designed to process live speech,
+              reason quickly, and deliver usable support while the user can
+              still affect the outcome.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-4 lg:grid-cols-3">
+            {technologyCards.map((card) => (
+              <article
+                key={card.title}
+                className="rounded-[24px] border border-white/10 bg-white/[0.035] p-6"
+              >
+                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white">
+                  {card.title}
+                </h3>
+
+                <p className="mt-4 text-[15px] leading-7 text-white/66">
+                  {card.body}
+                </p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#050607] px-5 py-12 sm:px-8 sm:py-16">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_1fr]">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.32em] text-[#E7C47D]/70">Technology</p>
-            <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
-              Built for speed because late help is not help.
-            </h2>
-          </div>
-
-          <div className="space-y-5 text-[15px] leading-7 text-white/68">
-            <p>
-              GEORGE uses OpenAI reasoning, Groq low-latency inference, Deepgram real-time speech recognition, Cartesia voice, Next.js, React, and TypeScript. The point is not to name-drop software. The point is speed, reliability, and support that arrives while the user can still use it.
-            </p>
-            <p>
-              The future is wearable: discreet audio, readable glasses, live briefing, document-aware support, scenario-specific preparation, and enterprise tools that help people perform in rooms where the stakes are high.
-            </p>
           </div>
         </div>
       </section>

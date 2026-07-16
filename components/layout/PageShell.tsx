@@ -1,5 +1,7 @@
 'use client'
 
+import { ShareIcon } from '@/components/icons/ShareIcon'
+
 import { ReactNode, useEffect, useState } from 'react'
 import Sidebar, { PromptItem } from '@/components/Sidebar'
 import Brand from '@/components/Brand'
@@ -160,8 +162,8 @@ export default function PageShell({
                   aria-label="Share G."
                   title="Share G."
                 >
-                  Share G.
-                </button>
+                    <ShareIcon className="h-4 w-4" />
+                  </button>
               </div>
             </div>
 

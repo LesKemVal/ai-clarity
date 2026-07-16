@@ -1,167 +1,202 @@
-'use client'
-
-import { useState } from 'react'
 import BxPageHeader from '@/components/BxPageHeader'
 
-type HelpSection =
-  | 'george'
-  | 'live'
-  | 'room'
-  | 'signal'
-  | 'continuity'
-  | 'voice'
-  | null
-
-const HELP_ITEMS: Array<{
-  id: Exclude<HelpSection, null>
-  index: string
-  label: string
-  title: string
-  body: string
-  utility: string
-  accent?: boolean
-}> = [
+const steps = [
   {
-    id: 'george',
     index: '01',
-    label: 'PLAN',
-    title: 'Plan with GEORGE.',
-    body: 'Build strategies, business plans, presentations, interview preparation, negotiation plans, project plans, or clear next steps. Start by describing the outcome you want to achieve.',
-    utility: 'Plans. Strategies. Roadmaps. Interviews. Meetings.',
-    accent: true,
+    label: 'START',
+    title: 'Begin with the result you want.',
+    body: 'Tell GEORGE what you are trying to accomplish. You can be specific or begin with a rough idea. GEORGE may ask for the smallest piece of information needed to make the next move useful.',
+    examples: [
+      'Help me prepare for an investor meeting.',
+      'Review this contract before I sign it.',
+      'Build a plan to launch this business.',
+      'Help me decide between these options.',
+    ],
   },
   {
-    id: 'signal',
     index: '02',
-    label: 'ANALYZE',
-    title: 'Analyze what matters.',
-    body: 'Review documents, contracts, opportunities, reports, and ideas. Compare options, identify risks, summarize information, and understand unfamiliar topics before making decisions.',
-    utility: 'Documents. Contracts. Opportunities. Decisions.',
+    label: 'PREPARE',
+    title: 'Think, plan, practice, and build.',
+    body: 'Use GEORGE before an important moment to organize your thinking, understand the situation, identify risks, prepare your message, and create the work you need.',
+    examples: [
+      'Plans and strategies',
+      'Interview and meeting preparation',
+      'Presentations, proposals, and pitch decks',
+      'Decisions, research, and next steps',
+    ],
   },
   {
-    id: 'room',
     index: '03',
-    label: 'CREATE',
-    title: 'Create better work.',
-    body: 'Draft pitch decks, proposals, presentations, emails, business plans, responses, and other work products that help move your objective forward.',
-    utility: 'Pitch decks. Presentations. Proposals. Writing.',
+    label: 'FILES',
+    title: 'Bring GEORGE the information that matters.',
+    body: 'Upload a document, image, résumé, contract, report, presentation, or other relevant file. Tell GEORGE what you need from it instead of only asking for a summary.',
+    examples: [
+      'Find the risks in this agreement.',
+      'Use my résumé to prepare stronger interview answers.',
+      'Turn this information into a presentation.',
+      'Tell me what matters for the decision I need to make.',
+    ],
   },
   {
-    id: 'continuity',
     index: '04',
-    label: 'DECIDE',
-    title: 'Make better decisions.',
-    body: 'Ask GEORGE to compare approaches, weigh tradeoffs, evaluate risks, and recommend practical next steps while keeping your desired outcome in view.',
-    utility: 'Compare. Decide. Recommend.',
-  },
-  {
-    id: 'voice',
-    index: '05',
-    label: 'PRACTICE',
-    title: 'Practice before the room.',
-    body: 'Rehearse interviews, presentations, negotiations, objections, difficult conversations, or important questions before they happen.',
-    utility: 'Rehearse. Refine. Improve.',
-  },
-  {
-    id: 'live',
-    index: '06',
     label: 'LIVE',
-    title: 'Continue into LIVE.',
-    body: 'When GEORGE recognizes that execution is approaching, it may recommend LIVE support. If you continue, GEORGE stays with you while the conversation unfolds, adapting to changing signals and supporting your desired outcome.',
-    utility: 'Prepare. Continue. Perform.',
+    title: 'Take GEORGE into the conversation.',
+    body: 'LIVE is the real-time operating mode for interviews, meetings, negotiations, presentations, sales calls, reviews, and other conversations where support is useful while the outcome can still change.',
+    examples: [
+      'Choose how you will receive support.',
+      'Brief GEORGE on the room and desired outcome.',
+      'Talk naturally and remain present.',
+      'Use, change, or ignore any guidance.',
+    ],
+  },
+  {
+    index: '05',
+    label: 'SUPPORT',
+    title: 'Choose the support that fits the moment.',
+    body: 'GEORGE can provide a small cue, help continue your thought, form a complete response, or recommend the next move. Audio support is designed to be easy to hear and use. Visual support can remain available to read and reference.',
+    examples: [
+      'Cue — a short nudge',
+      'Continuation — help finishing your thought',
+      'Response — a complete answer to adapt or repeat',
+      'Advice — a practical next move',
+    ],
+  },
+  {
+    index: '06',
+    label: 'CONTINUE',
+    title: 'Keep useful work available.',
+    body: 'Saved conversations help you return to plans, documents, decisions, and preparation. GEORGE may use relevant prior work when it improves the current objective, but a new conversation remains a new conversation.',
+    examples: [
+      'Open a saved conversation from the sidebar.',
+      'Start a new workspace when the objective changes.',
+      'Tell GEORGE what changed since the last session.',
+      'Decide what should be remembered or reused.',
+    ],
   },
 ]
 
-
+const principles = [
+  {
+    title: 'You remain in control.',
+    body: 'GEORGE provides judgment and support. You decide what to accept, change, ignore, say, or do.',
+  },
+  {
+    title: 'More context can improve the result.',
+    body: 'Your role, audience, desired outcome, constraints, documents, and known risks can make guidance more useful.',
+  },
+  {
+    title: 'The current objective comes first.',
+    body: 'Prior conversations and files should help the present work, not take it in another direction.',
+  },
+]
 
 export default function HelpPage() {
-  const [open, setOpen] = useState<HelpSection>('george')
-  const active = HELP_ITEMS.find((item) => item.id === open) || HELP_ITEMS[0]
-
   return (
     <main className="min-h-[100dvh] bg-black px-4 py-5 text-[#D7DBE4] sm:px-6 sm:py-8">
-      <div className="mx-auto flex min-h-[calc(100dvh-40px)] w-full max-w-[1080px] flex-col">
-        <BxPageHeader backLabel="GEORGE" />
+      <div className="mx-auto w-full max-w-[1120px]">
+        <BxPageHeader backLabel="GEORGE" backHref="/george" />
 
-        <section className="mb-10 grid gap-6 border-b border-white/10 pb-9 md:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.32em] text-white/34">
-              Operational Help
-            </div>
-
-            <h1 className="mt-4 max-w-3xl font-mono text-[42px] font-black uppercase leading-[0.9] tracking-[-0.075em] text-white md:text-[72px]">
-              HELP
-            </h1>
-
-            <div className="mt-6 font-mono text-[17px] font-semibold uppercase leading-[1.05] tracking-[0.12em] text-[#8FB6C9]/82 md:text-[28px]">
-              Understand what GEORGE can help you accomplish.
-            </div>
+        <section className="border-b border-white/[0.08] pb-10 pt-4 sm:pb-14 sm:pt-8">
+          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/34">
+            How to use GEORGE
           </div>
 
-          <p className="max-w-2xl self-end text-[17px] leading-8 text-white/62 md:text-[20px]">
-            Plan, prepare, review, decide, and move toward your desired outcome with clearer judgment and better communication.
+          <h1 className="mt-5 max-w-4xl font-mono text-[40px] font-black uppercase leading-[0.92] tracking-[-0.07em] text-white sm:text-[68px]">
+            Move from the situation you have to the outcome you want.
+          </h1>
+
+          <p className="mt-7 max-w-3xl text-[17px] leading-8 text-white/68 sm:text-[20px] sm:leading-9">
+            GEORGE helps you understand what is happening, decide what matters,
+            prepare the next move, create useful work, and communicate effectively
+            before, during, and after important moments.
           </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="/george"
+              className="inline-flex min-h-11 items-center rounded-[14px] bg-white px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-black transition hover:-translate-y-px"
+            >
+              Ask GEORGE
+            </a>
+
+            <a
+              href="/george/live-entry?source=help"
+              className="inline-flex min-h-11 items-center rounded-[14px] border border-[#3657A8]/55 bg-[#172347] px-5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white transition hover:-translate-y-px hover:bg-[#1B2A50]"
+            >
+              Prepare for LIVE
+            </a>
+          </div>
         </section>
 
-        <section className="grid gap-5 md:grid-cols-[0.82fr_1.18fr] md:items-start">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-1">
-            {HELP_ITEMS.map((item) => {
-              const selected = item.id === open
+        <section className="py-10 sm:py-14">
+          <div className="grid gap-4 md:grid-cols-2">
+            {steps.map((step) => (
+              <article
+                key={step.index}
+                className="rounded-[24px] border border-white/[0.07] bg-[#05060A] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.28)] sm:p-6"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-mono text-[10px] tracking-[0.18em] text-white/30">
+                    {step.index}
+                  </span>
 
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setOpen(selected ? null : item.id)}
-                  className={`min-h-[74px] rounded-[18px] px-4 py-4 text-left transition-all duration-200 active:scale-[0.985] ${
-                    selected
-                      ? 'bg-[#0D1118] text-white shadow-[0_22px_70px_rgba(0,0,0,0.42)] ring-1 ring-white/[0.08]'
-                      : 'bg-[#05060A] text-white/42 ring-1 ring-white/[0.045] hover:bg-[#080A0F] hover:text-white/72'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-[11px] tracking-[0.16em] text-current/54">{item.index}</span>
-                    <span className="text-[12px] text-current/48">{selected ? '—' : '+'}</span>
-                  </div>
-
-                  <div className="mt-3 font-mono text-[12px] uppercase tracking-[0.16em] text-current/76">
-                    {item.label}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="min-h-[360px] rounded-[28px] bg-[#05060A] px-6 py-6 text-left shadow-[0_28px_90px_rgba(0,0,0,0.48)] ring-1 ring-white/[0.055] md:px-8 md:py-8">
-            <div className="flex items-start justify-between gap-4 border-b border-white/[0.08] pb-6">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/34">
-                  {active.index} — {active.label}
+                  <span className="rounded-full border border-[#3657A8]/40 bg-[#172347] px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72">
+                    {step.label}
+                  </span>
                 </div>
 
-                <h2 className="mt-4 font-mono text-[30px] font-black uppercase leading-[0.96] tracking-[-0.055em] text-white md:text-[44px]">
-                  {active.title}
+                <h2 className="mt-5 font-mono text-[23px] font-black uppercase leading-[1] tracking-[-0.045em] text-white sm:text-[29px]">
+                  {step.title}
                 </h2>
-              </div>
 
-              <div className={`mt-1 h-2 w-2 rounded-full ${active.accent ? 'bg-[#8FB6C9]/58' : 'bg-white/32'}`} />
-            </div>
+                <p className="mt-5 text-[15px] leading-7 text-white/64">
+                  {step.body}
+                </p>
 
-            <p className="mt-7 max-w-2xl text-[19px] leading-8 text-white/62">
-              {active.body}
-            </p>
-
-            <div className="mt-8 rounded-[20px] bg-[#0B0D12] px-5 py-4 ring-1 ring-white/[0.045]">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/30">
-                Utility
-              </div>
-
-              <div className="mt-2 text-[15px] font-medium text-white/72">
-                {active.utility}
-              </div>
-            </div>
+                <div className="mt-6 border-t border-white/[0.06] pt-5">
+                  <div className="space-y-2">
+                    {step.examples.map((example) => (
+                      <div
+                        key={example}
+                        className="flex items-start gap-3 text-[13px] leading-6 text-white/46"
+                      >
+                        <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-[#6F8FE0]/72" />
+                        <span>{example}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
+
+        <section className="border-t border-white/[0.08] py-10 sm:py-14">
+          <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/30">
+            Keep in mind
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {principles.map((principle) => (
+              <article
+                key={principle.title}
+                className="rounded-[22px] border border-white/[0.065] bg-[#05060A] p-5"
+              >
+                <h2 className="font-mono text-[14px] font-semibold uppercase tracking-[0.08em] text-white/86">
+                  {principle.title}
+                </h2>
+
+                <p className="mt-4 text-[14px] leading-7 text-white/52">
+                  {principle.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <footer className="border-t border-white/[0.08] py-8 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-white/24">
+          GEORGE supports your judgment. You retain responsibility and final control.
+        </footer>
       </div>
     </main>
   )

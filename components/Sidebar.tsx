@@ -2,7 +2,18 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { deleteSession, renameSession, archiveSession, safeReadSessions, setActiveMode, setActiveSessionIdForMode, type GeorgeStoredSession } from '@/lib/george/session/store'
+import {
+  archiveSession,
+  deleteSession,
+  getActiveSessionForMode,
+  hasMeaningfulUserMessage,
+  renameSession,
+  safeReadSessions,
+  setActiveMode,
+  setActiveSessionIdForMode,
+  upsertSession,
+  type GeorgeStoredSession,
+} from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority, type GeorgeSessionTier } from '@/lib/george/session-authority'
 
 export type PromptItem = {
@@ -80,6 +91,9 @@ export default function Sidebar({
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
   const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<string | null>(null)
+  const [pendingNormalDestination, setPendingNormalDestination] = useState<
+    GeorgeStoredSession | 'new' | null
+  >(null)
 
   const [identityEmail, setIdentityEmail] = useState('')
   const [identityTier, setIdentityTier] = useState<GeorgeSessionTier>('smart')
@@ -156,11 +170,54 @@ export default function Sidebar({
     return source.replace(/\s+/g, ' ').slice(0, 42)
   }
 
-  const openNormalSession = (session: GeorgeStoredSession) => {
-    setActiveSessionIdForMode('normal', session.id)
+  const completeNormalNavigation = (destination: GeorgeStoredSession | 'new') => {
+    if (destination === 'new') {
+      setActiveMode('normal')
+      setShowSidebar?.(false)
+      onNewSession()
+      return
+    }
+
+    setActiveSessionIdForMode('normal', destination.id)
     setActiveMode('normal')
     setShowSidebar?.(false)
     window.location.href = '/george'
+  }
+
+  const requestNormalNavigation = (destination: GeorgeStoredSession | 'new') => {
+    if (!isLiveRoute) {
+      completeNormalNavigation(destination)
+      return
+    }
+
+    const activeLiveSession = getActiveSessionForMode('live')
+
+    if (!activeLiveSession || !hasMeaningfulUserMessage(activeLiveSession)) {
+      completeNormalNavigation(destination)
+      return
+    }
+
+    setPendingNormalDestination(destination)
+  }
+
+  const saveCurrentLiveSession = () => {
+    const activeLiveSession = getActiveSessionForMode('live')
+    if (!activeLiveSession) return
+
+    upsertSession({
+      ...activeLiveSession,
+      updatedAt: Date.now(),
+      metadata: {
+        ...(activeLiveSession.metadata || {}),
+        lifecycle: 'completed',
+        savedAt: Date.now(),
+        conversationRecordAvailable: true,
+      },
+    })
+  }
+
+  const openNormalSession = (session: GeorgeStoredSession) => {
+    requestNormalNavigation(session)
   }
 
   const openLiveSession = (session: GeorgeStoredSession) => {
@@ -344,31 +401,30 @@ return (
         Reuse this overlay pattern across future GEORGE pages. */}
     <aside
       data-george-sidebar-overlay="true"
-      className={`fixed left-0 top-0 z-[120] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-300 ${
+      className={`fixed left-0 top-0 z-[230] flex h-[100dvh] max-h-[100dvh] w-[258px] flex-col overflow-y-auto overflow-x-hidden overscroll-contain border-r border-white/[0.035] bg-[#07080B]/90 transition-transform duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
         showSidebar ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
-      } xl:fixed xl:top-0 xl:z-[95] xl:flex`}
+      } xl:fixed xl:top-0 xl:z-[230] xl:flex`}
     >
       <div className="border-b border-white/[0.035] px-4 pb-4 pt-3">
         <div className="relative flex items-start justify-between opacity-90">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2.5 translate-y-[2px]">
+            <button
+              type="button"
+              onClick={() => setShowSidebar?.(false)}
+              aria-label="Close GEORGE sidebar"
+              title="Close"
+              className="flex items-center gap-2.5 translate-y-[2px] rounded-[1.1rem] transition-[transform,filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] hover:brightness-110 active:scale-[0.97]"
+            >
               <img
                 src="/logofav.png"
                 alt="BRANESx"
                 className="h-[60px] w-[60px] rounded-[1.1rem] object-contain opacity-94"
               />
-            </div>
+            </button>
 
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowSidebar?.(false)}
-            className="ml-2 text-white/34 transition hover:text-white/62"
-            aria-label="Close sidebar"
-          >
-            ×
-          </button>
+
         </div>
       </div>
 
@@ -377,17 +433,17 @@ return (
           <section className="space-y-2.5">
             <button
               type="button"
-              onClick={() => {
-                setShowSidebar?.(false)
-                if (isLiveRoute) {
-                  window.location.href = '/george/live-entry'
-                  return
-                }
-                onNewSession()
-              }}
-              className="block w-full rounded-[0.55rem] border border-white/[0.04] bg-white/[0.014] px-3 py-1.5 text-left text-[11px] uppercase tracking-[0.14em] text-white/58 transition hover:bg-white/[0.026] hover:text-white/82"
+              onClick={() => requestNormalNavigation('new')}
+              className="block w-full rounded-[0.7rem] border border-white/[0.05] bg-white/[0.016] px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-300 hover:border-white/[0.08] hover:bg-white/[0.03] active:scale-[0.99]"
             >
-              New Workspace
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.13em] text-white/68">
+                New Normal Workspace
+              </span>
+              <span className="mt-1 block text-[10px] leading-4 text-white/30">
+                {isLiveRoute
+                  ? 'Leave LIVE and begin in Normal GEORGE.'
+                  : 'Begin a new Normal GEORGE session.'}
+              </span>
             </button>
           </section>
 
@@ -403,7 +459,7 @@ return (
                   setShowSidebar?.(false)
                   onOpenLiveGate()
                 }}
-                className="inline-flex rounded-[0.7rem] border border-[#8FB6C9]/[0.28] bg-[#8FB6C9]/[0.16] px-5 py-2 text-[13px] font-medium uppercase tracking-[0.18em] text-[#D7DCFF]/88 shadow-[0_0_24px_rgba(143,182,201,0.10)] transition hover:border-[#8FB6C9]/[0.42] hover:bg-[#8FB6C9]/[0.22] hover:text-white active:scale-[0.98]"
+                className="inline-flex rounded-[0.7rem] border border-[#4E7CFF]/45 bg-[#4E7CFF]/[0.18] px-5 py-2 text-[13px] font-medium uppercase tracking-[0.18em] text-[#E4E9FF]/92 shadow-[0_0_28px_rgba(78,124,255,0.18)] transition hover:border-[#4E7CFF]/65 hover:bg-[#4E7CFF]/[0.26] hover:text-white active:scale-[0.98]"
               >
                 LIVE
               </button>
@@ -466,7 +522,11 @@ return (
             </div>
 
             <div className="mt-2 space-y-0.5">
-              <a href="/help" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
+              <a
+                href="/help"
+                onClick={() => setShowSidebar?.(false)}
+                className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58"
+              >
                 Help
               </a>
               <a href="/legal/toa" className="block rounded-[0.55rem] px-3 py-2 text-[12px] text-white/34 transition hover:bg-white/[0.016] hover:text-white/58">
@@ -475,10 +535,10 @@ return (
             </div>
           </section>
 
-          {!isLiveRoute && normalSessions.length > 0 && (
+          {normalSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
             <div className="px-3 text-[10px] uppercase tracking-[0.22em] text-white/26">
-              Sessions
+              Workspaces
             </div>
 
             <div className="mt-3 space-y-1">
@@ -565,7 +625,7 @@ return (
 
 
 
-          {isLiveRoute && liveSessions.length > 0 && (
+          {liveSessions.length > 0 && (
           <section className="border-t border-white/[0.035] pt-4">
             <button
               type="button"
@@ -573,7 +633,7 @@ return (
               className="flex w-full items-center justify-between text-left"
             >
               <span className="text-[10px] uppercase tracking-[0.22em] text-white/26">
-                Conversations
+                LIVE conversations
               </span>
               <span className="text-[11px] text-white/20">
                 {openGroups['Conversations'] ? '▾' : '▸'}
@@ -761,6 +821,61 @@ return (
         </div>
       )}
     </aside>
+    {pendingNormalDestination && (
+      <div className="fixed inset-0 z-[260] flex items-center justify-center px-4">
+        <button
+          type="button"
+          aria-label="Stay in LIVE"
+          onClick={() => setPendingNormalDestination(null)}
+          className="absolute inset-0 bg-black/62 backdrop-blur-[12px]"
+        />
+
+        <div className="relative z-10 w-full max-w-[420px] rounded-[1.75rem] border border-white/[0.08] bg-[#080A0F]/98 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.68)]">
+          <div className="text-[17px] font-semibold text-white/90">
+            Leave LIVE?
+          </div>
+          <p className="mt-2 text-[13px] leading-5 text-white/46">
+            This opens a Normal GEORGE workspace. Save the current LIVE conversation first?
+          </p>
+
+          <div className="mt-5 grid gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const destination = pendingNormalDestination
+                saveCurrentLiveSession()
+                setPendingNormalDestination(null)
+                completeNormalNavigation(destination)
+              }}
+              className="rounded-[1rem] border border-[#4E7CFF]/30 bg-[#4E7CFF]/[0.10] px-4 py-3 text-left text-[13px] text-white/84 transition hover:bg-[#4E7CFF]/[0.16]"
+            >
+              Save LIVE and open workspace
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const destination = pendingNormalDestination
+                setPendingNormalDestination(null)
+                completeNormalNavigation(destination)
+              }}
+              className="rounded-[1rem] border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-left text-[13px] text-white/66 transition hover:bg-white/[0.04]"
+            >
+              Open without saving
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPendingNormalDestination(null)}
+              className="rounded-[1rem] px-4 py-3 text-left text-[13px] text-white/40 transition hover:bg-white/[0.025] hover:text-white/62"
+            >
+              Stay in LIVE
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
   </>
 )
 }
