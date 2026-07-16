@@ -176,11 +176,11 @@ export function PostLiveConversationRecordPanel({
       )}
 
       <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
-        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Recommended next move</p>
+        <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE Actions</p>
         {futureActions.length > 0 ? (
           <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[#DCEBFF]/72">
             {futureActions.map((action) => (
-              <li key={action}>We can {action.charAt(0).toLowerCase()}{action.slice(1)}</li>
+              <li key={action}>GEORGE can {action.charAt(0).toLowerCase()}{action.slice(1)}</li>
             ))}
           </ul>
         ) : (

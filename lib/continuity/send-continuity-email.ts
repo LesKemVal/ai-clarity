@@ -67,3 +67,73 @@ export async function sendContinuityEmail({
     `,
   })
 }
+
+
+export type GeorgeUserCommunicationInput = {
+  email: string
+  subject: string
+  headline: string
+  message: string
+  actionUrl?: string
+  actionLabel?: string
+  operationalReason: string
+}
+
+function escapeHtml(value: string) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+export async function sendGeorgeUserCommunication({
+  email,
+  subject,
+  headline,
+  message,
+  actionUrl,
+  actionLabel = 'Open GEORGE',
+  operationalReason,
+}: GeorgeUserCommunicationInput) {
+  const from = process.env.RESEND_FROM_EMAIL
+  if (!from) throw new Error('Missing RESEND_FROM_EMAIL')
+
+  const cleanEmail = String(email || '').trim().toLowerCase()
+  const cleanSubject = String(subject || '').trim()
+  const cleanHeadline = String(headline || '').trim()
+  const cleanMessage = String(message || '').trim()
+  const cleanReason = String(operationalReason || '').trim()
+  const cleanActionUrl = String(actionUrl || '').trim()
+  const cleanActionLabel = String(actionLabel || 'Open GEORGE').trim()
+
+  if (!cleanEmail || !cleanSubject || !cleanHeadline || !cleanMessage || !cleanReason) {
+    throw new Error('Incomplete GEORGE user communication')
+  }
+
+  const action = cleanActionUrl
+    ? `<a href="${escapeHtml(cleanActionUrl)}" style="display:inline-block;background:#D7DBE4;color:#07090D;text-decoration:none;font-weight:600;font-size:13px;padding:12px 18px;border-radius:999px;">${escapeHtml(cleanActionLabel)}</a>`
+    : ''
+
+  return resend.emails.send({
+    from,
+    to: cleanEmail,
+    subject: cleanSubject,
+    html: `
+      <div style="margin:0;background:#07090D;padding:28px 16px;font-family:Inter,Arial,sans-serif;color:#EAEAEA;">
+        <div style="max-width:540px;margin:0 auto;background:rgba(17,20,27,0.72);border:1px solid rgba(255,255,255,0.08);border-radius:22px;padding:24px;box-shadow:0 18px 48px rgba(0,0,0,0.28);">
+          <div style="display:inline-block;background:#0B0D12;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 14px;margin-bottom:18px;">
+            <div style="font-size:12px;letter-spacing:0.30em;text-transform:uppercase;color:#D7DBE4;">GEORGE</div>
+          </div>
+          <h1 style="font-size:21px;line-height:1.32;margin:0 0 12px 0;color:#F4F6FA;font-weight:500;">${escapeHtml(cleanHeadline)}</h1>
+          <p style="font-size:14px;line-height:1.7;color:#A9B0C7;margin:0 0 22px 0;">${escapeHtml(cleanMessage)}</p>
+          ${action}
+          <p style="font-size:10px;line-height:1.65;color:#555D72;margin-top:24px;">
+            Sent because GEORGE determined this communication could materially improve preparation, continuity, follow-through, or the next conversation.
+          </p>
+        </div>
+      </div>
+    `,
+  })
+}
