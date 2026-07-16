@@ -166,7 +166,7 @@ export function resolveLiveIntentRuntime(input: {
         /reg cf|cf-spv|broker|dealer|portal|capital|investor|raise|funding/.test(source)
           ? 'Select structure and vendor path'
           : /interview|hiring|candidate/.test(source)
-            ? 'Prepare the room and answer clearly'
+            ? 'Prepare the conversation and answer clearly'
             : /negotiation|terms|price|deal/.test(source)
               ? 'Protect position and move toward terms'
               : 'Carry this session into LIVE'

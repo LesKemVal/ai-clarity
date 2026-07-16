@@ -42,7 +42,7 @@ export function deriveLiveRoomPriorities(params: {
       urgency: roomState.state === 'clarification_required' ? 'high' : 'medium',
       recommendedBehavior: 'brief_confirmation',
       confidence: overlapRecovery.confidence,
-      reason: 'A possible question appeared during uncertain or overlapping room context.',
+      reason: 'A possible question appeared during uncertain or overlapping conversation context.',
     }
   }
 

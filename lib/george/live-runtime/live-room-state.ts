@@ -51,7 +51,7 @@ export function deriveLiveRoomState(params: {
   if (recovery.requiresAttention) {
     return {
       state: 'overlap_detected',
-      reason: recovery.summary || 'Recent room context may require attention.',
+      reason: recovery.summary || 'Recent conversation context may require attention.',
       shouldSlowDown: true,
       shouldSeekConfirmation: recovery.confidence !== 'high',
       shouldAvoidLongResponse: true,

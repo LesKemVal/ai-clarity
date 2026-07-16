@@ -519,7 +519,7 @@ export function buildPreparedRuntimeContextBuffer(params: {
   const purview = runtimeSupport?.purview || setup?.purview || null
 
   return [
-    room ? `LIVE room: ${room}` : 'LIVE room: Adaptive LIVE',
+    room ? `LIVE conversation: ${room}` : 'LIVE conversation: Adaptive LIVE',
     params.objectiveLine || '',
     params.steeringLine || '',
     purview?.label ? `Purview: ${purview.label}` : '',

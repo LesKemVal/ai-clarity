@@ -21,7 +21,7 @@ export type LiveContextPrimitive = {
 export const INDIVIDUAL_LIVE_CONTEXTS: Record<LiveContextType, LiveContextPrimitive> = {
   unknown: {
     type: 'unknown',
-    label: 'Unknown LIVE room',
+    label: 'Unknown LIVE conversation',
     intent: 'Clarify the room without assuming a campaign, sales process, or firm workflow.',
     defaultNeed: 'Ask what the user is walking into and what outcome matters most.',
     reusablePrimitives: ['one-question narrowing', 'pressure scan', 'next-move guidance'],

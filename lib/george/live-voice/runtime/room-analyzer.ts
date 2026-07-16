@@ -131,7 +131,7 @@ export function analyzeRoom(shadowMap: string): RoomAnalysis {
   const pressure = PRESSURE_PATTERNS.test(text)
   const interruption = INTERRUPTION_PATTERNS.test(text)
 
-  // Do not infer room context from a single nickname, joke, greeting, or weak keyword.
+  // Do not infer conversation context from a single nickname, joke, greeting, or weak keyword.
   // Example: “what’s up doc?” is not medical context.
   const authorityConfirmed = authority || (weakAuthority && (pressure || interruption))
 

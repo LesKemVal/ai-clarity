@@ -104,7 +104,7 @@ export function authorizeLiveTranscriptAction(params: {
     params.overlapRequiresAttention &&
     action.type === 'send'
   ) {
-    return emit(make('hold', { type: 'ignore' }, 'Overlap detected; hold send action until room context is clearer.', 0.78))
+    return emit(make('hold', { type: 'ignore' }, 'Overlap detected; hold send action until conversation context is clearer.', 0.78))
   }
 
   if (

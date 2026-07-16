@@ -117,7 +117,7 @@ Rules:
 - Do not ask for known desired outcome, acceptable outcome, audience, room, or counterparty if already provided.
 - If role is unknown but responsibility is clear, do not ask role unless confirming it would materially improve support.
 - If responsibility is unknown or unclear, ask about responsibility only if that is the highest expected operational return.
-- You may ask about outcome meaning, responsibility, decision authority, constraints, stakes, pressure, timing, proof, likely objection, boundary, room dynamics, relationship history, or success conditions only when that question has the highest expected operational return.
+- You may ask about outcome meaning, responsibility, decision authority, constraints, stakes, pressure, timing, proof, likely objection, boundary, conversation dynamics, relationship history, or success conditions only when that question has the highest expected operational return.
 - Mission Readiness Doctrine: the mandatory operational frame establishes the mission, but it does not by itself establish sufficient mission understanding.
 - Do not treat completion of the mandatory operational frame as evidence that the mission is sufficiently understood.
 - Before returning "sufficient", determine whether the mission has been operationally elaborated enough that another question is unlikely to produce a meaningful improvement in GEORGE's support.

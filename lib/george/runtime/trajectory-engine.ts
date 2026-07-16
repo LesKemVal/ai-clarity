@@ -34,7 +34,7 @@ export function assessTrajectory(input: {
   }
 
   if (/meeting|call|interview|negotiation|client|board|doctor/.test(text)) {
-    moves.push('prepare the room', 'define the desired outcome', 'prepare usable language')
+    moves.push('prepare the conversation', 'define the desired outcome', 'prepare usable language')
     needs.push('live', 'brief')
   }
 

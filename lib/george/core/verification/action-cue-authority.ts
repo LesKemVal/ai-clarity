@@ -100,7 +100,7 @@ function buildVerifiedResponse(input: {
   }
 
   if (isGeorgeQuestion && /\b(build this ourselves|ourselves|choose george)\b/i.test(lowerTranscript)) {
-    return 'You can build tools, but GEORGE is not just a prompt interface. The value is the runtime judgment around timing, restraint, evidence, delivery style, room context, and outcome movement. A pilot lets us prove whether that operating layer improves execution before you commit to scaling.'
+    return 'You can build tools, but GEORGE is not just a prompt interface. The value is the runtime judgment around timing, restraint, evidence, delivery style, conversation context, and outcome movement. A pilot lets us prove whether that operating layer improves execution before you commit to scaling.'
   }
 
   if (isGeorgeQuestion && /\b(market need|why does the market|why need)\b/i.test(lowerTranscript)) {

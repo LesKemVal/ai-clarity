@@ -226,7 +226,7 @@ export async function reasonLiveNextMove(input: LiveReasoningInput): Promise<Liv
         '- Preserve the user\'s sentence trajectory toward the desired outcome or strongest confirmed active outcome.',
         '- Complete grammar first. Complete meaning only from evidence.',
         '- User-declared reality, confirmed observation, transcript, and room memory may ground output.',
-        '- Objective and room context may shape tone, but they are never evidence by themselves.',
+        '- Objective and conversation context may shape tone, but they are never evidence by themselves.',
         '- Internal hypotheses may help interpretation, but they are not facts.',
         '- If using a hypothesis, mark it as possibility: may, might, could, seems, suggests, or likely.',
         '- Do not state unsupported facts as reality.',
@@ -267,7 +267,7 @@ ${supportStyle === 'cue'
 
 Intervention Type:
 ${continuationReasoning
-  ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve natural grammar, immediate trajectory, and user agency. In continuation mode, objective and room context may shape tone but are not evidence by themselves. Do not create facts, numbers, percentages, valuations, ownership terms, commitments, or claims not already supported by the transcript, recent room memory, known context, or user fragment. If a missing specific is required to preserve the thought, use a natural user-fillable placeholder such as "__". Do not turn the sentence into a template. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
+  ? '- CONTINUATION. The user intentionally requested help completing an unfinished thought. Complete the user\'s sentence fragment. Preserve natural grammar, immediate trajectory, and user agency. In continuation mode, objective and conversation context may shape tone but are not evidence by themselves. Do not create facts, numbers, percentages, valuations, ownership terms, commitments, or claims not already supported by the transcript, recent room memory, known context, or user fragment. If a missing specific is required to preserve the thought, use a natural user-fillable placeholder such as "__". Do not turn the sentence into a template. Do not coach. Do not redirect. Do not explain. Return only the continuation fragment, starting with "...".'
   : mode === 'response'
     ? '- RESPONSE. The user selected Response mode. Provide a complete usable answer as user-ready language the user could say in the room. Complete means sufficient for the moment, not unnecessarily long. Do not reduce it to a cue unless the room requires restraint.'
     : mode === 'presentation'

@@ -12,11 +12,11 @@ export const GEORGE_RUNTIME_INVARIANTS = {
   liveRuntime: [
     'LIVE is individual-first real-time conversational support.',
     'LIVE must not assume a campaign, firm workflow, CRM process, or sales pipeline.',
-    'LIVE should help with timing, tone, next words, restraint, pressure, and room dynamics.',
+    'LIVE should help with timing, tone, next words, restraint, pressure, and conversation dynamics.',
   ],
   continuity: [
     'Session signals are not automatically durable goals.',
-    'LIVE transcript and third-party speech are current-room context unless explicitly saved by the user.',
+    'LIVE transcript and third-party speech are current-conversation context unless explicitly saved by the user.',
     'Durable goals and memories require explicit user action or clear product-owned classification.',
   ],
   proLiveBoundary: [

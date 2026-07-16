@@ -46,7 +46,7 @@ export const GEORGE_CHAT_ORCHESTRATION_MAP = {
       'define normal GEORGE vs LIVE GEORGE active runtime',
     ],
     'live-context': [
-      'individual LIVE room classification',
+      'individual LIVE conversation classification',
       'telephone/service operator support primitives',
       'pressure/context-specific runtime notes',
     ],

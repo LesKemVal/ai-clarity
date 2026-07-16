@@ -37,10 +37,10 @@ export function recoverLiveOverlapContext(
     : possibleQuestion && likelyInterruption
       ? 'Possible overlapping question or objection occurred while GEORGE was maintaining the room.'
       : possibleQuestion
-        ? 'Possible question detected in recent room context.'
+        ? 'Possible question detected in recent conversation context.'
         : likelyInterruption
-          ? 'Possible interruption or objection detected in recent room context.'
-          : 'Recent room context may need confirmation before GEORGE continues.'
+          ? 'Possible interruption or objection detected in recent conversation context.'
+          : 'Recent conversation context may need confirmation before GEORGE continues.'
 
   return {
     requiresAttention,

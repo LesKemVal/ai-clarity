@@ -49,8 +49,8 @@ export function reconcileLiveAwareness(
   const continuityNote = !recentSignals.length
     ? ''
     : overlapDetected
-      ? 'Recent room context includes overlap or speech while GEORGE was speaking. Treat this as useful but uncertain signal.'
-      : 'Recent room context appears stable enough to preserve as continuity signal.'
+      ? 'Recent conversation context includes overlap or speech while GEORGE was speaking. Treat this as useful but uncertain signal.'
+      : 'Recent conversation context appears stable enough to preserve as continuity signal.'
 
   return {
     hasRecentContext: recentSignals.length > 0,
