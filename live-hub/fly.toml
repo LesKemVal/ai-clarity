@@ -4,6 +4,9 @@ primary_region = 'ord'
 [build]
   dockerfile = 'Dockerfile'
 
+kill_signal = 'SIGTERM'
+kill_timeout = '15s'
+
 [http_service]
   internal_port = 8080
   force_https = true
@@ -11,6 +14,18 @@ primary_region = 'ord'
   auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
+
+  [http_service.concurrency]
+    type = 'connections'
+    soft_limit = 200
+    hard_limit = 250
+
+  [[http_service.checks]]
+    grace_period = '10s'
+    interval = '15s'
+    method = 'GET'
+    path = '/readyz'
+    timeout = '2s'
 
 [[vm]]
   memory = '1gb'

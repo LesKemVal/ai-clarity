@@ -3,7 +3,8 @@ import dotenv from 'dotenv'
 dotenv.config({ path: new URL('../../.env.local', import.meta.url).pathname })
 dotenv.config()
 
-import { WebSocketServer } from 'ws'
+import { createServer } from 'node:http'
+import { WebSocketServer, WebSocket } from 'ws'
 import type { LiveHubContext } from './types/protocol.js'
 import { parseClientMessage, sendJson } from './transport/json.js'
 import { createDeepgramStream } from './stt/deepgram-stream.js'
@@ -11,9 +12,47 @@ import { createDeepgramStream } from './stt/deepgram-stream.js'
 const port = Number(process.env.PORT || 8080)
 const deepgramApiKey = process.env.DEEPGRAM_API_KEY || ''
 
-const wss = new WebSocketServer({ host: '0.0.0.0', port })
+const startedAt = Date.now()
+let acceptingConnections = true
+let shuttingDown = false
+
+const httpServer = createServer((request, response) => {
+  const path = request.url?.split('?')[0] || '/'
+
+  if (path === '/healthz') {
+    response.writeHead(200, { 'content-type': 'application/json' })
+    response.end(JSON.stringify({
+      ok: true,
+      service: 'george-live-hub',
+      uptimeMs: Date.now() - startedAt,
+      connections: wss.clients.size,
+      shuttingDown,
+    }))
+    return
+  }
+
+  if (path === '/readyz') {
+    const ready = acceptingConnections && !shuttingDown
+    response.writeHead(ready ? 200 : 503, { 'content-type': 'application/json' })
+    response.end(JSON.stringify({
+      ready,
+      service: 'george-live-hub',
+      connections: wss.clients.size,
+    }))
+    return
+  }
+
+  response.writeHead(404, { 'content-type': 'application/json' })
+  response.end(JSON.stringify({ error: 'not_found' }))
+})
+
+const wss = new WebSocketServer({ server: httpServer })
 
 wss.on('connection', (ws) => {
+  if (!acceptingConnections || shuttingDown) {
+    ws.close(1012, 'LIVE Hub is restarting')
+    return
+  }
   console.log('[LIVE HUB][client] connected')
   let context: LiveHubContext = {}
 
@@ -86,4 +125,45 @@ wss.on('connection', (ws) => {
   })
 })
 
-console.log(`[GEORGE LIVE HUB] listening on :${port}`)
+const shutdown = (signal: 'SIGTERM' | 'SIGINT') => {
+  if (shuttingDown) return
+
+  shuttingDown = true
+  acceptingConnections = false
+
+  console.log('[GEORGE LIVE HUB] shutdown requested', {
+    signal,
+    connections: wss.clients.size,
+  })
+
+  for (const client of wss.clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.close(1012, 'LIVE Hub is restarting')
+    }
+  }
+
+  const forceExitTimer = setTimeout(() => {
+    console.error('[GEORGE LIVE HUB] forced shutdown', {
+      signal,
+      connections: wss.clients.size,
+    })
+    process.exit(1)
+  }, 10_000)
+
+  forceExitTimer.unref()
+
+  wss.close(() => {
+    httpServer.close(() => {
+      clearTimeout(forceExitTimer)
+      console.log('[GEORGE LIVE HUB] shutdown complete', { signal })
+      process.exit(0)
+    })
+  })
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'))
+process.once('SIGINT', () => shutdown('SIGINT'))
+
+httpServer.listen(port, '0.0.0.0', () => {
+  console.log(`[GEORGE LIVE HUB] listening on :${port}`)
+})
