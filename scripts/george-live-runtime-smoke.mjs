@@ -41,6 +41,27 @@ assert(
 )
 
 assert(
+  pageSource.includes(
+    "window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', nextStyle)"
+  ) &&
+    pageSource.includes(
+      "window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', nextStyle)"
+    ) &&
+    pageSource.includes(
+      "window.localStorage.setItem('GEORGE_LIVE_SUPPORT_POLICY', choice)"
+    ),
+  'LIVE controls persist canonical support style, delivery style, and explicit support policy'
+)
+
+assert(
+  pageSource.includes("setLiveDeliveryStyle(nextStyle)") &&
+    pageSource.includes("'george_live_setup_active'") &&
+    pageSource.includes("supportStyle: nextStyle") &&
+    pageSource.includes("deliveryStyle: nextStyle"),
+  'LIVE controls immediately supersede stored track defaults and active setup behavior'
+)
+
+assert(
   statusPanelSource.includes('receiverProfileLabel'),
   'LIVE status panel should expose receiver profile label'
 )

@@ -27,9 +27,17 @@ export type LiveReceiverProfilePanel = {
 export const LIVE_SUPPORT_PANELS: LiveSupportPanel[] = [
   {
     id: 'advice',
-    label: 'Guidance',
-    line: 'Adaptive support delivered at the right moment.',
-    detail: 'Guidance is adaptive internally. GEORGE uses the least intrusive support that can meaningfully improve the outcome: cue, question, short phrase, timing adjustment, continuation, response, or posture reminder.',
+    label: 'Adaptive Cue',
+    line: 'Recommended. Begin with concise cues.',
+    detail:
+      'GEORGE starts with the shortest useful guidance likely to help you reach your desired outcome. GEORGE adapts when a cue alone is not enough for successful execution.',
+  },
+  {
+    id: 'response',
+    label: 'Adaptive Response',
+    line: 'Begin with concise, complete responses.',
+    detail:
+      'GEORGE starts with the shortest complete response you can use naturally. If complete lines are working, GEORGE leaves them alone. GEORGE may adapt to cues, continuation, recovery, or another operational resource when evidence suggests it would serve you better.',
   },
 ]
 
