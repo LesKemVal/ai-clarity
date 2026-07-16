@@ -23,7 +23,12 @@ import { buildOutcomeTestedBriefingSupport } from '@/lib/george/live-runtime/liv
 import { prepareConversationFromPackage } from '@/lib/george/preparation/runtime.mjs'
 import { getConversationResponsibilityOptions } from '@/lib/george/live-entry/responsibility-options'
 import { estimateResources, estimateWithResources, getPrepDocumentPrompt, type ResourceEstimate } from '@/lib/george/capabilities/live-entry-resources'
-import { LIVE_RECEIVER_PROFILE_PANELS, type LiveBriefingSupportPanelId, type LiveReceiverProfilePanelId } from '@/lib/george/capabilities/live-support-panels'
+import {
+  LIVE_RECEIVER_PROFILE_PANELS,
+  LIVE_SUPPORT_PANELS,
+  type LiveBriefingSupportPanelId,
+  type LiveReceiverProfilePanelId,
+} from '@/lib/george/capabilities/live-support-panels'
 import { deriveLiveCapabilityIds } from '@/lib/george/capabilities/live-capability-registry'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
@@ -416,18 +421,18 @@ function PanelShell({
   return (
     <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
       <div className="relative z-10 w-full max-w-[640px]">
-        <div className="mb-5 flex items-center gap-4">
+        <div className="mb-2 flex items-center gap-4">
           <BxPageHeader
           backLabel="BACK"
           onBack={onBack}
-          backHref="/george"
+          backHref="/"
         />
         </div>
 
         <section
           className="relative mt-4 w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none  sm:p-6"
         >
-          
+
 
           <div className="flex items-center justify-between gap-4">
             <div className="text-[9px] uppercase tracking-[0.32em] text-[#D7DBE4]/52">
@@ -740,6 +745,71 @@ function buildLiveBriefingSupportPanels({
 
 
 
+
+type LiveOrientationIconKind =
+  | 'conversation'
+  | 'reading'
+  | 'repeat'
+  | 'support'
+  | 'pause'
+  | 'audio'
+
+function LiveOrientationIcon({ kind }: { kind: LiveOrientationIconKind }) {
+  if (kind === 'conversation') {
+    return (
+      <svg viewBox="0 0 48 48" className="h-9 w-9" fill="none" aria-hidden="true">
+        <path d="M9 12h24a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H22l-8 6v-6H9a6 6 0 0 1-6-6V18a6 6 0 0 1 6-6Z" fill="currentColor" opacity=".88" />
+        <path d="M15 21h13M15 27h9" stroke="#071016" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (kind === 'reading') {
+    return (
+      <svg viewBox="0 0 48 48" className="h-9 w-9" fill="none" aria-hidden="true">
+        <path d="M8 10h13a5 5 0 0 1 5 5v23H13a5 5 0 0 0-5 5V10Z" fill="currentColor" opacity=".82" />
+        <path d="M40 10H27a5 5 0 0 0-5 5v23h13a5 5 0 0 1 5 5V10Z" fill="currentColor" opacity=".62" />
+        <path d="M13 18h8M13 24h8M28 18h7M28 24h7" stroke="#071016" strokeWidth="2.4" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (kind === 'repeat') {
+    return (
+      <svg viewBox="0 0 48 48" className="h-9 w-9" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M36 17a15 15 0 1 0 1 15" />
+        <path d="m32 8 5 9-10 1" />
+      </svg>
+    )
+  }
+
+  if (kind === 'support') {
+    return (
+      <svg viewBox="0 0 48 48" className="h-9 w-9" fill="none" aria-hidden="true">
+        <rect x="7" y="10" width="34" height="7" rx="3.5" fill="currentColor" opacity=".92" />
+        <rect x="11" y="21" width="27" height="7" rx="3.5" fill="currentColor" opacity=".68" />
+        <rect x="15" y="32" width="19" height="7" rx="3.5" fill="currentColor" opacity=".46" />
+      </svg>
+    )
+  }
+
+  if (kind === 'pause') {
+    return (
+      <svg viewBox="0 0 48 48" className="h-9 w-9" fill="currentColor" aria-hidden="true">
+        <rect x="10" y="8" width="10" height="32" rx="4" />
+        <rect x="28" y="8" width="10" height="32" rx="4" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 48 48" className="h-9 w-9" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" aria-hidden="true">
+      <path d="M24 29a8 8 0 0 0 8-8v-6a8 8 0 1 0-16 0v6a8 8 0 0 0 8 8Z" />
+      <path d="M10 22a14 14 0 0 0 28 0M24 36v7" />
+    </svg>
+  )
+}
+
 export default function LiveEntryClient() {
   const [ready, setReady] = useState(false)
   const [tier, setTier] = useState<Tier>('smart')
@@ -791,6 +861,10 @@ export default function LiveEntryClient() {
   const [showPrepPreview, setShowPrepPreview] = useState(false)
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false)
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1)
+  const [liveBriefingOpenSection, setLiveBriefingOpenSection] = useState<
+    'outcome' | 'responsibility' | 'participants' | 'context' | 'additional' | 'documents' | null
+  >('outcome')
+  const [liveRoomMoreOpen, setLiveRoomMoreOpen] = useState(false)
   const [liveBriefingToaAccepted, setLiveBriefingToaAccepted] = useState(false)
   const [liveBriefingSupportAccepted, setLiveBriefingSupportAccepted] = useState(false)
   const [liveRecoveryOptions, setLiveRecoveryOptions] = useState<LiveRecoveryOptionId[]>(DEFAULT_LIVE_RECOVERY_SELECTION)
@@ -799,7 +873,7 @@ export default function LiveEntryClient() {
   const [liveBriefingCapabilitiesConfirmed, setLiveBriefingCapabilitiesConfirmed] = useState(false)
   const [liveBriefingActiveSupportStyle, setLiveBriefingActiveSupportStyle] = useState<LiveBriefingSupportPanelId | null>(null)
   const [selectedReceiverProfile, setSelectedReceiverProfile] = useState<LiveReceiverProfilePanelId>('audio_only')
-  const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] = useState<'receiver' | 'speaking' | null>('receiver')
+  const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] = useState<'support' | 'receiver' | 'speaking' | null>('support')
   const [liveBriefingExpandedSupportPanel, setLiveBriefingExpandedSupportPanel] = useState<LiveBriefingSupportPanelId | null>(null)
   const [liveBriefingCommunicationConfirmed, setLiveBriefingCommunicationConfirmed] = useState(false)
   const [showQuickLiveSetup, setShowQuickLiveSetup] = useState(false)
@@ -814,6 +888,10 @@ export default function LiveEntryClient() {
     slowDown: 'Can we slow down?',
   })
   const [liveReadyAccepted, setLiveReadyAccepted] = useState(false)
+  const [liveControlsOrientationSeen, setLiveControlsOrientationSeen] = useState(false)
+  const [liveControlsEntryReady, setLiveControlsEntryReady] = useState(false)
+  const [liveApproachConfirmed, setLiveApproachConfirmed] = useState(false)
+  const [liveApproachEditing, setLiveApproachEditing] = useState(true)
   const [liveReadinessComplete, setLiveReadinessComplete] = useState(false)
   const [liveRoomObjectiveOption, setLiveRoomObjectiveOption] = useState<LiveRoomObjectiveOptionId | ''>('')
   const [customLiveRoomObjective, setCustomLiveRoomObjective] = useState('')
@@ -947,7 +1025,7 @@ export default function LiveEntryClient() {
 
   const responsibilityLimitCopy =
     tier === 'brilliant'
-      ? 'Select the responsibilities you carry in this conversation.'
+      ? 'Select every role you carry in this conversation.'
       : tier === 'intelligent'
         ? 'Select up to 2 responsibilities.'
         : 'Select the responsibility that matters most.'
@@ -980,9 +1058,9 @@ export default function LiveEntryClient() {
       key: 'name',
       kicker: 'LIVE ENTRY',
       label: 'Signal 1',
-      question: 'What should I call you in this room?',
-      helper: 'Name, title, nickname, or whatever people in the room will recognize.',
-      example: 'Lester, Mr. Sawyer, Dr. Patel, Alex, Coach Rivera.',
+      question: 'What should I call you in this conversation?',
+      helper: 'Name, title, nickname, or whatever people in the conversation will recognize.',
+      example: 'Lester, Mr. Sawyer, Dr. Patel, Alex, Coach, etc.',
     },
     {
       key: 'desiredOutcome',
@@ -996,9 +1074,9 @@ export default function LiveEntryClient() {
       key: 'role',
       kicker: 'RESPONSIBILITY SIGNAL',
       label: 'Signal 3',
-      question: 'What is your responsibility in this conversation?',
-      helper: 'Your responsibility tells GEORGE how you are expected to contribute, what authority you may have, and how best to support you.',
-      example: 'Interviewee, founder, CEO, presenter, decision maker, parent, advisor, lead negotiator.',
+      question: 'Who are you and what is your role in this conversation?',
+      helper: 'Your role helps GEORGE understand your perspective, responsibilities, authority, and how best to support you.',
+      example: 'Interviewee, founder, CEO, presenter, decision maker, parent, advisor, lead negotiator, coach, etc.',
     },
   ], [])
 
@@ -1289,7 +1367,7 @@ export default function LiveEntryClient() {
     void requestNextOptionalSignalQuestion(optionalSignalAnswers, nextSkipped)
   }
 
-  
+
   /*
     GEORGE Doctrine
 
@@ -1718,7 +1796,7 @@ const mandatoryLiveSignals = useMemo(() => {
       setPrepDocument({
         name: file.name,
         kind: 'file',
-        summary: 'File attached as room context. GEORGE should ask for clarification if the content is needed.',
+        summary: 'File attached as conversation context. GEORGE should ask for clarification if the content is needed.',
       })
     } catch {
       setPrepDocument({
@@ -2190,7 +2268,7 @@ const mandatoryLiveSignals = useMemo(() => {
   }
 
 
-  
+
   const appendProofTranscript = (speaker: 'george' | 'user', message: string) => {
     setProofTranscript((current) => [...current, { speaker, text: message }])
   }
@@ -2611,16 +2689,16 @@ const beginProofOfAwareness = async () => {
 
   if (liveEntryQuestionSurface) {
     return (
-      <main className="relative flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-black px-4 py-8 text-white">
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-8 pt-4 text-white sm:pt-5">
 
-        <div className="relative z-10 w-full max-w-[920px]">
+        <div className="relative z-10 mx-auto w-full max-w-[1120px]">
           <div className="mb-5 flex items-center gap-4">
-          <BxPageHeader backLabel="" />
+          <BxPageHeader backLabel="BACK" backHref="/george" />
         </div>
 
-          <section className="relative w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none sm:p-6">
+          <section className="relative w-full overflow-hidden rounded-[22px] border border-white/[0.04] bg-[#050505] px-5 pb-6 pt-4 shadow-[0_18px_60px_rgba(0,0,0,0.32)] sm:px-7 sm:pb-7 sm:pt-5">
 
-          <div className="relative z-30 max-w-[640px]">
+          <div className="relative z-30 max-w-[760px]">
 
           <div className="flex items-center justify-between gap-4">
             <div className="text-[10px] uppercase tracking-[0.28em] text-[#D7DBE4]/52">
@@ -2631,41 +2709,41 @@ const beginProofOfAwareness = async () => {
             </div>
           </div>
 
-          <h1 className="mt-3 text-[25px] font-semibold leading-tight tracking-[-0.04em] text-white/90">
+          <h1 className="mt-5 text-[24px] font-semibold leading-tight tracking-[-0.04em] text-white/90 sm:text-[27px]">
             {liveEntryQuestionSurface.readinessMessage ? "You're ready for LIVE." : liveEntryQuestionSurface.canBeginLive ? 'GEORGE has enough signal.' : 'Bring GEORGE up to speed.'}
           </h1>
 
-          <div className="mt-6 border-l border-[#AEB6FF]/24 pl-5 text-left">
+          <div className="mt-3 border-l border-[#AEB6FF]/24 pl-4 text-left sm:pl-5">
             <div className="text-[10px] uppercase tracking-[0.2em] text-white/34">
               {liveEntryQuestionSurface.label}
             </div>
 
-            <div className={`mt-4 min-h-[72px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? 'text-[17px] leading-7' : 'text-[22px] leading-8'} tracking-[-0.02em] text-[#F2F4FF]/86`}>
+            <div className={`mt-5 min-h-[66px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? 'text-[17px] leading-7' : 'text-[22px] leading-[1.55]'} tracking-[-0.02em] text-[#F2F4FF]/86`}>
               {liveEntryQuestionSurface.question}
               {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && (
                 <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
               )}
             </div>
 
-            <div className={`mt-2 text-[13px] leading-5 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#D7DBE4]/64' : 'text-white/42'}`}>
+            <div className={`mt-4 text-[13px] leading-6 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#D7DBE4]/64' : 'text-white/42'}`}>
               {liveEntryQuestionSurface.helper}
             </div>
 
             {!liveEntryQuestionSurface.readinessMessage && liveEntryQuestionSurface.example && (
-              <div className="mt-5 rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-2.5">
+              <div className="mt-5 rounded-[0.85rem] border border-white/[0.05] bg-white/[0.012] px-4 py-3">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
                   Example
                 </div>
-                <div className="mt-2 text-[12.5px] leading-6 text-white/44">
+                <div className="mt-2.5 text-[12.5px] leading-6 text-white/44">
                   {liveEntryQuestionSurface.example}
                 </div>
               </div>
             )}
 
             {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && currentMandatorySignalQuestion?.key === 'role' && (
-              <div className="mt-6">
+              <div className="mt-3">
                 <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">
-                  Suggested responsibilities
+                  Suggested roles
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -2720,17 +2798,17 @@ const beginProofOfAwareness = async () => {
                   }
                 }}
                 autoFocus
-                className="mt-6 w-full border-0 border-b border-[#4E7CFF]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/46"
+                className="mt-5 w-full border-0 border-b border-[#4E7CFF]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/46"
                 placeholder="say it here..."
               />
             )}
 
-            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
               <button
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
                 onClick={() => { unlockLiveEntryVoice(); liveEntryQuestionSurface.submit() }}
-                className="rounded-[0.95rem] border border-[#4E7CFF]/35 bg-[#4E7CFF]/[0.075] px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-[#D7DCFF]/88 transition hover:bg-[#4E7CFF]/[0.12] hover:text-white active:scale-[0.98] disabled:opacity-40"
+                className="rounded-[0.95rem] border border-white/[0.16] bg-white/80 px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition hover:bg-white/90 active:scale-[0.98] disabled:opacity-40"
               >
                 {liveEntryQuestionSurface.primaryAction}
               </button>
@@ -2764,8 +2842,8 @@ const beginProofOfAwareness = async () => {
                 }}
                 className={`rounded-[0.95rem] border px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
                   liveEntryQuestionSurface.canBeginLive
-                    ? 'border-[#D7DCFF]/[0.18] bg-[#D7DCFF]/[0.08] text-[#D7DCFF]/86 hover:border-[#D7DCFF]/32 hover:bg-[#D7DCFF]/[0.12] hover:text-white'
-                    : 'cursor-default border-white/[0.055] bg-white/[0.018] text-white/20'
+                    ? 'border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]'
+                    : 'cursor-default border-[#4E7CFF]/25 bg-[#4E7CFF] text-white opacity-35'
                 }`}
               >
                 {liveEntryQuestionSurface.canBeginLive ? 'Enter LIVE' : 'Add signal for LIVE'}
@@ -2839,7 +2917,7 @@ const beginProofOfAwareness = async () => {
           <div className="text-[10px] uppercase tracking-[0.26em] text-white/28">LIVE requires sign-in</div>
           <h1 className="mt-3 text-[24px] font-semibold tracking-[-0.04em] text-white/90">Sign in to use LIVE.</h1>
           <p className="mt-2 text-[13px] leading-5 text-white/46">
-            LIVE uses session continuity and room context. Sign in so GEORGE can protect the room from stale or unowned context.
+            LIVE uses session continuity and conversation context. Sign in so GEORGE can protect the room from stale or unowned context.
           </p>
           <a
             href="/george"
@@ -2964,144 +3042,264 @@ const beginProofOfAwareness = async () => {
 
 
     if (liveBriefingStep === 1) {
+      const toggleBriefingSection = (
+        section:
+          | 'outcome'
+          | 'responsibility'
+          | 'participants'
+          | 'context'
+          | 'additional'
+          | 'documents'
+      ) => {
+        setLiveBriefingOpenSection((current) => (current === section ? null : section))
+      }
+
+      const briefingRows = [
+        {
+          id: 'outcome' as const,
+          label: 'Desired outcome',
+          summary: objective || objectiveLabel || 'Outcome pending',
+        },
+        {
+          id: 'responsibility' as const,
+          label: 'Your responsibility',
+          summary: userPosition || positionLabel || 'Responsibility pending',
+        },
+        {
+          id: 'participants' as const,
+          label: 'Conversation with',
+          summary: audienceType || audienceLabel || 'Participants pending',
+        },
+        {
+          id: 'context' as const,
+          label: 'Conversation and known context',
+          summary: knownContext || observation || 'Context pending',
+        },
+        {
+          id: 'additional' as const,
+          label: 'Additional signal',
+          summary: secondaryPosition || 'Nothing additional yet',
+        },
+        {
+          id: 'documents' as const,
+          label: 'Documents',
+          summary: prepDocument?.name || 'No document added',
+        },
+      ]
+
       return (
         <PanelShell
-          label="BRIEF ROOM · EDITABLE"
-          title="Prepare Briefing"
+          label={
+            relatedSessionId !== 'not_related'
+              ? 'BRIEF ROOM · UPDATE'
+              : 'BRIEF ROOM · EDITABLE'
+          }
+          title={
+            relatedSessionId !== 'not_related'
+              ? 'Before we begin...'
+              : 'Here’s what I understand'
+          }
           stage={1}
         >
-          <div className="mt-4 space-y-2 rounded-[0.9rem] border border-[#4E7CFF]/[0.10] bg-black/22 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]">
-            <div className="text-[11.5px] leading-5 text-[#D7DBE4]/52">
-              Review the briefing. The more accurate the signal, the better GEORGE can support timing, judgment, and execution.
+          <div className="mt-3 rounded-[1.15rem] border border-white/[0.065] bg-[#07090D]/84 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-4">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
+                Operational briefing
+              </div>
+              <p className="mt-2 max-w-[650px] text-[12px] leading-5 text-[#D7DBE4]/50">
+                {relatedSessionId !== 'not_related'
+                  ? 'Has anything changed?'
+                  : 'Review everything GEORGE learned about the conversation. Open one section at a time to edit it.'}
+              </p>
             </div>
 
-            <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Desired Outcome</div>
-              <textarea
-                value={objective}
-                disabled={briefingInputsLocked}
-                onChange={(event) => updateBriefingObjective(event.target.value)}
-                rows={1}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#F2F4FF]/86 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                placeholder={objectiveLabel}
-              />
-            </label>
+            <div className="mt-4 divide-y divide-white/[0.045] rounded-[1rem] border border-white/[0.055] bg-black/20">
+              {briefingRows.map((row) => {
+                const open = liveBriefingOpenSection === row.id
 
-            <div className="grid grid-cols-2 gap-3">
-              <label className="block">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Your Role</div>
-                <input
-                  value={userPosition}
-                  disabled={briefingInputsLocked}
-                  onChange={(event) => setUserPosition(event.target.value)}
-                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                  placeholder={positionLabel}
-                />
-              </label>
+                return (
+                  <div key={row.id} className="overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => toggleBriefingSection(row.id)}
+                      className={`relative flex w-full items-start justify-between gap-4 overflow-hidden px-4 py-3.5 text-left transition ${
+                        row.id === 'documents'
+                          ? 'border-[#4E7CFF]/22 bg-[#4E7CFF]/[0.07] hover:bg-[#4E7CFF]/[0.11]'
+                          : 'hover:bg-white/[0.018]'
+                      }`}
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/28">
+                          {row.label}
+                        </span>
+                        <span className="mt-1.5 block line-clamp-2 text-[12.5px] leading-5 text-[#F2F4FF]/74">
+                          {row.summary}
+                        </span>
+                      </span>
 
-              <label className="block">
-                <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Conversation With</div>
-                <input
-                  value={audienceType}
-                  disabled={briefingInputsLocked}
-                  onChange={(event) => setAudienceType(event.target.value)}
-                  className="mt-1 w-full rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-white/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                  placeholder={audienceLabel}
-                />
-              </label>
+                      <span className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[8px] uppercase tracking-[0.15em] text-white/36">
+                        {open ? 'Close' : 'Edit'}
+                      </span>
+                    </button>
+
+                    <div
+                      className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                        open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      }`}
+                    >
+                      <div className="min-h-0 overflow-hidden">
+                        <div className="border-t border-white/[0.04] bg-white/[0.012] px-4 py-4">
+                          {row.id === 'outcome' && (
+                            <textarea
+                              value={objective}
+                              disabled={briefingInputsLocked}
+                              onChange={(event) => updateBriefingObjective(event.target.value)}
+                              rows={3}
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#F2F4FF]/88 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              placeholder={objectiveLabel}
+                            />
+                          )}
+
+                          {row.id === 'responsibility' && (
+                            <input
+                              value={userPosition}
+                              disabled={briefingInputsLocked}
+                              onChange={(event) => setUserPosition(event.target.value)}
+                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              placeholder={positionLabel}
+                            />
+                          )}
+
+                          {row.id === 'participants' && (
+                            <input
+                              value={audienceType}
+                              disabled={briefingInputsLocked}
+                              onChange={(event) => setAudienceType(event.target.value)}
+                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              placeholder={audienceLabel}
+                            />
+                          )}
+
+                          {row.id === 'context' && (
+                            <textarea
+                              value={knownContext}
+                              disabled={briefingInputsLocked}
+                              onChange={(event) => updateBriefingRoomSignal(event.target.value)}
+                              rows={4}
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              placeholder={observation}
+                            />
+                          )}
+
+                          {row.id === 'additional' && (
+                            <textarea
+                              value={secondaryPosition}
+                              disabled={briefingInputsLocked}
+                              onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
+                              rows={3}
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              placeholder="Anything else GEORGE should understand, remember, watch for, or help accomplish."
+                            />
+                          )}
+
+                          {row.id === 'documents' && (
+                            <div className="relative overflow-hidden rounded-[0.95rem] border border-[#4E7CFF]/[0.28] bg-[#4E7CFF]/[0.075] p-3.5 shadow-[0_0_30px_rgba(78,124,255,0.08)]">
+                              <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/[0.10] to-transparent blur-[1px] animate-[briefingUploadShimmer_4.8s_ease-in-out_infinite]"
+                              />
+                              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D7DCFF]/64">
+                                Add material GEORGE should know
+                              </div>
+                              <p className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/46">
+                                Upload facts, history, proof, constraints, or language that should strengthen this briefing.
+                              </p>
+
+                              <div className="mt-3">
+                                <RelevantDocumentationPanel
+                                  recommendations={documentationRecommendations}
+                                  document={prepDocument}
+                                  reading={prepDocumentReading}
+                                  onUpload={(file) => void handlePrepDocumentUpload(file)}
+                                  onRemove={() => setPrepDocument(null)}
+                                />
+                              </div>
+
+                              {prepDocument?.summary && (
+                                <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-black/20 px-3 py-2.5">
+                                  <div className="text-[9px] uppercase tracking-[0.18em] text-white/28">
+                                    Incorporated from document
+                                  </div>
+                                  <div className="mt-1.5 text-[11px] leading-5 text-white/48">
+                                    {prepDocument.summary}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {row.id !== 'documents' && (
+                            <button
+                              type="button"
+                              onClick={() => setLiveBriefingOpenSection(null)}
+                              className="mt-3 rounded-full border border-white/[0.07] px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/40 transition hover:border-white/[0.14] hover:text-white/66"
+                            >
+                              Done
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
-            <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Known Conversation Context</div>
-              <textarea
-                value={knownContext}
-                disabled={briefingInputsLocked}
-                onChange={(event) => updateBriefingRoomSignal(event.target.value)}
-                rows={2}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                placeholder={observation}
-              />
-            </label>
-
-            <label className="block">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/26">Additional Context (Optional)</div>
-              <textarea
-                disabled={briefingInputsLocked}
-                value={secondaryPosition}
-                onChange={(event) => setBriefingSecondaryOutcome(event.target.value)}
-                rows={1}
-                className="mt-1 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-1.5 text-[13px] leading-5 text-[#D7DBE4]/78 outline-none transition placeholder:text-white/18 disabled:cursor-default disabled:opacity-55 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                placeholder="Optional. If empty, GEORGE treats this signal as inconclusive."
-              />
-              <div className="mt-1 text-[10px] leading-4 text-white/24">
-                Add the next useful thing GEORGE should determine, remember, convey, watch for, or understand. Leave blank if inconclusive.
-              </div>
-            </label>
-
-            {briefingUnderstandingSignals.length > 0 && (
-              <div className="rounded-[0.82rem] border border-white/[0.055] bg-white/[0.018] px-3 py-3">
-                <div className="text-[9px] uppercase tracking-[0.22em] text-white/30">
-                  GEORGE understands
+            {(briefingUnderstandingSignals.length > 0 ||
+              briefingPreparation?.opportunities?.[0] ||
+              briefingPreparation?.risks?.[0]) && (
+              <div className="mt-3 rounded-[1rem] border border-white/[0.055] bg-white/[0.014] px-3.5 py-3">
+                <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/28">
+                  What GEORGE will carry into LIVE
                 </div>
-                <div className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/48">
-                  {briefingUnderstandingSignals.join(' • ')}
-                </div>
-              </div>
-            )}
 
-            {(briefingPreparation?.sufficientToBegin || briefingPreparation?.knownContext?.length > 0) && (
-              <div className="rounded-[0.82rem] border border-[#4E7CFF]/[0.10] bg-[#4E7CFF]/[0.035] px-3 py-3">
-                <div className="text-[9px] uppercase tracking-[0.22em] text-[#D7DCFF]/45">
-                  Preparation memory
-                </div>
-                <div className="mt-2 space-y-1.5 text-[11px] leading-5 text-[#D7DBE4]/56">
+                {briefingUnderstandingSignals.length > 0 && (
+                  <div className="mt-2 text-[11px] leading-5 text-[#D7DBE4]/50">
+                    {briefingUnderstandingSignals.join(' • ')}
+                  </div>
+                )}
+
+                <div className="mt-2 grid gap-1.5 text-[11px] leading-5 text-white/42 sm:grid-cols-2">
                   {briefingPreparation?.opportunities?.[0] && (
                     <div>Opportunity: {briefingPreparation.opportunities[0]}</div>
                   )}
                   {briefingPreparation?.risks?.[0] && (
                     <div>Risk: {briefingPreparation.risks[0]}</div>
                   )}
-                  {briefingPreparation?.reusableDocumentation?.length > 0 && (
-                    <div>Reusable documentation: {briefingPreparation.reusableDocumentation.length}</div>
-                  )}
-                  <div>Confidence: {Math.round((briefingPreparation?.confidence || 0) * 100)}%</div>
                 </div>
               </div>
             )}
-
-            <RelevantDocumentationPanel
-              recommendations={documentationRecommendations}
-              document={prepDocument}
-              reading={prepDocumentReading}
-              onUpload={(file) => void handlePrepDocumentUpload(file)}
-              onRemove={() => setPrepDocument(null)}
-            />
-
           </div>
 
-          <label className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-2.5 transition ${
-            liveBriefingToaAccepted
-              ? 'border-[#D7DCFF]/70 bg-[#4E7CFF]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.28)]'
-              : 'border-[#4E7CFF]/36 bg-[#4E7CFF]/[0.035]'
-          }`}>
+          <label
+            className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[1rem] border px-4 py-3 transition-[background-color,border-color,box-shadow] duration-500 ${
+              liveBriefingToaAccepted
+                ? 'border-[#D7DCFF]/70 bg-[#4E7CFF]/[0.12] shadow-[0_0_34px_rgba(174,182,255,0.20)]'
+                : 'border-[#4E7CFF]/28 bg-[#4E7CFF]/[0.028]'
+            }`}
+          >
             <input
               type="checkbox"
               checked={liveBriefingToaAccepted}
-              onChange={(event) => { unlockLiveEntryVoice(); setLiveBriefingToaAccepted(event.target.checked) }}
+              onChange={(event) => {
+                unlockLiveEntryVoice()
+                setLiveBriefingToaAccepted(event.target.checked)
+                if (event.target.checked) setLiveBriefingOpenSection(null)
+              }}
               className="mt-1 h-4 w-4 accent-[#4E7CFF]"
             />
             <span className="text-[12.5px] leading-5 text-[#D7DBE4]/72">
-              I’ve reviewed this briefing. It accurately reflects what I want GEORGE to understand before entering LIVE.{' '}
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault()
-                  window.open('/legal/toa', '_blank')
-                }}
-                className="text-[#D7DCFF]/72 underline underline-offset-4"
-              >
-                Read terms
-              </button>
+              I reviewed this briefing. It reflects what I want GEORGE to understand about this conversation before LIVE.
             </span>
           </label>
 
@@ -3109,7 +3307,21 @@ const beginProofOfAwareness = async () => {
             Continue
           </AwakeButton>
 
-
+          <style jsx>{`
+            @keyframes briefingUploadShimmer {
+              0%, 72% {
+                transform: translateX(0);
+                opacity: 0;
+              }
+              78% {
+                opacity: 0.42;
+              }
+              100% {
+                transform: translateX(430%);
+                opacity: 0;
+              }
+            }
+          `}</style>
         </PanelShell>
       )
     }
@@ -3138,6 +3350,49 @@ const beginProofOfAwareness = async () => {
         LIVE_RECEIVER_PROFILE_PANELS.find((panel) => panel.id === activeReceiverProfile) ||
         LIVE_RECEIVER_PROFILE_PANELS[0]
 
+      const activeAdaptiveSupportId: LiveBriefingSupportPanelId =
+        liveBriefingActiveSupportStyle === 'response' ||
+        selectedSupportStyle === 'response'
+          ? 'response'
+          : 'advice'
+
+      const activeAdaptiveSupportPanel =
+        LIVE_SUPPORT_PANELS.find(
+          (panel) => panel.id === activeAdaptiveSupportId
+        ) || LIVE_SUPPORT_PANELS[0]
+
+      const setActiveAdaptiveSupport = (
+        panelId: LiveBriefingSupportPanelId
+      ) => {
+        const runtimeStyle = toRuntimeSupportStyle(panelId)
+
+        setLiveBriefingActiveSupportStyle(panelId)
+        setSelectedSupportStyle(
+          normalizeLiveSupportStyle(runtimeStyle)
+        )
+        setLiveRecoveryAcknowledged(false)
+        setLiveBriefingCapabilitiesConfirmed(false)
+        setLiveBriefingOpenMechanicsPanel(null)
+
+        try {
+          window.localStorage.setItem(
+            'GEORGE_LIVE_SUPPORT_STYLE',
+            runtimeStyle
+          )
+          window.localStorage.setItem(
+            'GEORGE_LIVE_DELIVERY_STYLE',
+            runtimeStyle
+          )
+          window.localStorage.setItem(
+            'george_live_adaptive_support_preference',
+            panelId === 'response' ? 'response' : 'cue'
+          )
+          window.dispatchEvent(
+            new Event('george-live-support-style-change')
+          )
+        } catch {}
+      }
+
       const setActiveReceiverProfile = (profile: LiveReceiverProfilePanelId) => {
         setSelectedReceiverProfile(profile)
         setLiveBriefingSupportAccepted(true)
@@ -3149,8 +3404,17 @@ const beginProofOfAwareness = async () => {
           window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', profile)
           window.localStorage.setItem('george_live_entry_receiver_profile', profile)
           window.localStorage.setItem('george_live_entry_support_preference', profile)
-          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', 'advice')
-          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', 'advice')
+          const activeRuntimeStyle =
+            toRuntimeSupportStyle(activeAdaptiveSupportId)
+
+          window.localStorage.setItem(
+            'GEORGE_LIVE_SUPPORT_STYLE',
+            activeRuntimeStyle
+          )
+          window.localStorage.setItem(
+            'GEORGE_LIVE_DELIVERY_STYLE',
+            activeRuntimeStyle
+          )
           window.dispatchEvent(new Event('george-live-receiver-profile-change'))
         } catch {}
       }
@@ -3172,8 +3436,17 @@ const beginProofOfAwareness = async () => {
           window.localStorage.setItem('GEORGE_LIVE_RECEIVER_PROFILE', activeReceiverPanel.id)
           window.localStorage.setItem('george_live_entry_receiver_profile', activeReceiverPanel.id)
           window.localStorage.setItem('george_live_entry_support_preference', activeReceiverPanel.id)
-          window.localStorage.setItem('GEORGE_LIVE_SUPPORT_STYLE', 'advice')
-          window.localStorage.setItem('GEORGE_LIVE_DELIVERY_STYLE', 'advice')
+          const activeRuntimeStyle =
+            toRuntimeSupportStyle(activeAdaptiveSupportId)
+
+          window.localStorage.setItem(
+            'GEORGE_LIVE_SUPPORT_STYLE',
+            activeRuntimeStyle
+          )
+          window.localStorage.setItem(
+            'GEORGE_LIVE_DELIVERY_STYLE',
+            activeRuntimeStyle
+          )
         } catch {}
       }
 
@@ -3185,12 +3458,88 @@ const beginProofOfAwareness = async () => {
           onBack={() => setLiveBriefingStep(1)}
         >
           <div className="mt-3 space-y-3">
+            <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="text-[9px] uppercase tracking-[0.24em] text-white/34">
+                    GEORGE&apos;s support
+                  </div>
+                  <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
+                    {activeAdaptiveSupportPanel.label}
+                  </div>
+                  <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/48">
+                    {activeAdaptiveSupportPanel.line}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLiveBriefingOpenMechanicsPanel(
+                      liveBriefingOpenMechanicsPanel === 'support' ? null : 'support'
+                    )
+                  }
+                  className="shrink-0 rounded-[0.65rem] border border-white/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/46 transition hover:border-white/[0.16] hover:text-white/72"
+                >
+                  {liveBriefingOpenMechanicsPanel === 'support' ? 'Close' : 'Change'}
+                </button>
+              </div>
+
+              <div
+                className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+                  liveBriefingOpenMechanicsPanel === 'support'
+                    ? 'mt-4 grid-rows-[1fr] opacity-100'
+                    : 'mt-0 grid-rows-[0fr] opacity-0'
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {LIVE_SUPPORT_PANELS.map((panel) => {
+                      const active = activeAdaptiveSupportPanel.id === panel.id
+
+                      return (
+                        <button
+                          key={panel.id}
+                          type="button"
+                          onClick={() => setActiveAdaptiveSupport(panel.id)}
+                          className={`rounded-[0.72rem] border px-3 py-3 text-left transition ${
+                            active
+                              ? 'border-[#4E7CFF]/35 bg-[#4E7CFF]/[0.075]'
+                              : 'border-white/[0.06] bg-white/[0.018] hover:border-white/[0.14] hover:bg-white/[0.035]'
+                          }`}
+                        >
+                          <span className="block text-[11px] font-semibold text-[#F2F4FF]/82">
+                            {panel.label}
+                          </span>
+                          <span className="mt-1 block text-[10px] leading-4 text-white/40">
+                            {panel.line}
+                          </span>
+                          {active && (
+                            <span className="mt-3 block border-l border-white/[0.14] pl-3 text-[11px] leading-5 text-[#D7DBE4]/54">
+                              {panel.detail}
+                            </span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="rounded-[0.82rem] border border-[#4E7CFF]/[0.16] bg-[#4E7CFF]/[0.045] px-4 py-3">
               <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
                 Receiver selected
               </div>
-              <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                {activeReceiverPanel.label}
+              <div className="mt-2 flex items-center gap-2 text-[14px] font-semibold text-[#F2F4FF]/88">
+                <span>{activeReceiverPanel.label}</span>
+
+                {(activeReceiverPanel.id === 'visual_only' ||
+                  activeReceiverPanel.id === 'audio_visual') && (
+                  <span className="inline-flex items-center rounded-full border border-[#7EA1FF]/45 bg-[#4E7CFF] px-2 py-[1px] text-[8px] font-bold uppercase tracking-[0.16em] text-white">
+                    BETA
+                  </span>
+                )}
               </div>
               <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
                 Tell GEORGE how you will receive support. GEORGE adapts guidance automatically based on the room.
@@ -3220,8 +3569,14 @@ const beginProofOfAwareness = async () => {
                           : 'border-white/[0.06] bg-white/[0.018] hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]'
                       }`}
                     >
-                      <span className="block text-[11px] font-semibold text-[#F2F4FF]/78">
-                        {panel.label}
+                      <span className="flex items-center gap-2 text-[11px] font-semibold text-[#F2F4FF]/78">
+                        <span>{panel.label}</span>
+
+                        {(panel.id === 'visual_only' || panel.id === 'audio_visual') && (
+                          <span className="inline-flex items-center rounded-full border border-[#7EA1FF]/45 bg-[#4E7CFF] px-2 py-[1px] text-[8px] font-bold uppercase tracking-[0.16em] text-white">
+                            BETA
+                          </span>
+                        )}
                       </span>
                       <span className="mt-1 block text-[10px] leading-4 text-white/36">
                         {panel.line}
@@ -3393,7 +3748,7 @@ const beginProofOfAwareness = async () => {
                 onClick={() => setLiveBriefingStep(3)}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
                   liveRecoveryAcknowledged
-                    ? 'border-[#D7DCFF]/24 bg-[#D7DCFF]/[0.055] text-[#F2F4FF]/84 hover:bg-[#D7DCFF]/[0.08]'
+                    ? 'border-[#4E7CFF]/65 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#7EA1FF]/80 hover:bg-[#5B86FF]'
                     : 'cursor-default border-white/[0.05] bg-transparent text-white/20'
                 }`}
               >
@@ -3411,222 +3766,386 @@ const beginProofOfAwareness = async () => {
       const sequence = liveReadyConfirmSequenceRef.current
 
       setLiveReadyAccepted(checked)
+      setLiveControlsOrientationSeen(false)
+      setLiveControlsEntryReady(false)
       setLiveReadinessComplete(false)
 
       if (!checked) return
 
-      setLiveReadinessComplete(true)
+      window.setTimeout(() => {
+        if (liveReadyConfirmSequenceRef.current !== sequence) return
+        setLiveControlsOrientationSeen(true)
+      }, 700)
+
+      window.setTimeout(() => {
+        if (liveReadyConfirmSequenceRef.current !== sequence) return
+        setLiveControlsEntryReady(true)
+        setLiveReadinessComplete(true)
+      }, 1450)
     }
 
-    const liveRoomObjectiveOptions: Array<{
+    const totalBriefingSignal = [
+      resolvedConversationType,
+      audienceType,
+      objective,
+      knownContext,
+      secondaryPosition,
+      communicationStyle,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+
+    const liveApproachOptions: Array<{
       id: LiveRoomObjectiveOptionId
       label: string
       line: string
+      compatible: boolean
     }> = [
-      { id: 'project_strength', label: 'Project strength', line: 'Reinforce competence, confidence, and command of the conversation.' },
-      { id: 'build_trust', label: 'Build trust', line: 'Reduce doubt and help the other side feel safer moving forward.' },
-      { id: 'find_leverage', label: 'Find leverage', line: 'Surface information that may improve negotiating position later.' },
-      { id: 'find_common_ground', label: 'Find common ground', line: 'Identify shared interests, mutual benefit, or a path to agreement.' },
-      { id: 'surface_objections', label: 'Surface objections', line: 'Listen for resistance that may not be stated directly.' },
-      { id: 'confirm_authority', label: 'Confirm authority', line: 'Determine who can approve, decide, buy, hire, or move the matter forward.' },
-      { id: 'confirm_concern', label: 'Confirm concern', line: 'Clarify what is really creating hesitation, risk, or resistance.' },
-      { id: 'confirm_timeline', label: 'Confirm timeline', line: 'Identify urgency, deadlines, delay risk, or next-step timing.' },
-      { id: 'other', label: 'Other', line: 'Tell GEORGE what else to look for, reinforce, confirm, or help acquire.' },
+      {
+        id: 'project_strength',
+        label: 'Confident and prepared',
+        line: 'Present your position with command, proof, and composure.',
+        compatible: true,
+      },
+      {
+        id: 'build_trust',
+        label: 'Warm and reassuring',
+        line: 'Reduce unnecessary threat while keeping the objective visible.',
+        compatible: !/discipline|termination|enforcement|breach|default/.test(totalBriefingSignal),
+      },
+      {
+        id: 'find_leverage',
+        label: 'Strategic and firm',
+        line: 'Use lawful pressure, timing, and leverage without losing control.',
+        compatible: !/medical|doctor|patient|grief|bereavement/.test(totalBriefingSignal),
+      },
+      {
+        id: 'find_common_ground',
+        label: 'Collaborative',
+        line: 'Look for shared interests and a practical path forward.',
+        compatible: !/termination|final warning|cease and desist/.test(totalBriefingSignal),
+      },
+      {
+        id: 'surface_objections',
+        label: 'Curious and diagnostic',
+        line: 'Ask, listen, and uncover what is actually driving resistance.',
+        compatible: true,
+      },
+      {
+        id: 'confirm_authority',
+        label: 'Direct and decisive',
+        line: 'Move toward clarity, authority, and a concrete decision.',
+        compatible: !/grief|bereavement|trauma|apology|repair trust/.test(totalBriefingSignal),
+      },
+      {
+        id: 'confirm_concern',
+        label: 'Diplomatic and careful',
+        line: 'Protect the relationship while addressing the real issue.',
+        compatible: true,
+      },
+      {
+        id: 'confirm_timeline',
+        label: 'Concise and time-aware',
+        line: 'Keep the conversation focused on timing, next steps, and decisions.',
+        compatible: !/therapy|grief|bereavement/.test(totalBriefingSignal),
+      },
+      {
+        id: 'other',
+        label: 'Describe your approach',
+        line: 'Tell GEORGE how you want to show up in this conversation.',
+        compatible: true,
+      },
     ]
 
-    const visibleLiveRoomObjectiveOptions = liveRoomObjectiveOptions.slice(0, 3)
-    const moreLiveRoomObjectiveOptions = liveRoomObjectiveOptions.slice(3)
+    const visibleLiveApproachOptions = liveApproachOptions.filter((option) => option.compatible)
+    const selectedLiveApproach =
+      liveApproachOptions.find((option) => option.id === liveRoomObjectiveOption)
 
-    const selectedLiveRoomObjective =
-      liveRoomObjectiveOptions.find((option) => option.id === liveRoomObjectiveOption)
+    const customApproach = customLiveRoomObjective.trim()
+    const approachText =
+      liveRoomObjectiveOption === 'other'
+        ? customApproach
+        : selectedLiveApproach?.label || ''
 
-    const moreOpen =
-      Boolean(
-        selectedLiveRoomObjective &&
-        moreLiveRoomObjectiveOptions.some((option) => option.id === selectedLiveRoomObjective.id)
+    const unlawfulOrPhysicalThreat =
+      /(?:physically|violence|violent|hurt|harm|attack|assault|kill|weapon|blackmail|extort|illegal threat|unlawful threat)/i.test(
+        customApproach
       )
+
+    const likelyOutcomeConflict =
+      /preserve|repair|trust|relationship|de-escalat|reassur/i.test(totalBriefingSignal) &&
+      /humiliat|bully|hostile|cruel|destroy|embarrass/i.test(customApproach)
+
+    const approachInterpretation =
+      liveRoomObjectiveOption === 'other'
+        ? customApproach
+          ? `GEORGE understands that you want to approach this conversation as: ${customApproach}`
+          : 'Describe the approach you want GEORGE to understand.'
+        : selectedLiveApproach
+          ? `${selectedLiveApproach.label}. ${selectedLiveApproach.line}`
+          : 'Choose an approach or describe your own.'
+
+    const approachReady =
+      Boolean(approachText) &&
+      !unlawfulOrPhysicalThreat &&
+      !likelyOutcomeConflict &&
+      liveApproachConfirmed
 
     return (
       <PanelShell
-          label="BRIEF ROOM · FINAL CHECK"
-          title="Before we begin"
-          stage={3}
-          onBack={() => setLiveBriefingStep(2)}
-        >
-        {liveReadyAccepted && (
-          <div className="mt-5 rounded-[0.82rem] border border-[#4E7CFF]/[0.16] bg-[#4E7CFF]/[0.045] px-4 py-3">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
-                  Final check confirmed
-                </div>
-                <div className="mt-2 text-[14px] font-semibold text-[#F2F4FF]/88">
-                  {selectedLiveRoomObjective ? selectedLiveRoomObjective.label : 'No additional objective'}
-                </div>
-                <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/50">
-                  {selectedLiveRoomObjective
-                    ? 'GEORGE will keep this room signal in mind without treating it as required.'
-                    : 'GEORGE will listen, preserve credibility, and support the room as useful signal appears.'}
-                </div>
-              </div>
+        label="BRIEF ROOM · FINAL CHECK"
+        title={liveReadyAccepted ? 'You’re ready' : 'Choose your approach'}
+        stage={3}
+        onBack={() => {
+          setLiveRoomMoreOpen(false)
+          setLiveApproachEditing(true)
+          setLiveApproachConfirmed(false)
+          setLiveBriefingStep(2)
+        }}
+      >
+        {liveReadyAccepted ? (
+          <div className="mt-5 live-controls-orientation">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+              LIVE controls
+            </div>
+            <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/48">
+              These controls will be available in the conversation. They are shown here for orientation only.
+            </p>
 
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {[
+                ['conversation', 'Conversation', 'Open the conversation record when available.'],
+                ['reading', 'Reading', 'Make more room for discreet visual guidance.'],
+                ['repeat', 'Repeat', 'Hear or see the last line again.'],
+                ['support', 'Support', 'Change how GEORGE delivers help.'],
+                ['pause', 'Pause', 'Pause or resume LIVE listening.'],
+                ['audio', 'Audio', 'Turn spoken guidance on or off.'],
+              ].map(([kind, label, instruction]) => (
+                <div
+                  key={kind}
+                  aria-disabled="true"
+                  className="rounded-[1rem] border border-white/[0.065] bg-white/[0.018] px-3 py-3 text-center"
+                >
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1rem] border border-white/[0.07] bg-white/[0.02] text-[#D7E8EF]/82">
+                    <LiveOrientationIcon kind={kind as LiveOrientationIconKind} />
+                  </div>
+                  <div className="mt-3 text-[9px] font-semibold uppercase tracking-[0.15em] text-white/68">
+                    {label}
+                  </div>
+                  <div className="mt-1.5 text-[10px] leading-4 text-white/36">
+                    {instruction}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className={`mt-5 transition-[opacity,transform] duration-500 ${
+                liveControlsOrientationSeen
+                  ? 'translate-y-0 opacity-100'
+                  : 'translate-y-2 opacity-0'
+              }`}
+            >
+              <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/62">
+                Let&apos;s go to work.
+              </div>
+            </div>
+
+            {liveControlsEntryReady && (
+              <AwakeButton
+                active={liveReadinessComplete}
+                onClick={() => startLive(false, editableResources, true)}
+              >
+                ENTER LIVE
+              </AwakeButton>
+            )}
+
+            <div className="mt-3 flex justify-center">
               <button
                 type="button"
-                onClick={() => confirmReadyRoomAcknowledgement(false)}
-                className="shrink-0 rounded-full border border-white/[0.07] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/44 transition hover:border-[#D7DCFF]/20 hover:text-[#D7DCFF]/78"
+                onClick={() => {
+                  setLiveApproachEditing(false)
+                  setLiveApproachConfirmed(false)
+                  confirmReadyRoomAcknowledgement(false)
+                }}
+                className="text-center text-[9px] uppercase tracking-[0.16em] text-white/28 transition hover:text-white/52"
               >
-                Edit
+                Back to Review
               </button>
             </div>
+
+            <style jsx>{`
+              @keyframes liveControlsOrientationIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(14px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+
+              .live-controls-orientation {
+                animation: liveControlsOrientationIn 520ms
+                  cubic-bezier(0.22, 0.72, 0.18, 1) both;
+              }
+            `}</style>
           </div>
-        )}
-
-        {!liveReadyAccepted && (
-        <div className="mt-5 rounded-[0.82rem] border border-white/[0.08] bg-[#10131A]/[0.92] px-4 py-4 shadow-[0_18px_50px_rgba(0,0,0,0.38)]">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/46">
-Final check
-          </div>
-
-          <div className="mt-3 space-y-3 text-[13px] leading-6 text-[#D7DBE4]/64">
-            <p>Is there anything else?</p>
-            <p>Talk naturally to everyone else. Stay focused on your objective.</p>
-            <p>Use what helps. Ignore what doesn't.</p>
-            <p>I'll adapt my support while we're live. Afterward, I'll show you what changed, why it changed, whether it appeared to help, and ask what you want me to remember.</p>
-          </div>
-
-          <div className="mt-5 text-[10px] uppercase tracking-[0.22em] text-white/28">
-Anything I should keep in mind?
-          </div>
-
-          <div className="mt-3 divide-y divide-white/[0.055] border-y border-white/[0.055]">
-            {visibleLiveRoomObjectiveOptions.map((option) => {
-              const active = liveRoomObjectiveOption === option.id
-
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => {
-                    setLiveRoomObjectiveOption(active ? '' : option.id)
-                    if (option.id !== 'other') setCustomLiveRoomObjective('')
-                  }}
-                  className="w-full py-3 text-left"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
-                      active
-                        ? 'bg-[#4E7CFF] shadow-[0_0_10px_rgba(78,124,255,0.50)]'
-                        : 'bg-white/[0.14]'
-                    }`} />
-
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
-                        {option.label}
-                      </span>
-                      <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
-                        {option.line}
-                      </span>
-                    </span>
+        ) : (
+          <>
+            <div className="mt-5 rounded-[1rem] border border-white/[0.07] bg-[#090B10]/80 p-4">
+              {!liveApproachEditing && approachText ? (
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
+                      Approach
+                    </div>
+                    <div className="mt-2 text-[13px] font-semibold leading-5 text-[#F2F4FF]/84">
+                      {approachText}
+                    </div>
+                    <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/46">
+                      {approachInterpretation}
+                    </div>
                   </div>
-                </button>
-              )
-            })}
 
-            <details className="group" open={moreOpen}>
-              <summary className="flex cursor-pointer list-none items-center justify-between py-3 text-left">
-                <span>
-                  <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
-                    More
-                  </span>
-                  <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
-                    Additional intangible objectives.
-                  </span>
-                </span>
-                <span className="text-[11px] uppercase tracking-[0.18em] text-white/30 group-open:text-[#D7DCFF]/56">
-                  {moreOpen ? 'Open' : 'More'}
-                </span>
-              </summary>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLiveApproachEditing(true)
+                      setLiveApproachConfirmed(false)
+                    }}
+                    className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/42 transition hover:border-[#4E7CFF]/28 hover:text-[#D7DCFF]/78"
+                  >
+                    Edit
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
+                    Approach
+                  </div>
+                  <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/50">
+                    GEORGE filtered these choices using the full briefing. Choose how you want to enter this conversation.
+                  </p>
 
-              <div className="divide-y divide-white/[0.055] border-t border-white/[0.055]">
-                {moreLiveRoomObjectiveOptions.map((option) => {
-                  const active = liveRoomObjectiveOption === option.id
+                  <div className="mt-4 divide-y divide-white/[0.05] border-y border-white/[0.05]">
+                    {visibleLiveApproachOptions.map((option) => {
+                      const active = liveRoomObjectiveOption === option.id
 
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => {
-                        setLiveRoomObjectiveOption(active ? '' : option.id)
-                        if (option.id !== 'other') setCustomLiveRoomObjective('')
-                      }}
-                      className="w-full py-3 text-left"
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className={`mt-[6px] h-2 w-2 rounded-full transition ${
-                          active
-                            ? 'bg-[#4E7CFF] shadow-[0_0_10px_rgba(78,124,255,0.50)]'
-                            : 'bg-white/[0.14]'
-                        }`} />
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => {
+                            setLiveRoomObjectiveOption(option.id)
+                            setLiveApproachConfirmed(false)
 
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
-                            {option.label}
+                            if (option.id === 'other') {
+                              setLiveApproachEditing(true)
+                              return
+                            }
+
+                            setCustomLiveRoomObjective('')
+                            setLiveApproachEditing(false)
+                          }}
+                          className="flex w-full items-start gap-3 py-3 text-left"
+                        >
+                          <span
+                            className={`mt-[6px] h-2 w-2 rounded-full transition ${
+                              active
+                                ? 'bg-[#4E7CFF] shadow-[0_0_10px_rgba(78,124,255,0.50)]'
+                                : 'bg-white/[0.14]'
+                            }`}
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
+                              {option.label}
+                            </span>
+                            <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
+                              {option.line}
+                            </span>
                           </span>
-                          <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
-                            {option.line}
-                          </span>
-                        </span>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </details>
-          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
 
-          {liveRoomObjectiveOption === 'other' && (
-            <label className="mt-4 block">
-              <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
-                Other
-              </span>
-              <textarea
-                value={customLiveRoomObjective}
-                onChange={(event) => setCustomLiveRoomObjective(event.target.value)}
-                rows={3}
-                placeholder="What should GEORGE help surface, reinforce, confirm, learn, or acquire?"
-                className="mt-2 w-full resize-none rounded-[0.72rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
+                  {liveRoomObjectiveOption === 'other' && (
+                    <label className="mt-4 block">
+                      <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
+                        Describe your approach
+                      </span>
+                      <textarea
+                        value={customLiveRoomObjective}
+                        onChange={(event) => {
+                          setCustomLiveRoomObjective(event.target.value)
+                          setLiveApproachConfirmed(false)
+                        }}
+                        onBlur={() => {
+                          if (customLiveRoomObjective.trim()) {
+                            setLiveApproachEditing(false)
+                          }
+                        }}
+                        rows={3}
+                        placeholder="For example: I want to be firm without making them defensive."
+                        className="mt-2 w-full resize-none rounded-[0.8rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
+                      />
+                    </label>
+                  )}
+
+                  <div
+                    className={`mt-4 rounded-[0.8rem] border px-3.5 py-3 ${
+                      unlawfulOrPhysicalThreat || likelyOutcomeConflict
+                        ? 'border-amber-300/20 bg-amber-300/[0.045]'
+                        : approachText
+                          ? 'border-[#4E7CFF]/20 bg-[#4E7CFF]/[0.045]'
+                          : 'border-white/[0.055] bg-white/[0.015]'
+                    }`}
+                  >
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
+                      GEORGE understands
+                    </div>
+                    <div className="mt-2 text-[11.5px] leading-5 text-[#D7DBE4]/58">
+                      {unlawfulOrPhysicalThreat
+                        ? 'Lawful strategic pressure is permitted. Physical threats, unlawful coercion, blackmail, and illegal intimidation are not. Revise the approach before LIVE.'
+                        : likelyOutcomeConflict
+                          ? 'This approach appears to conflict with the briefing objective. Clarify or revise it before LIVE.'
+                          : approachInterpretation}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <label
+              className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[0.9rem] border px-4 py-3 transition ${
+                approachReady
+                  ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
+                  : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={liveApproachConfirmed}
+                disabled={!approachText || unlawfulOrPhysicalThreat || likelyOutcomeConflict}
+                onChange={(event) => setLiveApproachConfirmed(event.target.checked)}
+                className="mt-1 h-4 w-4 accent-[#D7DCFF] disabled:opacity-30"
               />
+              <span className="text-[12px] leading-5">
+                I confirm that this reflects how I want GEORGE to support my approach in this conversation.
+              </span>
             </label>
-          )}
 
-          <div className="mt-4 rounded-[0.72rem] border border-white/[0.055] bg-[#080A10]/[0.42] px-3.5 py-3 text-[11px] leading-5 text-[#D7DBE4]/46">
-            {selectedLiveRoomObjective
-              ? `GEORGE will treat “${selectedLiveRoomObjective.label}” as an additional intangible objective. If it conflicts with the outcome, GEORGE should protect the primary outcome first.`
-              : 'No intangible objective selected. GEORGE will focus on the desired outcome and adapt if useful signal appears.'}
-          </div>
-        </div>
+            <AwakeButton
+              active={approachReady}
+              onClick={() => confirmReadyRoomAcknowledgement(true)}
+            >
+              Show LIVE controls
+            </AwakeButton>
+          </>
         )}
-
-        {!liveReadyAccepted && (
-        <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.52] px-4 py-3 text-[#D7DBE4]/58 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]">
-          <input
-            type="checkbox"
-            checked={liveReadyAccepted}
-            onChange={(event) => confirmReadyRoomAcknowledgement(event.target.checked)}
-            className="mt-1 h-4 w-4 accent-[#D7DCFF]"
-          />
-
-          <span className="text-[12px] leading-5">
-{selectedLiveRoomObjective
-              ? `I understand that GEORGE will keep “${selectedLiveRoomObjective.label}” in mind during this room without treating it as required or replacing the primary outcome.`
-              : 'I understand that I do not need to add anything else. GEORGE will listen, preserve credibility, and support me as the room develops.'}
-          </span>
-        </label>
-        )}
-
-        <AwakeButton active={liveReadinessComplete} onClick={() => startLive(false, editableResources, true)}>
-          Now we go to work
-        </AwakeButton>
       </PanelShell>
     )
   }
@@ -3722,7 +4241,7 @@ Anything I should keep in mind?
         </div>
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
+        <div className="relative z-10 mx-auto w-full max-w-[640px] pt-0">
           <section className="rounded-[1.05rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.014),rgba(255,255,255,0.004))] p-3 shadow-[0_12px_34px_rgba(0,0,0,0.18)] sm:p-4">
             <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">QUICK LIVE</div>
 
@@ -3831,7 +4350,7 @@ Anything I should keep in mind?
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-24 pt-5 text-white sm:px-5 sm:pt-6">
+    <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-10 pt-4 text-white sm:px-5 sm:pt-5">
       <div className="pointer-events-none absolute inset-0 bg-black" />
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
@@ -3845,43 +4364,16 @@ Anything I should keep in mind?
 
       <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
 
-        <section className="rounded-[1.15rem] border border-white/[0.04] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.005))] p-3 shadow-[0_16px_44px_rgba(0,0,0,0.22)] sm:p-4">
-          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">LIVE</div>
+        <section className="rounded-[1.25rem] border border-white/[0.045] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.004))] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.24)] sm:p-5">
+          <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">ENTER LIVE</div>
 
-          <h1 className="mt-6 text-[34px] font-light uppercase leading-none tracking-[0.44em] text-[#D7DCFF]/82 sm:text-[44px]">
-            <span className="inline-block animate-[liveWordPulse_3.8s_ease-in-out_infinite]">
-              LIVE
-            </span>
+          <h1 className="mt-3 text-[28px] font-semibold leading-tight tracking-[-0.04em] text-white/92 sm:text-[34px]">
+            How do you want to enter?
           </h1>
 
-          <style jsx>{`
-            @keyframes liveEntryScenarioTrack {
-              0%, 7% { transform: translateY(0); }
-              10%, 17% { transform: translateY(-210px); }
-              20%, 27% { transform: translateY(-420px); }
-              30%, 37% { transform: translateY(-630px); }
-              40%, 47% { transform: translateY(-840px); }
-              50%, 57% { transform: translateY(-1050px); }
-              60%, 67% { transform: translateY(-1260px); }
-              70%, 77% { transform: translateY(-1470px); }
-              80%, 87% { transform: translateY(-1680px); }
-              90%, 97% { transform: translateY(-1890px); }
-              100% { transform: translateY(-2100px); }
-            }
-              18%, 100% { transform: scale(1); }
-            }
-
-            @keyframes liveWordPulse {
-              0%, 100% {
-                opacity: 0.72;
-                text-shadow: 0 0 0 rgba(215, 220, 255, 0);
-              }
-              50% {
-                opacity: 0.96;
-                text-shadow: 0 0 18px rgba(174, 182, 255, 0.22);
-              }
-            }
-          `}</style>
+          <p className="mt-2 max-w-[520px] text-[13px] leading-6 text-white/44">
+            Enter immediately, brief GEORGE first, or return to Normal GEORGE to think and plan.
+          </p>
 
           <div className="mt-4 grid gap-2">
             <button
@@ -3890,13 +4382,13 @@ Anything I should keep in mind?
               className="rounded-[0.95rem] border border-[#4E7CFF]/28 bg-[#4E7CFF]/[0.07] px-4 py-3 text-left transition hover:border-[#4E7CFF]/44 hover:bg-[#4E7CFF]/[0.11] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
-                Quick LIVE
+                Enter now
               </span>
-              <span className="mt-1 block text-[12px] leading-5 text-white/56">
-                Enter LIVE immediately with minimal setup.
+              <span className="mt-1 block text-[13px] leading-5 text-white/58">
+                Start LIVE with minimal preparation.
               </span>
-              <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                Best when the conversation is less complex or when the user prefers to brief GEORGE organically as the conversation unfolds.
+              <span className="mt-2 block text-[11px] leading-5 text-white/32">
+                GEORGE will learn from the room as the conversation unfolds.
               </span>
             </button>
 
@@ -3915,14 +4407,14 @@ Anything I should keep in mind?
               }}
               className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
             >
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/76">
-                Brief GEORGE
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/82">
+                Prepare with GEORGE
               </span>
-              <span className="mt-1 block text-[12px] leading-5 text-white/52">
-                Brief GEORGE when your conversation requires complexity or specific context.
+              <span className="mt-1 block text-[13px] leading-5 text-white/58">
+                Build a complete operational briefing before entering LIVE.
               </span>
-              <span className="mt-2 block text-[12px] leading-5 text-white/34">
-                Negotiations • Presentations • Board Meetings • Investor Meetings • Performance Reviews • Interviews • You Decide
+              <span className="mt-2 block text-[11px] leading-5 text-white/32">
+                Recommended when context, stakes, or the desired outcome require preparation.
               </span>
             </button>
 
@@ -3934,13 +4426,13 @@ Anything I should keep in mind?
               className="rounded-[0.95rem] border border-[#4E7CFF]/40 bg-[#4E7CFF] px-4 py-2.5 text-left text-white shadow-[0_0_26px_rgba(78,124,255,0.20)] transition hover:bg-[#5478F0] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-white">
-                Ask GEORGE
+                Normal GEORGE
               </span>
-              <span className="mt-1 block text-[12px] leading-5 text-white/78">
-                Think before you enter LIVE.
+              <span className="mt-1 block text-[13px] leading-5 text-white/82">
+                Think, plan, or prepare before entering LIVE.
               </span>
-              <span className="mt-3 inline-flex items-center text-[12px] font-medium tracking-[0.08em] text-white">
-                Plan with GEORGE →
+              <span className="mt-3 inline-flex items-center text-[11px] font-medium tracking-[0.08em] text-white/88">
+                Open Normal GEORGE →
               </span>
             </button>
 
@@ -3964,129 +4456,7 @@ Anything I should keep in mind?
           </div>
 
         </section>
-      <div className="pointer-events-none relative z-[12] mt-2 px-8 md:pointer-events-none md:fixed md:mt-0 md:px-0 md:left-[calc(50vw+365px)] md:top-[180px] md:w-[380px] lg:left-[calc(50vw+380px)] xl:left-[calc(50vw+400px)]">
-        <div className="overflow-hidden bg-black/0 px-1 py-1 [mask-image:linear-gradient(180deg,transparent,black_10%,black_82%,transparent)]">
-          <div className="relative h-[174px] overflow-hidden md:h-[280px]">
-            <div className="absolute left-0 right-0 top-0 animate-[liveEntryScenarioTrack_90s_linear_infinite]">
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">VC Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">VC: Why now?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: The market changed after Q2.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Anchor demand signal.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Customers are already pulling us forward.</div>
-                </div>
-              </div>
 
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Negotiation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">BRAND: We need exclusivity.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Protect optionality.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I can offer category exclusivity.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Ask for term limit.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Tie it to 60 days and performance.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Job Interview</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">INTERVIEWER: Why should we trust your judgment?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Pause. Lead with outcome.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: The strongest proof is what changed.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Anchor measurable result.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I improved follow-through and kept the team aligned.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Sales Call</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">CLIENT: Why is this worth changing for?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Tie pain to cost.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: The real cost is delay.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Ask for decision path.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Who needs to be aligned?</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Board Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">BOARD: What changed this quarter?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Lead with signal.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Retention improved while acquisition slowed.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Separate risk from plan.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: The response is already underway.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Performance Review</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">MANAGER: Where did you struggle?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Own it, then show correction.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I missed the signal early.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Name the adjustment.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Now I surface risk sooner.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Difficult Conversation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">THEM: That is not fair.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Lower temperature.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I hear that.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Return to shared outcome.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Let us separate impact from intent.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Presentation</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">AUDIENCE: What should we remember?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Repeat the frame.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: The point is simple.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Land the takeaway.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: This changes what we do next.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">Customer Support</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">CUSTOMER: I am frustrated.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Acknowledge first.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I understand why.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Give a clear next step.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: Here is what I can do now.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="inline-flex w-fit rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-black md:text-[10px]">You Decide</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">ROOM: The conversation shifts.</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Whatever the conversation, GEORGE has you covered.</div>
-                  <div className="text-[#D7DBE4]/62">YOU: I know where to go next.</div>
-                </div>
-              </div>
-
-              <div className="h-[210px]">
-                <div className="text-[17px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/82 md:text-[16px]">VC Meeting</div>
-                <div className="mt-5 space-y-3 text-[12px] leading-5 md:text-[12px]">
-                  <div className="text-[#D7DBE4]/62">VC: Why now?</div>
-                  <div className="text-[#D7DCFF]/78">GEORGE: Lead with timing.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
         {tier === 'smart' && (
           <p className="mt-2 text-center text-[12px] leading-5 text-[#D7DBE4]/36">

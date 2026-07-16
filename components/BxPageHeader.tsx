@@ -17,11 +17,11 @@ export default function BxPageHeader({
 }: BxPageHeaderProps) {
   const showBack = Boolean(backLabel)
   const backClass =
-    'inline-flex h-[22px] items-center justify-center rounded-[0.42rem] border border-[#6F86FF]/35 bg-[#4169E1] px-2 text-[8px] font-semibold uppercase leading-none tracking-[0.14em] text-white shadow-[0_0_12px_rgba(65,105,225,0.20)] transition hover:bg-[#5478F0] hover:text-white'
+    'inline-flex h-[28px] items-center justify-center rounded-[0.52rem] border border-[#7EA1FF]/30 bg-[#4E7CFF] px-3.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-white shadow-[0_7px_20px_rgba(20,61,168,0.18)] transition-colors hover:bg-[#5A84FF] active:bg-[#426FE8]'
 
   return (
     <header className="relative mb-5 flex items-center justify-between">
-      <div className="flex min-w-0 items-center gap-2.5">
+      <div className="flex min-w-0 items-center gap-7">
         <Link href="/" aria-label="Go to BRANESx home" className="group flex h-[58px] w-[58px] shrink-0 items-center justify-center">
           <img src="/logofav.png" alt="Bx" className="h-[52px] w-[52px] object-contain opacity-[0.96] transition group-hover:opacity-100" />
         </Link>
