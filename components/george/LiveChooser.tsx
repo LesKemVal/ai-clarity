@@ -92,7 +92,7 @@ export default function LiveChooser({
               {effectiveHasAccess
                 ? hasLiveSession
                   ? 'Resume a saved room or prepare a clean one.'
-                  : 'No saved LIVE room found. Start a clean room.'
+                  : 'No saved LIVE conversation found. Start a clean room.'
                 : sessionChecked
                   ? 'Restore account access to use LIVE.'
                   : 'Checking LIVE access...'}

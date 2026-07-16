@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { operationalMotion } from '@/lib/george/ui/operational-motion'
 import Sidebar from '@/components/Sidebar'
+import { ShareIcon } from '@/components/icons/ShareIcon'
 import ContinuityCapsule from '@/components/george/ContinuityCapsule'
 import MemoryContinuityPanel from '@/components/george/settings/MemoryContinuityPanel'
 import TypingPrescriptionSurface from '@/components/george/TypingPrescriptionSurface'
@@ -1006,27 +1007,6 @@ const [activeHelpTopic, setActiveHelpTopic] = useState<'live' | 'continuity' | '
 useEffect(() => {
   if (typeof window === 'undefined') return
 
-  const setGeorgeViewportHeight = () => {
-    const height = window.visualViewport?.height || window.innerHeight
-    document.documentElement.style.setProperty('--george-vh', `${height}px`)
-  }
-
-  setGeorgeViewportHeight()
-
-  window.addEventListener('resize', setGeorgeViewportHeight)
-  window.visualViewport?.addEventListener('resize', setGeorgeViewportHeight)
-  window.visualViewport?.addEventListener('scroll', setGeorgeViewportHeight)
-
-  return () => {
-    window.removeEventListener('resize', setGeorgeViewportHeight)
-    window.visualViewport?.removeEventListener('resize', setGeorgeViewportHeight)
-    window.visualViewport?.removeEventListener('scroll', setGeorgeViewportHeight)
-  }
-}, [])
-
-useEffect(() => {
-  if (typeof window === 'undefined') return
-
   const timer = window.setInterval(() => {
     setTierSignalPhase((phase) => (phase + 1) % 2)
   }, 3800)
@@ -1644,6 +1624,38 @@ const captureLiveEntryOptionalSignal = () => {
   const [pendingSessionTitle, setPendingSessionTitle] = useState('')
   const [conversationMenuLane, setConversationMenuLane] = useState<'selector' | 'personal' | 'professional'>('selector')
   const [showSidebar, setShowSidebar] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !showSidebar) return
+
+    const scrollY = window.scrollY
+    const body = document.body
+    const previous = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+    }
+
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+    body.style.overflow = 'hidden'
+
+    return () => {
+      body.style.position = previous.position
+      body.style.top = previous.top
+      body.style.left = previous.left
+      body.style.right = previous.right
+      body.style.width = previous.width
+      body.style.overflow = previous.overflow
+      window.scrollTo({ top: scrollY, left: 0, behavior: 'auto' })
+    }
+  }, [showSidebar])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -3862,15 +3874,59 @@ requestAnimationFrame(() => {
     'Turn ideas into action',
     'Make this decision easier',
   ]
-  const [homepageHeroStep, setHomepageHeroStep] = useState(0)
+  const [homepageHeroFlip, setHomepageHeroFlip] = useState({
+    front: 0,
+    back: 1,
+    flipped: false,
+    transitionEnabled: true,
+  })
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setHomepageHeroStep((step) => (step + 1) % homepageHeroSequence.length)
-    }, 2200)
+    let settleTimer: number | null = null
+    let resetTimer: number | null = null
 
-    return () => window.clearInterval(timer)
-  }, [])
+    const timer = window.setInterval(() => {
+      setHomepageHeroFlip((state) => ({
+        ...state,
+        flipped: true,
+        transitionEnabled: true,
+      }))
+
+      settleTimer = window.setTimeout(() => {
+        setHomepageHeroFlip((state) => {
+          const nextFront = state.back
+          const nextBack =
+            (state.back + 1) % homepageHeroSequence.length
+
+          return {
+            front: nextFront,
+            back: nextBack,
+            flipped: false,
+            transitionEnabled: false,
+          }
+        })
+
+        resetTimer = window.setTimeout(() => {
+          setHomepageHeroFlip((state) => ({
+            ...state,
+            transitionEnabled: true,
+          }))
+        }, 40)
+      }, 900)
+    }, 3600)
+
+    return () => {
+      window.clearInterval(timer)
+
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer)
+      }
+
+      if (resetTimer !== null) {
+        window.clearTimeout(resetTimer)
+      }
+    }
+  }, [homepageHeroSequence.length])
 
   const heroTitle = useMemo(() => {
     const now = new Date()
@@ -3898,12 +3954,38 @@ requestAnimationFrame(() => {
 
 
   const stopListening = useCallback(() => {
+    if (liveMode) {
+      stopLiveAudioRuntimeDirect()
+      setIsListening(false)
+      return
+    }
+
     recognitionRef.current?.stop?.()
     setIsListening(false)
-  }, [])
+  }, [liveMode, stopLiveAudioRuntimeDirect])
 
   const startListening = useCallback(() => {
     if (liveMode) {
+      if (isListening || isThinking || speakingRef.current) return
+
+      setVoiceError('')
+      setInterimTranscript('')
+      setIsListening(true)
+
+      try {
+        const startResult = startLiveAudioRuntime()
+
+        void Promise.resolve(startResult).catch((error) => {
+          console.warn('[GEORGE LIVE AUDIO][START]', error)
+          setIsListening(false)
+          setVoiceError('LIVE microphone connection failed.')
+        })
+      } catch (error) {
+        console.warn('[GEORGE LIVE AUDIO][START]', error)
+        setIsListening(false)
+        setVoiceError('LIVE microphone connection failed.')
+      }
+
       return
     }
 
@@ -3922,7 +4004,13 @@ requestAnimationFrame(() => {
     } catch {
       // browser timing collisions
     }
-  }, [isIOS, isListening, isThinking])
+  }, [
+    liveMode,
+    isIOS,
+    isListening,
+    isThinking,
+    startLiveAudioRuntime,
+  ])
 
   function splitForSpeech(text: string): string[] {
     const cleaned = text.replace(/\s+/g, ' ').trim()
@@ -5098,7 +5186,7 @@ useEffect(() => {
       key: 'name',
       kicker: 'Bring GEORGE up to speed',
       label: 'Question 1',
-      question: 'What should I call you in this room?',
+      question: 'What should I call you in this conversation?',
       examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel, Alex, etc.',
     },
     {
@@ -5300,6 +5388,12 @@ return (
   0%, 46% { opacity: 0.72; }
   47%, 100% { opacity: 0; }
 }
+
+@keyframes georgeBxBreathe {
+  0%, 82%, 100% { transform: translateX(0) scale(1); filter: brightness(1); }
+  88% { transform: translateX(2px) scale(1.035); filter: brightness(1.08); }
+  94% { transform: translateX(0) scale(1); filter: brightness(1); }
+}
 `}</style>
 
 
@@ -5358,7 +5452,7 @@ return (
             type="button"
             aria-label="Close GEORGE sidebar"
             onClick={() => setShowSidebar(false)}
-            className="fixed inset-0 z-[40] cursor-default bg-black/76 backdrop-blur-md transition"
+            className="fixed inset-0 z-[220] cursor-default bg-black/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)]"
           />
         )}
 
@@ -5413,7 +5507,12 @@ return (
             setMessages([])
             messagesRef.current = []
             setHasSentFirstNormalMessage(false)
-            setHomepageHeroStep(0)
+            setHomepageHeroFlip({
+              front: 0,
+              back: 1,
+              flipped: false,
+              transitionEnabled: true,
+            })
             setInput('')
             setInterimTranscript('')
             setVoiceError('')
@@ -5515,13 +5614,15 @@ return (
             }}
         />
 
-        <div className={`flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y transition-[filter,transform,opacity] duration-300 ${showSidebar ? 'pointer-events-none scale-[0.995] blur-[8px] opacity-60' : 'scale-100 blur-0 opacity-100'}`}>
-          <div className={`flex min-h-[var(--george-vh,100dvh)] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 ${
+        <div className={`flex min-w-0 w-full flex-1 flex-col overflow-visible touch-pan-y transition-opacity duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
+          showSidebar ? 'pointer-events-none' : ''
+        }`}>
+          <div className={`flex min-h-[100dvh] w-full flex-1 flex-col overflow-visible touch-pan-y px-4 pb-0 ${
             showPreLiveSignalSurface
               ? 'pt-[108px] md:pt-[78px]'
               : 'pt-[68px] md:pt-[78px]'
           } md:h-screen md:min-h-0 md:overflow-hidden md:overscroll-none md:px-10 md:pb-0 xl:px-16`}>
-            <header className={`fixed top-0 left-0 right-0 flex justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200 ${"z-50"}`}>
+            <header className="fixed inset-x-0 top-0 z-[170] flex min-h-[60px] justify-center bg-[#000000]/92 px-4 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl transition duration-200">
 
               {false && !(forceLive || liveMode) && !showMobileHero && (
                 <div
@@ -5538,11 +5639,28 @@ return (
                     if (!showSidebar) setShowSidebar(true)
                   }}
                   disabled={showSidebar}
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] text-[22px] text-[#D7DBE4]/72 shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition hover:-translate-x-1 hover:bg-white/[0.075] hover:text-white active:scale-[0.96] xl:inline-flex ${showSidebar ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  className={`group inline-flex h-11 w-11 items-center justify-center rounded-[15px] bg-white/[0.045] shadow-[0_14px_44px_rgba(0,0,0,0.34)] ring-1 ring-white/[0.06] backdrop-blur-xl transition-[transform,opacity,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] hover:bg-white/[0.075] hover:shadow-[0_16px_48px_rgba(0,0,0,0.42),0_0_20px_rgba(54,87,168,0.12)] active:scale-[0.96] xl:inline-flex ${
+                    showSidebar
+                      ? 'pointer-events-none opacity-0'
+                      : 'opacity-100'
+                  }`}
                   aria-label="Open GEORGE sidebar"
                   title="Open"
                 >
-                  <img src="/logofav.png" alt="Bx" className="h-7 w-7 object-contain opacity-95" />
+                  {normalConversationStarted ? (
+                    <img
+                      src="/logofav.png"
+                      alt="Bx"
+                      className="h-8 w-8 rounded-[0.8rem] object-contain opacity-95 [animation:georgeBxBreathe_10s_ease-in-out_infinite] group-hover:brightness-110"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-8 w-8 items-center justify-center font-mono text-[22px] leading-none text-[#D7DBE4]/72 transition-transform duration-300 group-hover:-translate-x-1 group-hover:text-white"
+                    >
+                      ←
+                    </span>
+                  )}
                 </button>
 
                 <div className="hidden xl:grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
@@ -5569,24 +5687,7 @@ return (
                       aria-label="Share GEORGE context"
                       title="Share GEORGE context"
                     >
-                      <div className="flex items-center gap-2">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.9"
-                          className="h-[9px] w-[9px] text-[#D7DBE4]/42"
-                        >
-                          <path d="M7 12v7a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-7" />
-                          <path d="M12 3v12" />
-                          <path d="M8 7l4-4 4 4" />
-                        </svg>
-
-                        <span className="tracking-[0.08em] uppercase text-[#D7DBE4]/58">
-                          Share
-                        </span>
-                      </div>
+                      <ShareIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -5594,13 +5695,11 @@ return (
                   <button
                     type="button"
                     onClick={handleShareGeorge}
-                    className="inline-flex h-5 items-center justify-center px-1 text-[6px] font-medium uppercase tracking-[0.08em] text-[#D7DBE4]/34 transition hover:text-[#D7DBE4]/62"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/[0.025] text-[#D7DBE4]/52 ring-1 ring-white/[0.045] transition-[transform,background-color,color] duration-300 hover:bg-white/[0.055] hover:text-white active:scale-[0.97]"
                     aria-label="Share GEORGE context"
                     title="Share GEORGE context"
                   >
-                    <span className="tracking-[0.08em] uppercase text-[#D7DBE4]/58">
-                      Share
-                    </span>
+                    <ShareIcon className="h-[17px] w-[17px]" />
                   </button>
 
                   <button
@@ -5887,20 +5986,28 @@ return (
               Ask GEORGE
             </h1>
 
-            <div
-              key={homepageHeroStep}
-              className="inline-flex animate-[georgeHomepageHeroFade_2.8s_ease-in-out_both] rounded-[22px] bg-[#4E7CFF]/20 px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(78,124,255,0.18)] backdrop-blur-xl sm:px-8 sm:py-5 sm:text-[34px]"
-            >
-              {homepageHeroSequence[homepageHeroStep]}
-            </div>
+                        <div className="[perspective:1600px]">
+              <div
+                className={`relative grid w-fit [transform-style:preserve-3d] ${
+                  homepageHeroFlip.transitionEnabled
+                    ? 'transition-transform duration-[900ms] ease-[cubic-bezier(0.22,0.72,0.18,1)]'
+                    : ''
+                }`}
+                style={{
+                  transform: homepageHeroFlip.flipped
+                    ? 'rotateX(180deg)'
+                    : 'rotateX(0deg)',
+                }}
+              >
+                <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] sm:px-8 sm:py-5 sm:text-[34px]">
+                  {homepageHeroSequence[homepageHeroFlip.front]}
+                </div>
 
-            <style jsx>{`
-              @keyframes georgeHomepageHeroFade {
-                0% { opacity: 0; filter: blur(2px); }
-                16%, 78% { opacity: 1; filter: blur(0); }
-                100% { opacity: 0; filter: blur(2px); }
-              }
-            `}</style>
+                <div className="col-start-1 row-start-1 inline-flex w-fit max-w-[calc(100vw-40px)] rounded-[22px] border border-[#3657A8]/55 bg-[#172347] px-6 py-4 text-[26px] font-medium leading-8 tracking-[-0.03em] text-[#F4F8FF] shadow-[0_18px_60px_rgba(12,27,68,0.48)] [backface-visibility:hidden] [transform:rotateX(180deg)] sm:px-8 sm:py-5 sm:text-[34px]">
+                  {homepageHeroSequence[homepageHeroFlip.back]}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -6322,9 +6429,11 @@ return (
                   }
                 } catch {}
               }}
-              className="px-1 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
+              aria-label="Share response"
+              title="Share response"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[#D7DBE4]/50 transition-[background-color,color,transform] duration-300 hover:bg-white/[0.04] hover:text-[#D7DBE4]/85 active:scale-[0.96]"
             >
-              Share
+              <ShareIcon className="h-3.5 w-3.5" />
             </button>
 
               </>
@@ -6520,7 +6629,7 @@ return (
   })}
 
 {showScrollHint && (
-  <div className="fixed bottom-[calc(184px+env(safe-area-inset-bottom))] left-1/2 z-[90] -translate-x-1/2 transition-opacity duration-200">
+  <div className="fixed bottom-[calc(286px+env(safe-area-inset-bottom))] left-1/2 z-[100] -translate-x-1/2 transition-opacity duration-200 md:bottom-[calc(300px+env(safe-area-inset-bottom))]">
     <button
       type="button"
       onClick={() => {
@@ -6528,10 +6637,22 @@ return (
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
         setShowScrollHint(false)
       }}
-      className="text-[14px] font-medium tracking-[0.06em] text-[#D7DBE4]/44 transition hover:text-[#D7DBE4]/72"
-      aria-label="Continue"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/72 text-[#D7DBE4]/58 shadow-[0_8px_24px_rgba(0,0,0,0.32)] backdrop-blur-md transition hover:border-[#4FA8FF] hover:text-[#D7DBE4]/86"
+      aria-label="Scroll to latest message"
     >
-      Continue ↓
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+      <span className="sr-only">Scroll to latest message</span>
     </button>
   </div>
 )}
@@ -6595,7 +6716,7 @@ return (
         </div>
       )}
 
-      <div className="relative mt-2 min-h-5 cursor-text">
+      <div className="relative mt-2 min-h-5 cursor-text overflow-hidden rounded-[0.9rem] border border-[#3657A8]/48 bg-[#172347] shadow-[0_12px_38px_rgba(12,27,68,0.34)]">
         <textarea
           ref={textareaRef}
           value={input}
@@ -6617,7 +6738,12 @@ return (
   </div>
 )}
 
-<div ref={messagesEndRef} className={`${(forceLive || liveMode) && !showLiveEntrySequence ? 'h-[104px] md:h-[124px]' : 'h-[54px] md:h-[64px]'}`} />
+<div
+  ref={messagesEndRef}
+  className={`${(forceLive || liveMode) && !showLiveEntrySequence
+    ? 'h-[300px] md:h-[320px]'
+    : 'h-[270px] md:h-[290px]'}`}
+/>
 
 </div>
 
@@ -7029,7 +7155,7 @@ if (liveMode) {
           className={`absolute right-2 top-1 h-1 w-1 rounded-full ${
             reroutePrompt || suggestedPrompts !== tieredStarterPrompts && suggestedPrompts.length > 0
               ? 'bg-white'
-              : 'bg-white/85'
+              : 'bg-[#4FA8FF]5'
           } ${
             suggestedSignal || rerouteSignal
               ? 'ring-1 ring-white/[0.18] shadow-[0_0_8px_rgba(255,255,255,0.14)] '
@@ -7815,8 +7941,8 @@ Continue from here, tell me what changed, or start fresh.`
 
               {!(forceLive || liveMode) && (
                 <>
-                  <div className="pointer-events-none fixed bottom-0 left-0 right-0 xl:left-[280px] z-[55] h-[212px] bg-[#000000]" />
-                  <div className="pointer-events-none fixed bottom-[196px] left-0 right-0 xl:left-[280px] z-[55] h-[92px] bg-gradient-to-t from-[#000000] to-transparent" />
+                  <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-[248px] bg-[#000000]" />
+                  <div className="pointer-events-none fixed inset-x-0 bottom-[232px] z-[40] h-[120px] bg-gradient-to-t from-[#000000] via-[#000000]/92 to-transparent" />
                 </>
               )}
 
@@ -8084,7 +8210,9 @@ Continue from here, tell me what changed, or start fresh.`
 
 
 
-<div className={`${(forceLive || liveMode) ? 'fixed bottom-[96px] left-0 right-0 mx-auto' : 'fixed bottom-[112px] left-0 right-0 mx-auto'} z-[80] w-[min(680px,calc(100vw-72px))] bg-transparent px-0 py-0`}>
+<div className={`${(forceLive || liveMode)
+  ? 'fixed inset-x-0 bottom-[96px]'
+  : 'fixed inset-x-0 bottom-[112px]'} z-[90] mx-auto w-[min(720px,calc(100vw-32px))] bg-transparent px-0 py-0`}>
 
 {!(forceLive || liveMode) && !showMobileHero && messagesRef.current.some((message) => message.role === 'assistant') && (
   <button
@@ -8146,13 +8274,13 @@ Continue from here, tell me what changed, or start fresh.`
 
       openLiveEntryFromMessage(latestAssistant || messagesRef.current[messagesRef.current.length - 1])
     }}
-    className={`relative mb-2 w-full overflow-hidden rounded-[0.9rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
+    className={`relative z-[60] mb-2 w-full overflow-hidden rounded-[1.5rem] border px-4 py-2.5 text-left transition active:scale-[0.99] ${
       operationalResourceMonitor?.opportunity?.thresholdMet
-        ? 'border-[#4E7CFF]/50 bg-[#4E7CFF]/[0.16] shadow-[0_0_34px_rgba(78,124,255,0.18)]'
-        : 'border-[#4E7CFF]/32 bg-[#4E7CFF]/[0.08] hover:bg-[#4E7CFF]/[0.12]'
+        ? 'border-[#4668B8]/65 bg-[#101A36] shadow-[0_0_34px_rgba(8,18,48,0.48)]'
+        : 'border-[#2B457F]/50 bg-[#101A36] shadow-[0_12px_36px_rgba(4,10,28,0.40)] hover:border-[#4668B8]/65 hover:bg-[#152345]'
     }`}
   >
-    <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[0.9rem]">
+    <span className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.5rem]">
       <span className="absolute inset-y-0 left-[-45%] w-[38%] animate-[georgeLiveBarShimmer_4.8s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.16] to-transparent" />
     </span>
     <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/86">
@@ -8168,7 +8296,7 @@ Continue from here, tell me what changed, or start fresh.`
 )}
 
 
-                    <div className="george-composer-shell relative flex-1 overflow-visible border-0 bg-transparent shadow-none">
+                    <div className="george-composer-shell relative z-[60] isolate flex-1 overflow-hidden rounded-[1.5rem] border border-[#2B457F]/48 bg-[#101A36] shadow-[0_12px_38px_rgba(4,10,28,0.46)]">
 
                       <input
                         ref={fileInputRef}
@@ -8323,7 +8451,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           <button
                             type="button"
                             onClick={cycleLiveReceiverProfile}
-                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#D7DCFF]/[0.18] hover:text-[#D7DCFF]/78 active:scale-[0.98]"
+                            className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-[#D7DCFF]/78 active:scale-[0.98]"
                           >
                             {activeLiveReceiverProfileLabel}
                           </button>
@@ -8332,7 +8460,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                             <button
                               type="button"
                               onClick={() => setShowLiveSteeringReference((value) => !value)}
-                              className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#D7DCFF]/[0.18] hover:text-[#D7DCFF]/78"
+                              className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-[#D7DCFF]/78"
                             >
                               Steering
                             </button>
@@ -8380,7 +8508,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                               e.stopPropagation()
                               setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
                             }}
-                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-white/[0.16] hover:text-white/72"
+                            className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-[#5579D7]/70 hover:text-white/72"
                           >
                             {language === 'English' ? 'EN' : language === 'Español' ? 'ES' : language === 'Français' ? 'FR' : language === 'العربية' ? 'AR' : language === '中文' ? 'ZH' : language === '日本語' ? 'JA' : 'EN'}
                           </button>
@@ -8388,7 +8516,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           <button
                             type="button"
                             onClick={requestExitLiveMode}
-                            className="rounded-full border border-white/[0.07] bg-black/60 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-red-100/[0.18] hover:text-red-100/78"
+                            className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-red-100/[0.18] hover:text-red-100/78"
                           >
                             Exit
                           </button>
@@ -8419,7 +8547,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}
-                        className={`${(forceLive || liveMode) ? 'min-h-[22px] pl-14 pr-[92px] py-0 md:min-h-[22px] md:pl-11 md:pr-[84px] md:py-0' : 'min-h-[42px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2'} w-full resize-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#D7DBE4]/92 outline-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:ring-0 md:text-[15px]`}
+                        className={`${(forceLive || liveMode) ? 'min-h-[40px] pl-14 pr-[92px] py-2 md:min-h-[38px] md:pl-11 md:pr-[84px] md:py-2' : 'min-h-[46px] pl-14 pr-[92px] py-2.5 md:min-h-[42px] md:pl-11 md:pr-[84px] md:py-2'} block w-full resize-none rounded-none border-0 bg-transparent text-[16px] leading-[1.35] font-normal tracking-[0.002em] text-[#F4F8FF]/92 shadow-none outline-none placeholder:italic placeholder:text-[#D7DBE4]/38 transition focus:border-0 focus:bg-transparent focus:outline-none focus:ring-0 md:text-[15px]`}
                       />
 
                       <div className={`${(forceLive || liveMode) ? 'hidden' : 'absolute right-1 top-1/2 flex'} -translate-y-1/2 items-center gap-2`}>
