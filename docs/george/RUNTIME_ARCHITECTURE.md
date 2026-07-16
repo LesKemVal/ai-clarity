@@ -1,5 +1,64 @@
 # GEORGE Runtime Architecture
 
+
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCE_ARCHITECTURE_START -->
+## Adaptive LIVE Starting-Preference Architecture
+
+Adaptive Cue and Adaptive Response are starting preferences inside the existing LIVE runtime.
+
+They are not separate modes or separate intelligences.
+
+Canonical flow:
+
+```text
+Desired outcome
+↓
+Room, user, and conversation signals
+↓
+Selected adaptive starting preference
+↓
+Support Behavior Composer
+↓
+Observed execution assessment
+↓
+Operational resource
+↓
+Receiver delivery policy
+↓
+Audio, visual, or audio-visual realization
+```
+
+The preference remains stable until the user changes it.
+
+The operational resource may adapt moment by moment.
+
+Operational resources remain:
+
+- cue
+- line
+- continuation
+- response
+- repeat
+- recovery
+- temporary yield while the user is already executing successfully
+
+Adaptive Cue starts from concise support and expands when the user cannot successfully execute from a cue.
+
+Adaptive Response starts from concise completeness. If complete lines are working, preserve them. Do not reduce support solely to minimize word count.
+
+Continuation is selected from evidence such as unfinished language, known talking points, missing endings, repeatable lines, interruption recovery, and language already available in queue.
+
+A starting preference permits adaptation.
+
+An explicit current-room style instruction constrains adaptation until changed.
+
+Behavior Composer decides the support resource.
+
+Delivery policy decides how that resource is rendered for audio-only, visual-only, or audio-visual receivers.
+
+`app/george/page.tsx` must not choose operational resources, interpret room signals, generate continuation behavior, own adaptive preference doctrine, or own receiver policy.
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCE_ARCHITECTURE_END -->
+
 <!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
 ## Provider-Boundary Authority — Current Validated State
 
@@ -1202,3 +1261,23 @@ real-time execution for the room.
 Execution may compress.
 
 Judgment may not.
+
+
+## User-Facing Conversation Terminology
+
+`Conversation` is the canonical user-facing concept across GEORGE and LIVE.
+
+User-facing copy should describe:
+
+- the conversation
+- conversation participants
+- conversation context
+- conversation dynamics
+- conversation conditions
+- conversation history
+- preparing, entering, pausing, resuming, saving, and ending a LIVE conversation
+
+`Room` remains available for internal runtime identifiers and implementation concepts such
+as `liveRoom`, `roomContext`, `roomSignals`, telemetry, and compatibility fields. Internal
+runtime naming must not leak into user-facing product copy unless a literal physical room
+is the subject.

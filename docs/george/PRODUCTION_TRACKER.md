@@ -1,5 +1,84 @@
 # GEORGE Production Tracker
 
+
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_START -->
+## Production Update — Adaptive LIVE Starting Preferences
+
+The existing LIVE runtime now supports two adaptive starting preferences:
+
+- **Adaptive Cue** — recommended default.
+- **Adaptive Response** — begins with concise, complete, immediately usable language.
+
+This is not a new runtime, coordinator, reasoning lane, support composer, or delivery system.
+
+The selected preference determines where GEORGE begins. It does not define where GEORGE must remain.
+
+### Adaptive Cue
+
+Adaptive Cue begins with the shortest useful support the user can successfully execute from.
+
+The governing requirement is not minimum word count alone.
+
+The governing requirement is:
+
+> Use the smallest operational resource that materially improves the user's probability of reaching the desired outcome.
+
+GEORGE may use a line, continuation, response, repeat, or recovery when evidence indicates that a cue is not translating into effective execution.
+
+### Adaptive Response
+
+Adaptive Response begins with the shortest complete, speakable response likely to improve execution.
+
+Adaptive Response is not a verbose mode.
+
+If the user successfully interprets, personalizes, shortens, breaks down, and delivers complete lines, GEORGE should preserve Adaptive Response.
+
+GEORGE should not compress to Cue merely because Cue uses fewer words.
+
+Adaptation is evidence-driven, not compression-driven.
+
+### Continuation
+
+Continuation remains an operational resource selected by GEORGE.
+
+It is not currently a separate user starting preference.
+
+Continuation, repeat, or recovery may be appropriate when the user loses a word, loses a prepared sentence ending, pauses inside a known talking point, loses a repeatable line, or needs language already available in queue restored.
+
+When sufficient evidence of intended language exists, GEORGE should restore that language rather than introduce unrelated wording.
+
+### Explicit user authority
+
+An adaptive preference is a starting default.
+
+An explicit instruction to remain with cues, responses, or short lines is authoritative for the current LIVE room until the user changes it.
+
+### Canonical ownership
+
+- `lib/george/live-runtime/support-behavior-composer.ts` owns adaptive preference interpretation and operational-resource selection.
+- `lib/george/live-runtime/live-support-behavior-pipeline.ts` remains the canonical signal-to-support flow.
+- `lib/george/capabilities/live-support-panels.ts` owns user-facing descriptions.
+- `app/george/live-entry/LiveEntryClient.tsx` collects and persists the current-room preference.
+- `lib/george/live-delivery/*` owns receiver-specific realization.
+- `app/george/page.tsx` remains rendering, interaction, mounting, and pass-through only.
+
+Do not move support judgment, continuation selection, response shaping, receiver policy, or adaptive preference doctrine into `app/george/page.tsx`.
+
+Changing receiver profile must not reset adaptive preference.
+
+### Validation
+
+The adaptive starting-preference implementation passed:
+
+- LIVE Entry smoke
+- LIVE Runtime smoke
+- production build
+- LIVE Hub TypeScript build
+- `git diff --check`
+
+Production direction remains portability, behavioral qualification, measured latency, reliability, authority, and runtime freeze readiness.
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_END -->
+
 <!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
 ## Current Production Update — Compact Provider Boundary Qualification
 
@@ -1075,3 +1154,23 @@ Required build order:
 If Normal and LIVE appear to diverge outside authorized execution differences, LIVE is treated as the reference implementation.
 
 The fix belongs in the shared reasoning runtime unless the difference is explicitly an execution policy.
+
+
+## User-Facing Conversation Terminology
+
+`Conversation` is the canonical user-facing concept across GEORGE and LIVE.
+
+User-facing copy should describe:
+
+- the conversation
+- conversation participants
+- conversation context
+- conversation dynamics
+- conversation conditions
+- conversation history
+- preparing, entering, pausing, resuming, saving, and ending a LIVE conversation
+
+`Room` remains available for internal runtime identifiers and implementation concepts such
+as `liveRoom`, `roomContext`, `roomSignals`, telemetry, and compatibility fields. Internal
+runtime naming must not leak into user-facing product copy unless a literal physical room
+is the subject.

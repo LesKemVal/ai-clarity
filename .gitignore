@@ -25,3 +25,25 @@ data/continuity-tokens.json
 
 # Local backup snapshots
 *.bak.*
+
+# Local patch-script backups
+*.ts.bak
+*.tsx.bak
+*.js.bak
+*.jsx.bak
+*.mjs.bak
+*.cjs.bak
+*.css.bak
+*.scss.bak
+*.json.bak
+*.py.bak
+*.ts.*.bak
+*.tsx.*.bak
+*.js.*.bak
+*.jsx.*.bak
+*.mjs.*.bak
+*.cjs.*.bak
+*.css.*.bak
+*.scss.*.bak
+*.json.*.bak
+*.py.*.bak

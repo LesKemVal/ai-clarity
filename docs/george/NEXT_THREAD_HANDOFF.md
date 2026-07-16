@@ -2,270 +2,174 @@
 
 Branch: `live-hub-runtime`
 
-Current validated HEAD:
+Current inspected HEAD:
 
 ```text
-53ebf32 Compact Normal provider execution boundary
-0061367 Constrain outcome advancement to the smallest move
-7a6a0c8 Consolidate provider execution authority
-0c0b10e Add Normal execution posture
-4cc90b1 Add contextual conversation move variants
-55d69cd Evaluate signal value before acquisition
-ecddc12 Route opportunity questions through conversation strategy
-89522e0 Link opportunity preparation to active sessions
-9330392 Make opportunity card a generic registry consumer
-621cfe2 Register opportunity readiness capabilities
-4087527 Add opportunity readiness and shared preparation flow
+d2e28a4 Consolidate browser-scoped session lifecycle
 ```
 
 ## FIRST
 
-Read, in order:
+Read in order:
 
 1. `docs/george/PRODUCTION_TRACKER.md`
 2. `docs/george/RUNTIME_ARCHITECTURE.md`
 3. `docs/george/OPERATIONAL_PROFILE.md`
 4. `docs/george/NEXT_THREAD_HANDOFF.md`
 
-These documents are the production authorities after this synchronization.
+Inspect implementation before changing anything.
 
 Do not redesign GEORGE.
 
-Do not add another runtime, coordinator, reasoning layer, preparation system, authority block, or prompt architecture.
+Do not create another runtime, reasoning lane, support composer, delivery router, preference store, or competing authority.
 
 Do not move reasoning into `app/george/page.tsx`.
 
-Do not confuse Normal and LIVE realization.
+## CURRENT VALIDATED WORK
 
-Normal speaks to the user.
+The LIVE runtime supports two adaptive starting preferences:
 
-LIVE supports the user in the room through the existing LIVE runtime, support-style, receiver, timing, response-shaping, and delivery owners.
+- **Adaptive Cue** — recommended default.
+- **Adaptive Response** — begins with concise, complete, usable language.
 
-## PRODUCT DOCTRINE
+The preference determines where GEORGE begins, not where GEORGE must remain.
 
-GEORGE is one operational intelligence.
+GEORGE adapts from observed execution unless the user explicitly requires a particular support style.
 
-Normal prepares, reasons, plans, learns, and talks directly with the user.
+Adaptive Cue seeks the smallest useful resource the user can successfully execute from.
 
-LIVE executes in the room.
+Adaptive Response seeks the shortest complete, speakable response likely to improve execution.
 
-Preparation is continuous and may happen naturally in Normal, through standalone LIVE Entry, or through another registered opportunity.
+If complete lines are working, preserve them.
 
-Execution is intentional and remains owned by the existing execution gateway.
+Do not compress merely because a cue is shorter.
 
-The user remains the final authority.
+Continuation remains a runtime-selected resource for lost words, sentence endings, prepared talking points, repeatable lines, interruption recovery, or language already in queue.
 
-The selected conversational move defines the maximum response scope for the current turn.
+## ARCHITECTURE
 
-Advancement means the smallest move that improves the operational state, not completing the entire likely project on every turn.
+One GEORGE.
 
-## CURRENT CANONICAL OWNERSHIP
+One LIVE runtime.
 
-### Opportunity readiness
+One signal-to-support pipeline.
 
-Canonical owner:
+One Support Behavior Composer.
 
-`lib/george/runtime/operational-resource-monitor.ts`
+One operational-resource vocabulary.
 
-The Opportunity Registry supports LIVE support, Pitch Deck, and Brief. The Normal bottom card remains a generic registry consumer. Preparation remains conversational and links to the active session.
+One receiver delivery policy.
 
-### Signal economy and conversation realization
+Canonical owners:
 
-- `operational-judgment.ts` decides whether another signal is worth the conversational cost.
-- `conversation-strategy.ts` decides how to earn the signal.
-- `conversation-move-library.ts` owns contextual wording variants.
-- `execution-policy.ts` owns mode-specific realization.
-- `runtime-context-composer.ts` owns the consolidated provider-boundary authority.
-- `runtime-pipeline.ts` coordinates the canonical sequence and provider request.
-- `page.tsx` renders and routes only.
+- `lib/george/live-runtime/support-behavior-composer.ts`
+- `lib/george/live-runtime/live-support-behavior-pipeline.ts`
+- `lib/george/capabilities/live-support-panels.ts`
+- `app/george/live-entry/LiveEntryClient.tsx`
+- `lib/george/live-delivery/*`
 
-A signal may have many conversational realizations but one semantic meaning.
+`app/george/page.tsx` remains a UI mount, interaction, rendering, and pass-through surface only.
 
-Do not ask merely to complete fields.
+Do not add support-resource selection, continuation rules, response-length doctrine, signal interpretation, receiver policy, explicit style-lock authority, or duplicate LIVE runtime state there.
 
-### Normal execution posture
+## USER AUTHORITY
 
-Normal has a transient, derived execution posture:
+Adaptive preference is a starting default.
 
-- planning
-- preparing
-- execution_imminent
-- recovering
+Explicit user instruction is authoritative for the current room.
 
-This is not a new runtime or persistent phase machine.
+Do not automatically promote current-room constraints into the Operational Profile.
 
-It changes only how Normal prepares the user.
+## CURRENT HOMEPAGE STATE
 
-It must never alter LIVE room-facing behavior, receiver realization, cue compression, timing, support behavior, or delivery policy.
+The homepage hero communicates:
 
-## COMPACT NORMAL PROVIDER BOUNDARY
+1. Preparation before the conversation.
+2. Support during the conversation.
+3. Review after the conversation.
 
-Validated commit:
+Each pass flips from the top, fades in the tagline, and types a short explanation.
 
-`53ebf32 Compact Normal provider execution boundary`
+Ask GEORGE, LIVE Support, and Help appear side by side on desktop.
 
-`buildGeorgeProviderRequest()` now receives `currentRuntime` explicitly.
+Post-conversation doctrine:
 
-When a Normal turn already contains consolidated `PROVIDER EXECUTION AUTHORITY`, the provider request omits duplicated legacy base, operational, steering, dynamic, and conversation-engine guidance.
+- summary first;
+- transcript immediately available on request;
+- transcript treated as evidence.
 
-The compact Normal request preserves:
+## NEXT PRODUCT AREA
 
-- language requirements;
-- the Normal mode boundary;
-- applicable preparation-time LIVE availability/opening or discipline;
-- consolidated provider execution authority as the final block.
+Inspect and redesign the active LIVE room.
 
-LIVE provider assembly is unchanged.
+Direction:
 
-Do not infer LIVE mode from `includeLiveDiscipline`; LIVE availability may surface during Normal preparation.
+- remove the oversized permanent card;
+- create a quiet operating surface;
+- use realistic phone controls that can later translate to glasses;
+- do not expose internal runtime concepts;
+- do not add controls that duplicate GEORGE adaptation.
 
-Do not add another provider authority block.
+Controls to inspect:
 
-Do not restore removed legacy guidance merely to make the provider appear more comprehensive.
+- listening and connection state;
+- receiver;
+- pause or suspend support;
+- repeat last support;
+- discreet exit.
 
-## CURRENT VALIDATION
+## VALIDATION
 
-Implementation commit `53ebf32` passed:
+The adaptive-preference implementation passed:
 
-- `npm run george:core:smoke`
-- `npm run build`
-- `cd ~/ai-clarity/live-hub && npm run build`
+- LIVE Entry smoke
+- LIVE Runtime smoke
+- production build
+- LIVE Hub TypeScript build
 - `git diff --check`
 
-The documentation recovery must also pass `git diff --check` and GEORGE Core Smoke before commit.
-
-`docs/george/OPERATIONAL_PROFILE.md` remains unchanged because this implementation did not alter Operational Profile doctrine.
-
-## IMMEDIATE NEXT QUALIFICATION
-
-Run the real Normal scenario:
-
-```text
-I need to prepare for an investor meeting.
-```
-
-Expected behavior:
-
-GEORGE makes the smallest useful move that improves the operational state, such as narrowing the intended outcome.
-
-It should not automatically create the deck, diligence pack, narrative, objections, and close.
-
-Also compare response latency against the pre-compaction behavior.
-
-If behavior still fails:
-
-1. inspect the actual compact provider request;
-2. confirm the selected move and execution policy reaching the provider;
-3. inspect provider realization;
-4. do not add another reasoning stage;
-5. do not add investor-specific rules;
-6. do not re-expand the provider prompt without evidence.
-
-## ENGINEERING WORKFLOW
+## WORKING STYLE
 
 The owner does not manually edit code.
 
-Use downloadable Python audit or patch bundles.
+Every patch must be one complete copy-and-paste command beginning with `cd ~/ai-clarity`.
 
-Every terminal command must begin from or explicitly return to:
+Do not use shell heredocs.
 
-```bash
-cd ~/ai-clarity
-```
-
-Inspect ownership before patching.
-
-Measure before removing.
-
-Patch only canonical owners.
-
-Keep one operational idea per commit.
-
-Do not commit failed builds.
-
-After every implementation patch:
-
-```bash
-cd ~/ai-clarity
-npm run george:core:smoke
-npm run build
-
-cd ~/ai-clarity/live-hub
-npm run build
-
-cd ~/ai-clarity
-git diff --check
-git status --short
-git diff --stat
-```
-
-Documentation is synchronized only after implementation is validated.
-
-Audit and validation scripts should place exactly one clearly named ZIP on Desktop and should not leave an output folder beside it.
-
-## PRODUCTION DIRECTION
-
-Priorities:
-
-1. Qualify the compact provider boundary behaviorally.
-2. Confirm whether prompt compaction recovered latency.
-3. Preserve universal reasoning.
-4. Preserve Normal/LIVE separation.
-5. Qualify behavior across domains one scenario at a time.
-6. Keep builds green.
-7. Keep production authority synchronized.
-8. Continue portability hardening only after provider realization is reliable.
-
-No drift.
-
-
----
-
-## Behavioral Qualification Phase
-
-Current production branch:
-
-live-hub-runtime
-
-Current production commits:
-
-96cdaee Add behavioral qualification framework
-
-fcc2883 Qualify shared preparation signal reasoning
-
-Behavioral qualification is now mandatory.
-
-Before changing shared reasoning:
-
-Run:
-
-npm run george:behavior:qualify
-
-npm run george:shared-reasoning:qualify
-
-Then:
-
-npm run build
-
-cd live-hub
-npm run build
-
-Engineering doctrine:
+Use downloadable Python patch files for large changes.
 
 Inspect first.
 
 Patch one canonical owner.
 
-Build.
+Run focused smoke tests.
 
-Qualify behavior.
+Run the production build.
 
-Synchronize documentation.
+Run the LIVE Hub build.
 
-Normal and LIVE share one operational reasoning runtime.
+Run `git diff --check`.
 
-Execution may compress.
+Synchronize documentation after implementation passes.
 
-Judgment may not.
+Commit only validated work.
 
-LIVE is the behavioral reference implementation whenever shared reasoning appears to diverge outside authorized execution differences.
+## PRODUCTION DIRECTION
+
+Preserve adaptive behavior.
+
+Validate with real LIVE room evidence.
+
+Redesign LIVE without moving runtime authority into UI.
+
+Optimize measured latency.
+
+Preserve receiver portability.
+
+Keep `app/george/page.tsx` thin.
+
+Keep validation green.
+
+Continue toward production freeze and portable runtime extraction.
+
+No drift.

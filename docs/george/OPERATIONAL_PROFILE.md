@@ -303,3 +303,45 @@ Operational Defaults improve the starting point.
 Reasoning determines the best action for the present work.
 
 User agency remains primary.
+
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_START -->
+## Adaptive LIVE Starting Preferences
+
+Adaptive Cue and Adaptive Response are temporary LIVE execution preferences.
+
+They define where GEORGE begins supporting the user in the current room.
+
+They do not automatically rewrite the Operational Profile.
+
+Adaptive starting preference, receiver profile, and explicit user style constraint are separate concepts.
+
+The starting preference establishes the initial posture.
+
+The receiver profile determines delivery.
+
+An explicit style constraint governs the current room until the user changes it.
+
+Successful current-room adaptation remains temporary unless the user chooses to retain it.
+
+The user remains the final authority.
+<!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_END -->
+
+
+## User-Facing Conversation Terminology
+
+`Conversation` is the canonical user-facing concept across GEORGE and LIVE.
+
+User-facing copy should describe:
+
+- the conversation
+- conversation participants
+- conversation context
+- conversation dynamics
+- conversation conditions
+- conversation history
+- preparing, entering, pausing, resuming, saving, and ending a LIVE conversation
+
+`Room` remains available for internal runtime identifiers and implementation concepts such
+as `liveRoom`, `roomContext`, `roomSignals`, telemetry, and compatibility fields. Internal
+runtime naming must not leak into user-facing product copy unless a literal physical room
+is the subject.
