@@ -1318,3 +1318,19 @@ Reasoning may remain probabilistic and evidence-weighted.
 Execution at any moment is singular.
 
 Architectural ownership must remain explicit even when operational interpretation remains ambiguous.
+
+<!-- LIVE_PORTABILITY_BOUNDARY:BEGIN -->
+## Validated LIVE portability boundary
+
+Validated at commit `6fadb44`.
+
+The LIVE runtime/host separation has completed its current production-hardening pass:
+
+- `lib/george/live-runtime` contains portable operational policy, reasoning, composition, detection, and state transformation.
+- `lib/george/live-host` contains browser persistence, lifecycle, playback, restoration, session, usage, preference, and outcome effects.
+- The repository-wide portability audit found no direct browser API ownership inside `lib/george/live-runtime`.
+- Runtime code does not import `live-host`.
+- `docs/george/LIVE_PORTABILITY_AUDIT.md` records the validated boundary and inspected files.
+
+This is the production portability checkpoint. Future browser or device integrations must enter through host adapters rather than adding environment ownership to the runtime.
+<!-- LIVE_PORTABILITY_BOUNDARY:END -->

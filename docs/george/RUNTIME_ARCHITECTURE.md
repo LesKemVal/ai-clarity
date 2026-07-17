@@ -1436,3 +1436,27 @@ Reasoning may remain probabilistic and evidence-weighted.
 Execution at any moment is singular.
 
 Architectural ownership must remain explicit even when operational interpretation remains ambiguous.
+
+<!-- LIVE_PORTABILITY_BOUNDARY:BEGIN -->
+## LIVE runtime and host boundary
+
+The canonical portability boundary is:
+
+```text
+Portable operational behavior
+  lib/george/live-runtime/*
+            ↑ invoked by
+Environment and browser adapters
+  lib/george/live-host/*
+            ↑ mounted by
+Application surfaces and bridges
+```
+
+Ownership rules:
+
+- Runtime owns operational reasoning, signal interpretation, policy, composition, detection, arbitration inputs, and portable state transformations.
+- Host owns browser storage, browser lifecycle, media playback, session restoration, runtime leases, usage persistence, support preferences, and outcome persistence.
+- Runtime must not import host.
+- Application surfaces must not recreate either owner's behavior.
+- New device targets should implement host adapters while preserving the portable runtime.
+<!-- LIVE_PORTABILITY_BOUNDARY:END -->

@@ -499,3 +499,18 @@
 - `lib/george/chat/runtime-signals.ts` — `937090f439499abe8ca7089708828999813041967fdb906051486b55e2c6a7ec`
 - `lib/george/runtime/runtime-interpretation.ts` — `bf177208f1dd3382f10c6a8d08011eb6ef45b55939877c5bdbca57af496aca38`
 - `lib/george/chat/live-context.ts` — `280f27da3b9f708ed5fd3b1ea7e6480c57956fa885a7c836b49d4b5c026e8c0d`
+
+<!-- LIVE_PORTABILITY_BOUNDARY:BEGIN -->
+## LIVE portability surface ownership
+
+`app/george/page.tsx` is a mount and orchestration surface. It may call canonical runtime and host modules, but it must not absorb their implementation.
+
+Canonical ownership:
+
+- `lib/george/live-runtime/*` — portable operational intelligence and policy
+- `lib/george/live-host/*` — browser and environment effects
+- `components/george/live/*` — UI bridges and delivery surfaces
+- `app/george/page.tsx` — integration surface only
+
+The page must not duplicate persistence, playback, restoration, lifecycle, session, preference, usage, or outcome ownership.
+<!-- LIVE_PORTABILITY_BOUNDARY:END -->
