@@ -129,6 +129,72 @@ The adaptive starting-preference implementation passed:
 Production direction remains portability, behavioral qualification, measured latency, reliability, authority, and runtime freeze readiness.
 <!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_END -->
 
+<!-- GEORGE_RECEIVER_POLICY_OWNERSHIP_START -->
+## Production Update — Explicit LIVE Receiver Policy Ownership
+
+Current validated implementation HEAD:
+
+```text
+7aa4846 Extract LIVE receiver delivery policy
+9137bd6 Extract LIVE Entry speaking presentation
+3a7b5cf Extract LIVE Entry support presentation
+3d2c0d4 Extract LIVE Entry receiver presentation
+```
+
+Receiver-specific realization now has one explicit canonical owner:
+
+- `lib/george/live-delivery/receiver-policy.ts`
+
+The receiver policy owns:
+
+- audio-only surface selection and concise spoken shaping;
+- visual-only readable, structured, persistence-friendly shaping;
+- audio-visual coordination where audio carries immediate steering and visual carries reference;
+- receiver-profile fallback when a requested surface is unavailable;
+- receiver-specific delivery-policy reasons.
+
+The delivery router remains:
+
+- `lib/george/live-delivery/delivery-router.ts`
+
+The delivery router owns conversion of approved LIVE behavior into delivery cues. It does not own support judgment or receiver-specific shaping.
+
+Canonical flow:
+
+```text
+Signals and transcripts
+↓
+Support Behavior Composer
+↓
+Selected operational resource
+↓
+Receiver Policy
+↓
+Delivery Router
+↓
+Voice, visual, or silent dispatch
+```
+
+`components/george/live/LiveHubDeliveryBridge.tsx` remains a bridge-level subscriber and dispatcher. It does not own behavior selection, receiver policy, or runtime reasoning.
+
+LIVE Entry presentation extraction is also validated:
+
+- `LiveReceiverProfilePanel.tsx` renders receiver selection;
+- `LiveAdaptiveSupportPanel.tsx` renders adaptive starting-preference selection;
+- `LiveSpeakingStylePanel.tsx` renders speaking-style selection;
+- `LiveEntryClient.tsx` retains current-room state, persistence, acknowledgement resets, preparation orchestration, and runtime startup authority.
+
+Changing receiver profile must not change adaptive starting preference or create another runtime.
+
+Validation passed:
+
+- protected production build and smoke chain;
+- LIVE Hub TypeScript build;
+- `git diff --check`.
+
+Immediate direction remains behavioral qualification, latency measurement, recovery qualification, portability inspection, and runtime freeze readiness.
+<!-- GEORGE_RECEIVER_POLICY_OWNERSHIP_END -->
+
 <!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
 ## Current Production Update — Compact Provider Boundary Qualification
 

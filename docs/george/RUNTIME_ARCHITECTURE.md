@@ -106,6 +106,75 @@ Delivery policy decides how that resource is rendered for audio-only, visual-onl
 `app/george/page.tsx` must not choose operational resources, interpret room signals, generate continuation behavior, own adaptive preference doctrine, or own receiver policy.
 <!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCE_ARCHITECTURE_END -->
 
+<!-- GEORGE_RECEIVER_POLICY_ARCHITECTURE_START -->
+## Explicit Receiver-Policy Architecture
+
+Receiver realization is now separated from delivery routing without creating a new runtime or reasoning lane.
+
+Canonical LIVE realization flow:
+
+```text
+Support Behavior Composer
+↓
+Selected operational resource
+↓
+Receiver Policy
+↓
+Delivery Router
+↓
+Bridge dispatch
+↓
+Audio, visual, or silent surface
+```
+
+Canonical owners:
+
+- `lib/george/live-runtime/support-behavior-composer.ts`
+  - decides what operational support resource is appropriate;
+  - does not decide surface-specific wording or routing.
+- `lib/george/live-delivery/receiver-policy.ts`
+  - resolves audio-only, visual-only, and audio-visual realization;
+  - applies surface-specific cognitive-load and readability constraints;
+  - does not change the selected operational resource or reason independently.
+- `lib/george/live-delivery/delivery-router.ts`
+  - creates delivery cues from approved behavior and receiver-policy results;
+  - does not own receiver shaping.
+- `components/george/live/LiveHubDeliveryBridge.tsx`
+  - subscribes to approved ACTION_CUE events;
+  - applies commitment and duplicate-suppression safeguards;
+  - dispatches routed cues to voice, visual, or silent handlers;
+  - owns no runtime reasoning.
+
+Receiver policy principles:
+
+### Audio-only
+
+- concise;
+- sequential;
+- repeatable;
+- low-cognitive-load;
+- normally speakable within one breath;
+- unavailable audio resolves to silence rather than an unauthorized visual fallback.
+
+### Visual-only
+
+- readable;
+- glanceable;
+- structured when useful;
+- capable of carrying more detail than audio;
+- persistence is a presentation concern downstream of receiver shaping.
+
+### Audio-visual
+
+- audio carries immediate timing or steering;
+- visual carries persistent reference;
+- the two surfaces may express the same selected operational resource differently without becoming separate behavior decisions.
+
+One-breath audio is a receiver constraint, not a reasoning limit.
+
+The receiver profile changes realization only. It must not reset adaptive preference, create a new support mode, or create another GEORGE.
+<!-- GEORGE_RECEIVER_POLICY_ARCHITECTURE_END -->
+
 <!-- GEORGE_PROVIDER_BOUNDARY_UPDATE_START -->
 ## Provider-Boundary Authority — Current Validated State
 
@@ -411,11 +480,16 @@ The runtime must reason before it realizes. Realization expresses selected suppo
 - `lib/george/live-runtime/live-transcript-controller.ts`
   - transcript execution control without duplicate support authority
 - `lib/george/live-voice/runtime/response-shaper.ts`
-  - receiver-aware LIVE response shaping
-  - one-breath audio realization
+  - legacy-compatible LIVE response shaping primitives where still invoked
+  - not canonical receiver-policy ownership
+- `lib/george/live-delivery/receiver-policy.ts`
+  - canonical receiver-profile realization
+  - audio, visual, and audio-visual surface shaping
+- `lib/george/live-delivery/delivery-router.ts`
+  - delivery-cue construction from approved behavior and receiver-policy output
 - `components/george/live/LiveHubDeliveryBridge.tsx`
-  - bridge-level delivery dispatch
-  - no runtime reasoning or behavior-selection ownership
+  - bridge-level commitment safeguards and delivery dispatch
+  - no runtime reasoning, behavior-selection, or receiver-policy ownership
 
 `app/george/page.tsx` remains a mount, interaction, and pass-through surface. It must not become the owner of posture realization, receiver policy, runtime reasoning, operational resources, or turn lifecycle.
 
