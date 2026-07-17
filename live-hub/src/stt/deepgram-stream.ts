@@ -24,6 +24,36 @@ function buildRecentTranscript(fragments: string[]) {
     .join('\n')
 }
 
+function readPositiveInteger(
+  value: string | undefined,
+  fallback: number
+) {
+  const parsed = Number(value)
+
+  return Number.isFinite(parsed) && parsed > 0
+    ? Math.floor(parsed)
+    : fallback
+}
+
+const maxPendingAudioChunks = readPositiveInteger(
+  process.env.LIVE_HUB_DEEPGRAM_MAX_PENDING_CHUNKS,
+  64
+)
+const maxPendingAudioBytes = readPositiveInteger(
+  process.env.LIVE_HUB_DEEPGRAM_MAX_PENDING_BYTES,
+  1_048_576
+)
+const maxPendingAudioAgeMs = readPositiveInteger(
+  process.env.LIVE_HUB_DEEPGRAM_MAX_PENDING_AGE_MS,
+  5_000
+)
+
+type PendingAudioChunk = {
+  audio: ArrayBuffer
+  bytes: number
+  queuedAt: number
+}
+
 export function createDeepgramStream(params: {
   ws: WebSocket
   apiKey: string
@@ -37,7 +67,8 @@ export function createDeepgramStream(params: {
   let lastCuePriority = 0
   let lastFinalTranscriptKey = ''
   let lastFinalAt = 0
-  const pendingAudio: ArrayBuffer[] = []
+  const pendingAudio: PendingAudioChunk[] = []
+  let pendingAudioBytes = 0
   const recentTranscriptFragments: string[] = []
 
   const dg = deepgram.listen.live({
@@ -46,6 +77,96 @@ export function createDeepgramStream(params: {
     interim_results: true,
     endpointing: 350,
   })
+
+  function clearPendingAudio(reason: string) {
+    if (!pendingAudio.length) return
+
+    console.warn('[LIVE HUB][deepgram][pending-audio-cleared]', {
+      reason,
+      droppedChunks: pendingAudio.length,
+      droppedBytes: pendingAudioBytes,
+    })
+
+    pendingAudio.length = 0
+    pendingAudioBytes = 0
+  }
+
+  function evictExpiredPendingAudio(now = Date.now()) {
+    let droppedChunks = 0
+    let droppedBytes = 0
+
+    while (
+      pendingAudio.length &&
+      now - pendingAudio[0].queuedAt > maxPendingAudioAgeMs
+    ) {
+      const dropped = pendingAudio.shift()
+      if (!dropped) break
+
+      pendingAudioBytes -= dropped.bytes
+      droppedChunks += 1
+      droppedBytes += dropped.bytes
+    }
+
+    if (droppedChunks) {
+      console.warn('[LIVE HUB][deepgram][pending-audio-expired]', {
+        droppedChunks,
+        droppedBytes,
+        remainingChunks: pendingAudio.length,
+        remainingBytes: pendingAudioBytes,
+        maxPendingAudioAgeMs,
+      })
+    }
+  }
+
+  function queuePendingAudio(audio: ArrayBuffer) {
+    const now = Date.now()
+    const bytes = audio.byteLength
+
+    evictExpiredPendingAudio(now)
+
+    if (bytes > maxPendingAudioBytes) {
+      console.warn('[LIVE HUB][deepgram][pending-audio-rejected]', {
+        reason: 'chunk_exceeds_byte_limit',
+        chunkBytes: bytes,
+        maxPendingAudioBytes,
+      })
+      return
+    }
+
+    let droppedChunks = 0
+    let droppedBytes = 0
+
+    while (
+      pendingAudio.length &&
+      (
+        pendingAudio.length >= maxPendingAudioChunks ||
+        pendingAudioBytes + bytes > maxPendingAudioBytes
+      )
+    ) {
+      const dropped = pendingAudio.shift()
+      if (!dropped) break
+
+      pendingAudioBytes -= dropped.bytes
+      droppedChunks += 1
+      droppedBytes += dropped.bytes
+    }
+
+    if (droppedChunks) {
+      console.warn('[LIVE HUB][deepgram][pending-audio-overflow]', {
+        policy: 'drop_oldest',
+        droppedChunks,
+        droppedBytes,
+        incomingBytes: bytes,
+        remainingChunks: pendingAudio.length,
+        remainingBytes: pendingAudioBytes,
+        maxPendingAudioChunks,
+        maxPendingAudioBytes,
+      })
+    }
+
+    pendingAudio.push({ audio, bytes, queuedAt: now })
+    pendingAudioBytes += bytes
+  }
 
   function rememberTranscriptFragment(transcript: string, isFinal: boolean) {
     const clean = normalizeTranscriptFragment(transcript)
@@ -249,14 +370,22 @@ export function createDeepgramStream(params: {
     deepgramOpen = true
     console.log('[LIVE HUB][deepgram] open')
 
+    evictExpiredPendingAudio()
+
     while (pendingAudio.length) {
       const chunk = pendingAudio.shift()
-      if (chunk) dg.send(chunk)
+      if (!chunk) continue
+
+      pendingAudioBytes -= chunk.bytes
+      dg.send(chunk.audio)
     }
+
+    pendingAudioBytes = 0
   })
 
   dg.on(LiveTranscriptionEvents.Close, () => {
     deepgramOpen = false
+    clearPendingAudio('deepgram_close')
     console.log('[LIVE HUB][deepgram] close')
   })
 
@@ -272,6 +401,9 @@ export function createDeepgramStream(params: {
   })
 
   dg.on(LiveTranscriptionEvents.Error, (error) => {
+    deepgramOpen = false
+    clearPendingAudio('deepgram_error')
+
     sendJson(params.ws, {
       type: 'ERROR',
       error: error instanceof Error ? error.message : 'Deepgram stream error.',
@@ -287,7 +419,7 @@ export function createDeepgramStream(params: {
       ) as ArrayBuffer
 
       if (!deepgramOpen) {
-        pendingAudio.push(audio)
+        queuePendingAudio(audio)
         return
       }
 
@@ -310,6 +442,9 @@ export function createDeepgramStream(params: {
     },
 
     close() {
+      deepgramOpen = false
+      clearPendingAudio('stream_close')
+
       try {
         dg.finish()
       } catch {}
