@@ -6,7 +6,7 @@ import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runti
 import { routeGeorgeDeliveryCues } from '@/lib/george/live-delivery/delivery-router'
 import { evaluateGeorgeDeliveryCommitment } from '@/lib/george/live-delivery/delivery-commitment'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
-import { composeGeorgeSupportBehavior } from '@/lib/george/live-runtime/support-behavior-composer'
+import { resolveGeorgeDeliveryBehavior } from '@/lib/george/live-delivery/delivery-behavior-resolver'
 import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type {
@@ -47,55 +47,21 @@ export function LiveHubDeliveryBridge({
     const unsubscribe = adapter.subscribe((event) => {
       if (event.type !== 'ACTION_CUE') return
 
-      /*
-       * Behavior is resolved before receiver routing.
-       *
-       * The Behavior Composer determines what GEORGE should do. The delivery
-       * router then shapes that same behavior independently for each active
-       * receiver surface.
-       */
-      const responseModePlaceholder =
-        deliveryStyle === 'response' &&
-        event.source === 'local' &&
-        /^(clarify before answering\.?|ask for clarification\.?|clarify\.?)/i.test(
-          String(event.cue || '').trim()
-        )
+      const behaviorResolution = resolveGeorgeDeliveryBehavior({
+        actionCue: event,
+        deliveryStyle,
+        desiredOutcome: context.objective,
+      })
 
-      let actionCueForDelivery = event
-      let behaviorFallbackReason: string | undefined
-
-      if (responseModePlaceholder) {
-        const behaviorDecision = composeGeorgeSupportBehavior({
-          desiredOutcome: context.objective,
-          deliveryStyle,
-          hasSafeResponse: false,
-        })
-
-        const fallbackText =
-          behaviorDecision.operationalResource === 'silence'
-            ? ''
-            : behaviorDecision.operationalResource === 'cue'
-              ? 'Buy a second. Ask them to clarify what they mean.'
-              : 'Clarify before answering.'
-
-        behaviorFallbackReason = behaviorDecision.reason
-        actionCueForDelivery = {
-          ...event,
-          cue: fallbackText,
-          category: 'operational_guidance',
-          confidence: Math.max(event.confidence || 0, 0.7),
-          priority: Math.max(event.priority || 0, 7),
-        }
-
+      if (behaviorResolution.fallbackApplied) {
         console.info('[LIVE][hub][delivery][behavior-fallback]', {
-          operationalResource: behaviorDecision.operationalResource,
-          reason: behaviorDecision.reason,
-          actionCue: actionCueForDelivery,
+          reason: behaviorResolution.behaviorReason,
+          actionCue: behaviorResolution.actionCue,
         })
       }
 
       const resolvedDeliveryCues = routeGeorgeDeliveryCues({
-        actionCue: actionCueForDelivery,
+        actionCue: behaviorResolution.actionCue,
         context: {
           voiceEnabled,
           receiverProfile,
@@ -107,7 +73,7 @@ export function LiveHubDeliveryBridge({
       }).map((deliveryCue) => ({
         ...deliveryCue,
         turnId: event.turnId || deliveryCue.turnId,
-        reason: behaviorFallbackReason || deliveryCue.reason,
+        reason: behaviorResolution.behaviorReason || deliveryCue.reason,
       }))
 
       const resolvedDeliveryCue =
