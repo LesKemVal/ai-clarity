@@ -79,6 +79,7 @@ import { resolvePreProviderSend } from '@/lib/george/runtime/pre-provider-send-r
 import { resolveCoursesExpandResponse } from '@/lib/george/runtime/training-runtime'
 import { detectLiveFriction, scoreLiveFriction } from '@/lib/george/live-runtime/live-friction'
 import type { OperationalResourceMonitorState } from '@/lib/george/runtime/operational-resource-monitor'
+import type { GeorgeRuntimeAuthoritySnapshot } from '@/lib/george/runtime/runtime-pipeline'
 
 const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
@@ -1707,6 +1708,12 @@ const [savePopupUpward, setSavePopupUpward] = useState(true)
   const [activeMemoryFolder, setActiveMemoryFolder] = useState<string | null>(null)
 const [lastDomain, setLastDomain] = useState<string | null>(null)
 const [operationalResourceMonitor, setOperationalResourceMonitor] = useState<OperationalResourceMonitorState | null>(null)
+
+  const [
+    canonicalRuntimeAuthority,
+    setCanonicalRuntimeAuthority,
+  ] = useState<GeorgeRuntimeAuthoritySnapshot | null>(null)
+
 const liveBarMessages = useMemo(() => {
   const opportunity = operationalResourceMonitor?.opportunity
 
@@ -4740,6 +4747,12 @@ const handleSend = useCallback(
 
         setOperationalResourceMonitor(data?.operationalResourceMonitor || null)
 
+        if (data?.runtimeAuthoritySnapshot) {
+          setCanonicalRuntimeAuthority(
+            data.runtimeAuthoritySnapshot as GeorgeRuntimeAuthoritySnapshot
+          )
+        }
+
         let finalContent = data.message
 
         if (typeof finalContent === 'string' && liveMode) {
@@ -5425,6 +5438,7 @@ return (
           intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
+          runtimeSnapshot: canonicalRuntimeAuthority || undefined,
         }}
         transcript={liveHubShadowTranscript}
         transcriptFinal={true}
@@ -5448,6 +5462,7 @@ return (
           intangibleObjective: String(liveRuntimeSupport?.intangibleObjective || ''),
           userPosition: String(liveRuntimeSupport?.userPosition || ''),
           deliveryStyle: liveDeliveryStyle,
+          runtimeSnapshot: canonicalRuntimeAuthority || undefined,
         }}
         voiceEnabled={voiceOn}
         receiverProfile={liveReceiverProfile}

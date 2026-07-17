@@ -69,6 +69,7 @@ import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-pr
 import {
   isStandaloneAmbiguousKnowledgeQuestion,
   resolveGeorgeRuntimePipeline,
+  selectGeorgeRuntimeAuthoritySnapshot,
 } from '@/lib/george/runtime/runtime-pipeline'
 
 const openai = new OpenAI({
@@ -985,6 +986,9 @@ LANGUAGE MODE: SPANISH
       providerResolution,
     } = runtimePipeline
 
+    const runtimeAuthoritySnapshot =
+      selectGeorgeRuntimeAuthoritySnapshot(runtimePipeline)
+
     const model = providerResolution.model
     const { systemContent, messages: providerMessages } = providerRequest
 
@@ -1090,7 +1094,11 @@ LANGUAGE MODE: SPANISH
       latestUserText,
     })
 
-    return NextResponse.json({ message: reply, operationalResourceMonitor })
+    return NextResponse.json({
+      message: reply,
+      operationalResourceMonitor,
+      runtimeAuthoritySnapshot,
+    })
   } catch (err: unknown) {
     console.error('Chat route error:', err)
 

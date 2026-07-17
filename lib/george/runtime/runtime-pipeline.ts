@@ -193,6 +193,26 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   source: 'runtime_pipeline'
 }>
 
+export type GeorgeRuntimeAuthoritySnapshot = Readonly<{
+  operationalJudgment: GeorgeRuntimePipelineSnapshot['operationalJudgment']
+  conversationStrategy: GeorgeRuntimePipelineSnapshot['conversationStrategy']
+  conversationMoveDefinition: GeorgeRuntimePipelineSnapshot['conversationMoveDefinition']
+  executionPolicy: GeorgeRuntimePipelineSnapshot['executionPolicy']
+  source: 'runtime_pipeline'
+}>
+
+export function selectGeorgeRuntimeAuthoritySnapshot(
+  snapshot: GeorgeRuntimePipelineSnapshot
+): GeorgeRuntimeAuthoritySnapshot {
+  return Object.freeze({
+    operationalJudgment: snapshot.operationalJudgment,
+    conversationStrategy: snapshot.conversationStrategy,
+    conversationMoveDefinition: snapshot.conversationMoveDefinition,
+    executionPolicy: snapshot.executionPolicy,
+    source: snapshot.source,
+  })
+}
+
 export function resolveGeorgeRuntimeProvider(input: {
   userText: string
   tier: string
