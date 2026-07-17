@@ -57,7 +57,6 @@ import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-
 import type { LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
 import { buildLiveInteractionContinuity, buildLiveOutcomeReview } from '@/lib/george/live-runtime/live-interaction-continuity'
 import { PostLiveConversationRecordPanel } from '@/components/george/live/PostLiveConversationRecordPanel'
-import { LiveFooterControls } from '@/components/george/live/LiveFooterControls'
 import { LiveRoomStatusPanel } from '@/components/george/live/LiveRoomStatusPanel'
 import { LiveHubShadowBridge } from '@/components/george/live/LiveHubShadowBridge'
 import { LiveHubVisualCueBridge } from '@/components/george/live/LiveHubVisualCueBridge'
@@ -5877,6 +5876,10 @@ return (
           setShowToast(true)
           return true
         }}
+        onExitLive={() => {
+          setShowNormalUtilityMenu(null)
+          requestExitLiveMode()
+        }}
         onRoomToggle={() => {
           const nextEnabled = !liveGeorgeEnabled
           setLiveGeorgeEnabled(nextEnabled)
@@ -6785,50 +6788,6 @@ return (
 
 
               <div className="hidden">
-                <LiveFooterControls
-                  language={language}
-                  liveMode={liveMode}
-                  voiceOn={voiceOn}
-                  tierLabel={tierUpgradeAction.currentLabel}
-                  tierActionLabel={tierUpgradeAction.label}
-                  motionHoverText={operationalMotion.hoverText}
-                  motionPress={operationalMotion.press}
-                  onHelp={() => {
-                    setActiveHelpTopic('live')
-                    setShowLanguageMenu(false)
-                    setShowNormalUtilityMenu((value) => value === 'help' ? null : 'help')
-                  }}
-                  onLanguage={(e) => {
-                    e.stopPropagation()
-                    setShowNormalUtilityMenu((value) => value === 'language' ? null : 'language')
-                  }}
-                  onExitOrTier={() => {
-                    if (liveMode) {
-                      setShowNormalUtilityMenu(null)
-                      requestExitLiveMode()
-                      return
-                    }
-
-                    setShowNormalUtilityMenu(null)
-                    setShowTierModal(true)
-                  }}
-                  onVoiceToggle={() => {
-                    if (currentTier === 'smart') {
-                      setToastMessage('Voice replies unlock above Smart.')
-                      setShowToast(true)
-                      return
-                    }
-
-                    const nextVoice = !voiceOn
-                    hasUserInteractedRef.current = true
-                    setVoiceOn(nextVoice)
-                    setInteractionMode(nextVoice ? 'speech' : 'text')
-                    window.localStorage.setItem('george_voice', nextVoice ? 'on' : 'off')
-                    setToastMessage(nextVoice ? 'Audio on' : 'Audio off')
-                    setShowToast(true)
-                  }}
-                />
-
                   {showNormalUtilityMenu && (
                     <button
                       type="button"
@@ -8547,8 +8506,11 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           <button
                             type="button"
                             onClick={requestExitLiveMode}
-                            className="rounded-full border border-[#3657A8]/48 bg-[#172347] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42 backdrop-blur-xl transition hover:border-red-100/[0.18] hover:text-red-100/78"
+                            aria-label="Leave LIVE"
+                            title="Leave LIVE"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-red-300/25 bg-red-950/35 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-red-100/78 shadow-[0_0_18px_rgba(248,113,113,0.10)] backdrop-blur-xl transition hover:border-red-200/45 hover:bg-red-950/50 hover:text-red-50 active:scale-[0.98]"
                           >
+                            <span className="h-1.5 w-1.5 rounded-full bg-red-300/70 shadow-[0_0_8px_rgba(252,165,165,0.45)]" />
                             Exit
                           </button>
                         </div>

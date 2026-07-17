@@ -29,6 +29,7 @@ type LiveRoomStatusPanelProps = {
   communicationStyle: string
   onRoomToggle: () => void
   onVoiceToggle: () => void
+  onExitLive: () => void
   onPauseLive?: () => void
   onReceiverPressed: () => void
   onCommunicationPressed: () => void
@@ -317,6 +318,7 @@ export function LiveRoomStatusPanel({
   communicationStyle,
   onRoomToggle,
   onVoiceToggle,
+  onExitLive,
   onPauseLive,
   onReceiverPressed,
   onCommunicationPressed,
@@ -408,27 +410,40 @@ export function LiveRoomStatusPanel({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onVoiceToggle}
-          className={`shrink-0 rounded-full border px-2.25 py-1.25 font-semibold uppercase transition-[transform,border-color,background-color,opacity] duration-400 active:scale-[0.97] ${
-            voiceOn
-              ? 'border-[#2EA7D7]/70 bg-[#2EA7D7]/[0.12]'
-              : 'border-[#2EA7D7]/22 bg-[#2EA7D7]/[0.04]'
-          }`}
-          aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
-        >
-          <span className="text-[11px] font-semibold tracking-[0.14em] text-white">
-            AUDIO
-          </span>
-          <span
-            className={`ml-1 text-[7px] tracking-[0.12em] ${
-              voiceOn ? 'text-white/82' : 'text-white/56'
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onVoiceToggle}
+            className={`rounded-full border px-2.25 py-1.25 font-semibold uppercase transition-[transform,border-color,background-color,opacity] duration-400 active:scale-[0.97] ${
+              voiceOn
+                ? 'border-[#2EA7D7]/70 bg-[#2EA7D7]/[0.12]'
+                : 'border-[#2EA7D7]/22 bg-[#2EA7D7]/[0.04]'
             }`}
+            aria-label={voiceOn ? 'Turn audio off' : 'Turn audio on'}
           >
-            {voiceOn ? 'ON' : 'OFF'}
-          </span>
-        </button>
+            <span className="text-[11px] font-semibold tracking-[0.14em] text-white">
+              AUDIO
+            </span>
+            <span
+              className={`ml-1 text-[7px] tracking-[0.12em] ${
+                voiceOn ? 'text-white/82' : 'text-white/56'
+              }`}
+            >
+              {voiceOn ? 'ON' : 'OFF'}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onExitLive}
+            className="inline-flex items-center gap-1.5 rounded-full border border-red-200/14 bg-red-100/[0.025] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-red-100/58 transition-[transform,border-color,background-color,color] duration-300 hover:border-red-200/28 hover:bg-red-100/[0.055] hover:text-red-100/86 active:scale-[0.97]"
+            aria-label="Exit LIVE"
+            title="Exit LIVE"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-red-200/42 shadow-[0_0_10px_rgba(248,113,113,0.22)]" />
+            EXIT
+          </button>
+        </div>
       </div>
 
       <div className="rounded-[1.75rem] border border-white/[0.055] bg-[#05070B]/88 p-2 shadow-[0_22px_70px_rgba(0,0,0,0.46),inset_0_1px_0_rgba(255,255,255,0.035)] backdrop-blur-xl">
