@@ -10,24 +10,52 @@ export default function GeorgeLivePage() {
 
   useEffect(() => {
     try {
-      const existing =
-        window.localStorage.getItem('george_live_setup_active') ||
-        window.localStorage.getItem('GEORGE_LIVE_SETUP')
+      const preparedRaw = window.localStorage.getItem('GEORGE_LIVE_SETUP')
+      const activeRaw = window.localStorage.getItem('george_live_setup_active')
 
-      if (!existing) {
-        const fallbackSetup = {
-          room: 'LIVE',
-          objective: 'Continue the LIVE conversation.',
-          knownContext: '',
-          liveAssistMode: 'lines',
-          controlWords: '',
-          createdAt: Date.now(),
-          localFallback: true,
-        }
+      const prepared = preparedRaw ? JSON.parse(preparedRaw) : null
+      const active = activeRaw ? JSON.parse(activeRaw) : null
 
-        window.localStorage.setItem('GEORGE_LIVE_SETUP', JSON.stringify(fallbackSetup))
-        window.localStorage.setItem('george_live_setup_active', JSON.stringify(fallbackSetup))
+      const setup = prepared || active || {
+        room: 'LIVE',
+        objective: 'Continue the LIVE conversation.',
+        knownContext: '',
+        liveAssistMode: 'lines',
+        controlWords: '',
+        createdAt: Date.now(),
+        localFallback: true,
       }
+
+      const currentKnownContext = String(
+        setup.knownContext ||
+        setup.observedReality ||
+        setup.runtimeSupport?.knownContext ||
+        ''
+      ).trim()
+
+      const synchronizedRuntimeSupport = {
+        ...(setup.runtimeSupport || {}),
+        room: setup.room,
+        objective: setup.objective,
+        chair: setup.chair,
+        knownContext: currentKnownContext,
+        briefingKnowledge: currentKnownContext,
+      }
+
+      const synchronizedSetup = {
+        ...setup,
+        knownContext: currentKnownContext,
+        observedReality: currentKnownContext,
+        runtimeSupport: synchronizedRuntimeSupport,
+      }
+
+      const serializedSetup = JSON.stringify(synchronizedSetup)
+      const serializedSupport = JSON.stringify(synchronizedRuntimeSupport)
+
+      window.localStorage.setItem('GEORGE_LIVE_SETUP', serializedSetup)
+      window.localStorage.setItem('george_live_setup_active', serializedSetup)
+      window.localStorage.setItem('george_live_runtime_support_active', serializedSupport)
+      window.localStorage.setItem('george_live_runtime_support', serializedSupport)
     } catch {}
 
     setReady(true)
