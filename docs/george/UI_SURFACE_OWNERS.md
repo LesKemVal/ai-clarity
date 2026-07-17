@@ -132,7 +132,7 @@
 - `lib/george/live-runtime/live-tts-metrics.ts`
 - `lib/george/live-voice/spoken-text.ts`
 - `lib/george/live-voice/runtime/response-shaper.ts`
-- `lib/george/live-runtime/audio-playback.ts`
+- `lib/george/live-host/audio-playback.ts`
 - `lib/george/live-delivery/voice-speed-policy.ts`
 - `lib/george/live-runtime/speech-queue.ts`
 - `lib/george/ui/operational-motion.ts`
@@ -376,7 +376,7 @@
 - `lib/george/live-runtime/live-tts-metrics.ts` — `488619bc82edad145abf07e1d55b27ee98427de4e68b343117a98dcf001f7684`
 - `lib/george/live-voice/spoken-text.ts` — `0988e460281df08f0bf8a9b1c38462bd5eacf08d11aa3fc61c5ea4c9fb6f91eb`
 - `lib/george/live-voice/runtime/response-shaper.ts` — `eb4ca37335f575e1d9fec7352a9161aacc13d14131da0f0f450bc734048a0e4d`
-- `lib/george/live-runtime/audio-playback.ts` — `863372469f5285abeffe0dd84db617dabd6aeeb016e2f1098159019fed760a76`
+- `lib/george/live-host/audio-playback.ts` — `863372469f5285abeffe0dd84db617dabd6aeeb016e2f1098159019fed760a76`
 - `lib/george/live-delivery/voice-speed-policy.ts` — `a03ed1e3fbb0a34519e132dd7f0abb5af3051ac25b9ca5e5a27e1434f845cf45`
 - `lib/george/live-runtime/speech-queue.ts` — `79d77bbeaf6e7f648b3fa524f069f91ed39b6ec2ac9c2d5ea847de16ed5245a4`
 - `lib/george/ui/operational-motion.ts` — `dd8bbd286a2dd11a9979bfc64254a60763880abd4f7014cea0b8788faa411c29`
