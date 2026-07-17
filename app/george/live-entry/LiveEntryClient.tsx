@@ -141,40 +141,11 @@ const DEFAULT_ROOM_PHRASES = [
   'Can we unpack that?',
 ]
 
-function getRoomPhraseExamples(role: string) {
-  const clean = role.toLowerCase()
-
-  if (/patient|doctor|medical/.test(clean)) {
-    return [
-      'E.g. Help me understand that.',
-      'E.g. Can we slow down for a second?',
-      'E.g. What are my options?',
-      'E.g. I want to make sure I understand.',
-    ]
-  }
-
-  if (/candidate|interviewee|interview/.test(clean)) {
-    return [
-      'E.g. Good question.',
-      'E.g. Let me think about that.',
-      'E.g. Could you clarify that?',
-      'E.g. Can I expand on that?',
-    ]
-  }
-
-  if (/ceo|founder|investor|executive/.test(clean)) {
-    return [
-      'E.g. That\'s fair.',
-      'E.g. Help me understand that.',
-      'E.g. What\'s driving that concern?',
-      'E.g. Let\'s think through that.',
-    ]
-  }
-
+function getRoomPhraseExamples(_role: string) {
   return [
-    'E.g. That\'s fair.',
+    'E.g. Let me think about that.',
     'E.g. Help me understand that.',
-    'E.g. Can we unpack that?',
+    'E.g. Can we slow down for a second?',
     'E.g. What am I missing?',
   ]
 }
@@ -391,224 +362,55 @@ type LiveBriefingSupportPanel = {
 }
 
 function buildLiveBriefingSupportPanels({
-  room,
-  audience,
-  objective,
-  position,
+  room: _room,
+  audience: _audience,
+  objective: _objective,
+  position: _position,
 }: {
   room: string
   audience: string
   objective: string
   position: string
 }): LiveBriefingSupportPanel[] {
-  const signal = `${room} ${audience} ${objective} ${position}`.toLowerCase()
-
-  if (/investor|capital|fundraising|raise|fund|terms|valuation/.test(signal)) {
-    return [
-      {
-        id: 'advice',
-        label: 'Adaptive support',
-        defaultLine: 'Default: observational advice.',
-        body: 'In this room, I may help you notice objections, timing pressure, hesitation, leverage, or movement toward terms.',
-        examples: [
-          'They do not sound convinced by that yet.',
-          'I think I would ask what specifically concerns them.',
-          'They seem to be moving toward terms.',
-        ],
-        why: 'Capital conversations often turn on credibility, timing, and what the other side is really testing.',
-      },
-      {
-        id: 'completion',
-        label: 'Continue',
-        defaultLine: 'Default: concise completion.',
-        body: 'If you want help continuing a thought, I may offer the next useful sentence without inventing facts.',
-        examples: [
-          'You: “Here is what we need…”',
-          'GEORGE: “…before we can move forward responsibly.”',
-          'You can use it, reword it, or ignore it.',
-        ],
-        why: 'Investor rooms reward clear sequencing and controlled answers.',
-      },
-      {
-        id: 'steering',
-        label: 'Adjustments',
-        defaultLine: 'Optional: natural phrases.',
-        body: 'You do not need steering phrases. If you use phrases like “let me think” or “one second,” I can treat them as signal to slow down, clarify, or hold position.',
-        examples: [
-          '“Let me think” can signal: buy time.',
-          '“Right” can signal: keep listening.',
-          '“One second” can signal: hold support unless needed.',
-        ],
-        why: 'Natural phrases let you adjust support without exposing GEORGE.',
-      },
-    ]
-  }
-
-  if (/interview|candidate|hiring|job|recruiter/.test(signal)) {
-    return [
-      {
-        id: 'advice',
-        label: 'Adaptive support',
-        defaultLine: 'Default: answer-shaping advice.',
-        body: 'In this room, I may help you notice when the interviewer wants an example, when an answer is too broad, or when to return to the question.',
-        examples: [
-          'I think I would answer that more directly.',
-          'They seem interested in the example.',
-          'I would probably bring this back to what you actually did.',
-        ],
-        why: 'Interviews often shift quickly from prepared answers to proof under pressure.',
-      },
-      {
-        id: 'completion',
-        label: 'Continue',
-        defaultLine: 'Default: recovery completion.',
-        body: 'If you want help continuing an answer, I may offer a next sentence that preserves your meaning and momentum.',
-        examples: [
-          'You: “The reason that mattered was…”',
-          'GEORGE: “…because it showed I could make a decision under pressure.”',
-          'Use it exactly, adjust it, or ignore it.',
-        ],
-        why: 'Unexpected questions can interrupt momentum; completion preserves continuity.',
-      },
-      {
-        id: 'steering',
-        label: 'Adjustments',
-        defaultLine: 'Optional: natural phrases.',
-        body: 'You do not need steering phrases. If you use phrases like “good question” or “let me think,” I can treat them as signal to organize the answer.',
-        examples: [
-          '“Good question” can signal: prepare a structured answer.',
-          '“Let me think” can signal: slow down.',
-          '“Can I clarify?” can signal: protect accuracy.',
-        ],
-        why: 'Natural phrases create time without making the room feel mechanical.',
-      },
-    ]
-  }
-
-  if (/doctor|medical|patient|symptom|treatment|physician/.test(signal)) {
-    return [
-      {
-        id: 'advice',
-        label: 'Adaptive support',
-        defaultLine: 'Default: clarification advice.',
-        body: 'In this room, I may help you notice when a question remains unanswered, when the next step is unclear, or when details should be repeated.',
-        examples: [
-          'I do not think they answered your concern yet.',
-          'I would ask what happens next.',
-          'I think I would repeat the timeline clearly.',
-        ],
-        why: 'Medical conversations require accuracy, sequence, and follow-through.',
-      },
-      {
-        id: 'completion',
-        label: 'Continue',
-        defaultLine: 'Default: factual completion.',
-        body: 'If you want help organizing symptoms, concerns, or questions, I may suggest a next sentence without creating facts.',
-        examples: [
-          'You: “What I want to understand is…”',
-          'GEORGE: “…what changes after today and what I should watch for.”',
-          'You remain responsible for the facts.',
-        ],
-        why: 'Completion should help organize facts, not create them.',
-      },
-      {
-        id: 'steering',
-        label: 'Adjustments',
-        defaultLine: 'Optional: natural phrases.',
-        body: 'You do not need steering phrases. If you use phrases like “I want to make sure I understand,” I can prioritize clarity and unanswered questions.',
-        examples: [
-          '“Can we slow down?” can signal: clarify.',
-          '“What are my options?” can signal: compare choices.',
-          '“I want to understand” can signal: plain language.',
-        ],
-        why: 'Natural phrases help you advocate without losing the room.',
-      },
-    ]
-  }
-
-  if (/negotiat|offer|deal|price|counter|buyer|seller/.test(signal)) {
-    return [
-      {
-        id: 'advice',
-        label: 'Adaptive support',
-        defaultLine: 'Default: leverage advice.',
-        body: 'In this room, I may help you notice pressure, concessions, unclear terms, or moments where asking another question is stronger than answering.',
-        examples: [
-          'They seem to be trying to speed this up.',
-          'I would probably ask what flexibility exists.',
-          'I do not think I would agree yet.',
-        ],
-        why: 'Negotiation depends on timing, control, and knowing when not to fill silence.',
-      },
-      {
-        id: 'completion',
-        label: 'Continue',
-        defaultLine: 'Default: controlled completion.',
-        body: 'If you want help advancing a position, I may suggest a next sentence that protects the outcome without escalating unnecessarily.',
-        examples: [
-          'You: “Here is what I need…”',
-          'GEORGE: “…before I can make a decision.”',
-          'Use it, reshape it, or ignore it.',
-        ],
-        why: 'A clean next sentence can prevent rushed concessions.',
-      },
-      {
-        id: 'steering',
-        label: 'Adjustments',
-        defaultLine: 'Optional: natural phrases.',
-        body: 'You do not need steering phrases. If you use phrases like “let me think” or “walk me through that,” I can treat them as signal to slow pressure or clarify terms.',
-        examples: [
-          '“Let me think” can signal: buy time.',
-          '“Walk me through that” can signal: make them explain.',
-          '“I am not rushing this” can signal: hold position.',
-        ],
-        why: 'Natural phrases let you control pace without exposing support.',
-      },
-    ]
-  }
-
   return [
     {
       id: 'advice',
       label: 'Adaptive support',
       defaultLine: 'Default: observational advice.',
-      body: 'In this room, I may help you notice confusion, pressure, drift, unanswered questions, or moments where the conversation should return to the objective.',
+      body: 'As the conversation develops, I may help you notice pressure, uncertainty, drift, unanswered questions, changing commitment, or moments where returning to the outcome would be useful.',
       examples: [
         'I think I would ask another question.',
-        'They seem unsure about that.',
-        'I would probably bring this back to the main point.',
+        'They seem uncertain about that.',
+        'I would bring this back to the outcome.',
       ],
-      why: 'Most rooms change through timing, pressure, and what people leave unsaid.',
+      why: 'GEORGE reasons from the objective, available signal, and what changes in the room—not from a separate room-specific playbook.',
     },
     {
       id: 'completion',
       label: 'Continue',
-      defaultLine: 'Default: conversational continuation.',
-      body: 'If you want help continuing a thought, I may suggest the next useful sentence while keeping you in control.',
+      defaultLine: 'Default: concise continuation.',
+      body: 'If you want help continuing a thought, I may suggest the next useful sentence while preserving your meaning, the desired outcome, and your control.',
       examples: [
         'You: “What matters most here…”',
         'GEORGE: “…is making sure we are solving the right problem.”',
         'Use it exactly, adjust it, or ignore it.',
       ],
-      why: 'Completion gives you access to the next useful sentence without taking control.',
+      why: 'Continuation supports the same outcome-oriented reasoning without creating facts or replacing your judgment.',
     },
     {
       id: 'steering',
       label: 'Adjustments',
       defaultLine: 'Optional: natural phrases.',
-      body: 'You do not need steering phrases. Over time, phrases like “hmm,” “right,” “let me think,” or “one second” can help GEORGE adapt more precisely.',
+      body: 'You do not need steering phrases. Natural phrases such as “let me think,” “help me understand,” or “one second” can provide additional signal about pace, clarity, or whether support should pause.',
       examples: [
         '“Let me think” can signal: slow down.',
-        '“Right” can signal: keep listening.',
+        '“Help me understand” can signal: clarify.',
         '“One second” can signal: hold support.',
       ],
-      why: 'Steering phrases are optional. GEORGE works without them.',
+      why: 'Steering phrases add signal to one GEORGE runtime; they do not switch to another intelligence or strategy engine.',
     },
   ]
 }
-
-
-
 
 type LiveOrientationIconKind =
   | 'conversation'
