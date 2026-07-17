@@ -101,16 +101,18 @@ export function LiveHubVisualCueBridge({
       at: now,
     })
 
-    const shouldSpeakCue =
-      receiverProfile !== 'visual_only' &&
-      voiceEnabled &&
-      cue.source === 'groq'
+  }, [receiverProfile, visualCue, voiceEnabled])
 
-    if (shouldSpeakCue) {
-      markRuntimeEvent(cue.turnId || clean, 'voice_cue_requested')
-      onSpeakCue?.(clean, cue.turnId)
-    }
-  }, [onSpeakCue, receiverProfile, visualCue, voiceEnabled])
+  const handleVoiceCue = useCallback((cue: GeorgeDeliveryCue) => {
+    const clean = String(cue.text || '')
+      .trim()
+      .replace(/^[“”"']+|[“”"']+$/g, '')
+
+    if (!clean) return
+
+    markRuntimeEvent(cue.turnId || clean, 'voice_cue_requested')
+    onSpeakCue?.(clean, cue.turnId)
+  }, [onSpeakCue])
 
   useEffect(() => {
     if (!active) {
@@ -180,7 +182,7 @@ export function LiveHubVisualCueBridge({
         receiverProfile={receiverProfile}
         voiceEnabled={voiceEnabled}
         onVisualCue={handleVisualCue}
-        onVoiceCue={handleVisualCue}
+        onVoiceCue={handleVoiceCue}
       />
 
       {active && visualCue && receiverProfile !== 'audio_only' && (
