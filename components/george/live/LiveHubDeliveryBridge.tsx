@@ -47,31 +47,22 @@ export function LiveHubDeliveryBridge({
     const unsubscribe = adapter.subscribe((event) => {
       if (event.type !== 'ACTION_CUE') return
 
-      const resolvedDeliveryCues = routeGeorgeDeliveryCues({
-        actionCue: event,
-        context: {
-          voiceEnabled,
-          receiverProfile,
-          deliveryStyle,
-          room: context.room,
-          objective: context.objective,
-          knownContext: context.knownContext,
-        },
-      }).map((deliveryCue) => ({
-        ...deliveryCue,
-        turnId: event.turnId || deliveryCue.turnId,
-      }))
-
-      const resolvedDeliveryCue =
-        resolvedDeliveryCues.find((cue) => cue.mode !== 'silent') ||
-        resolvedDeliveryCues[0]
-
-      if (!resolvedDeliveryCue) return
-
+      /*
+       * Behavior is resolved before receiver routing.
+       *
+       * The Behavior Composer determines what GEORGE should do. The delivery
+       * router then shapes that same behavior independently for each active
+       * receiver surface.
+       */
       const responseModePlaceholder =
         deliveryStyle === 'response' &&
         event.source === 'local' &&
-        /^(clarify before answering\.?|ask for clarification\.?|clarify\.?)/i.test(resolvedDeliveryCue.text.trim())
+        /^(clarify before answering\.?|ask for clarification\.?|clarify\.?)/i.test(
+          String(event.cue || '').trim()
+        )
+
+      let actionCueForDelivery = event
+      let behaviorFallbackReason: string | undefined
 
       if (responseModePlaceholder) {
         const behaviorDecision = composeGeorgeSupportBehavior({
@@ -87,27 +78,43 @@ export function LiveHubDeliveryBridge({
               ? 'Buy a second. Ask them to clarify what they mean.'
               : 'Clarify before answering.'
 
-        const fallbackCue = {
-          ...resolvedDeliveryCue,
-          text: fallbackText,
-          reason: behaviorDecision.reason,
-          category: 'operational_guidance' as const,
-          confidence: Math.max(resolvedDeliveryCue.confidence || 0, 0.7),
-          priority: Math.max(resolvedDeliveryCue.priority || 0, 7),
+        behaviorFallbackReason = behaviorDecision.reason
+        actionCueForDelivery = {
+          ...event,
+          cue: fallbackText,
+          category: 'operational_guidance',
+          confidence: Math.max(event.confidence || 0, 0.7),
+          priority: Math.max(event.priority || 0, 7),
         }
 
         console.info('[LIVE][hub][delivery][behavior-fallback]', {
           operationalResource: behaviorDecision.operationalResource,
           reason: behaviorDecision.reason,
-          fallbackCue,
+          actionCue: actionCueForDelivery,
         })
-
-        resolvedDeliveryCue.text = fallbackCue.text
-        resolvedDeliveryCue.reason = fallbackCue.reason
-        resolvedDeliveryCue.category = fallbackCue.category
-        resolvedDeliveryCue.confidence = fallbackCue.confidence
-        resolvedDeliveryCue.priority = fallbackCue.priority
       }
+
+      const resolvedDeliveryCues = routeGeorgeDeliveryCues({
+        actionCue: actionCueForDelivery,
+        context: {
+          voiceEnabled,
+          receiverProfile,
+          deliveryStyle,
+          room: context.room,
+          objective: context.objective,
+          knownContext: context.knownContext,
+        },
+      }).map((deliveryCue) => ({
+        ...deliveryCue,
+        turnId: event.turnId || deliveryCue.turnId,
+        reason: behaviorFallbackReason || deliveryCue.reason,
+      }))
+
+      const resolvedDeliveryCue =
+        resolvedDeliveryCues.find((cue) => cue.mode !== 'silent') ||
+        resolvedDeliveryCues[0]
+
+      if (!resolvedDeliveryCue) return
 
       const deliveryKey = resolvedDeliveryCue.turnId || resolvedDeliveryCue.text
       const previousDelivery = deliveredCueByTurnRef.current[deliveryKey]
