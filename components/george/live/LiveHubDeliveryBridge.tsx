@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
-import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-router'
+import { routeGeorgeDeliveryCues } from '@/lib/george/live-delivery/delivery-router'
 import { evaluateGeorgeDeliveryCommitment } from '@/lib/george/live-delivery/delivery-commitment'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { composeGeorgeSupportBehavior } from '@/lib/george/live-runtime/support-behavior-composer'
@@ -11,7 +11,6 @@ import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/appr
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type {
   GeorgeDeliveryCue,
-  GeorgeDeliveryMode,
   GeorgeLiveDeliveryStyle,
   GeorgeLiveReceiverProfile,
 } from '@/lib/george/live-delivery/types'
@@ -19,7 +18,6 @@ import type {
 type LiveHubDeliveryBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
-  mode?: GeorgeDeliveryMode
   deliveryStyle?: GeorgeLiveDeliveryStyle
   receiverProfile?: GeorgeLiveReceiverProfile
   voiceEnabled?: boolean
@@ -31,10 +29,9 @@ type LiveHubDeliveryBridgeProps = {
 export function LiveHubDeliveryBridge({
   active,
   context,
-  mode = 'visual',
   deliveryStyle = 'advice',
   receiverProfile,
-  voiceEnabled = mode === 'voice',
+  voiceEnabled = false,
   onVisualCue,
   onVoiceCue,
   onSilentCue,
@@ -50,7 +47,7 @@ export function LiveHubDeliveryBridge({
     const unsubscribe = adapter.subscribe((event) => {
       if (event.type !== 'ACTION_CUE') return
 
-      const deliveryCue = routeGeorgeDeliveryCue({
+      const resolvedDeliveryCues = routeGeorgeDeliveryCues({
         actionCue: event,
         context: {
           voiceEnabled,
@@ -60,13 +57,16 @@ export function LiveHubDeliveryBridge({
           objective: context.objective,
           knownContext: context.knownContext,
         },
-      })
-
-      const resolvedDeliveryCue = {
+      }).map((deliveryCue) => ({
         ...deliveryCue,
         turnId: event.turnId || deliveryCue.turnId,
-        mode,
-      }
+      }))
+
+      const resolvedDeliveryCue =
+        resolvedDeliveryCues.find((cue) => cue.mode !== 'silent') ||
+        resolvedDeliveryCues[0]
+
+      if (!resolvedDeliveryCue) return
 
       const responseModePlaceholder =
         deliveryStyle === 'response' &&
@@ -151,21 +151,23 @@ export function LiveHubDeliveryBridge({
 
       commitGeorgeApprovedLiveDelivery(resolvedDeliveryCue)
 
-      console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
+      for (const routedCue of resolvedDeliveryCues) {
+        console.info('[LIVE][hub][delivery] DELIVERY_CUE', routedCue)
 
-      markRuntimeEvent(resolvedDeliveryCue.turnId || deliveryKey, 'delivery_cue')
+        markRuntimeEvent(routedCue.turnId || deliveryKey, 'delivery_cue')
 
-      if (resolvedDeliveryCue.mode === 'visual') {
-        onVisualCue?.(resolvedDeliveryCue)
-        return
+        if (routedCue.mode === 'visual') {
+          onVisualCue?.(routedCue)
+          continue
+        }
+
+        if (routedCue.mode === 'voice') {
+          onVoiceCue?.(routedCue)
+          continue
+        }
+
+        onSilentCue?.(routedCue)
       }
-
-      if (resolvedDeliveryCue.mode === 'voice') {
-        onVoiceCue?.(resolvedDeliveryCue)
-        return
-      }
-
-      onSilentCue?.(resolvedDeliveryCue)
     })
 
     return () => {
@@ -173,7 +175,6 @@ export function LiveHubDeliveryBridge({
     }
   }, [
     active,
-    mode,
     context.room,
     context.chair,
     context.objective,
