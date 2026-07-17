@@ -10,23 +10,3 @@ export function detectLiveOutcomeSignal(text: string): LiveOutcomeSignal | null 
 
   return null
 }
-
-export function recordLiveOutcomeSignal(params: {
-  signal: LiveOutcomeSignal
-  text: string
-  now?: number
-  limit?: number
-}) {
-  if (typeof window === 'undefined') return
-
-  const history = JSON.parse(window.localStorage.getItem('GEORGE_OUTCOMES') || '[]')
-  history.unshift({
-    signal: params.signal,
-    text: params.text,
-    ts: params.now || Date.now(),
-  })
-  window.localStorage.setItem(
-    'GEORGE_OUTCOMES',
-    JSON.stringify(history.slice(0, params.limit || 50))
-  )
-}

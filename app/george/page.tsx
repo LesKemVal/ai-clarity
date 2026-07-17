@@ -29,7 +29,8 @@ import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-
 import { consumeFreshNormalBrowserSessionRequest, createSession, ensureGeorgeBrowserInstanceScope, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
-import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
+import { detectLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
+import { recordLiveOutcomeSignal } from '@/lib/george/live-host/live-outcome-observation'
 import { readGeorgeNormalDraft } from '@/lib/george/live-host/draft-restoration'
 import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import {
