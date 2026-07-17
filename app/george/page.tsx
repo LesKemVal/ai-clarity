@@ -41,13 +41,15 @@ import {
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 import {
   applyPreparedRuntimeMemory,
+  type LivePrepSetup,
+} from '@/lib/george/live-runtime/prep-runtime'
+import {
+  consumePreparedLiveSetup,
   markLiveRuntimeStarted,
   persistActiveLiveRuntimeSupport,
   readActiveLiveRuntimeSupport,
-  consumePreparedLiveSetup,
-  reconcileActiveLiveRuntimeUsage,
-  type LivePrepSetup,
-} from '@/lib/george/live-runtime/prep-runtime'
+} from '@/lib/george/live-host/live-prep-storage'
+import { reconcileActiveLiveRuntimeUsage } from '@/lib/george/live-host/live-runtime-usage'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
