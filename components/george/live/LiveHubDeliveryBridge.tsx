@@ -9,13 +9,20 @@ import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { composeGeorgeSupportBehavior } from '@/lib/george/live-runtime/support-behavior-composer'
 import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
-import type { GeorgeDeliveryCue, GeorgeDeliveryMode, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
+import type {
+  GeorgeDeliveryCue,
+  GeorgeDeliveryMode,
+  GeorgeLiveDeliveryStyle,
+  GeorgeLiveReceiverProfile,
+} from '@/lib/george/live-delivery/types'
 
 type LiveHubDeliveryBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   mode?: GeorgeDeliveryMode
   deliveryStyle?: GeorgeLiveDeliveryStyle
+  receiverProfile?: GeorgeLiveReceiverProfile
+  voiceEnabled?: boolean
   onVisualCue?: (cue: GeorgeDeliveryCue) => void
   onVoiceCue?: (cue: GeorgeDeliveryCue) => void
   onSilentCue?: (cue: GeorgeDeliveryCue) => void
@@ -26,6 +33,8 @@ export function LiveHubDeliveryBridge({
   context,
   mode = 'visual',
   deliveryStyle = 'advice',
+  receiverProfile,
+  voiceEnabled = mode === 'voice',
   onVisualCue,
   onVoiceCue,
   onSilentCue,
@@ -44,7 +53,8 @@ export function LiveHubDeliveryBridge({
       const deliveryCue = routeGeorgeDeliveryCue({
         actionCue: event,
         context: {
-          voiceEnabled: mode === 'voice',
+          voiceEnabled,
+          receiverProfile,
           deliveryStyle,
           room: context.room,
           objective: context.objective,
@@ -170,6 +180,8 @@ export function LiveHubDeliveryBridge({
     context.knownContext,
     context.userPosition,
     deliveryStyle,
+    receiverProfile,
+    voiceEnabled,
     onVisualCue,
     onVoiceCue,
     onSilentCue,

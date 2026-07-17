@@ -5,15 +5,16 @@ import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { subscribeGeorgeApprovedDeliveryReplay } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
-import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
-
-type LiveHubReceiverProfile = 'visual_only' | 'audio_visual' | 'audio_only'
+import type {
+  GeorgeDeliveryCue,
+  GeorgeLiveReceiverProfile,
+} from '@/lib/george/live-delivery/types'
 
 type LiveHubVisualCueBridgeProps = {
   active: boolean
   context: GeorgeLiveHubContext
   voiceEnabled?: boolean
-  receiverProfile?: LiveHubReceiverProfile
+  receiverProfile?: GeorgeLiveReceiverProfile
   onSpeakCue?: (cue: string, turnId?: string) => void
 }
 
@@ -177,6 +178,8 @@ export function LiveHubVisualCueBridge({
         context={context}
         mode={receiverProfile === 'audio_only' ? 'voice' : 'visual'}
         deliveryStyle={context.deliveryStyle as any}
+        receiverProfile={receiverProfile}
+        voiceEnabled={voiceEnabled}
         onVisualCue={handleVisualCue}
         onVoiceCue={handleVisualCue}
       />
