@@ -11,6 +11,7 @@ import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
 import { determineLiveVoiceSpeed } from '@/lib/george/live-delivery/voice-speed-policy'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { getLastGeorgeApprovedLiveDelivery, replayLastGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
+import { buildGeorgeApprovedDeliveryRewordRequest } from '@/lib/george/live-runtime/approved-delivery-transform'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -5837,15 +5838,20 @@ return (
           } catch {}
 
           const approvedDelivery = getLastGeorgeApprovedLiveDelivery()
+          const rewordRequest =
+            approvedDelivery && choice === 'natural'
+              ? buildGeorgeApprovedDeliveryRewordRequest({
+                  delivery: approvedDelivery,
+                  choice,
+                })
+              : null
 
-          if (approvedDelivery?.text) {
-            void handleSend(
-              `Reword this already-approved LIVE support to sound ${choice}. Preserve its meaning, outcome, and factual boundaries. Do not add a new recommendation or unsupported claim. Return only the reworded support:\n\n${approvedDelivery.text}`
-            )
+          if (rewordRequest) {
+            void handleSend(rewordRequest)
           }
 
           setToastMessage(
-            approvedDelivery?.text
+            rewordRequest
               ? `Communication: ${nextStyle}. Rewording current support.`
               : `Communication: ${nextStyle}`
           )
