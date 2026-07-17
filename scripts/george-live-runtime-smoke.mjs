@@ -9,6 +9,8 @@ const root = process.cwd()
 const pageSource = readFileSync(`${root}/app/george/page.tsx`, 'utf8')
 const statusPanelSource = readFileSync(`${root}/components/george/live/LiveRoomStatusPanel.tsx`, 'utf8')
 const deliveryRouterSource = readFileSync(`${root}/lib/george/live-delivery/delivery-router.ts`, 'utf8')
+const receiverPolicySource = readFileSync(`${root}/lib/george/live-delivery/receiver-policy.ts`, 'utf8')
+const deliveryBridgeSource = readFileSync(`${root}/components/george/live/LiveHubDeliveryBridge.tsx`, 'utf8')
 
 assert(
   pageSource.includes('cycleLiveReceiverProfile'),
@@ -82,8 +84,46 @@ assert(
 )
 
 assert(
-  deliveryRouterSource.includes('receiverProfile'),
-  'LIVE delivery router should shape delivery by receiver profile'
+  deliveryRouterSource.includes('resolveGeorgeReceiverDeliveryPolicy'),
+  'LIVE delivery router should delegate receiver realization to canonical receiver policy'
+)
+
+assert(
+  !deliveryRouterSource.includes('function shapeAudioText') &&
+    !deliveryRouterSource.includes('function shapeVisualOnlyText') &&
+    !deliveryRouterSource.includes('function resolveDeliveryModes'),
+  'LIVE delivery router must not duplicate receiver-specific shaping or surface selection'
+)
+
+assert(
+  receiverPolicySource.includes('export function resolveGeorgeReceiverDeliveryPolicy'),
+  'LIVE receiver policy should expose the canonical receiver realization boundary'
+)
+
+assert(
+  receiverPolicySource.includes("receiverProfile === 'visual_only'") &&
+    receiverPolicySource.includes("receiverProfile === 'audio_only'") &&
+    receiverPolicySource.includes("['voice', 'visual']"),
+  'LIVE receiver policy should explicitly support visual-only, audio-only, and audio-visual profiles'
+)
+
+assert(
+  receiverPolicySource.includes('shapeAudioText') &&
+    receiverPolicySource.includes('shapeVisualOnlyText') &&
+    receiverPolicySource.includes('shapeVisualReferenceText'),
+  'LIVE receiver policy should own distinct audio, visual-only, and audio-visual reference shaping'
+)
+
+assert(
+  receiverPolicySource.includes("return input.voiceEnabled ? ['voice'] : ['silent']"),
+  'Audio-only receiver policy should suppress unavailable audio instead of creating an unauthorized visual fallback'
+)
+
+assert(
+  deliveryBridgeSource.includes('routeGeorgeDeliveryCues') &&
+    !deliveryBridgeSource.includes('shapeAudioText') &&
+    !deliveryBridgeSource.includes('shapeVisualOnlyText'),
+  'LIVE delivery bridge should dispatch routed cues without owning receiver shaping'
 )
 
 console.log('GEORGE LIVE runtime smoke passed')
