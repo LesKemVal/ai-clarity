@@ -22,6 +22,7 @@ export function LiveHubShadowBridge({
   const lastForwardedTranscriptRef = useRef('')
   const lastTurnIdRef = useRef('')
   const pendingFinalTranscriptRef = useRef('')
+  const pendingFinalTurnIdRef = useRef('')
   const finalTranscriptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     if (!active) return
@@ -76,7 +77,11 @@ export function LiveHubShadowBridge({
     const clean = String(transcript || '').trim()
     if (!clean) return
 
-    const forwardTranscript = (text: string, isFinal: boolean) => {
+    const forwardTranscript = (
+      text: string,
+      isFinal: boolean,
+      existingTurnId?: string
+    ) => {
       if (!text) return
       if (lastForwardedTranscriptRef.current === text) return
 
@@ -87,12 +92,20 @@ export function LiveHubShadowBridge({
         isFinal,
       })
 
-      const turnId = `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      const turnId =
+        existingTurnId ||
+        `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
       lastTurnIdRef.current = turnId
 
       markRuntimeEvent(turnId, 'transcript_input')
 
-      getGeorgeLiveHubRuntimeAdapter().sendTranscript(text, isFinal, turnId, context.deliveryStyle)
+      getGeorgeLiveHubRuntimeAdapter().sendTranscript(
+        text,
+        isFinal,
+        turnId,
+        context.deliveryStyle
+      )
       markRuntimeEvent(turnId, 'hub_transcript_sent')
     }
 
@@ -107,15 +120,35 @@ export function LiveHubShadowBridge({
       .replace(/\s+/g, ' ')
       .trim()
 
+    if (!pendingFinalTurnIdRef.current) {
+      pendingFinalTurnIdRef.current =
+        `live-hub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+      markRuntimeEvent(
+        pendingFinalTurnIdRef.current,
+        'final_transcript_buffer_started'
+      )
+    } else {
+      markRuntimeEvent(
+        pendingFinalTurnIdRef.current,
+        'final_transcript_buffer_extended'
+      )
+    }
+
     if (finalTranscriptTimerRef.current) {
       clearTimeout(finalTranscriptTimerRef.current)
     }
 
     finalTranscriptTimerRef.current = setTimeout(() => {
       const finalText = pendingFinalTranscriptRef.current.trim()
+      const finalTurnId = pendingFinalTurnIdRef.current
+
       pendingFinalTranscriptRef.current = ''
+      pendingFinalTurnIdRef.current = ''
       finalTranscriptTimerRef.current = null
-      forwardTranscript(finalText, true)
+
+      markRuntimeEvent(finalTurnId, 'final_transcript_buffer_released')
+      forwardTranscript(finalText, true, finalTurnId)
     }, 275)
 
     return () => {

@@ -6,6 +6,9 @@ export type GeorgeRuntimeMetricEvent =
   | 'first_audio_chunk_sent'
   | 'deepgram_interim'
   | 'deepgram_final'
+  | 'final_transcript_buffer_started'
+  | 'final_transcript_buffer_extended'
+  | 'final_transcript_buffer_released'
   | 'transcript_input'
   | 'hub_transcript_queued'
   | 'hub_transcript_flushed'
@@ -46,7 +49,13 @@ export function markRuntimeEvent(
 ) {
   const now = Date.now()
 
-  if (event === 'transcript_input' && !turnStarts.has(turnId)) {
+  if (
+    (
+      event === 'final_transcript_buffer_started' ||
+      event === 'transcript_input'
+    ) &&
+    !turnStarts.has(turnId)
+  ) {
     turnStarts.set(turnId, now)
   }
 
