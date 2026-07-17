@@ -106,6 +106,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
               intangibleObjective: currentContext.intangibleObjective,
               userPosition: currentContext.userPosition,
               deliveryStyle: currentContext.deliveryStyle,
+              runtimeSnapshot: currentContext.runtimeSnapshot,
             }
             if (!cleanCue) {
               console.info('[LIVE][hub][adapter] dropped empty ACTION_CUE', event)

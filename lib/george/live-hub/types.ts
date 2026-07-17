@@ -1,5 +1,7 @@
 import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
+export type GeorgeRuntimeAuthoritySnapshot = Readonly<Record<string, unknown>>
+
 export type GeorgeActionCueEvidence = {
   // transcript is the latest/governing utterance.
   transcript?: string
@@ -15,6 +17,11 @@ export type GeorgeActionCueEvidence = {
   userPosition?: string
   deliveryStyle?: GeorgeLiveDeliveryStyle
   runtimeIntent?: string
+  /**
+   * Canonical decision already produced by resolveGeorgeRuntimePipeline().
+   * LIVE carries this snapshot unchanged and must not recompute its strategy.
+   */
+  runtimeSnapshot?: GeorgeRuntimeAuthoritySnapshot
 }
 
 export type GeorgeActionCue = {
@@ -42,6 +49,11 @@ export type GeorgeLiveHubContext = {
   intangibleObjective?: string
   userPosition?: string
   deliveryStyle?: GeorgeLiveDeliveryStyle
+  /**
+   * Existing canonical runtime snapshot for the governing turn.
+   * This is a transport carrier, not a second reasoning contract.
+   */
+  runtimeSnapshot?: GeorgeRuntimeAuthoritySnapshot
 }
 
 export type GeorgeLiveHubEvent =

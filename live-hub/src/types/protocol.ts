@@ -1,3 +1,5 @@
+export type GeorgeRuntimeAuthoritySnapshot = Readonly<Record<string, unknown>>
+
 export type LiveHubDeliveryStyle =
   | 'silent'
   | 'cue'
@@ -20,6 +22,11 @@ export type GeorgeActionCueEvidence = {
   userPosition?: string
   deliveryStyle?: LiveHubDeliveryStyle
   runtimeIntent?: string
+  /**
+   * Canonical runtime decision produced before LIVE execution.
+   * The Hub may carry and consume it but may not replace its strategy.
+   */
+  runtimeSnapshot?: GeorgeRuntimeAuthoritySnapshot
 }
 
 export type LiveHubContext = {
@@ -33,6 +40,11 @@ export type LiveHubContext = {
   intangibleObjective?: string
   userPosition?: string
   deliveryStyle?: LiveHubDeliveryStyle
+  /**
+   * Existing canonical runtime snapshot for the governing turn.
+   * This is transported unchanged rather than reconstructed in the Hub.
+   */
+  runtimeSnapshot?: GeorgeRuntimeAuthoritySnapshot
 }
 
 export type ClientMessage =

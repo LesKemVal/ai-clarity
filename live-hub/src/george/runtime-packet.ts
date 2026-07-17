@@ -19,6 +19,7 @@ export type GeorgeRuntimePacket = {
   userPosition?: string
   deliveryStyle: LiveHubDeliveryStyle
   runtimeIntent: GeorgeRuntimeIntent
+  runtimeSnapshot?: LiveHubContext['runtimeSnapshot']
   cue: string
   reason: string
   category: string
@@ -60,6 +61,7 @@ export function buildRuntimePacket(input: {
       deliveryStyle: input.context.deliveryStyle || 'cue',
       category: input.cue.category,
     }),
+    runtimeSnapshot: input.context.runtimeSnapshot,
     cue: input.cue.cue,
     reason: input.cue.reason,
     category: input.cue.category,

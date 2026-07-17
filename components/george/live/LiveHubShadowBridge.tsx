@@ -68,6 +68,7 @@ export function LiveHubShadowBridge({
     context.secondaryObjective,
     context.intangibleObjective,
     context.deliveryStyle,
+    context.runtimeSnapshot,
   ])
 
   useEffect(() => {

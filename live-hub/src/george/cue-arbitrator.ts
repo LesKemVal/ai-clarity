@@ -30,6 +30,7 @@ function buildActionCueEvidence(packet: GeorgeRuntimePacket): GeorgeActionCueEvi
     userPosition: packet.userPosition,
     deliveryStyle: packet.deliveryStyle,
     runtimeIntent: packet.runtimeIntent,
+    runtimeSnapshot: packet.runtimeSnapshot,
   }
 }
 
