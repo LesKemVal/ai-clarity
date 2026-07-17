@@ -176,7 +176,6 @@ export function LiveHubVisualCueBridge({
       <LiveHubDeliveryBridge
         active={active}
         context={context}
-        mode={receiverProfile === 'audio_only' ? 'voice' : 'visual'}
         deliveryStyle={context.deliveryStyle as any}
         receiverProfile={receiverProfile}
         voiceEnabled={voiceEnabled}
