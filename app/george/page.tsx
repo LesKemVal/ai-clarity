@@ -52,7 +52,7 @@ import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-bri
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
-import { recordLiveSupportPreference } from '@/lib/george/live-runtime/live-support-preferences'
+import { recordLiveSupportPreference } from '@/lib/george/live-host/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import type { LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
 import { buildLiveInteractionContinuity, buildLiveOutcomeReview } from '@/lib/george/live-runtime/live-interaction-continuity'

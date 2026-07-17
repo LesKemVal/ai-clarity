@@ -1,4 +1,4 @@
-import { rankLiveSupportTags } from './live-support-preferences'
+import { rankLiveSupportTags } from './live-support-ranking'
 
 export type LiveFastPathResult =
   | {
@@ -27,7 +27,8 @@ export function tryLiveFastPath(params: {
 
   if (!input) return { handled: false }
 
-  const serve = (tags: string[]) => rankLiveSupportTags(tags)
+  const serve = (tags: string[]) =>
+    rankLiveSupportTags(tags, params.preferredServingTags)
 
   if (/^(can you hear me|are you listening|you there)[?.!\s]*$/i.test(input)) {
     return {

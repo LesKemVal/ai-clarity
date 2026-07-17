@@ -1,9 +1,6 @@
-export type LiveSupportTag =
-  | 'Continuation'
-  | 'Cues'
-  | 'Advise'
-  | 'Outcome'
-  | 'Close'
+import type { LiveSupportTag } from '@/lib/george/live-runtime/live-support-ranking'
+
+export type { LiveSupportTag }
 
 export type LiveSupportPreferenceProfile = {
   liked: Record<string, number>
@@ -31,7 +28,10 @@ export function readLiveSupportPreferenceProfile(): LiveSupportPreferenceProfile
     const parsed = JSON.parse(raw)
     return {
       liked: parsed?.liked && typeof parsed.liked === 'object' ? parsed.liked : {},
-      disliked: parsed?.disliked && typeof parsed.disliked === 'object' ? parsed.disliked : {},
+      disliked:
+        parsed?.disliked && typeof parsed.disliked === 'object'
+          ? parsed.disliked
+          : {},
       updatedAt: Number(parsed?.updatedAt || Date.now()),
     }
   } catch {
@@ -59,19 +59,16 @@ export function recordLiveSupportPreference(params: {
   }
 
   profile.updatedAt = Date.now()
-  window.localStorage.setItem(LIVE_SUPPORT_PREFERENCES_KEY, JSON.stringify(profile))
+  window.localStorage.setItem(
+    LIVE_SUPPORT_PREFERENCES_KEY,
+    JSON.stringify(profile)
+  )
   return profile
 }
 
-export function rankLiveSupportTags(tags: string[], profile = readLiveSupportPreferenceProfile()) {
-  return [...tags].sort((a, b) => {
-    const scoreA = (profile.liked[a] || 0) - (profile.disliked[a] || 0)
-    const scoreB = (profile.liked[b] || 0) - (profile.disliked[b] || 0)
-    return scoreB - scoreA
-  })
-}
-
-export function getPreferredLiveSupportTags(profile = readLiveSupportPreferenceProfile()) {
+export function getPreferredLiveSupportTags(
+  profile = readLiveSupportPreferenceProfile()
+) {
   const allTags = Array.from(
     new Set([
       ...Object.keys(profile.liked || {}),
@@ -80,10 +77,15 @@ export function getPreferredLiveSupportTags(profile = readLiveSupportPreferenceP
   )
 
   return allTags
-    .filter((tag) => (profile.liked[tag] || 0) - (profile.disliked[tag] || 0) > 0)
+    .filter(
+      (tag) =>
+        (profile.liked[tag] || 0) - (profile.disliked[tag] || 0) > 0
+    )
     .sort((a, b) => {
-      const scoreA = (profile.liked[a] || 0) - (profile.disliked[a] || 0)
-      const scoreB = (profile.liked[b] || 0) - (profile.disliked[b] || 0)
+      const scoreA =
+        (profile.liked[a] || 0) - (profile.disliked[a] || 0)
+      const scoreB =
+        (profile.liked[b] || 0) - (profile.disliked[b] || 0)
       return scoreB - scoreA
     })
     .slice(0, 3)

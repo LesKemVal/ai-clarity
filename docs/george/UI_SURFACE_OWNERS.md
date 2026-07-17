@@ -159,7 +159,7 @@
 - `lib/george/core/build-interpretation.ts`
 - `lib/george/live-runtime/outcome-reassessment.ts`
 - `lib/george/live-runtime/live-fast-path.ts`
-- `lib/george/live-runtime/live-support-preferences.ts`
+- `lib/george/live-host/live-support-preferences.ts`
 - `lib/george/live-runtime/live-runtime-context.ts`
 - `lib/george/live-runtime/live-outcome-review.ts`
 - `lib/george/live-runtime/live-interaction-continuity.ts`
@@ -403,7 +403,7 @@
 - `lib/george/core/build-interpretation.ts` — `65d26254da2552abbcb4dd699db088a0ea35ae1d48ddcbd1f03f0cf7cac14113`
 - `lib/george/live-runtime/outcome-reassessment.ts` — `7b90682bc3a9ca5c1d365cb15a15343c84c6538597bdb9a9c41f062b92f0697b`
 - `lib/george/live-runtime/live-fast-path.ts` — `287400316fcf40cf3fa48af2408b2e802e1d1a3080d2cf5c4899e244b5696f6c`
-- `lib/george/live-runtime/live-support-preferences.ts` — `ad1d01375ef1d2df6f789a2b4b76f62a7a768adc17e5d986162f85dd1ac3d5cd`
+- `lib/george/live-host/live-support-preferences.ts` — `ad1d01375ef1d2df6f789a2b4b76f62a7a768adc17e5d986162f85dd1ac3d5cd`
 - `lib/george/live-runtime/live-runtime-context.ts` — `04e3055cc21b11bc917a62aeffe5b77418b41f21dc85f3323b4e5c5ab7764c6f`
 - `lib/george/live-runtime/live-outcome-review.ts` — `5f892d34b17f98f186a27ea6425a50c8df38a796203be7786d567e66d4592408`
 - `lib/george/live-runtime/live-interaction-continuity.ts` — `45f0bbea4b5b92b3bed9f133d75a0c19d4b452572b34f196377d23958ff78cb7`
