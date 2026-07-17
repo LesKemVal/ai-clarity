@@ -30,7 +30,7 @@ import { consumeFreshNormalBrowserSessionRequest, createSession, ensureGeorgeBro
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
 import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-runtime/session-controller'
 import { detectLiveOutcomeSignal, recordLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
-import { readGeorgeNormalDraft } from '@/lib/george/live-runtime/draft-restoration'
+import { readGeorgeNormalDraft } from '@/lib/george/live-host/draft-restoration'
 import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import {
   getPostResponseSuggestedPrompts,

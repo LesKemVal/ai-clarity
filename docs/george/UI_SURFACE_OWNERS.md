@@ -150,7 +150,7 @@
 - `lib/george/session-authority.ts`
 - `lib/george/live-runtime/session-controller.ts`
 - `lib/george/live-runtime/live-outcome-observation.ts`
-- `lib/george/live-runtime/draft-restoration.ts`
+- `lib/george/live-host/draft-restoration.ts`
 - `lib/george/training/training-helpers.ts`
 - `lib/george/prompts/suggested-prompts.ts`
 - `lib/george/operator/load-runtime-overlay.ts`
@@ -316,7 +316,7 @@
 - `app/george/page.tsx:6121` — `}) : (normalConversationStarted ? messages : []))`
 - `app/george/page.tsx:6635` — `{showLiveEntrySequence && (forceLive || liveMode) && (forceLive || messages.length === 0) && (`
 - `lib/george/live-runtime/session-controller.ts:90` — `candidate.messages.length === 0`
-- `lib/george/live-runtime/draft-restoration.ts:37` — `if (!draft || !Array.isArray(draft.messages) || draft.messages.length === 0) {`
+- `lib/george/live-host/draft-restoration.ts:37` — `if (!draft || !Array.isArray(draft.messages) || draft.messages.length === 0) {`
 - `lib/george/runtime/operational-judgment.ts:186` — `evidence.hasConversationOutcome`
 - `lib/george/runtime/intent-state.ts:92` — `(input.messages.length > 10 ? 0.25 : 0)`
 - `lib/george/runtime/live-recommendation-governor.ts:17` — `hasConversationOutcome: boolean`
@@ -394,7 +394,7 @@
 - `lib/george/session-authority.ts` — `6b403e7b423debc1c3ef1edaa0c7a221e87379350dff789c4d436ff36b3db73b`
 - `lib/george/live-runtime/session-controller.ts` — `2c4f7eb0dd3c47e834b5b89d59274e7e2aca1bcec06a70e50e558f61abbccf15`
 - `lib/george/live-runtime/live-outcome-observation.ts` — `3a9b3462ccf5b2a701ff83e4493e77100be16d8381e84c43873d72cba39b07e4`
-- `lib/george/live-runtime/draft-restoration.ts` — `42c3c9be1521f3f87cf6444cecd1db77e8ac2cfcb23af70f236e0018e460ae9d`
+- `lib/george/live-host/draft-restoration.ts` — `42c3c9be1521f3f87cf6444cecd1db77e8ac2cfcb23af70f236e0018e460ae9d`
 - `lib/george/training/training-helpers.ts` — `a9e5bad758276ed22a06014080fe9ca54c651ee6de7954a75e575e7e5977c85a`
 - `lib/george/prompts/suggested-prompts.ts` — `bdf23a1995137ad4166fa9d090e3049dcd2aaf2193df0641e93921d06e3b38ae`
 - `lib/george/operator/load-runtime-overlay.ts` — `992aa6c9bedb85ec83679700062e9faf4965daa3f9fc4a2f6fa46748a3e46683`
