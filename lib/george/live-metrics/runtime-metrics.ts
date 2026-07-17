@@ -29,8 +29,15 @@ export type GeorgeRuntimeMetricEvent =
   | 'tts_playback_start'
   | 'tts_playback_end'
 
+export type GeorgeRuntimeMetricRecord = {
+  event: GeorgeRuntimeMetricEvent
+  at: number
+  latencyMs?: number
+  sincePreviousMs?: number
+}
+
 const turnStarts = new Map<string, number>()
-const turnEvents = new Map<string, GeorgeRuntimeMetricEvent[]>()
+const turnEvents = new Map<string, GeorgeRuntimeMetricRecord[]>()
 
 export function startRuntimeTurn(turnId: string) {
   const now = Date.now()
@@ -60,15 +67,25 @@ export function markRuntimeEvent(
   }
 
   const start = turnStarts.get(turnId)
-  const timeline = [...(turnEvents.get(turnId) || []), event]
-  turnEvents.set(turnId, timeline)
+  const previousRecords = turnEvents.get(turnId) || []
+  const previous = previousRecords[previousRecords.length - 1]
+  const record: GeorgeRuntimeMetricRecord = {
+    event,
+    at: now,
+    latencyMs: start ? now - start : undefined,
+    sincePreviousMs: previous ? now - previous.at : undefined,
+  }
+  const records = [...previousRecords, record]
+  turnEvents.set(turnId, records)
 
+  const timeline = records.map((entry) => entry.event)
   const contract = validateLatencyTimeline(timeline, turnId)
 
   console.info('[LIVE][metrics]', {
     event,
     turnId,
-    latencyMs: start ? now - start : undefined,
+    latencyMs: record.latencyMs,
+    sincePreviousMs: record.sincePreviousMs,
     at: now,
     latencyContract: {
       complete: contract.complete,
@@ -87,12 +104,37 @@ export function markRuntimeEvent(
   }
 }
 
+export function getRuntimeTurnMetricRecords(turnId: string) {
+  return (turnEvents.get(turnId) || []).map((record) => ({ ...record }))
+}
+
 export function getRuntimeTurnTimeline(turnId: string) {
-  return [...(turnEvents.get(turnId) || [])]
+  return getRuntimeTurnMetricRecords(turnId).map((record) => record.event)
 }
 
 export function getRuntimeTurnLatencyContract(turnId: string) {
   return validateLatencyTimeline(getRuntimeTurnTimeline(turnId), turnId)
+}
+
+export function getRuntimeTurnLatencyReport(turnId: string) {
+  const records = getRuntimeTurnMetricRecords(turnId)
+  const first = records[0]
+  const last = records[records.length - 1]
+
+  return {
+    turnId,
+    totalLatencyMs:
+      first && last
+        ? last.at - first.at
+        : 0,
+    contract: getRuntimeTurnLatencyContract(turnId),
+    stages: records.map((record) => ({
+      event: record.event,
+      at: record.at,
+      latencyMs: record.latencyMs,
+      sincePreviousMs: record.sincePreviousMs,
+    })),
+  }
 }
 
 export function resetRuntimeTurnMetrics(turnId?: string) {
