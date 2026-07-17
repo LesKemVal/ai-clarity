@@ -1,6 +1,56 @@
 # GEORGE Production Tracker
 
 
+<!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_START -->
+## Production Update — LIVE Entry Authority Cleanup
+
+Validated through commit:
+
+```text
+975dc16 Extract LIVE Entry orientation icons
+b4fb7f3 Make LIVE Entry support outcome oriented
+a37b25f Separate LIVE briefing presentation from runtime authority
+b6c648a Synchronize stale runtime documentation references
+0bdb92a Publish canonical runtime authority to LIVE
+45d438a Carry canonical runtime snapshot through LIVE
+3fc9e2d Restrict LIVE local cues to execution-safe assistance
+9ec14ab Reject stale LIVE briefing context
+```
+
+The LIVE Entry surface has been reduced toward its correct responsibility: collect room preparation, present runtime-owned guidance, preserve user authority, and mount the canonical LIVE runtime without becoming a competing reasoning or behavioral owner.
+
+Validated changes:
+
+- LIVE Entry briefing presentation is separated from runtime authority.
+- LIVE Entry support language is outcome-oriented rather than room-specific.
+- Room-category briefing branches no longer define alternate support intelligence.
+- Canonical runtime state remains the authority carried into LIVE.
+- Stale LIVE briefing context is rejected rather than silently reused.
+- Local LIVE cues remain restricted to execution-safe assistance.
+- `LiveOrientationIcon` and its icon-kind type now live in `components/george/live-entry/LiveOrientationIcon.tsx`.
+- `app/george/live-entry/LiveEntryClient.tsx` remains the orchestration and rendering surface for entry preparation; extracted orientation icons are presentation-only.
+
+Canonical ownership remains:
+
+- shared runtime modules own interpretation, judgment, strategy, support behavior, and execution policy;
+- `lib/george/live-runtime/*` owns LIVE support behavior and signal-to-support flow;
+- `lib/george/live-delivery/*` owns receiver-specific realization;
+- LIVE Entry collects and persists current-room preparation and renders runtime-owned state;
+- presentational components may be extracted from LIVE Entry but must not acquire runtime authority;
+- `app/george/page.tsx` remains rendering, interaction, mounting, and pass-through only.
+
+Validation passed:
+
+- GEORGE preparation smoke
+- production build
+- LIVE Hub TypeScript build
+- `git diff --check`
+
+The next production objective is broader portability qualification and continued removal of presentation weight from large route-level clients without moving intelligence into UI components.
+<!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_END -->
+
+
+
 <!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCES_START -->
 ## Production Update — Adaptive LIVE Starting Preferences
 

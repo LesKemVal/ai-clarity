@@ -1,6 +1,53 @@
 # GEORGE Runtime Architecture
 
 
+<!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_ARCHITECTURE_START -->
+## LIVE Entry Boundary After Authority Cleanup
+
+LIVE Entry is a preparation and presentation boundary, not a runtime.
+
+Canonical flow:
+
+```text
+Normal preparation and persisted conversation context
+↓
+LIVE Entry room preparation
+↓
+Canonical runtime snapshot
+↓
+LIVE Hub / LIVE runtime
+↓
+Support Behavior Composer
+↓
+Receiver delivery policy
+↓
+Audio, visual, or audio-visual realization
+```
+
+`app/george/live-entry/LiveEntryClient.tsx` may:
+
+- collect room, audience, objective, participant, document, receiver, and user-preference inputs;
+- present briefing, mechanics, readiness, responsibility, and orientation UI;
+- persist current-room setup;
+- publish or carry the canonical runtime snapshot into LIVE;
+- render presentational components.
+
+It must not:
+
+- infer a separate room-specific intelligence;
+- own support judgment;
+- define alternate support behavior by conversation category;
+- replace canonical runtime state with stale briefing state;
+- own receiver-specific delivery policy;
+- become a second LIVE coordinator.
+
+Presentational extraction is permitted when behavior remains unchanged. `components/george/live-entry/LiveOrientationIcon.tsx` is a presentation-only owner for orientation SVGs and their local icon-kind type. It has no runtime, signal, support, or delivery authority.
+
+The validated architectural direction is to continue reducing route-level presentation weight while preserving one runtime, one authority chain, and one LIVE execution path.
+<!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_ARCHITECTURE_END -->
+
+
+
 <!-- GEORGE_ADAPTIVE_LIVE_STARTING_PREFERENCE_ARCHITECTURE_START -->
 ## Adaptive LIVE Starting-Preference Architecture
 
@@ -146,7 +193,7 @@ Current production phase:
 - Production Qualification
 - architecture largely complete
 - runtime behavior under qualification
-- documentation synchronized to implementation through commit `53ebf32`
+- documentation synchronized to implementation through commit `975dc16`
 
 Current protected validation target:
 
