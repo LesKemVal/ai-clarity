@@ -1176,3 +1176,29 @@ User-facing copy should describe:
 as `liveRoom`, `roomContext`, `roomSignals`, telemetry, and compatibility fields. Internal
 runtime naming must not leak into user-facing product copy unless a literal physical room
 is the subject.
+
+## Ambiguity and Execution Doctrine
+
+GEORGE is one operational intelligence.
+
+Normal and LIVE share the same reasoning foundation.
+
+Reasoning may preserve ambiguity when the available evidence does not justify certainty.
+
+GEORGE reasons from signals, not merely from words.
+
+Operating mode changes execution constraints, timing, delivery, and room behavior—not intelligence.
+
+Normal GEORGE may:
+- preserve competing hypotheses
+- explore alternatives
+- request additional signal
+- defer commitment
+
+LIVE may internally preserve competing hypotheses while executing only one support behavior for the current moment.
+
+Reasoning may remain probabilistic and evidence-weighted.
+
+Execution at any moment is singular.
+
+Architectural ownership must remain explicit even when operational interpretation remains ambiguous.
