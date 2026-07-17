@@ -2,44 +2,32 @@ import type { LiveHubContext } from '../types/protocol.js'
 import type { GeorgeLocalCue } from './cue-types.js'
 import { matchCuePattern } from './cue-patterns.js'
 
-export function resolveLocalCue(input: {
-  transcript: string
-  context: LiveHubContext
+function buildExecutionSafeCue(input: {
+  matchedCue: GeorgeLocalCue
+  deliveryStyle?: LiveHubContext['deliveryStyle']
   isFinal?: boolean
 }): GeorgeLocalCue | null {
-  const text = input.transcript.trim()
-  if (text.length < 8 && input.context.deliveryStyle !== 'continue') return null
-
-  const cue = matchCuePattern(text)
-
-  if (!cue) {
-    if (input.isFinal && input.context.deliveryStyle && input.context.deliveryStyle !== 'cue') {
-      return {
-        cue: 'Give a useful response.',
-        reason: 'No local cue matched; final transcript requires delivery-style support.',
-        category: 'clarification',
-        confidence: 0.62,
-        priority: 70,
-      }
-    }
-
-    return null
-  }
-
-  if (cue.category === 'clarification' && !input.isFinal) {
-    return null
-  }
-
-  const objective = String(input.context.objective || '').toLowerCase()
-
-  if (cue.category === 'pricing' && objective.includes('close')) {
+  if (input.matchedCue.category === 'stall') {
     return {
-      ...cue,
-      cue: 'Anchor value first.',
-      confidence: Math.max(cue.confidence, 0.9),
-      priority: Math.max(cue.priority, 92),
+      ...input.matchedCue,
+      cue: 'Pause.',
+      reason: 'Execution-safe pacing support while canonical judgment is unavailable.',
+      confidence: Math.max(input.matchedCue.confidence, 0.84),
+      priority: Math.max(input.matchedCue.priority, 75),
     }
   }
 
-  return cue
-}
+  if (input.matchedCue.category === 'pressure') {
+    return {
+      ...input.matchedCue,
+      cue: 'Slow down.',
+      reason: 'Execution-safe pressure support while canonical judgment is unavailable.',
+      confidence: Math.max(input.matchedCue.confidence, 0.8),
+      priority: Math.max(input.matchedCue.priority, 85),
+    }
+  }
+
+  if (
+    input.isFinal &&
+    input.deliveryStyle === 'continue'
+  ) {
