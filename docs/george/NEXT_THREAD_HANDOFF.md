@@ -63,7 +63,6 @@ One receiver delivery policy.
 Canonical owners:
 
 - `lib/george/live-runtime/support-behavior-composer.ts`
-- `lib/george/live-runtime/live-support-behavior-pipeline.ts`
 - `lib/george/capabilities/live-support-panels.ts`
 - `app/george/live-entry/LiveEntryClient.tsx`
 - `lib/george/live-delivery/*`

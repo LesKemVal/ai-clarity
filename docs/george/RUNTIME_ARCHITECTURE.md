@@ -621,7 +621,7 @@ Current boundary:
 
 Future extraction target:
 
-- `lib/george/runtime/reasoning-context-composer.ts`
+- `lib/george/runtime/runtime-context-composer.ts`
 
 First extraction should be behavior-neutral:
 

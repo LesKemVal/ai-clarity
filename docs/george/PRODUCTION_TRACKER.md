@@ -56,7 +56,7 @@ An explicit instruction to remain with cues, responses, or short lines is author
 ### Canonical ownership
 
 - `lib/george/live-runtime/support-behavior-composer.ts` owns adaptive preference interpretation and operational-resource selection.
-- `lib/george/live-runtime/live-support-behavior-pipeline.ts` remains the canonical signal-to-support flow.
+- `lib/george/live-runtime/support-behavior-composer.ts` remains the canonical signal-to-support flow.
 - `lib/george/capabilities/live-support-panels.ts` owns user-facing descriptions.
 - `app/george/live-entry/LiveEntryClient.tsx` collects and persists the current-room preference.
 - `lib/george/live-delivery/*` owns receiver-specific realization.
@@ -636,7 +636,7 @@ Current assessment:
 
 Future extraction target:
 
-- `lib/george/runtime/reasoning-context-composer.ts`
+- `lib/george/runtime/runtime-context-composer.ts`
 
 First extraction must be behavior-neutral:
 
