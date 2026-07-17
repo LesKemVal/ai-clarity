@@ -355,7 +355,9 @@ Signals → Behavior Composer → Delivery / Recovery → LIVE Interaction Conti
 Ownership remains:
 
 - Behavior Composer owns temporary support behavior composition.
-- Delivery Bridge owns delivery routing only.
+- Canonical receiver-specific routing and surface shaping are owned by `lib/george/live-delivery/delivery-router.ts`.
+- Delivery Bridge dispatches the cues returned by canonical delivery policy; it does not own receiver-specific shaping.
+- Approved LIVE delivery history, repeat, and replay state are owned by `lib/george/live-runtime/approved-delivery-history.ts`.
 - Spoken Memory owns last-line/current-sentence/tail recovery helpers.
 - Transcript Controller owns local action resolution.
 - Final Transcript Adapter owns action-to-application conversion.

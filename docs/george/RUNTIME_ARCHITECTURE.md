@@ -914,6 +914,14 @@ LIVE signals / transcript → transcript routing → LIVE transcript controller 
 
 Support Behavior Composer owner: `lib/george/live-runtime/support-behavior-composer.ts`.
 
+Receiver delivery policy owner: `lib/george/live-delivery/delivery-router.ts`.
+
+The delivery router converts one selected support behavior into receiver-appropriate `voice`, `visual`, or `silent` cues. It owns audio flattening, visual structure preservation, surface limits, and receiver-profile routing for `audio_only`, `visual_only`, and `audio_visual`.
+
+Approved delivery history owner: `lib/george/live-runtime/approved-delivery-history.ts`.
+
+Approved delivery history owns the last committed LIVE delivery and the repeat/reword replay event. UI surfaces may subscribe to replay, but they do not independently own approved-delivery state.
+
 The composer decides temporary support behaviors: cue, bridge, completion, sentence_recovery, repeat_tail, full_response, and silence.
 
 It must not generate language. It must not persist learning. It must not write the Operational Profile. It answers only: what support behavior is most useful right now?
