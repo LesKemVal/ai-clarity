@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { subscribeGeorgeApprovedDeliveryReplay } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryCue } from '@/lib/george/live-delivery/types'
 
@@ -118,6 +119,34 @@ export function LiveHubVisualCueBridge({
       setVisualCue(null)
     }
   }, [active])
+
+  useEffect(() => {
+    if (!active) return
+
+    return subscribeGeorgeApprovedDeliveryReplay(({ delivery }) => {
+      if (receiverProfile === 'audio_only') return
+
+      const now = Date.now()
+
+      lastCueRef.current = delivery.text
+      currentPriorityRef.current = delivery.priority
+      lastRenderedAtRef.current = now
+
+      setVisualCue({
+        turnId: delivery.turnId,
+        text: delivery.text,
+        priority: delivery.priority,
+        confidence: delivery.confidence,
+        source: delivery.source,
+        at: now,
+      })
+
+      markRuntimeEvent(
+        delivery.turnId || delivery.text,
+        'visual_cue_received'
+      )
+    })
+  }, [active, receiverProfile])
 
   useEffect(() => {
     if (!visualCue) return

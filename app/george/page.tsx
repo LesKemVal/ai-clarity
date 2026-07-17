@@ -10,6 +10,7 @@ import { governLiveResponse } from '@/lib/george/live-voice/runtime/response-sha
 import { createAudioPlayback } from '@/lib/george/live-runtime/audio-playback'
 import { determineLiveVoiceSpeed } from '@/lib/george/live-delivery/voice-speed-policy'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
+import { getLastGeorgeApprovedLiveDelivery, replayLastGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
 import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
@@ -2812,8 +2813,14 @@ const startLiveAudioRuntime = liveAudioRuntime.start
       }
 
       if (event.intent === 'repeat_last_line') {
-        const lastLine = liveLastSpokenUtteranceRef.current.trim()
-        if (lastLine) void speakText(lastLine)
+        const approvedDelivery = replayLastGeorgeApprovedLiveDelivery('repeat')
+        const lastLine =
+          approvedDelivery?.text ||
+          liveLastSpokenUtteranceRef.current.trim()
+
+        if (lastLine && (voiceOn || liveReceiverProfile === 'audio_only')) {
+          void speakText(lastLine)
+        }
         return
       }
 
@@ -5829,11 +5836,26 @@ return (
             window.localStorage.setItem('GEORGE_LIVE_REWORD_POLICY', choice)
           } catch {}
 
-          setToastMessage(`Communication: ${nextStyle}`)
+          const approvedDelivery = getLastGeorgeApprovedLiveDelivery()
+
+          if (approvedDelivery?.text) {
+            void handleSend(
+              `Reword this already-approved LIVE support to sound ${choice}. Preserve its meaning, outcome, and factual boundaries. Do not add a new recommendation or unsupported claim. Return only the reworded support:\n\n${approvedDelivery.text}`
+            )
+          }
+
+          setToastMessage(
+            approvedDelivery?.text
+              ? `Communication: ${nextStyle}. Rewording current support.`
+              : `Communication: ${nextStyle}`
+          )
           setShowToast(true)
         }}
         onRepeatPressed={() => {
-          const lastLine = liveLastSpokenUtteranceRef.current.trim()
+          const approvedDelivery = replayLastGeorgeApprovedLiveDelivery('repeat')
+          const lastLine =
+            approvedDelivery?.text ||
+            liveLastSpokenUtteranceRef.current.trim()
 
           if (!lastLine) {
             setToastMessage('No previous support to repeat.')
@@ -5841,7 +5863,10 @@ return (
             return false
           }
 
-          void speakText(lastLine)
+          if (voiceOn || liveReceiverProfile === 'audio_only') {
+            void speakText(lastLine)
+          }
+
           setToastMessage('Repeating last line.')
           setShowToast(true)
           return true

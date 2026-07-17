@@ -7,6 +7,7 @@ import { routeGeorgeDeliveryCue } from '@/lib/george/live-delivery/delivery-rout
 import { evaluateGeorgeDeliveryCommitment } from '@/lib/george/live-delivery/delivery-commitment'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { composeGeorgeSupportBehavior } from '@/lib/george/live-runtime/support-behavior-composer'
+import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type { GeorgeDeliveryCue, GeorgeDeliveryMode, GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
@@ -137,6 +138,8 @@ export function LiveHubDeliveryBridge({
         confidence: resolvedDeliveryCue.confidence,
         priority: resolvedDeliveryCue.priority,
       }
+
+      commitGeorgeApprovedLiveDelivery(resolvedDeliveryCue)
 
       console.info('[LIVE][hub][delivery] DELIVERY_CUE', resolvedDeliveryCue)
 
