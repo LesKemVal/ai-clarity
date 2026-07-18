@@ -22,6 +22,11 @@ export function LiveAdaptiveSupportPanel({
   onToggle,
   onSelect,
 }: LiveAdaptiveSupportPanelProps) {
+  function selectPanel(panelId: LiveBriefingSupportPanelId) {
+    onSelect(panelId)
+    onToggle()
+  }
+
   return (
     <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-4">
       <div className="flex items-start justify-between gap-4">
@@ -64,7 +69,7 @@ export function LiveAdaptiveSupportPanel({
                 <button
                   key={panel.id}
                   type="button"
-                  onClick={() => onSelect(panel.id)}
+                  onClick={() => selectPanel(panel.id)}
                   className={`rounded-[0.72rem] border px-3 py-3 text-left transition ${
                     active
                       ? 'border-[#4E7CFF]/35 bg-[#4E7CFF]/[0.075]'
