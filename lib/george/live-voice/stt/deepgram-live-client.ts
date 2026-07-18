@@ -22,6 +22,15 @@ function cleanSttText(value: unknown) {
   return String(value || '').replace(/\s+/g, ' ').trim()
 }
 
+function reportLiveSttError(
+  handlers: DeepgramLiveClientHandlers,
+  message: string,
+  error?: unknown
+) {
+  console.warn('[GEORGE DEEPGRAM]', message, error)
+  handlers.onError?.(new Error(message))
+}
+
 function isLikelyIncompleteSttUtterance(value: string) {
   const clean = cleanSttText(value)
   if (!clean) return false
@@ -305,13 +314,20 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
           handlers.onPartial?.(transcript.trim())
         }
       } catch (error) {
-        handlers.onError?.(error)
+        reportLiveSttError(
+          handlers,
+          'LIVE transcription received an unreadable response. Try reconnecting.',
+          error
+        )
       }
     }
 
     socket.onerror = (error) => {
-      console.warn('[GEORGE DEEPGRAM] websocket error', error)
-      handlers.onError?.(error)
+      reportLiveSttError(
+        handlers,
+        'LIVE transcription connection failed. Check your network and try again.',
+        error
+      )
     }
 
     socket.onclose = (event) => {
