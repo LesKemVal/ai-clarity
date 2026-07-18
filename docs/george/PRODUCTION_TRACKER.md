@@ -1334,3 +1334,15 @@ The LIVE runtime/host separation has completed its current production-hardening 
 
 This is the production portability checkpoint. Future browser or device integrations must enter through host adapters rather than adding environment ownership to the runtime.
 <!-- LIVE_PORTABILITY_BOUNDARY:END -->
+
+<!-- LIVE_LATENCY_OPTIMIZATION:BEGIN -->
+## LIVE latency optimization
+
+The first measured critical-path optimization replaces the fixed 275 ms final-transcript stabilization delay with a portable release policy:
+
+- 90 ms when the transcript ends with terminal punctuation
+- 140 ms for a complete multi-word transcript
+- 210 ms for very short fragments that may still receive an adjacent final segment
+
+The policy remains under `lib/george/live-runtime`, while the browser bridge only schedules the release. This removes 65–185 ms from the final-transcript-to-Hub path without eliminating protection against fragmented speech-to-text finals.
+<!-- LIVE_LATENCY_OPTIMIZATION:END -->

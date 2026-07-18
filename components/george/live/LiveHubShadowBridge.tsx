@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import { resolveLiveFinalTranscriptReleaseDelayMs } from '@/lib/george/live-runtime/final-transcript-release-policy'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 
 type LiveHubShadowBridgeProps = {
@@ -140,6 +141,11 @@ export function LiveHubShadowBridge({
       clearTimeout(finalTranscriptTimerRef.current)
     }
 
+    const finalTranscriptReleaseDelayMs =
+      resolveLiveFinalTranscriptReleaseDelayMs(
+        pendingFinalTranscriptRef.current
+      )
+
     finalTranscriptTimerRef.current = setTimeout(() => {
       const finalText = pendingFinalTranscriptRef.current.trim()
       const finalTurnId = pendingFinalTurnIdRef.current
@@ -150,7 +156,7 @@ export function LiveHubShadowBridge({
 
       markRuntimeEvent(finalTurnId, 'final_transcript_buffer_released')
       forwardTranscript(finalText, true, finalTurnId)
-    }, 275)
+    }, finalTranscriptReleaseDelayMs)
 
     return () => {
       if (finalTranscriptTimerRef.current) {

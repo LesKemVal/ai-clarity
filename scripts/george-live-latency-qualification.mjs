@@ -55,4 +55,35 @@ for (const event of [
   )
 }
 
+const releasePolicySource = readFileSync(
+  `${root}/lib/george/live-runtime/final-transcript-release-policy.ts`,
+  'utf8'
+)
+const shadowBridgeSource = readFileSync(
+  `${root}/components/george/live/LiveHubShadowBridge.tsx`,
+  'utf8'
+)
+
+for (const expected of [
+  'terminal: 90',
+  'standard: 140',
+  'fragment: 210',
+  'resolveLiveFinalTranscriptReleaseDelayMs',
+]) {
+  assert(
+    releasePolicySource.includes(expected),
+    `LIVE final transcript release policy should include ${expected}`
+  )
+}
+
+assert(
+  shadowBridgeSource.includes('resolveLiveFinalTranscriptReleaseDelayMs'),
+  'LIVE Hub shadow bridge should use the canonical final transcript release policy'
+)
+
+assert(
+  !shadowBridgeSource.includes('}, 275)'),
+  'LIVE Hub shadow bridge should not retain the fixed 275ms transcript delay'
+)
+
 console.log('GEORGE LIVE latency qualification passed')
