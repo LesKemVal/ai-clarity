@@ -20,7 +20,8 @@
     "george:live-behavior:qualify": "node scripts/george-live-behavior-qualification.mjs",
     "george:live-recovery:qualify": "node scripts/george-live-recovery-qualification.mjs",
     "george:live-explanatory-cue:qualify": "node scripts/george-live-explanatory-cue-qualification.mjs",
-    "george:live-host-boundary:qualify": "node scripts/george-live-host-boundary-qualification.mjs"
+    "george:live-host-boundary:qualify": "node scripts/george-live-host-boundary-qualification.mjs",
+    "george:live-audio-startup:qualify": "node scripts/george-live-audio-startup-qualification.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

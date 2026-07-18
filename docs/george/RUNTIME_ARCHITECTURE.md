@@ -1512,3 +1512,23 @@ application surface -> portable runtime
 portable runtime -X-> browser host
 ```
 <!-- LIVE_HOST_COMPOSITION:END -->
+
+<!-- LIVE_AUDIO_HOST_LIFECYCLE:BEGIN -->
+## Audio host lifecycle
+
+`lib/george/live-host/audio-playback.ts` owns the complete lifecycle of one
+generated audio object:
+
+```text
+audio URL
+  -> readiness event or bounded fallback
+  -> immediate play request
+  -> playback start
+  -> playback end, failure, or explicit stop
+  -> timer/listener cleanup and promise settlement
+```
+
+The application retains the playback handle rather than the raw browser audio
+element. This allows interruption and replacement to terminate the active host
+operation cleanly without moving audio behavior into the portable runtime.
+<!-- LIVE_AUDIO_HOST_LIFECYCLE:END -->

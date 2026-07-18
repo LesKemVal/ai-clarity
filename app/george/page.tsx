@@ -2647,7 +2647,7 @@ const responseTimerRef = useRef<any>(null)
 
 const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
   const speakingRef = useRef(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioRef = useRef<ReturnType<typeof createAudioPlayback> | null>(null)
   const liveTranscriptSubmitRef = useRef<(text: string) => void>(() => {})
   const lastLiveFinalTranscriptRef = useRef<LastLiveFinalTranscript>(null)
   const liveBuyTimeUntilRef = useRef<number>(0)
@@ -4092,10 +4092,7 @@ requestAnimationFrame(() => {
     stopBridgeSpeech()
 
     if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.onended = null
-      audioRef.current.onerror = null
-      audioRef.current.oncanplaythrough = null
+      audioRef.current.stop()
       audioRef.current = null
     }
 
@@ -4207,6 +4204,7 @@ if (activePromptContext || activePromptLabel) {
       afterStop: () => {
         isSpeakingRef.current = false
         speakingRef.current = false
+        audioRef.current?.stop()
         audioRef.current = null
         setIsSpeaking(false)
       },
@@ -4261,12 +4259,8 @@ if (activePromptContext || activePromptLabel) {
           },
         })
 
-        try {
-          audioRef.current?.pause()
-          audioRef.current = null
-        } catch {}
-
-        audioRef.current = playback.audio
+        audioRef.current?.stop()
+        audioRef.current = playback
         stopBridgeSpeech()
         await playback.play()
       },

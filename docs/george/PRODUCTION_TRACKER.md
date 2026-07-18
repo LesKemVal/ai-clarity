@@ -1376,3 +1376,20 @@ This is a portability boundary, not a second runtime. Portable modules under
 A replacement application host can provide an equivalent composition boundary
 without changing runtime reasoning or delivery ownership.
 <!-- LIVE_APPLICATION_HOST_BOUNDARY:END -->
+
+<!-- LIVE_AUDIO_STARTUP:BEGIN -->
+## LIVE audio startup and interruption hardening
+
+The browser audio host no longer adds an unconditional 80 ms delay after an
+audio readiness event. Playback begins immediately when the media element is
+ready, with a shorter 180 ms readiness fallback for browsers that do not emit a
+reliable readiness event.
+
+The host playback handle now owns timer cleanup, listener cleanup, and promise
+settlement. Application interruption uses `playback.stop()` rather than pausing
+a raw `HTMLAudioElement`, preventing a stopped queue item from remaining
+unsettled.
+
+This change affects host execution latency and resilience only. Runtime
+reasoning, delivery authority, and receiver policy are unchanged.
+<!-- LIVE_AUDIO_STARTUP:END -->
