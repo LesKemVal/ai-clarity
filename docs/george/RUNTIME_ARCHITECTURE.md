@@ -1460,3 +1460,22 @@ Ownership rules:
 - Application surfaces must not recreate either owner's behavior.
 - New device targets should implement host adapters while preserving the portable runtime.
 <!-- LIVE_PORTABILITY_BOUNDARY:END -->
+
+<!-- LIVE_OPERATIONAL_ASSESSMENT:BEGIN -->
+## Operational assessment delivery contract
+
+The LIVE runtime produces one operational assessment. It is not recomputed by a receiver surface.
+
+```text
+room signals
+  -> operational reasoning
+  -> operational assessment
+       action
+       evidence
+       confidence
+       optional outcome impact
+  -> receiver delivery policy
+```
+
+Runtime ownership determines what support is warranted and why. Delivery ownership determines how much of that same assessment is spoken or displayed. This preserves one intelligence and one reasoning path across audio-only, visual-only, and audio-visual receivers.
+<!-- LIVE_OPERATIONAL_ASSESSMENT:END -->

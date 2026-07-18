@@ -1,5 +1,9 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
 import {
+  composeGeorgeOperationalCueText,
+  resolveGeorgeOperationalAssessment,
+} from '@/lib/george/live-runtime/operational-assessment'
+import {
   DEFAULT_GEORGE_LIVE_DELIVERY_STYLE,
   type GeorgeDeliveryContext,
   type GeorgeDeliveryCue,
@@ -62,6 +66,7 @@ function buildDeliveryCue(input: {
     mode: input.mode,
     text: input.text,
     reason: input.reason,
+    operationalAssessment: input.actionCue.operationalAssessment,
     source: input.actionCue.source,
     category: input.actionCue.category,
     deliveryStyle: input.deliveryStyle,
@@ -78,8 +83,16 @@ export function routeGeorgeDeliveryCues(input: {
   const voiceEnabled = Boolean(input.context?.voiceEnabled)
   const deliveryStyle = input.context?.deliveryStyle || DEFAULT_GEORGE_LIVE_DELIVERY_STYLE
   const baseText = composeBaseDeliveryText({ actionCue: input.actionCue, deliveryStyle })
+  const operationalAssessment = resolveGeorgeOperationalAssessment({
+    actionCue: input.actionCue,
+    actionText: baseText,
+  })
+  const explanatoryText = composeGeorgeOperationalCueText({
+    assessment: operationalAssessment,
+    deliveryStyle,
+  })
 
-  if (!baseText) {
+  if (!explanatoryText) {
     return [
       buildDeliveryCue({
         actionCue: input.actionCue,
@@ -92,13 +105,16 @@ export function routeGeorgeDeliveryCues(input: {
   }
 
   return resolveGeorgeReceiverDeliveryPolicy({
-    text: baseText,
+    text: explanatoryText,
     voiceEnabled,
     deliveryStyle,
     receiverProfile: input.context?.receiverProfile,
   }).map((delivery) =>
     buildDeliveryCue({
-      actionCue: input.actionCue,
+      actionCue: {
+        ...input.actionCue,
+        operationalAssessment,
+      },
       deliveryStyle,
       mode: delivery.mode,
       text: delivery.text,

@@ -24,10 +24,18 @@ export type GeorgeActionCueEvidence = {
   runtimeSnapshot?: GeorgeRuntimeAuthoritySnapshot
 }
 
+export type GeorgeOperationalAssessment = {
+  action: string
+  evidence?: string
+  outcomeImpact?: string
+  confidence: number
+}
+
 export type GeorgeActionCue = {
   turnId?: string
   cue: string
   reason: string
+  operationalAssessment?: GeorgeOperationalAssessment
   source: 'local' | 'groq'
   localCue: string
   fastCue?: string

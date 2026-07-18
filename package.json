@@ -18,7 +18,8 @@
     "george:user-communication:smoke": "node scripts/george-user-communication-smoke.mjs",
     "george:live-latency:qualify": "node scripts/george-live-latency-qualification.mjs",
     "george:live-behavior:qualify": "node scripts/george-live-behavior-qualification.mjs",
-    "george:live-recovery:qualify": "node scripts/george-live-recovery-qualification.mjs"
+    "george:live-recovery:qualify": "node scripts/george-live-recovery-qualification.mjs",
+    "george:live-explanatory-cue:qualify": "node scripts/george-live-explanatory-cue-qualification.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

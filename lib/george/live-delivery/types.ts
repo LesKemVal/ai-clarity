@@ -24,6 +24,7 @@ export type GeorgeDeliveryCue = {
   mode: GeorgeDeliveryMode
   text: string
   reason: string
+  operationalAssessment?: GeorgeActionCue['operationalAssessment']
   source: GeorgeActionCue['source']
   category: GeorgeActionCue['category']
   deliveryStyle: GeorgeLiveDeliveryStyle

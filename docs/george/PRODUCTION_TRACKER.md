@@ -1346,3 +1346,16 @@ The first measured critical-path optimization replaces the fixed 275 ms final-tr
 
 The policy remains under `lib/george/live-runtime`, while the browser bridge only schedules the release. This removes 65–185 ms from the final-transcript-to-Hub path without eliminating protection against fragmented speech-to-text finals.
 <!-- LIVE_LATENCY_OPTIMIZATION:END -->
+
+<!-- LIVE_EXPLANATORY_CUES:BEGIN -->
+## Evidence-grounded LIVE cues
+
+LIVE cues now preserve the operational assessment that already produced the recommendation. A cue may carry:
+
+- the action the user should take,
+- the observable or confidence-aware evidence supporting that action,
+- optional outcome impact,
+- and the assessment confidence.
+
+The delivery router renders that single assessment without invoking a second reasoning pass. Cue delivery exposes action plus evidence; richer receiver profiles may also expose outcome impact. Internal runtime and delivery reasons are not presented as room evidence.
+<!-- LIVE_EXPLANATORY_CUES:END -->
