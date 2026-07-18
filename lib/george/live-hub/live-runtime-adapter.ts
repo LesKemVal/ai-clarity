@@ -28,7 +28,27 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   let currentContext: GeorgeLiveHubContext = {}
   let lastTranscriptRef = ''
   let lastTurnIdRef = ''
-  const pendingTranscripts: Array<{ text: string; isFinal: boolean; turnId?: string; deliveryStyle?: GeorgeLiveHubContext['deliveryStyle'] }> = []
+  type PendingTranscript = {
+    text: string
+    isFinal: boolean
+    turnId?: string
+    deliveryStyle?: GeorgeLiveHubContext['deliveryStyle']
+  }
+
+  const pendingTranscripts: PendingTranscript[] = []
+
+  const sendTranscriptPacket = (
+    transcript: Pick<PendingTranscript, 'text' | 'isFinal' | 'turnId'>,
+    deliveryStyle?: GeorgeLiveHubContext['deliveryStyle']
+  ) => {
+    transport?.sendJson?.({
+      type: 'TRANSCRIPT_INPUT',
+      text: transcript.text,
+      isFinal: transcript.isFinal,
+      turnId: transcript.turnId,
+      deliveryStyle,
+    })
+  }
 
   const flushPendingTranscripts = () => {
     if (!connected) return
@@ -45,13 +65,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         markRuntimeEvent(next.turnId, 'hub_transcript_flushed')
       }
 
-      transport?.sendJson?.({
-        type: 'TRANSCRIPT_INPUT',
-        text: next.text,
-        isFinal: next.isFinal,
-        turnId: next.turnId,
-        deliveryStyle: currentContext.deliveryStyle,
-      })
+      sendTranscriptPacket(next, currentContext.deliveryStyle)
     }
   }
 
@@ -212,13 +226,14 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
       })
       console.info('[LIVE][hub][adapter][send-transcript-context]', currentContext)
 
-      transport?.sendJson?.({
-        type: 'TRANSCRIPT_INPUT',
-        text: clean,
-        isFinal,
-        turnId,
-        deliveryStyle: resolvedDeliveryStyle,
-      })
+      sendTranscriptPacket(
+        {
+          text: clean,
+          isFinal,
+          turnId,
+        },
+        resolvedDeliveryStyle
+      )
     },
 
     subscribe(listener: GeorgeLiveHubRuntimeListener) {

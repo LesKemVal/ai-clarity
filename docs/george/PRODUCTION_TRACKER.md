@@ -1393,3 +1393,15 @@ unsettled.
 This change affects host execution latency and resilience only. Runtime
 reasoning, delivery authority, and receiver policy are unchanged.
 <!-- LIVE_AUDIO_STARTUP:END -->
+
+<!-- LIVE_TRANSCRIPT_PACKET_CONSTRUCTION:BEGIN -->
+## Canonical transcript packet construction
+
+`lib/george/live-hub/live-runtime-adapter.ts` now contains one private
+`sendTranscriptPacket` helper for constructing and sending `TRANSCRIPT_INPUT`.
+
+Immediate transcript delivery and queued transcript flush continue to preserve
+their existing behavior. This commit removes duplicate packet construction
+only; it does not change queue ownership, transport ownership, reconnect
+behavior, delivery-style semantics, runtime reasoning, or cue arbitration.
+<!-- LIVE_TRANSCRIPT_PACKET_CONSTRUCTION:END -->

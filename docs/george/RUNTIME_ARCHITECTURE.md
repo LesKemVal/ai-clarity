@@ -1532,3 +1532,20 @@ The application retains the playback handle rather than the raw browser audio
 element. This allows interruption and replacement to terminate the active host
 operation cleanly without moving audio behavior into the portable runtime.
 <!-- LIVE_AUDIO_HOST_LIFECYCLE:END -->
+
+<!-- LIVE_TRANSCRIPT_PACKET_OWNER:BEGIN -->
+## Transcript packet owner
+
+The LIVE runtime adapter remains the canonical owner of transcript queueing and
+transport dispatch. Within that owner, `TRANSCRIPT_INPUT` envelope construction
+is centralized in one private helper:
+
+```text
+immediate transcript ─┐
+                      ├─> sendTranscriptPacket -> transport
+queued transcript ────┘
+```
+
+This consolidation is intentionally internal to the existing adapter boundary.
+No new runtime, transport, or application abstraction is introduced.
+<!-- LIVE_TRANSCRIPT_PACKET_OWNER:END -->
