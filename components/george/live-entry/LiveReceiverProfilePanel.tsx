@@ -34,6 +34,11 @@ export function LiveReceiverProfilePanel({
   onToggle,
   onSelect,
 }: LiveReceiverProfilePanelProps) {
+  function selectProfile(profile: LiveReceiverProfilePanelId) {
+    onSelect(profile)
+    onToggle()
+  }
+
   return (
     <div className="rounded-[0.82rem] border border-[#4E7CFF]/[0.16] bg-[#4E7CFF]/[0.045] px-4 py-3">
       <div className="text-[9px] uppercase tracking-[0.24em] text-[#D7DCFF]/46">
@@ -66,7 +71,7 @@ export function LiveReceiverProfilePanel({
               <button
                 key={panel.id}
                 type="button"
-                onClick={() => onSelect(panel.id)}
+                onClick={() => selectProfile(panel.id)}
                 className={`rounded-[0.72rem] border px-3 py-2.5 text-left transition ${
                   active
                     ? 'border-[#4E7CFF]/[0.24] bg-[#4E7CFF]/[0.055]'
