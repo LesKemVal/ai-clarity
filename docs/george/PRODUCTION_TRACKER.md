@@ -1359,3 +1359,20 @@ LIVE cues now preserve the operational assessment that already produced the reco
 
 The delivery router renders that single assessment without invoking a second reasoning pass. Cue delivery exposes action plus evidence; richer receiver profiles may also expose outcome impact. Internal runtime and delivery reasons are not presented as room evidence.
 <!-- LIVE_EXPLANATORY_CUES:END -->
+
+<!-- LIVE_APPLICATION_HOST_BOUNDARY:BEGIN -->
+## LIVE application host composition boundary
+
+`lib/george/live-host/live-application-host.ts` is now the canonical
+application-facing browser-host boundary.
+
+`app/george/page.tsx` no longer imports each storage, session, audio,
+outcome, usage, draft, and support-preference owner independently. The page
+consumes one host composition module while the existing focused host modules
+remain canonical owners of their individual browser responsibilities.
+
+This is a portability boundary, not a second runtime. Portable modules under
+`lib/george/live-runtime` remain prohibited from importing browser-host code.
+A replacement application host can provide an equivalent composition boundary
+without changing runtime reasoning or delivery ownership.
+<!-- LIVE_APPLICATION_HOST_BOUNDARY:END -->

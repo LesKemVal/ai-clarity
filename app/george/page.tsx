@@ -7,7 +7,20 @@ import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
 import { normalizeBrandSpeech } from '@/lib/george/live-voice/spoken-text'
 import { governLiveResponse } from '@/lib/george/live-voice/runtime/response-shaper'
-import { createAudioPlayback } from '@/lib/george/live-host/audio-playback'
+import {
+  buildGeorgeSessionRestoreState,
+  consumePreparedLiveSetup,
+  createAudioPlayback,
+  findGeorgeSessionToRestore,
+  markLiveRuntimeStarted,
+  persistActiveLiveRuntimeSupport,
+  readActiveLiveRuntimeSupport,
+  readGeorgeNormalDraft,
+  reconcileActiveLiveRuntimeUsage,
+  recordLiveOutcomeSignal,
+  recordLiveSupportPreference,
+  saveGeorgeSession,
+} from '@/lib/george/live-host/live-application-host'
 import { determineLiveVoiceSpeed } from '@/lib/george/live-delivery/voice-speed-policy'
 import { drainSpeechQueue, replaceSpeechQueue, clearSpeechQueue } from '@/lib/george/live-runtime/speech-queue'
 import { getLastGeorgeApprovedLiveDelivery, replayLastGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
@@ -28,10 +41,7 @@ import LiveChooser from '@/components/george/LiveChooser'
 import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-runtime/live-guidance'
 import { consumeFreshNormalBrowserSessionRequest, createSession, ensureGeorgeBrowserInstanceScope, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
-import { buildGeorgeSessionRestoreState, findGeorgeSessionToRestore, saveGeorgeSession } from '@/lib/george/live-host/session-controller'
 import { detectLiveOutcomeSignal } from '@/lib/george/live-runtime/live-outcome-observation'
-import { recordLiveOutcomeSignal } from '@/lib/george/live-host/live-outcome-observation'
-import { readGeorgeNormalDraft } from '@/lib/george/live-host/draft-restoration'
 import { appendFollowUp, buildTrainingIntakeOverride, trainingNeedsJurisdiction } from '@/lib/george/training/training-helpers'
 import {
   getPostResponseSuggestedPrompts,
@@ -44,18 +54,10 @@ import {
   applyPreparedRuntimeMemory,
   type LivePrepSetup,
 } from '@/lib/george/live-runtime/prep-runtime'
-import {
-  consumePreparedLiveSetup,
-  markLiveRuntimeStarted,
-  persistActiveLiveRuntimeSupport,
-  readActiveLiveRuntimeSupport,
-} from '@/lib/george/live-host/live-prep-storage'
-import { reconcileActiveLiveRuntimeUsage } from '@/lib/george/live-host/live-runtime-usage'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
-import { recordLiveSupportPreference } from '@/lib/george/live-host/live-support-preferences'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import type { LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
 import { buildLiveInteractionContinuity, buildLiveOutcomeReview } from '@/lib/george/live-runtime/live-interaction-continuity'

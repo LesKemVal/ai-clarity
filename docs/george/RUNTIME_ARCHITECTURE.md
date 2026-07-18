@@ -1479,3 +1479,36 @@ room signals
 
 Runtime ownership determines what support is warranted and why. Delivery ownership determines how much of that same assessment is spoken or displayed. This preserves one intelligence and one reasoning path across audio-only, visual-only, and audio-visual receivers.
 <!-- LIVE_OPERATIONAL_ASSESSMENT:END -->
+
+<!-- LIVE_HOST_COMPOSITION:BEGIN -->
+## Application host composition
+
+The browser application mounts GEORGE through one host-facing dependency:
+
+```text
+app/george/page.tsx
+        |
+        v
+live-host/live-application-host.ts
+        |
+        +-- audio playback
+        +-- session persistence
+        +-- prep persistence
+        +-- draft restoration
+        +-- runtime usage
+        +-- outcome recording
+        +-- support preferences
+```
+
+The composition module does not absorb runtime reasoning and does not replace
+the focused host owners. It defines the application-shell boundary that another
+browser, desktop, mobile, or wearable companion host can replace.
+
+Dependency direction remains one way:
+
+```text
+application surface -> host composition -> focused host adapters
+application surface -> portable runtime
+portable runtime -X-> browser host
+```
+<!-- LIVE_HOST_COMPOSITION:END -->
