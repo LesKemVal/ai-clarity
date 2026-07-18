@@ -22,7 +22,8 @@
     "george:live-explanatory-cue:qualify": "node scripts/george-live-explanatory-cue-qualification.mjs",
     "george:live-host-boundary:qualify": "node scripts/george-live-host-boundary-qualification.mjs",
     "george:live-audio-startup:qualify": "node scripts/george-live-audio-startup-qualification.mjs",
-    "george:live-transcript-packet:qualify": "node scripts/george-live-transcript-packet-qualification.mjs"
+    "george:live-transcript-packet:qualify": "node scripts/george-live-transcript-packet-qualification.mjs",
+    "george:live-timer-ownership:qualify": "node scripts/george-live-timer-ownership-qualification.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

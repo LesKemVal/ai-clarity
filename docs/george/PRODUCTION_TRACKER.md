@@ -1405,3 +1405,19 @@ their existing behavior. This commit removes duplicate packet construction
 only; it does not change queue ownership, transport ownership, reconnect
 behavior, delivery-style semantics, runtime reasoning, or cue arbitration.
 <!-- LIVE_TRANSCRIPT_PACKET_CONSTRUCTION:END -->
+
+<!-- LIVE_TIMER_OWNERSHIP:BEGIN -->
+## LIVE final-transcript timer ownership
+
+`LiveHubShadowBridge` now owns its final-transcript release timer through one
+canonical clear/reset lifecycle.
+
+The timer is replaced only when transcript input changes and is cleared when
+the LIVE bridge deactivates or unmounts. Pending final transcript state is
+discarded during shutdown so a later room activation cannot inherit stale
+words or a stale turn identifier.
+
+Delivery-style changes no longer rerun the transcript buffering effect. The
+latest delivery style is read through a ref at dispatch time, preserving
+current delivery behavior without duplicating a pending final transcript.
+<!-- LIVE_TIMER_OWNERSHIP:END -->

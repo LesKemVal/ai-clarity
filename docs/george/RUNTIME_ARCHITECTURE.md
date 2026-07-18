@@ -1549,3 +1549,23 @@ queued transcript ────┘
 This consolidation is intentionally internal to the existing adapter boundary.
 No new runtime, transport, or application abstraction is introduced.
 <!-- LIVE_TRANSCRIPT_PACKET_OWNER:END -->
+
+<!-- LIVE_TIMER_OWNER:BEGIN -->
+## Final-transcript timer owner
+
+`components/george/live/LiveHubShadowBridge.tsx` is the canonical owner of the
+browser-side final-transcript release timer.
+
+```text
+final transcript fragment
+        ↓
+replace owned release timer
+        ↓
+release buffered final transcript
+        ↓
+clear timer and pending turn state
+```
+
+Bridge deactivation and unmount use the same reset lifecycle. No timer utility
+or parallel runtime owner is introduced.
+<!-- LIVE_TIMER_OWNER:END -->

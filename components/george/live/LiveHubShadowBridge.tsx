@@ -25,6 +25,32 @@ export function LiveHubShadowBridge({
   const pendingFinalTranscriptRef = useRef('')
   const pendingFinalTurnIdRef = useRef('')
   const finalTranscriptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const deliveryStyleRef = useRef(context.deliveryStyle)
+
+  const clearFinalTranscriptTimer = () => {
+    if (!finalTranscriptTimerRef.current) return
+
+    clearTimeout(finalTranscriptTimerRef.current)
+    finalTranscriptTimerRef.current = null
+  }
+
+  const resetPendingFinalTranscript = () => {
+    clearFinalTranscriptTimer()
+    pendingFinalTranscriptRef.current = ''
+    pendingFinalTurnIdRef.current = ''
+  }
+
+  useEffect(() => {
+    deliveryStyleRef.current = context.deliveryStyle
+  }, [context.deliveryStyle])
+
+  useEffect(() => {
+    if (!active) return
+    if (!isGeorgeLiveHubEnabled()) return
+
+    return resetPendingFinalTranscript
+  }, [active])
+
   useEffect(() => {
     if (!active) return
     if (!isGeorgeLiveHubEnabled()) return
@@ -106,7 +132,7 @@ export function LiveHubShadowBridge({
         text,
         isFinal,
         turnId,
-        context.deliveryStyle
+        deliveryStyleRef.current
       )
       markRuntimeEvent(turnId, 'hub_transcript_sent')
     }
@@ -137,9 +163,7 @@ export function LiveHubShadowBridge({
       )
     }
 
-    if (finalTranscriptTimerRef.current) {
-      clearTimeout(finalTranscriptTimerRef.current)
-    }
+    clearFinalTranscriptTimer()
 
     const finalTranscriptReleaseDelayMs =
       resolveLiveFinalTranscriptReleaseDelayMs(
@@ -154,17 +178,13 @@ export function LiveHubShadowBridge({
       pendingFinalTurnIdRef.current = ''
       finalTranscriptTimerRef.current = null
 
+      if (!finalText || !finalTurnId) return
+
       markRuntimeEvent(finalTurnId, 'final_transcript_buffer_released')
       forwardTranscript(finalText, true, finalTurnId)
     }, finalTranscriptReleaseDelayMs)
 
-    return () => {
-      if (finalTranscriptTimerRef.current) {
-        clearTimeout(finalTranscriptTimerRef.current)
-        finalTranscriptTimerRef.current = null
-      }
-    }
-  }, [active, transcript, transcriptFinal, context.deliveryStyle])
+  }, [active, transcript, transcriptFinal])
 
   return null
 }
