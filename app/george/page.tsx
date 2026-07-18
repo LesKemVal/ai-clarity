@@ -1,7 +1,6 @@
 'use client'
 import { buildOpportunitySignalAcquisitionMessage } from '@/lib/george/runtime/conversation-strategy'
 
-import { applyGovernedLiveCueRuntimeMemory } from '@/lib/george/live-runtime/governed-live-cue'
 
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
@@ -50,10 +49,7 @@ import {
   samePromptSet,
 } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
-import {
-  applyPreparedRuntimeMemory,
-  type LivePrepSetup,
-} from '@/lib/george/live-runtime/prep-runtime'
+import type { LivePrepSetup } from '@/lib/george/live-runtime/prep-runtime'
 import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
@@ -91,7 +87,6 @@ const GEORGE_LAST_NORMAL_DRAFT = 'george_last_normal_draft'
 
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = '[RESPONSIBILITY_CHECKPOINT]'
 const LIVE_ENTRY_TOA_MARKER = '[TOA_CHECKPOINT]'
-const LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED = false
 
 
 function getLiveEntryCheckpointState(
@@ -980,15 +975,6 @@ const [voiceError, setVoiceError] = useState('')
         ? 'repeatable_lines'
         : 'short_cues')
 
-  const liveRuntimeMemoryRef = useRef({
-    acceptedCarryCount: 0,
-    overrideCount: 0,
-    hesitationCount: 0,
-    preferredForce: 'balanced' as 'light' | 'balanced' | 'strong',
-    toneCorrection: 'neutral' as 'softer' | 'firmer' | 'neutral',
-    communicationBaseline: 'adaptive' as 'adaptive' | 'executive' | 'conversational',
-    roomCommunicationNotes: [] as string[],
-  })
   const liveLastSignalRef = useRef<number>(0)
 const liveInterventionRef = useRef<number>(0)
 const lastCueTsRef = useRef<number>(0)
@@ -2045,7 +2031,6 @@ useEffect(() => {
 
       markLiveRuntimeStarted()
       persistActiveLiveRuntimeSupport(liveSetup)
-      liveRuntimeMemoryRef.current = applyPreparedRuntimeMemory(liveRuntimeMemoryRef.current, liveSetup)
 
       if (liveSetup) {
         window.localStorage.setItem('george_live_setup_active', JSON.stringify(liveSetup))
@@ -2186,68 +2171,6 @@ useEffect(() => {
 
 
 
-
-
-// This powers the older injectGovernedLiveCue() path through /api/george/live/govern.
-// It is not part of the active Deepgram transcript -> router -> controller -> action-authority path.
-// Preserve until Pro LIVE / legacy cue governance is fully classified.
-async function canGovernorInjectLiveCue(transcript: string) {
-  if (!transcript.trim()) return false
-
-  try {
-    const res = await fetch('/api/george/live/govern', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        transcript,
-        mode: 'voice_live',
-        audio: true,
-        shadowMap: transcript,
-        lastFiveSeconds: transcript,
-        supportStyle:
-          typeof window !== 'undefined'
-            ? window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') ||
-              window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') ||
-              (window.localStorage.getItem('george_live_assist_mode') === 'lines' ? 'continue' : 'cue')
-            : 'cue',
-        liveAssistMode:
-          typeof window !== 'undefined' && (
-            window.localStorage.getItem('GEORGE_LIVE_SUPPORT_STYLE') === 'continue' ||
-            window.localStorage.getItem('GEORGE_LIVE_DELIVERY_STYLE') === 'continue' ||
-            window.localStorage.getItem('george_live_assist_mode') === 'lines'
-          )
-            ? 'lines'
-            : 'cues',
-        runtimeMemory: liveRuntimeMemoryRef.current,
-        runtimeSupport: readActiveLiveRuntimeSupport(),
-      }),
-    })
-
-    const packet = await res.json().catch(() => null)
-    return Boolean(packet?.shouldSpeak)
-  } catch {
-    return false
-  }
-}
-
-async function injectGovernedLiveCue(transcript: string, content: string) {
-  const allowed = await canGovernorInjectLiveCue(transcript)
-  const shouldInject = applyGovernedLiveCueRuntimeMemory(
-    liveRuntimeMemoryRef.current,
-    transcript,
-    allowed
-  )
-
-  if (!shouldInject) return false
-
-  setPendingAssistantMessage(null)
-  setPendingAssistantMessage({
-    role: 'assistant',
-    content,
-  })
-
-  return true
-}
 
 
 const georgeProfile = detectConversationProfile(input, interimTranscript)
@@ -5027,16 +4950,6 @@ responseTimerRef.current = setTimeout(() => {
     lower.includes("maybe") ||
     lower.includes("what do you think")
 
-  if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && strongSignal) {
-    stopListening()
-    void injectGovernedLiveCue(livePrompt, 'Say: “Let me make this simple…”').then((injected) => {
-      if (!injected) return
-      setConversationSignal('LIVE strong signal')
-      setAdaptiveCueLabel('Strong opportunity detected')
-    })
-    return
-  }
-
   const text = liveTranscript || ""
   const friction = detectLiveFriction(text)
   const score = scoreLiveFriction(text)
@@ -5045,24 +4958,6 @@ responseTimerRef.current = setTimeout(() => {
 
   const interventionNow = Date.now()
   const canIntervene = interventionNow - liveInterventionRef.current > 8000
-
-  if (LEGACY_BROWSER_STT_LIVE_DECISIONS_ENABLED && liveMode && canIntervene && score >= 3) {
-    stopListening()
-
-    if (score >= 5) {
-      void injectGovernedLiveCue(
-        text,
-        'Pause. Take control of the next sentence.\n\nSay: “Let me clarify the main point.”'
-      )
-    } else {
-      void injectGovernedLiveCue(text, 'Cue: Slow down. Ask one clean question.')
-    }
-
-    liveInterventionRef.current = interventionNow
-    setConversationSignal('LIVE intervention')
-    setAdaptiveCueLabel(score >= 4 ? 'Objection detected' : 'Adjust delivery')
-    return
-  }
 
   if (score < 3) return
 
