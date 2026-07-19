@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "npm run george:core:smoke && npm run george:behavior:qualify && npm run george:live-entry:smoke && npm run george:conversation-package:smoke && npm run george:live-runtime:smoke && npm run george:live-latency:qualify && npm run george:live-behavior:qualify && npm run george:live-recovery:qualify && npm run george:live-portability:qualify && npm run george:preparation:smoke && next build",
+    "build": "npm run george:core:smoke && npm run george:behavior:qualify && npm run george:live-entry:smoke && npm run george:conversation-package:smoke && npm run george:live-runtime:smoke && npm run george:live-latency:qualify && npm run george:live-behavior:qualify && npm run george:live-recovery:qualify && npm run george:live-hub-resilience:qualify && npm run george:live-portability:qualify && npm run george:preparation:smoke && next build",
     "start": "next start",
     "lint": "eslint",
     "live:proxy": "node server/live/deepgram-proxy.js",
@@ -19,6 +19,7 @@
     "george:live-latency:qualify": "node scripts/george-live-latency-qualification.mjs",
     "george:live-behavior:qualify": "node scripts/george-live-behavior-qualification.mjs",
     "george:live-recovery:qualify": "node scripts/george-live-recovery-qualification.mjs",
+    "george:live-hub-resilience:qualify": "node scripts/george-live-hub-resilience-qualification.mjs",
     "george:live-explanatory-cue:qualify": "node scripts/george-live-explanatory-cue-qualification.mjs",
     "george:live-host-boundary:qualify": "node scripts/george-live-host-boundary-qualification.mjs",
     "george:live-portability:qualify": "node scripts/george-live-portability-qualification.mjs",
