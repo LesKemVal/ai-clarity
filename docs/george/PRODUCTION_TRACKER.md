@@ -1,3 +1,21 @@
+# Voice Playback Generation Ownership — VALIDATED PENDING BUILD
+
+The canonical voice playback path now invalidates asynchronous TTS and playback work whenever speech is stopped or superseded.
+
+A playback generation is captured after prior speech is cancelled. TTS responses, playback assignment, and playback start must still own that generation before audio can reach the user.
+
+This prevents an older, slower TTS request from beginning playback after a newer LIVE cue has already taken ownership.
+
+Canonical owner:
+
+- `app/george/page.tsx` existing voice playback boundary
+
+Qualification:
+
+- `scripts/george-voice-playback-ownership-qualification.mjs`
+
+No routing, behavior composition, or receiver policy was moved into rendering.
+
 # Reconnect Transcript Policy Ownership — VALIDATED PENDING BUILD
 
 The LIVE runtime adapter now preserves the delivery policy captured by each transcript while disconnected.

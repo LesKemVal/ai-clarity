@@ -2723,6 +2723,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
   const speechQueueRef = useRef<string[]>([])
   const isSpeakingRef = useRef(false)
   const stopSpeechRef = useRef(false)
+  const speechPlaybackGenerationRef = useRef(0)
   const suppressLegacyLiveVoiceUntilRef = useRef(0)
   const savePickerRef = useRef<HTMLDivElement | null>(null)
   const folderBrowserRef = useRef<HTMLDivElement | null>(null)
@@ -4004,6 +4005,7 @@ requestAnimationFrame(() => {
   }
 
   async function stopSpeech() {
+    speechPlaybackGenerationRef.current += 1
     clearSpeechQueue({
       setQueue: (queue) => {
         speechQueueRef.current = queue
@@ -4106,7 +4108,8 @@ if (activePromptContext || activePromptLabel) {
 
   }
 
-  async function playQueue(liveTurnId?: string) {
+  async function playQueue(liveTurnId?: string, playbackGeneration = speechPlaybackGenerationRef.current) {
+    if (playbackGeneration !== speechPlaybackGenerationRef.current) return
     if (isSpeakingRef.current) return
 
     await drainSpeechQueue({
@@ -4145,11 +4148,28 @@ if (activePromptContext || activePromptLabel) {
         const url = await fetchSpeech(chunk, turnId)
         if (!url) return
 
+        if (playbackGeneration !== speechPlaybackGenerationRef.current) {
+          URL.revokeObjectURL(url)
+          console.info('[GEORGE LIVE AUDIO][STALE PLAYBACK DISCARDED]', {
+            turnId,
+            playbackGeneration,
+            currentGeneration: speechPlaybackGenerationRef.current,
+          })
+          return
+        }
+
         const playback = createAudioPlayback({
           url,
           onStopRequested: () => stopSpeechRef.current,
-          onBeforePlay: revealPendingAssistantMessage,
+          onBeforePlay: () => {
+            if (playbackGeneration !== speechPlaybackGenerationRef.current) return
+            revealPendingAssistantMessage()
+          },
           onPlaybackStart: () => {
+            if (playbackGeneration !== speechPlaybackGenerationRef.current) {
+              playback.stop()
+              return
+            }
             if (turnId) {
               markLiveTtsPlaybackStart(turnId)
             }
@@ -4182,6 +4202,11 @@ if (activePromptContext || activePromptLabel) {
           },
         })
 
+        if (playbackGeneration !== speechPlaybackGenerationRef.current) {
+          playback.stop()
+          return
+        }
+
         audioRef.current?.stop()
         audioRef.current = playback
         stopBridgeSpeech()
@@ -4208,6 +4233,7 @@ if (activePromptContext || activePromptLabel) {
       try {
         setVoiceError('')
         await stopSpeech()
+        const playbackGeneration = speechPlaybackGenerationRef.current
 
         const cleaned = text
           .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -4248,7 +4274,7 @@ if (activePromptContext || activePromptLabel) {
           ? chunks.slice(-1)
           : chunks)
 
-        await playQueue(options?.turnId)
+        await playQueue(options?.turnId, playbackGeneration)
       } catch {
         revealPendingAssistantMessage()
         speakingRef.current = false

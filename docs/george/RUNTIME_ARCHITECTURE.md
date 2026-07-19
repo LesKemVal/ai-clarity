@@ -1,3 +1,11 @@
+# Voice Playback Generation Ownership
+
+Voice playback has a single request-generation boundary at the existing host playback implementation.
+
+Stopping or replacing speech increments the generation. Every asynchronous TTS result must retain the captured generation through URL creation, playback assignment, and playback start. Superseded work is discarded and its object URL is revoked.
+
+This is playback concurrency control only. Behavior Composer still chooses support behavior, Delivery Router still chooses receiver policy, and Delivery Bridge still dispatches approved cues.
+
 # Reconnect Transcript Ownership
 
 The LIVE runtime adapter owns transcript queue continuity across transport interruption.
