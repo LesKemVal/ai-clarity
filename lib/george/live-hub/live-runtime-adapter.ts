@@ -25,6 +25,10 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
   const listeners = new Set<GeorgeLiveHubRuntimeListener>()
   let transport: GeorgeLiveHubTransport | null = null
   let connected = false
+  let intentionalDisconnect = false
+  let reconnectAttempt = 0
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  let transportGeneration = 0
   let currentContext: GeorgeLiveHubContext = {}
   let lastTranscriptRef = ''
   let lastTurnIdRef = ''
@@ -73,114 +77,155 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     listeners.forEach((listener) => listener(event))
   }
 
-  return {
-    connect(context?: GeorgeLiveHubContext) {
-      currentContext = context || {}
-      console.info('[LIVE][hub][adapter][connect-context]', currentContext)
-      const url =
-        params?.url ||
-        process.env.NEXT_PUBLIC_LIVE_HUB_URL ||
-        'ws://localhost:8080'
+  const clearReconnectTimer = () => {
+    if (!reconnectTimer) return
+    clearTimeout(reconnectTimer)
+    reconnectTimer = null
+  }
+
+  const scheduleReconnect = () => {
+    if (intentionalDisconnect || reconnectTimer) return
+
+    const delayMs = Math.min(1000 * (2 ** reconnectAttempt), 8000)
+    reconnectAttempt += 1
+
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null
+      if (intentionalDisconnect) return
 
       emit({ type: 'STATUS', status: 'connecting', at: Date.now() })
+      openTransport()
+    }, delayMs)
+  }
 
-      connected = false
-      transport?.close()
+  const openTransport = () => {
+    const url =
+      params?.url ||
+      process.env.NEXT_PUBLIC_LIVE_HUB_URL ||
+      'ws://localhost:8080'
 
-      transport = createGeorgeLiveHubWebSocketTransport({
-        url,
-        handlers: {
-          onOpen: () => {
-            connected = true
-            emit({ type: 'STATUS', status: 'connected', at: Date.now() })
-            flushPendingTranscripts()
-          },
-          onClose: () => {
-            connected = false
-            emit({ type: 'STATUS', status: 'idle', at: Date.now() })
-          },
-          onError: (error) => {
-            connected = false
-            emit({ type: 'ERROR', error, at: Date.now() })
-            emit({ type: 'STATUS', status: 'error', at: Date.now() })
-          },
-          onEvent: (event) => {
-            if (event?.type !== 'ACTION_CUE') return
+    const generation = ++transportGeneration
 
-            const cleanCue = String(event?.cue || '').trim()
-            const fallbackEvidence = {
-              transcript: lastTranscriptRef,
-              recentTranscript: lastTranscriptRef,
-              room: currentContext.room,
-              objective: currentContext.objective,
-              knownContext: currentContext.knownContext,
-              briefingKnowledge: currentContext.briefingKnowledge,
-              secondaryOutcome: currentContext.secondaryOutcome,
-              secondaryObjective: currentContext.secondaryObjective,
-              intangibleObjective: currentContext.intangibleObjective,
-              userPosition: currentContext.userPosition,
-              deliveryStyle: currentContext.deliveryStyle,
-              runtimeSnapshot: currentContext.runtimeSnapshot,
-            }
-            if (!cleanCue) {
-              console.info('[LIVE][hub][adapter] dropped empty ACTION_CUE', event)
-              return
-            }
+    transport?.close()
+    connected = false
 
-            console.info('[LIVE][hub][adapter][raw-action-cue]', {
-              turnId: event.turnId || lastTurnIdRef,
-              cue: event.cue,
-              source: event.source,
-              hasEvidence: Boolean(event.evidence),
-              evidence: event.evidence || fallbackEvidence,
-            })
+    transport = createGeorgeLiveHubWebSocketTransport({
+      url,
+      handlers: {
+        onOpen: () => {
+          if (generation !== transportGeneration || intentionalDisconnect) return
 
-            const finalizedEvent = finalizeGeorgeActionCueAuthority({
-              actionCue: {
-                ...event,
-                turnId: event.turnId || lastTurnIdRef,
-                evidence: event.evidence || fallbackEvidence,
-                cue: cleanCue,
-              } as GeorgeActionCue,
-              context: currentContext,
-            })
+          connected = true
+          reconnectAttempt = 0
+          clearReconnectTimer()
+          emit({ type: 'STATUS', status: 'connected', at: Date.now() })
+          flushPendingTranscripts()
+        },
+        onClose: () => {
+          if (generation !== transportGeneration) return
 
-            const resolvedEvent = {
+          connected = false
+          emit({ type: 'STATUS', status: 'idle', at: Date.now() })
+          scheduleReconnect()
+        },
+        onError: (error) => {
+          if (generation !== transportGeneration) return
+
+          connected = false
+          emit({ type: 'ERROR', error, at: Date.now() })
+          emit({ type: 'STATUS', status: 'error', at: Date.now() })
+          scheduleReconnect()
+        },
+        onEvent: (event) => {
+          if (generation !== transportGeneration) return
+          if (event?.type !== 'ACTION_CUE') return
+
+          const cleanCue = String(event?.cue || '').trim()
+          const fallbackEvidence = {
+            transcript: lastTranscriptRef,
+            recentTranscript: lastTranscriptRef,
+            room: currentContext.room,
+            objective: currentContext.objective,
+            knownContext: currentContext.knownContext,
+            briefingKnowledge: currentContext.briefingKnowledge,
+            secondaryOutcome: currentContext.secondaryOutcome,
+            secondaryObjective: currentContext.secondaryObjective,
+            intangibleObjective: currentContext.intangibleObjective,
+            userPosition: currentContext.userPosition,
+            deliveryStyle: currentContext.deliveryStyle,
+            runtimeSnapshot: currentContext.runtimeSnapshot,
+          }
+          if (!cleanCue) {
+            console.info('[LIVE][hub][adapter] dropped empty ACTION_CUE', event)
+            return
+          }
+
+          console.info('[LIVE][hub][adapter][raw-action-cue]', {
+            turnId: event.turnId || lastTurnIdRef,
+            cue: event.cue,
+            source: event.source,
+            hasEvidence: Boolean(event.evidence),
+            evidence: event.evidence || fallbackEvidence,
+          })
+
+          const finalizedEvent = finalizeGeorgeActionCueAuthority({
+            actionCue: {
               ...event,
-              ...finalizedEvent,
-              turnId: finalizedEvent.turnId || event.turnId || lastTurnIdRef,
-              evidence: finalizedEvent.evidence || event.evidence || fallbackEvidence,
-              cue: finalizedEvent.cue,
-            } as ({ type: 'ACTION_CUE' } & GeorgeActionCue)
+              turnId: event.turnId || lastTurnIdRef,
+              evidence: event.evidence || fallbackEvidence,
+              cue: cleanCue,
+            } as GeorgeActionCue,
+            context: currentContext,
+          })
 
-            const isResponseModeLocalCue =
-              currentContext.deliveryStyle === 'response' &&
-              resolvedEvent.source === 'local'
+          const resolvedEvent = {
+            ...event,
+            ...finalizedEvent,
+            turnId: finalizedEvent.turnId || event.turnId || lastTurnIdRef,
+            evidence: finalizedEvent.evidence || event.evidence || fallbackEvidence,
+            cue: finalizedEvent.cue,
+          } as ({ type: 'ACTION_CUE' } & GeorgeActionCue)
 
-            if (isResponseModeLocalCue) {
-              console.info('[LIVE][hub][adapter][local-action-cue-suppressed]', {
-                turnId: resolvedEvent.turnId,
-                cue: resolvedEvent.cue,
-                source: resolvedEvent.source,
-                deliveryStyle: currentContext.deliveryStyle,
-              })
-              return
-            }
+          const isResponseModeLocalCue =
+            currentContext.deliveryStyle === 'response' &&
+            resolvedEvent.source === 'local'
 
-            console.info('[LIVE][hub][adapter][final-action-cue]', {
+          if (isResponseModeLocalCue) {
+            console.info('[LIVE][hub][adapter][local-action-cue-suppressed]', {
               turnId: resolvedEvent.turnId,
               cue: resolvedEvent.cue,
               source: resolvedEvent.source,
-              hasEvidence: Boolean(resolvedEvent.evidence),
-              evidence: resolvedEvent.evidence,
+              deliveryStyle: currentContext.deliveryStyle,
             })
+            return
+          }
 
-            emit(resolvedEvent)
-          },
+          console.info('[LIVE][hub][adapter][final-action-cue]', {
+            turnId: resolvedEvent.turnId,
+            cue: resolvedEvent.cue,
+            source: resolvedEvent.source,
+            hasEvidence: Boolean(resolvedEvent.evidence),
+            evidence: resolvedEvent.evidence,
+          })
+
+          emit(resolvedEvent)
         },
-      })
+      },
+    })
 
-      transport.connect(context)
+    transport.connect(currentContext)
+  }
+
+  return {
+    connect(context?: GeorgeLiveHubContext) {
+      currentContext = context || {}
+      intentionalDisconnect = false
+      reconnectAttempt = 0
+      clearReconnectTimer()
+
+      console.info('[LIVE][hub][adapter][connect-context]', currentContext)
+      emit({ type: 'STATUS', status: 'connecting', at: Date.now() })
+      openTransport()
     },
 
     syncContext(context?: GeorgeLiveHubContext) {
@@ -191,8 +236,12 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
     },
 
     disconnect() {
+      intentionalDisconnect = true
       connected = false
+      reconnectAttempt = 0
+      clearReconnectTimer()
       pendingTranscripts.length = 0
+      transportGeneration += 1
       transport?.close()
       transport = null
       emit({ type: 'STATUS', status: 'idle', at: Date.now() })
