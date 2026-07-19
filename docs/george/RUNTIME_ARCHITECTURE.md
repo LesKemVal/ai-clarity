@@ -1,3 +1,15 @@
+# Reconnect Transcript Ownership
+
+The LIVE runtime adapter owns transcript queue continuity across transport interruption.
+
+Each pending transcript packet carries the delivery style resolved when that packet entered the adapter. Reconnect flush must preserve that packet-level policy rather than substituting the adapter's latest context.
+
+This boundary prevents transport recovery from changing behavioral delivery semantics.
+
+Canonical implementation:
+
+- `lib/george/live-hub/live-runtime-adapter.ts`
+
 # GEORGE Runtime Architecture
 
 <!-- GEORGE_STALE_REASONING_GUARD_START -->

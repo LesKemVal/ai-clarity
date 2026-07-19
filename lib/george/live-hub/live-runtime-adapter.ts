@@ -69,7 +69,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
         markRuntimeEvent(next.turnId, 'hub_transcript_flushed')
       }
 
-      sendTranscriptPacket(next, currentContext.deliveryStyle)
+      sendTranscriptPacket(next, next.deliveryStyle)
     }
   }
 

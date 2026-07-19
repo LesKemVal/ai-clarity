@@ -1,3 +1,19 @@
+# Reconnect Transcript Policy Ownership — VALIDATED PENDING BUILD
+
+The LIVE runtime adapter now preserves the delivery policy captured by each transcript while disconnected.
+
+A queued transcript is flushed with its own stored `deliveryStyle`. A later context synchronization cannot silently rewrite the receiver policy of transcript work that was already accepted by the adapter.
+
+Canonical owner:
+
+- `lib/george/live-hub/live-runtime-adapter.ts`
+
+Qualification:
+
+- `scripts/george-reconnect-transcript-ownership-qualification.mjs`
+
+This closes a reconnect race in which queued transcript intent could be delivered under a newer support style after transport recovery.
+
 # GEORGE Production Tracker
 
 <!-- GEORGE_STALE_REASONING_GUARD_START -->
