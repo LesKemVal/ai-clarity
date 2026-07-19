@@ -1,5 +1,61 @@
 # GEORGE Runtime Architecture
 
+<!-- GEORGE_RECEIVER_RENDERING_CONTRACT_START -->
+## Receiver Rendering and Application-Host Contract
+
+The receiver realization boundary is validated as:
+
+```text
+Signals and transcripts
+↓
+Support Behavior Composer
+↓
+Selected operational resource
+↓
+Receiver Policy
+↓
+Delivery Router
+↓
+Delivery Bridge
+↓
+Surface renderer or host voice executor
+```
+
+### Visual rendering contract
+
+`lib/george/live-delivery/receiver-policy.ts` owns the structure and wording of receiver-specific visual guidance.
+
+`components/george/live/LiveHubVisualCueBridge.tsx` owns presentation of approved visual guidance.
+
+The visual bridge must:
+
+- render policy-created text unchanged;
+- preserve policy-created newline boundaries;
+- allow normal wrapping of long lines;
+- preserve existing hold, replacement, replay, priority, and commitment behavior;
+- remain free of receiver-specific text limits and behavioral shaping.
+
+The current renderer satisfies this contract with newline-preserving whitespace behavior and normal word wrapping.
+
+Rendering preserves structure. It does not create structure.
+
+### Application-host contract
+
+`app/george/page.tsx` may own host integration responsibilities, including receiver-preference hydration and persistence, LIVE bridge mounting, microphone lifecycle integration, speech synthesis or TTS execution, playback lifecycle and telemetry, user-triggered repeat, pause, and compression controls, and presentation state.
+
+It must not own support-resource selection, receiver-specific shaping, delivery-surface selection, delivery routing, independent ACTION_CUE interpretation, a parallel speech-delivery policy, or a second LIVE runtime.
+
+A host voice executor is not a competing delivery owner when it speaks only text already approved and dispatched through the canonical delivery chain.
+
+### Validated ownership conclusion
+
+Inspection found no proven duplicate receiver-policy or delivery-router ownership in `app/george/page.tsx`.
+
+No architecture change is authorized from suspicion alone.
+
+Patch the application host only when inspection proves that it independently makes a decision already owned by Support Behavior Composer, Receiver Policy, Delivery Router, or Delivery Bridge.
+<!-- GEORGE_RECEIVER_RENDERING_CONTRACT_END -->
+
 
 <!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_ARCHITECTURE_START -->
 ## LIVE Entry Boundary After Authority Cleanup

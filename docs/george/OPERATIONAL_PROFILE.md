@@ -1,5 +1,25 @@
 # GEORGE Operational Profile Doctrine
 
+<!-- GEORGE_RECEIVER_REALIZATION_PROFILE_START -->
+## Receiver Realization and Operational Profile Boundary
+
+Receiver profile is a current execution condition.
+
+It determines how already-selected support is realized for the user:
+
+- audio-only favors concise, sequential, repeatable, low-cognitive-load speech;
+- visual-only may preserve readable hierarchy, line boundaries, detail, and persistent reference;
+- audio-visual may use audio for immediate steering and visual for persistent reference.
+
+Receiver profile does not create another GEORGE, create a separate Operational Profile, alter the user's identity or continuity, independently select the operational support resource, rewrite the user's adaptive starting preference, or become a permanent user default unless the user chooses to retain it.
+
+Structured visual realization may preserve newline-separated guidance because visual support is persistent and glanceable.
+
+Preserving that structure is a renderer responsibility after Receiver Policy has shaped the approved guidance.
+
+The Operational Profile may inform which receiver or realization pattern tends to work well for the user, but current user direction and current operating conditions remain authoritative.
+<!-- GEORGE_RECEIVER_REALIZATION_PROFILE_END -->
+
 Branch: `live-hub-runtime`
 
 ## Purpose

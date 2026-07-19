@@ -1,5 +1,86 @@
 # GEORGE Production Tracker
 
+<!-- GEORGE_RECEIVER_RENDERING_VALIDATION_START -->
+## Production Update — Receiver Rendering and Host Ownership Validation
+
+Validated on `live-hub-runtime` after focused LIVE production qualification.
+
+### Confirmed implementation state
+
+The canonical LIVE delivery chain remains:
+
+```text
+Support Behavior Composer
+↓
+Receiver Policy
+↓
+Delivery Router
+↓
+Delivery Bridge
+↓
+Voice, visual, or silent realization
+```
+
+Canonical owners remain:
+
+- `lib/george/live-runtime/support-behavior-composer.ts` selects the operational support resource.
+- `lib/george/live-delivery/receiver-policy.ts` realizes that resource for audio-only, visual-only, or audio-visual receivers.
+- `lib/george/live-delivery/delivery-router.ts` converts approved receiver-policy results into delivery cues.
+- `components/george/live/LiveHubDeliveryBridge.tsx` subscribes, applies delivery safeguards, and dispatches.
+- `components/george/live/LiveHubVisualCueBridge.tsx` renders approved visual guidance.
+- `app/george/live-entry/LiveEntryClient.tsx` collects and persists current-room receiver and support preferences.
+- `app/george/page.tsx` remains the application host and TTS execution surface; it does not own receiver shaping or routing policy.
+
+### Structured visual guidance
+
+Receiver Policy may generate newline-separated visual guidance.
+
+`LiveHubVisualCueBridge.tsx` preserves that structure through renderer-level whitespace handling:
+
+- `whitespace-pre-line` preserves policy-created line boundaries;
+- `break-words` allows long guidance to wrap;
+- `{visualCue.text}` is rendered without bridge-level restructuring;
+- the renderer does not duplicate receiver-policy text limits or shaping rules.
+
+The visual renderer preserves policy output without becoming a behavioral or receiver-policy owner.
+
+### Host ownership audit
+
+The receiver-profile and TTS responsibilities in `app/george/page.tsx` were inspected.
+
+No competing delivery authority was proven.
+
+Current page responsibilities remain valid host responsibilities:
+
+- hydrate and persist the selected receiver preference;
+- mount the LIVE bridges;
+- expose the host voice executor;
+- execute approved speech;
+- support user-controlled repeat, pause, and compression actions.
+
+The page does not independently choose receiver surfaces, reshape receiver-specific guidance, or replace Delivery Router authority.
+
+No runtime patch was justified by this audit.
+
+### Validation passed
+
+- GEORGE LIVE delivery policy smoke
+- GEORGE LIVE runtime smoke
+- GEORGE LIVE behavioral qualification
+- GEORGE LIVE host boundary qualification
+- GEORGE LIVE timer ownership qualification
+
+The local production checkout contained a pre-existing modification to `next-env.d.ts`. It was not part of this production synchronization.
+
+### Current direction
+
+Architecture remains stable.
+
+Next priorities are final production builds, measured latency qualification, runtime portability qualification, recovery and degradation qualification, documentation accuracy, and production freeze readiness.
+
+Do not manufacture architecture changes where current ownership is already correct.
+<!-- GEORGE_RECEIVER_RENDERING_VALIDATION_END -->
+
 
 <!-- GEORGE_LIVE_ENTRY_AUTHORITY_CLEANUP_START -->
 ## Production Update — LIVE Entry Authority Cleanup
