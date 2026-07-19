@@ -1,5 +1,24 @@
 # GEORGE Production Tracker
 
+<!-- GEORGE_STALE_REASONING_GUARD_START -->
+## Production Update — Stale Provider Reasoning Guard
+
+The canonical LIVE transcript stream now prevents superseded asynchronous provider reasoning from reaching delivery.
+
+`live-hub/src/stt/deepgram-stream.ts` remains the owner of transcript-to-provider orchestration. Each final fast-cue request claims a monotonic request generation. A provider result may emit `FAST_CUE`, enter provider-enriched arbitration, or emit `ACTION_CUE` only when its generation is still current.
+
+A newer final transcript supersedes unresolved older provider work. Deepgram close and error boundaries also invalidate unresolved provider work and clear prepared interim reasoning.
+
+This is a delivery-safety guard, not a second runtime, provider owner, or cancellation architecture. The underlying provider request may finish, but stale output is discarded before it can influence the room.
+
+Qualification:
+
+- `npm run george:stale-reasoning:qualify`
+- full production build
+- LIVE Hub TypeScript build
+
+<!-- GEORGE_STALE_REASONING_GUARD_END -->
+
 <!-- GEORGE_RECEIVER_RENDERING_VALIDATION_START -->
 ## Production Update — Receiver Rendering and Host Ownership Validation
 

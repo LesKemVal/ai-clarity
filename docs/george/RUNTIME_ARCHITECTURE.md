@@ -1,5 +1,33 @@
 # GEORGE Runtime Architecture
 
+<!-- GEORGE_STALE_REASONING_GUARD_START -->
+## Stale Provider Reasoning Guard
+
+Provider enrichment is asynchronous and may resolve after a newer final transcript has already superseded the request.
+
+The canonical transcript stream owns a monotonic fast-cue request generation:
+
+```text
+final transcript
+→ claim latest provider-request generation
+→ resolve prepared or direct provider reasoning
+→ verify generation is still current
+→ FAST_CUE / enriched arbitration / ACTION_CUE
+```
+
+When the generation is stale, the result is observed and discarded before delivery. Stream close and error boundaries invalidate unresolved generations and clear interim preparation.
+
+This guard preserves current ownership:
+
+- Interim Reasoning Preparer owns reusable interim candidates.
+- Deepgram Stream owns transcript/provider orchestration and stale-result rejection.
+- Cue Arbitrator still owns cue selection.
+- Delivery remains downstream of approved `ACTION_CUE`.
+- No UI, bridge, or renderer owns provider race policy.
+
+<!-- GEORGE_STALE_REASONING_GUARD_END -->
+
+
 <!-- GEORGE_RECEIVER_RENDERING_CONTRACT_START -->
 ## Receiver Rendering and Application-Host Contract
 

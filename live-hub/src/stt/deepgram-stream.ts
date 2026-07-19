@@ -68,6 +68,7 @@ export function createDeepgramStream(params: {
   let lastCuePriority = 0
   let lastFinalTranscriptKey = ''
   let lastFinalAt = 0
+  let latestFastCueRequestId = 0
   const pendingAudio: PendingAudioChunk[] = []
   let pendingAudioBytes = 0
   const recentTranscriptFragments: string[] = []
@@ -327,6 +328,7 @@ export function createDeepgramStream(params: {
 
     const preparedReasoning = interimReasoning.consume(transcript)
     const fastCueRequest = preparedReasoning?.result || resolveGroqFastCue(packet)
+    const fastCueRequestId = ++latestFastCueRequestId
 
     console.log('[LIVE HUB][groq] queued', {
       turnId: activeTurnId,
@@ -348,6 +350,15 @@ export function createDeepgramStream(params: {
 
     void fastCueRequest
       .then((fastCue) => {
+        if (fastCueRequestId !== latestFastCueRequestId) {
+          console.log('[LIVE HUB][groq] stale result discarded', {
+            turnId: activeTurnId,
+            fastCueRequestId,
+            latestFastCueRequestId,
+          })
+          return
+        }
+
         console.log('[LIVE HUB][groq] resolved', {
           turnId: activeTurnId,
           fastCue,
@@ -419,6 +430,8 @@ export function createDeepgramStream(params: {
 
   dg.on(LiveTranscriptionEvents.Close, () => {
     deepgramOpen = false
+    latestFastCueRequestId += 1
+    interimReasoning.clear()
     clearPendingAudio('deepgram_close')
     console.log('[LIVE HUB][deepgram] close')
   })
@@ -436,6 +449,8 @@ export function createDeepgramStream(params: {
 
   dg.on(LiveTranscriptionEvents.Error, (error) => {
     deepgramOpen = false
+    latestFastCueRequestId += 1
+    interimReasoning.clear()
     clearPendingAudio('deepgram_error')
 
     sendJson(params.ws, {
