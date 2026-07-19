@@ -11,6 +11,15 @@ function walk(directory) {
   })
 }
 
+function stripNonCode(source) {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1 ')
+    .replace(/`(?:\\.|[^`\\])*`/g, ' ')
+    .replace(/'(?:\\.|[^'\\])*'/g, ' ')
+    .replace(/"(?:\\.|[^"\\])*"/g, ' ')
+}
+
 const portableOwners = [
   'lib/george/live-runtime',
   'lib/george/live-delivery',
@@ -44,6 +53,7 @@ for (const owner of portableOwners) {
 
   for (const path of files) {
     const source = readFileSync(path, 'utf8')
+    const executableSource = stripNonCode(source)
     const displayPath = relative(root, path)
 
     for (const forbiddenImport of forbiddenImports) {
@@ -55,7 +65,7 @@ for (const owner of portableOwners) {
 
     for (const forbiddenGlobal of forbiddenBrowserGlobals) {
       assert(
-        !forbiddenGlobal.test(source),
+        !forbiddenGlobal.test(executableSource),
         `Portable runtime owner must not depend on browser execution globals: ${displayPath} -> ${forbiddenGlobal}`
       )
     }
