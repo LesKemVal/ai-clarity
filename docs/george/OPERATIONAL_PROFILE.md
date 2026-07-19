@@ -365,3 +365,19 @@ User-facing copy should describe:
 as `liveRoom`, `roomContext`, `roomSignals`, telemetry, and compatibility fields. Internal
 runtime naming must not leak into user-facing product copy unless a literal physical room
 is the subject.
+
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:BEGIN -->
+## Operational Profile interface stability
+
+The Operational Profile remains evidence consumed by the canonical runtime. It is not a delivery contract, transport contract, renderer contract, or provider-specific prompt format.
+
+Runtime interface freeze preserves this separation:
+
+- profile evidence may inform behavior composition and operational reasoning;
+- receiver policy may use current-room receiver preferences without rewriting the profile;
+- transport may carry a canonical runtime snapshot without recomputing profile meaning;
+- bridges and renderers may not mutate or reinterpret the profile;
+- provider degradation and runtime restart must not create alternate profile authority.
+
+The profile remains portable across provider, model, host, device, and user interface changes.
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:END -->

@@ -1625,3 +1625,46 @@ clear timer and pending turn state
 Bridge deactivation and unmount use the same reset lifecycle. No timer utility
 or parallel runtime owner is introduced.
 <!-- LIVE_TIMER_OWNER:END -->
+
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:BEGIN -->
+## Frozen production runtime interfaces
+
+The current production interfaces are stable portability boundaries, not invitations to create new layers.
+
+```text
+Support Behavior Composer
+        ↓
+Receiver Policy
+        ↓
+Delivery Router
+        ↓
+Delivery Bridge
+        ↓
+Voice / visual / silent host realization
+```
+
+The LIVE Hub adapter is a transport boundary only:
+
+```text
+connect(context)
+syncContext(context)
+disconnect()
+sendTranscript(text, isFinal, turnId, deliveryStyle)
+subscribe(listener)
+```
+
+It may own connection state, bounded reconnect, stale-transport rejection, context replay, and queued transcript release. It must not choose support behavior, shape receiver content, render guidance, or execute audio.
+
+Contract ownership:
+
+- Runtime behavior contracts belong to `lib/george/live-runtime`.
+- Receiver and delivery contracts belong to `lib/george/live-delivery`.
+- Hub transport contracts belong to `lib/george/live-hub`.
+- Runtime telemetry contracts belong to `lib/george/live-metrics`.
+- Browser execution belongs to host and application surfaces.
+- Bridges translate and dispatch; renderers present approved output.
+
+Dependency direction remains one way. Rendering may consume delivery output but may not reinterpret it. Delivery may consume an approved runtime assessment but may not recompute it. Telemetry may observe every boundary but may not become an authority boundary.
+
+`scripts/george-runtime-interface-freeze-qualification.mjs` protects these ownership and public-surface constraints in the production build.
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:END -->

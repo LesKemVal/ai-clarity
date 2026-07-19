@@ -1502,3 +1502,49 @@ Delivery-style changes no longer rerun the transcript buffering effect. The
 latest delivery style is read through a ref at dispatch time, preserving
 current delivery behavior without duplicating a pending final transcript.
 <!-- LIVE_TIMER_OWNERSHIP:END -->
+
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:BEGIN -->
+## Runtime interface freeze
+
+Validated after LIVE Hub resilience, provider degradation, and restart continuity qualification.
+
+The production runtime boundary is frozen around the existing canonical owners:
+
+- `lib/george/live-runtime/support-behavior-composer.ts` owns support behavior selection.
+- `lib/george/live-delivery/receiver-policy.ts` owns receiver-specific realization.
+- `lib/george/live-delivery/delivery-router.ts` owns delivery cue construction and routing.
+- `lib/george/live-hub/live-runtime-adapter.ts` owns transport lifecycle, context synchronization, transcript queueing, reconnect, and subscription.
+- `lib/george/live-metrics/runtime-metrics.ts` observes runtime execution without making runtime decisions.
+- `components/george/live/LiveHubDeliveryBridge.tsx` dispatches approved delivery.
+- `components/george/live/LiveHubVisualCueBridge.tsx` renders approved visual guidance.
+
+The public LIVE Hub adapter surface remains intentionally narrow:
+
+```text
+connect
+syncContext
+disconnect
+sendTranscript
+subscribe
+```
+
+The protected contracts are:
+
+- support behavior input and decision;
+- receiver profile and delivery context;
+- delivery cue;
+- LIVE Hub context and event;
+- runtime metric event;
+- bridge dispatch and renderer boundaries.
+
+Future portability work must extend implementations behind these contracts. It must not add competing public entry points, move behavior into bridges, move receiver shaping into renderers, or move host execution into the portable runtime.
+
+Production qualification now includes:
+
+- LIVE Hub resilience qualification;
+- provider degradation qualification;
+- LIVE restart continuity qualification;
+- runtime interface freeze qualification.
+
+Runtime interface changes require a verified production or portability need, focused qualification, synchronized architecture documentation, and a separate validated commit.
+<!-- GEORGE_RUNTIME_INTERFACE_FREEZE:END -->
