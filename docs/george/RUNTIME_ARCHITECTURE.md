@@ -1668,3 +1668,26 @@ Dependency direction remains one way. Rendering may consume delivery output but 
 
 `scripts/george-runtime-interface-freeze-qualification.mjs` protects these ownership and public-surface constraints in the production build.
 <!-- GEORGE_RUNTIME_INTERFACE_FREEZE:END -->
+
+
+<!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:BEGIN -->
+## Duplicate-ownership protection
+
+The application page is permitted to compose state, mount bridges, present runtime observations, and provide host callbacks. It is not permitted to import or invoke canonical support-behavior, receiver-policy, delivery-routing, or runtime-construction decisions directly.
+
+The final production audit protects this dependency direction:
+
+```text
+application composition
+        ↓
+shadow / delivery bridges
+        ↓
+canonical runtime and delivery owners
+        ↓
+approved host realization
+```
+
+Renderers consume approved delivery output. Bridges translate and dispatch. Canonical owners decide. A new feature must extend the existing owner rather than reproduce its decision in a page, bridge, renderer, test surface, or provider adapter.
+
+`scripts/george-duplicate-ownership-audit.mjs` is part of the production build immediately after runtime-interface-freeze qualification.
+<!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:END -->

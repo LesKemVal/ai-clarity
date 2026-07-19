@@ -1548,3 +1548,24 @@ Production qualification now includes:
 
 Runtime interface changes require a verified production or portability need, focused qualification, synchronized architecture documentation, and a separate validated commit.
 <!-- GEORGE_RUNTIME_INTERFACE_FREEZE:END -->
+
+
+<!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:BEGIN -->
+## Final duplicate-ownership audit
+
+The production ownership audit passed after runtime interface freeze.
+
+The audit verifies that `app/george/page.tsx` remains an application composition surface and does not directly own support behavior composition, receiver policy, delivery routing, or LIVE Hub adapter construction. Runtime-facing state displayed or passed by the page remains orchestration rather than decision authority.
+
+Canonical ownership remains:
+
+- support behavior: `lib/george/live-runtime/support-behavior-composer.ts`;
+- receiver realization: `lib/george/live-delivery/receiver-policy.ts`;
+- delivery routing: `lib/george/live-delivery/delivery-router.ts`;
+- transport lifecycle: `lib/george/live-hub/live-runtime-adapter.ts`;
+- dispatch: `components/george/live/LiveHubDeliveryBridge.tsx`;
+- visual rendering: `components/george/live/LiveHubVisualCueBridge.tsx`;
+- transcript transport composition: `components/george/live/LiveHubShadowBridge.tsx`.
+
+`scripts/george-duplicate-ownership-audit.mjs` protects these boundaries in the production build and rejects duplicate declarations of the principal canonical decision functions.
+<!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:END -->
