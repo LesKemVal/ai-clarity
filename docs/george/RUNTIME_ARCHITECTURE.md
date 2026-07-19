@@ -1,3 +1,11 @@
+# ACTION_CUE Turn Identity
+
+Turn identity originates with transcript acceptance and must be preserved by every downstream ACTION_CUE.
+
+The client adapter may validate identity, but it must not infer ACTION_CUE ownership from whichever transcript happened to be submitted most recently. Packets without a `turnId` are invalid and are rejected before authority finalization, routing, rendering, or voice playback.
+
+This preserves one end-to-end identity across reasoning, delivery, telemetry, visual rendering, and TTS.
+
 # Voice Playback Generation Ownership
 
 Voice playback has a single request-generation boundary at the existing host playback implementation.

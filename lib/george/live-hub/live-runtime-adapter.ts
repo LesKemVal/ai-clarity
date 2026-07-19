@@ -141,6 +141,16 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
           if (event?.type !== 'ACTION_CUE') return
 
           const cleanCue = String(event?.cue || '').trim()
+          const eventTurnId = String(event?.turnId || '').trim()
+
+          if (!eventTurnId) {
+            console.warn('[LIVE][hub][adapter][action-cue-dropped-missing-turn-id]', {
+              cue: event?.cue,
+              source: event?.source,
+            })
+            return
+          }
+
           const fallbackEvidence = {
             transcript: lastTranscriptRef,
             recentTranscript: lastTranscriptRef,
@@ -161,7 +171,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
           }
 
           console.info('[LIVE][hub][adapter][raw-action-cue]', {
-            turnId: event.turnId || lastTurnIdRef,
+            turnId: eventTurnId,
             cue: event.cue,
             source: event.source,
             hasEvidence: Boolean(event.evidence),
@@ -171,7 +181,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
           const finalizedEvent = finalizeGeorgeActionCueAuthority({
             actionCue: {
               ...event,
-              turnId: event.turnId || lastTurnIdRef,
+              turnId: eventTurnId,
               evidence: event.evidence || fallbackEvidence,
               cue: cleanCue,
             } as GeorgeActionCue,
@@ -181,7 +191,7 @@ export function createGeorgeLiveHubRuntimeAdapter(params?: {
           const resolvedEvent = {
             ...event,
             ...finalizedEvent,
-            turnId: finalizedEvent.turnId || event.turnId || lastTurnIdRef,
+            turnId: finalizedEvent.turnId || eventTurnId,
             evidence: finalizedEvent.evidence || event.evidence || fallbackEvidence,
             cue: finalizedEvent.cue,
           } as ({ type: 'ACTION_CUE' } & GeorgeActionCue)

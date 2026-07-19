@@ -1,3 +1,19 @@
+# ACTION_CUE Turn Ownership — VALIDATED PENDING BUILD
+
+The LIVE adapter no longer assigns a provider or local ACTION_CUE to the most recently submitted transcript when the cue arrives without a `turnId`.
+
+An ACTION_CUE must carry its originating runtime identity. Missing identity is now treated as an invalid runtime packet and is dropped before authority finalization or delivery routing.
+
+This closes a cross-turn race in which a delayed cue lacking identity could be attributed to a newer transcript and delivered under the wrong telemetry and delivery commitment key.
+
+Canonical owner:
+
+- `lib/george/live-hub/live-runtime-adapter.ts`
+
+Qualification:
+
+- `scripts/george-action-cue-turn-ownership-qualification.mjs`
+
 # Voice Playback Generation Ownership — VALIDATED PENDING BUILD
 
 The canonical voice playback path now invalidates asynchronous TTS and playback work whenever speech is stopped or superseded.
