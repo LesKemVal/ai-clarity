@@ -5,6 +5,10 @@ function assert(condition, message) {
 }
 
 const root = process.cwd()
+const receiverPolicySource = readFileSync(
+  `${root}/lib/george/live-delivery/receiver-policy.ts`,
+  'utf8'
+)
 const routerSource = readFileSync(
   `${root}/lib/george/live-delivery/delivery-router.ts`,
   'utf8'
@@ -31,54 +35,54 @@ assert(
 )
 
 assert(
-  routerSource.includes("if (input.receiverProfile === 'visual_only') return ['visual']"),
+  receiverPolicySource.includes("if (input.receiverProfile === 'visual_only') return ['visual']"),
   'visual_only must route exclusively to visual delivery'
 )
 
 assert(
-  routerSource.includes(
+  receiverPolicySource.includes(
     "if (input.receiverProfile === 'audio_only') return input.voiceEnabled ? ['voice'] : ['silent']"
   ),
   'audio_only must route to voice when available and fail closed to silent'
 )
 
 assert(
-  routerSource.includes(
+  receiverPolicySource.includes(
     "return input.voiceEnabled ? ['voice', 'visual'] : ['visual']"
   ),
   'audio_visual must route one support behavior to both surfaces when voice is enabled'
 )
 
 assert(
-  routerSource.includes('shapeAudioText') &&
-    routerSource.includes('shapeVisualOnlyText') &&
-    routerSource.includes('shapeVisualReferenceText'),
+  receiverPolicySource.includes('shapeAudioText') &&
+    receiverPolicySource.includes('shapeVisualOnlyText') &&
+    receiverPolicySource.includes('shapeVisualReferenceText'),
   'receiver delivery policy must own separate audio, visual-only, and visual-reference shaping'
 )
 
 assert(
-  routerSource.includes("input.receiverProfile === 'visual_only'") &&
-    routerSource.includes('VISUAL_MAX_CHARS') &&
-    routerSource.includes('preserveLines'),
+  receiverPolicySource.includes("input.receiverProfile === 'visual_only'") &&
+    receiverPolicySource.includes('VISUAL_MAX_CHARS') &&
+    receiverPolicySource.includes('preserveLines'),
   'visual-only policy must preserve readable structure and allow richer guidance'
 )
 
 assert(
-  routerSource.includes('AUDIO_MAX_CHARS') &&
-    routerSource.includes('flattenForAudio') &&
-    routerSource.includes("input.mode === 'voice'"),
+  receiverPolicySource.includes('AUDIO_MAX_CHARS') &&
+    receiverPolicySource.includes('flattenForAudio') &&
+    receiverPolicySource.includes("input.mode === 'voice'"),
   'audio policy must flatten support for sequential spoken delivery'
 )
 
 assert(
-  routerSource.includes(
+  receiverPolicySource.includes(
     "? 'Receiver policy routed support as persistent visual reference.'"
   ),
   'audio_visual visual output must be identified as persistent reference'
 )
 
 assert(
-  routerSource.includes(
+  receiverPolicySource.includes(
     ": 'Receiver policy routed support as readable visual-only guidance.'"
   ),
   'visual_only output must be identified as readable visual guidance'
@@ -93,8 +97,13 @@ assert(
 )
 
 assert(
-  bridgeSource.includes('routeGeorgeDeliveryCue'),
+  bridgeSource.includes('routeGeorgeDeliveryCues'),
   'delivery bridge must delegate receiver routing to the canonical delivery policy'
+)
+
+assert(
+  visualBridgeSource.includes('whitespace-pre-line'),
+  'visual bridge must preserve receiver-policy structure when rendering visual guidance'
 )
 
 console.log('GEORGE LIVE delivery policy smoke passed')
