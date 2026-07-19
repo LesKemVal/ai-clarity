@@ -103,9 +103,11 @@ assert(
 )
 
 assert(
-  visualBridgeSource.includes('{visualCue.text}') &&
+  visualBridgeSource.includes('whitespace-pre-line') &&
+    visualBridgeSource.includes('break-words') &&
+    visualBridgeSource.includes('{visualCue.text}') &&
     !visualBridgeSource.includes('.replace(/\\n+/g'),
-  'visual bridge must pass policy-created line breaks through without reshaping them'
+  'visual bridge must preserve policy-created line breaks, wrap long text, and avoid reshaping content'
 )
 
 console.log('GEORGE LIVE delivery policy smoke passed')
