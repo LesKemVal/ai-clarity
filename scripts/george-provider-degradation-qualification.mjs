@@ -153,7 +153,7 @@ assertIncludes(
 assertOrder(
   hubSttStream,
   'const localActionCue = arbitrateCue({ packet })',
-  'void resolveGroqFastCue(packet)',
+  'resolveGroqFastCue(packet)',
   'Local cue resolution must precede optional LLM enrichment'
 )
 

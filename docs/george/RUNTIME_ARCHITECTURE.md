@@ -1704,3 +1704,30 @@ STT latency tuning remains transport configuration, not behavioral authority.
 
 These owners may reduce capture and endpoint detection delay, but they must not choose support behavior, receiver realization, delivery routing, or rendering.
 <!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_END -->
+
+
+<!-- GEORGE_EARLY_REASONING_ARCHITECTURE_START -->
+## Early Reasoning Preparation Boundary
+
+Early reasoning preparation is latency work inside the existing LIVE Hub pipeline.
+
+```text
+Stable interim transcript
+↓
+Candidate provider reasoning
+↓
+Final transcript compatibility validation
+↓
+Canonical cue arbitration
+↓
+ACTION_CUE delivery
+```
+
+Preparation does not authorize delivery. The final transcript remains the
+delivery gate. Incompatible, stale, or missing preparation falls back to the
+canonical final-transcript provider request.
+
+The preparer owns only candidate lifecycle and transcript compatibility. It does
+not own support behavior, receiver policy, delivery routing, rendering, or user
+authority.
+<!-- GEORGE_EARLY_REASONING_ARCHITECTURE_END -->

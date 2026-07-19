@@ -7,6 +7,7 @@ import { buildRuntimePacket } from '../george/runtime-packet.js'
 import { resolveGroqFastCue } from '../llm/groq-fast-lane.js'
 import { arbitrateCue } from '../george/cue-arbitrator.js'
 import { markLatency } from '../metrics/latency.js'
+import { createInterimReasoningPreparer } from '../george/interim-reasoning-preparer.js'
 
 function createRuntimeTurnId() {
   return `live-turn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -70,6 +71,10 @@ export function createDeepgramStream(params: {
   const pendingAudio: PendingAudioChunk[] = []
   let pendingAudioBytes = 0
   const recentTranscriptFragments: string[] = []
+  const interimReasoning = createInterimReasoningPreparer<
+    ReturnType<typeof buildRuntimePacket>,
+    Awaited<ReturnType<typeof resolveGroqFastCue>>
+  >()
 
   const dg = deepgram.listen.live({
     model: 'nova-2',
@@ -302,17 +307,46 @@ export function createDeepgramStream(params: {
       console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'local_cue_sent'))
     }
 
+    if (!isFinal) {
+      const prepared = interimReasoning.prepare({
+        transcript,
+        packet,
+        resolve: resolveGroqFastCue,
+      })
+
+      if (prepared) {
+        console.log('[LIVE HUB][early-reasoning] prepared', {
+          turnId: activeTurnId,
+          transcript,
+          deliveryStyle: packet.deliveryStyle,
+        })
+      }
+
+      return
+    }
+
+    const preparedReasoning = interimReasoning.consume(transcript)
+    const fastCueRequest = preparedReasoning?.result || resolveGroqFastCue(packet)
+
     console.log('[LIVE HUB][groq] queued', {
       turnId: activeTurnId,
       signal: packet.signal,
       cue: packet.cue,
       deliveryStyle: packet.deliveryStyle,
       recentTranscriptAvailable: Boolean(packet.recentTranscript),
+      reusedPreparedReasoning: Boolean(preparedReasoning),
+      preparedReasoningAgeMs: preparedReasoning?.ageMs,
     })
 
-    console.log('[LIVE HUB][latency]', markLatency(turnStartAt, 'groq_request'))
+    console.log(
+      '[LIVE HUB][latency]',
+      markLatency(
+        turnStartAt,
+        preparedReasoning ? 'early_reasoning_reused' : 'groq_request'
+      )
+    )
 
-    void resolveGroqFastCue(packet)
+    void fastCueRequest
       .then((fastCue) => {
         console.log('[LIVE HUB][groq] resolved', {
           turnId: activeTurnId,

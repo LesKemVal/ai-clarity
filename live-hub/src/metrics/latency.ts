@@ -2,6 +2,7 @@ export type LiveLatencyEvent =
   | 'transcript_received'
   | 'local_cue_sent'
   | 'groq_request'
+  | 'early_reasoning_reused'
   | 'groq_response'
   | 'fast_cue_sent'
 

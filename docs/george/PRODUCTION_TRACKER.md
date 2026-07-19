@@ -1589,3 +1589,29 @@ Canonical ownership remains unchanged. STT transport owns capture cadence and pr
 
 Validation authority: `scripts/george-live-input-latency-qualification.mjs`.
 <!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_END -->
+
+
+<!-- GEORGE_EARLY_REASONING_PREPARATION_START -->
+## Production Update — Early Reasoning Preparation
+
+LIVE Hub may begin provider reasoning from a sufficiently stable interim transcript,
+but it may not dispatch interim provider output as an ACTION_CUE.
+
+Canonical behavior:
+
+- stable interim transcripts may prepare one candidate provider result;
+- short or unstable interim fragments do not start preparation;
+- preparation expires after a bounded interval;
+- the final transcript validates compatibility before reuse;
+- incompatible or expired preparation is discarded;
+- final processing falls back to the canonical provider request;
+- only final transcript processing may arbitrate and dispatch the prepared result.
+
+Canonical owner:
+
+- `live-hub/src/george/interim-reasoning-preparer.ts` owns candidate lifecycle and final compatibility;
+- `live-hub/src/stt/deepgram-stream.ts` remains the transcript pipeline and final delivery gate.
+
+This reduces final-turn provider wait without creating another runtime, behavior
+composer, delivery owner, or reasoning authority.
+<!-- GEORGE_EARLY_REASONING_PREPARATION_END -->
