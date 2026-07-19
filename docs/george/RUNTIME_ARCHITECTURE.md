@@ -1691,3 +1691,16 @@ Renderers consume approved delivery output. Bridges translate and dispatch. Cano
 
 `scripts/george-duplicate-ownership-audit.mjs` is part of the production build immediately after runtime-interface-freeze qualification.
 <!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:END -->
+
+
+<!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_START -->
+## LIVE Input Latency Boundary
+
+STT latency tuning remains transport configuration, not behavioral authority.
+
+- Browser capture cadence: `lib/george/live-voice/stt/deepgram-live-client.ts`.
+- LIVE Hub provider endpointing: `live-hub/src/stt/deepgram-stream.ts`.
+- Final utterance assembly: `lib/george/live-runtime/final-transcript-release-policy.ts` through `LiveHubShadowBridge.tsx`.
+
+These owners may reduce capture and endpoint detection delay, but they must not choose support behavior, receiver realization, delivery routing, or rendering.
+<!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_END -->

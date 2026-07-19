@@ -195,7 +195,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       '&interim_results=true' +
       '&smart_format=true' +
       '&punctuate=true' +
-      '&endpointing=350'
+      '&endpointing=250'
 
     try {
       await navigator.mediaDevices.enumerateDevices()
@@ -264,7 +264,7 @@ export function createDeepgramLiveClient(handlers: DeepgramLiveClientHandlers): 
       }
 
       if (liveSttDebug()) console.info('[GEORGE DEEPGRAM] recorder start', { mimeType: recorder.mimeType })
-      recorder.start(250)
+      recorder.start(100)
     }
 
     socket.onmessage = (message) => {

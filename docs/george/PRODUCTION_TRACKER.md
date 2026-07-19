@@ -1569,3 +1569,23 @@ Canonical ownership remains:
 
 `scripts/george-duplicate-ownership-audit.mjs` protects these boundaries in the production build and rejects duplicate declarations of the principal canonical decision functions.
 <!-- GEORGE_DUPLICATE_OWNERSHIP_AUDIT:END -->
+
+
+<!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_START -->
+## Production Update — LIVE Input Latency Optimization
+
+The first measured latency optimization reduces delay before stable LIVE transcript availability without changing runtime ownership.
+
+Qualified changes:
+
+- browser microphone audio chunks are sent every 100 ms instead of every 250 ms;
+- browser Deepgram endpointing is reduced from 350 ms to 250 ms;
+- direct LIVE Hub Deepgram endpointing is aligned at 250 ms;
+- canonical final-transcript assembly safeguards remain 90 ms terminal, 140 ms standard, and 210 ms fragment release delays.
+
+This removes up to 150 ms of audio-upload cadence delay and 100 ms of endpointing delay from the STT critical path while retaining the existing final transcript assembly policy.
+
+Canonical ownership remains unchanged. STT transport owns capture cadence and provider endpointing. The final transcript release policy owns bounded utterance assembly. Behavior, receiver policy, delivery routing, dispatch, and rendering remain untouched.
+
+Validation authority: `scripts/george-live-input-latency-qualification.mjs`.
+<!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_END -->

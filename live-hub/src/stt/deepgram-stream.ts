@@ -75,7 +75,7 @@ export function createDeepgramStream(params: {
     model: 'nova-2',
     smart_format: true,
     interim_results: true,
-    endpointing: 350,
+    endpointing: 250,
   })
 
   function clearPendingAudio(reason: string) {
