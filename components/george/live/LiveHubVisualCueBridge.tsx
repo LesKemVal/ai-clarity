@@ -191,7 +191,7 @@ export function LiveHubVisualCueBridge({
             <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
               GEORGE
             </div>
-            <div className="text-sm leading-snug text-white/90">
+            <div className="whitespace-pre-line break-words text-sm leading-snug text-white/90">
               {visualCue.text}
             </div>
           </div>
