@@ -542,7 +542,7 @@ export function LiveRoomStatusPanel({
 
           <DockButton
             compact={viewMode === 'reading'}
-            label="Receiver"
+            label="Delivery"
             detail={receiverProfileLabel || 'Visual'}
             active={liveRoomActive}
             disabled={isThinking}

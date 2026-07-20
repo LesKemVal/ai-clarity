@@ -43,21 +43,21 @@ export const LIVE_SUPPORT_PANELS: LiveSupportPanel[] = [
 
 export const LIVE_RECEIVER_PROFILE_PANELS: LiveReceiverProfilePanel[] = [
   {
-    id: 'visual_only',
-    label: 'Visual',
-    line: 'Readable support on screen only.',
-    detail: 'Use this when you can glance at GEORGE. Visual support may be richer, structured, persistent, and skimmable.',
-  },
-  {
     id: 'audio_only',
     label: 'Audio',
-    line: 'Spoken support in your ear only.',
-    detail: 'Use this when you cannot safely read. Audio support stays sequential, repeatable, and low-cognitive-load where useful.',
+    line: 'Spoken support in your ear.',
+    detail: 'Use earbuds or audio glasses when reading is not practical. GEORGE keeps spoken guidance sequential, repeatable, and low-cognitive-load.',
   },
   {
     id: 'audio_visual',
-    label: 'Audio + Visual',
-    line: 'Spoken steering plus readable reference.',
-    detail: 'Use this when you have both earbuds and a readable surface. Audio is immediate steering. Visual is persistent reference.',
+    label: 'Glasses',
+    line: 'Readable guidance through supported glasses.',
+    detail: 'Use supported text-capable glasses for discreet, in-view guidance. Audio may carry immediate steering while visual support remains available as readable reference.',
+  },
+  {
+    id: 'visual_only',
+    label: 'Desktop / Mobile',
+    line: 'Readable support in the responsive web workspace.',
+    detail: 'Use the desktop or mobile interface when the screen is your delivery surface. Visual guidance may be structured, persistent, skimmable, and richer than spoken delivery.',
   },
 ]

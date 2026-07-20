@@ -26,6 +26,18 @@ Canonical implementation:
 
 - `lib/george/live-hub/live-runtime-adapter.ts`
 
+# Delivery Profile Terminology Boundary
+
+The product presents **Delivery Profile** as the user-facing name for how GEORGE reaches the user:
+
+- Audio
+- Glasses
+- Desktop / Mobile
+
+The runtime continues to use receiver-profile identifiers and Receiver Policy internally. This separation is intentional: product language may evolve without changing the portable delivery contract or duplicating delivery authority.
+
+No delivery-profile presentation component may choose support behavior, shape receiver-specific guidance, route delivery, or acquire runtime reasoning.
+
 # GEORGE Runtime Architecture
 
 <!-- GEORGE_STALE_REASONING_GUARD_START -->

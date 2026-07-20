@@ -48,6 +48,28 @@ Qualification:
 
 This closes a reconnect race in which queued transcript intent could be delivered under a newer support style after transport recovery.
 
+# Delivery Profile Product Terminology — VALIDATED
+
+User-facing LIVE terminology now describes the delivery surface without changing runtime architecture.
+
+Production labels:
+
+- **Audio** — spoken support through earbuds or audio glasses.
+- **Glasses** — readable guidance through supported text-capable glasses, with audio available for immediate steering.
+- **Desktop / Mobile** — the responsive web workspace as the readable delivery surface.
+
+Internal compatibility identifiers remain `audio_only`, `audio_visual`, and `visual_only`.
+
+Canonical ownership remains unchanged:
+
+- `lib/george/capabilities/live-support-panels.ts` owns the user-facing profile labels and descriptions.
+- `components/george/live-entry/LiveReceiverProfilePanel.tsx` presents Delivery Profile selection.
+- `components/george/live/LiveRoomStatusPanel.tsx` presents the current Delivery control.
+- `lib/george/live-delivery/receiver-policy.ts` remains the sole owner of receiver-specific realization.
+- `app/george/page.tsx` was not changed and owns no delivery policy or runtime reasoning.
+
+This is terminology and presentation hardening for production portability. It does not create another runtime, routing owner, or receiver-policy implementation.
+
 # GEORGE Production Tracker
 
 <!-- GEORGE_STALE_REASONING_GUARD_START -->
