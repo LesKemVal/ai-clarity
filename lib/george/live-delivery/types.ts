@@ -1,15 +1,8 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
+import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-contracts'
+export type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-contracts'
 
 export type GeorgeDeliveryMode = 'voice' | 'visual' | 'silent'
-
-export type GeorgeLiveDeliveryStyle =
-  | 'silent'
-  | 'cue'
-  | 'advice'
-  | 'line'
-  | 'response'
-  | 'expandedLine'
-  | 'continue'
 
 export type GeorgeLiveReceiverProfile =
   | 'visual_only'

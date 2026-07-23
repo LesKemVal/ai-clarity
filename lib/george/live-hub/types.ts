@@ -1,4 +1,4 @@
-import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
+import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-contracts'
 
 export type GeorgeRuntimeAuthoritySnapshot = Readonly<Record<string, unknown>>
 

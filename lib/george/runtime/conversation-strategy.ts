@@ -5,25 +5,9 @@ import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engin
 import {
   resolveConversationMoveDefinition,
   resolveSignalAcquisitionMoveVariant,
+  type GeorgeConversationMove,
   type GeorgeConversationMoveDefinition,
 } from '@/lib/george/runtime/conversation-move-library'
-
-export type GeorgeConversationMove =
-  | 'answer'
-  | 'ask'
-  | 'clarify'
-  | 'anchor'
-  | 'reframe'
-  | 'summarize'
-  | 'validate'
-  | 'challenge'
-  | 'redirect'
-  | 'slow'
-  | 'close'
-  | 'explore'
-  | 'probe'
-  | 'confirm'
-  | 'pause'
 
 export type GeorgeConversationStrategy = {
   move: GeorgeConversationMove

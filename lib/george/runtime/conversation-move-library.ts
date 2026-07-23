@@ -1,4 +1,19 @@
-import type { GeorgeConversationMove } from '@/lib/george/runtime/conversation-strategy'
+export type GeorgeConversationMove =
+  | 'answer'
+  | 'ask'
+  | 'clarify'
+  | 'anchor'
+  | 'reframe'
+  | 'summarize'
+  | 'validate'
+  | 'challenge'
+  | 'redirect'
+  | 'slow'
+  | 'close'
+  | 'explore'
+  | 'probe'
+  | 'confirm'
+  | 'pause'
 
 export type GeorgeConversationMoveDefinition = {
   id: GeorgeConversationMove
