@@ -1,4 +1,4 @@
-# ACTION_CUE Turn Ownership — VALIDATED PENDING BUILD
+# ACTION_CUE Turn Ownership — VALIDATED
 
 The LIVE adapter no longer assigns a provider or local ACTION_CUE to the most recently submitted transcript when the cue arrives without a `turnId`.
 
@@ -14,7 +14,7 @@ Qualification:
 
 - `scripts/george-action-cue-turn-ownership-qualification.mjs`
 
-# Voice Playback Generation Ownership — VALIDATED PENDING BUILD
+# Voice Playback Generation Ownership — VALIDATED
 
 The canonical voice playback path now invalidates asynchronous TTS and playback work whenever speech is stopped or superseded.
 
@@ -32,7 +32,7 @@ Qualification:
 
 No routing, behavior composition, or receiver policy was moved into rendering.
 
-# Reconnect Transcript Policy Ownership — VALIDATED PENDING BUILD
+# Reconnect Transcript Policy Ownership — VALIDATED
 
 The LIVE runtime adapter now preserves the delivery policy captured by each transcript while disconnected.
 
@@ -71,6 +71,27 @@ Canonical ownership remains unchanged:
 This is terminology and presentation hardening for production portability. It does not create another runtime, routing owner, or receiver-policy implementation.
 
 # GEORGE Production Tracker
+
+<!-- GEORGE_SHARED_REASONING_EXECUTION_BOUNDARY_START -->
+## Production Update — Shared Reasoning and Execution Boundary Hardening
+
+The runtime governance maps now state the existing architecture explicitly:
+
+- GEORGE is one operational intelligence;
+- Normal and LIVE use one canonical reasoning chain;
+- operating modes do not own separate outcome reasoning, judgment, strategy, or user understanding;
+- `execution_policy` is the canonical branch point between shared reasoning and mode-specific realization;
+- Normal and LIVE apply different execution constraints to the same resolved intelligence;
+- presentation, delivery, receiver policy, and rendering remain downstream consumers and may not recompute upstream reasoning.
+
+Canonical ownership hardened in:
+
+- `lib/george/runtime/runtime-governance-map.ts`;
+- `lib/george/runtime/governance-ownership.ts`;
+- `docs/george/RUNTIME_ARCHITECTURE.md`.
+
+This is an ownership and doctrine hardening change. It does not add another runtime, reasoning lane, provider authority, execution layer, or delivery owner.
+<!-- GEORGE_SHARED_REASONING_EXECUTION_BOUNDARY_END -->
 
 <!-- GEORGE_STALE_REASONING_GUARD_START -->
 ## Production Update — Stale Provider Reasoning Guard
@@ -1706,3 +1727,29 @@ Canonical owner:
 This reduces final-turn provider wait without creating another runtime, behavior
 composer, delivery owner, or reasoning authority.
 <!-- GEORGE_EARLY_REASONING_PREPARATION_END -->
+
+
+<!-- GEORGE_LIVE_DELIVERY_DEADLINE_GOVERNOR_START -->
+## LIVE Delivery Deadline Governor
+
+Status: VALIDATED
+
+The existing LIVE latency package now owns operational delivery usefulness as well
+as measurement. It does not introduce another runtime, reasoning lane, delivery
+router, or telemetry store.
+
+Canonical behavior:
+
+- current audio-visual support preserves visual and voice delivery;
+- audio-visual support that misses the preferred visual window compresses to
+  visual-only delivery rather than speaking a stale cue;
+- expired visual support is suppressed;
+- audio-only support retains its receiver-specific playback window and is
+  suppressed when that window expires;
+- bridges consume the deadline decision and do not recompute it;
+- judgment is unchanged. Only execution is compressed or suppressed.
+
+Qualification:
+
+`npm run george:live-delivery-deadline:qualify`
+<!-- GEORGE_LIVE_DELIVERY_DEADLINE_GOVERNOR_END -->

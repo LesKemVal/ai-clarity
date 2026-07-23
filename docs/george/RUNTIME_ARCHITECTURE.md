@@ -1490,9 +1490,13 @@ The future Operational Judgment owner will synthesize those streams into one ope
 
 # Shared Operational Reasoning
 
-GEORGE reasons once.
+GEORGE is one operational intelligence and reasons through one canonical chain.
 
-Normal and LIVE realize that reasoning differently.
+Normal and LIVE do not own separate intelligence, outcome reasoning, operational judgment, conversation strategy, or user understanding. They consume the same resolved reasoning and diverge at execution realization.
+
+Execution Policy is the canonical branch point. Operating mode changes realization constraints, timing, interaction, and delivery; it does not create another reasoning pipeline.
+
+Normal and LIVE realize the same resolved intelligence differently.
 
 Shared operational reasoning produces:
 
@@ -1799,3 +1803,28 @@ The preparer owns only candidate lifecycle and transcript compatibility. It does
 not own support behavior, receiver policy, delivery routing, rendering, or user
 authority.
 <!-- GEORGE_EARLY_REASONING_ARCHITECTURE_END -->
+
+
+<!-- GEORGE_LIVE_DELIVERY_DEADLINE_BOUNDARY_START -->
+## LIVE Delivery Deadline Boundary
+
+Operational latency authority remains inside `lib/george/live-metrics`.
+
+The latency package owns:
+
+- timeline contracts;
+- observed per-turn metrics;
+- production latency budgets;
+- receiver-specific delivery usefulness deadlines.
+
+The Delivery Bridge applies the canonical result:
+
+`deliver | compress | suppress`
+
+Compression changes execution only. It may remove late voice delivery when a
+timely visual receiver remains available. It may not rewrite operational
+judgment, create replacement reasoning, or reinterpret the selected behavior.
+
+The Delivery Router continues to own receiver routing. Rendering continues to
+render approved delivery without recomputation.
+<!-- GEORGE_LIVE_DELIVERY_DEADLINE_BOUNDARY_END -->
