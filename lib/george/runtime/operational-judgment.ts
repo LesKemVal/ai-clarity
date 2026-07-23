@@ -19,6 +19,13 @@ export type OperationalJudgmentAction =
   | 'advance_outcome'
   | 'clarify_direction'
 
+export type GeorgeOperationalPosture =
+  | 'planning'
+  | 'preparing'
+  | 'execution_imminent'
+  | 'recovering'
+  | 'executing_live'
+
 export type LiveSupportJudgment = {
   posture: 'none' | 'surface' | 'recommend'
   explainOnRequest: boolean
@@ -35,9 +42,9 @@ export type SignalAcquisitionJudgment = {
   reason: string
 }
 
-
 export type OperationalJudgment = {
   action: OperationalJudgmentAction
+  operationalPosture: GeorgeOperationalPosture
   decisionSurface: JudgmentSurfaceState['decisionSurface']
   delivery: RuntimeSignalArbitration['delivery']
   agency: RuntimeSignalArbitration['agency']
@@ -146,9 +153,15 @@ export function resolveOperationalJudgment(
     trajectory: input.trajectory,
     outcomeState: input.outcomeState,
   })
+  const operationalPosture = resolveOperationalPosture({
+    input,
+    action,
+    conversationStrategy,
+  })
 
   return {
     action,
+    operationalPosture,
     decisionSurface: input.judgmentSurface.decisionSurface,
     delivery:
       action === 'acquire_smallest_signal' && input.runtimeArbitration.delivery === 'normal'
@@ -164,11 +177,46 @@ export function resolveOperationalJudgment(
         ? signalAcquisition.requestedSignal
         : undefined,
     liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence, input.judgmentSurface.signalSufficiency),
-    rationale: buildRationale(input, action),
+    rationale: buildRationale(input, action, operationalPosture),
     source: 'operational_judgment',
   }
 }
 
+export function resolveOperationalPosture(input: {
+  input: OperationalJudgmentInput
+  action: OperationalJudgmentAction
+  conversationStrategy: GeorgeConversationStrategy
+}): GeorgeOperationalPosture {
+  if (input.action === 'restore_continuity' || input.action === 'warn_and_move') {
+    return 'recovering'
+  }
+
+  if (input.input.currentRuntime === 'live_george') {
+    return 'executing_live'
+  }
+
+  const text = String(input.input.latestUserText || '').toLowerCase()
+  const executionImminent =
+    /\b(about to|walking into|starts? in|begin(?:s|ning)? in|in \d+\s*(?:minute|minutes|hour|hours)|later today|this afternoon|this evening|tonight|tomorrow|meeting is today|call is today|interview is today)\b/i.test(
+      text
+    ) ||
+    /\b(already negotiating|already discussing terms|in the room|on the call)\b/i.test(
+      text
+    )
+
+  if (executionImminent) return 'execution_imminent'
+
+  if (
+    input.conversationStrategy.move === 'explore' ||
+    input.conversationStrategy.move === 'ask' ||
+    input.conversationStrategy.move === 'clarify' ||
+    input.conversationStrategy.move === 'probe'
+  ) {
+    return 'preparing'
+  }
+
+  return 'planning'
+}
 
 export function resolveLiveSupportJudgment(
   evidence: LiveRecommendationEvidence,
@@ -270,12 +318,14 @@ function resolveAction(
 
 function buildRationale(
   input: OperationalJudgmentInput,
-  action: OperationalJudgmentAction
+  action: OperationalJudgmentAction,
+  operationalPosture: GeorgeOperationalPosture
 ) {
   const rationale = [
     `governing signal: ${input.runtimeArbitration.winner}`,
     `signal sufficiency: ${input.judgmentSurface.signalSufficiency}`,
     `trajectory: ${input.trajectory.currentMove}`,
+    `operational posture: ${operationalPosture}`,
   ]
 
   if (input.continuityRestoration.active) {
@@ -302,6 +352,7 @@ export function buildOperationalJudgmentNote(
   return `
 OPERATIONAL JUDGMENT
 - Governing action: ${judgment.action}
+- Operational posture: ${judgment.operationalPosture}
 - Decision surface: ${judgment.decisionSurface}
 - Delivery density: ${judgment.delivery}
 - Agency posture: ${judgment.agency}
