@@ -5,7 +5,11 @@ import { isGeorgeLiveHubEnabled } from '@/lib/george/live-hub/feature-flag'
 import { getGeorgeLiveHubRuntimeAdapter } from '@/lib/george/live-hub/live-runtime-adapter'
 import { routeGeorgeDeliveryCues } from '@/lib/george/live-delivery/delivery-router'
 import { evaluateGeorgeDeliveryCommitment } from '@/lib/george/live-delivery/delivery-commitment'
-import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
+import {
+  getRuntimeTurnMetricRecords,
+  markRuntimeEvent,
+} from '@/lib/george/live-metrics/runtime-metrics'
+import { resolveGeorgeLiveDeliveryDeadline } from '@/lib/george/live-metrics/latency-budgets.mjs'
 import { resolveGeorgeDeliveryBehavior } from '@/lib/george/live-delivery/delivery-behavior-resolver'
 import { commitGeorgeApprovedLiveDelivery } from '@/lib/george/live-runtime/approved-delivery-history'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
@@ -76,13 +80,54 @@ export function LiveHubDeliveryBridge({
         reason: behaviorResolution.behaviorReason || deliveryCue.reason,
       }))
 
-      const resolvedDeliveryCue =
+      const candidateDeliveryCue =
         resolvedDeliveryCues.find((cue) => cue.mode !== 'silent') ||
         resolvedDeliveryCues[0]
 
-      if (!resolvedDeliveryCue) return
+      if (!candidateDeliveryCue) return
 
-      const deliveryKey = resolvedDeliveryCue.turnId || resolvedDeliveryCue.text
+      const deliveryKey =
+        candidateDeliveryCue.turnId || candidateDeliveryCue.text
+      const deliveryDeadline = resolveGeorgeLiveDeliveryDeadline({
+        records: getRuntimeTurnMetricRecords(deliveryKey),
+        generatedAt: event.at,
+        modes: resolvedDeliveryCues.map((cue) => cue.mode),
+      })
+
+      if (deliveryDeadline.action === 'suppress') {
+        markRuntimeEvent(deliveryKey, 'delivery_deadline_suppressed')
+        console.info('[LIVE][hub][delivery][deadline-suppressed]', {
+          turnId: deliveryKey,
+          ageMs: deliveryDeadline.ageMs,
+          reason: deliveryDeadline.reason,
+          suppressedModes: deliveryDeadline.suppressedModes,
+        })
+        return
+      }
+
+      const deadlineApprovedCues =
+        deliveryDeadline.action === 'compress'
+          ? resolvedDeliveryCues.filter((cue) =>
+              deliveryDeadline.deliverModes.includes(cue.mode)
+            )
+          : resolvedDeliveryCues
+
+      if (deliveryDeadline.action === 'compress') {
+        markRuntimeEvent(deliveryKey, 'delivery_deadline_compressed')
+        console.info('[LIVE][hub][delivery][deadline-compressed]', {
+          turnId: deliveryKey,
+          ageMs: deliveryDeadline.ageMs,
+          reason: deliveryDeadline.reason,
+          deliverModes: deliveryDeadline.deliverModes,
+          suppressedModes: deliveryDeadline.suppressedModes,
+        })
+      }
+
+      const resolvedDeliveryCue =
+        deadlineApprovedCues.find((cue) => cue.mode !== 'silent') ||
+        deadlineApprovedCues[0]
+
+      if (!resolvedDeliveryCue) return
       const previousDelivery = deliveredCueByTurnRef.current[deliveryKey]
 
       const deliveryDecision = evaluateGeorgeDeliveryCommitment({
@@ -124,7 +169,7 @@ export function LiveHubDeliveryBridge({
 
       commitGeorgeApprovedLiveDelivery(resolvedDeliveryCue)
 
-      for (const routedCue of resolvedDeliveryCues) {
+      for (const routedCue of deadlineApprovedCues) {
         console.info('[LIVE][hub][delivery] DELIVERY_CUE', routedCue)
 
         markRuntimeEvent(routedCue.turnId || deliveryKey, 'delivery_cue')

@@ -19,6 +19,8 @@ export type GeorgeRuntimeMetricEvent =
   | 'delivery_revision'
   | 'delivery_duplicate_suppressed'
   | 'delivery_revision_suppressed'
+  | 'delivery_deadline_compressed'
+  | 'delivery_deadline_suppressed'
   | 'visual_cue_received'
   | 'visual_cue_rendered'
   | 'voice_cue_requested'
