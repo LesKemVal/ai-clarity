@@ -39,6 +39,37 @@ Do not:
 - duplicate canonical ownership;
 - manufacture architecture changes where ownership is already correct.
 
+<!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_START -->
+## Production Update — LIVE Input Latency Optimization
+
+LIVE input transport latency has been reduced without moving timing authority into behavior, reasoning, delivery policy, rendering, or `app/george/page.tsx`.
+
+Validated transport configuration:
+
+- browser microphone audio chunks are sent every 100 ms;
+- browser Deepgram endpointing is reduced from 350 ms to 250 ms;
+- LIVE Hub Deepgram endpointing is reduced from 350 ms to 250 ms;
+- terminal final-transcript release preserves the canonical 90 ms delay;
+- standard final-transcript release preserves the canonical 140 ms delay;
+- fragment final-transcript release preserves the canonical 210 ms delay.
+
+Canonical ownership remains:
+
+- `lib/george/live-voice/stt/deepgram-live-client.ts` owns browser microphone transport cadence and browser Deepgram endpointing;
+- `live-hub/src/stt/deepgram-stream.ts` owns LIVE Hub provider transport endpointing;
+- `lib/george/live-runtime/final-transcript-release-policy.ts` owns final-transcript release timing.
+
+STT latency tuning is transport configuration, not behavioral authority.
+
+This optimization does not create another runtime, reasoning lane, transcript owner, support-behavior authority, or delivery system.
+
+Qualification:
+
+- `npm run george:live-input-latency:qualify`
+- full production build
+- LIVE Hub TypeScript build
+<!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_END -->
+
 ## Product Doctrine
 
 GEORGE is one operational intelligence.
