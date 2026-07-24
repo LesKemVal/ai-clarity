@@ -16,6 +16,7 @@ export type LiveRecommendationEvidence = {
   trajectorySignal: boolean
   hasConversationOutcome: boolean
   pressureHigh: boolean
+  directGeorgeParticipationRequest: boolean
 }
 
 function hasAny(text: string, patterns: RegExp[]) {
@@ -27,8 +28,15 @@ export function evaluateLiveRecommendationEvidence(
 ): LiveRecommendationEvidence {
   const t = String(input.latestUserText || '').toLowerCase().trim()
   const alreadyLive = input.currentRuntime === 'live_george'
+  const directGeorgeParticipationRequest = hasAny(t, [
+    /\b(?:let'?s|lets) get on (?:a|the) call together\b/,
+    /\b(?:join|come on|be on) (?:a|the|my|our) call(?: with me| with us)?\b/,
+    /\b(?:talk|speak) (?:to|with) me on (?:a|the) call\b/,
+    /\bcan you (?:join|come on|be on) (?:a|the|my|our) call\b/,
+  ])
 
   const executionImminent =
+    !directGeorgeParticipationRequest &&
     hasAny(t, [
       /\bright now\b/,
       /\bin \d+\s?(minutes?|mins?|hours?)\b/,
@@ -48,27 +56,28 @@ export function evaluateLiveRecommendationEvidence(
     ])
 
   const conversationPressure =
-    Boolean(input.pressureHigh) ||
-    hasAny(t, [
-      /\bmeeting\b/,
-      /\binterview\b/,
-      /\bcall\b/,
-      /\bnegotiation\b/,
-      /\bpresentation\b/,
-      /\bdebate\b/,
-      /\bargument\b/,
-      /\bclient\b/,
-      /\bboss\b/,
-      /\bmanager\b/,
-      /\bboard\b/,
-      /\binvestor\b/,
-      /\bdoctor\b/,
-      /\bchallenged\b/,
-      /\bpush(ed)? back\b/,
-      /\bpressure\b/,
-      /\bwhat (do|should) i say\b/,
-      /\bhow (do|should) i respond\b/,
-    ])
+    !directGeorgeParticipationRequest &&
+    (Boolean(input.pressureHigh) ||
+      hasAny(t, [
+        /\bmeeting\b/,
+        /\binterview\b/,
+        /\bcall\b/,
+        /\bnegotiation\b/,
+        /\bpresentation\b/,
+        /\bdebate\b/,
+        /\bargument\b/,
+        /\bclient\b/,
+        /\bboss\b/,
+        /\bmanager\b/,
+        /\bboard\b/,
+        /\binvestor\b/,
+        /\bdoctor\b/,
+        /\bchallenged\b/,
+        /\bpush(ed)? back\b/,
+        /\bpressure\b/,
+        /\bwhat (do|should) i say\b/,
+        /\bhow (do|should) i respond\b/,
+      ]))
 
   const trajectorySignal =
     Boolean(input.objectiveKnown) &&
@@ -107,5 +116,6 @@ export function evaluateLiveRecommendationEvidence(
     trajectorySignal,
     hasConversationOutcome,
     pressureHigh: Boolean(input.pressureHigh),
+    directGeorgeParticipationRequest,
   }
 }
