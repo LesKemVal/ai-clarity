@@ -2,7 +2,6 @@ import type {
   GeorgeActionCue,
   GeorgeOperationalAssessment,
 } from '@/lib/george/live-hub/types'
-import type { GeorgeLiveDeliveryStyle } from '@/lib/george/live-delivery/types'
 
 const INTERNAL_REASON_PATTERNS = [
   /receiver policy/i,
@@ -22,18 +21,6 @@ function cleanSentence(value: string) {
     .replace(/^["“”]+|["“”]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim()
-}
-
-function sentenceCase(value: string) {
-  const clean = cleanSentence(value)
-  if (!clean) return ''
-  return clean.charAt(0).toUpperCase() + clean.slice(1)
-}
-
-function withTerminalPunctuation(value: string) {
-  const clean = sentenceCase(value)
-  if (!clean) return ''
-  return /[.!?]$/.test(clean) ? clean : `${clean}.`
 }
 
 function isUserFacingEvidence(value: string) {
@@ -63,31 +50,4 @@ export function resolveGeorgeOperationalAssessment(input: {
       Math.min(1, existing?.confidence ?? input.actionCue.confidence ?? 0)
     ),
   }
-}
-
-export function composeGeorgeOperationalCueText(input: {
-  assessment: GeorgeOperationalAssessment
-  deliveryStyle: GeorgeLiveDeliveryStyle
-}) {
-  const action = withTerminalPunctuation(input.assessment.action)
-  if (!action) return ''
-
-  const evidence = withTerminalPunctuation(input.assessment.evidence || '')
-  const outcomeImpact = withTerminalPunctuation(
-    input.assessment.outcomeImpact || ''
-  )
-
-  if (input.deliveryStyle === 'continue') {
-    return input.assessment.action
-  }
-
-  if (input.deliveryStyle === 'cue') {
-    return [action, evidence].filter(Boolean).join(' ')
-  }
-
-  if (input.deliveryStyle === 'advice') {
-    return [action, evidence, outcomeImpact].filter(Boolean).join(' ')
-  }
-
-  return [action, evidence, outcomeImpact].filter(Boolean).join('\n\n')
 }
