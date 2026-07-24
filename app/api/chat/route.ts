@@ -70,6 +70,7 @@ import {
   type NormalProviderSemanticIntent,
 } from '@/lib/george/runtime/provider/normal-provider'
 import {
+  hasRelevantConversationContext,
   isStandaloneAmbiguousKnowledgeQuestion,
   resolveGeorgeRuntimePipeline,
   selectGeorgeRuntimeAuthoritySnapshot,
@@ -910,7 +911,8 @@ LANGUAGE MODE: SPANISH
 
     const useCompactNormalKnowledgePrompt =
       currentRuntime === 'normal_george' &&
-      isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw)
+      isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw) &&
+      !hasRelevantConversationContext(recentMessages, latestUserRaw)
 
     const baseSystemPrompt = useCompactNormalKnowledgePrompt
       ? buildNormalKnowledgeCoreBlock({ isFirstSession })

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "george:contextual-ambiguity:qualify": "tsx scripts/george-behavior/contextual-ambiguity-qualification.ts",
     "dev": "next dev --webpack",
     "build": "npm run george:core:smoke && npm run george:behavior:qualify && npm run george:live-entry:smoke && npm run george:conversation-package:smoke && npm run george:live-runtime:smoke && npm run george:live-latency:qualify && npm run george:live-input-latency:qualify && npm run george:early-reasoning:qualify && npm run george:stale-reasoning:qualify && npm run george:live-delivery-deadline:qualify && npm run george:latency-optimization:qualify && npm run george:live-behavior:qualify && npm run george:live-recovery:qualify && npm run george:live-hub-resilience:qualify && npm run george:reconnect-transcript-ownership:qualify && npm run george:voice-playback-ownership:qualify && npm run george:action-cue-turn-ownership:qualify && npm run george:provider-degradation:qualify && npm run george:live-restart-continuity:qualify && npm run george:runtime-interface-freeze:qualify && npm run george:duplicate-ownership:audit && npm run george:live-portability:qualify && npm run george:preparation:smoke && next build",
     "start": "next start",
