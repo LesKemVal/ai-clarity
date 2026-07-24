@@ -127,6 +127,29 @@ Provider realization
 
 The provider realizes approved runtime authority. The provider does not replace GEORGE's judgment or create another runtime owner.
 
+### Normal Provider Realization Boundary
+
+Canonical Normal text-provider owner:
+
+```text
+lib/george/runtime/provider/normal-provider.ts
+```
+
+This owner:
+
+- executes Normal text realization through OpenAI or Groq;
+- preserves provider selection resolved by the canonical runtime pipeline;
+- returns complete user-facing text;
+- returns provider semantic intent from the same realization call;
+- treats semantic intent as provider metadata, not as competing reasoning or judgment authority;
+- preserves valid plain-text provider output when semantic metadata is absent.
+
+OpenAI and Groq are provider realization options for the same GEORGE intelligence. They are not separate runtimes, operating modes, judgment systems, or product identities.
+
+`app/api/chat/route.ts` coordinates the resolved provider request and Groq-to-OpenAI fallback without recreating provider-selection policy.
+
+The route retains a separate OpenAI Responses API path for image input. That multimodal capability does not duplicate Normal text-provider realization.
+
 <!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_START -->
 ## LIVE Input Latency Ownership Boundary
 
@@ -695,6 +718,12 @@ Do not solve runtime races in rendering.
 ```text
 Shared reasoning
 → lib/george/runtime/*
+
+Normal text-provider realization
+→ lib/george/runtime/provider/normal-provider.ts
+
+Normal multimodal image realization
+→ app/api/chat/route.ts through the OpenAI Responses API
 
 Support behavior
 → lib/george/live-runtime/support-behavior-composer.ts

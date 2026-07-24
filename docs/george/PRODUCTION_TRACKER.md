@@ -124,6 +124,27 @@ Canonical owners under `lib/george/runtime/*` own shared interpretation, outcome
 
 Normal and LIVE must not create competing versions of these responsibilities.
 
+### Normal Provider Realization
+
+Canonical Normal text-provider owner:
+
+- `lib/george/runtime/provider/normal-provider.ts`
+
+Responsibilities:
+
+- execute Normal text realization through OpenAI or Groq;
+- preserve provider selection resolved by the canonical runtime pipeline;
+- return complete user-facing text;
+- return provider semantic intent from the same realization call;
+- preserve valid plain-text provider output when semantic metadata is absent;
+- avoid creating another reasoning, judgment, or product authority.
+
+OpenAI and Groq are provider realization options for the same GEORGE intelligence. They are not separate modes or runtimes.
+
+`app/api/chat/route.ts` coordinates the resolved provider request and Groq-to-OpenAI fallback without recreating provider-selection policy.
+
+The route separately owns OpenAI Responses API execution for image input. This multimodal capability does not duplicate Normal text-provider realization.
+
 ### Support Behavior Composer
 
 Canonical owner:
