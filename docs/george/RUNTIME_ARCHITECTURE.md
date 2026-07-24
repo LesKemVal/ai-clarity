@@ -127,6 +127,32 @@ Provider realization
 
 The provider realizes approved runtime authority. The provider does not replace GEORGE's judgment or create another runtime owner.
 
+<!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_START -->
+## LIVE Input Latency Ownership Boundary
+
+LIVE input latency is reduced within the existing transcript transport and final-transcript release boundaries.
+
+Canonical ownership:
+
+- `lib/george/live-voice/stt/deepgram-live-client.ts` owns browser microphone chunk cadence and browser Deepgram endpointing;
+- `live-hub/src/stt/deepgram-stream.ts` owns LIVE Hub Deepgram transport configuration;
+- `lib/george/live-runtime/final-transcript-release-policy.ts` owns final-transcript release timing.
+
+Validated configuration:
+
+- browser microphone audio chunks are sent every 100 ms;
+- browser and LIVE Hub Deepgram endpointing use 250 ms;
+- terminal final transcripts preserve a 90 ms release delay;
+- standard final transcripts preserve a 140 ms release delay;
+- fragment final transcripts preserve a 210 ms release delay.
+
+STT latency tuning remains transport configuration, not behavioral authority.
+
+Transport timing may reduce how quickly signal reaches canonical reasoning. It does not interpret user intent, infer the desired outcome, assess trajectory, make operational judgments, select support behavior, compose receiver-specific guidance, route delivery, or render output.
+
+Latency optimization must not create another transcript owner, reasoning lane, behavior authority, delivery owner, or page-level runtime decision.
+<!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_END -->
+
 ## LIVE Runtime Flow
 
 Canonical LIVE flow:
