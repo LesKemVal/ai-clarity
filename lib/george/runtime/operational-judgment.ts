@@ -339,7 +339,7 @@ OPERATIONAL JUDGMENT
 - Delivery policy: ${judgment.delivery}
 - Agency policy: ${judgment.agency}
 - Confidence: ${judgment.confidence.toFixed(2)}
-- Outcome: ${judgment.outcomeState.outcome}
+- Outcome: ${judgment.outcomeState.immediateOutcome}
 - Outcome phase: ${judgment.outcomeState.phase}
 - Conversation move: ${judgment.conversationStrategy.move}
 - Conversation move purpose: ${judgment.conversationStrategy.purpose}

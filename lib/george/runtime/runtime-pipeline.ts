@@ -574,10 +574,7 @@ function resolveProviderConversationMessages(
     content: latestUserText,
   })
 
-  if (
-    isStandaloneAmbiguousKnowledgeQuestion(latestUserText) &&
-    !hasRelevantConversationContext(recentMessages, latestUserText)
-  ) {
+  if (isStandaloneAmbiguousKnowledgeQuestion(latestUserText)) {
     return Object.freeze([currentUserMessage])
   }
 
@@ -603,34 +600,6 @@ function resolveProviderConversationMessages(
 
 function normalizeProviderMessageContent(text: string) {
   return text.trim().replace(/\s+/g, ' ')
-}
-
-export function hasRelevantConversationContext(
-  recentMessages: readonly GeorgeProviderMessage[],
-  latestUserText: string
-) {
-  const normalizedLatest = normalizeProviderMessageContent(latestUserText)
-
-  const priorMessages = recentMessages.filter(
-    (message) =>
-      normalizeProviderMessageContent(message.content) !== normalizedLatest
-  )
-
-  if (!priorMessages.length) return false
-
-  const recentContext = priorMessages
-    .slice(-6)
-    .map((message) => message.content)
-    .join(' ')
-    .toLowerCase()
-
-  const domainSignals =
-    /\b(reg\s*cf|regulation crowdfunding|broker[- ]dealer|funding portal|securit(?:y|ies)|offering|raise|capital|investor|investment|equity|shares?|stock|valuation|dilution|convertible|safe|preferred|common stock|service contract|contract extension)\b/i
-
-  const objectiveSignals =
-    /\b(i want|we need|my goal|our goal|success|objective|extend|extension|help getting|position(?:ing)?|prepare|call|meeting|negotiat(?:e|ion)|pitch)\b/i
-
-  return domainSignals.test(recentContext) || objectiveSignals.test(recentContext)
 }
 
 export function isStandaloneAmbiguousKnowledgeQuestion(text: string) {

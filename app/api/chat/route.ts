@@ -68,9 +68,9 @@ import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-re
 import {
   runNormalTextCompletion,
   type NormalProviderSemanticIntent,
+  type NormalProviderSemanticJudgment,
 } from '@/lib/george/runtime/provider/normal-provider'
 import {
-  hasRelevantConversationContext,
   isStandaloneAmbiguousKnowledgeQuestion,
   resolveGeorgeRuntimePipeline,
   selectGeorgeRuntimeAuthoritySnapshot,
@@ -911,8 +911,7 @@ LANGUAGE MODE: SPANISH
 
     const useCompactNormalKnowledgePrompt =
       currentRuntime === 'normal_george' &&
-      isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw) &&
-      !hasRelevantConversationContext(recentMessages, latestUserRaw)
+      isStandaloneAmbiguousKnowledgeQuestion(latestUserRaw)
 
     const baseSystemPrompt = useCompactNormalKnowledgePrompt
       ? buildNormalKnowledgeCoreBlock({ isFirstSession })
@@ -1000,6 +999,7 @@ LANGUAGE MODE: SPANISH
 
     let reply = ''
     let providerSemanticIntent: NormalProviderSemanticIntent = null
+    let providerSemanticJudgment: NormalProviderSemanticJudgment | null = null
 
     if (hasImageInput) {
       const response = await openai.responses.create({
@@ -1043,6 +1043,8 @@ LANGUAGE MODE: SPANISH
           reply = providerResult?.text || ''
           providerSemanticIntent =
             providerResult?.semanticIntent ?? null
+          providerSemanticJudgment =
+            providerResult?.semanticJudgment ?? null
         } catch (error) {
           console.warn(
             '[GEORGE][normal-fast-lane] Groq failed; falling back to OpenAI.',
@@ -1069,6 +1071,8 @@ LANGUAGE MODE: SPANISH
         reply = providerResult?.text || ''
         providerSemanticIntent =
           providerResult?.semanticIntent ?? null
+        providerSemanticJudgment =
+          providerResult?.semanticJudgment ?? null
       }
     }
 
@@ -1107,6 +1111,7 @@ LANGUAGE MODE: SPANISH
       runtimeAuthoritySnapshot: {
         ...runtimeAuthoritySnapshot,
         providerSemanticIntent,
+        providerSemanticJudgment,
       },
     })
   } catch (err: unknown) {
