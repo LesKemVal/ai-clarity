@@ -35,7 +35,7 @@ export function resolveLiveRecommendationPresentation(input: {
   const latestUserText = String(input.latestUserText || '').toLowerCase()
   const receiverLabel = resolveReceiverLabel(latestUserText, Boolean(input.voiceMode))
   const contextLabel = resolveExecutionContextLabel(latestUserText)
-  const show = input.liveSupport.posture === 'recommend'
+  const show = input.liveSupport.posture === 'surface'
 
   return {
     show,

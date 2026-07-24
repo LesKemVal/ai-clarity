@@ -63,7 +63,7 @@ function resolvePressure(text: string, situation: Situation, judgment: Operation
   if (situation === 'executive') return 'Decision confidence depends on whether the evidence, risks, and ownership are clear.'
   if (situation === 'difficult_conversation') return 'Emotion and defensiveness can displace the issue that actually needs resolution.'
   if (judgment.action === 'restore_continuity') return 'An unresolved prior commitment or dependency is shaping the current move.'
-  if (judgment.liveSupport.posture === 'recommend') return 'The situation is moving from preparation into real-time execution pressure.'
+  if (judgment.liveSupport.posture === 'surface') return 'The situation is moving from preparation into real-time execution pressure.'
   return 'A constraint, tradeoff, or resistance is affecting the desired outcome.'
 }
 

@@ -587,15 +587,33 @@ assert(
 )
 
 assert(
-  operationalJudgment.liveSupport.posture === 'recommend',
-  'operational judgment should own the LIVE recommendation decision'
+  operationalJudgment.liveSupport.posture === 'surface' &&
+    operationalJudgment.liveSupport.instruction.includes(
+      'provider determines LIVE materially improves the desired outcome'
+    ) &&
+    operationalJudgment.liveSupport.instruction.includes(
+      'Never auto-route or change operating mode'
+    ),
+  'operational judgment should govern LIVE presentation without recreating semantic recommendation ownership'
 )
 
 const operationalJudgmentNote = buildOperationalJudgmentNote(operationalJudgment)
 
 assert(
-  operationalJudgmentNote.includes('single operational synthesis'),
-  'operational judgment note should declare one governing synthesis'
+  operationalJudgmentNote.includes('OPERATIONAL JUDGMENT') &&
+    operationalJudgmentNote.includes(
+      'Governing action: ' + operationalJudgment.action
+    ) &&
+    operationalJudgmentNote.includes(
+      'Operational posture: ' + operationalJudgment.operationalPosture
+    ) &&
+    operationalJudgmentNote.includes(
+      'Agency policy: ' + operationalJudgment.agency
+    ) &&
+    operationalJudgmentNote.includes(
+      'LIVE capability posture: ' + operationalJudgment.liveSupport.posture
+    ),
+  'operational judgment note should expose one governing operational synthesis without recreating semantic ownership'
 )
 
 const preparationFraming = resolveContextFraming({

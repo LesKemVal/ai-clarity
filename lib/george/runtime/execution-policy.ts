@@ -101,7 +101,7 @@ export function resolveGeorgeExecutionPolicy(
   const deliveryPreference = resolveDeliveryPreference(live, input.voiceMode)
   const assumptionHandling = resolveAssumptionHandling(input.moveDefinition)
   const repetitionPolicy =
-    input.operationalJudgment.liveSupport.posture === 'recommend'
+    input.operationalJudgment.liveSupport.posture === 'surface'
       ? 'suppress_duplicate_live_recommendation'
       : live || input.strategy.move === 'summarize'
         ? 'avoid_restatement'
