@@ -27,6 +27,9 @@ type VisualCueState = {
   at: number
 }
 
+const AUDIO_VISUAL_HOLD_MS = 12000
+const VISUAL_ONLY_HOLD_MS = 20000
+
 export function LiveHubVisualCueBridge({
   active,
   context,
@@ -100,7 +103,6 @@ export function LiveHubVisualCueBridge({
       source: cue.source,
       at: now,
     })
-
   }, [receiverProfile, visualCue, voiceEnabled])
 
   const handleVoiceCue = useCallback((cue: GeorgeDeliveryCue) => {
@@ -159,9 +161,9 @@ export function LiveHubVisualCueBridge({
     const holdMs =
       receiverProfile === 'audio_only'
         ? 0
-        : receiverProfile === 'audio_visual'
-          ? 12000
-          : 12000
+        : receiverProfile === 'visual_only'
+          ? VISUAL_ONLY_HOLD_MS
+          : AUDIO_VISUAL_HOLD_MS
 
     if (holdMs <= 0) return
 
