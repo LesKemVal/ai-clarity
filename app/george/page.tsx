@@ -36,6 +36,7 @@ import DesktopOperationalSurface from '@/components/george/DesktopOperationalSur
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 import HeadsetOperatorIcon from '@/components/george/HeadsetOperatorIcon'
 import LiveChooser from '@/components/george/LiveChooser'
+import { LiveCapabilitySurface } from '@/components/george/LiveCapabilitySurface'
 import { buildLiveGuidance, detectConversationProfile } from '@/lib/george/live-runtime/live-guidance'
 import { consumeFreshNormalBrowserSessionRequest, createSession, ensureGeorgeBrowserInstanceScope, getActiveMode, getActiveSessionForMode, getActiveSessionIdForMode, setActiveSessionIdForMode, setActiveMode, updateActiveSessionMessages, updateCampaignSessionMetadata, getCampaignSessions, getSessionsForMode, deleteSession, hasMeaningfulUserMessage, hydrateSessionsFromServer } from '@/lib/george/session/store'
 import { fetchGeorgeSessionAuthority, readCachedGeorgeSessionAuthority, writeCachedGeorgeSessionAuthority, clearCachedGeorgeSessionAuthority } from '@/lib/george/session-authority'
@@ -5077,11 +5078,12 @@ responseTimerRef.current = setTimeout(() => {
   const showConversation =
     hasDraftInput ||
     liveMode ||
-    (normalConversationStarted && !isPreLiveSignalAcquisition)
+    normalConversationStarted
 
   const showMobileHero =
     !(forceLive || liveMode) &&
-    !normalConversationStarted
+    !normalConversationStarted &&
+    !showPreLiveSignalSurface
 
   const showGeorgeHeroTitle = true
   const showGeorgeHeroTagline = !normalConversationStarted
@@ -5162,6 +5164,13 @@ useEffect(() => {
 
   const isPreLiveEarbudReady = showPreLiveSignalSurface && preLiveSignalComplete
 
+  const livePreparationConversationActive =
+    showPreLiveSignalSurface &&
+    (
+      !preLiveSignalComplete ||
+      typedMessageIndex === messages.length - 1
+    )
+
   const submitPreLiveSignalAnswer = () => {
     const answer = input.trim()
 
@@ -5205,7 +5214,7 @@ useEffect(() => {
       if (fromMessageLive) {
         const readyMessage: Message = {
           role: 'assistant',
-          content: 'I have what I need to support you in the room. Tap LIVE and we’ll go. If you want to keep briefing me first, keep typing.',
+          content: 'You’re all set. I’ll be ready to support you in real time. Start whenever you’re ready—just tap Start.',
           source: 'system_override',
         }
 
@@ -5228,6 +5237,19 @@ useEffect(() => {
     setPreLiveSignalStep(nextStep)
     setActivePromptContext('pre_live_signal_acquisition')
     setActivePromptLabel(`Question ${nextStep + 1}`)
+
+    const nextQuestion = preLiveQuestions[nextStep]
+    const nextQuestionMessage: Message = {
+      role: 'assistant',
+      content: `${nextQuestion.kicker}.\n\n${nextQuestion.question}\n\n${nextQuestion.examples}`,
+      source: 'system_override',
+    }
+
+    setMessages((prev) => {
+      const next = [...prev, nextQuestionMessage]
+      messagesRef.current = next
+      return next
+    })
 
     return true
   }
@@ -5918,7 +5940,11 @@ return (
         scrollPaddingTop: liveStatusStackClearance,
       }
     : undefined}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] transition-[background-color,border-color,box-shadow] duration-500 ${
+    livePreparationConversationActive
+      ? "border-y border-[#3657A8]/32 bg-[linear-gradient(180deg,rgba(23,35,71,0.52),rgba(10,18,38,0.28))] shadow-[inset_0_18px_70px_rgba(26,53,116,0.18)]"
+      : "border-y border-transparent bg-transparent"
+  } ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${
   (forceLive || liveMode) && !showLiveEntrySequence
     ? ""
     : hasVisibleThread && !isPreLiveSignalAcquisition
@@ -6102,6 +6128,15 @@ return (
     </div>
   )}
 
+  {livePreparationConversationActive && (
+    <div className="mx-auto mb-5 flex w-full max-w-[760px] items-center gap-3 border-b border-[#6E91E8]/18 pb-3">
+      <span className="h-1.5 w-1.5 rounded-full bg-[#75A4FF]/80 shadow-[0_0_14px_rgba(117,164,255,0.62)]" />
+      <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#BFD0FF]/58">
+        LIVE Preparation
+      </span>
+    </div>
+  )}
+
   {bridgeThinking && (
     <div className="text-sm leading-7 text-[#D7DBE4]/70">
       GEORGE is working
@@ -6250,6 +6285,35 @@ return (
 
       {m.role === 'assistant' && (
         <div className="relative space-y-1.5">
+
+          {isLatestAssistant && !liveMode && (
+            <div className="mt-2 flex items-center gap-2">
+              <LiveCapabilitySurface
+                phase={
+                  preLiveSignalComplete
+                    ? 'ready'
+                    : showPreLiveSignalSurface
+                      ? 'preparing'
+                      : 'available'
+                }
+                onPrepare={() => {
+                  try {
+                    window.localStorage.setItem(
+                      'GEORGE_PRE_LIVE_FROM_MESSAGE',
+                      '1'
+                    )
+                    window.localStorage.setItem(
+                      'GEORGE_LIVE_INTENT_STAGE',
+                      'signal_acquisition'
+                    )
+                  } catch {}
+
+                  startLiveSignalAcquisition()
+                }}
+                onStart={openLiveEntry}
+              />
+            </div>
+          )}
 
           {isLatestAssistant && liveMode && (
   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#D7DBE4]/50">
