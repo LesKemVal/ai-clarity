@@ -1,3 +1,4 @@
+import type { GeorgeOperationalAssessment } from '@/lib/george/live-hub/types'
 import {
   DEFAULT_GEORGE_LIVE_RECEIVER_PROFILE,
   type GeorgeDeliveryMode,
@@ -31,6 +32,53 @@ function normalizeSupportText(text: string) {
     .replace(/\n{3,}/g, '\n\n')
     .replace(/[ \t]+/g, ' ')
     .trim()
+}
+
+function cleanSentence(value: string) {
+  return String(value || '')
+    .replace(/^(cue|advice|response|presentation):\s*/i, '')
+    .replace(/^["“”]+|["“”]+$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function sentenceCase(value: string) {
+  const clean = cleanSentence(value)
+  if (!clean) return ''
+  return clean.charAt(0).toUpperCase() + clean.slice(1)
+}
+
+function withTerminalPunctuation(value: string) {
+  const clean = sentenceCase(value)
+  if (!clean) return ''
+  return /[.!?]$/.test(clean) ? clean : `${clean}.`
+}
+
+export function composeGeorgeOperationalCueText(input: {
+  assessment: GeorgeOperationalAssessment
+  deliveryStyle: GeorgeLiveDeliveryStyle
+}) {
+  const action = withTerminalPunctuation(input.assessment.action)
+  if (!action) return ''
+
+  const evidence = withTerminalPunctuation(input.assessment.evidence || '')
+  const outcomeImpact = withTerminalPunctuation(
+    input.assessment.outcomeImpact || ''
+  )
+
+  if (input.deliveryStyle === 'continue') {
+    return input.assessment.action
+  }
+
+  if (input.deliveryStyle === 'cue') {
+    return [action, evidence].filter(Boolean).join(' ')
+  }
+
+  if (input.deliveryStyle === 'advice') {
+    return [action, evidence, outcomeImpact].filter(Boolean).join(' ')
+  }
+
+  return [action, evidence, outcomeImpact].filter(Boolean).join('\n\n')
 }
 
 function flattenForAudio(text: string) {
