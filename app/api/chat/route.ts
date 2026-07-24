@@ -65,7 +65,10 @@ import { evaluateRuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-lear
 import { resolveRuntimeControls } from '@/lib/george/runtime/resolve-runtime-controls'
 import { buildJudgmentSurfaceState, buildJudgmentSurfaceNote } from '@/lib/george/runtime/judgment-surface'
 import { evaluateLiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
-import { runNormalTextCompletion } from '@/lib/george/runtime/provider/normal-provider'
+import {
+  runNormalTextCompletion,
+  type NormalProviderSemanticIntent,
+} from '@/lib/george/runtime/provider/normal-provider'
 import {
   isStandaloneAmbiguousKnowledgeQuestion,
   resolveGeorgeRuntimePipeline,
@@ -994,6 +997,7 @@ LANGUAGE MODE: SPANISH
 
 
     let reply = ''
+    let providerSemanticIntent: NormalProviderSemanticIntent = null
 
     if (hasImageInput) {
       const response = await openai.responses.create({
@@ -1027,13 +1031,16 @@ LANGUAGE MODE: SPANISH
     } else {
       if (providerResolution.provider === 'groq') {
         try {
-          reply =
-            (await runNormalTextCompletion({
-              provider: providerResolution.provider,
-              model,
-              systemContent,
-              messages: providerMessages,
-            })) || ''
+          const providerResult = await runNormalTextCompletion({
+            provider: providerResolution.provider,
+            model,
+            systemContent,
+            messages: providerMessages,
+          })
+
+          reply = providerResult?.text || ''
+          providerSemanticIntent =
+            providerResult?.semanticIntent ?? null
         } catch (error) {
           console.warn(
             '[GEORGE][normal-fast-lane] Groq failed; falling back to OpenAI.',
@@ -1043,7 +1050,8 @@ LANGUAGE MODE: SPANISH
       }
 
       if (!reply) {
-        const completion = await openai.chat.completions.create({
+        const providerResult = await runNormalTextCompletion({
+          provider: 'openai',
           model:
             providerResolution.provider === 'groq'
               ? (
@@ -1052,16 +1060,13 @@ LANGUAGE MODE: SPANISH
                   'gpt-4o'
                 )
               : model,
-          messages: [
-            {
-              role: 'system',
-              content: systemContent,
-            },
-            ...providerMessages,
-          ],
+          systemContent,
+          messages: providerMessages,
         })
 
-        reply = completion.choices?.[0]?.message?.content?.trim() || ''
+        reply = providerResult?.text || ''
+        providerSemanticIntent =
+          providerResult?.semanticIntent ?? null
       }
     }
 
@@ -1097,7 +1102,10 @@ LANGUAGE MODE: SPANISH
     return NextResponse.json({
       message: reply,
       operationalResourceMonitor,
-      runtimeAuthoritySnapshot,
+      runtimeAuthoritySnapshot: {
+        ...runtimeAuthoritySnapshot,
+        providerSemanticIntent,
+      },
     })
   } catch (err: unknown) {
     console.error('Chat route error:', err)
