@@ -2,7 +2,6 @@
 import { buildOpportunitySignalAcquisitionMessage } from '@/lib/george/runtime/conversation-strategy'
 
 
-import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { markLiveTtsAudioReceived, markLiveTtsPlaybackEnd, markLiveTtsPlaybackStart, markLiveTtsRequestStart, startLiveTtsTurn } from '@/lib/george/live-runtime/live-tts-metrics'
 import { normalizeBrandSpeech } from '@/lib/george/live-voice/spoken-text'
 import { governLiveResponse } from '@/lib/george/live-voice/runtime/response-shaper'
@@ -50,9 +49,7 @@ import {
 } from '@/lib/george/prompts/suggested-prompts'
 import { applyRuntimeOverlayFromCode } from '@/lib/george/operator/load-runtime-overlay'
 import type { LivePrepSetup } from '@/lib/george/live-runtime/prep-runtime'
-import { buildLiveEntryBriefing } from '@/lib/george/live-runtime/live-entry-briefing'
 import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
-import { buildOutcomeReassessmentRuntimeBlock } from '@/lib/george/live-runtime/outcome-reassessment'
 import { tryLiveFastPath } from '@/lib/george/live-runtime/live-fast-path'
 import { buildLiveRuntimeContext } from '@/lib/george/live-runtime/live-runtime-context'
 import type { LiveOutcomeObservation } from '@/lib/george/live-runtime/live-outcome-review'
