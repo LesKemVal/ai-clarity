@@ -176,7 +176,7 @@ export function resolveOperationalJudgment(
       signalAcquisition.shouldAcquire
         ? signalAcquisition.requestedSignal
         : undefined,
-    liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence, input.judgmentSurface.signalSufficiency),
+    liveSupport: resolveLiveSupportJudgment(input.liveRecommendationEvidence),
     rationale: buildRationale(input, action, operationalPosture),
     source: 'operational_judgment',
   }
@@ -218,66 +218,48 @@ export function resolveOperationalPosture(input: {
   return 'planning'
 }
 
+/**
+ * Governs only the presentation policy for the LIVE capability.
+ *
+ * It does not determine whether LIVE is relevant or beneficial and it does not
+ * reinterpret the user's language. The provider owns semantic understanding
+ * and may naturally recommend a capability when that capability best serves
+ * the user's desired outcome. Runtime judgment preserves activation authority,
+ * prevents automatic mode changes, and keeps passive availability unobtrusive.
+ */
 export function resolveLiveSupportJudgment(
-  evidence: LiveRecommendationEvidence,
-  signalSufficiency: JudgmentSurfaceState['signalSufficiency']
+  evidence: LiveRecommendationEvidence
 ): LiveSupportJudgment {
-  const shouldRecommend =
-    !evidence.alreadyLive &&
-    evidence.signalUsable &&
-    evidence.executionImminent &&
-    evidence.conversationPressure
-
-  const shouldSurface =
-    !evidence.alreadyLive &&
-    evidence.signalUsable &&
-    evidence.hasConversationOutcome
-
-  if (shouldRecommend) {
-    const strength =
-      signalSufficiency === 'sufficient' && evidence.pressureHigh
-        ? 'strong'
-        : signalSufficiency === 'sufficient'
-          ? 'recommend'
-          : 'soft'
-
+  if (evidence.alreadyLive) {
     return {
-      posture: 'recommend',
+      posture: 'none',
       explainOnRequest: false,
-      strength,
-      reason:
-        'The situation appears to be moving from planning into real-time human execution pressure.',
-      instruction:
-        strength === 'strong'
-          ? 'The user appears to be entering real-time execution pressure. Offer LIVE as available support without selling it. Ask simply if they want GEORGE in the room.'
-          : 'Offer LIVE as optional execution support only if the user is about to enter the room. Do not upsell and do not auto-route.',
+      strength: 'none',
+      reason: 'Already in LIVE mode.',
+      instruction: '',
     }
   }
 
-  if (shouldSurface) {
+  if (evidence.signalUsable && evidence.hasConversationOutcome) {
     return {
       posture: 'surface',
       explainOnRequest: true,
       strength: 'none',
       reason:
-        'GEORGE has enough outcome and conversation signal to understand that LIVE may help if this moves into the room.',
+        'LIVE remains an available capability; semantic relevance is owned by provider reasoning.',
       instruction:
-        'LIVE may be surfaced as a quiet execution capability marker. Explain LIVE only once when the user taps or asks. Frame it as support for a specific conversation or desired outcome, not as the next required move.',
+        'Keep LIVE available without injecting a recommendation. If the provider determines LIVE materially improves the desired outcome, preserve that recommendation and present activation as the user’s choice. Never auto-route or change operating mode.',
     }
   }
 
   return {
     posture: 'none',
-    explainOnRequest: false,
+    explainOnRequest: true,
     strength: 'none',
-    reason: evidence.alreadyLive
-      ? 'Already in LIVE mode.'
-      : !evidence.signalUsable
-        ? 'Signal is not sufficient enough to explain LIVE usefully yet.'
-        : !evidence.trajectorySignal && !evidence.conversationPressure
-          ? 'Trajectory does not yet indicate a realistic future live benefit.'
-          : 'LIVE recommendation threshold not met.',
-    instruction: '',
+    reason:
+      'LIVE remains available, but runtime presentation has no semantic result to surface this turn.',
+    instruction:
+      'Do not infer capability relevance from keywords, confidence thresholds, or runtime heuristics. Preserve any explicit user request or provider capability recommendation and leave activation to the user.',
   }
 }
 
@@ -354,28 +336,19 @@ OPERATIONAL JUDGMENT
 - Governing action: ${judgment.action}
 - Operational posture: ${judgment.operationalPosture}
 - Decision surface: ${judgment.decisionSurface}
-- Delivery density: ${judgment.delivery}
-- Agency posture: ${judgment.agency}
-- Judgment confidence: ${judgment.confidence.toFixed(2)}
-- Primary outcome: ${judgment.outcomeState.primaryOutcome}
-- Immediate outcome: ${judgment.outcomeState.immediateOutcome}
+- Delivery policy: ${judgment.delivery}
+- Agency policy: ${judgment.agency}
+- Confidence: ${judgment.confidence.toFixed(2)}
+- Outcome: ${judgment.outcomeState.outcome}
 - Outcome phase: ${judgment.outcomeState.phase}
-- Outcome confidence: ${judgment.outcomeState.confidence.toFixed(2)}
-- Signal acquisition warranted: ${judgment.signalAcquisition.shouldAcquire ? 'yes' : 'no'}
+- Conversation move: ${judgment.conversationStrategy.move}
+- Conversation move purpose: ${judgment.conversationStrategy.purpose}
+- Signal acquisition: ${judgment.signalAcquisition.shouldAcquire ? 'acquire' : 'do not acquire'}
 - Signal operational value: ${judgment.signalAcquisition.operationalValue}
 - Signal conversational cost: ${judgment.signalAcquisition.conversationalCost}
-- Signal acquisition reason: ${judgment.signalAcquisition.reason}
-- LIVE support posture: ${judgment.liveSupport.posture}
-- LIVE recommendation strength: ${judgment.liveSupport.strength}
-- Explain LIVE on request: ${judgment.liveSupport.explainOnRequest ? 'yes' : 'no'}
-- LIVE support reason: ${judgment.liveSupport.reason}
-- LIVE support instruction: ${judgment.liveSupport.instruction}
-${judgment.smallestSignal ? `- Acquire only this signal: ${judgment.smallestSignal}` : '- Additional signal is not required before the first useful move.'}
-- Evidence: ${judgment.rationale.join('; ')}
-- This is the single operational synthesis for the current turn.
-- Evidence producers inform this judgment; they do not independently govern the response.
-- Response shaping and output governance must execute this judgment without creating a competing posture.
-- LIVE may be surfaced quietly when outcome and conversation signal are present. Recommend it only when execution pressure is imminent. Never upsell or auto-route.
-- Preserve explicit user direction, safety boundaries, and LIVE authority.
+${judgment.smallestSignal ? `- Smallest useful signal: ${judgment.smallestSignal}` : ''}
+- LIVE capability posture: ${judgment.liveSupport.posture}
+- LIVE capability instruction: ${judgment.liveSupport.instruction || 'No LIVE presentation instruction.'}
+- Rationale: ${judgment.rationale.join(' | ')}
 `.trim()
 }
