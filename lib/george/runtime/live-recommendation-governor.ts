@@ -33,10 +33,16 @@ export function evaluateLiveRecommendationEvidence(
     /\b(?:join|come on|be on) (?:a|the|my|our) call(?: with me| with us)?\b/,
     /\b(?:talk|speak) (?:to|with) me on (?:a|the) call\b/,
     /\bcan you (?:join|come on|be on) (?:a|the|my|our) call\b/,
+    /\b(?:help|support|assist|guide|coach|cue) me (?:on|during|through) (?:a|the|my|our)?\s*(?:phone )?(?:call|meeting|interview|negotiation|presentation|conversation)\b/,
+    /\b(?:help|support|assist|guide|coach|cue) (?:on|during|through) (?:a|the|my|our)?\s*(?:phone )?(?:call|meeting|interview|negotiation|presentation|conversation)\b/,
+    /\b(?:can|will|could|would) you (?:provide|produce|give|activate|start|open|launch|turn on|enable) live support\b/,
+    /\b(?:activate|start|open|launch|turn on|enable|use|enter|go) live(?: support| mode)?\b/,
+    /\bi want (?:you to )?(?:activate|start|open|launch|turn on|enable|use|enter|go) live(?: support| mode)?\b/,
+    /\b(?:can|will|could|would) you (?:listen|stay with me|be with me|accompany me) (?:on|during) (?:a|the|my|our)?\s*(?:phone )?(?:call|meeting|interview|negotiation|presentation|conversation)\b/,
   ])
 
   const executionImminent =
-    !directGeorgeParticipationRequest &&
+    directGeorgeParticipationRequest ||
     hasAny(t, [
       /\bright now\b/,
       /\bin \d+\s?(minutes?|mins?|hours?)\b/,
@@ -56,57 +62,60 @@ export function evaluateLiveRecommendationEvidence(
     ])
 
   const conversationPressure =
-    !directGeorgeParticipationRequest &&
-    (Boolean(input.pressureHigh) ||
-      hasAny(t, [
-        /\bmeeting\b/,
-        /\binterview\b/,
-        /\bcall\b/,
-        /\bnegotiation\b/,
-        /\bpresentation\b/,
-        /\bdebate\b/,
-        /\bargument\b/,
-        /\bclient\b/,
-        /\bboss\b/,
-        /\bmanager\b/,
-        /\bboard\b/,
-        /\binvestor\b/,
-        /\bdoctor\b/,
-        /\bchallenged\b/,
-        /\bpush(ed)? back\b/,
-        /\bpressure\b/,
-        /\bwhat (do|should) i say\b/,
-        /\bhow (do|should) i respond\b/,
-      ]))
-
-  const trajectorySignal =
-    Boolean(input.objectiveKnown) &&
+    directGeorgeParticipationRequest ||
+    Boolean(input.pressureHigh) ||
     hasAny(t, [
-      /\bfounder\b/,
-      /\bstartup\b/,
-      /\bbusiness\b/,
-      /\bcompany\b/,
-      /\bproduct\b/,
-      /\bcapital\b/,
-      /\bfunding\b/,
-      /\binvestor\b/,
-      /\bpartner(ship)?\b/,
-      /\bcustomer(s)?\b/,
-      /\bhiring\b/,
-      /\bjob\b/,
+      /\bmeeting\b/,
       /\binterview\b/,
-      /\bnegotiate\b/,
-      /\bdeal\b/,
-      /\bpitch\b/,
+      /\bcall\b/,
+      /\bnegotiation\b/,
       /\bpresentation\b/,
+      /\bdebate\b/,
+      /\bargument\b/,
+      /\bclient\b/,
+      /\bboss\b/,
+      /\bmanager\b/,
+      /\bboard\b/,
+      /\binvestor\b/,
+      /\bdoctor\b/,
+      /\bchallenged\b/,
+      /\bpush(ed)? back\b/,
+      /\bpressure\b/,
+      /\bwhat (do|should) i say\b/,
+      /\bhow (do|should) i respond\b/,
     ])
 
+  const trajectorySignal =
+    directGeorgeParticipationRequest ||
+    (Boolean(input.objectiveKnown) &&
+      hasAny(t, [
+        /\bfounder\b/,
+        /\bstartup\b/,
+        /\bbusiness\b/,
+        /\bcompany\b/,
+        /\bproduct\b/,
+        /\bcapital\b/,
+        /\bfunding\b/,
+        /\binvestor\b/,
+        /\bpartner(ship)?\b/,
+        /\bcustomer(s)?\b/,
+        /\bhiring\b/,
+        /\bjob\b/,
+        /\binterview\b/,
+        /\bnegotiate\b/,
+        /\bdeal\b/,
+        /\bpitch\b/,
+        /\bpresentation\b/,
+      ]))
+
   const signalUsable =
+    directGeorgeParticipationRequest ||
     input.signalSufficiency === 'sufficient' ||
     input.signalSufficiency === 'needs-smallest-signal'
 
   const hasConversationOutcome =
-    Boolean(input.objectiveKnown) && conversationPressure
+    directGeorgeParticipationRequest ||
+    (Boolean(input.objectiveKnown) && conversationPressure)
 
   return {
     alreadyLive,
