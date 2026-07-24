@@ -5,6 +5,7 @@ import './operational-overrides.css'
 import MobileHeaderGate from '@/components/layout/MobileHeaderGate'
 import LanguageRailSupport from '@/components/george/LanguageRailSupport'
 import SidebarAccountDropdownEnhancer from '@/components/george/SidebarAccountDropdownEnhancer'
+import CapabilityOpportunityBridge from '@/components/george/chat/CapabilityOpportunityBridge'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -76,6 +77,7 @@ export default function RootLayout({
         <MobileHeaderGate />
         <LanguageRailSupport />
         <SidebarAccountDropdownEnhancer />
+        <CapabilityOpportunityBridge />
 
         <div className="flex-1 pt-[max(env(safe-area-inset-top),0px)]">
           {children}
