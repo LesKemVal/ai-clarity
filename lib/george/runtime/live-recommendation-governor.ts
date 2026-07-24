@@ -18,96 +18,32 @@ export type LiveRecommendationEvidence = {
   pressureHigh: boolean
 }
 
-function hasAny(text: string, patterns: RegExp[]) {
-  return patterns.some((pattern) => pattern.test(text))
-}
-
 /**
- * Supplies conservative evidence for unsolicited LIVE recommendations only.
+ * Supplies presentation context for the LIVE capability.
  *
- * This module does not decide whether a user is asking for LIVE and must not
- * interpret direct capability requests. The provider reasons about those from
- * GEORGE identity, the full conversation, and the user's current objective.
+ * This module does not decide whether LIVE is relevant, beneficial, requested,
+ * or preferred. The provider reasons about capability benefit from the full
+ * conversation, the user's explicit or inferred intent, and the desired or
+ * likely desired outcome. Operational judgment may use this evidence only to
+ * govern how an available capability is surfaced while preserving user agency.
  */
 export function evaluateLiveRecommendationEvidence(
   input: LiveRecommendationEvidenceInput
 ): LiveRecommendationEvidence {
-  const t = String(input.latestUserText || '').toLowerCase().trim()
   const alreadyLive = input.currentRuntime === 'live_george'
-
-  const executionImminent = hasAny(t, [
-    /\bright now\b/,
-    /\bin \d+\s?(minutes?|mins?|hours?)\b/,
-    /\b(?:meeting|call|interview|presentation|negotiation|session)\s+(?:starts?|begins?|kicks? off)\s+in\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:minutes?|mins?|hours?)\b/,
-    /\b(?:meeting|call|interview|presentation|negotiation|session)\s+is\s+in\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:minutes?|mins?|hours?)\b/,
-    /\babout to\b/,
-    /\bwalking into\b/,
-    /\bi'?m in\b/,
-    /\bi am in\b/,
-    /\bon the call\b/,
-    /\bin the meeting\b/,
-    /\bin an interview\b/,
-    /\bpresenting\b/,
-  ])
-
-  const conversationPressure =
-    Boolean(input.pressureHigh) ||
-    hasAny(t, [
-      /\bmeeting\b/,
-      /\binterview\b/,
-      /\bcall\b/,
-      /\bnegotiation\b/,
-      /\bpresentation\b/,
-      /\bdebate\b/,
-      /\bargument\b/,
-      /\bclient\b/,
-      /\bboss\b/,
-      /\bmanager\b/,
-      /\bboard\b/,
-      /\binvestor\b/,
-      /\bdoctor\b/,
-      /\bchallenged\b/,
-      /\bpush(ed)? back\b/,
-      /\bpressure\b/,
-      /\bwhat (do|should) i say\b/,
-      /\bhow (do|should) i respond\b/,
-    ])
-
-  const trajectorySignal =
-    Boolean(input.objectiveKnown) &&
-    hasAny(t, [
-      /\bfounder\b/,
-      /\bstartup\b/,
-      /\bbusiness\b/,
-      /\bcompany\b/,
-      /\bproduct\b/,
-      /\bcapital\b/,
-      /\bfunding\b/,
-      /\binvestor\b/,
-      /\bpartner(ship)?\b/,
-      /\bcustomer(s)?\b/,
-      /\bhiring\b/,
-      /\bjob\b/,
-      /\binterview\b/,
-      /\bnegotiate\b/,
-      /\bdeal\b/,
-      /\bpitch\b/,
-      /\bpresentation\b/,
-    ])
-
   const signalUsable =
     input.signalSufficiency === 'sufficient' ||
     input.signalSufficiency === 'needs-smallest-signal'
-
-  const hasConversationOutcome =
-    Boolean(input.objectiveKnown) && conversationPressure
+  const hasConversationOutcome = Boolean(input.objectiveKnown) && signalUsable
 
   return {
     alreadyLive,
     signalUsable,
-    executionImminent,
-    conversationPressure,
-    trajectorySignal,
+    // Capability relevance must not be inferred from phrase matching here.
+    // OpenAI reasons about timing, intent, and likely benefit from full context.
+    executionImminent: false,
+    conversationPressure: false,
+    trajectorySignal: hasConversationOutcome,
     hasConversationOutcome,
     pressureHigh: Boolean(input.pressureHigh),
   }
