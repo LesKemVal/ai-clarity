@@ -11,6 +11,10 @@ const assessmentSource = readFileSync(
   `${root}/lib/george/live-runtime/operational-assessment.ts`,
   'utf8'
 )
+const receiverPolicySource = readFileSync(
+  `${root}/lib/george/live-delivery/receiver-policy.ts`,
+  'utf8'
+)
 const routerSource = readFileSync(
   `${root}/lib/george/live-delivery/delivery-router.ts`,
   'utf8'
@@ -31,7 +35,6 @@ for (const expected of [
 
 for (const expected of [
   'resolveGeorgeOperationalAssessment',
-  'composeGeorgeOperationalCueText',
   'isUserFacingEvidence',
   'INTERNAL_REASON_PATTERNS',
 ]) {
@@ -42,8 +45,35 @@ for (const expected of [
 }
 
 assert(
+  !assessmentSource.includes('export function composeGeorgeOperationalCueText'),
+  'Operational assessment must not export receiver-specific cue composition'
+)
+
+assert(
+  receiverPolicySource.includes('export function composeGeorgeOperationalCueText'),
+  'Receiver policy must own operational cue composition'
+)
+
+for (const expected of [
+  "deliveryStyle === 'continue'",
+  "deliveryStyle === 'cue'",
+  "deliveryStyle === 'advice'",
+  "join('\\n\\n')",
+]) {
+  assert(
+    receiverPolicySource.includes(expected),
+    `Receiver policy should preserve explanatory cue behavior: ${expected}`
+  )
+}
+
+assert(
   routerSource.includes('const operationalAssessment = resolveGeorgeOperationalAssessment'),
   'Delivery router should resolve the canonical operational assessment once'
+)
+
+assert(
+  routerSource.includes("from './receiver-policy'"),
+  'Delivery router should import cue composition from canonical Receiver Policy'
 )
 
 assert(
