@@ -1,8 +1,5 @@
 import type { GeorgeActionCue } from '@/lib/george/live-hub/types'
-import {
-  composeGeorgeOperationalCueText,
-  resolveGeorgeOperationalAssessment,
-} from '@/lib/george/live-runtime/operational-assessment'
+import { resolveGeorgeOperationalAssessment } from '@/lib/george/live-runtime/operational-assessment'
 import {
   DEFAULT_GEORGE_LIVE_DELIVERY_STYLE,
   type GeorgeDeliveryContext,
@@ -10,7 +7,10 @@ import {
   type GeorgeDeliveryMode,
   type GeorgeLiveDeliveryStyle,
 } from './types'
-import { resolveGeorgeReceiverDeliveryPolicy } from './receiver-policy'
+import {
+  composeGeorgeOperationalCueText,
+  resolveGeorgeReceiverDeliveryPolicy,
+} from './receiver-policy'
 
 function composeBaseDeliveryText(input: {
   actionCue: GeorgeActionCue
