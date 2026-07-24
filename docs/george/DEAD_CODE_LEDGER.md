@@ -17,34 +17,32 @@ This ledger prevents unfinished contracts and transitional files from silently b
 
 ## Open Items
 
+None recorded.
+
+## Resolved Items
+
 ### `lib/george/runtime/provider-semantic-intent.ts`
 
-Status: **Pending integration — currently unreferenced**
+Resolution: **Removed before integration**
 
-Introduced in commit:
+History:
 
 ```text
 951e77b Add shared provider semantic intent contract
+b268833 Remove unintegrated semantic intent contract
 ```
 
-Intended canonical use:
+Reason:
 
-- provider realization returns user-facing output and semantic capability intent from the same reasoning pass;
-- shared runtime consumes explicit capability requests and inferred opportunities;
-- execution policy determines mode-specific realization downstream.
+- the file had no consumer;
+- it introduced a future contract outside the active provider boundary;
+- retaining it would have created silent dead code.
 
-Must not become:
+Replacement rule:
 
-- a second provider call;
-- a LIVE-specific language parser;
-- a duplicate intent owner;
-- a keyword or phrase classifier;
-- a separate Normal or LIVE reasoning lane.
-
-Resolution condition:
-
-- wire the contract into the canonical provider result and runtime pipeline with qualification coverage; or
-- delete the file if the provider contract is implemented through another existing canonical owner.
+- extend the existing canonical provider result directly;
+- wire provider output, runtime consumption, response payload, and qualification coverage in the same implementation sequence;
+- do not reintroduce a standalone semantic-intent owner unless an active consumer exists in the same change.
 
 ## Confirmed Dead Code
 
