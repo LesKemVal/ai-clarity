@@ -277,7 +277,7 @@ export function resolveLiveSupportJudgment(
         : !evidence.trajectorySignal && !evidence.conversationPressure
           ? 'Trajectory does not yet indicate a realistic future live benefit.'
           : 'LIVE recommendation threshold not met.',
-    instruction: 'Do not recommend LIVE. Continue normal GEORGE support.',
+    instruction: '',
   }
 }
 
