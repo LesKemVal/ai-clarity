@@ -201,6 +201,8 @@ Delivery Router
 ↓
 Delivery Bridge
 ↓
+Visual Presentation Policy
+↓
 Voice, visual, or silent realization
 ```
 
@@ -437,6 +439,27 @@ Responsibilities:
 
 A bridge dispatches approved delivery. It does not decide what GEORGE believes or what operational support is appropriate.
 
+## Visual Presentation Policy Architecture
+
+Canonical owner:
+
+```text
+lib/george/live-delivery/visual-presentation-policy.ts
+```
+
+Responsibilities:
+
+- resolve presentation interruption and replacement;
+- suppress duplicate presentation;
+- enforce priority replacement safeguards;
+- resolve receiver-profile-specific visual persistence timing;
+- preserve Receiver Policy output without reshaping it;
+- remain portable and independent of React rendering.
+
+Visual Presentation Policy consumes approved delivery downstream of Delivery Bridge.
+
+It does not perform reasoning, support behavior selection, operational assessment, receiver shaping, or delivery routing.
+
 ## Visual Bridge Architecture
 
 Canonical owner:
@@ -447,14 +470,18 @@ components/george/live/LiveHubVisualCueBridge.tsx
 
 Responsibilities:
 
+- subscribe to approved delivery;
+- invoke Visual Presentation Policy;
 - render approved visual guidance unchanged;
 - preserve policy-created newline structure;
 - allow normal word wrapping;
-- apply presentation-level replacement, replay, priority, and persistence behavior;
 - report visual telemetry;
+- replay approved delivery when appropriate;
 - avoid receiver-specific text shaping.
 
 Rendering preserves structure. It does not create structure.
+
+The Visual Bridge does not own interruption, replacement, priority, duplicate-suppression, or persistence policy.
 
 Current validated persistence policy:
 

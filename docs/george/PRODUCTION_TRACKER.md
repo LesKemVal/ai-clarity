@@ -111,6 +111,8 @@ Delivery Router
 ↓
 Delivery Bridge
 ↓
+Visual Presentation Policy
+↓
 Voice, visual, or silent realization
 ```
 
@@ -248,6 +250,24 @@ Responsibilities:
 - dispatch approved voice and visual cues;
 - remain free of competing support behavior, receiver shaping, and routing authority.
 
+### Visual Presentation Policy
+
+Canonical owner:
+
+- `lib/george/live-delivery/visual-presentation-policy.ts`
+
+Responsibilities:
+
+- own presentation interruption and replacement policy;
+- own duplicate suppression and priority replacement policy;
+- own visual persistence timing;
+- preserve Receiver Policy output without reshaping it;
+- remain portable and rendering-independent.
+
+Visual Presentation Policy is downstream of Receiver Policy, Delivery Router, and Delivery Bridge.
+
+It must not compose support behavior, operational assessment, receiver policy, or delivery routing.
+
 ### Visual Bridge
 
 Canonical owner:
@@ -256,12 +276,15 @@ Canonical owner:
 
 Responsibilities:
 
+- subscribe to approved delivery;
+- invoke Visual Presentation Policy;
 - render approved visual guidance;
 - preserve Receiver Policy line structure;
-- apply presentation-level cue interruption and persistence safeguards;
 - report visual delivery telemetry;
 - replay approved delivery history when appropriate;
 - avoid reshaping or recomposing receiver-policy text.
+
+The Visual Bridge renders approved presentation. It does not own interruption, replacement, priority, duplicate-suppression, or persistence policy.
 
 Validated presentation policy:
 
@@ -452,6 +475,7 @@ Latest production synchronization baseline includes:
 cc391fd Route operational cue composition through receiver policy
 a826168 Align explanatory cue qualification with canonical ownership
 cbf577d Extend visual-only LIVE cue persistence
+2819a30 Extract LIVE visual presentation policy
 ```
 
 Validated production command:
