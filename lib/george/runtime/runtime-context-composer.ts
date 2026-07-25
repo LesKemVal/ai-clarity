@@ -8,6 +8,7 @@ export type GovernedRuntimeContextInput = {
   arbitrationResponseShapeNote?: string | null
   adaptiveUserProfileNote?: string | null
   durableBehavioralMemoryNote?: string | null
+  operationalMemoryEvidenceNote?: string | null
   runtimeOutcomeLearningNote?: string | null
   continuityRestorationNote?: string | null
   judgmentSurfaceNote?: string | null
@@ -103,6 +104,7 @@ export function buildNormalProviderRuntimeContext(input: {
   providerExecutionAuthority: string
   adaptiveUserProfileNote?: string | null
   durableBehavioralMemoryNote?: string | null
+  operationalMemoryEvidenceNote?: string | null
   runtimeOutcomeLearningNote?: string | null
   continuityRestorationNote?: string | null
   continuityGovernanceNote?: string | null
@@ -111,6 +113,7 @@ export function buildNormalProviderRuntimeContext(input: {
   return composeRuntimeContext([
     input.adaptiveUserProfileNote,
     input.durableBehavioralMemoryNote,
+    input.operationalMemoryEvidenceNote,
     input.runtimeOutcomeLearningNote,
     input.continuityRestorationNote,
     input.continuityGovernanceNote,
@@ -142,6 +145,7 @@ export function buildGovernedRuntimeContext(input: GovernedRuntimeContextInput) 
     input.arbitrationResponseShapeNote,
     input.adaptiveUserProfileNote,
     input.durableBehavioralMemoryNote,
+    input.operationalMemoryEvidenceNote,
     input.runtimeOutcomeLearningNote,
     input.continuityRestorationNote,
     input.judgmentSurfaceNote,
