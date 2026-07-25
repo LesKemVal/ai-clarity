@@ -6286,35 +6286,6 @@ return (
       {m.role === 'assistant' && (
         <div className="relative space-y-1.5">
 
-          {isLatestAssistant && !liveMode && (
-            <div className="mt-2 flex items-center gap-2">
-              <LiveCapabilitySurface
-                phase={
-                  preLiveSignalComplete
-                    ? 'ready'
-                    : showPreLiveSignalSurface
-                      ? 'preparing'
-                      : 'available'
-                }
-                onPrepare={() => {
-                  try {
-                    window.localStorage.setItem(
-                      'GEORGE_PRE_LIVE_FROM_MESSAGE',
-                      '1'
-                    )
-                    window.localStorage.setItem(
-                      'GEORGE_LIVE_INTENT_STAGE',
-                      'signal_acquisition'
-                    )
-                  } catch {}
-
-                  startLiveSignalAcquisition()
-                }}
-                onStart={openLiveEntry}
-              />
-            </div>
-          )}
-
           {isLatestAssistant && liveMode && (
   <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-[#D7DBE4]/50">
 
@@ -6427,6 +6398,75 @@ return (
           <div className="flex items-center gap-3 flex-nowrap overflow-x-auto text-[11px] text-[#D7DBE4]/50">
             {(
               <>
+            {isLatestAssistant && (
+              <>
+                <LiveCapabilitySurface
+                  phase={
+                    preLiveSignalComplete
+                      ? 'ready'
+                      : showPreLiveSignalSurface
+                        ? 'preparing'
+                        : 'available'
+                  }
+                  onPrepare={() => {
+                    try {
+                      window.localStorage.setItem(
+                        'GEORGE_PRE_LIVE_FROM_MESSAGE',
+                        '1'
+                      )
+                      window.localStorage.setItem(
+                        'GEORGE_LIVE_INTENT_STAGE',
+                        'signal_acquisition'
+                      )
+                    } catch {}
+
+                    startLiveSignalAcquisition()
+                  }}
+                  onStart={openLiveEntry}
+                />
+
+                {[
+                  {
+                    label: 'PLAN',
+                    prompt: 'Help me plan the best next steps from here.',
+                  },
+                  {
+                    label: 'WRITE',
+                    prompt: 'Help me write what I need from this conversation.',
+                  },
+                  {
+                    label: 'REVIEW',
+                    prompt: 'Review what we have so far and identify what should improve.',
+                  },
+                ].map((capability) => (
+                  <button
+                    key={capability.label}
+                    type="button"
+                    onClick={() => {
+                      setInput(capability.prompt)
+
+                      window.requestAnimationFrame(() => {
+                        textareaRef.current?.focus()
+                        textareaRef.current?.setSelectionRange(
+                          capability.prompt.length,
+                          capability.prompt.length
+                        )
+                      })
+                    }}
+                    className="inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.018] px-3 text-[10px] font-semibold tracking-[0.18em] text-[#D7DBE4]/54 transition hover:border-[#75A4FF]/34 hover:bg-[#172347]/52 hover:text-[#E4EBFF]/88 active:scale-[0.97]"
+                    aria-label={`Use GEORGE to ${capability.label.toLowerCase()}`}
+                  >
+                    {capability.label}
+                  </button>
+                ))}
+
+                <span
+                  className="h-4 w-px shrink-0 bg-white/[0.07]"
+                  aria-hidden="true"
+                />
+              </>
+            )}
+
             <button
               type="button"
               onClick={async () => {
