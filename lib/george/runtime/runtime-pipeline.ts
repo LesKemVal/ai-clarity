@@ -9,6 +9,10 @@ import {
   resolveGeorgeOutcomeState,
   type GeorgeOutcomeState,
 } from '@/lib/george/live-voice/runtime/active-outcome'
+import {
+  buildOperationalMemoryEvidenceNote,
+  type OperationalMemoryRuntimeEvidence,
+} from '@/lib/george/operational-memory/runtime-evidence'
 import type { AdaptiveUserProfile } from '@/lib/george/runtime/adaptive-user-profile'
 import {
   buildConversationMoveDefinitionNote,
@@ -141,6 +145,7 @@ export type GeorgeRuntimePipelineInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
   providerPrompt: GeorgeProviderPromptInput
   onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
   governedContextNotes: Readonly<{
@@ -180,6 +185,7 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   providerResolution: NormalGeorgeReasoningDecision
   timing: GeorgeRuntimePipelineTiming
   notes: Readonly<{
+    operationalMemoryEvidenceNote: string
     outcomeEvolutionNote: string
     trajectoryNote: string
     operationalJudgmentNote: string
@@ -359,6 +365,9 @@ export function resolveGeorgeRuntimePipeline(
 
   const notes = measureStage('runtime_note_assembly', () =>
     Object.freeze({
+      operationalMemoryEvidenceNote: input.operationalMemoryEvidence
+        ? buildOperationalMemoryEvidenceNote(input.operationalMemoryEvidence)
+        : '',
       outcomeEvolutionNote: buildOutcomeEvolutionNote(outcomeEvolution),
       trajectoryNote: buildTrajectoryNote(trajectoryAssessment),
       operationalJudgmentNote: buildOperationalJudgmentNote(operationalJudgment),
@@ -408,6 +417,8 @@ export function resolveGeorgeRuntimePipeline(
               input.governedContextNotes.adaptiveUserProfileNote,
             durableBehavioralMemoryNote:
               input.governedContextNotes.durableBehavioralMemoryNote,
+            operationalMemoryEvidenceNote:
+              notes.operationalMemoryEvidenceNote,
             runtimeOutcomeLearningNote:
               input.governedContextNotes.runtimeOutcomeLearningNote,
             continuityRestorationNote:
@@ -419,6 +430,8 @@ export function resolveGeorgeRuntimePipeline(
           })
         : buildGovernedRuntimeContext({
             ...input.governedContextNotes,
+            operationalMemoryEvidenceNote:
+              notes.operationalMemoryEvidenceNote,
             trajectoryNote: notes.trajectoryNote,
             operationalJudgmentNote:
               notes.operationalJudgmentNote,
