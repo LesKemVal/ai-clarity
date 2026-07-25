@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { subscribeGeorgeApprovedDeliveryReplay } from '@/lib/george/live-runtime/approved-delivery-history'
+import {
+  resolveGeorgeVisualPresentationDecision,
+  resolveGeorgeVisualPresentationHoldMs,
+} from '@/lib/george/live-delivery/visual-presentation-policy'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type {
   GeorgeDeliveryCue,
@@ -27,9 +31,6 @@ type VisualCueState = {
   at: number
 }
 
-const AUDIO_VISUAL_HOLD_MS = 12000
-const VISUAL_ONLY_HOLD_MS = 20000
-
 export function LiveHubVisualCueBridge({
   active,
   context,
@@ -42,79 +43,78 @@ export function LiveHubVisualCueBridge({
   const currentPriorityRef = useRef(0)
   const lastRenderedAtRef = useRef(0)
 
-  const handleVisualCue = useCallback((cue: GeorgeDeliveryCue) => {
-    const clean = String(cue.text || '')
-      .trim()
-      .replace(/^[“”"']+|[“”"']+$/g, '')
+  const handleVisualCue = useCallback(
+    (cue: GeorgeDeliveryCue) => {
+      const decision = resolveGeorgeVisualPresentationDecision({
+        text: cue.text,
+        candidatePriority: cue.priority,
+        currentText: lastCueRef.current,
+        currentPriority: currentPriorityRef.current,
+        hasCurrentCue: Boolean(visualCue),
+        lastRenderedAt: lastRenderedAtRef.current,
+      })
 
-    console.info('[LIVE][visual-bridge][candidate]', {
-      clean,
-      source: cue.source,
-      priority: cue.priority,
-      confidence: cue.confidence,
-      receiverProfile,
-      voiceEnabled,
-      hasVisualCue: Boolean(visualCue),
-      lastCue: lastCueRef.current,
-      currentPriority: currentPriorityRef.current,
-      ageMs: Date.now() - lastRenderedAtRef.current,
-      turnId: cue.turnId,
-    })
+      console.info('[LIVE][visual-bridge][candidate]', {
+        clean: decision.text,
+        source: cue.source,
+        priority: cue.priority,
+        confidence: cue.confidence,
+        receiverProfile,
+        voiceEnabled,
+        hasVisualCue: Boolean(visualCue),
+        lastCue: lastCueRef.current,
+        currentPriority: currentPriorityRef.current,
+        ageMs: Date.now() - lastRenderedAtRef.current,
+        turnId: cue.turnId,
+        presentationAction: decision.action,
+        presentationReason: decision.reason,
+      })
 
-    if (!clean) {
-      console.info('[LIVE][visual-bridge][blocked]', 'empty')
-      return
-    }
+      if (decision.action === 'suppress') {
+        console.info(
+          '[LIVE][visual-bridge][blocked]',
+          decision.reason
+        )
+        return
+      }
 
-    if (lastCueRef.current === clean) {
-      console.info('[LIVE][visual-bridge][blocked]', 'duplicate')
-      return
-    }
+      lastCueRef.current = decision.text
+      currentPriorityRef.current = cue.priority
+      lastRenderedAtRef.current = decision.now
 
-    const now = Date.now()
-    const cueAgeMs = now - lastRenderedAtRef.current
-    const canInterruptCurrentCue =
-      !visualCue ||
-      cueAgeMs > 2600 ||
-      cue.priority > currentPriorityRef.current + 18
+      markRuntimeEvent(
+        cue.turnId || decision.text,
+        'visual_cue_received'
+      )
 
-    if (!canInterruptCurrentCue) {
-      console.info('[LIVE][visual-bridge][blocked]', 'current cue hold')
-      return
-    }
+      setVisualCue({
+        turnId: cue.turnId,
+        text: decision.text,
+        priority: cue.priority,
+        confidence: cue.confidence,
+        source: cue.source,
+        at: decision.now,
+      })
+    },
+    [receiverProfile, visualCue, voiceEnabled]
+  )
 
-    if (visualCue && cue.priority < currentPriorityRef.current) {
-      console.info('[LIVE][visual-bridge][blocked]', 'lower priority')
-      return
-    }
+  const handleVoiceCue = useCallback(
+    (cue: GeorgeDeliveryCue) => {
+      const clean = String(cue.text || '')
+        .trim()
+        .replace(/^[“”"'’]+|[“”"'’]+$/g, '')
 
-    lastCueRef.current = clean
-    currentPriorityRef.current = cue.priority
+      if (!clean) return
 
-    markRuntimeEvent(cue.turnId || clean, 'visual_cue_received')
-
-    lastRenderedAtRef.current = now
-
-    setVisualCue({
-      turnId: cue.turnId,
-      text: clean,
-      priority: cue.priority,
-      confidence: cue.confidence,
-      source: cue.source,
-      at: now,
-    })
-  }, [receiverProfile, visualCue, voiceEnabled])
-
-  const handleVoiceCue = useCallback((cue: GeorgeDeliveryCue) => {
-    const clean = String(cue.text || '')
-      .trim()
-      .replace(/^[“”"']+|[“”"']+$/g, '')
-
-    if (!clean) return
-
-    markRuntimeEvent(cue.turnId || clean, 'voice_cue_requested')
-    onSpeakCue?.(clean, cue.turnId)
-  }, [onSpeakCue])
+      markRuntimeEvent(
+        cue.turnId || clean,
+        'voice_cue_requested'
+      )
+      onSpeakCue?.(clean, cue.turnId)
+    },
+    [onSpeakCue]
+  )
 
   useEffect(() => {
     if (!active) {
@@ -156,14 +156,13 @@ export function LiveHubVisualCueBridge({
   useEffect(() => {
     if (!visualCue) return
 
-    markRuntimeEvent(visualCue.turnId || visualCue.text, 'visual_cue_rendered')
+    markRuntimeEvent(
+      visualCue.turnId || visualCue.text,
+      'visual_cue_rendered'
+    )
 
     const holdMs =
-      receiverProfile === 'audio_only'
-        ? 0
-        : receiverProfile === 'visual_only'
-          ? VISUAL_ONLY_HOLD_MS
-          : AUDIO_VISUAL_HOLD_MS
+      resolveGeorgeVisualPresentationHoldMs(receiverProfile)
 
     if (holdMs <= 0) return
 
@@ -187,18 +186,21 @@ export function LiveHubVisualCueBridge({
         onVoiceCue={handleVoiceCue}
       />
 
-      {active && visualCue && receiverProfile !== 'audio_only' && (
-        <div className="pointer-events-none fixed bottom-[236px] left-6 right-6 z-[9999] md:left-8 md:right-auto md:w-[440px]">
-          <div className="rounded-2xl border border-[#8FB6C9]/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-[#8FB6C9]/20 backdrop-blur-xl">
-            <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-              GEORGE
-            </div>
-            <div className="whitespace-pre-line break-words text-sm leading-snug text-white/90">
-              {visualCue.text}
+      {active &&
+        visualCue &&
+        receiverProfile !== 'audio_only' && (
+          <div className="pointer-events-none fixed bottom-[236px] left-6 right-6 z-[9999] md:left-8 md:right-auto md:w-[440px]">
+            <div className="rounded-2xl border border-[#8FB6C9]/20 bg-[#0B0D12]/96 px-5 py-4 shadow-2xl shadow-[#8FB6C9]/20 backdrop-blur-xl">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+                GEORGE
+              </div>
+
+              <div className="whitespace-pre-line break-words text-sm leading-snug text-white/90">
+                {visualCue.text}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   )
 }
