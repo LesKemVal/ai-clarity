@@ -31,7 +31,7 @@ export function LiveCapabilitySurface({
 
       window.setTimeout(() => {
         setFlipped(false)
-      }, 1500)
+      }, 1200)
     }
 
     if (phase === 'ready' || emphasized) {
@@ -51,10 +51,9 @@ export function LiveCapabilitySurface({
   if (phase === 'preparing') {
     return (
       <div
-        className="inline-flex items-center gap-2 rounded-full border border-[#4F78D8]/24 bg-[#172347]/70 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#BFD0FF]/68"
+        className="inline-flex shrink-0 items-center whitespace-nowrap rounded-[0.55rem] border border-[#5678C8]/28 bg-[#172347]/54 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.17em] text-[#B9C9F3]/74"
         aria-label="LIVE preparation in progress"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-[#75A4FF]/80 shadow-[0_0_12px_rgba(117,164,255,0.58)]" />
         Preparing LIVE
       </div>
     )
@@ -68,7 +67,7 @@ export function LiveCapabilitySurface({
     <button
       type="button"
       onClick={ready ? onStart : onPrepare}
-      className="group relative h-8 min-w-[76px] [perspective:900px]"
+      className="group relative inline-grid shrink-0 [perspective:900px]"
       aria-label={
         ready
           ? 'Start the prepared LIVE conversation'
@@ -76,15 +75,15 @@ export function LiveCapabilitySurface({
       }
     >
       <span
-        className={`absolute inset-0 grid [transform-style:preserve-3d] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`col-start-1 row-start-1 grid [transform-style:preserve-3d] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           flipped ? '[transform:rotateX(180deg)]' : ''
         }`}
       >
-        <span className="col-start-1 row-start-1 inline-flex items-center justify-center rounded-full border border-[#4F78D8]/28 bg-[#172347]/76 px-3 text-[10px] font-semibold tracking-[0.2em] text-[#DDE7FF]/82 shadow-[0_8px_28px_rgba(12,27,68,0.24)] [backface-visibility:hidden] transition group-hover:border-[#75A4FF]/48 group-hover:text-white">
+        <span className="col-start-1 row-start-1 inline-flex items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-white/[0.075] bg-white/[0.018] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#D7DBE4]/62 [backface-visibility:hidden] transition group-hover:border-[#6F91DE]/30 group-hover:bg-[#172347]/38 group-hover:text-[#E4EBFF]/88">
           {front}
         </span>
 
-        <span className="col-start-1 row-start-1 inline-flex items-center justify-center rounded-full border border-[#4F78D8]/34 bg-[#20305E]/82 px-3 text-[10px] font-semibold tracking-[0.2em] text-[#E8EEFF]/88 shadow-[0_8px_28px_rgba(12,27,68,0.30)] [backface-visibility:hidden] [transform:rotateX(180deg)]">
+        <span className="col-start-1 row-start-1 inline-flex items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-[#5678C8]/30 bg-[#172347]/58 px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#DCE6FF]/82 [backface-visibility:hidden] [transform:rotateX(180deg)]">
           {back}
         </span>
       </span>

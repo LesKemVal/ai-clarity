@@ -3221,6 +3221,7 @@ I’ll stay with you.`
 
   const [showScrollHint, setShowScrollHint] = useState(false)
   const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({})
+  const [responseActionMenuIndex, setResponseActionMenuIndex] = useState<number | null>(null)
 
   useEffect(() => {
     const checkScroll = () => {
@@ -6395,7 +6396,7 @@ return (
 
           {!liveMode &&
             !liveMode && (
-          <div className="flex items-center gap-3 flex-nowrap overflow-x-auto text-[11px] text-[#D7DBE4]/50">
+          <div className="relative flex max-w-full items-center gap-2 overflow-x-auto whitespace-nowrap text-[11px] text-[#D7DBE4]/50 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(
               <>
             {isLatestAssistant && (
@@ -6431,6 +6432,10 @@ return (
                     prompt: 'Help me plan the best next steps from here.',
                   },
                   {
+                    label: 'DECK',
+                    prompt: 'Help me build a presentation deck from this conversation.',
+                  },
+                  {
                     label: 'WRITE',
                     prompt: 'Help me write what I need from this conversation.',
                   },
@@ -6453,58 +6458,95 @@ return (
                         )
                       })
                     }}
-                    className="inline-flex h-8 shrink-0 items-center justify-center rounded-full border border-white/[0.07] bg-white/[0.018] px-3 text-[10px] font-semibold tracking-[0.18em] text-[#D7DBE4]/54 transition hover:border-[#75A4FF]/34 hover:bg-[#172347]/52 hover:text-[#E4EBFF]/88 active:scale-[0.97]"
+                    className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-white/[0.07] bg-white/[0.018] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#D7DBE4]/54 transition hover:border-[#75A4FF]/28 hover:bg-[#172347]/38 hover:text-[#E4EBFF]/88 active:scale-[0.97]"
                     aria-label={`Use GEORGE to ${capability.label.toLowerCase()}`}
                   >
                     {capability.label}
                   </button>
                 ))}
 
-                <span
-                  className="h-4 w-px shrink-0 bg-white/[0.07]"
-                  aria-hidden="true"
-                />
               </>
             )}
 
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard?.writeText(m.content)
-                  setToastMessage('Copied')
-                  setShowToast(true)
-                } catch {}
-              }}
-              className="px-1 py-1 text-[11px] text-[#D7DBE4]/50 transition hover:text-[#D7DBE4]/85 active:text-[#D7DBE4]/85"
-            >
-              Copy
-            </button>
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setResponseActionMenuIndex(
+                    responseActionMenuIndex === i ? null : i
+                  )
+                }}
+                aria-label="More response actions"
+                title="More"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-[0.5rem] text-[#D7DBE4]/48 transition hover:bg-white/[0.035] hover:text-[#D7DBE4]/82"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="5" r="1.45" />
+                  <circle cx="12" cy="12" r="1.45" />
+                  <circle cx="12" cy="19" r="1.45" />
+                </svg>
+              </button>
 
-            <button
-              type="button"
-              onClick={async () => {
-                const shareText = m.content
-                try {
-                  if (navigator.share) {
-                    await navigator.share({
-                      title: 'GEORGE by BRANESx',
-                      text: `GEORGE\n\n${shareText}`,
-                      url: window.location.origin + '/',
-                    })
-                  } else if (navigator.clipboard?.writeText) {
-                    await navigator.clipboard.writeText(shareText)
-                    setToastMessage('Copied')
-                    setShowToast(true)
-                  }
-                } catch {}
-              }}
-              aria-label="Share response"
-              title="Share response"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[#D7DBE4]/50 transition-[background-color,color,transform] duration-300 hover:bg-white/[0.04] hover:text-[#D7DBE4]/85 active:scale-[0.96]"
-            >
-              <ShareIcon className="h-3.5 w-3.5" />
-            </button>
+              {responseActionMenuIndex === i && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Close response actions"
+                    onClick={() => setResponseActionMenuIndex(null)}
+                    className="fixed inset-0 z-[79] cursor-default bg-transparent"
+                  />
+
+                  <div className="absolute bottom-[34px] right-0 z-[80] min-w-[116px] overflow-hidden rounded-[0.75rem] border border-white/[0.075] bg-[#080B11]/96 p-1 shadow-[0_18px_54px_rgba(0,0,0,0.46)] backdrop-blur-xl">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard?.writeText(m.content)
+                          setToastMessage('Copied')
+                          setShowToast(true)
+                        } catch {}
+
+                        setResponseActionMenuIndex(null)
+                      }}
+                      className="block w-full rounded-[0.5rem] px-3 py-2 text-left text-[11px] text-[#D7DBE4]/68 transition hover:bg-white/[0.045] hover:text-white"
+                    >
+                      Copy
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const shareText = m.content
+
+                        try {
+                          if (navigator.share) {
+                            await navigator.share({
+                              title: 'GEORGE by BRANESx',
+                              text: `GEORGE\n\n${shareText}`,
+                              url: window.location.origin + '/',
+                            })
+                          } else if (navigator.clipboard?.writeText) {
+                            await navigator.clipboard.writeText(shareText)
+                            setToastMessage('Copied')
+                            setShowToast(true)
+                          }
+                        } catch {}
+
+                        setResponseActionMenuIndex(null)
+                      }}
+                      className="block w-full rounded-[0.5rem] px-3 py-2 text-left text-[11px] text-[#D7DBE4]/68 transition hover:bg-white/[0.045] hover:text-white"
+                    >
+                      Share
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
 
               </>
             )}
