@@ -15,7 +15,7 @@ const heroSequences = [
     title: ['LIVE SUPPORT'],
     lines: [
       'Support during the conversation?',
-      'GEORGE recognizes useful signals and provides discreet guidance while the conversation is still happening and the outcome can still change.',
+      'GEORGE recognizes useful signals and provides discreet guidance while the conversation is still happening and what you want is still on the table.',
     ],
   },
   {
