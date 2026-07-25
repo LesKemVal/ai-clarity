@@ -188,7 +188,7 @@ export default function HomePage() {
                   {card.title}
                 </h3>
 
-                <p className="mt-5 text-[15px] leading-7 text-white/68">
+                <p className="mt-5 text-[15px] leading-7 text-white">
                   {card.body}
                 </p>
               </article>
@@ -226,7 +226,7 @@ export default function HomePage() {
                   {card.title}
                 </h3>
 
-                <p className="mt-4 text-[15px] leading-7 text-white/68">
+                <p className="mt-4 text-[15px] leading-7 text-white">
                   {card.body}
                 </p>
               </article>
@@ -257,7 +257,7 @@ export default function HomePage() {
                   {card.title}
                 </h3>
 
-                <p className="mt-5 text-[15px] leading-7 text-white/68">
+                <p className="mt-5 text-[15px] leading-7 text-white">
                   {card.body}
                 </p>
               </article>
