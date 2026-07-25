@@ -26,6 +26,14 @@ export const LIVE_PREPARATION_SIGNAL_KEYS = [
 export type LivePreparationSignalKey =
   (typeof LIVE_PREPARATION_SIGNAL_KEYS)[number]
 
+const LIVE_PREPARATION_QUESTIONS: Record<LivePreparationSignalKey, string> = {
+  name: 'What should I call you while we prepare?',
+  role: 'Before we go in, what is your role in the conversation?',
+  counterparty: 'Tell me a little about who you will be speaking with.',
+  desiredOutcome: 'If everything goes well, what would you like to walk away with?',
+  acceptableOutcome: 'And if that is not possible, what is an outcome you would still feel good about?',
+}
+
 export function resolveFirstMissingLivePreparationSignal(
   signals: Record<string, unknown> | null | undefined
 ): LivePreparationSignalKey | null {
@@ -38,6 +46,53 @@ export function resolveFirstMissingLivePreparationSignal(
   return null
 }
 
+export function resolveLivePreparationQuestion(
+  key: LivePreparationSignalKey
+): string {
+  return LIVE_PREPARATION_QUESTIONS[key]
+}
+
+export function buildLivePreparationContinuation(input: {
+  signals: Record<string, unknown> | null | undefined
+  nextKey: LivePreparationSignalKey
+}): string {
+  const source = input.signals || {}
+  const room = String(source.counterparty || '').trim()
+  const outcome = String(source.desiredOutcome || '').trim()
+  const nextQuestion = resolveLivePreparationQuestion(input.nextKey)
+
+  if (outcome) {
+    return `We left off preparing around ${outcome}. ${nextQuestion}`
+  }
+
+  if (room) {
+    return `We left off talking about the conversation you are preparing for with ${room}. ${nextQuestion}`
+  }
+
+  return `We left off here. ${nextQuestion}`
+}
+
+export function buildLivePreparationAcknowledgement(input: {
+  completedKey: LivePreparationSignalKey
+  nextKey: LivePreparationSignalKey
+}): string {
+  const nextQuestion = resolveLivePreparationQuestion(input.nextKey)
+
+  switch (input.completedKey) {
+    case 'name':
+      return `Good. ${nextQuestion}`
+    case 'role':
+      return `Got it. ${nextQuestion}`
+    case 'counterparty':
+      return `That helps me understand the room. ${nextQuestion}`
+    case 'desiredOutcome':
+      return `That gives us something concrete to work toward. ${nextQuestion}`
+    case 'acceptableOutcome':
+      return `Good. I have enough context to support you.`
+    default:
+      return nextQuestion
+  }
+}
 
 export function resolveLivePreparationReadiness(
   signals: Record<string, unknown> | null | undefined
@@ -111,7 +166,7 @@ export function resolveLiveMessageBarSetup(input: {
     return {
       mode: 'choose_briefing',
       assistantContent:
-        'I can prepare you for this conversation.\n\nQuick LIVE: Begin with what I already know. I’ll ask only for what is still missing.\n\nFull Brief: Keep preparing with me before we enter LIVE.',
+        'I can help you get ready for this conversation. We can begin with what I already know, or spend a little more time sharpening the briefing first.',
     }
   }
 
@@ -141,7 +196,7 @@ export function resolveLiveIntentRuntime(input: {
 
   if (noIntent) {
     return {
-      assistantContent: 'No problem. We’ll stay here.',
+      assistantContent: 'No problem. We will stay here.',
       clearStage: true,
       clearSourceContext: true,
       clearPromptContext: true,
@@ -152,8 +207,8 @@ export function resolveLiveIntentRuntime(input: {
     return {
       nextStage: 'confirm_relation',
       assistantContent: yesIntent
-        ? 'Good. Is LIVE for this session, or a different room you’re walking into?'
-        : 'I can do that. Is LIVE for this session, or a different room you’re walking into?',
+        ? 'Good. Are we preparing for the conversation we are already discussing, or a different room you are walking into?'
+        : 'I can help you prepare. Is this for the conversation we are already discussing, or a different room you are walking into?',
     }
   }
 
@@ -185,7 +240,7 @@ export function resolveLiveIntentRuntime(input: {
 
     return {
       nextStage: 'collect_signal',
-      assistantContent: 'Tell me the room and the outcome. For example: “interview with hiring manager — get the offer.”',
+      assistantContent: 'Tell me a little about the conversation you are walking into and what you would like to achieve.',
     }
   }
 
@@ -212,6 +267,6 @@ export function resolveLiveIntentRuntime(input: {
 
   return {
     nextStage: 'confirm_intent',
-    assistantContent: 'I can prepare LIVE. Is that what you want to do?',
+    assistantContent: 'I can help you prepare for LIVE. Is that what you want to do?',
   }
 }
