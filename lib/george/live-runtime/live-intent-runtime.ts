@@ -26,12 +26,115 @@ export const LIVE_PREPARATION_SIGNAL_KEYS = [
 export type LivePreparationSignalKey =
   (typeof LIVE_PREPARATION_SIGNAL_KEYS)[number]
 
-const LIVE_PREPARATION_QUESTIONS: Record<LivePreparationSignalKey, string> = {
-  name: 'What should I call you while we prepare?',
-  role: 'Before we go in, what is your role in the conversation?',
-  counterparty: 'Tell me a little about who you will be speaking with.',
-  desiredOutcome: 'If everything goes well, what would you like to walk away with?',
-  acceptableOutcome: 'And if that is not possible, what is an outcome you would still feel good about?',
+export type LivePreparationQuestion = {
+  key: LivePreparationSignalKey
+  kicker: string
+  label: string
+  question: string
+  examples: string
+}
+
+export const LIVE_PREPARATION_QUESTIONS: readonly LivePreparationQuestion[] =
+  Object.freeze([
+    {
+      key: 'name',
+      kicker: 'Bring GEORGE up to speed',
+      label: 'Question 1',
+      question: 'What should I call you in this conversation?',
+      examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel, Alex, etc.',
+    },
+    {
+      key: 'role',
+      kicker: 'Position signal',
+      label: 'Question 2',
+      question: 'What is your role in the conversation — your position or title?',
+      examples:
+        'Examples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
+    },
+    {
+      key: 'counterparty',
+      kicker: 'Room signal',
+      label: 'Question 3',
+      question: 'Who are you speaking with?',
+      examples:
+        'Examples: investor, hiring manager, doctor, customer, employee, client, board member, etc.',
+    },
+    {
+      key: 'desiredOutcome',
+      kicker: 'Outcome signal',
+      label: 'Question 4',
+      question: 'What do you want from this conversation?',
+      examples: 'Name the result you are trying to move toward.',
+    },
+    {
+      key: 'acceptableOutcome',
+      kicker: 'Settlement signal',
+      label: 'Question 5',
+      question:
+        'If your ideal outcome is not available, what would you settle for?',
+      examples:
+        'This helps GEORGE understand the floor, not just the target.',
+    },
+  ])
+
+const LIVE_PREPARATION_QUESTION_BY_KEY =
+  LIVE_PREPARATION_QUESTIONS.reduce(
+    (questions, question) => {
+      questions[question.key] = question.question
+      return questions
+    },
+    {} as Record<LivePreparationSignalKey, string>
+  )
+
+export function resolveLivePreparationStep(step: number) {
+  const normalizedStep = Number.isFinite(step)
+    ? Math.max(0, Math.floor(step))
+    : 0
+
+  const question = LIVE_PREPARATION_QUESTIONS[normalizedStep] || null
+  const complete = normalizedStep >= LIVE_PREPARATION_QUESTIONS.length
+
+  return Object.freeze({
+    step: normalizedStep,
+    question,
+    complete,
+    total: LIVE_PREPARATION_QUESTIONS.length,
+    nextStep: complete ? normalizedStep : normalizedStep + 1,
+  })
+}
+
+export function resolveLivePreparationTransition(
+  signals: Record<string, unknown> | null | undefined
+) {
+  const firstMissingKey =
+    resolveFirstMissingLivePreparationSignal(signals)
+  const total = LIVE_PREPARATION_QUESTIONS.length
+
+  if (!firstMissingKey) {
+    return Object.freeze({
+      step: total,
+      question: null,
+      complete: true,
+      total,
+    })
+  }
+
+  const step = LIVE_PREPARATION_QUESTIONS.findIndex(
+    (question) => question.key === firstMissingKey
+  )
+
+  if (step < 0) {
+    throw new Error(
+      `[GEORGE LIVE PREPARATION] Unknown preparation signal: ${firstMissingKey}`
+    )
+  }
+
+  return Object.freeze({
+    step,
+    question: LIVE_PREPARATION_QUESTIONS[step],
+    complete: false,
+    total,
+  })
 }
 
 export function resolveFirstMissingLivePreparationSignal(
@@ -49,7 +152,7 @@ export function resolveFirstMissingLivePreparationSignal(
 export function resolveLivePreparationQuestion(
   key: LivePreparationSignalKey
 ): string {
-  return LIVE_PREPARATION_QUESTIONS[key]
+  return LIVE_PREPARATION_QUESTION_BY_KEY[key]
 }
 
 export function buildLivePreparationContinuation(input: {
