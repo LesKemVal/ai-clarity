@@ -1,4 +1,13 @@
 'use client'
+
+import {
+  clearLivePreparationPreviewReady,
+  clearLivePreparationSignals,
+  isLivePreparationPreviewReady,
+  loadLivePreparationSignals,
+  markLivePreparationPreviewReady,
+  saveLivePreparationSignals,
+} from '@/lib/george/live-browser/live-preparation-browser-storage'
 import { buildOpportunitySignalAcquisitionMessage } from '@/lib/george/runtime/conversation-strategy'
 
 
@@ -69,8 +78,9 @@ import { type LiveAwarenessFragment } from '@/lib/george/live-runtime/live-aware
 import { processLiveAwarenessSignal } from '@/lib/george/live-runtime/live-awareness-pipeline'
 import { buildLiveSelfDescription, isLiveIdentityQuestion } from '@/lib/george/identity/live-self-description'
 import {
-  resolveFirstMissingLivePreparationSignal,
   resolveLivePreparationReadiness,
+  resolveLivePreparationStep,
+  resolveLivePreparationTransition,
   resolveLiveIntentRuntime,
   resolveLiveMessageBarSetup,
 } from '@/lib/george/live-runtime/live-intent-runtime'
@@ -298,6 +308,7 @@ type Message = {
   simplifiedFromIndex?: number
   source?: 'user_input' | 'sidebar_prompt' | 'live_transcript' | 'third_party_speech' | 'system_override'
   servingTags?: string[]
+  presentationMode?: 'live_preparation'
 }
 
 type PromptSelection = {
@@ -919,6 +930,7 @@ const [voiceError, setVoiceError] = useState('')
         role: 'assistant',
         content: 'Give GEORGE signal.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
         source: 'system_override',
+        presentationMode: 'live_preparation',
       },
     ]
 
@@ -2898,6 +2910,7 @@ const startLiveAudioRuntime = liveAudioRuntime.start
       role: 'assistant',
       content: 'I can prepare you for this conversation.\n\nQuick LIVE: Begin with what I already know. I’ll ask only for what is still missing.\n\nFull Brief: Keep preparing with me before we enter LIVE.',
       source: 'system_override',
+      presentationMode: 'live_preparation',
     }
 
     setMessages((prev) => {
@@ -2938,18 +2951,18 @@ const startLiveAudioRuntime = liveAudioRuntime.start
 
     setPreLiveSignals(storedSignals)
 
-    const firstMissingKey =
-      resolveFirstMissingLivePreparationSignal(storedSignals)
+    const preparationTransition =
+      resolveLivePreparationTransition(storedSignals)
 
-    if (!firstMissingKey) {
-      setPreLiveSignalStep(preLiveQuestions.length)
+    if (preparationTransition.complete) {
+      setPreLiveSignalStep(preparationTransition.total)
       setPreLiveSignalComplete(true)
       setShowPreLiveSignalSurface(true)
       setActivePromptContext('pre_live_signal_ready')
       setActivePromptLabel('LIVE Ready')
 
       try {
-        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        markLivePreparationPreviewReady()
         window.localStorage.setItem('george_start_new_live', '1')
       } catch {}
 
@@ -2957,27 +2970,24 @@ const startLiveAudioRuntime = liveAudioRuntime.start
       return
     }
 
-    const firstMissingIndex = preLiveQuestions.findIndex(
-      (question) => question.key === firstMissingKey
-    )
+    const question = preparationTransition.question
 
-    if (firstMissingIndex < 0) {
+    if (!question) {
       throw new Error(
-        `[GEORGE LIVE PREPARATION] Unknown preparation signal: ${firstMissingKey}`
+        '[GEORGE LIVE PREPARATION] Missing preparation question.'
       )
     }
 
-    setPreLiveSignalStep(firstMissingIndex)
+    setPreLiveSignalStep(preparationTransition.step)
     setPreLiveSignalComplete(false)
     setShowPreLiveSignalSurface(true)
     setActivePromptContext('pre_live_signal_acquisition')
-    setActivePromptLabel(`Question ${firstMissingIndex + 1}`)
-
-    const question = preLiveQuestions[firstMissingIndex]
+    setActivePromptLabel(question.label)
     const liveSignalMessage: Message = {
       role: 'assistant',
       content: `${question.kicker}.\n\n${question.question}\n\n${question.examples}`,
       source: 'system_override',
+      presentationMode: 'live_preparation',
     }
 
     setMessages((prev) => {
@@ -3155,6 +3165,27 @@ setPreLiveMessages(null)
     }
   }
   const startNewGeorgeSession = (openingMessage: Message, sessionLabel = 'GEORGE Session') => {
+    // A new workspace must begin in a clean normal-GEORGE state.
+    // LIVE preparation cannot survive into the new workspace.
+    setShowPreLiveSignalSurface(false)
+    setPreLiveSignalStep(0)
+    setPreLiveSignals({})
+    setPreLiveSignalComplete(false)
+    setActivePromptContext(null)
+    setActivePromptLabel(null)
+    setConversationMode(null)
+    setTypedMessageIndex(null)
+    setTypedMessageContent('')
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('GEORGE_PRE_LIVE_FROM_MESSAGE')
+      window.localStorage.removeItem('GEORGE_LIVE_INTENT_STAGE')
+      clearLivePreparationPreviewReady()
+      window.localStorage.removeItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
+      window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
+      window.localStorage.removeItem('george_start_new_live')
+      window.localStorage.removeItem('george_fresh_live_entry')
+    }
     if (typeof window !== 'undefined' && messagesRef.current.length > 1) {
       try {
         saveSessionToV2({
@@ -5121,46 +5152,11 @@ useEffect(() => {
   })
 }, [showMobileHero, liveMode])
 
-  const preLiveQuestions = [
-    {
-      key: 'name',
-      kicker: 'Bring GEORGE up to speed',
-      label: 'Question 1',
-      question: 'What should I call you in this conversation?',
-      examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel, Alex, etc.',
-    },
-    {
-      key: 'role',
-      kicker: 'Position signal',
-      label: 'Question 2',
-      question: 'What is your role in the conversation — your position or title?',
-      examples: 'Examples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
-    },
-    {
-      key: 'counterparty',
-      kicker: 'Room signal',
-      label: 'Question 3',
-      question: 'Who are you speaking with?',
-      examples: 'Examples: investor, hiring manager, doctor, customer, employee, client, board member, etc.',
-    },
-    {
-      key: 'desiredOutcome',
-      kicker: 'Outcome signal',
-      label: 'Question 4',
-      question: 'What do you want from this conversation?',
-      examples: 'Name the result you are trying to move toward.',
-    },
-    {
-      key: 'acceptableOutcome',
-      kicker: 'Settlement signal',
-      label: 'Question 5',
-      question: 'If your ideal outcome is not available, what would you settle for?',
-      examples: 'This helps GEORGE understand the floor, not just the target.',
-    },
-  ]
+  const preLivePreparationStep =
+    resolveLivePreparationStep(preLiveSignalStep)
 
   const currentPreLiveQuestion = showPreLiveSignalSurface
-    ? preLiveQuestions[preLiveSignalStep]
+    ? preLivePreparationStep.question
     : null
 
   const isPreLiveEarbudReady = showPreLiveSignalSurface && preLiveSignalComplete
@@ -5184,26 +5180,48 @@ useEffect(() => {
       [currentPreLiveQuestion.key]: answer,
     }
 
+    const preparationAnswerMessage: Message = {
+      role: 'user',
+      content: answer,
+      source: 'user_input',
+    }
+
+    setMessages((prev) => {
+      const latest = prev[prev.length - 1]
+
+      const alreadyVisible =
+        latest?.role === 'user' &&
+        String(latest.content || '').trim() === answer
+
+      const next = alreadyVisible
+        ? prev
+        : [...prev, preparationAnswerMessage]
+
+      messagesRef.current = next
+      return next
+    })
+
     setPreLiveSignals(nextSignals)
 
     try {
-      window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(nextSignals))
+      saveLivePreparationSignals(nextSignals)
       window.localStorage.setItem(`GEORGE_PRE_LIVE_${currentPreLiveQuestion.key.toUpperCase()}`, answer)
     } catch {}
 
     setInput('')
 
-    const nextStep = preLiveSignalStep + 1
+    const preparationTransition =
+      resolveLivePreparationTransition(nextSignals)
 
-    if (nextStep >= preLiveQuestions.length) {
-      setPreLiveSignalStep(preLiveQuestions.length)
+    if (preparationTransition.complete) {
+      setPreLiveSignalStep(preparationTransition.total)
       setPreLiveSignalComplete(true)
       setShowPreLiveSignalSurface(true)
       setActivePromptContext('pre_live_signal_ready')
       setActivePromptLabel('LIVE Ready')
 
       try {
-        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        markLivePreparationPreviewReady()
         window.localStorage.setItem('george_start_new_live', '1')
       } catch {}
 
@@ -5217,6 +5235,7 @@ useEffect(() => {
           role: 'assistant',
           content: 'You’re all set. I’ll be ready to support you in real time. Start whenever you’re ready—just tap Start.',
           source: 'system_override',
+          presentationMode: 'live_preparation',
         }
 
         setMessages((prev) => {
@@ -5235,15 +5254,22 @@ useEffect(() => {
       return true
     }
 
-    setPreLiveSignalStep(nextStep)
-    setActivePromptContext('pre_live_signal_acquisition')
-    setActivePromptLabel(`Question ${nextStep + 1}`)
+    const nextQuestion = preparationTransition.question
 
-    const nextQuestion = preLiveQuestions[nextStep]
+    if (!nextQuestion) {
+      throw new Error(
+        '[GEORGE LIVE PREPARATION] Missing next preparation question.'
+      )
+    }
+
+    setPreLiveSignalStep(preparationTransition.step)
+    setActivePromptContext('pre_live_signal_acquisition')
+    setActivePromptLabel(nextQuestion.label)
     const nextQuestionMessage: Message = {
       role: 'assistant',
       content: `${nextQuestion.kicker}.\n\n${nextQuestion.question}\n\n${nextQuestion.examples}`,
       source: 'system_override',
+      presentationMode: 'live_preparation',
     }
 
     setMessages((prev) => {
@@ -5464,6 +5490,30 @@ return (
                   suggestedRestart: 'Resume this GEORGE session and continue from the clearest next step.',
                 })
               }
+            } catch {}
+
+            setShowPreLiveSignalSurface(false)
+            setPreLiveSignalStep(0)
+            setPreLiveSignals({})
+            setPreLiveSignalComplete(false)
+            setConversationMode(null)
+
+            try {
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_FROM_MESSAGE')
+              window.localStorage.removeItem('GEORGE_LIVE_INTENT_STAGE')
+              clearLivePreparationPreviewReady()
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_SOURCE_CONTEXT')
+              window.localStorage.removeItem('GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION')
+              window.localStorage.removeItem('george_start_new_live')
+              window.localStorage.removeItem('george_fresh_live_entry')
+
+              // A new workspace starts a new preparation context.
+              clearLivePreparationSignals()
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_ROLE')
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_ROOM')
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_IDENTITY')
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_DESIREDOUTCOME')
+              window.localStorage.removeItem('GEORGE_PRE_LIVE_ACCEPTABLEOUTCOME')
             } catch {}
 
             setMessages([])
@@ -5941,11 +5991,7 @@ return (
         scrollPaddingTop: liveStatusStackClearance,
       }
     : undefined}
-  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain px-3 md:[-webkit-overflow-scrolling:touch] transition-[background-color,border-color,box-shadow] duration-500 ${
-    livePreparationConversationActive
-      ? "border-y border-[#3657A8]/32 bg-[linear-gradient(180deg,rgba(23,35,71,0.52),rgba(10,18,38,0.28))] shadow-[inset_0_18px_70px_rgba(26,53,116,0.18)]"
-      : "border-y border-transparent bg-transparent"
-  } ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[360px] md:pb-[250px]" : "pb-[280px] md:pb-[250px]"} md:px-6 space-y-3 ${
+  className={`w-full flex-1 min-h-0 overflow-y-auto overflow-x-hidden touch-pan-y overscroll-y-contain bg-transparent px-3 md:[-webkit-overflow-scrolling:touch] ${(forceLive || liveMode) && !showLiveEntrySequence ? "pb-[390px] md:pb-[280px]" : showPreLiveSignalSurface ? "pb-[220px] md:pb-[250px]" : "pb-[210px] md:pb-[250px]"} md:px-6 space-y-3 ${
   (forceLive || liveMode) && !showLiveEntrySequence
     ? ""
     : hasVisibleThread && !isPreLiveSignalAcquisition
@@ -5956,10 +6002,10 @@ return (
 } ${(showNormalUtilityMenu || showLiveQuickMenu || showLiveSessionDetails || showSessionPicker || showExitPopup || showUpgradeModal || showTierModal || showProLiveComingSoon || showLiveChooser) ? "blur-[8px] transition-[filter] duration-200" : "blur-0 transition-[filter] duration-200"}`}>
 
 
-{showMobileHero && !(forceLive || liveMode) && (shouldKeepHeroVisible || showPreLiveSignalSurface) && (
+{showMobileHero && !(forceLive || liveMode) && shouldKeepHeroVisible && !showPreLiveSignalSurface && (
   <section
     data-george-normal-hero
-    className={`${showPreLiveSignalSurface ? 'pointer-events-auto bottom-[188px] overflow-y-auto overscroll-contain pb-10' : 'pointer-events-none'} fixed left-0 right-0 top-[92px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4`}
+    className="pointer-events-none fixed left-0 right-0 top-[92px] z-[35] mx-auto w-full max-w-[760px] px-8 pt-1 md:bottom-[220px] md:pt-4"
   >
     <div className="george-utility-presence">
       <div className="george-utility-brand">
@@ -6004,11 +6050,11 @@ return (
           </div>
         )}
 
-        {showGeorgeHeroTagline && !hasSentFirstNormalMessage && showPreLiveSignalSurface && (
+        {false && showGeorgeHeroTagline && !hasSentFirstNormalMessage && showPreLiveSignalSurface && (
           <p>Start with your desired outcome.</p>
         )}
 
-        {showPreLiveSignalSurface && (
+        {false && showPreLiveSignalSurface && (
           <div className="mt-7 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
             {!isPreLiveEarbudReady && currentPreLiveQuestion && (
               <>
@@ -6028,19 +6074,21 @@ return (
                   )}
 
                   <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/24">
-                    {preLiveSignalStep + 1}/{preLiveQuestions.length}
+                    {preLiveSignalStep + 1}/{preLivePreparationStep.total}
                   </div>
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                  {currentPreLiveQuestion.kicker}
-                </div>
+                {currentPreLiveQuestion && (
+                  <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
+                    {currentPreLiveQuestion?.kicker}
+                  </div>
+                )}
 
                 <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                  {currentPreLiveQuestion.label}
+                  {currentPreLiveQuestion?.label}
                 </div>
 
                 <div className="mt-3 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
-                  {currentPreLiveQuestion.question}
+                  {currentPreLiveQuestion?.question}
                 </div>
 
                 <div className="mt-4 max-w-[34rem] rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
@@ -6049,7 +6097,7 @@ return (
                   </div>
 
                   <div className="mt-2 break-words text-[12.5px] leading-6 text-white/44">
-                    {currentPreLiveQuestion.examples}
+                    {currentPreLiveQuestion?.examples}
                   </div>
                 </div>
               </>
@@ -6129,15 +6177,6 @@ return (
     </div>
   )}
 
-  {livePreparationConversationActive && (
-    <div className="mx-auto mb-5 flex w-full max-w-[760px] items-center gap-3 border-b border-[#6E91E8]/18 pb-3">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#75A4FF]/80 shadow-[0_0_14px_rgba(117,164,255,0.62)]" />
-      <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#BFD0FF]/58">
-        LIVE Preparation
-      </span>
-    </div>
-  )}
-
   {bridgeThinking && (
     <div className="text-sm leading-7 text-[#D7DBE4]/70">
       GEORGE is working
@@ -6173,6 +6212,19 @@ return (
       }`}
     >
       <div
+        style={
+          m.role === 'assistant' &&
+          !liveMode &&
+          m.presentationMode === 'live_preparation'
+            ? {
+                background:
+                  'linear-gradient(180deg, rgba(24,42,86,0.82), rgba(14,27,58,0.76))',
+                borderColor: 'rgba(69,105,188,0.32)',
+                boxShadow: '0 12px 34px rgba(4,12,32,0.22)',
+              }
+            : undefined
+        }
+        data-george-message-presentation={m.presentationMode || undefined}
         className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.72]' : 'leading-[1.68]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
           m.role === 'user'
             ? (liveMode
@@ -6180,7 +6232,9 @@ return (
               : 'message-user ml-auto self-end max-w-[min(82%,34rem)] text-left rounded-[1.05rem] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
             : (liveMode
               ? 'max-w-full text-left rounded-[1.15rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
-              : 'message-assistant max-w-full text-left px-1 py-2')
+              : m.presentationMode === 'live_preparation'
+                ? 'w-fit max-w-[min(92%,42rem)] self-start rounded-[0.95rem] border px-4 py-3 text-left'
+                : 'message-assistant max-w-full text-left px-1 py-2')
         }`}
       >
         {m.role === 'assistant' ? (
@@ -8009,8 +8063,8 @@ Continue from here, tell me what changed, or start fresh.`
 
               {!(forceLive || liveMode) && (
                 <>
-                  <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-[248px] bg-[#000000]" />
-                  <div className="pointer-events-none fixed inset-x-0 bottom-[232px] z-[40] h-[120px] bg-gradient-to-t from-[#000000] via-[#000000]/92 to-transparent" />
+                  <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-[176px] bg-[#000000] md:h-[248px]" />
+                  <div className="pointer-events-none fixed inset-x-0 bottom-[160px] z-[40] h-[72px] bg-gradient-to-t from-[#000000] via-[#000000]/88 to-transparent md:bottom-[232px] md:h-[120px]" />
                 </>
               )}
 

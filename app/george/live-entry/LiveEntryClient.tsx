@@ -1,5 +1,14 @@
 'use client'
 
+import {
+  clearLivePreparationPreviewReady,
+  clearLivePreparationSignals,
+  isLivePreparationPreviewReady,
+  loadLivePreparationSignals,
+  markLivePreparationPreviewReady,
+  saveLivePreparationSignals,
+} from '@/lib/george/live-browser/live-preparation-browser-storage'
+
 import Image from 'next/image'
 import BxPageHeader from '@/components/BxPageHeader'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -751,7 +760,7 @@ export default function LiveEntryClient() {
     }
 
     try {
-      window.localStorage.setItem('GEORGE_PRE_LIVE_SIGNALS', JSON.stringify(nextSignals))
+      saveLivePreparationSignals(nextSignals)
       window.localStorage.setItem(`GEORGE_PRE_LIVE_${key.toUpperCase()}`, answer)
     } catch {}
 
@@ -769,7 +778,7 @@ export default function LiveEntryClient() {
       setShowOpenAISignalSurface(true)
 
       try {
-        window.localStorage.setItem('GEORGE_PRE_LIVE_PREVIEW_READY', '1')
+        markLivePreparationPreviewReady()
         window.localStorage.setItem('george_start_new_live', '1')
       } catch {}
 
@@ -1053,8 +1062,8 @@ const mandatoryLiveSignals = useMemo(() => {
         window.localStorage.getItem('george_start_new_live') === '1'
 
       if (shouldResetLiveEntry) {
-        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
-        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+        clearLivePreparationPreviewReady()
+        clearLivePreparationSignals()
         window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
         window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
         window.localStorage.removeItem('GEORGE_LIVE_SETUP')
@@ -1064,7 +1073,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
       const acquiredSignals = shouldResetLiveEntry
         ? {}
-        : JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+        : loadLivePreparationSignals()
       setPreLiveSignals(acquiredSignals)
 
       if (acquiredSignals.name) {
@@ -1124,8 +1133,8 @@ const mandatoryLiveSignals = useMemo(() => {
       const isStartSource = source === 'start'
 
       if (isStartSource) {
-        window.localStorage.removeItem('GEORGE_PRE_LIVE_PREVIEW_READY')
-        window.localStorage.removeItem('GEORGE_PRE_LIVE_SIGNALS')
+        clearLivePreparationPreviewReady()
+        clearLivePreparationSignals()
         window.localStorage.removeItem('GEORGE_PRE_LIVE_OPTIONAL_SIGNALS')
         window.localStorage.removeItem('GEORGE_LAST_LIVE_SETUP')
         window.localStorage.removeItem('GEORGE_LIVE_SETUP')
@@ -1168,7 +1177,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
       const acquiredSignalsForAccess = isStartSource
         ? {}
-        : JSON.parse(window.localStorage.getItem('GEORGE_PRE_LIVE_SIGNALS') || '{}') || {}
+        : loadLivePreparationSignals()
 
       const isFreshLiveStart =
         window.localStorage.getItem('george_start_new_live') === '1' ||
@@ -1179,7 +1188,7 @@ const mandatoryLiveSignals = useMemo(() => {
 
       const preLiveReady =
         !isFreshLiveStart && (
-          window.localStorage.getItem('GEORGE_PRE_LIVE_PREVIEW_READY') === '1' ||
+          isLivePreparationPreviewReady() ||
           params.get('devPreview') === '1' ||
           Object.keys(acquiredSignalsForAccess).length > 0 ||
           Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
