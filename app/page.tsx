@@ -95,7 +95,7 @@ export default function HomePage() {
               </h1>
             </div>
 
-            <div className="space-y-5 text-[16px] leading-8 text-white/72">
+            <div className="space-y-5 text-[16px] leading-8 text-white">
               <p>
                 GEORGE is real-time operational intelligence designed to help
                 you navigate, adapt, and succeed in critical conversations.
@@ -107,7 +107,7 @@ export default function HomePage() {
                 happening, and protect your desired outcome.
               </p>
 
-              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-[#8FB6C9]">
+              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-white">
                 <span>Prepare</span>
                 <span>Perform</span>
                 <span>Adapt</span>
@@ -222,7 +222,7 @@ export default function HomePage() {
                 key={card.title}
                 className="rounded-[24px] border border-[#4E7CFF]/24 bg-[#4E7CFF]/[0.07] p-6"
               >
-                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-[#AFC1FF]">
+                <h3 className="font-mono text-[12px] uppercase tracking-[0.24em] text-white">
                   {card.title}
                 </h3>
 
