@@ -2,15 +2,28 @@
 
 import { useEffect } from 'react'
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  prompt(): Promise<void>
+  userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+}
+
 declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent
+  }
+
   interface Window {
-    __branesInstallPrompt?: any
+    __branesInstallPrompt?: BeforeInstallPromptEvent
   }
 }
 
 export default function InstallPromptCapture() {
   useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event) => {
+    const handleBeforeInstallPrompt = (event: BeforeInstallPromptEvent) => {
       event.preventDefault()
       window.__branesInstallPrompt = event
     }

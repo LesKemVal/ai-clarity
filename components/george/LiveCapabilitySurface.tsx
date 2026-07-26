@@ -21,10 +21,7 @@ export function LiveCapabilitySurface({
   const [flipped, setFlipped] = useState(false)
 
   useEffect(() => {
-    if (phase === 'preparing') {
-      setFlipped(false)
-      return
-    }
+    if (phase === 'preparing') return
 
     const runFlip = () => {
       setFlipped(true)

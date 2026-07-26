@@ -74,14 +74,34 @@ const tiers: TierCard[] = [
   },
 ]
 export default function TopUpPage() {
-  const [intent, setIntent] = useState<string | null>(null)
+  const [intent] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+
+    return new URLSearchParams(window.location.search).get('intent')
+  })
   const [feedbackType, setFeedbackType] = useState('suggestion')
   const [feedback, setFeedback] = useState('')
   const [message, setMessage] = useState('')
   const [playingVoice, setPlayingVoice] = useState<string | null>(null)
   const [expandedTier, setExpandedTier] = useState<TierId | null>(null)
-  const [activeCheckout, setActiveCheckout] = useState<CheckoutTier | null>(null)
-  const [currentTier, setCurrentTier] = useState<TierId>('smart')
+  const [activeCheckout, setActiveCheckout] = useState<CheckoutTier | null>(() => {
+    if (typeof window === 'undefined') return null
+
+    const checkout = new URLSearchParams(window.location.search).get('checkout')
+    return checkout === 'intelligent' ||
+      checkout === 'brilliant' ||
+      checkout === 'brilliant_day'
+      ? checkout
+      : null
+  })
+  const [currentTier] = useState<TierId>(() => {
+    if (typeof window === 'undefined') return 'smart'
+
+    const stored = window.localStorage.getItem('george_tier')
+    return stored === 'intelligent' || stored === 'brilliant'
+      ? stored
+      : 'smart'
+  })
 
   const currentUsageGuidance = useMemo(() => {
     if (intent === 'conversation' || intent === 'pro') {
@@ -111,18 +131,6 @@ export default function TopUpPage() {
     if (typeof window === 'undefined') return
 
     const params = new URLSearchParams(window.location.search)
-    setIntent(params.get('intent'))
-
-    const storedTier = window.localStorage.getItem('george_tier')
-    if (storedTier === 'intelligent' || storedTier === 'brilliant') {
-      setCurrentTier(storedTier)
-    }
-
-    const checkout = params.get('checkout')
-    if (checkout === 'intelligent' || checkout === 'brilliant' || checkout === 'brilliant_day') {
-      setActiveCheckout(checkout)
-    }
-
     async function verifyActivationReturn() {
       if (params.get('payment') !== 'success') return
 

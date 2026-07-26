@@ -50,16 +50,11 @@ function maskEmail(value: string) {
 }
 
 export default function SidebarAccountDropdownEnhancer() {
-  const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
   const [anchor, setAnchor] = useState<AnchorRect | null>(null)
   const [email, setEmail] = useState('')
   const [tier, setTier] = useState('smart')
   const [authenticated, setAuthenticated] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -79,8 +74,6 @@ export default function SidebarAccountDropdownEnhancer() {
   }, [open])
 
   useEffect(() => {
-    if (!mounted) return
-
     const onClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null
       const card = findAccountCard()
@@ -103,10 +96,9 @@ export default function SidebarAccountDropdownEnhancer() {
 
     document.addEventListener('click', onClick, true)
     return () => document.removeEventListener('click', onClick, true)
-  }, [mounted])
+  }, [])
 
   useEffect(() => {
-    if (!mounted) return
     const card = findAccountCard()
     if (!card) return
 
@@ -125,9 +117,9 @@ export default function SidebarAccountDropdownEnhancer() {
 
     card.addEventListener('keydown', onKeyDown)
     return () => card.removeEventListener('keydown', onKeyDown)
-  }, [mounted])
+  }, [])
 
-  if (!mounted || !open || !anchor) return null
+  if (!open || !anchor) return null
 
   const top = Math.max(12, anchor.top + anchor.height + 8)
   const left = Math.max(12, anchor.left)

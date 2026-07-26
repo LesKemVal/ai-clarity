@@ -1099,16 +1099,11 @@ textarea:focus{
 /* conversation surface overhaul */
 
 .message-user{
-  backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,.06);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.05),
-      rgba(255,255,255,.02)
-    );
-  box-shadow:
-    0 18px 48px rgba(0,0,0,.18);
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1153,16 +1148,11 @@ textarea:focus{
 /* conversation surface overhaul */
 
 .message-user{
-  backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,.06);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.05),
-      rgba(255,255,255,.02)
-    );
-  box-shadow:
-    0 18px 48px rgba(0,0,0,.18);
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1206,14 +1196,11 @@ textarea:focus{
 
 
 .message-user{
-  border:1px solid rgba(255,255,255,.05);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.045),
-      rgba(255,255,255,.018)
-    );
-  backdrop-filter:blur(14px);
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1381,7 +1368,11 @@ textarea::placeholder{
 }
 
 .message-user{
-  max-width:72%;
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1405,7 +1396,11 @@ textarea::placeholder{
 }
 
 .message-user{
-  max-width:68%;
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1502,13 +1497,11 @@ textarea::placeholder{
 }
 
 .message-user{
-  border-color:rgba(255,255,255,.045)!important;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.038),
-      rgba(255,255,255,.014)
-    )!important;
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1582,7 +1575,11 @@ textarea::placeholder{
 }
 
 .message-user{
-  margin-top:.35rem;
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 
@@ -1608,7 +1605,11 @@ textarea::placeholder{
 }
 
 .message-user{
-  border-radius:1.05rem!important;
+  background:#F7F8FA!important;
+  color:#171717!important;
+  border:none!important;
+  backdrop-filter:none!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1765,4 +1766,61 @@ select {
 
 [data-george-normal-hero] .george-utility-copy-loop div {
   max-width: none;
+}
+
+
+/* GEORGE composer one-shot send feedback */
+@keyframes georgeComposerSendPulse {
+  0% {
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  58% {
+    opacity: 0.68;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes georgeComposerSendShimmer {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  30% {
+    opacity: 0.72;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(720px);
+  }
+}
+
+.george-composer-send-pulse {
+  background: rgb(255 255 255 / 5.5%);
+  animation: georgeComposerSendPulse 700ms ease-out both;
+}
+
+.george-composer-send-shimmer {
+  background: rgb(255 255 255 / 70%);
+  box-shadow: 0 0 5px rgb(255 255 255 / 42%);
+  animation: georgeComposerSendShimmer 980ms
+    cubic-bezier(0.22, 0.72, 0.18, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .george-composer-send-pulse,
+  .george-composer-send-shimmer {
+    animation: none;
+    opacity: 0;
+  }
 }

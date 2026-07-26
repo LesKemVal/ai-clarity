@@ -584,7 +584,10 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   const [preparationTaglineIndex, setPreparationTaglineIndex] = useState(0)
   const [typedPreparationTagline, setTypedPreparationTagline] = useState('')
   const [hasSentFirstNormalMessage, setHasSentFirstNormalMessage] = useState(false)
-  const [composerPlaceholder, setComposerPlaceholder] = useState('say it here...')
+  const [composerPlaceholder, setComposerPlaceholder] = useState('Say it here…')
+  const [composerFocused, setComposerFocused] = useState(false)
+  const [composerSendFeedback, setComposerSendFeedback] = useState(false)
+  const [composerSendFeedbackSignal, setComposerSendFeedbackSignal] = useState(0)
   const [lastGuidedLine, setLastGuidedLine] = useState('')
   const [liveMode, setLiveMode] = useState(false)
 
@@ -680,10 +683,17 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
   }
 
   useEffect(() => {
-    if (input.trim()) return
+    if (input.trim() || composerFocused) return
 
     let mounted = true
-    const phrases = ['say it here...', 'ask it here...']
+    const phrases = [
+      'Say it here…',
+      'Ask it here…',
+      'Upload a document…',
+      'LIVE is available…',
+      'Use your capabilities…',
+      'Need a pitch deck?',
+    ]
     let phraseIndex = phrases.indexOf(composerPlaceholder)
     if (phraseIndex < 0) phraseIndex = 0
 
@@ -697,7 +707,21 @@ export default function Page({ forceLive = false }: { forceLive?: boolean } = {}
       mounted = false
       window.clearInterval(timer)
     }
-  }, [input, composerPlaceholder])
+  }, [input, composerFocused, composerPlaceholder])
+
+  useEffect(() => {
+    if (!composerSendFeedbackSignal) return
+
+    setComposerSendFeedback(true)
+
+    const timer = window.setTimeout(() => {
+      setComposerSendFeedback(false)
+    }, 1050)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [composerSendFeedbackSignal])
 
 const [messages, setMessages] = useState<Message[]>([])
 const normalSessionBootedRef = useRef(false)
@@ -4342,6 +4366,10 @@ const handleSend = useCallback(
     ) => {
       let text = (overrideText ?? input).trim()
 
+      if (overrideText === undefined && !options?.hidden && text) {
+        setComposerSendFeedbackSignal((current) => current + 1)
+      }
+
       const liveRuntimeSetup = (() => {
         if (typeof window === 'undefined' || !liveMode) return null
 
@@ -6228,8 +6256,8 @@ return (
         className={`relative whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-[15.5px] md:text-[15.8px] landscape:text-[18px] ${(forceLive || liveMode) ? 'leading-[1.72]' : 'leading-[1.68]'} landscape:leading-8 tracking-[0.002em] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#D7DBE4]/88 ${
           m.role === 'user'
             ? (liveMode
-              ? 'ml-auto self-end max-w-[82%] text-left rounded-[1.05rem] border border-[#8FB6C9]/[0.06] bg-[linear-gradient(180deg,rgba(20,32,48,0.52),rgba(10,16,24,0.34))] px-3.5 py-2.5 shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
-              : 'message-user ml-auto self-end max-w-[min(82%,34rem)] text-left rounded-[1.05rem] px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
+              ? 'ml-auto self-end max-w-[82%] text-left rounded-[1.05rem] border-0 bg-[#F7F8FA] px-3.5 py-2.5 text-[#171717] shadow-[0_10px_24px_rgba(3,8,14,0.18)]'
+              : 'message-user ml-auto self-end max-w-[min(82%,34rem)] text-left rounded-[1.05rem] border-0 bg-[#F7F8FA] px-3.5 py-2.5 text-[#171717] shadow-[0_12px_30px_rgba(0,0,0,0.16)]')
             : (liveMode
               ? 'max-w-full text-left rounded-[1.15rem] border border-[#8FB6C9]/[0.045] bg-[linear-gradient(180deg,rgba(10,18,28,0.42),rgba(6,10,16,0.22))] px-4 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
               : m.presentationMode === 'live_preparation'
@@ -6252,7 +6280,7 @@ return (
               />
             )}
             <span
-              className="block max-w-full break-words [overflow-wrap:anywhere] text-white opacity-100"
+              className="block max-w-full break-words [overflow-wrap:anywhere] text-[#171717] opacity-100"
             >
               {m.content}
             </span>
@@ -6892,11 +6920,16 @@ return (
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
-          placeholder={composerPlaceholder}
+          onFocus={() => {
+            setComposerFocused(true)
+            setComposerSendFeedback(false)
+          }}
+          onBlur={() => setComposerFocused(false)}
+          placeholder={composerFocused ? '' : composerPlaceholder}
           className="max-h-36 min-h-6 w-full resize-none appearance-none overflow-y-auto border-0 bg-transparent p-0 font-mono text-[13px] leading-6 tracking-[0.01em] text-[#D7DBE4]/76 outline-none ring-0 shadow-none placeholder:italic placeholder:text-[#D7DBE4]/26 focus:border-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
         />
 
-        {!input.trim() && (
+        {!input.trim() && !composerFocused && (
           <span className="pointer-events-none absolute left-0 top-[3px] h-[18px] w-px bg-[#D7DBE4]/60 [animation:georgeComposerCursorBlink_.48s_steps(1,end)_infinite]" />
         )}
       </div>
@@ -8338,6 +8371,18 @@ Continue from here, tell me what changed, or start fresh.`
 
 
                     <div className={`george-composer-shell relative z-[60] isolate flex-1 overflow-hidden rounded-[1.5rem] border shadow-[0_12px_38px_rgba(4,10,28,0.46)] ${!(forceLive || liveMode) ? 'border-[#4668B8]/65 !bg-[#101A36] shadow-[0_0_34px_rgba(8,18,48,0.48)]' : 'border-[#2B457F]/48 bg-[#101A36]'}`}>
+                      {composerSendFeedback && (
+                        <>
+                          <span
+                            aria-hidden="true"
+                            className="george-composer-send-pulse pointer-events-none absolute inset-0 z-0"
+                          />
+                          <span
+                            aria-hidden="true"
+                            className="george-composer-send-shimmer pointer-events-none absolute inset-y-0 left-0 z-[1] w-px"
+                          />
+                        </>
+                      )}
 
                       <input
                         ref={fileInputRef}
@@ -8587,7 +8632,12 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
                           handleComposerKeyDown(e)
                         }}
-                        placeholder={composerPlaceholder}
+                        onFocus={() => {
+            setComposerFocused(true)
+            setComposerSendFeedback(false)
+          }}
+          onBlur={() => setComposerFocused(false)}
+          placeholder={composerFocused ? '' : composerPlaceholder}
                         rows={1}
                         onInput={autoResizeTextarea}
                         style={{ WebkitUserSelect: 'text', minHeight: '40px', maxHeight: '140px' }}

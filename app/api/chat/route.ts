@@ -80,6 +80,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+type ResponsesCreateInput = Extract<
+  Parameters<typeof openai.responses.create>[0]['input'],
+  readonly unknown[]
+>
+
+type ResponsesCreateInputItem =
+  ResponsesCreateInput extends readonly (infer T)[]
+    ? T
+    : never
+
 type IncomingMessage = {
   role?: string
   content?: string
@@ -1002,34 +1012,53 @@ LANGUAGE MODE: SPANISH
     let providerSemanticJudgment: NormalProviderSemanticJudgment | null = null
 
     if (hasImageInput) {
+      const input: ResponsesCreateInput = [
+        {
+          role: 'system',
+          content: systemContent,
+        },
+        ...recentMessages.map((m): ResponsesCreateInputItem => {
+          if (
+            m.role === 'user' &&
+            (m.imageDataUrl || m.imageDataUrls?.length)
+          ) {
+            const imageUrls = (
+              m.imageDataUrls?.length
+                ? m.imageDataUrls
+                : m.imageDataUrl
+                  ? [m.imageDataUrl]
+                  : []
+            ).slice(0, 10)
+
+            return {
+              role: 'user',
+              content: [
+                {
+                  type: 'input_text',
+                  text: m.content || 'Analyze this image and help me.',
+                },
+                ...imageUrls.map((src) => ({
+                  type: 'input_image' as const,
+                  image_url: src,
+                  detail: 'auto' as const,
+                })),
+              ],
+            }
+          }
+
+          return {
+            role: m.role,
+            content: m.content,
+          }
+        }),
+      ]
+
       const response = await openai.responses.create({
         model,
-        input: [
-          {
-            role: 'system',
-            content: systemContent,
-          },
-          ...recentMessages.map((m) =>
-            m.role === 'user' && (m.imageDataUrl || m.imageDataUrls?.length)
-              ? ({
-                  role: 'user',
-                  content: [
-                    { type: 'input_text', text: m.content || 'Analyze this image and help me.' },
-                    ...((m.imageDataUrls?.length ? m.imageDataUrls : m.imageDataUrl ? [m.imageDataUrl] : []).slice(0, 10).map((src) => ({
-                      type: 'input_image',
-                      image_url: src,
-                    }))),
-                  ],
-                } as any)
-              : ({
-                  role: m.role,
-                  content: m.content,
-                } as any)
-          ),
-        ],
+        input,
       })
 
-      reply = (response as any).output_text?.trim() || ''
+      reply = response.output_text.trim()
     } else {
       if (providerResolution.provider === 'groq') {
         try {

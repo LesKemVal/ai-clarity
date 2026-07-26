@@ -1,34 +1,36 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import GeorgePaymentElement from '@/components/george/checkout/GeorgePaymentElement'
 
 type CheckoutTier = 'intelligent' | 'brilliant' | 'brilliant_day'
 
 export default function ActivatePage() {
-  const [tier, setTier] = useState<CheckoutTier>('brilliant')
-  const [intent, setIntent] = useState('')
+  const [tier, setTier] = useState<CheckoutTier>(() => {
+    if (typeof window === 'undefined') return 'brilliant'
+
+    const nextTier = new URLSearchParams(window.location.search).get('tier')
+
+    return (
+      nextTier === 'intelligent' ||
+      nextTier === 'brilliant' ||
+      nextTier === 'brilliant_day'
+    )
+      ? nextTier
+      : 'brilliant'
+  })
+
+  const [intent] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return new URLSearchParams(window.location.search).get('intent') || ''
+  })
 
   const copy = useMemo(() => {
     if (tier === 'intelligent') return 'Activate Intelligent operational support.'
     if (tier === 'brilliant_day') return 'Activate Brilliant for today.'
     return 'Activate Brilliant operational awareness.'
   }, [tier])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const params = new URLSearchParams(window.location.search)
-    const nextTier = params.get('tier')
-    const nextIntent = params.get('intent') || ''
-
-    if (nextTier === 'intelligent' || nextTier === 'brilliant' || nextTier === 'brilliant_day') {
-      setTier(nextTier)
-    }
-
-    setIntent(nextIntent)
-  }, [])
 
   const accessBrief = useMemo(() => {
     if (tier === 'intelligent') {

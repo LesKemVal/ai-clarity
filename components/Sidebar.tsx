@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   archiveSession,
   deleteSession,
@@ -84,9 +84,26 @@ export default function Sidebar({
   liveMode = false,
 }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const isLiveRoute = pathname?.startsWith('/george/live')
-  const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
-  const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>([])
+  const initialSessions =
+    typeof window === 'undefined'
+      ? []
+      : safeReadSessions()
+
+  const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>(() =>
+    initialSessions
+      .filter(session => session.mode === 'normal' && !session.archived)
+      .sort((a,b) => b.updatedAt - a.updatedAt)
+      .slice(0,12)
+  )
+
+  const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>(() =>
+    initialSessions
+      .filter(session => session.mode === 'live' && !session.archived)
+      .sort((a,b) => b.updatedAt - a.updatedAt)
+      .slice(0,12)
+  )
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)
@@ -119,7 +136,6 @@ export default function Sidebar({
   }
 
   useEffect(() => {
-    loadNormalSessions()
     window.addEventListener('storage', loadNormalSessions)
     return () => window.removeEventListener('storage', loadNormalSessions)
   }, [])
@@ -181,7 +197,7 @@ export default function Sidebar({
     setActiveSessionIdForMode('normal', destination.id)
     setActiveMode('normal')
     setShowSidebar?.(false)
-    window.location.href = '/george'
+    router.push('/george')
   }
 
   const requestNormalNavigation = (destination: GeorgeStoredSession | 'new') => {
@@ -224,7 +240,7 @@ export default function Sidebar({
     setActiveSessionIdForMode('live', session.id)
     setActiveMode('live')
     setShowSidebar?.(false)
-    window.location.href = '/george/live'
+    router.push('/george/live')
   }
 
   const deleteNormalSession = (sessionId: string) => {

@@ -6,12 +6,12 @@ const LANGUAGE_OPTIONS = ['English', 'Español', 'Français', 'العربية', 
 
 export default function LanguageRailSupport() {
   const [open, setOpen] = useState(false)
-  const [current, setCurrent] = useState('English')
+  const [current, setCurrent] = useState(() => {
+    if (typeof window === 'undefined') return 'English'
+    return window.localStorage.getItem('george_language') || 'English'
+  })
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    setCurrent(window.localStorage.getItem('george_language') || 'English')
-
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null
       const button = target?.closest('button') as HTMLButtonElement | null
