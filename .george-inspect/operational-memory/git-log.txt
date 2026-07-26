@@ -1,0 +1,30 @@
+bedffdd Add Redis operational formula library
+1b781dd Ignore TypeScript build cache
+9a6f564 Resolve React 19 lint cleanup and production TypeScript issues
+45d2128 Wire operational memory evidence into runtime pipeline
+f15d11f Accept operational memory runtime evidence
+eca40c5 Add operational memory runtime evidence contract
+59fcd16 Add operational memory retrieval policy
+3fe651b Add operational memory orchestrator
+ac5f4ac Add operational formula validator
+9e6d98a Add operational formula extractor
+91cf4dd Add canonical formula library contract
+0ddeecb Add operational memory contracts
+baaec6d Refine LIVE support hero copy
+4ad6775 Unify front page text color
+75c8f78 Brighten front page card body text
+c3d47d4 Synchronize visual presentation policy documentation
+2819a30 Extract LIVE visual presentation policy
+d6a2d9a Enrich LIVE preparation runtime metadata
+777b4d6 Isolate LIVE preparation browser storage adapter
+d0f3ac2 Refine GEORGE capability controls
+f3168d5 Add persistent GEORGE capability controls
+00925f4 Add conversational LIVE capability entry
+7f08c94 Synchronize LIVE presentation posture
+fc547e0 Preserve standalone knowledge ambiguity
+bd43080 Preserve context and established objectives
+a9c69a5 Archive runtime transitions and remove obsolete backups
+9c90265 Preserve Pro LIVE source snapshots
+f4918af Archive shelved Pro LIVE artifacts
+7b8a276 Remove unused LIVE imports
+639d706 Document Normal provider realization ownership

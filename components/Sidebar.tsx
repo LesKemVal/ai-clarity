@@ -86,24 +86,8 @@ export default function Sidebar({
   const pathname = usePathname()
   const router = useRouter()
   const isLiveRoute = pathname?.startsWith('/george/live')
-  const initialSessions =
-    typeof window === 'undefined'
-      ? []
-      : safeReadSessions()
-
-  const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>(() =>
-    initialSessions
-      .filter(session => session.mode === 'normal' && !session.archived)
-      .sort((a,b) => b.updatedAt - a.updatedAt)
-      .slice(0,12)
-  )
-
-  const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>(() =>
-    initialSessions
-      .filter(session => session.mode === 'live' && !session.archived)
-      .sort((a,b) => b.updatedAt - a.updatedAt)
-      .slice(0,12)
-  )
+  const [normalSessions, setNormalSessions] = useState<GeorgeStoredSession[]>([])
+  const [liveSessions, setLiveSessions] = useState<GeorgeStoredSession[]>([])
   const [goalChecks, setGoalChecks] = useState<GoalCheckItem[]>([])
   const [activeGoalCheck, setActiveGoalCheck] = useState<GoalCheckItem | null>(null)
   const [sessionMenuId, setSessionMenuId] = useState<string | null>(null)

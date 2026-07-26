@@ -1886,6 +1886,18 @@ useEffect(() => {
         window.localStorage.setItem('GEORGE_LAST_CONVERSATION_RECORD', JSON.stringify(record))
         setLastConversationRecord(record)
         setShowConversationRecord(true)
+
+        void fetch('/api/george/operational-memory/learn', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            conversationRecord: record,
+          }),
+        }).catch((error) => {
+          console.error('[GEORGE][OPERATIONAL_MEMORY][LEARN_REQUEST_FAILED]', error)
+        })
       }
     } catch {}
 

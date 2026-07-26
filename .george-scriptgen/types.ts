@@ -1,13 +1,5 @@
 export type OperationalMemoryScope = 'personal' | 'organization' | 'general'
 
-export type OperationalFormulaVisibility = 'public' | 'private' | 'organization'
-
-export type OperationalFormulaStatus =
-  | 'candidate'
-  | 'validated'
-  | 'contested'
-  | 'retired'
-
 export type OperationalParticipantRole =
   | 'user'
   | 'counterparty'
@@ -85,13 +77,6 @@ export type OperationalFormula = {
   version: number
   scope: OperationalMemoryScope
   ownerId?: string
-  name?: string
-  publisher?: string
-  visibility?: OperationalFormulaVisibility
-  status?: OperationalFormulaStatus
-  bestUsedFor?: string[]
-  uses?: number
-  verifiedByBranesx?: boolean
   roomTypes: string[]
   objectiveTypes: string[]
   prerequisites: string[]

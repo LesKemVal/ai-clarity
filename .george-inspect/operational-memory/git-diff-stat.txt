@@ -1,0 +1,6 @@
+ app/george/page.tsx                                |  12 ++
+ components/Sidebar.tsx                             |  20 +--
+ lib/george/operational-memory/formula-extractor.ts |   7 +-
+ lib/george/operational-memory/formula-validator.ts |  25 +++-
+ lib/george/operational-memory/types.ts             | 138 ++++++++++++++++++++-
+ 5 files changed, 176 insertions(+), 26 deletions(-)
