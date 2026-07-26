@@ -48,3 +48,6 @@ data/continuity-tokens.json
 *.json.*.bak
 *.py.*.bak
 tsconfig.tsbuildinfo
+.george-inspect/
+.george-scriptgen/
+operational-learning-inspection.txt
