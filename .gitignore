@@ -47,3 +47,4 @@ data/continuity-tokens.json
 *.scss.*.bak
 *.json.*.bak
 *.py.*.bak
+tsconfig.tsbuildinfo
