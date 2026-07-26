@@ -1,3 +1,5 @@
+export const MINIMUM_VALIDATION_USES = 100
+
 export type ValidationOutcome =
   | 'success'
   | 'partial_success'
@@ -21,11 +23,15 @@ export type ValidationStatistics = {
 
 export type PublicValidationSummary = {
   usedLabel: string
-  successLabel: string
+  successLabel: string | null
   successRateLabel: string | null
+  validationLabel: string
   usedCount: number
   successfulUseCount: number
   successRate: number | null
+  minimumValidationUses: number
+  isValidationEligible: boolean
+  usesUntilValidation: number
 }
 
 function normalizeCount(value: number) {
@@ -137,26 +143,43 @@ export function buildPublicValidationSummary(
     usedCount,
     normalizeCount(statistics.successfulUseCount)
   )
-  const successRate =
+  const isValidationEligible = usedCount >= MINIMUM_VALIDATION_USES
+  const usesUntilValidation = Math.max(
+    0,
+    MINIMUM_VALIDATION_USES - usedCount
+  )
+  const measuredSuccessRate =
     statistics.successRate === null
       ? null
       : Math.min(1, Math.max(0, statistics.successRate))
+  const successRate = isValidationEligible ? measuredSuccessRate : null
+  const subjectLabel = subject === 'script' ? 'Script' : 'Formula'
 
   return {
     usedCount,
     successfulUseCount,
     successRate,
+    minimumValidationUses: MINIMUM_VALIDATION_USES,
+    isValidationEligible,
+    usesUntilValidation,
     usedLabel: `Used ${usedCount.toLocaleString('en-US')} ${pluralize(
       usedCount,
       'time'
     )}`,
-    successLabel: `${successfulUseCount.toLocaleString(
-      'en-US'
-    )} successful ${pluralize(successfulUseCount, 'use')}`,
+    successLabel:
+      successRate === null
+        ? null
+        : `${Math.round(successRate * 100)}% successful`,
     successRateLabel:
       successRate === null
         ? null
         : `${Math.round(successRate * 100)}% successful across known outcomes`,
+    validationLabel: isValidationEligible
+      ? `${subjectLabel} validation eligible`
+      : `${usesUntilValidation.toLocaleString('en-US')} more ${pluralize(
+          usesUntilValidation,
+          'use'
+        )} required before validation`,
   }
 }
 
