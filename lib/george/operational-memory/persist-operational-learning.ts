@@ -5,6 +5,9 @@ import {
   type OperationalConversationRecordAdapterInput,
 } from './conversation-record-adapter'
 import { createOperationalMemory } from './operational-memory'
+import {
+  createRedisOperationalLearningRecordRecorder,
+} from './redis-learning-record-recorder'
 import { createRedisOperationalFormulaLibrary } from './redis-formula-library'
 import {
   createRedisOperationalScriptExecutionRecorder,
@@ -37,6 +40,8 @@ export async function persistOperationalLearning(
     scriptLibrary: createRedisOperationalScriptLibrary(),
     scriptExecutionRecorder:
       createRedisOperationalScriptExecutionRecorder(),
+    learningRecordRecorder:
+      createRedisOperationalLearningRecordRecorder(),
   })
 
   return operationalMemory.learn(operationalRecord)

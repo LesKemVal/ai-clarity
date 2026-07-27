@@ -1,5 +1,6 @@
 export type { OperationalScriptLibrary } from './script-library'
 export type { OperationalScriptExecutionRecorder } from './script-execution-recorder'
+export type { OperationalLearningRecordRecorder } from './learning-record-recorder'
 export type {
   OperationalFormulaReassessmentEngine,
   OperationalFormulaReassessmentInput,

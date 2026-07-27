@@ -13,6 +13,7 @@ import {
   type OperationalFormulaExtractionOptions,
 } from './formula-extractor'
 import type { OperationalFormulaLibrary } from './formula-library'
+import type { OperationalLearningRecordRecorder } from './learning-record-recorder'
 import type {
   OperationalFormulaReassessmentEngine,
 } from './formula-reassessment-engine'
@@ -61,6 +62,7 @@ export type OperationalMemoryDependencies = {
   scriptExecutionRecorder?: OperationalScriptExecutionRecorder
   formulaReassessmentEngine?: OperationalFormulaReassessmentEngine
   formulaEvolutionEngine?: OperationalFormulaEvolutionEngine
+  learningRecordRecorder?: OperationalLearningRecordRecorder
 }
 
 export type OperationalMemoryLearnOptions = {
@@ -90,6 +92,7 @@ export function createOperationalMemory(
       createDefaultOperationalFormulaReassessmentEngine(),
     formulaEvolutionEngine =
       createDefaultOperationalFormulaEvolutionEngine(),
+    learningRecordRecorder,
   } = dependencies
 
   return {
@@ -173,6 +176,10 @@ export function createOperationalMemory(
 
         reassessments.push(reassessment)
 
+        if (learningRecordRecorder) {
+          await learningRecordRecorder.saveReassessment(reassessment)
+        }
+
         const evolution = await formulaEvolutionEngine.evolve({
           formula: validation.formula,
           conversation: record,
@@ -189,6 +196,10 @@ export function createOperationalMemory(
 
         if (evolution.lineage) {
           lineages.push(evolution.lineage)
+
+          if (learningRecordRecorder) {
+            await learningRecordRecorder.saveLineage(evolution.lineage)
+          }
         }
       }
 
