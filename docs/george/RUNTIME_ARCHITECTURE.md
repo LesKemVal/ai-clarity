@@ -150,6 +150,73 @@ OpenAI and Groq are provider realization options for the same GEORGE intelligenc
 
 The route retains a separate OpenAI Responses API path for image input. That multimodal capability does not duplicate Normal text-provider realization.
 
+## Operational Memory Retrieval Boundary
+
+Operational memory is a shared reasoning resource. It is not a separate runtime, provider, judgment system, or operating mode.
+
+Canonical owners:
+
+```text
+lib/george/operational-memory/operational-memory.ts
+lib/george/operational-memory/redis-formula-library.ts
+lib/george/operational-memory/retrieval-policy.ts
+lib/george/operational-memory/runtime-evidence.ts
+```
+
+Responsibilities remain separated:
+
+- Operational Memory coordinates durable learning and formula retrieval;
+- the Redis formula library owns authenticated durable persistence and retrieval;
+- Retrieval Policy normalizes current context, ranks candidates, and selects materially relevant formulas;
+- Runtime Evidence converts selected formulas into a bounded supporting-evidence contract;
+- the shared runtime pipeline decides how that evidence participates in current reasoning;
+- `app/api/chat/route.ts` invokes retrieval and records observational retrieval telemetry.
+
+Canonical flow:
+
+```text
+Authenticated user
+↓
+Current room, objective, and observed signals
+↓
+Operational Memory retrieval
+↓
+Formula ranking
+↓
+Retrieval Policy
+↓
+Operational-memory runtime evidence
+↓
+Shared runtime pipeline
+↓
+Provider-request assembly
+```
+
+Operational-memory evidence is optional.
+
+When retrieval produces no qualified evidence, no operational-memory provider context is injected.
+
+Retrieved formulas remain subordinate to:
+
+- explicit current user direction;
+- current-turn meaning;
+- active desired outcome;
+- present evidence and signals;
+- current operating conditions;
+- canonical operational judgment.
+
+The runtime pipeline consumes operational-memory evidence without absorbing retrieval, persistence, ranking, or formula ownership.
+
+Observational retrieval telemetry belongs to the canonical chat-route invocation boundary. LIVE runtime metrics continue to own LIVE execution telemetry only.
+
+Qualification owner:
+
+```text
+scripts/george-operational-memory-retrieval-qualification.mjs
+```
+
+The qualification protects authenticated isolation, normalization, ranking, policy selection, evidence suppression and generation, runtime-pipeline injection, provider-context integration, and ownership separation.
+
 <!-- GEORGE_LIVE_INPUT_LATENCY_BOUNDARY_START -->
 ## LIVE Input Latency Ownership Boundary
 

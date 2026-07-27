@@ -70,6 +70,41 @@ Qualification:
 - LIVE Hub TypeScript build
 <!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_END -->
 
+## Operational Learning and Memory — Production Qualified
+
+GEORGE now has a complete operational-learning path from durable formula persistence through governed runtime retrieval.
+
+Validated implementation:
+
+- operational learning records are persisted through the canonical operational-memory owner;
+- authenticated retrieval is isolated to the current user's durable formula library;
+- retrieval context is normalized from current room, objective, and observed signals;
+- candidate formulas are ranked before runtime use;
+- retrieval policy selects only formulas that materially match the present work;
+- selected formulas are converted into supporting runtime evidence;
+- empty or unusable retrieval does not create provider context;
+- the canonical runtime pipeline consumes operational-memory evidence without transferring reasoning authority;
+- `app/api/chat/route.ts` owns retrieval invocation and observational retrieval telemetry;
+- LIVE execution telemetry remains separate and does not acquire operational-memory ownership.
+
+Operational memory is supporting evidence, not instruction or authority.
+
+Current-turn meaning, active desired outcome, present evidence, explicit user direction, and canonical operational judgment remain authoritative.
+
+Focused qualification:
+
+```text
+node --experimental-strip-types scripts/george-operational-memory-retrieval-qualification.mjs
+```
+
+Validated commits:
+
+```text
+88ca0a4 Persist operational learning records
+6ceb99b Wire operational memory retrieval
+5969eaf Qualify operational memory retrieval
+```
+
 ## Product Doctrine
 
 GEORGE is one operational intelligence.
@@ -470,12 +505,12 @@ live-hub-runtime
 Latest production synchronization baseline includes:
 
 ```text
-91769ce Remove delivery text composition from operational assessment
-7f1fa60 Move operational cue composition to receiver policy
-cc391fd Route operational cue composition through receiver policy
-a826168 Align explanatory cue qualification with canonical ownership
-cbf577d Extend visual-only LIVE cue persistence
-2819a30 Extract LIVE visual presentation policy
+5969eaf Qualify operational memory retrieval
+6ceb99b Wire operational memory retrieval
+88ca0a4 Persist operational learning records
+74dbe5d Remove premature reassessment recorder contract
+7851ab1 Remove duplicate operational formula store
+3fe5ce7 Add formula reassessment recorder contract
 ```
 
 Validated production command:
@@ -511,6 +546,7 @@ Current validated results:
 - GEORGE duplicate ownership audit — PASS;
 - GEORGE LIVE portability qualification — PASS;
 - GEORGE preparation smoke — PASS;
+- GEORGE operational-memory retrieval qualification — PASS;
 - Next.js production build — PASS.
 
 Latest ownership-audit result:
@@ -563,15 +599,15 @@ Architecture changes now require evidence of a genuine defect or missing product
 
 ### Documentation
 
-**IN SYNCHRONIZATION**
+**SYNCHRONIZED**
 
-Order:
+The production authorities now reflect the validated operational-learning, retrieval, runtime-evidence, telemetry, and qualification implementation:
 
 1. `PRODUCTION_TRACKER.md`
 2. `RUNTIME_ARCHITECTURE.md`
 3. `OPERATIONAL_PROFILE.md`
 
-This tracker is synchronized with the validated implementation baseline above.
+These documents are authoritative while they remain synchronized with implementation.
 
 ### Product completion
 
