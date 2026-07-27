@@ -2,6 +2,7 @@ import {
   classifyControlState,
   scoreRuntimeSignals,
   detectLikelyBottleneck,
+  detectExecutionImminence,
   detectLiveScenario,
   type ChatSignalMessage,
 } from '@/lib/george/chat/runtime-signals'
@@ -18,6 +19,7 @@ export type GeorgeIntentState = {
   narrowingReadiness: number
   continuityDependency: number
   liveRisk: boolean
+  executionImminent: boolean
   emotionalLoad: number
   cadenceAvoid: string[]
   bottleneck: {
@@ -45,6 +47,7 @@ export function buildPassiveIntentState(input: {
   const scores = scoreRuntimeSignals(input.latestUserText)
   const bottleneck = detectLikelyBottleneck(input.latestUserText)
   const liveScenario = detectLiveScenario(input.latestUserText, input.promptContext)
+  const executionImminent = detectExecutionImminence(input.latestUserText)
   const cadenceAvoid = detectCadenceAvoidance(input.messages)
 
   const wordCount = text ? text.split(/\s+/).length : 0
@@ -107,6 +110,7 @@ export function buildPassiveIntentState(input: {
     narrowingReadiness,
     continuityDependency,
     liveRisk: liveScenario.active && actionable,
+    executionImminent,
     emotionalLoad,
     cadenceAvoid,
     bottleneck,

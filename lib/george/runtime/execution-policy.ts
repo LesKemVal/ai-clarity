@@ -132,35 +132,11 @@ export function resolveGeorgeExecutionPolicy(
 export function resolveNormalExecutionPosture(
   input: GeorgeExecutionPolicyInput
 ): GeorgeNormalExecutionPosture {
-  const text = String(input.latestUserText || '').toLowerCase()
+  const posture = input.operationalJudgment.operationalPosture
 
-  if (
-    input.outcomeEvolution.kind === 'contradiction_detected' ||
-    input.operationalJudgment.action === 'restore_continuity' ||
-    input.operationalJudgment.action === 'warn_and_move'
-  ) {
-    return 'recovering'
-  }
-
-  const executionImminent =
-    /\b(about to|walking into|starts? in|begin(?:s|ning)? in|in \d+\s*(?:minute|minutes|hour|hours)|later today|this afternoon|this evening|tonight|tomorrow|meeting is today|call is today|interview is today)\b/i.test(
-      text
-    ) ||
-    /\b(already negotiating|already discussing terms|in the room|on the call)\b/i.test(
-      text
-    )
-
-  if (executionImminent) return 'execution_imminent'
-
-  if (
-    input.operationalResourceMonitor.opportunity?.thresholdMet ||
-    input.strategy.move === 'explore' ||
-    input.strategy.move === 'ask' ||
-    input.strategy.move === 'clarify' ||
-    input.strategy.move === 'probe'
-  ) {
-    return 'preparing'
-  }
+  if (posture === 'recovering') return 'recovering'
+  if (posture === 'execution_imminent') return 'execution_imminent'
+  if (posture === 'preparing') return 'preparing'
 
   return 'planning'
 }

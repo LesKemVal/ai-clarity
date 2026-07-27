@@ -140,7 +140,7 @@ function derivePhase(combined: string, executionImminent: boolean): GeorgeOutcom
   if (/completed|done|closed|signed|accepted|finished/.test(combined)) return 'complete'
   if (/recover|bring me back|interrupted|lost my place/.test(combined)) return 'recovery'
   if (/close|final decision|commitment|sign today/.test(combined)) return 'closing'
-  if (executionImminent || /right now|starts? in|begins? in|walking into|in the room|on the call/.test(combined)) {
+  if (executionImminent) {
     return 'execution'
   }
   if (combined.trim()) return 'preparation'

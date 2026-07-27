@@ -195,16 +195,9 @@ export function resolveOperationalPosture(input: {
     return 'executing_live'
   }
 
-  const text = String(input.input.latestUserText || '').toLowerCase()
-  const executionImminent =
-    /\b(about to|walking into|starts? in|begin(?:s|ning)? in|in \d+\s*(?:minute|minutes|hour|hours)|later today|this afternoon|this evening|tonight|tomorrow|meeting is today|call is today|interview is today)\b/i.test(
-      text
-    ) ||
-    /\b(already negotiating|already discussing terms|in the room|on the call)\b/i.test(
-      text
-    )
-
-  if (executionImminent) return 'execution_imminent'
+  if (input.input.intentState.executionImminent) {
+    return 'execution_imminent'
+  }
 
   if (
     input.conversationStrategy.move === 'explore' ||

@@ -70,6 +70,29 @@ LIVE executes.
 
 The shared reasoning chain resolves intelligence before mode-specific execution constraints are applied.
 
+Execution timing follows this canonical ownership chain:
+
+```text
+Runtime Signals
+↓
+Intent State
+↓
+Operational Judgment
+↓
+Execution Policy
+↓
+Active Outcome
+```
+
+Ownership rules:
+
+- Runtime Signals interpret current-turn execution timing;
+- Intent State carries canonical `executionImminent` evidence;
+- Operational Judgment selects the operational posture;
+- Execution Policy realizes Operational Judgment posture and must not reinterpret transcript language;
+- Active Outcome trusts supplied execution-timing evidence;
+- LIVE recommendation evidence does not own execution timing.
+
 `execution_policy` is the canonical branch point between shared reasoning and mode-specific realization.
 
 ```text

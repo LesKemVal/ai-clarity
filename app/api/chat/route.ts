@@ -1000,7 +1000,7 @@ LANGUAGE MODE: SPANISH
       voiceMode,
       objectiveKnown: passiveIntentState.objectiveState !== 'unclear',
       signalUsable: judgmentSurface.signalSufficiency !== 'insufficient',
-      executionImminent: liveRecommendationEvidence.executionImminent,
+      executionImminent: passiveIntentState.executionImminent,
       tier,
       hasImageInput,
       intentState: passiveIntentState,

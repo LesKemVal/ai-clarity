@@ -502,6 +502,37 @@ Latest validated branch:
 live-hub-runtime
 ```
 
+## Canonical Execution-Imminence Ownership — Validated
+
+Execution timing now has one canonical semantic owner.
+
+Canonical flow:
+
+```text
+Runtime Signals
+↓
+Intent State
+↓
+Operational Judgment
+↓
+Execution Policy
+↓
+Active Outcome
+```
+
+Ownership boundaries:
+
+- `lib/george/chat/runtime-signals.ts` interprets current-turn execution timing through `detectExecutionImminence()`;
+- `GeorgeIntentState.executionImminent` carries canonical timing evidence through the shared runtime;
+- Operational Judgment consumes canonical timing evidence and selects the operational posture;
+- Execution Policy realizes the posture selected by Operational Judgment and does not reinterpret transcript language;
+- Active Outcome consumes supplied execution timing and does not independently infer imminence;
+- LIVE recommendation evidence does not own execution timing.
+
+Removed duplicate ownership included independent timing-language interpretation inside Operational Judgment, Execution Policy, and Active Outcome.
+
+Focused core qualification and the complete production build pass with this ownership consolidation.
+
 Latest production synchronization baseline includes:
 
 ```text

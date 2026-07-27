@@ -155,6 +155,19 @@ export function detectCadenceAvoidance(messages: ChatSignalMessage[]) {
   return [...new Set(avoid)].slice(0, 5)
 }
 
+export function detectExecutionImminence(input: string) {
+  const text = input.toLowerCase().trim()
+
+  return (
+    /\b(about to|walking into|starts? in|begin(?:s|ning)? in|in \d+\s*(?:minute|minutes|hour|hours)|later today|this afternoon|this evening|tonight|tomorrow|meeting is today|call is today|interview is today)\b/i.test(
+      text
+    ) ||
+    /\b(already negotiating|already discussing terms|in the room|on the call|right now talking)\b/i.test(
+      text
+    )
+  )
+}
+
 export function detectLiveScenario(input: string, promptContext?: string | null) {
   const context = (promptContext || '').toLowerCase()
 

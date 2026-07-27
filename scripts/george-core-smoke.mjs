@@ -1110,12 +1110,17 @@ assert(
   'Execution Policy should preserve move-bounded response scope as a universal realization invariant'
 )
 
+const imminentOperationalJudgment = {
+  ...operationalJudgment,
+  operationalPosture: 'execution_imminent' as const,
+}
+
 const imminentNormalPolicy = resolveGeorgeExecutionPolicy({
   runtime: 'normal_george',
   voiceMode: false,
-  strategy: operationalJudgment.conversationStrategy,
-  moveDefinition: operationalJudgment.conversationStrategy.definition,
-  operationalJudgment,
+  strategy: imminentOperationalJudgment.conversationStrategy,
+  moveDefinition: imminentOperationalJudgment.conversationStrategy.definition,
+  operationalJudgment: imminentOperationalJudgment,
   outcomeEvolution: phaseEvolution,
   operationalResourceMonitor,
   latestUserText:
@@ -1150,8 +1155,8 @@ const livePostureIsolation = resolveNormalExecutionPosture({
 })
 
 assert(
-  livePostureIsolation === 'execution_imminent',
-  'Normal posture resolver should recognize imminent execution from current-turn evidence'
+  livePostureIsolation === operationalJudgment.operationalPosture,
+  'Normal posture resolver should preserve canonical Operational Judgment posture instead of reinterpreting current-turn language'
 )
 
 const liveQuestionStrategy = resolveGeorgeConversationStrategy({
