@@ -2,6 +2,69 @@
 
 import { HomeHeroSequence } from '@/components/home/HomeHeroSequence'
 
+const taskCards = [
+  {
+    title: 'Prepare this sales call',
+    body: 'Clarify the objective, research the prospect, anticipate objections, shape the opening, and identify the strongest close.',
+  },
+  {
+    title: 'Make my case',
+    body: 'Organize the argument, surface supporting evidence, anticipate challenges, and sharpen the language that carries the point.',
+  },
+  {
+    title: 'Negotiate the price',
+    body: 'Define your position, understand leverage, protect your limits, plan concessions, and prepare the next move before pressure arrives.',
+  },
+  {
+    title: 'Book the appointment',
+    body: 'Build a concise reason to meet, handle hesitation, choose the right ask, and prepare a clear path to commitment.',
+  },
+  {
+    title: 'Review this contract',
+    body: 'Identify obligations, risks, unclear language, negotiation points, and the questions that should be answered before you agree.',
+  },
+  {
+    title: 'Cold-call this prospect',
+    body: 'Prepare the opening, establish relevance quickly, qualify interest, handle resistance, and ask for the next concrete step.',
+  },
+  {
+    title: 'Prepare for this interview',
+    body: 'Clarify the role, connect your experience to the need, prepare proof, practice difficult questions, and strengthen your close.',
+  },
+  {
+    title: 'Respond to this objection',
+    body: 'Identify the concern beneath the words, choose the right posture, answer directly, preserve trust, and move the conversation forward.',
+  },
+  {
+    title: 'Plan this project',
+    body: 'Define the goal, sequence the work, identify dependencies and risks, assign next actions, and keep execution tied to the objective.',
+  },
+  {
+    title: 'Teach me this subject',
+    body: 'Start from what you already know, explain the core ideas clearly, test understanding, and build toward practical command of the topic.',
+  },
+  {
+    title: 'Help me decide',
+    body: 'Clarify what matters, compare the real tradeoffs, identify missing information, test assumptions, and choose the strongest available path.',
+  },
+  {
+    title: 'Draft the follow-up',
+    body: 'Preserve the purpose of the conversation, capture commitments, clarify the next step, and write in the tone the relationship requires.',
+  },
+  {
+    title: 'Analyze this proposal',
+    body: 'Test the logic, assumptions, value, risks, evidence, and decision points before you present, accept, reject, or revise it.',
+  },
+  {
+    title: 'Prepare this presentation',
+    body: 'Clarify the audience and objective, structure the message, strengthen proof, prepare transitions, and rehearse the moments that matter most.',
+  },
+  {
+    title: 'Resolve this conflict',
+    body: 'Separate facts from friction, understand each position, identify what can move, prepare careful language, and work toward a durable resolution.',
+  },
+]
+
 const supportModes = [
   {
     title: 'Cue',
@@ -24,7 +87,7 @@ const supportModes = [
 const audienceCards = [
   {
     title: 'Professional advancement',
-    body: 'Support for critical interviews, investor pitches, contract negotiations, executive presentations, and other conversations where communication can influence a successful outcome.',
+    body: 'Support for critical interviews, investor pitches, contract negotiations, executive presentations, and other conversations where communication can influence a successful goal.',
   },
   {
     title: 'Speaking disabilities',
@@ -58,7 +121,7 @@ const contextCards = [
   },
   {
     title: 'Briefing integration',
-    body: 'Desired outcome, acceptable outcome, audience, pressure, risks, constraints, documents, and known context sharpen the guidance before the conversation begins.',
+    body: 'Desired goal, acceptable objective, audience, pressure, risks, constraints, documents, and known context sharpen the guidance before the conversation begins.',
   },
 ]
 
@@ -84,15 +147,50 @@ export default function HomePage() {
 
       <section className="border-t border-white/10 bg-black px-5 py-14 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-7xl">
+          <div className="max-w-5xl">
+            <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+              Start with the goal
+            </p>
+
+            <h1 className="mt-4 max-w-5xl font-mono text-[36px] font-black uppercase leading-[0.92] tracking-[-0.07em] sm:text-[60px]">
+              Tell GEORGE what you need to accomplish.
+            </h1>
+
+            <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
+              GEORGE helps clarify the objective, prepare the work, navigate the communication, and move the goal forward.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {taskCards.map((task) => (
+              <article
+                key={task.title}
+                className="rounded-[24px] border border-white/10 bg-[#08090A] p-6 transition hover:border-[#4E7CFF]/35 hover:bg-[#4E7CFF]/[0.045]"
+              >
+                <h2 className="font-mono text-[13px] font-semibold uppercase tracking-[0.18em] text-white">
+                  {task.title}
+                </h2>
+
+                <p className="mt-4 text-[15px] leading-7 text-white/62">
+                  {task.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-black px-5 py-14 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
               <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
                 Communication intelligence
               </p>
 
-              <h1 className="mt-4 max-w-4xl font-mono text-[36px] font-black uppercase leading-[0.92] tracking-[-0.07em] sm:text-[60px]">
+              <h2 className="mt-4 max-w-4xl font-mono text-[36px] font-black uppercase leading-[0.92] tracking-[-0.07em] sm:text-[60px]">
                 Communication intelligence for high-stakes moments.
-              </h1>
+              </h2>
             </div>
 
             <div className="space-y-5 text-[16px] leading-8 text-white">
@@ -104,14 +202,14 @@ export default function HomePage() {
               <p>
                 GEORGE supports you before, during, and after important
                 meetings—helping you prepare for the moment, recognize what is
-                happening, and protect your desired outcome.
+                happening, and protect your objective.
               </p>
 
               <div className="flex flex-wrap gap-x-6 gap-y-2 pt-2 font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-white">
                 <span>Prepare</span>
                 <span>Perform</span>
                 <span>Adapt</span>
-                <span>Improve outcomes</span>
+                <span>Advance goals</span>
               </div>
             </div>
           </div>
@@ -127,7 +225,7 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-4 max-w-3xl font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
-                Help while the outcome can still change.
+                Help while the goal can still change.
               </h2>
             </div>
 
@@ -205,7 +303,7 @@ export default function HomePage() {
             </p>
 
             <h2 className="mt-4 font-mono text-[32px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[48px]">
-              The room, your role, and the outcome change the support.
+              The room, your role, and the objective change the support.
             </h2>
 
             <p className="mt-6 max-w-xl text-[16px] leading-8 text-white/68">
@@ -284,7 +382,7 @@ export default function HomePage() {
               arrives after the moment has passed has little operational
               value. The infrastructure is designed to process live speech,
               reason quickly, and deliver usable support while the user can
-              still affect the outcome.
+              still affect the objective.
             </p>
           </div>
 
