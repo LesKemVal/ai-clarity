@@ -5,24 +5,31 @@ import { requestFreshNormalBrowserSession } from '@/lib/george/session/store'
 
 const heroSequences = [
   {
+    title: ['GEORGE'],
+    lines: [
+      'Operational intelligence for conversations that matter.',
+      'GEORGE helps you accomplish objectives, not simply answer questions.',
+    ],
+  },
+  {
     title: ['PREPARE'],
     lines: [
-      'Preparation before the conversation?',
-      'Clarify the outcome, understand the room, organize what matters, identify risks, and practice the moments that may decide the conversation.',
+      'Before the conversation.',
+      'Understand the room, organize what matters, identify risks, and practice the moments that may determine the outcome.',
     ],
   },
   {
     title: ['LIVE SUPPORT'],
     lines: [
-      'Support during the conversation?',
-      'GEORGE recognizes useful signals and provides discreet guidance while the conversation is still happening and what you want is still on the table.',
+      'During the conversation.',
+      'GEORGE recognizes meaningful signals and provides discreet guidance while the conversation is still unfolding and outcomes can still change.',
     ],
   },
   {
     title: ['CONVERSATION', 'REVIEW'],
     lines: [
-      'Review after the conversation?',
-      'GEORGE presents the summary first, explains what mattered, and keeps the full transcript immediately available as evidence whenever you request it.',
+      'After the conversation.',
+      'Review what happened, understand why it mattered, preserve the evidence, and improve the next conversation.',
     ],
   },
 ]
@@ -246,30 +253,30 @@ export function HomeHeroSequence() {
             }`}
           >
             <div
-                key={`${detailSequence.title.join('-')}-tagline`}
-                className={`max-w-[820px] text-left font-mono text-[20px] font-semibold uppercase leading-[1.18] tracking-[0.085em] text-white/92 transition-all duration-300 sm:text-[30px] md:text-[36px] ${
-                  flipState.detailsVisible
-                    ? 'translate-y-0 opacity-100 blur-0'
-                    : '-translate-y-2 opacity-0 blur-[2px]'
-                }`}
-              >
-                {detailSequence.lines[0]}
-              </div>
+              key={`${detailSequence.title.join('-')}-tagline`}
+              className={`max-w-[820px] text-left font-mono text-[20px] font-semibold uppercase leading-[1.18] tracking-[0.085em] text-white/92 transition-all duration-300 sm:text-[30px] md:text-[36px] ${
+                flipState.detailsVisible
+                  ? 'translate-y-0 opacity-100 blur-0'
+                  : '-translate-y-2 opacity-0 blur-[2px]'
+              }`}
+            >
+              {detailSequence.lines[0]}
+            </div>
 
-              <div
-                key={`${detailSequence.title.join('-')}-explanation`}
-                className={`mt-2 max-w-[760px] pr-2 text-left font-mono text-[16px] font-medium normal-case leading-7 tracking-[0.01em] text-white/68 transition-opacity duration-300 sm:text-[19px] sm:leading-8 md:text-[21px] md:leading-9 ${
-                  flipState.detailsVisible ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                {typedExplanation}
+            <div
+              key={`${detailSequence.title.join('-')}-explanation`}
+              className={`mt-2 max-w-[760px] pr-2 text-left font-mono text-[16px] font-medium normal-case leading-7 tracking-[0.01em] text-white/68 transition-opacity duration-300 sm:text-[19px] sm:leading-8 md:text-[21px] md:leading-9 ${
+                flipState.detailsVisible ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              {typedExplanation}
 
-                {flipState.detailsVisible &&
-                  typedExplanation.length <
-                    (detailSequence.lines[1]?.length || 0) && (
-                    <span className="ml-1 inline-block h-[0.9em] w-px animate-pulse bg-white/52 align-middle" />
-                  )}
-              </div>
+              {flipState.detailsVisible &&
+                typedExplanation.length <
+                  (detailSequence.lines[1]?.length || 0) && (
+                  <span className="ml-1 inline-block h-[0.9em] w-px animate-pulse bg-white/52 align-middle" />
+                )}
+            </div>
           </div>
         </div>
 
