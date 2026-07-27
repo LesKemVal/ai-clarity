@@ -96,7 +96,15 @@ Ownership rules:
 `execution_policy` is the canonical branch point between shared reasoning and mode-specific realization.
 
 ```text
-Available information and signals
+Available information
+↓
+Conversation Signals
+↓
+Operational Signal Normalization
+↓
+Operational Signal Interpretation
+↓
+Shared Runtime Pipeline
 ↓
 Outcome reasoning
 ↓
@@ -149,6 +157,47 @@ Provider realization
 ```
 
 The provider realizes approved runtime authority. The provider does not replace GEORGE's judgment or create another runtime owner.
+
+## Operational Signal Boundary
+
+Canonical producer:
+
+`lib/george/core/build-interpretation.ts`
+
+Canonical signal owners:
+
+- `lib/george/runtime/conversation-signals.ts`
+- `lib/george/runtime/operational-signal-normalizer.ts`
+- `lib/george/runtime/operational-signal-interpreter.ts`
+
+Responsibilities:
+
+- Conversation Signals detect conversational evidence.
+- Operational Signal Normalizer produces canonical `OperationalSignal[]` values.
+- Operational Signal Interpreter prepares those signals for shared runtime reasoning.
+- `buildGeorgeCoreInterpretation()` coordinates the canonical signal pipeline.
+- `app/api/chat/route.ts` transports canonical operational signals into the shared runtime.
+- Operational Judgment and Conversation Strategy consume canonical signals without recreating signal ownership.
+
+Conversation Strategy prefers canonical operational signals before transcript compatibility heuristics. Transcript heuristics remain temporary compatibility behavior and are not canonical ownership.
+
+Canonical flow:
+
+Conversation
+↓
+Conversation Signals
+↓
+Operational Signal Normalization
+↓
+Operational Signal Interpretation
+↓
+Shared Runtime Pipeline
+↓
+Operational Judgment
+↓
+Conversation Strategy
+
+This preserves one signal interpretation path, one shared runtime, and one reasoning authority.
 
 ### Normal Provider Realization Boundary
 

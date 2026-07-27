@@ -544,6 +544,25 @@ Latest production synchronization baseline includes:
 3fe5ce7 Add formula reassessment recorder contract
 ```
 
+Operational signal runtime integration completed:
+
+- Conversation Signals now feed canonical operational signal normalization.
+- Operational Signal Normalization produces canonical `OperationalSignal[]` values.
+- Operational Signal Interpretation prepares those signals for shared runtime reasoning.
+- `buildGeorgeCoreInterpretation()` coordinates the canonical signal pipeline.
+- `app/api/chat/route.ts` transports canonical operational signals into the shared runtime.
+- Operational Judgment and Conversation Strategy consume canonical signals without recreating ownership.
+- Conversation Strategy prefers canonical operational signals before transcript compatibility heuristics.
+
+Validated runtime flow:
+
+```text
+OperationalSignal[]
+→ Shared Runtime Pipeline
+→ Operational Judgment
+→ Conversation Strategy
+```
+
 Validated production command:
 
 ```text
