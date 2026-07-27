@@ -950,6 +950,8 @@ LANGUAGE MODE: SPANISH
     let operationalMemoryEvidence = null
 
     if (operationalMemoryUserId) {
+      const operationalMemoryRetrievalStartedAt = Date.now()
+
       try {
         const operationalMemoryContext =
           body?.operationalMemoryContext &&
