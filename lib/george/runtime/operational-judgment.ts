@@ -5,6 +5,7 @@ import type { ContinuityRestorationState } from '@/lib/george/runtime/continuity
 import type { GeorgeIntentState } from '@/lib/george/runtime/intent-state'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
 import type { LiveRecommendationEvidence } from '@/lib/george/runtime/live-recommendation-governor'
+import type { OperationalSignal } from '@/lib/george/runtime/operational-signals'
 import type { RuntimeOutcomeSignals } from '@/lib/george/runtime/outcome-learning'
 import type { RuntimeSignalArbitration } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
@@ -68,6 +69,7 @@ export type OperationalJudgmentInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  operationalSignals?: OperationalSignal[]
   outcomeState: GeorgeOutcomeState
   latestUserText: string
 }
@@ -149,6 +151,7 @@ export function resolveOperationalJudgment(
     action,
     currentRuntime: input.currentRuntime,
     latestUserText: input.latestUserText,
+    operationalSignals: input.operationalSignals,
     judgmentSurface: input.judgmentSurface,
     trajectory: input.trajectory,
     outcomeState: input.outcomeState,

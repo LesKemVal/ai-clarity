@@ -1,4 +1,5 @@
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
+import type { OperationalSignal } from '@/lib/george/runtime/operational-signals'
 import {
   buildContextFramingPresentationNote,
   buildLiveRecommendationPresentationNote,
@@ -145,6 +146,7 @@ export type GeorgeRuntimePipelineInput = {
   outcomeSignals: RuntimeOutcomeSignals
   adaptiveProfile: AdaptiveUserProfile
   liveRecommendationEvidence: LiveRecommendationEvidence
+  operationalSignals: OperationalSignal[]
   operationalMemoryEvidence?: OperationalMemoryRuntimeEvidence | null
   providerPrompt: GeorgeProviderPromptInput
   onStageTiming?: (timing: GeorgeRuntimePipelineStageTiming) => void
@@ -305,6 +307,7 @@ export function resolveGeorgeRuntimePipeline(
       outcomeSignals: input.outcomeSignals,
       adaptiveProfile: input.adaptiveProfile,
       liveRecommendationEvidence: input.liveRecommendationEvidence,
+      operationalSignals: input.operationalSignals,
       outcomeState,
       latestUserText: input.latestUserText,
     })

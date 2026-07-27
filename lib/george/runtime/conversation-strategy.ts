@@ -1,6 +1,10 @@
 import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-policy'
 import type { GeorgeOutcomeState } from '@/lib/george/live-voice/runtime/active-outcome'
 import type { JudgmentSurfaceState } from '@/lib/george/runtime/judgment-surface'
+import {
+  hasOperationalSignal,
+  type OperationalSignal,
+} from '@/lib/george/runtime/operational-signals'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
 import {
   resolveConversationMoveDefinition,
@@ -56,6 +60,7 @@ export type GeorgeConversationStrategyInput = {
     | 'clarify_direction'
   currentRuntime: CurrentGeorgeRuntime
   latestUserText: string
+  operationalSignals?: OperationalSignal[]
   judgmentSurface: JudgmentSurfaceState
   trajectory: TrajectoryAssessment
   outcomeState: GeorgeOutcomeState
@@ -67,6 +72,9 @@ export function resolveGeorgeConversationStrategy(
   input: GeorgeConversationStrategyInput
 ): GeorgeConversationStrategy {
   const text = String(input.latestUserText || '').toLowerCase()
+  const operationalSignals = input.operationalSignals || []
+  const hasSignal = (kind: OperationalSignal['kind']) =>
+    hasOperationalSignal(operationalSignals, kind)
   const assumption =
     'The user may know room facts, prior statements, relationships, or constraints GEORGE cannot observe.'
 
@@ -95,7 +103,12 @@ export function resolveGeorgeConversationStrategy(
     move = 'clarify'
     purpose = 'Narrow the issue before the user commits to an answer or concession.'
     confidence = Math.max(confidence, 0.76)
-  } else if (/objection|pushback|concern|hesitation|valuation|too high|too low/.test(text)) {
+  } else if (
+    hasSignal('hesitation') ||
+    hasSignal('resistance') ||
+    hasSignal('proof_challenge') ||
+    /objection|pushback|concern|valuation|too high|too low/.test(text)
+  ) {
     move = 'probe'
     purpose = 'Use a context-sensitive move to expose the operative concern before defending or conceding.'
     confidence = Math.max(confidence, 0.7)
@@ -103,13 +116,21 @@ export function resolveGeorgeConversationStrategy(
     move = 'reframe'
     purpose = 'Reset the conversation around the governing issue without abandoning the active outcome.'
     confidence = Math.max(confidence, 0.74)
-  } else if (/agree|sounds good|ready|next step|move forward|commit/.test(text)) {
+  } else if (
+    hasSignal('decision_readiness') ||
+    hasSignal('commitment_forming') ||
+    /agree|sounds good|ready|next step|move forward|commit/.test(text)
+  ) {
     move = 'close'
     purpose = 'Convert positive movement into a clear commitment or next step.'
     confidence = Math.max(confidence, 0.72)
   } else if (
     input.currentRuntime === 'live_george' &&
-    /pause|slow down|rushing|talking fast|interrupted|overwhelmed/.test(text)
+    (
+      hasSignal('interruption_attempt') ||
+      hasSignal('pressure_rising') ||
+      /pause|slow down|rushing|talking fast|interrupted|overwhelmed/.test(text)
+    )
   ) {
     move = 'slow'
     purpose = 'Protect execution quality by reducing pace before the next substantive move.'

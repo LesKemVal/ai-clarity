@@ -50,6 +50,7 @@ import {
 import { buildDeliveryAndForesightBlock } from '@/lib/george/chat/delivery-foresight-block'
 import { appendPostResponseNotices } from '@/lib/george/runtime/post-response-governance'
 import { buildPassiveIntentState } from '@/lib/george/runtime/intent-state'
+import { buildGeorgeCoreInterpretation } from '@/lib/george/core/build-interpretation'
 import { buildRuntimeInterpretation } from '@/lib/george/runtime/runtime-interpretation'
 import { buildRuntimeAdapter, buildRuntimeAdapterNote, type GeorgeRuntimeAdapter } from '@/lib/george/runtime/runtime-adapter'
 import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtime/earbud-runtime'
@@ -993,6 +994,11 @@ LANGUAGE MODE: SPANISH
       }
     }
 
+    const coreInterpretation = buildGeorgeCoreInterpretation({
+      transcript: latestUserRaw,
+      room: currentRuntime === 'live_george' ? 'LIVE' : undefined,
+    })
+
     const runtimePipeline = resolveGeorgeRuntimePipeline({
       currentRuntime,
       latestUserText: latestUserRaw,
@@ -1010,6 +1016,7 @@ LANGUAGE MODE: SPANISH
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
+      operationalSignals: coreInterpretation.operationalSignals || [],
       operationalMemoryEvidence,
       providerPrompt: {
         languageRule,
