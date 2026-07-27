@@ -15,6 +15,8 @@ type LiveAdaptiveSupportPanelProps = {
   onSelect: (panelId: LiveBriefingSupportPanelId) => void
 }
 
+const SUPPORT_OPTIONS_ID = 'george-live-support-options'
+
 export function LiveAdaptiveSupportPanel({
   activePanel,
   open,
@@ -42,11 +44,17 @@ export function LiveAdaptiveSupportPanel({
           <div className="mt-1 text-[11px] leading-5 text-[#D7DBE4]/48">
             {activePanel.line}
           </div>
+
+          <div className="mt-2 border-l border-white/[0.12] pl-3 text-[11px] leading-5 text-[#D7DBE4]/48">
+            {activePanel.detail}
+          </div>
         </div>
 
         <button
           type="button"
           onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={SUPPORT_OPTIONS_ID}
           className="shrink-0 rounded-[0.65rem] border border-white/[0.08] px-2.5 py-1 text-[9px] uppercase tracking-[0.16em] text-white/46 transition hover:border-white/[0.16] hover:text-white/72"
         >
           {open ? 'Close' : 'Change'}
@@ -54,6 +62,7 @@ export function LiveAdaptiveSupportPanel({
       </div>
 
       <div
+        id={SUPPORT_OPTIONS_ID}
         className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)] ${
           open
             ? 'mt-4 grid-rows-[1fr] opacity-100'
@@ -61,7 +70,7 @@ export function LiveAdaptiveSupportPanel({
         }`}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="GEORGE support preference">
             {panels.map((panel) => {
               const active = activePanel.id === panel.id
 
@@ -69,6 +78,8 @@ export function LiveAdaptiveSupportPanel({
                 <button
                   key={panel.id}
                   type="button"
+                  role="radio"
+                  aria-checked={active}
                   onClick={() => selectPanel(panel.id)}
                   className={`rounded-[0.72rem] border px-3 py-3 text-left transition ${
                     active
@@ -83,12 +94,6 @@ export function LiveAdaptiveSupportPanel({
                   <span className="mt-1 block text-[10px] leading-4 text-white/40">
                     {panel.line}
                   </span>
-
-                  {active && (
-                    <span className="mt-3 block border-l border-white/[0.14] pl-3 text-[11px] leading-5 text-[#D7DBE4]/54">
-                      {panel.detail}
-                    </span>
-                  )}
                 </button>
               )
             })}
