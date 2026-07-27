@@ -19,6 +19,16 @@ const DEFAULT_POLICY: OperationalMemoryRetrievalPolicy = {
   generalReserve: 1,
 }
 
+export function normalizeFormulaRetrievalType(value: unknown) {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+
+  return normalized || undefined
+}
+
 export function buildFormulaRetrievalContext(
   context: FormulaRetrievalContext,
   overrides: Partial<OperationalMemoryRetrievalPolicy> = {}

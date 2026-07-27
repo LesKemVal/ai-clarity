@@ -4728,6 +4728,24 @@ const handleSend = useCallback(
           })
         }
 
+        const activeOperationalSession =
+          getActiveSessionForMode(liveMode ? 'live' : 'normal')
+
+        const operationalMemoryContext = {
+          roomType: liveMode
+            ? liveRuntimeSupport?.room ||
+              liveRuntimeSetup?.room ||
+              'LIVE'
+            : 'NORMAL',
+          objectiveType:
+            liveRuntimeSetup?.objective ||
+            activeOperationalSession?.userGoal ||
+            activeOperationalSession?.metadata?.desiredOutcome ||
+            activePromptContext ||
+            undefined,
+          observedSignalTypes: [],
+        }
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -4741,6 +4759,7 @@ const handleSend = useCallback(
             contextTurnCount,
             tier: currentTier,
             language,
+            operationalMemoryContext,
           }),
         })
 

@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getGeorgeModeBlock, type GeorgeMode } from '@/lib/george/behavior/mode'
 import { getGeorgeIdentityRuntime } from '@/lib/george/identity/runtime'
 import { getObjectiveEngagementRuntime } from '@/lib/george/behavior/objective-engagement'
@@ -75,6 +75,15 @@ import {
   resolveGeorgeRuntimePipeline,
   selectGeorgeRuntimeAuthoritySnapshot,
 } from '@/lib/george/runtime/runtime-pipeline'
+import { createOperationalMemory } from '@/lib/george/operational-memory/operational-memory'
+import { createRedisOperationalFormulaLibrary } from '@/lib/george/operational-memory/redis-formula-library'
+import {
+  applyOperationalMemoryRetrievalPolicy,
+  buildFormulaRetrievalContext,
+  normalizeFormulaRetrievalType,
+} from '@/lib/george/operational-memory/retrieval-policy'
+import { createOperationalMemoryRuntimeEvidence } from '@/lib/george/operational-memory/runtime-evidence'
+import { readGeorgeSession } from '@/lib/security/george-session'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -614,9 +623,13 @@ function isValidIncomingMessage(m: IncomingMessage): m is FilteredIncomingMessag
   return !!m && m.role !== 'system' && typeof m.content === 'string'
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
+    const session = await readGeorgeSession(req)
+    const operationalMemoryUserId = String(session?.email || '')
+      .trim()
+      .toLowerCase()
     const language = body?.language === 'ES' ? 'ES' : 'EN'
 
     const incomingMessages: IncomingMessage[] = Array.isArray(body?.messages)
@@ -934,6 +947,50 @@ LANGUAGE MODE: SPANISH
           tier
         )
 
+    let operationalMemoryEvidence = null
+
+    if (operationalMemoryUserId) {
+      try {
+        const operationalMemoryContext =
+          body?.operationalMemoryContext &&
+          typeof body.operationalMemoryContext === 'object'
+            ? body.operationalMemoryContext
+            : {}
+
+        const formulaContext = buildFormulaRetrievalContext({
+          userId: operationalMemoryUserId,
+          roomType: normalizeFormulaRetrievalType(
+            operationalMemoryContext.roomType
+          ),
+          objectiveType: normalizeFormulaRetrievalType(
+            operationalMemoryContext.objectiveType
+          ),
+          observedSignalTypes: Array.isArray(
+            operationalMemoryContext.observedSignalTypes
+          )
+            ? operationalMemoryContext.observedSignalTypes
+                .map(normalizeFormulaRetrievalType)
+                .filter((value: string | undefined): value is string => Boolean(value))
+            : [],
+        })
+
+        const operationalMemory = createOperationalMemory({
+          formulaLibrary: createRedisOperationalFormulaLibrary(),
+        })
+
+        const retrieved = await operationalMemory.retrieve(formulaContext)
+        const selected = applyOperationalMemoryRetrievalPolicy(retrieved)
+
+        operationalMemoryEvidence =
+          createOperationalMemoryRuntimeEvidence(selected)
+      } catch (error) {
+        console.error(
+          '[GEORGE][OPERATIONAL_MEMORY][RETRIEVAL_FAILED]',
+          error
+        )
+      }
+    }
+
     const runtimePipeline = resolveGeorgeRuntimePipeline({
       currentRuntime,
       latestUserText: latestUserRaw,
@@ -951,6 +1008,7 @@ LANGUAGE MODE: SPANISH
       outcomeSignals: runtimeOutcomeSignals,
       adaptiveProfile: adaptiveUserProfile,
       liveRecommendationEvidence,
+      operationalMemoryEvidence,
       providerPrompt: {
         languageRule,
         modeBlock,
