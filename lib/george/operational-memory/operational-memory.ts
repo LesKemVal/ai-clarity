@@ -1,14 +1,27 @@
 import {
+  createDefaultOperationalFormulaEvolutionEngine,
+} from './default-formula-evolution-engine'
+import {
+  createDefaultOperationalFormulaReassessmentEngine,
+} from './default-formula-reassessment-engine'
+import type {
+  OperationalFormulaEvolutionEngine,
+  OperationalFormulaEvolutionResult,
+} from './formula-evolution-engine'
+import {
   extractOperationalFormulas,
   type OperationalFormulaExtractionOptions,
 } from './formula-extractor'
 import type { OperationalFormulaLibrary } from './formula-library'
-import type { OperationalScriptLibrary } from './script-library'
+import type {
+  OperationalFormulaReassessmentEngine,
+} from './formula-reassessment-engine'
 import type { OperationalScriptExecutionRecorder } from './script-execution-recorder'
 import {
   createOperationalScriptGenerator,
   type OperationalScriptGenerator,
 } from './script-generator'
+import type { OperationalScriptLibrary } from './script-library'
 import {
   validateOperationalFormula,
   type OperationalFormulaValidationPolicy,
@@ -17,6 +30,8 @@ import {
 import type {
   ConversationRecord,
   FormulaRetrievalContext,
+  OperationalFormulaLineage,
+  OperationalFormulaReassessment,
   OperationalScript,
   OperationalScriptExecution,
   RetrievedOperationalFormula,
@@ -29,9 +44,14 @@ export type OperationalMemoryLearningResult = {
   skippedCount: number
   generatedCount: number
   persistedCount: number
+  reassessedCount: number
+  evolvedCount: number
   generatedScripts: OperationalScript[]
   executionIds: string[]
   validations: OperationalFormulaValidationResult[]
+  reassessments: OperationalFormulaReassessment[]
+  evolutions: OperationalFormulaEvolutionResult[]
+  lineages: OperationalFormulaLineage[]
 }
 
 export type OperationalMemoryDependencies = {
@@ -39,6 +59,8 @@ export type OperationalMemoryDependencies = {
   scriptGenerator?: OperationalScriptGenerator
   scriptLibrary?: OperationalScriptLibrary
   scriptExecutionRecorder?: OperationalScriptExecutionRecorder
+  formulaReassessmentEngine?: OperationalFormulaReassessmentEngine
+  formulaEvolutionEngine?: OperationalFormulaEvolutionEngine
 }
 
 export type OperationalMemoryLearnOptions = {
@@ -64,6 +86,10 @@ export function createOperationalMemory(
     scriptGenerator = createOperationalScriptGenerator(),
     scriptLibrary,
     scriptExecutionRecorder,
+    formulaReassessmentEngine =
+      createDefaultOperationalFormulaReassessmentEngine(),
+    formulaEvolutionEngine =
+      createDefaultOperationalFormulaEvolutionEngine(),
   } = dependencies
 
   return {
@@ -76,9 +102,14 @@ export function createOperationalMemory(
       const validations: OperationalFormulaValidationResult[] = []
       const generatedScripts: OperationalScript[] = []
       const executionIds: string[] = []
+      const reassessments: OperationalFormulaReassessment[] = []
+      const evolutions: OperationalFormulaEvolutionResult[] = []
+      const lineages: OperationalFormulaLineage[] = []
+
       let savedCount = 0
       let skippedCount = 0
       let persistedCount = 0
+      let evolvedCount = 0
 
       for (const candidate of candidates) {
         const existing = await formulaLibrary.getById(candidate.id)
@@ -101,6 +132,7 @@ export function createOperationalMemory(
         const generatedScript = await scriptGenerator.generate(
           validation.formula
         )
+
         generatedScripts.push(generatedScript)
 
         if (scriptLibrary) {
@@ -108,25 +140,55 @@ export function createOperationalMemory(
           persistedCount += 1
         }
 
+        let execution: OperationalScriptExecution | undefined
+
         if (scriptExecutionRecorder) {
-          const execution: OperationalScriptExecution = {
+          const now = Date.now()
+
+          execution = {
             id: crypto.randomUUID(),
             conversationId: record.id,
             userId: record.userId,
+            organizationId: record.organizationId,
             scriptId: generatedScript.id,
             scriptVersion: generatedScript.version,
             formulaId: validation.formula.id,
             formulaVersion: validation.formula.version,
-            startedAt: Date.now(),
-            endedAt: undefined,
+            startedAt: now,
+            endedAt: record.endedAt,
             deviations: [],
-            outcomes: [],
-            createdAt: Date.now(),
+            outcomes: record.outcomes,
+            createdAt: now,
           }
 
           await scriptExecutionRecorder.save(execution)
-
           executionIds.push(execution.id)
+        }
+
+        const reassessment = await formulaReassessmentEngine.reassess({
+          formula: validation.formula,
+          conversation: record,
+          scriptExecution: execution,
+        })
+
+        reassessments.push(reassessment)
+
+        const evolution = await formulaEvolutionEngine.evolve({
+          formula: validation.formula,
+          conversation: record,
+          reassessment,
+          scriptExecution: execution,
+        })
+
+        evolutions.push(evolution)
+
+        if (evolution.formula) {
+          await formulaLibrary.save(evolution.formula)
+          evolvedCount += 1
+        }
+
+        if (evolution.lineage) {
+          lineages.push(evolution.lineage)
         }
       }
 
@@ -137,9 +199,14 @@ export function createOperationalMemory(
         skippedCount,
         generatedCount: generatedScripts.length,
         persistedCount,
+        reassessedCount: reassessments.length,
+        evolvedCount,
         generatedScripts,
         executionIds,
         validations,
+        reassessments,
+        evolutions,
+        lineages,
       }
     },
   }

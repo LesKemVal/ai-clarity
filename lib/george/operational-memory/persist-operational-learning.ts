@@ -6,6 +6,10 @@ import {
 } from './conversation-record-adapter'
 import { createOperationalMemory } from './operational-memory'
 import { createRedisOperationalFormulaLibrary } from './redis-formula-library'
+import {
+  createRedisOperationalScriptExecutionRecorder,
+} from './redis-script-execution-recorder'
+import { createRedisOperationalScriptLibrary } from './redis-script-library'
 
 export type PersistOperationalLearningInput = Omit<
   OperationalConversationRecordAdapterInput,
@@ -30,6 +34,9 @@ export async function persistOperationalLearning(
 
   const operationalMemory = createOperationalMemory({
     formulaLibrary: createRedisOperationalFormulaLibrary(),
+    scriptLibrary: createRedisOperationalScriptLibrary(),
+    scriptExecutionRecorder:
+      createRedisOperationalScriptExecutionRecorder(),
   })
 
   return operationalMemory.learn(operationalRecord)
