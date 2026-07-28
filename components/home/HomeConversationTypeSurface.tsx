@@ -1,38 +1,47 @@
-"use client";
+'use client'
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react'
 import {
   CONVERSATION_TYPES,
   type ConversationType,
-} from "@/lib/george/live-entry/conversation-types";
-import { LIVE_PREPARATION_QUESTIONS } from "@/lib/george/live-runtime/live-intent-runtime";
+} from '@/lib/george/live-entry/conversation-types'
+import {
+  loadLivePreparationSignals,
+  markLivePreparationPreviewReady,
+  saveLivePreparationSignals,
+} from '@/lib/george/live-browser/live-preparation-browser-storage'
+import {
+  LIVE_PREPARATION_QUESTIONS,
+  resolveLivePreparationReadiness,
+  resolveLivePreparationTransition,
+} from '@/lib/george/live-runtime/live-intent-runtime'
 
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
 
   useEffect(() => {
-    setValue("");
-    if (!enabled || !text) return;
+    setValue('')
+    if (!enabled || !text) return
 
-    let index = 0;
+    let index = 0
     const timer = window.setInterval(() => {
-      index += 1;
-      setValue(text.slice(0, index));
-      if (index >= text.length) window.clearInterval(timer);
-    }, speed);
+      index += 1
+      setValue(text.slice(0, index))
+      if (index >= text.length) window.clearInterval(timer)
+    }, speed)
 
-    return () => window.clearInterval(timer);
-  }, [enabled, speed, text]);
+    return () => window.clearInterval(timer)
+  }, [enabled, speed, text])
 
-  return value;
+  return value
 }
 
 function ConversationTypeCard({
   conversationType,
   onSelect,
 }: {
-  conversationType: ConversationType;
-  onSelect: (conversationType: ConversationType) => void;
+  conversationType: ConversationType
+  onSelect: (conversationType: ConversationType) => void
 }) {
   return (
     <button
@@ -47,181 +56,145 @@ function ConversationTypeCard({
         →
       </span>
     </button>
-  );
+  )
 }
 
 export function HomeConversationTypeSurface() {
-  const [selectedType, setSelectedType] = useState<ConversationType | null>(
-    null,
-  );
-  const [introStage, setIntroStage] = useState(0);
-  const [customizing, setCustomizing] = useState(false);
-  const [transitioningToBriefing, setTransitioningToBriefing] = useState(false);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedType, setSelectedType] = useState<ConversationType | null>(null)
+  const [introStage, setIntroStage] = useState(0)
+  const [customizing, setCustomizing] = useState(false)
+  const [transitioningToBriefing, setTransitioningToBriefing] = useState(false)
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [searchQuery, setSearchQuery] = useState('')
 
   const visibleTypes = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return CONVERSATION_TYPES;
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return CONVERSATION_TYPES
 
     return CONVERSATION_TYPES.filter((item) =>
       [item.title, item.description, item.initialization]
-        .join(" ")
+        .join(' ')
         .toLowerCase()
         .includes(query),
-    );
-  }, [searchQuery]);
+    )
+  }, [searchQuery])
+
+  const preparationTransition = useMemo(
+    () => resolveLivePreparationTransition(answers),
+    [answers],
+  )
+  const readiness = useMemo(
+    () => resolveLivePreparationReadiness(answers),
+    [answers],
+  )
+  const activeQuestion = preparationTransition.question
+  const activeQuestionIndex = activeQuestion
+    ? LIVE_PREPARATION_QUESTIONS.findIndex(
+        (question) => question.key === activeQuestion.key,
+      )
+    : LIVE_PREPARATION_QUESTIONS.length
 
   useEffect(() => {
     if (!selectedType) {
-      setIntroStage(0);
-      setCustomizing(false);
-      setTransitioningToBriefing(false);
-      setQuestionIndex(0);
-      setAnswers({});
-      return;
+      setIntroStage(0)
+      setCustomizing(false)
+      setTransitioningToBriefing(false)
+      setAnswers({})
+      return
     }
 
-    const structureTimer = window.setTimeout(() => setIntroStage(1), 220);
-    const initializationTimer = window.setTimeout(() => setIntroStage(2), 1050);
-    const customizePromptTimer = window.setTimeout(
-      () => setIntroStage(3),
-      1550,
-    );
-    const buttonTimer = window.setTimeout(() => setIntroStage(4), 1850);
+    const structureTimer = window.setTimeout(() => setIntroStage(1), 220)
+    const initializationTimer = window.setTimeout(() => setIntroStage(2), 1050)
+    const customizePromptTimer = window.setTimeout(() => setIntroStage(3), 1550)
+    const buttonTimer = window.setTimeout(() => setIntroStage(4), 1850)
 
     return () => {
-      window.clearTimeout(structureTimer);
-      window.clearTimeout(initializationTimer);
-      window.clearTimeout(customizePromptTimer);
-      window.clearTimeout(buttonTimer);
-    };
-  }, [selectedType]);
+      window.clearTimeout(structureTimer)
+      window.clearTimeout(initializationTimer)
+      window.clearTimeout(customizePromptTimer)
+      window.clearTimeout(buttonTimer)
+    }
+  }, [selectedType])
 
   const structureText = useTypewriter(
-    "The structure is ready.",
+    'The structure is ready.',
     introStage >= 1,
     34,
-  );
+  )
   const initializationText = useTypewriter(
-    selectedType?.initialization || "",
+    selectedType?.initialization || '',
     introStage >= 2,
     18,
-  );
+  )
   const customizeText = useTypewriter(
-    "Would you like to customize it?",
+    'Would you like to customize it?',
     introStage >= 3,
     28,
-  );
-
-  const structuredQuestions = LIVE_PREPARATION_QUESTIONS.slice(0, 4);
-  const activeQuestion = structuredQuestions[questionIndex] || null;
+  )
   const questionText = useTypewriter(
-    activeQuestion?.question || "",
+    activeQuestion?.question || '',
     customizing && Boolean(activeQuestion),
     24,
-  );
+  )
 
   function resetSelection() {
-    setSelectedType(null);
+    setSelectedType(null)
   }
 
   function beginCustomization() {
-    setTransitioningToBriefing(true);
+    const existingSignals = loadLivePreparationSignals()
+    setAnswers(existingSignals)
+    setTransitioningToBriefing(true)
+
     window.setTimeout(() => {
-      setCustomizing(true);
-      setTransitioningToBriefing(false);
-    }, 420);
+      setCustomizing(true)
+      setTransitioningToBriefing(false)
+    }, 420)
   }
 
-  function continueBriefing() {
-    if (!activeQuestion) return;
+  function saveCurrentAnswer() {
+    if (!activeQuestion) return
 
-    const answer = String(answers[activeQuestion.key] || "").trim();
-    if (!answer) return;
+    const answer = String(answers[activeQuestion.key] || '').trim()
+    if (!answer) return
 
-    try {
-      const nextSignals = {
-        ...answers,
-        [activeQuestion.key]: answer,
-      };
+    const nextSignals = {
+      ...answers,
+      [activeQuestion.key]: answer,
+    }
 
-      window.localStorage.setItem(
-        `GEORGE_PRE_LIVE_${activeQuestion.key.toUpperCase()}`,
-        answer,
-      );
-      window.localStorage.setItem(
-        "GEORGE_PRE_LIVE_SIGNALS",
-        JSON.stringify(nextSignals),
-      );
-    } catch {}
-
-    setQuestionIndex((current) =>
-      Math.min(current + 1, structuredQuestions.length),
-    );
+    setAnswers(nextSignals)
+    saveLivePreparationSignals(nextSignals)
   }
 
   function continueToLiveFinalCheck() {
-    if (!selectedType) return;
+    if (!selectedType || !readiness.thresholdMet) return
 
-    const signals = structuredQuestions.reduce<Record<string, string>>(
-      (current, question) => {
-        const answer = String(answers[question.key] || "").trim();
-        if (answer) current[question.key] = answer;
-        return current;
-      },
-      {},
-    );
+    const signals = Object.fromEntries(
+      Object.entries(answers)
+        .map(([key, value]) => [key, String(value || '').trim()])
+        .filter(([, value]) => Boolean(value)),
+    )
+
+    saveLivePreparationSignals(signals)
+    markLivePreparationPreviewReady()
 
     try {
       window.localStorage.setItem(
-        "GEORGE_PRE_LIVE_SIGNALS",
-        JSON.stringify(signals),
-      );
-
-      for (const [key, value] of Object.entries(signals)) {
-        window.localStorage.setItem(
-          `GEORGE_PRE_LIVE_${key.toUpperCase()}`,
-          value,
-        );
-      }
-
-      window.localStorage.setItem(
-        "GEORGE_HOMEPAGE_LIVE_HANDOFF",
+        'GEORGE_HOMEPAGE_LIVE_HANDOFF',
         JSON.stringify({
           conversationTypeId: selectedType.id,
           conversationType: selectedType.title,
+          conversationGroup: selectedType.group,
           signals,
-          mechanics: {
-            supportStyle: "cue",
-            receiverProfile: "audio_only",
-            communicationStyle: "Diplomatic",
-          },
+          readiness: resolveLivePreparationReadiness(signals),
           createdAt: Date.now(),
         }),
-      );
-
-      // Homepage route uses the canonical recommended mechanics.
-      window.localStorage.setItem("GEORGE_LIVE_SUPPORT_STYLE", "cue");
-      window.localStorage.setItem("GEORGE_LIVE_DELIVERY_STYLE", "cue");
-      window.localStorage.setItem(
-        "george_live_adaptive_support_preference",
-        "cue",
-      );
-      window.localStorage.setItem("GEORGE_LIVE_RECEIVER_PROFILE", "audio_only");
-      window.localStorage.setItem(
-        "george_live_entry_receiver_profile",
-        "audio_only",
-      );
-      window.localStorage.setItem(
-        "george_live_communication_style",
-        "Diplomatic",
-      );
+      )
     } catch {}
 
     window.location.href =
-      "/george/live-entry?source=homepage&stage=final-check";
+      '/george/live-entry?source=homepage&stage=final-check'
   }
 
   return (
@@ -254,13 +227,13 @@ export function HomeConversationTypeSurface() {
         <div className="mt-9">
           <div className="mb-5 flex items-center justify-between gap-4">
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
-              {visibleTypes.length} conversation{" "}
-              {visibleTypes.length === 1 ? "type" : "types"}
+              {visibleTypes.length} conversation{' '}
+              {visibleTypes.length === 1 ? 'type' : 'types'}
             </p>
             {searchQuery.trim() && (
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
+                onClick={() => setSearchQuery('')}
                 className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38 transition hover:text-white/78"
               >
                 Clear search
@@ -291,136 +264,136 @@ export function HomeConversationTypeSurface() {
       {selectedType && (
         <div className="relative z-10 border-t border-white/[0.08] bg-black px-5 py-12 sm:px-8 sm:py-16">
           <div className="mx-auto w-full max-w-5xl">
-            <div className="w-full">
-              <button
-                type="button"
-                onClick={resetSelection}
-                className="mb-5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/38 transition hover:text-white/78"
-              >
-                ← Choose another conversation type
-              </button>
+            <button
+              type="button"
+              onClick={resetSelection}
+              className="mb-5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/38 transition hover:text-white/78"
+            >
+              ← Choose another conversation type
+            </button>
 
-              <div className="rounded-[30px] border border-white/[0.1] bg-[#08090A] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.48)] sm:p-9">
-                <div className="border-b border-white/[0.08] pb-7">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
-                    Conversation type
-                  </div>
-                  <h2 className="mt-3 font-mono text-[22px] font-semibold uppercase tracking-[-0.025em] text-white sm:text-[28px]">
-                    {selectedType.title}
-                  </h2>
-                  {!customizing && (
-                    <p className="mt-3 max-w-2xl text-[14px] leading-7 text-white/58">
-                      {selectedType.description}
-                    </p>
-                  )}
+            <div className="rounded-[30px] border border-white/[0.1] bg-[#08090A] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.48)] sm:p-9">
+              <div className="border-b border-white/[0.08] pb-7">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
+                  Conversation type
                 </div>
+                <h2 className="mt-3 font-mono text-[22px] font-semibold uppercase tracking-[-0.025em] text-white sm:text-[28px]">
+                  {selectedType.title}
+                </h2>
+                {!customizing && (
+                  <p className="mt-3 max-w-2xl text-[14px] leading-7 text-white/58">
+                    {selectedType.description}
+                  </p>
+                )}
+              </div>
 
-                {!customizing ? (
-                  <div
-                    className={`pt-7 transition-all duration-[420ms] ${transitioningToBriefing ? "translate-y-[-6px] opacity-0" : "translate-y-0 opacity-100"}`}
-                  >
-                    <div className="min-h-[48px] font-mono text-[22px] leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-10">
-                      {structureText}
-                    </div>
-                    <p className="mt-4 min-h-[56px] max-w-3xl text-[15px] leading-7 text-white/66">
-                      {initializationText}
-                    </p>
-                    <h3 className="mt-6 min-h-[28px] font-mono text-[15px] font-semibold tracking-[-0.02em] text-white">
-                      {customizeText}
-                    </h3>
-                    <p
-                      className={`mt-2 text-[13px] leading-6 text-white/48 transition-opacity duration-300 ${introStage >= 3 ? "opacity-100" : "opacity-0"}`}
-                    >
-                      GEORGE will use the existing briefing to understand your
-                      role, the room, and your objective before adapting
-                      naturally.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={beginCustomization}
-                      className={`mt-5 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition duration-500 hover:border-[#AEB6FF]/75 hover:bg-[#203268] ${introStage >= 4 && !transitioningToBriefing ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"}`}
-                    >
-                      Customize this conversation
-                    </button>
+              {!customizing ? (
+                <div
+                  className={`pt-7 transition-all duration-[420ms] ${transitioningToBriefing ? 'translate-y-[-6px] opacity-0' : 'translate-y-0 opacity-100'}`}
+                >
+                  <div className="min-h-[48px] font-mono text-[22px] leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-10">
+                    {structureText}
                   </div>
-                ) : (
-                  <div className="pt-7">
-                    {activeQuestion ? (
-                      <div
-                        key={activeQuestion.key}
-                        className="animate-[fadeIn_420ms_ease-out]"
-                      >
-                        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                          {activeQuestion.kicker}
-                        </div>
-                        <h3 className="mt-3 min-h-[58px] font-mono text-[18px] leading-7 tracking-[-0.025em] text-white sm:text-[22px]">
-                          {questionText}
-                        </h3>
-                        <p className="mt-3 text-[13px] leading-6 text-white/42">
-                          {activeQuestion.examples}
-                        </p>
-                        <textarea
-                          autoFocus
-                          value={answers[activeQuestion.key] || ""}
-                          onChange={(event) =>
-                            setAnswers((current) => ({
-                              ...current,
-                              [activeQuestion.key]: event.target.value,
-                            }))
-                          }
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" && !event.shiftKey) {
-                              event.preventDefault();
-                              continueBriefing();
-                            }
-                          }}
-                          rows={3}
-                          className="mt-5 w-full resize-none rounded-[16px] border border-white/[0.1] bg-white/[0.025] px-4 py-3 text-[15px] leading-6 text-white outline-none transition focus:border-[#7EA1FF]/55"
-                        />
-                        <div className="mt-5 flex items-center justify-between gap-4">
-                          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/28">
-                            {questionIndex + 1} of {structuredQuestions.length}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={continueBriefing}
-                            disabled={
-                              !String(answers[activeQuestion.key] || "").trim()
-                            }
-                            className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
-                          >
-                            Continue
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="animate-[fadeIn_420ms_ease-out]">
-                        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                          Initial briefing established
-                        </div>
-                        <h3 className="mt-3 font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
-                          GEORGE has enough signal to prepare your LIVE entry.
-                        </h3>
-                        <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
-                          Your recommended mechanics are already set. Review the
-                          final check, then enter LIVE.
-                        </p>
+                  <p className="mt-4 min-h-[56px] max-w-3xl text-[15px] leading-7 text-white/66">
+                    {initializationText}
+                  </p>
+                  <h3 className="mt-6 min-h-[28px] font-mono text-[15px] font-semibold tracking-[-0.02em] text-white">
+                    {customizeText}
+                  </h3>
+                  <p
+                    className={`mt-2 text-[13px] leading-6 text-white/48 transition-opacity duration-300 ${introStage >= 3 ? 'opacity-100' : 'opacity-0'}`}
+                  >
+                    GEORGE will continue the canonical LIVE briefing and preserve
+                    any preparation signals already established.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={beginCustomization}
+                    className={`mt-5 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition duration-500 hover:border-[#AEB6FF]/75 hover:bg-[#203268] ${introStage >= 4 && !transitioningToBriefing ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'}`}
+                  >
+                    Customize this conversation
+                  </button>
+                </div>
+              ) : activeQuestion ? (
+                <div key={activeQuestion.key} className="pt-7 animate-[fadeIn_420ms_ease-out]">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
+                    {activeQuestion.kicker}
+                  </div>
+                  <h3 className="mt-3 min-h-[58px] font-mono text-[18px] leading-7 tracking-[-0.025em] text-white sm:text-[22px]">
+                    {questionText}
+                  </h3>
+                  <p className="mt-3 text-[13px] leading-6 text-white/42">
+                    {activeQuestion.examples}
+                  </p>
+                  <textarea
+                    autoFocus
+                    value={answers[activeQuestion.key] || ''}
+                    onChange={(event) =>
+                      setAnswers((current) => ({
+                        ...current,
+                        [activeQuestion.key]: event.target.value,
+                      }))
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault()
+                        saveCurrentAnswer()
+                      }
+                    }}
+                    rows={3}
+                    className="mt-5 w-full resize-none rounded-[16px] border border-white/[0.1] bg-white/[0.025] px-4 py-3 text-[15px] leading-6 text-white outline-none transition focus:border-[#7EA1FF]/55"
+                  />
+                  <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/28">
+                      {activeQuestionIndex + 1} of {LIVE_PREPARATION_QUESTIONS.length}
+                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {readiness.thresholdMet && (
                         <button
                           type="button"
                           onClick={continueToLiveFinalCheck}
-                          className="mt-6 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
+                          className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
                         >
-                          Continue to final check
+                          Continue with this briefing
                         </button>
-                      </div>
-                    )}
+                      )}
+                      <button
+                        type="button"
+                        onClick={saveCurrentAnswer}
+                        disabled={!String(answers[activeQuestion.key] || '').trim()}
+                        className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                      >
+                        Continue
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
+                    Briefing established
+                  </div>
+                  <h3 className="mt-3 font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                    GEORGE has the canonical preparation signals for your LIVE entry.
+                  </h3>
+                  <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
+                    Review the existing final check, add documents or context there,
+                    then enter LIVE.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={continueToLiveFinalCheck}
+                    disabled={!readiness.thresholdMet}
+                    className="mt-6 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                  >
+                    Continue to final check
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
     </section>
-  );
+  )
 }
