@@ -16,6 +16,14 @@ import {
   resolveLivePreparationTransition,
 } from '@/lib/george/live-runtime/live-intent-runtime'
 
+type SurfacePhase =
+  | 'selection'
+  | 'selected'
+  | 'introduction'
+  | 'questions'
+  | 'decision'
+  | 'review'
+
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
   const [value, setValue] = useState('')
 
@@ -61,10 +69,11 @@ function ConversationTypeCard({
 
 export function HomeConversationTypeSurface() {
   const [selectedType, setSelectedType] = useState<ConversationType | null>(null)
+  const [phase, setPhase] = useState<SurfacePhase>('selection')
   const [introStage, setIntroStage] = useState(0)
-  const [customizing, setCustomizing] = useState(false)
-  const [transitioningToBriefing, setTransitioningToBriefing] = useState(false)
+  const [decisionReady, setDecisionReady] = useState(false)
   const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [editingQuestionKey, setEditingQuestionKey] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const visibleTypes = useMemo(() => {
@@ -87,7 +96,11 @@ export function HomeConversationTypeSurface() {
     () => resolveLivePreparationReadiness(answers),
     [answers],
   )
-  const activeQuestion = preparationTransition.question
+  const activeQuestion = editingQuestionKey
+    ? LIVE_PREPARATION_QUESTIONS.find(
+        (question) => question.key === editingQuestionKey,
+      ) || null
+    : preparationTransition.question
   const activeQuestionIndex = activeQuestion
     ? LIVE_PREPARATION_QUESTIONS.findIndex(
         (question) => question.key === activeQuestion.key,
@@ -95,61 +108,69 @@ export function HomeConversationTypeSurface() {
     : LIVE_PREPARATION_QUESTIONS.length
 
   useEffect(() => {
-    if (!selectedType) {
-      setIntroStage(0)
-      setCustomizing(false)
-      setTransitioningToBriefing(false)
-      setAnswers({})
-      return
-    }
+    if (phase !== 'introduction') return
 
-    const structureTimer = window.setTimeout(() => setIntroStage(1), 220)
-    const initializationTimer = window.setTimeout(() => setIntroStage(2), 1050)
-    const customizePromptTimer = window.setTimeout(() => setIntroStage(3), 1550)
-    const buttonTimer = window.setTimeout(() => setIntroStage(4), 1850)
+    setIntroStage(0)
+    const structureTimer = window.setTimeout(() => setIntroStage(1), 180)
+    const customizeTimer = window.setTimeout(() => setIntroStage(2), 1150)
+    const buttonTimer = window.setTimeout(() => setIntroStage(3), 1750)
 
     return () => {
       window.clearTimeout(structureTimer)
-      window.clearTimeout(initializationTimer)
-      window.clearTimeout(customizePromptTimer)
+      window.clearTimeout(customizeTimer)
       window.clearTimeout(buttonTimer)
     }
-  }, [selectedType])
+  }, [phase])
+
+  useEffect(() => {
+    if (phase !== 'decision') return
+
+    setDecisionReady(false)
+    const timer = window.setTimeout(() => setDecisionReady(true), 2450)
+    return () => window.clearTimeout(timer)
+  }, [phase])
 
   const structureText = useTypewriter(
     'The structure is ready.',
-    introStage >= 1,
+    phase === 'introduction' && introStage >= 1,
     34,
-  )
-  const initializationText = useTypewriter(
-    selectedType?.initialization || '',
-    introStage >= 2,
-    18,
-  )
-  const customizeText = useTypewriter(
-    'Would you like to customize it?',
-    introStage >= 3,
-    28,
   )
   const questionText = useTypewriter(
     activeQuestion?.question || '',
-    customizing && Boolean(activeQuestion),
+    phase === 'questions' && Boolean(activeQuestion),
+    24,
+  )
+  const decisionText = useTypewriter(
+    'You can continue directly into LIVE now, or remain here and continue briefing GEORGE.',
+    phase === 'decision',
     24,
   )
 
-  function resetSelection() {
-    setSelectedType(null)
+  function selectConversation(conversationType: ConversationType) {
+    setSelectedType(conversationType)
+    setPhase('selected')
+    setIntroStage(0)
+    setDecisionReady(false)
+    setEditingQuestionKey(null)
   }
 
-  function beginCustomization() {
-    const existingSignals = loadLivePreparationSignals()
-    setAnswers(existingSignals)
-    setTransitioningToBriefing(true)
+  function resetSelection() {
+    setSelectedType(null)
+    setPhase('selection')
+    setIntroStage(0)
+    setDecisionReady(false)
+    setEditingQuestionKey(null)
+    setAnswers({})
+  }
 
-    window.setTimeout(() => {
-      setCustomizing(true)
-      setTransitioningToBriefing(false)
-    }, 420)
+  function beginPreparation() {
+    setPhase('introduction')
+  }
+
+  function beginQuestions() {
+    setAnswers(loadLivePreparationSignals())
+    setEditingQuestionKey(null)
+    setPhase('questions')
   }
 
   function saveCurrentAnswer() {
@@ -165,10 +186,21 @@ export function HomeConversationTypeSurface() {
 
     setAnswers(nextSignals)
     saveLivePreparationSignals(nextSignals)
+
+    if (editingQuestionKey) {
+      setEditingQuestionKey(null)
+      setPhase('review')
+      return
+    }
+
+    const nextTransition = resolveLivePreparationTransition(nextSignals)
+    if (!nextTransition.question) {
+      window.setTimeout(() => setPhase('decision'), 260)
+    }
   }
 
-  function continueToLiveFinalCheck() {
-    if (!selectedType || !readiness.thresholdMet) return
+  function preserveHomepageHandoff() {
+    if (!selectedType || !readiness.thresholdMet) return false
 
     const signals = Object.fromEntries(
       Object.entries(answers)
@@ -193,128 +225,147 @@ export function HomeConversationTypeSurface() {
       )
     } catch {}
 
-    window.location.href =
-      '/george/live-entry?source=homepage&stage=final-check'
+    return true
+  }
+
+  function approveAndContinueToLive() {
+    if (!preserveHomepageHandoff()) return
+    window.location.href = '/george/live-entry?source=homepage&stage=final-check'
+  }
+
+  function continueBriefing() {
+    if (!preserveHomepageHandoff()) return
+    window.location.href = '/george?source=homepage-briefing'
   }
 
   return (
-    <section className="relative border-t border-white/10 bg-black px-5 py-14 sm:px-8 sm:py-20">
-      <div className="mx-auto max-w-[1700px]">
-        <div className="max-w-5xl">
-          <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
-            Conversation types
-          </p>
-          <h1 className="mt-4 font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
-            What do you want GEORGE to help you do?
-          </h1>
-          <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-            Choose the closest conversation type, or describe what you want to
-            accomplish.
-          </p>
-
-          <label className="mt-8 block max-w-3xl">
-            <span className="sr-only">Search conversation types</span>
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Describe what you want to accomplish"
-              className="w-full rounded-[16px] border border-white/[0.1] bg-[#08090A] px-5 py-4 text-[15px] text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-            />
-          </label>
-        </div>
-
-        <div className="mt-9">
-          <div className="mb-5 flex items-center justify-between gap-4">
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
-              {visibleTypes.length} conversation{' '}
-              {visibleTypes.length === 1 ? 'type' : 'types'}
-            </p>
-            {searchQuery.trim() && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38 transition hover:text-white/78"
-              >
-                Clear search
-              </button>
-            )}
-          </div>
-
-          {visibleTypes.length > 0 ? (
-            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-              {visibleTypes.map((conversationType) => (
-                <ConversationTypeCard
-                  key={conversationType.id}
-                  conversationType={conversationType}
-                  onSelect={setSelectedType}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[18px] border border-white/[0.08] bg-[#08090A] px-5 py-6">
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/48">
-                No close match yet. Try a broader description.
+    <section
+      className={`relative min-h-[100dvh] border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
+        selectedType ? 'bg-[#020304]' : 'bg-black'
+      }`}
+    >
+      <div className="mx-auto w-full max-w-[1700px]">
+        {phase === 'selection' ? (
+          <div className="animate-[fadeIn_420ms_ease-out]">
+            <div className="max-w-5xl">
+              <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+                Conversation types
               </p>
+              <h1 className="mt-4 font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
+                What do you want GEORGE to help you do?
+              </h1>
+              <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
+                Choose the closest conversation type, or describe what you want to accomplish.
+              </p>
+
+              <label className="mt-8 block max-w-3xl">
+                <span className="sr-only">Search conversation types</span>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Describe what you want to accomplish"
+                  className="w-full rounded-[16px] border border-white/[0.1] bg-[#08090A] px-5 py-4 text-[15px] text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
+                />
+              </label>
             </div>
-          )}
-        </div>
-      </div>
 
-      {selectedType && (
-        <div className="relative z-10 border-t border-white/[0.08] bg-black px-5 py-12 sm:px-8 sm:py-16">
-          <div className="mx-auto w-full max-w-5xl">
-            <button
-              type="button"
-              onClick={resetSelection}
-              className="mb-5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/38 transition hover:text-white/78"
-            >
-              ← Choose another conversation type
-            </button>
+            <div className="mt-9">
+              <div className="mb-5 flex items-center justify-between gap-4">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
+                  {visibleTypes.length} conversation {visibleTypes.length === 1 ? 'type' : 'types'}
+                </p>
+                {searchQuery.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38 transition hover:text-white/78"
+                  >
+                    Clear search
+                  </button>
+                )}
+              </div>
 
-            <div className="rounded-[30px] border border-white/[0.1] bg-[#08090A] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.48)] sm:p-9">
+              {visibleTypes.length > 0 ? (
+                <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                  {visibleTypes.map((conversationType) => (
+                    <ConversationTypeCard
+                      key={conversationType.id}
+                      conversationType={conversationType}
+                      onSelect={selectConversation}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-[18px] border border-white/[0.08] bg-[#08090A] px-5 py-6">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/48">
+                    No close match yet. Try a broader description.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="mx-auto w-full max-w-5xl animate-[fadeIn_420ms_ease-out]">
+            <div className="rounded-[30px] border border-white/[0.1] bg-[#08090A] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.56)] sm:p-9">
               <div className="border-b border-white/[0.08] pb-7">
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
                   Conversation type
                 </div>
                 <h2 className="mt-3 font-mono text-[22px] font-semibold uppercase tracking-[-0.025em] text-white sm:text-[28px]">
-                  {selectedType.title}
+                  {selectedType?.title}
                 </h2>
-                {!customizing && (
-                  <p className="mt-3 max-w-2xl text-[14px] leading-7 text-white/58">
-                    {selectedType.description}
-                  </p>
-                )}
               </div>
 
-              {!customizing ? (
-                <div
-                  className={`pt-7 transition-all duration-[420ms] ${transitioningToBriefing ? 'translate-y-[-6px] opacity-0' : 'translate-y-0 opacity-100'}`}
-                >
+              {phase === 'selected' && (
+                <div className="pt-7">
+                  <p className="max-w-3xl text-[15px] leading-7 text-white/62">
+                    {selectedType?.description}
+                  </p>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={beginPreparation}
+                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
+                    >
+                      Continue
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetSelection}
+                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/66 transition hover:border-white/30 hover:text-white"
+                    >
+                      Select another conversation
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'introduction' && (
+                <div className="pt-7">
                   <div className="min-h-[48px] font-mono text-[22px] leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-10">
                     {structureText}
                   </div>
-                  <p className="mt-4 min-h-[56px] max-w-3xl text-[15px] leading-7 text-white/66">
-                    {initializationText}
-                  </p>
-                  <h3 className="mt-6 min-h-[28px] font-mono text-[15px] font-semibold tracking-[-0.02em] text-white">
-                    {customizeText}
-                  </h3>
-                  <p
-                    className={`mt-2 text-[13px] leading-6 text-white/48 transition-opacity duration-300 ${introStage >= 3 ? 'opacity-100' : 'opacity-0'}`}
+                  <h3
+                    className={`mt-7 font-mono text-[18px] font-semibold tracking-[-0.02em] text-white transition-opacity duration-500 ${
+                      introStage >= 2 ? 'opacity-100' : 'opacity-0'
+                    }`}
                   >
-                    GEORGE will continue the canonical LIVE briefing and preserve
-                    any preparation signals already established.
-                  </p>
+                    Customize your conversation.
+                  </h3>
                   <button
                     type="button"
-                    onClick={beginCustomization}
-                    className={`mt-5 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition duration-500 hover:border-[#AEB6FF]/75 hover:bg-[#203268] ${introStage >= 4 && !transitioningToBriefing ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'}`}
+                    onClick={beginQuestions}
+                    className={`mt-6 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition duration-500 hover:border-[#AEB6FF]/75 hover:bg-[#203268] ${
+                      introStage >= 3 ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
+                    }`}
                   >
-                    Customize this conversation
+                    Start
                   </button>
                 </div>
-              ) : activeQuestion ? (
+              )}
+
+              {phase === 'questions' && activeQuestion && (
                 <div key={activeQuestion.key} className="pt-7 animate-[fadeIn_420ms_ease-out]">
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
                     {activeQuestion.kicker}
@@ -343,57 +394,108 @@ export function HomeConversationTypeSurface() {
                     rows={3}
                     className="mt-5 w-full resize-none rounded-[16px] border border-white/[0.1] bg-white/[0.025] px-4 py-3 text-[15px] leading-6 text-white outline-none transition focus:border-[#7EA1FF]/55"
                   />
-                  <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
+                  <div className="mt-5 flex items-center justify-between gap-4">
                     <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/28">
                       {activeQuestionIndex + 1} of {LIVE_PREPARATION_QUESTIONS.length}
                     </span>
-                    <div className="flex flex-wrap items-center gap-3">
-                      {readiness.thresholdMet && (
-                        <button
-                          type="button"
-                          onClick={continueToLiveFinalCheck}
-                          className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
-                        >
-                          Continue with this briefing
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={saveCurrentAnswer}
-                        disabled={!String(answers[activeQuestion.key] || '').trim()}
-                        className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
-                      >
-                        Continue
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={saveCurrentAnswer}
+                      disabled={!String(answers[activeQuestion.key] || '').trim()}
+                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Continue
+                    </button>
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {phase === 'decision' && (
+                <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
+                  <h3 className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
+                    {decisionText}
+                  </h3>
+                  <div
+                    className={`mt-7 flex flex-wrap gap-3 transition-all duration-500 ${
+                      decisionReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setPhase('review')}
+                      disabled={!readiness.thresholdMet}
+                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Continue to LIVE
+                    </button>
+                    <button
+                      type="button"
+                      onClick={continueBriefing}
+                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
+                    >
+                      Continue briefing
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'review' && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                    Briefing established
+                    Review answers
                   </div>
-                  <h3 className="mt-3 font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
-                    GEORGE has the canonical preparation signals for your LIVE entry.
-                  </h3>
-                  <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
-                    Review the existing final check, add documents or context there,
-                    then enter LIVE.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={continueToLiveFinalCheck}
-                    disabled={!readiness.thresholdMet}
-                    className="mt-6 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
-                  >
-                    Continue to final check
-                  </button>
+                  <div className="mt-5 space-y-3">
+                    {LIVE_PREPARATION_QUESTIONS.map((question) => (
+                      <div
+                        key={question.key}
+                        className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
+                              {question.question}
+                            </p>
+                            <p className="mt-2 text-[14px] leading-6 text-white/76">
+                              {answers[question.key]}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingQuestionKey(question.key)
+                              setPhase('questions')
+                            }}
+                            className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-[#AEB6FF]/72 transition hover:text-white"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={approveAndContinueToLive}
+                      disabled={!readiness.thresholdMet}
+                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Approve and continue
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPhase('decision')}
+                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
+                    >
+                      Back
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </section>
   )
 }
