@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { requestFreshNormalBrowserSession } from '@/lib/george/session/store'
+import { HomeHeroConversationTicker } from '@/components/home/HomeHeroConversationTicker'
 
 const heroSequences = [
   {
@@ -54,6 +55,15 @@ export function HomeHeroSequence() {
   })
   const [typedExplanation, setTypedExplanation] = useState('')
   const typewriterTimerRef = useRef<number | null>(null)
+  const mountedRef = useRef(false)
+
+  useEffect(() => {
+    mountedRef.current = true
+
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
 
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
@@ -61,6 +71,8 @@ export function HomeHeroSequence() {
         window.location.reload()
         return
       }
+
+      if (!mountedRef.current) return
 
       setFlipState({
         front: 0,
@@ -79,12 +91,16 @@ export function HomeHeroSequence() {
     let resetTimer: number | undefined
 
     const timer = window.setInterval(() => {
+      if (!mountedRef.current) return
+
       setFlipState((current) => ({
         ...current,
         detailsVisible: false,
       }))
 
       flipTimer = window.setTimeout(() => {
+        if (!mountedRef.current) return
+
         setFlipState((current) => ({
           ...current,
           flipped: true,
@@ -93,6 +109,8 @@ export function HomeHeroSequence() {
       }, 320)
 
       settleTimer = window.setTimeout(() => {
+        if (!mountedRef.current) return
+
         setFlipState((current) => {
           const nextFront = current.back
 
@@ -107,6 +125,8 @@ export function HomeHeroSequence() {
         })
 
         resetTimer = window.setTimeout(() => {
+          if (!mountedRef.current) return
+
           setFlipState((current) => ({
             ...current,
             detailsVisible: true,
@@ -128,19 +148,30 @@ export function HomeHeroSequence() {
 
   useEffect(() => {
     if (!flipState.detailsVisible) {
-      setTypedExplanation('')
+      if (mountedRef.current) {
+        setTypedExplanation('')
+      }
       return
     }
 
     const explanation =
       heroSequences[flipState.detailsIndex]?.lines?.[1] || ''
 
-    setTypedExplanation('')
+    if (mountedRef.current) {
+      setTypedExplanation('')
+    }
 
     let characterIndex = 0
 
     const startTimer = window.setTimeout(() => {
+      if (!mountedRef.current) return
+
       const typingTimer = window.setInterval(() => {
+        if (!mountedRef.current) {
+          window.clearInterval(typingTimer)
+          return
+        }
+
         characterIndex += 1
         setTypedExplanation(explanation.slice(0, characterIndex))
 
@@ -155,7 +186,7 @@ export function HomeHeroSequence() {
     return () => {
       window.clearTimeout(startTimer)
 
-      if (typewriterTimerRef.current) {
+      if (typewriterTimerRef.current !== null) {
         window.clearInterval(typewriterTimerRef.current)
         typewriterTimerRef.current = null
       }
@@ -203,6 +234,7 @@ export function HomeHeroSequence() {
   return (
     <section className="relative min-h-[100dvh] overflow-hidden bg-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_32%,rgba(55,183,255,0.09),transparent_30%),linear-gradient(180deg,#050607_0%,#000_100%)]" />
+      <HomeHeroConversationTicker />
 
       <button
         type="button"

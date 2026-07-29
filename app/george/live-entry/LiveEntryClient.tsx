@@ -3271,393 +3271,173 @@ const beginProofOfAwareness = async () => {
     }
 
 
-    const confirmReadyRoomAcknowledgement = (checked: boolean) => {
-      liveReadyConfirmSequenceRef.current += 1
-      const sequence = liveReadyConfirmSequenceRef.current
-
-      setLiveReadyAccepted(checked)
-      setLiveControlsOrientationSeen(false)
-      setLiveControlsEntryReady(false)
-      setLiveReadinessComplete(false)
-
-      if (!checked) return
-
-      window.setTimeout(() => {
-        if (liveReadyConfirmSequenceRef.current !== sequence) return
-        setLiveControlsOrientationSeen(true)
-      }, 700)
-
-      window.setTimeout(() => {
-        if (liveReadyConfirmSequenceRef.current !== sequence) return
-        setLiveControlsEntryReady(true)
-        setLiveReadinessComplete(true)
-      }, 1450)
-    }
-
-    const totalBriefingSignal = [
-      resolvedConversationType,
-      audienceType,
-      objective,
-      knownContext,
-      secondaryPosition,
-      communicationStyle,
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-
-    const liveApproachOptions: Array<{
-      id: LiveRoomObjectiveOptionId
+    const liveControlOrientation: Array<{
+      kind: LiveOrientationIconKind
       label: string
-      line: string
-      compatible: boolean
+      description: string
+      state?: string
     }> = [
       {
-        id: 'project_strength',
-        label: 'Confident and prepared',
-        line: 'Present your position with command, proof, and composure.',
-        compatible: true,
+        kind: 'conversation',
+        label: 'Conversation',
+        description: 'Open the active conversation record and preparation context.',
       },
       {
-        id: 'build_trust',
-        label: 'Warm and reassuring',
-        line: 'Reduce unnecessary threat while keeping the objective visible.',
-        compatible: !/discipline|termination|enforcement|breach|default/.test(totalBriefingSignal),
+        kind: 'reading',
+        label: 'Reading',
+        description: 'Expand discreet visual guidance when more detail is useful.',
       },
       {
-        id: 'find_leverage',
-        label: 'Strategic and firm',
-        line: 'Use lawful pressure, timing, and leverage without losing control.',
-        compatible: !/medical|doctor|patient|grief|bereavement/.test(totalBriefingSignal),
+        kind: 'repeat',
+        label: 'Repeat',
+        description: 'Replay or restore the most recent guidance without interrupting the room.',
       },
       {
-        id: 'find_common_ground',
-        label: 'Collaborative',
-        line: 'Look for shared interests and a practical path forward.',
-        compatible: !/termination|final warning|cease and desist/.test(totalBriefingSignal),
+        kind: 'support',
+        label: 'Support',
+        description: 'Adjust how GEORGE assists while preserving one intelligence.',
+        state:
+          selectedSupportStyle === 'continue'
+            ? 'Continuation'
+            : selectedSupportStyle === 'response'
+              ? 'Response'
+              : selectedSupportStyle === 'presentation'
+                ? 'Presentation'
+                : 'Cue',
       },
       {
-        id: 'surface_objections',
-        label: 'Curious and diagnostic',
-        line: 'Ask, listen, and uncover what is actually driving resistance.',
-        compatible: true,
+        kind: 'pause',
+        label: 'Pause',
+        description: 'Pause or resume LIVE listening whenever you need control.',
       },
       {
-        id: 'confirm_authority',
-        label: 'Direct and decisive',
-        line: 'Move toward clarity, authority, and a concrete decision.',
-        compatible: !/grief|bereavement|trauma|apology|repair trust/.test(totalBriefingSignal),
-      },
-      {
-        id: 'confirm_concern',
-        label: 'Diplomatic and careful',
-        line: 'Protect the relationship while addressing the real issue.',
-        compatible: true,
-      },
-      {
-        id: 'confirm_timeline',
-        label: 'Concise and time-aware',
-        line: 'Keep the conversation focused on timing, next steps, and decisions.',
-        compatible: !/therapy|grief|bereavement/.test(totalBriefingSignal),
-      },
-      {
-        id: 'other',
-        label: 'Describe your approach',
-        line: 'Tell GEORGE how you want to show up in this conversation.',
-        compatible: true,
+        kind: 'audio',
+        label: 'Audio',
+        description: 'Turn spoken guidance on or off without ending the LIVE session.',
+        state:
+          selectedReceiverProfile === 'visual_only'
+            ? 'Visual only'
+            : selectedReceiverProfile === 'audio_visual'
+              ? 'Audio + visual'
+              : 'Audio',
       },
     ]
-
-    const visibleLiveApproachOptions = liveApproachOptions.filter((option) => option.compatible)
-    const selectedLiveApproach =
-      liveApproachOptions.find((option) => option.id === liveRoomObjectiveOption)
-
-    const customApproach = customLiveRoomObjective.trim()
-    const approachText =
-      liveRoomObjectiveOption === 'other'
-        ? customApproach
-        : selectedLiveApproach?.label || ''
-
-    const unlawfulOrPhysicalThreat =
-      /(?:physically|violence|violent|hurt|harm|attack|assault|kill|weapon|blackmail|extort|illegal threat|unlawful threat)/i.test(
-        customApproach
-      )
-
-    const likelyOutcomeConflict =
-      /preserve|repair|trust|relationship|de-escalat|reassur/i.test(totalBriefingSignal) &&
-      /humiliat|bully|hostile|cruel|destroy|embarrass/i.test(customApproach)
-
-    const approachInterpretation =
-      liveRoomObjectiveOption === 'other'
-        ? customApproach
-          ? `GEORGE understands that you want to approach this conversation as: ${customApproach}`
-          : 'Describe the approach you want GEORGE to understand.'
-        : selectedLiveApproach
-          ? `${selectedLiveApproach.label}. ${selectedLiveApproach.line}`
-          : 'Choose an approach or describe your own.'
-
-    const approachReady =
-      Boolean(approachText) &&
-      !unlawfulOrPhysicalThreat &&
-      !likelyOutcomeConflict &&
-      liveApproachConfirmed
 
     return (
       <PanelShell
-        label="BRIEF ROOM · FINAL CHECK"
-        title={liveReadyAccepted ? 'You’re ready' : 'Choose your approach'}
+        label="BRIEF ROOM · READINESS"
+        title="Ready Room."
         stage={3}
-        onBack={() => {
-          setLiveRoomMoreOpen(false)
-          setLiveApproachEditing(true)
-          setLiveApproachConfirmed(false)
-          setLiveBriefingStep(2)
-        }}
+        onBack={() => setLiveBriefingStep(2)}
       >
-        {liveReadyAccepted ? (
-          <div className="mt-5 live-controls-orientation">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-              LIVE controls
-            </div>
-            <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/48">
-              These controls will be available in the conversation. They are shown here for orientation only.
-            </p>
+        <div className="mt-4">
+          <div className="relative overflow-hidden rounded-[1.15rem] border border-[#8298FF]/[0.15] bg-[#080A10] px-4 py-4">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(78,124,255,0.12),transparent_42%)]" />
 
-            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {[
-                ['conversation', 'Conversation', 'Open the conversation record when available.'],
-                ['reading', 'Reading', 'Make more room for discreet visual guidance.'],
-                ['repeat', 'Repeat', 'Hear or see the last line again.'],
-                ['support', 'Support', 'Change how GEORGE delivers help.'],
-                ['pause', 'Pause', 'Pause or resume LIVE listening.'],
-                ['audio', 'Audio', 'Turn spoken guidance on or off.'],
-              ].map(([kind, label, instruction]) => (
-                <div
-                  key={kind}
-                  aria-disabled="true"
-                  className="rounded-[1rem] border border-white/[0.065] bg-white/[0.018] px-3 py-3 text-center"
-                >
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[1rem] border border-white/[0.07] bg-white/[0.02] text-[#D7E8EF]/82">
-                    <LiveOrientationIcon kind={kind as LiveOrientationIconKind} />
+            <div className="relative">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#B8C6FF]/48">
+                    LIVE workspace
                   </div>
-                  <div className="mt-3 text-[9px] font-semibold uppercase tracking-[0.15em] text-white/68">
-                    {label}
-                  </div>
-                  <div className="mt-1.5 text-[10px] leading-4 text-white/36">
-                    {instruction}
+
+                  <div className="mt-2 text-[16px] font-semibold tracking-[-0.025em] text-[#F4F6FF]/90">
+                    Your controls are ready.
                   </div>
                 </div>
-              ))}
-            </div>
 
-            <div
-              className={`mt-5 transition-[opacity,transform] duration-500 ${
-                liveControlsOrientationSeen
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-2 opacity-0'
-              }`}
-            >
-              <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/62">
-                Let&apos;s go to work.
+                <div className="flex items-center gap-2 rounded-full border border-emerald-300/[0.14] bg-emerald-300/[0.045] px-2.5 py-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300/80 shadow-[0_0_10px_rgba(110,231,183,0.55)]" />
+                  <span className="text-[8px] font-semibold uppercase tracking-[0.18em] text-emerald-100/58">
+                    Ready
+                  </span>
+                </div>
+              </div>
+
+              <p className="mt-2 max-w-[500px] text-[12px] leading-5 text-[#D7DBE4]/46">
+                These controls remain available throughout the conversation. Use them without leaving LIVE.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {liveControlOrientation.map((control) => (
+              <div
+                key={control.kind}
+                className="group relative min-h-[154px] overflow-hidden rounded-[1rem] border border-white/[0.065] bg-[#07090E] px-3 py-3 transition hover:border-[#8298FF]/[0.20] hover:bg-[#0A0D15]"
+              >
+                <div className="pointer-events-none absolute right-0 top-0 h-20 w-20 bg-[radial-gradient(circle_at_top_right,rgba(78,124,255,0.09),transparent_68%)] opacity-0 transition group-hover:opacity-100" />
+
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-[0.78rem] border border-white/[0.075] bg-white/[0.025] text-[#DCE6FF]/78">
+                  <LiveOrientationIcon kind={control.kind} />
+                </div>
+
+                <div className="relative mt-3 flex items-center justify-between gap-2">
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/72">
+                    {control.label}
+                  </div>
+
+                  {control.state && (
+                    <div className="truncate rounded-full border border-[#8298FF]/[0.13] bg-[#8298FF]/[0.045] px-2 py-1 text-[7px] font-semibold uppercase tracking-[0.12em] text-[#CBD5FF]/55">
+                      {control.state}
+                    </div>
+                  )}
+                </div>
+
+                <p className="relative mt-2 text-[10.5px] leading-[1.55] text-[#D7DBE4]/38">
+                  {control.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 rounded-[1rem] border border-white/[0.06] bg-white/[0.018] px-4 py-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
+                  Before entry
+                </div>
+                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
+                  Remember your earbuds.
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
+                  In the room
+                </div>
+                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
+                  Speak normally. Be clear.
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
+                  If things change
+                </div>
+                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
+                  We adapt.
+                </div>
               </div>
             </div>
-
-            {liveControlsEntryReady && (
-              <AwakeButton
-                active={liveReadinessComplete}
-                onClick={() => startLive(false, editableResources, true)}
-              >
-                ENTER LIVE
-              </AwakeButton>
-            )}
-
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setLiveApproachEditing(false)
-                  setLiveApproachConfirmed(false)
-                  confirmReadyRoomAcknowledgement(false)
-                }}
-                className="text-center text-[9px] uppercase tracking-[0.16em] text-white/28 transition hover:text-white/52"
-              >
-                Back to Review
-              </button>
-            </div>
-
-            <style jsx>{`
-              @keyframes liveControlsOrientationIn {
-                from {
-                  opacity: 0;
-                  transform: translateY(14px);
-                }
-                to {
-                  opacity: 1;
-                  transform: translateY(0);
-                }
-              }
-
-              .live-controls-orientation {
-                animation: liveControlsOrientationIn 520ms
-                  cubic-bezier(0.22, 0.72, 0.18, 1) both;
-              }
-            `}</style>
           </div>
-        ) : (
-          <>
-            <div className="mt-5 rounded-[1rem] border border-white/[0.07] bg-[#090B10]/80 p-4">
-              {!liveApproachEditing && approachText ? (
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
-                      Approach
-                    </div>
-                    <div className="mt-2 text-[13px] font-semibold leading-5 text-[#F2F4FF]/84">
-                      {approachText}
-                    </div>
-                    <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/46">
-                      {approachInterpretation}
-                    </div>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLiveApproachEditing(true)
-                      setLiveApproachConfirmed(false)
-                    }}
-                    className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.16em] text-white/42 transition hover:border-[#4E7CFF]/28 hover:text-[#D7DCFF]/78"
-                  >
-                    Edit
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">
-                    Approach
-                  </div>
-                  <p className="mt-2 text-[12px] leading-5 text-[#D7DBE4]/50">
-                    GEORGE filtered these choices using the full briefing. Choose how you want to enter this conversation.
-                  </p>
-
-                  <div className="mt-4 divide-y divide-white/[0.05] border-y border-white/[0.05]">
-                    {visibleLiveApproachOptions.map((option) => {
-                      const active = liveRoomObjectiveOption === option.id
-
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => {
-                            setLiveRoomObjectiveOption(option.id)
-                            setLiveApproachConfirmed(false)
-
-                            if (option.id === 'other') {
-                              setLiveApproachEditing(true)
-                              return
-                            }
-
-                            setCustomLiveRoomObjective('')
-                            setLiveApproachEditing(false)
-                          }}
-                          className="flex w-full items-start gap-3 py-3 text-left"
-                        >
-                          <span
-                            className={`mt-[6px] h-2 w-2 rounded-full transition ${
-                              active
-                                ? 'bg-[#4E7CFF] shadow-[0_0_10px_rgba(78,124,255,0.50)]'
-                                : 'bg-white/[0.14]'
-                            }`}
-                          />
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-[12px] font-semibold text-[#F2F4FF]/84">
-                              {option.label}
-                            </span>
-                            <span className="mt-1 block text-[11px] leading-4 text-[#D7DBE4]/44">
-                              {option.line}
-                            </span>
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {liveRoomObjectiveOption === 'other' && (
-                    <label className="mt-4 block">
-                      <span className="block text-[10px] uppercase tracking-[0.2em] text-white/28">
-                        Describe your approach
-                      </span>
-                      <textarea
-                        value={customLiveRoomObjective}
-                        onChange={(event) => {
-                          setCustomLiveRoomObjective(event.target.value)
-                          setLiveApproachConfirmed(false)
-                        }}
-                        onBlur={() => {
-                          if (customLiveRoomObjective.trim()) {
-                            setLiveApproachEditing(false)
-                          }
-                        }}
-                        rows={3}
-                        placeholder="For example: I want to be firm without making them defensive."
-                        className="mt-2 w-full resize-none rounded-[0.8rem] border border-white/[0.07] bg-white/[0.026] px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/78 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/42 focus:bg-[#4E7CFF]/[0.035]"
-                      />
-                    </label>
-                  )}
-
-                  <div
-                    className={`mt-4 rounded-[0.8rem] border px-3.5 py-3 ${
-                      unlawfulOrPhysicalThreat || likelyOutcomeConflict
-                        ? 'border-amber-300/20 bg-amber-300/[0.045]'
-                        : approachText
-                          ? 'border-[#4E7CFF]/20 bg-[#4E7CFF]/[0.045]'
-                          : 'border-white/[0.055] bg-white/[0.015]'
-                    }`}
-                  >
-                    <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-white/30">
-                      GEORGE understands
-                    </div>
-                    <div className="mt-2 text-[11.5px] leading-5 text-[#D7DBE4]/58">
-                      {unlawfulOrPhysicalThreat
-                        ? 'Lawful strategic pressure is permitted. Physical threats, unlawful coercion, blackmail, and illegal intimidation are not. Revise the approach before LIVE.'
-                        : likelyOutcomeConflict
-                          ? 'This approach appears to conflict with the briefing objective. Clarify or revise it before LIVE.'
-                          : approachInterpretation}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <label
-              className={`mt-4 flex cursor-pointer items-start gap-3 rounded-[0.9rem] border px-4 py-3 transition ${
-                approachReady
-                  ? 'border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86'
-                  : 'border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={liveApproachConfirmed}
-                disabled={!approachText || unlawfulOrPhysicalThreat || likelyOutcomeConflict}
-                onChange={(event) => setLiveApproachConfirmed(event.target.checked)}
-                className="mt-1 h-4 w-4 accent-[#D7DCFF] disabled:opacity-30"
-              />
-              <span className="text-[12px] leading-5">
-                I confirm that this reflects how I want GEORGE to support my approach in this conversation.
-              </span>
-            </label>
-
+          <div className="mt-4">
             <AwakeButton
-              active={approachReady}
-              onClick={() => confirmReadyRoomAcknowledgement(true)}
+              active
+              onClick={() => startLive(false, editableResources, true)}
             >
-              Show LIVE controls
+              ENTER LIVE
             </AwakeButton>
-          </>
-        )}
+          </div>
+
+          <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/24">
+            Your voice I know. The room I understand.
+          </p>
+        </div>
       </PanelShell>
     )
+
   }
 
   if (showQuickLiveSetup) {

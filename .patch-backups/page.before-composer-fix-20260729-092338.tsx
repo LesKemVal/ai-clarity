@@ -4,41 +4,25 @@
    Audio hides the composer. Visual restores the existing canonical composer. */
 const GEORGE_LIVE_VISUAL_COMPOSER_STYLE = `
   @media (max-width: 639px) {
-    html[data-george-live-view="controls"]
-      .george-live-composer-region {
+    html[data-george-live-view="controls"] .george-composer-shell {
       display: none !important;
     }
 
-    html[data-george-live-view="reading"]
-      .george-live-composer-region {
+    html[data-george-live-view="reading"] .george-composer-shell {
       display: block !important;
       position: fixed !important;
-      left: 16px !important;
-      right: 16px !important;
-      bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+      left: 12px !important;
+      right: 12px !important;
+      bottom: calc(72px + env(safe-area-inset-bottom)) !important;
       width: auto !important;
-      max-width: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      z-index: 10050 !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-
-    html[data-george-live-view="reading"]
-      .george-composer-shell {
-      display: block !important;
-      width: 100% !important;
+      z-index: 10020 !important;
       visibility: visible !important;
       opacity: 1 !important;
       pointer-events: auto !important;
     }
 
     html[data-george-live-view="reading"] body {
-      padding-bottom: calc(
-        118px + env(safe-area-inset-bottom)
-      ) !important;
+      padding-bottom: calc(142px + env(safe-area-inset-bottom));
     }
   }
 `;
@@ -6470,6 +6454,8 @@ I’ll stay with you.`,
                           ).slice(0, 3) as [string, string, string]
                         }
                         receiverProfile={liveReceiverProfile}
+                        viewMode={liveViewMode}
+                        onViewModeChange={setLiveViewMode}
                         receiverProfileLabel={activeLiveReceiverProfileLabel}
                         communicationStyle={getActiveLiveCommunicationStyle()}
                         onSupportSelected={(choice) => {
@@ -9532,13 +9518,17 @@ Continue from here, tell me what changed, or start fresh.`,
                     forceLive || liveMode
                       ? "fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] md:bottom-[96px]"
                       : "fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] md:bottom-[112px]"
-                  } george-live-composer-region z-[190] pointer-events-auto mx-auto w-[min(720px,calc(100vw-32px))] bg-transparent px-0 py-0`}
+                  } ${
+                    (forceLive || liveMode) && liveViewMode === "controls"
+                      ? "hidden"
+                      : ""
+                  } z-[190] pointer-events-auto mx-auto w-[min(720px,calc(100vw-32px))] bg-transparent px-0 py-0`}
                 >
                   <div
                     aria-hidden="true"
                     className="pointer-events-none mb-2 select-none text-center font-mono text-[8px] font-semibold uppercase tracking-[0.34em] text-white/22"
                   >
-                    GEORGE can make mistakes. Check important information.
+                    BRANESX
                   </div>
 
                   <div

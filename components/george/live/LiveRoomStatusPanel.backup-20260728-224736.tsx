@@ -113,7 +113,6 @@ type ControlPillProps = {
   detail: string;
   active?: boolean;
   disabled?: boolean;
-  compact?: boolean;
   tone?: "conversation" | "support" | "runtime";
   onClick: () => void;
 };
@@ -124,57 +123,75 @@ function ControlPill({
   active = false,
   disabled = false,
   tone = "runtime",
-  compact = false,
   onClick,
 }: ControlPillProps) {
   void tone;
 
   const icon =
     label === "Pause" ? (
-      <svg viewBox="0 0 64 64" aria-hidden="true" className="h-[44%] w-[44%]">
-        <rect x="17" y="12" width="11" height="40" rx="3" fill="currentColor" />
-        <rect x="36" y="12" width="11" height="40" rx="3" fill="currentColor" />
+      <svg viewBox="0 0 72 72" aria-hidden="true" className="h-[48%] w-[48%]">
+        <rect
+          x="19"
+          y="13"
+          width="12"
+          height="46"
+          rx="3.5"
+          fill="currentColor"
+        />
+        <rect
+          x="41"
+          y="13"
+          width="12"
+          height="46"
+          rx="3.5"
+          fill="currentColor"
+        />
       </svg>
     ) : label === "Resume" ? (
-      <svg viewBox="0 0 64 64" aria-hidden="true" className="h-[44%] w-[44%]">
-        <path d="M20 13.5 50 32 20 50.5Z" fill="currentColor" />
+      <svg viewBox="0 0 72 72" aria-hidden="true" className="h-[48%] w-[48%]">
+        <path d="M23 14 57 36 23 58Z" fill="currentColor" />
       </svg>
     ) : label === "Repeat" ? (
-      <svg viewBox="0 0 64 64" aria-hidden="true" className="h-[50%] w-[50%]">
+      <svg viewBox="0 0 72 72" aria-hidden="true" className="h-[54%] w-[54%]">
         <path
-          d="M48.5 19.5A22 22 0 1 0 53 39"
+          d="M55 22A25 25 0 1 0 59 45"
           fill="none"
           stroke="currentColor"
-          strokeWidth="6"
+          strokeWidth="7"
           strokeLinecap="round"
         />
         <path
-          d="M39 11.5h12v12"
+          d="M44 12h14v14"
           fill="none"
           stroke="currentColor"
-          strokeWidth="6"
+          strokeWidth="7"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
     ) : label === "Support" ? (
-      <svg viewBox="0 0 64 64" aria-hidden="true" className="h-[52%] w-[52%]">
+      <svg viewBox="0 0 72 72" aria-hidden="true" className="h-[56%] w-[56%]">
         <path
-          d="M11 29c0-10 9-18 21-18s21 8 21 18-9 18-21 18c-3 0-6-.5-8.7-1.5L14 52l2.8-10.2A17 17 0 0 1 11 29Z"
+          d="M12 33c0-12 10-21 24-21s24 9 24 21-10 21-24 21c-3.7 0-7.2-.7-10.2-2L15 59l3.3-11.7A19.5 19.5 0 0 1 12 33Z"
           fill="none"
           stroke="currentColor"
-          strokeWidth="4.5"
+          strokeWidth="5.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="24" cy="29" r="2.6" fill="currentColor" />
-        <circle cx="32" cy="29" r="2.6" fill="currentColor" />
-        <circle cx="40" cy="29" r="2.6" fill="currentColor" />
+        <circle cx="27" cy="33" r="3" fill="currentColor" />
+        <circle cx="36" cy="33" r="3" fill="currentColor" />
+        <circle cx="45" cy="33" r="3" fill="currentColor" />
       </svg>
     ) : (
-      <svg viewBox="0 0 64 64" aria-hidden="true" className="h-[50%] w-[50%]">
-        <path d="m15 46 4-13L43 9l12 12-24 24-13 4Z" fill="currentColor" />
-        <path d="m39 13 12 12" fill="none" stroke="#05080c" strokeWidth="4" />
+      <svg viewBox="0 0 72 72" aria-hidden="true" className="h-[54%] w-[54%]">
+        <path d="m16 54 4.5-15L49 10.5 61.5 23 33 51.5Z" fill="currentColor" />
+        <path
+          d="m45 14.5 12.5 12.5"
+          fill="none"
+          stroke="#07101c"
+          strokeWidth="4.5"
+        />
       </svg>
     );
 
@@ -186,66 +203,66 @@ function ControlPill({
       aria-label={`${label}: ${detail}`}
       title={`${label}: ${detail}`}
       className={`
-        group relative flex min-w-0 flex-col items-center justify-center
-        overflow-hidden border text-center
-        transition-[transform,border-color,background-color,box-shadow] duration-150
-        active:translate-y-[1px] active:scale-[0.99]
+        group relative flex h-full min-h-[286px] min-w-0
+        flex-col items-center justify-center overflow-hidden
+        rounded-[2.4rem] border px-5 py-8 text-center
+        transition-[transform,border-color,box-shadow,filter] duration-200
+        active:translate-y-[3px] active:scale-[0.992]
         disabled:cursor-not-allowed disabled:opacity-40
-
-        ${
-          compact
-            ? "h-[86px] rounded-[0.95rem] px-1.5 py-2 sm:h-[92px] sm:rounded-[1rem]"
-            : "h-full min-h-0 rounded-[1.65rem] px-3 py-4"
-        }
-
+        sm:min-h-[300px] sm:px-7 sm:py-9
         ${
           active
-            ? "border-[#477fb8]/70 bg-[#07111c] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.08)]"
-            : "border-[#263849]/70 bg-[#05090e] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.04)] hover:border-[#3a5875]/80 hover:bg-[#070d14]"
+            ? "border-[#69b4ff]/80 shadow-[0_28px_72px_rgba(0,0,0,0.82),0_0_44px_rgba(50,137,240,0.20),inset_0_1px_0_rgba(190,224,255,0.18),inset_0_-28px_50px_rgba(0,0,0,0.48)]"
+            : "border-[#365270]/75 shadow-[0_28px_72px_rgba(0,0,0,0.82),0_0_34px_rgba(35,113,214,0.13),inset_0_1px_0_rgba(180,218,255,0.13),inset_0_-28px_50px_rgba(0,0,0,0.52)] hover:border-[#5683b4]/90 hover:shadow-[0_30px_78px_rgba(0,0,0,0.86),0_0_48px_rgba(48,132,235,0.20),inset_0_1px_0_rgba(190,224,255,0.17),inset_0_-28px_50px_rgba(0,0,0,0.46)]"
         }
       `}
     >
       <span
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(47,112,181,0.08),transparent_40%),linear-gradient(145deg,rgba(10,22,35,0.72),rgba(3,7,12,0.98)_65%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(53,139,239,0.27),transparent_38%),radial-gradient(circle_at_50%_76%,rgba(16,74,145,0.15),transparent_52%),linear-gradient(145deg,#102942_0%,#081827_45%,#030a12_100%)]"
       />
 
       <span
-        className={`relative flex items-center justify-center rounded-full border border-[#315b88]/65 bg-[#02070d]/90 text-[#4f98e8] shadow-[inset_0_0_14px_rgba(35,89,145,0.12)] ${
-          compact ? "h-8 w-8" : "h-[94px] w-[94px] sm:h-[104px] sm:w-[104px]"
-        }`}
-      >
-        <span className="relative flex h-full w-full items-center justify-center drop-shadow-[0_0_5px_rgba(73,145,224,0.35)]">
+        aria-hidden="true"
+        className="absolute inset-[1px] rounded-[calc(2.4rem-1px)] border border-white/[0.035]"
+      />
+
+      <span
+        aria-hidden="true"
+        className="absolute inset-[8px] rounded-[calc(2.4rem-8px)] shadow-[inset_0_1px_0_rgba(146,201,255,0.055),inset_0_0_42px_rgba(12,49,91,0.22)]"
+      />
+
+      <span
+        aria-hidden="true"
+        className="absolute left-[14%] right-[14%] top-0 h-px bg-gradient-to-r from-transparent via-[#9fd1ff]/35 to-transparent"
+      />
+
+      <span className="relative flex h-[146px] w-[146px] items-center justify-center rounded-full border-[2px] border-[#467fc9]/85 bg-[radial-gradient(circle_at_45%_36%,rgba(55,131,226,0.27),rgba(3,13,25,0.88)_68%)] text-[#62aaff] shadow-[0_0_36px_rgba(48,130,230,0.20),inset_0_0_34px_rgba(44,116,208,0.22),inset_0_1px_0_rgba(160,211,255,0.12)] transition-[transform,border-color,box-shadow] duration-200 group-hover:scale-[1.025] group-hover:border-[#68adff]/95 group-hover:shadow-[0_0_48px_rgba(61,148,247,0.28),inset_0_0_38px_rgba(49,126,222,0.28)] sm:h-[158px] sm:w-[158px]">
+        <span className="absolute inset-[8px] rounded-full border border-[#2d5f9d]/55" />
+        <span className="absolute inset-[17px] rounded-full bg-[radial-gradient(circle_at_44%_34%,rgba(69,144,235,0.10),transparent_60%)]" />
+        <span className="relative flex h-full w-full items-center justify-center drop-shadow-[0_0_13px_rgba(81,164,255,0.85)]">
           {icon}
         </span>
       </span>
 
-      <span
-        className={`relative block font-semibold uppercase leading-none text-white/90 ${
-          compact
-            ? "mt-2 max-w-full truncate text-[9px] tracking-[0.08em] sm:text-[10px]"
-            : "mt-4 text-[20px] tracking-[0.075em] sm:text-[22px]"
-        }`}
-      >
+      <span className="relative mt-7 block text-[28px] font-semibold uppercase leading-none tracking-[0.095em] text-white/95 drop-shadow-[0_2px_16px_rgba(255,255,255,0.10)] sm:text-[31px]">
         {label}
       </span>
 
-      {!compact && (
-        <span className="relative mt-3 block max-w-full truncate font-mono text-[10px] font-medium uppercase leading-4 tracking-[0.14em] text-white/42 sm:text-[11px]">
-          {detail}
-        </span>
-      )}
+      <span className="relative mt-5 block max-w-full truncate font-mono text-[12px] font-medium uppercase leading-5 tracking-[0.17em] text-white/52 sm:text-[13px]">
+        {detail}
+      </span>
 
       <span
         aria-hidden="true"
-        className={`relative rounded-full ${
-          compact ? "mt-2 h-1.5 w-1.5" : "mt-4 h-2 w-2"
-        } ${
+        className={`relative mt-7 h-3 w-3 rounded-full ${
           active
-            ? "bg-[#62a9eb] shadow-[0_0_7px_rgba(78,151,224,0.55)]"
-            : "bg-[#386c9f] shadow-[0_0_5px_rgba(55,111,166,0.35)]"
+            ? "bg-[#76bdff] shadow-[0_0_9px_rgba(118,189,255,1),0_0_26px_rgba(54,143,245,0.90)]"
+            : "bg-[#579ff1] shadow-[0_0_8px_rgba(87,159,241,0.95),0_0_22px_rgba(44,126,226,0.70)]"
         }`}
-      />
+      >
+        <span className="absolute left-[2px] top-[1px] h-[3px] w-[5px] rounded-full bg-white/50" />
+      </span>
     </button>
   );
 }
@@ -321,12 +338,7 @@ export function LiveRoomStatusPanel({
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem("GEORGE_LIVE_VIEW_MODE");
-      if (stored === "controls" || stored === "reading") {
-        setViewMode(stored);
-        document.documentElement.dataset.georgeLiveView = stored;
-      } else {
-        document.documentElement.dataset.georgeLiveView = "controls";
-      }
+      if (stored === "controls" || stored === "reading") setViewMode(stored);
     } catch {}
 
     const desktopQuery = window.matchMedia("(min-width: 640px)");
@@ -345,15 +357,8 @@ export function LiveRoomStatusPanel({
 
   const setMobileView = (nextMode: LiveViewMode) => {
     setViewMode(nextMode);
-
     try {
       window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", nextMode);
-      document.documentElement.dataset.georgeLiveView = nextMode;
-      window.dispatchEvent(
-        new CustomEvent("george-live-view-change", {
-          detail: { viewMode: nextMode },
-        }),
-      );
     } catch {}
   };
 
@@ -380,11 +385,6 @@ export function LiveRoomStatusPanel({
         : "hybrid";
 
   const isAudioOnlyLayout = liveLayoutMode === "audio";
-
-  // Workspace layout owns control presentation.
-  // Receiver profile controls delivery, not button size.
-  const isCompactControlLayout =
-    viewMode === "reading" || isDesktopReadingSurface;
 
   useEffect(() => {
     const readingIsVisible = viewMode === "reading" || isDesktopReadingSurface;
@@ -446,36 +446,12 @@ export function LiveRoomStatusPanel({
     onRoomToggle();
   };
 
-  const handleViewCycle = () => {
-    const nextMode: LiveViewMode =
-      viewMode === "controls" ? "reading" : "controls";
-
-    setViewMode(nextMode);
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", nextMode);
-    } catch {}
-  };
-
-  // GEORGE LIVE WORKSPACE DOM CONTRACT
-  useEffect(() => {
-    document.documentElement.dataset.georgeLiveView = viewMode;
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", viewMode);
-    } catch {}
-
-    return () => {
-      delete document.documentElement.dataset.georgeLiveView;
-    };
-  }, [viewMode]);
-
   const controlGrid = (
     <div
-      className={`grid ${
-        isCompactControlLayout
-          ? "grid-cols-4 gap-2"
-          : "h-[48dvh] min-h-[330px] max-h-[470px] grid-cols-2 auto-rows-fr gap-3"
+      className={`grid grid-cols-2 ${
+        isAudioOnlyLayout
+          ? "min-h-0 flex-1 auto-rows-fr gap-4 sm:gap-5"
+          : "gap-3 sm:grid-cols-4 sm:gap-3"
       }`}
     >
       <ControlPill
@@ -483,7 +459,6 @@ export function LiveRoomStatusPanel({
         detail={isListening ? "Suspend support" : "Continue support"}
         active={!isListening}
         disabled={isThinking}
-        compact={isCompactControlLayout}
         onClick={handlePause}
       />
 
@@ -492,7 +467,6 @@ export function LiveRoomStatusPanel({
         detail="Last support"
         tone="support"
         disabled={isThinking}
-        compact={isCompactControlLayout}
         onClick={() => {
           onRepeatPressed();
         }}
@@ -503,7 +477,6 @@ export function LiveRoomStatusPanel({
         detail="Choose style"
         tone="support"
         disabled={isThinking}
-        compact={isCompactControlLayout}
         onClick={() => setOverlay("support")}
       />
 
@@ -512,7 +485,6 @@ export function LiveRoomStatusPanel({
         detail={communicationStyle || "Natural"}
         tone="support"
         disabled={isThinking}
-        compact={isCompactControlLayout}
         onClick={() => setOverlay("reword")}
       />
     </div>
@@ -547,33 +519,21 @@ export function LiveRoomStatusPanel({
       className="pointer-events-auto w-full"
       aria-label="LIVE conversation controls"
     >
-      <div className="mb-3 hidden min-h-[42px] items-start justify-between gap-3 px-2 sm:flex sm:px-3">
-        <div className="min-w-0 flex-1">
-          <OperationalStatus
-            isListening={isListening}
-            isThinking={isThinking}
-            liveRoomActive={liveRoomActive}
-          />
-          <p
-            className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
-              showRoomIntro ? "opacity-100" : "opacity-0"
-            }`}
-            aria-hidden={!showRoomIntro}
-          >
-            {roomSummary}
-            {safeObjective ? ` · ${safeObjective}` : ""}
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onReceiverPressed}
-          aria-label="Change delivery or view"
-          title="Change delivery or view"
-          className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
+      <div className="mb-3 hidden min-h-[42px] px-2 sm:block sm:px-3">
+        <OperationalStatus
+          isListening={isListening}
+          isThinking={isThinking}
+          liveRoomActive={liveRoomActive}
+        />
+        <p
+          className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
+            showRoomIntro ? "opacity-100" : "opacity-0"
+          }`}
+          aria-hidden={!showRoomIntro}
         >
-          Controls
-        </button>
+          {roomSummary}
+          {safeObjective ? ` · ${safeObjective}` : ""}
+        </p>
       </div>
 
       {/* Phone: Controls and Reading are intentionally separate receiver modes. */}
@@ -586,33 +546,21 @@ export function LiveRoomStatusPanel({
                 : "min-h-[calc(100dvh-190px)]"
             }`}
           >
-            <div className="mb-3 flex min-h-[42px] items-start justify-between gap-3 px-2">
-              <div className="min-w-0 flex-1">
-                <OperationalStatus
-                  isListening={isListening}
-                  isThinking={isThinking}
-                  liveRoomActive={liveRoomActive}
-                />
-                <p
-                  className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
-                    showRoomIntro ? "opacity-100" : "opacity-0"
-                  }`}
-                  aria-hidden={!showRoomIntro}
-                >
-                  {roomSummary}
-                  {safeObjective ? ` · ${safeObjective}` : ""}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleViewCycle}
-                aria-label="Switch to visual reading view"
-                title="Switch to visual reading view"
-                className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
+            <div className="mb-3 min-h-[42px] px-2">
+              <OperationalStatus
+                isListening={isListening}
+                isThinking={isThinking}
+                liveRoomActive={liveRoomActive}
+              />
+              <p
+                className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
+                  showRoomIntro ? "opacity-100" : "opacity-0"
+                }`}
+                aria-hidden={!showRoomIntro}
               >
-                Controls
-              </button>
+                {roomSummary}
+                {safeObjective ? ` · ${safeObjective}` : ""}
+              </p>
             </div>
 
             <div
@@ -623,23 +571,6 @@ export function LiveRoomStatusPanel({
               }`}
             >
               {controlGrid}
-              <div
-                aria-label="Emergency and machine notification"
-                aria-live="assertive"
-                className="mt-3 flex min-h-[72px] shrink-0 items-center rounded-[1rem] border border-[#31506f]/55 bg-[#040910]/96 px-4 py-3 shadow-[inset_0_1px_0_rgba(120,181,240,0.04)]"
-              >
-                <div className="min-w-0">
-                  <div className="mb-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#72afe8]/48">
-                    Emergency · Machine
-                  </div>
-                  <p className="line-clamp-2 text-[12px] leading-[1.45] text-white/58">
-                    {signalSummary ||
-                      (liveRoomActive
-                        ? "Urgent support and machine notices will appear here."
-                        : "Support is suspended. Resume when you are ready.")}
-                  </p>
-                </div>
-              </div>
               {!isAudioOnlyLayout && (signalSummary || !liveRoomActive) && (
                 <div className="mt-2 border-t border-white/[0.045] px-3 py-2.5 text-center text-[10px] leading-4 text-white/30">
                   {liveRoomActive
@@ -650,7 +581,7 @@ export function LiveRoomStatusPanel({
             </div>
           </div>
         ) : (
-          <div className="flex min-h-[calc(100dvh-150px)] flex-col gap-3">
+          <div className="flex min-h-[calc(100dvh-150px)] flex-col gap-2">
             <div className="flex min-h-[42px] items-center justify-between gap-2 rounded-[1rem] border border-white/[0.06] bg-[#05070B]/88 px-3 py-2 shadow-[0_14px_42px_rgba(0,0,0,0.36)] backdrop-blur-xl">
               <OperationalStatus
                 isListening={isListening}
@@ -660,20 +591,13 @@ export function LiveRoomStatusPanel({
 
               <button
                 type="button"
-                onClick={handleViewCycle}
-                aria-label="Switch to audio controls view"
-                title="Switch to audio controls view"
-                className="rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
+                onClick={() => setMobileView("controls")}
+                className="rounded-[1rem] border border-[#35506e]/75 bg-[linear-gradient(145deg,#102b47,#071624)] px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/92 shadow-[0_10px_28px_rgba(0,0,0,0.48),inset_0_1px_0_rgba(151,205,255,0.10)] transition-[transform,border-color,box-shadow] duration-200 hover:border-[#5791cc]/80 hover:shadow-[0_12px_34px_rgba(0,0,0,0.55),0_0_22px_rgba(48,132,226,0.12),inset_0_1px_0_rgba(151,205,255,0.14)] active:translate-y-[1px]"
               >
                 Controls
               </button>
             </div>
-
-            <div className="shrink-0 rounded-[1rem] border border-white/[0.045] bg-[#03070b]/94 p-2">
-              {controlGrid}
-            </div>
-
-            <div className="min-h-0 flex-1">{readingSurface}</div>
+            {readingSurface}
           </div>
         )}
       </div>

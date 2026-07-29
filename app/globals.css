@@ -1098,14 +1098,6 @@ textarea:focus{
 
 /* conversation surface overhaul */
 
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
-
 .message-assistant{
   background:transparent;
   border:none;
@@ -1147,14 +1139,6 @@ textarea:focus{
 
 /* conversation surface overhaul */
 
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
-
 .message-assistant{
   background:transparent;
   border:none;
@@ -1194,14 +1178,6 @@ textarea:focus{
 }
 
 
-
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
 
 .message-assistant{
   border:none;
@@ -1367,14 +1343,6 @@ textarea::placeholder{
   border-color:rgba(255,255,255,.14);
 }
 
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
-
 .message-assistant{
   padding-left:6px;
 }
@@ -1393,14 +1361,6 @@ textarea::placeholder{
 
 .george-command-surface textarea::placeholder{
   color:rgba(255,255,255,.16)!important;
-}
-
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1496,14 +1456,6 @@ textarea::placeholder{
   transform:translateY(-1px);
 }
 
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
-
 .message-assistant{
   background:transparent!important;
 }
@@ -1574,15 +1526,6 @@ textarea::placeholder{
   padding-top:.15rem;
 }
 
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
-}
-
-
 /* GEORGE workspace convergence */
 
 [data-george-normal-hero]{
@@ -1602,14 +1545,6 @@ textarea::placeholder{
 
 .george-composer-shell{
   border-radius:1.18rem!important;
-}
-
-.message-user{
-  background:#F7F8FA!important;
-  color:#171717!important;
-  border:none!important;
-  backdrop-filter:none!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.16)!important;
 }
 
 .message-assistant{
@@ -1824,3 +1759,164 @@ select {
     opacity: 0;
   }
 }
+
+/* GEORGE universal button color inversion */
+:where(button, [role="button"], a[data-button]) {
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 120ms ease !important;
+}
+
+/* White buttons become site blue; every nested label becomes white. */
+:where(
+  button.bg-white,
+  [role="button"].bg-white,
+  a.bg-white,
+  button[class*="bg-[#fff"],
+  [role="button"][class*="bg-[#fff"],
+  a[class*="bg-[#fff"]
+):is(:hover, :focus-visible, :active) {
+  background-color: #4e7cff !important;
+  border-color: #4e7cff !important;
+  color: #ffffff !important;
+}
+
+:where(
+  button.bg-white,
+  [role="button"].bg-white,
+  a.bg-white,
+  button[class*="bg-[#fff"],
+  [role="button"][class*="bg-[#fff"],
+  a[class*="bg-[#fff"]
+):is(:hover, :focus-visible, :active),
+:where(
+  button.bg-white,
+  [role="button"].bg-white,
+  a.bg-white,
+  button[class*="bg-[#fff"],
+  [role="button"][class*="bg-[#fff"],
+  a[class*="bg-[#fff"]
+):is(:hover, :focus-visible, :active) * {
+  color: #ffffff !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Site-blue buttons become white; every nested label becomes black. */
+:where(
+  button[class*="bg-[#4E7CFF]"],
+  button[class*="bg-[#4e7cff]"],
+  button[class*="bg-[#4F7CFF]"],
+  button[class*="bg-[#4f7cff]"],
+  button[class*="bg-[#315BFF]"],
+  button[class*="bg-[#315bff]"],
+  [role="button"][class*="bg-[#4E7CFF]"],
+  [role="button"][class*="bg-[#4e7cff]"],
+  a[class*="bg-[#4E7CFF]"],
+  a[class*="bg-[#4e7cff]"]
+):is(:hover, :focus-visible, :active) {
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #050505 !important;
+}
+
+:where(
+  button[class*="bg-[#4E7CFF]"],
+  button[class*="bg-[#4e7cff]"],
+  button[class*="bg-[#4F7CFF]"],
+  button[class*="bg-[#4f7cff]"],
+  button[class*="bg-[#315BFF]"],
+  button[class*="bg-[#315bff]"],
+  [role="button"][class*="bg-[#4E7CFF]"],
+  [role="button"][class*="bg-[#4e7cff]"],
+  a[class*="bg-[#4E7CFF]"],
+  a[class*="bg-[#4e7cff]"]
+):is(:hover, :focus-visible, :active),
+:where(
+  button[class*="bg-[#4E7CFF]"],
+  button[class*="bg-[#4e7cff]"],
+  button[class*="bg-[#4F7CFF]"],
+  button[class*="bg-[#4f7cff]"],
+  button[class*="bg-[#315BFF]"],
+  button[class*="bg-[#315bff]"],
+  [role="button"][class*="bg-[#4E7CFF]"],
+  [role="button"][class*="bg-[#4e7cff]"],
+  a[class*="bg-[#4E7CFF]"],
+  a[class*="bg-[#4e7cff]"]
+):is(:hover, :focus-visible, :active) * {
+  color: #050505 !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+@keyframes georgeHeroTickerLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes georgeHeroTickerRight {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="georgeHeroTicker"] {
+    animation: none !important;
+  }
+}
+/* END GEORGE universal button color inversion */
+
+/* GEORGE NORMAL USER MESSAGE — CANONICAL OWNER */
+.message-user > span {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+@media (max-width: 640px) {
+}
+/* END GEORGE NORMAL USER MESSAGE — CANONICAL OWNER */
+
+/* GEORGE NORMAL USER MESSAGE — CANONICAL OWNER */
+.message-user {
+  display: inline-flex !important;
+  width: fit-content !important;
+  max-width: min(78%, 32rem) !important;
+  flex: 0 0 auto !important;
+  align-self: flex-end !important;
+  padding: 7px 14px !important;
+  border: 0 !important;
+  border-radius: 13px !important;
+  background: #f7f8fa !important;
+  color: #171717 !important;
+  line-height: 1.3 !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16) !important;
+  backdrop-filter: none !important;
+}
+
+.message-user > span {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+@media (max-width: 640px) {
+  .message-user {
+    max-width: 82% !important;
+    padding: 6px 12px !important;
+    border-radius: 12px !important;
+  }
+}
+/* END GEORGE NORMAL USER MESSAGE — CANONICAL OWNER */

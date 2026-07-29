@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   CONVERSATION_TYPES,
   type ConversationType,
@@ -55,7 +55,11 @@ function ConversationTypeCard({
     <button
       type="button"
       onClick={() => onSelect(conversationType)}
-      className="group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border border-white/[0.08] bg-[#08090A] px-4 py-3 text-left transition duration-200 hover:border-[#4E7CFF]/42 hover:bg-[#4E7CFF]/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+      className={`group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border px-4 py-3 text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
+        conversationType.title === 'Other'
+          ? 'border-[#7EA1FF]/35 bg-[#4F7CFF] hover:bg-[#5A84FF]'
+          : 'border-white/[0.08] bg-[#08090A] hover:border-white/[0.16] hover:bg-[#0D0F12]'
+      }`}
     >
       <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
         {conversationType.title}
@@ -111,14 +115,25 @@ export function HomeConversationTypeSurface() {
     if (phase !== 'introduction') return
 
     setIntroStage(0)
-    const structureTimer = window.setTimeout(() => setIntroStage(1), 180)
-    const customizeTimer = window.setTimeout(() => setIntroStage(2), 1150)
-    const buttonTimer = window.setTimeout(() => setIntroStage(3), 1750)
+
+    const introductionText =
+      'The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.'
+    const typewriterDuration = introductionText.length * 24
+
+    const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180)
+    const customizeTimer = window.setTimeout(
+      () => setIntroStage(2),
+      typewriterDuration + 520,
+    )
+    const startTimer = window.setTimeout(
+      () => setIntroStage(3),
+      typewriterDuration + 1450,
+    )
 
     return () => {
-      window.clearTimeout(structureTimer)
+      window.clearTimeout(typewriterTimer)
       window.clearTimeout(customizeTimer)
-      window.clearTimeout(buttonTimer)
+      window.clearTimeout(startTimer)
     }
   }, [phase])
 
@@ -131,9 +146,9 @@ export function HomeConversationTypeSurface() {
   }, [phase])
 
   const structureText = useTypewriter(
-    'The structure is ready.',
+    'The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.',
     phase === 'introduction' && introStage >= 1,
-    34,
+    24,
   )
   const questionText = useTypewriter(
     activeQuestion?.question || '',
@@ -165,6 +180,34 @@ export function HomeConversationTypeSurface() {
 
   function beginPreparation() {
     setPhase('introduction')
+  }
+
+  function goBack() {
+    setEditingQuestionKey(null)
+
+    if (phase === 'selected') {
+      resetSelection()
+      return
+    }
+
+    if (phase === 'introduction') {
+      setPhase('selected')
+      return
+    }
+
+    if (phase === 'questions') {
+      setPhase('introduction')
+      return
+    }
+
+    if (phase === 'decision') {
+      setPhase('questions')
+      return
+    }
+
+    if (phase === 'review') {
+      setPhase('decision')
+    }
   }
 
   function beginQuestions() {
@@ -248,7 +291,7 @@ export function HomeConversationTypeSurface() {
         {phase === 'selection' ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-5xl">
-              <p className="inline-flex rounded-full border border-[#3657A8]/55 bg-[#172347] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)]">
+              <p className="inline-flex rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)] border-[#7EA1FF]/35 bg-[#4E7CFF] text-white shadow-[0_10px_30px_rgba(20,61,168,0.22)] transition-colors hover:bg-white hover:text-black active:bg-white active:text-black">
                 Conversation types
               </p>
               <h1 className="mt-4 font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
@@ -260,6 +303,14 @@ export function HomeConversationTypeSurface() {
 
               <label className="mt-8 block max-w-3xl">
                 <span className="sr-only">Search conversation types</span>
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
+                    All Conversations
+                  </div>
+                  <div className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">
+                    {visibleTypes.length}
+                  </div>
+                </div>
                 <input
                   type="search"
                   value={searchQuery}
@@ -271,7 +322,7 @@ export function HomeConversationTypeSurface() {
             </div>
 
             <div className="mt-9">
-              <div className="mb-5 flex items-center justify-between gap-4">
+              <div className="mb-5 flex items-center justify-between gap-2 sm:gap-3">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
                   {visibleTypes.length} conversation {visibleTypes.length === 1 ? 'type' : 'types'}
                 </p>
@@ -287,7 +338,7 @@ export function HomeConversationTypeSurface() {
               </div>
 
               {visibleTypes.length > 0 ? (
-                <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                <div className="grid gap-2 pb-24 sm:grid-cols-2 sm:pb-0 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                   {visibleTypes.map((conversationType) => (
                     <ConversationTypeCard
                       key={conversationType.id}
@@ -306,76 +357,149 @@ export function HomeConversationTypeSurface() {
             </div>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-5xl animate-[fadeIn_420ms_ease-out]">
-            <div className="rounded-[30px] border border-white/[0.1] bg-[#08090A] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.56)] sm:p-9">
-              <div className="border-b border-white/[0.08] pb-7">
-                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
-                  Conversation type
+          <div className="mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out]">
+            <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 sm:p-5 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-7">
+              <div
+                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
+                  phase === 'questions'
+                    ? 'border-transparent pb-3'
+                    : ''
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="whitespace-nowrap font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
+                      Conversation type
+                    </div>
+
+                    <h2 className="mt-2 font-mono text-[21px] font-semibold uppercase leading-tight tracking-[-0.025em] text-white sm:text-[25px]">
+                      {selectedType?.title}
+                    </h2>
+                  </div>
+
+                  <div
+                    className={`shrink-0 transition-all duration-500 ${
+                      phase === 'questions'
+                        ? 'pointer-events-none -translate-y-1 opacity-0'
+                        : 'translate-y-0 opacity-100'
+                    }`}
+                  >
+
+                    {phase !== 'selected' && phase !== 'questions' && (
+                      <div className="flex gap-2 flex-col items-stretch shrink-0 w-[116px] sm:w-[132px]">
+                        <button
+                          type="button"
+                          onClick={goBack}
+                          className="rounded-[9px] border border-white/[0.12] bg-transparent font-mono font-semibold uppercase tracking-[0.12em] text-white/52 transition hover:border-white/25 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap"
+                        >
+                          ← Back
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={resetSelection}
+                          className="rounded-[9px] border border-white/[0.12] bg-transparent font-mono font-semibold uppercase tracking-[0.12em] text-white/52 transition hover:border-white/25 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap order-last"
+                        >
+                        Re-select
+                      </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <h2 className="mt-3 font-mono text-[22px] font-semibold uppercase tracking-[-0.025em] text-white sm:text-[28px]">
-                  {selectedType?.title}
-                </h2>
               </div>
 
               {phase === 'selected' && (
-                <div className="pt-7">
-                  <p className="max-w-3xl text-[15px] leading-7 text-white/62">
-                    {selectedType?.description}
-                  </p>
-                  <div className="mt-7 flex flex-wrap gap-3">
+                <div className="pt-6 animate-[fadeIn_420ms_ease-out]">
+                  <div className="max-w-3xl">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/48">
+                      What this conversation does
+                    </div>
+
+                    <p className="mt-3 text-[15px] leading-7 text-white/58">
+                      {selectedType?.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-7 grid grid-cols-2 gap-3">
+
                     <button
-                      type="button"
-                      onClick={beginPreparation}
-                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
-                    >
-                      Continue
-                    </button>
+                                          type="button"
+                                          onClick={beginPreparation}
+                                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
+                                        >
+                                          Continue →
+                                        </button>
+
                     <button
-                      type="button"
-                      onClick={resetSelection}
-                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/66 transition hover:border-white/30 hover:text-white"
-                    >
-                      Select another conversation
-                    </button>
+                                          type="button"
+                                          onClick={resetSelection}
+                                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
+                                        >
+                                            Re-select
+                                          </button>
+
                   </div>
                 </div>
               )}
 
               {phase === 'introduction' && (
-                <div className="pt-7">
-                  <div className="min-h-[48px] font-mono text-[22px] leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-10">
+                <div className="pt-6">
+                  <div className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.03em] text-white sm:text-[24px] sm:leading-9">
                     {structureText}
                   </div>
-                  <h3
-                    className={`mt-7 font-mono text-[18px] font-semibold tracking-[-0.02em] text-white transition-opacity duration-500 ${
-                      introStage >= 2 ? 'opacity-100' : 'opacity-0'
+
+                  <div
+                    className={`mt-6 transition-all duration-700 ${
+                      introStage >= 2
+                        ? 'translate-y-0 opacity-100'
+                        : 'pointer-events-none translate-y-2 opacity-0'
                     }`}
                   >
-                    Customize your conversation.
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={beginQuestions}
-                    className={`mt-6 rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition duration-500 hover:border-[#AEB6FF]/75 hover:bg-[#203268] ${
-                      introStage >= 3 ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
+                    <h3 className="font-mono text-[17px] font-semibold tracking-[-0.02em] text-white">
+                      Customize your conversation.
+                    </h3>
+
+                    <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
+                      GEORGE will continue the canonical LIVE briefing and
+                      preserve any preparation signals already established.
+                    </p>
+                  </div>
+
+                  <div
+                    className={`mt-5 transition-all duration-500 ${
+                      introStage >= 3
+                        ? 'translate-y-0 opacity-100'
+                        : 'pointer-events-none translate-y-2 opacity-0'
                     }`}
                   >
-                    Start
-                  </button>
+                    <button
+                      type="button"
+                      onClick={beginQuestions}
+                      className="h-10 rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A]"
+                    >
+                      Start →
+                    </button>
+                  </div>
                 </div>
               )}
 
               {phase === 'questions' && activeQuestion && (
-                <div key={activeQuestion.key} className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
+                <div
+                  key={activeQuestion.key}
+                  className="pt-5 animate-[fadeIn_420ms_ease-out]"
+                >
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/52">
                     {activeQuestion.kicker}
                   </div>
-                  <h3 className="mt-3 min-h-[58px] font-mono text-[18px] leading-7 tracking-[-0.025em] text-white sm:text-[22px]">
+
+                  <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[18px] leading-7 tracking-[-0.025em] text-white sm:text-[21px]">
                     {questionText}
                   </h3>
-                  <p className="mt-3 text-[13px] leading-6 text-white/42">
+
+                  <p className="mt-2 max-w-3xl text-[12px] leading-5 text-white/36">
                     {activeQuestion.examples}
                   </p>
+
                   <textarea
                     autoFocus
                     value={answers[activeQuestion.key] || ''}
@@ -391,20 +515,40 @@ export function HomeConversationTypeSurface() {
                         saveCurrentAnswer()
                       }
                     }}
-                    rows={3}
-                    className="mt-5 w-full resize-none rounded-[16px] border border-white/[0.1] bg-white/[0.025] px-4 py-3 text-[15px] leading-6 text-white outline-none transition focus:border-[#7EA1FF]/55"
+                    rows={2}
+                    placeholder="Type your answer"
+                    className="mt-4 min-h-[104px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/18 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                   />
-                  <div className="mt-5 flex items-center justify-between gap-4">
-                    <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/28">
-                      {activeQuestionIndex + 1} of {LIVE_PREPARATION_QUESTIONS.length}
-                    </span>
+
+                  <div className="mt-4 flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/26">
+                        {activeQuestionIndex + 1} of {LIVE_PREPARATION_QUESTIONS.length}
+                      </span>
+
+                      <div className="flex gap-1" aria-hidden="true">
+                        {LIVE_PREPARATION_QUESTIONS.map((question, index) => (
+                          <span
+                            key={question.key}
+                            className={`h-[3px] w-4 rounded-full transition-colors duration-300 ${
+                              index <= activeQuestionIndex
+                                ? 'bg-[#7EA1FF]/68'
+                                : 'bg-white/[0.09]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       onClick={saveCurrentAnswer}
-                      disabled={!String(answers[activeQuestion.key] || '').trim()}
-                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                      disabled={!String(
+                        answers[activeQuestion.key] || '',
+                      ).trim()}
+                      className="h-10 rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A] disabled:cursor-not-allowed disabled:opacity-25"
                     >
-                      Continue
+                      Continue →
                     </button>
                   </div>
                 </div>
@@ -450,7 +594,7 @@ export function HomeConversationTypeSurface() {
                         key={question.key}
                         className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
                       >
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start justify-between gap-2 sm:gap-3">
                           <div>
                             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
                               {question.question}
@@ -485,7 +629,7 @@ export function HomeConversationTypeSurface() {
                     <button
                       type="button"
                       onClick={() => setPhase('decision')}
-                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
+                      className="rounded-full border border-white/[0.14] py-3 font-mono font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap"
                     >
                       Back
                     </button>

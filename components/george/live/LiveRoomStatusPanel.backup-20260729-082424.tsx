@@ -321,12 +321,7 @@ export function LiveRoomStatusPanel({
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem("GEORGE_LIVE_VIEW_MODE");
-      if (stored === "controls" || stored === "reading") {
-        setViewMode(stored);
-        document.documentElement.dataset.georgeLiveView = stored;
-      } else {
-        document.documentElement.dataset.georgeLiveView = "controls";
-      }
+      if (stored === "controls" || stored === "reading") setViewMode(stored);
     } catch {}
 
     const desktopQuery = window.matchMedia("(min-width: 640px)");
@@ -345,15 +340,8 @@ export function LiveRoomStatusPanel({
 
   const setMobileView = (nextMode: LiveViewMode) => {
     setViewMode(nextMode);
-
     try {
       window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", nextMode);
-      document.documentElement.dataset.georgeLiveView = nextMode;
-      window.dispatchEvent(
-        new CustomEvent("george-live-view-change", {
-          detail: { viewMode: nextMode },
-        }),
-      );
     } catch {}
   };
 
@@ -457,25 +445,12 @@ export function LiveRoomStatusPanel({
     } catch {}
   };
 
-  // GEORGE LIVE WORKSPACE DOM CONTRACT
-  useEffect(() => {
-    document.documentElement.dataset.georgeLiveView = viewMode;
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", viewMode);
-    } catch {}
-
-    return () => {
-      delete document.documentElement.dataset.georgeLiveView;
-    };
-  }, [viewMode]);
-
   const controlGrid = (
     <div
       className={`grid ${
         isCompactControlLayout
           ? "grid-cols-4 gap-2"
-          : "h-[48dvh] min-h-[330px] max-h-[470px] grid-cols-2 auto-rows-fr gap-3"
+          : "h-[66dvh] min-h-[480px] max-h-[680px] grid-cols-2 auto-rows-fr gap-3"
       }`}
     >
       <ControlPill
@@ -623,23 +598,6 @@ export function LiveRoomStatusPanel({
               }`}
             >
               {controlGrid}
-              <div
-                aria-label="Emergency and machine notification"
-                aria-live="assertive"
-                className="mt-3 flex min-h-[72px] shrink-0 items-center rounded-[1rem] border border-[#31506f]/55 bg-[#040910]/96 px-4 py-3 shadow-[inset_0_1px_0_rgba(120,181,240,0.04)]"
-              >
-                <div className="min-w-0">
-                  <div className="mb-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#72afe8]/48">
-                    Emergency · Machine
-                  </div>
-                  <p className="line-clamp-2 text-[12px] leading-[1.45] text-white/58">
-                    {signalSummary ||
-                      (liveRoomActive
-                        ? "Urgent support and machine notices will appear here."
-                        : "Support is suspended. Resume when you are ready.")}
-                  </p>
-                </div>
-              </div>
               {!isAudioOnlyLayout && (signalSummary || !liveRoomActive) && (
                 <div className="mt-2 border-t border-white/[0.045] px-3 py-2.5 text-center text-[10px] leading-4 text-white/30">
                   {liveRoomActive
