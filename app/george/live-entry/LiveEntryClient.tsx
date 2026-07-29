@@ -1131,6 +1131,26 @@ const mandatoryLiveSignals = useMemo(() => {
       const params = new URLSearchParams(window.location.search)
       const source = params.get('source')
       const isStartSource = source === 'start'
+      const isHomepageSource = source === 'homepage'
+
+      let homepageHandoff: {
+        conversationType?: string
+        signals?: Record<string, string>
+      } | null = null
+
+      if (isHomepageSource) {
+        try {
+          const rawHomepageHandoff = window.localStorage.getItem(
+            'GEORGE_HOMEPAGE_LIVE_HANDOFF'
+          )
+
+          homepageHandoff = rawHomepageHandoff
+            ? JSON.parse(rawHomepageHandoff)
+            : null
+        } catch {
+          homepageHandoff = null
+        }
+      }
 
       if (isStartSource) {
         clearLivePreparationPreviewReady()
@@ -1175,27 +1195,77 @@ const mandatoryLiveSignals = useMemo(() => {
         setLiveReadinessComplete(false)
       }
 
-      const acquiredSignalsForAccess = isStartSource
+      const storedPreparationSignals = isStartSource
         ? {}
         : loadLivePreparationSignals()
+
+      const acquiredSignalsForAccess =
+        isHomepageSource && homepageHandoff?.signals
+          ? {
+              ...storedPreparationSignals,
+              ...homepageHandoff.signals,
+            }
+          : storedPreparationSignals
 
       const isFreshLiveStart =
         window.localStorage.getItem('george_start_new_live') === '1' ||
         params.get('source') === 'signal' ||
         params.get('source') === 'home' ||
-        false ||
         params.get('source') === 'founder'
 
       const preLiveReady =
-        !isFreshLiveStart && (
+        isHomepageSource ||
+        (!isFreshLiveStart && (
           isLivePreparationPreviewReady() ||
           params.get('devPreview') === '1' ||
           Object.keys(acquiredSignalsForAccess).length > 0 ||
           Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
           Boolean(window.localStorage.getItem('george_live_setup_active'))
-        )
+        ))
 
       setPreLivePreviewReady(preLiveReady)
+
+      if (isHomepageSource && homepageHandoff) {
+        setPreLiveSignals(acquiredSignalsForAccess)
+        setLiveEntryMandatoryMode(false)
+        setLiveEntryReadyMessageVisible(false)
+        setShowOpenAISignalSurface(true)
+
+        const homepageConversationType = String(
+          homepageHandoff.conversationType || ''
+        ).trim()
+
+        if (homepageConversationType) {
+          const knownHomepageRoom = CONVERSATION_TYPES.some(
+            (option) => option.label === homepageConversationType
+          )
+
+          setConversationType(
+            knownHomepageRoom ? homepageConversationType : 'Other'
+          )
+
+          if (!knownHomepageRoom) {
+            setCustomConversationType(homepageConversationType)
+          }
+        }
+
+        /*
+         * The front surface has already completed its preparation work.
+         * LIVE Entry remains the canonical owner of Mechanics and Ready Room,
+         * so this route resumes at the first unresolved popup: Mechanics.
+         */
+        setLiveBriefingStep(2)
+        setLiveBriefingToaAccepted(true)
+        setLiveBriefingSupportAccepted(false)
+        setLiveBriefingCommunicationConfirmed(false)
+        setLiveRecoveryAcknowledged(false)
+        setLiveReadyAccepted(false)
+        setLiveReadinessComplete(false)
+        setShowPrepPreview(false)
+        setShowLiveBriefingRoom(true)
+
+        window.localStorage.removeItem('GEORGE_HOMEPAGE_LIVE_HANDOFF')
+      }
 
       const saved = JSON.parse(window.localStorage.getItem('GEORGE_LAST_LIVE_SETUP') || 'null')
 
@@ -2304,48 +2374,46 @@ const beginProofOfAwareness = async () => {
 
   if (liveEntryQuestionSurface) {
     return (
-      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-8 pt-4 text-white sm:pt-5">
+      <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-14 text-white sm:px-8 sm:py-20">
 
-        <div className="relative z-10 mx-auto w-full max-w-[1120px]">
-          <div className="mb-5 flex items-center gap-4">
+        <div className="relative z-10 mx-auto w-full max-w-5xl">
+          <div className="mb-6 flex items-center gap-4">
           <BxPageHeader backLabel="BACK" backHref="/george" />
         </div>
 
-          <section className="relative w-full overflow-hidden rounded-[22px] border border-white/[0.04] bg-[#050505] px-5 pb-6 pt-4 shadow-[0_18px_60px_rgba(0,0,0,0.32)] sm:px-7 sm:pb-7 sm:pt-5">
+          <section className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#050505] px-5 py-6 sm:px-8 sm:py-8">
 
-          <div className="relative z-30 max-w-[760px]">
+          <div className="relative z-30 mx-auto max-w-[760px]">
 
           <div className="flex items-center justify-between gap-4">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[#D7DBE4]/52">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
               {liveEntryQuestionSurface.kicker}
             </div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
+            <div className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">
               {liveEntryQuestionSurface.step}
             </div>
           </div>
 
-          <h1 className="mt-5 text-[24px] font-semibold leading-tight tracking-[-0.04em] text-white/90 sm:text-[27px]">
+          <h1 className="mt-5 font-mono text-[28px] font-black uppercase leading-[0.98] tracking-[-0.055em] text-white sm:text-[36px]">
             {liveEntryQuestionSurface.readinessMessage ? "You're ready for LIVE." : liveEntryQuestionSurface.canBeginLive ? 'GEORGE has enough signal.' : 'Bring GEORGE up to speed.'}
           </h1>
 
-          <div className="mt-3 border-l border-[#AEB6FF]/24 pl-4 text-left sm:pl-5">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-white/34">
+          <div className="mt-7 text-left">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
               {liveEntryQuestionSurface.label}
             </div>
 
-            <div className={`mt-5 min-h-[66px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? 'text-[17px] leading-7' : 'text-[22px] leading-[1.55]'} tracking-[-0.02em] text-[#F2F4FF]/86`}>
+            <div className={`mt-4 min-h-[58px] whitespace-pre-line ${liveEntryQuestionSurface.readinessMessage ? 'text-[16px] leading-7' : 'text-[20px] leading-[1.5] sm:text-[22px]'} tracking-[-0.025em] text-white/90`}>
               {liveEntryQuestionSurface.question}
-              {!liveEntryQuestionSurface.loading && !liveEntryQuestionSurface.readinessMessage && (
-                <span className="ml-1 inline-block h-[18px] w-px translate-y-[3px] animate-pulse bg-[#D7DBE4]/60" />
-              )}
+
             </div>
 
-            <div className={`mt-4 text-[13px] leading-6 ${liveEntryQuestionSurface.readinessMessage ? 'text-[#D7DBE4]/64' : 'text-white/42'}`}>
+            <div className={`mt-3 text-[13px] leading-6 ${liveEntryQuestionSurface.readinessMessage ? 'text-white/64' : 'text-white/48'}`}>
               {liveEntryQuestionSurface.helper}
             </div>
 
             {!liveEntryQuestionSurface.readinessMessage && liveEntryQuestionSurface.example && (
-              <div className="mt-5 rounded-[0.85rem] border border-white/[0.05] bg-white/[0.012] px-4 py-3">
+              <div className="mt-5 rounded-[16px] border border-white/[0.08] bg-[#08090A] px-4 py-4">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/24">
                   Example
                 </div>
@@ -2395,7 +2463,7 @@ const beginProofOfAwareness = async () => {
                     value={customConversationResponsibility}
                     onChange={(event) => setCustomConversationResponsibility(event.target.value)}
                     autoFocus
-                    className="mt-4 w-full border-0 border-b border-[#4E7CFF]/22 bg-transparent px-0 py-3 text-[16px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/46"
+                    className="mt-4 w-full rounded-[16px] border border-white/[0.10] bg-[#08090A] px-5 py-4 text-[15px] leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
                     placeholder="write another responsibility..."
                   />
                 )}
@@ -2413,17 +2481,17 @@ const beginProofOfAwareness = async () => {
                   }
                 }}
                 autoFocus
-                className="mt-5 w-full border-0 border-b border-[#4E7CFF]/22 bg-transparent px-0 py-3 text-[18px] leading-7 text-[#D7DBE4]/88 outline-none placeholder:text-white/20 focus:border-[#4E7CFF]/46"
+                className="mt-6 w-full rounded-[16px] border border-white/[0.10] bg-[#08090A] px-5 py-4 text-[15px] leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
                 placeholder="say it here..."
               />
             )}
 
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 disabled={liveEntryQuestionSurface.loading}
                 onClick={() => { unlockLiveEntryVoice(); liveEntryQuestionSurface.submit() }}
-                className="rounded-[0.95rem] border border-white/[0.16] bg-white/80 px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-black transition hover:bg-white/90 active:scale-[0.98] disabled:opacity-40"
+                className="rounded-[14px] border border-white/[0.12] bg-white px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-white/90 active:scale-[0.99] disabled:opacity-40"
               >
                 {liveEntryQuestionSurface.primaryAction}
               </button>
@@ -2455,7 +2523,7 @@ const beginProofOfAwareness = async () => {
                   setShowLiveBriefingRoom(true)
                   setLiveBriefingStep(1)
                 }}
-                className={`rounded-[0.95rem] border px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98] ${
+                className={`rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
                   liveEntryQuestionSurface.canBeginLive
                     ? 'border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]'
                     : 'cursor-default border-[#4E7CFF]/25 bg-[#4E7CFF] text-white opacity-35'
