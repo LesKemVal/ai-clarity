@@ -52,6 +52,10 @@ import {
   cleanBriefingValue,
   titleBriefingValue,
 } from '@/lib/george/live-entry/outcome-briefing-presentation'
+import {
+  resolveLiveEntry,
+  type HomepageLiveHandoff,
+} from '@/lib/george/live-entry/entry-resolution'
 
 type Tier = 'smart' | 'intelligent' | 'brilliant'
 
@@ -1130,15 +1134,10 @@ const mandatoryLiveSignals = useMemo(() => {
     try {
       const params = new URLSearchParams(window.location.search)
       const source = params.get('source')
-      const isStartSource = source === 'start'
-      const isHomepageSource = source === 'homepage'
 
-      let homepageHandoff: {
-        conversationType?: string
-        signals?: Record<string, string>
-      } | null = null
+      let homepageHandoff: HomepageLiveHandoff | null = null
 
-      if (isHomepageSource) {
+      if (source === 'homepage') {
         try {
           const rawHomepageHandoff = window.localStorage.getItem(
             'GEORGE_HOMEPAGE_LIVE_HANDOFF'
@@ -1151,6 +1150,8 @@ const mandatoryLiveSignals = useMemo(() => {
           homepageHandoff = null
         }
       }
+
+      const isStartSource = source === 'start'
 
       if (isStartSource) {
         clearLivePreparationPreviewReady()
@@ -1199,33 +1200,31 @@ const mandatoryLiveSignals = useMemo(() => {
         ? {}
         : loadLivePreparationSignals()
 
-      const acquiredSignalsForAccess =
-        isHomepageSource && homepageHandoff?.signals
-          ? {
-              ...storedPreparationSignals,
-              ...homepageHandoff.signals,
-            }
-          : storedPreparationSignals
+      const entryResolution = resolveLiveEntry({
+        source,
+        homepageHandoff,
+        storedPreparationSignals,
+        preparationPreviewReady: isLivePreparationPreviewReady(),
+        devPreview: params.get('devPreview') === '1',
+        startNewLive:
+          window.localStorage.getItem('george_start_new_live') === '1',
+        hasLiveSetup: Boolean(
+          window.localStorage.getItem('GEORGE_LIVE_SETUP')
+        ),
+        hasActiveLiveSetup: Boolean(
+          window.localStorage.getItem('george_live_setup_active')
+        ),
+      })
 
-      const isFreshLiveStart =
-        window.localStorage.getItem('george_start_new_live') === '1' ||
-        params.get('source') === 'signal' ||
-        params.get('source') === 'home' ||
-        params.get('source') === 'founder'
-
-      const preLiveReady =
-        isHomepageSource ||
-        (!isFreshLiveStart && (
-          isLivePreparationPreviewReady() ||
-          params.get('devPreview') === '1' ||
-          Object.keys(acquiredSignalsForAccess).length > 0 ||
-          Boolean(window.localStorage.getItem('GEORGE_LIVE_SETUP')) ||
-          Boolean(window.localStorage.getItem('george_live_setup_active'))
-        ))
+      const {
+        acquiredSignals: acquiredSignalsForAccess,
+        isFreshLiveStart,
+        preLiveReady,
+      } = entryResolution
 
       setPreLivePreviewReady(preLiveReady)
 
-      if (isHomepageSource && homepageHandoff) {
+      if (entryResolution.firstStep === 'mechanics' && homepageHandoff) {
         setPreLiveSignals(acquiredSignalsForAccess)
         setLiveEntryMandatoryMode(false)
         setLiveEntryReadyMessageVisible(false)
