@@ -18,7 +18,7 @@ assert.match(
 
 assert.match(
   source,
-  /async function playQueue\(liveTurnId\?: string, playbackGeneration = speechPlaybackGenerationRef\.current\)/,
+  /async function playQueue\(\s*liveTurnId\?: string,\s*playbackGeneration = speechPlaybackGenerationRef\.current,\s*\)/s,
   'Queue playback must capture its generation'
 )
 
@@ -36,7 +36,7 @@ assert.match(
 
 assert.match(
   source,
-  /await stopSpeech\(\)\s*const playbackGeneration = speechPlaybackGenerationRef\.current/s,
+  /await stopSpeech\(\);\s*const playbackGeneration = speechPlaybackGenerationRef\.current/s,
   'Each speech request must capture ownership after invalidating prior work'
 )
 
