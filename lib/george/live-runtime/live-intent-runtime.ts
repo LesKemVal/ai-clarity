@@ -1,3 +1,40 @@
+/*
+ * ============================================================================
+ * PRODUCTION NOTE — LIVE ENTRY ACQUISITION (DO NOT REMOVE)
+ * ============================================================================
+ *
+ * GEORGE intentionally supports multiple routes into LIVE.
+ *
+ * These are NOT duplicate runtimes.
+ *
+ * Current entry surfaces include:
+ *
+ *   • Traditional LIVE preparation
+ *   • Normal GEORGE surface → LIVE
+ *   • Homepage → LIVE
+ *
+ * The objective is NOT to merge or eliminate these entry paths.
+ *
+ * The objective is ONLY to improve how preparation information is acquired.
+ *
+ * Planned acquisition flow:
+ *
+ *   1. Ask for the user's name.
+ *   2. Ask:
+ *        "Tell me everything I need to know about this conversation."
+ *   3. Ask for the desired outcome.
+ *   4. GEORGE extracts operational signals internally.
+ *   5. Ask only the single highest-value follow-up question if needed.
+ *   6. Allow LIVE once preparation is sufficient.
+ *
+ * This replaces rigid multi-question collection while preserving every
+ * existing route into LIVE.
+ *
+ * Preparation doctrine changes information acquisition only.
+ * It does NOT change LIVE architecture or entry surfaces.
+ * ============================================================================
+ */
+
 export type LiveIntentStage =
   | 'confirm_intent'
   | 'confirm_relation'
@@ -33,6 +70,45 @@ export type LivePreparationQuestion = {
   question: string
   examples: string
 }
+
+
+/*
+ * ============================================================================
+ * TODO — NEXT PRODUCTION ACQUISITION MODEL
+ * ============================================================================
+ *
+ * Replace the fixed preparation interview with operational acquisition.
+ *
+ * Existing implementation:
+ *
+ *   Name
+ *   Role
+ *   Counterparty
+ *   Desired Outcome
+ *   Acceptable Outcome
+ *
+ * Planned implementation:
+ *
+ *   1. Name
+ *   2. "Tell me everything I need to know about this conversation."
+ *   3. Desired Outcome
+ *   4. GEORGE extracts:
+ *        - chair / role
+ *        - counterparty
+ *        - pressure
+ *        - risks
+ *        - leverage
+ *        - constraints
+ *        - history
+ *        - operational signals
+ *   5. Ask one additional question only if confidence requires it.
+ *   6. LIVE becomes available.
+ *
+ * IMPORTANT:
+ * Do NOT remove the three LIVE entry routes.
+ * Change only information acquisition.
+ * ============================================================================
+ */
 
 export const LIVE_PREPARATION_QUESTIONS: readonly LivePreparationQuestion[] =
   Object.freeze([
