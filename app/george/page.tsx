@@ -1107,11 +1107,19 @@ export default function Page({
     setPreLiveSignalComplete(false);
     window.localStorage.removeItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION");
 
+    const firstPreparationQuestion =
+      resolveLivePreparationStep(0).question;
+
+    if (!firstPreparationQuestion) {
+      throw new Error(
+        "[GEORGE LIVE PREPARATION] Missing initial preparation question.",
+      );
+    }
+
     const nextMessages: Message[] = [
       {
         role: "assistant",
-        content:
-          "Give GEORGE signal.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.",
+        content: `${firstPreparationQuestion.kicker}.\n\n${firstPreparationQuestion.question}\n\n${firstPreparationQuestion.examples}`,
         source: "system_override",
         presentationMode: "live_preparation",
       },
@@ -1122,7 +1130,7 @@ export default function Page({
     setLiveMode(false);
     setConversationMode(null);
     setActivePromptContext("pre_live_signal_acquisition");
-    setActivePromptLabel("Start New LIVE");
+    setActivePromptLabel(firstPreparationQuestion.label);
     setInput("");
     setInterimTranscript("");
     setMessages(nextMessages);
