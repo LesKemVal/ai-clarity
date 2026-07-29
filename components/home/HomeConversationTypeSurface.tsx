@@ -1,64 +1,64 @@
-'use client'
+"use client";
 
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   CONVERSATION_TYPES,
   type ConversationType,
-} from '@/lib/george/live-entry/conversation-types'
+} from "@/lib/george/live-entry/conversation-types";
 import {
   loadLivePreparationSignals,
   markLivePreparationPreviewReady,
   saveLivePreparationSignals,
-} from '@/lib/george/live-browser/live-preparation-browser-storage'
+} from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
   LIVE_PREPARATION_QUESTIONS,
   resolveLivePreparationReadiness,
   resolveLivePreparationTransition,
-} from '@/lib/george/live-runtime/live-intent-runtime'
+} from "@/lib/george/live-runtime/live-intent-runtime";
 
 type SurfacePhase =
-  | 'selection'
-  | 'selected'
-  | 'introduction'
-  | 'questions'
-  | 'decision'
-  | 'review'
+  | "selection"
+  | "selected"
+  | "introduction"
+  | "questions"
+  | "decision"
+  | "review";
 
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState("");
 
   useEffect(() => {
-    setValue('')
-    if (!enabled || !text) return
+    setValue("");
+    if (!enabled || !text) return;
 
-    let index = 0
+    let index = 0;
     const timer = window.setInterval(() => {
-      index += 1
-      setValue(text.slice(0, index))
-      if (index >= text.length) window.clearInterval(timer)
-    }, speed)
+      index += 1;
+      setValue(text.slice(0, index));
+      if (index >= text.length) window.clearInterval(timer);
+    }, speed);
 
-    return () => window.clearInterval(timer)
-  }, [enabled, speed, text])
+    return () => window.clearInterval(timer);
+  }, [enabled, speed, text]);
 
-  return value
+  return value;
 }
 
 function ConversationTypeCard({
   conversationType,
   onSelect,
 }: {
-  conversationType: ConversationType
-  onSelect: (conversationType: ConversationType) => void
+  conversationType: ConversationType;
+  onSelect: (conversationType: ConversationType) => void;
 }) {
   return (
     <button
       type="button"
       onClick={() => onSelect(conversationType)}
       className={`group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border px-4 py-3 text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
-        conversationType.title === 'Other'
-          ? 'border-[#7EA1FF]/35 bg-[#4F7CFF] hover:bg-[#5A84FF]'
-          : 'border-white/[0.08] bg-[#08090A] hover:border-white/[0.16] hover:bg-[#0D0F12]'
+        conversationType.title === "Other"
+          ? "border-[#7EA1FF]/35 bg-[#4F7CFF] hover:bg-[#5A84FF]"
+          : "border-white/[0.08] bg-[#08090A] hover:border-white/[0.16] hover:bg-[#0D0F12]"
       }`}
     >
       <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
@@ -68,195 +68,199 @@ function ConversationTypeCard({
         →
       </span>
     </button>
-  )
+  );
 }
 
 export function HomeConversationTypeSurface() {
-  const [selectedType, setSelectedType] = useState<ConversationType | null>(null)
-  const [phase, setPhase] = useState<SurfacePhase>('selection')
-  const [introStage, setIntroStage] = useState(0)
-  const [decisionReady, setDecisionReady] = useState(false)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [editingQuestionKey, setEditingQuestionKey] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedType, setSelectedType] = useState<ConversationType | null>(
+    null,
+  );
+  const [phase, setPhase] = useState<SurfacePhase>("selection");
+  const [introStage, setIntroStage] = useState(0);
+  const [decisionReady, setDecisionReady] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [editingQuestionKey, setEditingQuestionKey] = useState<string | null>(
+    null,
+  );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const visibleTypes = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase()
-    if (!query) return CONVERSATION_TYPES
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return CONVERSATION_TYPES;
 
     return CONVERSATION_TYPES.filter((item) =>
       [item.title, item.description, item.initialization]
-        .join(' ')
+        .join(" ")
         .toLowerCase()
         .includes(query),
-    )
-  }, [searchQuery])
+    );
+  }, [searchQuery]);
 
   const preparationTransition = useMemo(
     () => resolveLivePreparationTransition(answers),
     [answers],
-  )
+  );
   const readiness = useMemo(
     () => resolveLivePreparationReadiness(answers),
     [answers],
-  )
+  );
   const activeQuestion = editingQuestionKey
     ? LIVE_PREPARATION_QUESTIONS.find(
         (question) => question.key === editingQuestionKey,
       ) || null
-    : preparationTransition.question
+    : preparationTransition.question;
   const activeQuestionIndex = activeQuestion
     ? LIVE_PREPARATION_QUESTIONS.findIndex(
         (question) => question.key === activeQuestion.key,
       )
-    : LIVE_PREPARATION_QUESTIONS.length
+    : LIVE_PREPARATION_QUESTIONS.length;
 
   useEffect(() => {
-    if (phase !== 'introduction') return
+    if (phase !== "introduction") return;
 
-    setIntroStage(0)
+    setIntroStage(0);
 
     const introductionText =
-      'The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.'
-    const typewriterDuration = introductionText.length * 24
+      "The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.";
+    const typewriterDuration = introductionText.length * 24;
 
-    const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180)
+    const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180);
     const customizeTimer = window.setTimeout(
       () => setIntroStage(2),
       typewriterDuration + 520,
-    )
+    );
     const startTimer = window.setTimeout(
       () => setIntroStage(3),
       typewriterDuration + 1450,
-    )
+    );
 
     return () => {
-      window.clearTimeout(typewriterTimer)
-      window.clearTimeout(customizeTimer)
-      window.clearTimeout(startTimer)
-    }
-  }, [phase])
+      window.clearTimeout(typewriterTimer);
+      window.clearTimeout(customizeTimer);
+      window.clearTimeout(startTimer);
+    };
+  }, [phase]);
 
   useEffect(() => {
-    if (phase !== 'decision') return
+    if (phase !== "decision") return;
 
-    setDecisionReady(false)
-    const timer = window.setTimeout(() => setDecisionReady(true), 2450)
-    return () => window.clearTimeout(timer)
-  }, [phase])
+    setDecisionReady(false);
+    const timer = window.setTimeout(() => setDecisionReady(true), 2450);
+    return () => window.clearTimeout(timer);
+  }, [phase]);
 
   const structureText = useTypewriter(
-    'The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.',
-    phase === 'introduction' && introStage >= 1,
+    "The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.",
+    phase === "introduction" && introStage >= 1,
     24,
-  )
+  );
   const questionText = useTypewriter(
-    activeQuestion?.question || '',
-    phase === 'questions' && Boolean(activeQuestion),
+    activeQuestion?.question || "",
+    phase === "questions" && Boolean(activeQuestion),
     24,
-  )
+  );
   const decisionText = useTypewriter(
-    'You can continue directly into LIVE now, or remain here and continue briefing GEORGE.',
-    phase === 'decision',
+    "You can continue directly into LIVE now, or remain here and continue briefing GEORGE.",
+    phase === "decision",
     24,
-  )
+  );
 
   function selectConversation(conversationType: ConversationType) {
-    setSelectedType(conversationType)
-    setPhase('selected')
-    setIntroStage(0)
-    setDecisionReady(false)
-    setEditingQuestionKey(null)
+    setSelectedType(conversationType);
+    setPhase("selected");
+    setIntroStage(0);
+    setDecisionReady(false);
+    setEditingQuestionKey(null);
   }
 
   function resetSelection() {
-    setSelectedType(null)
-    setPhase('selection')
-    setIntroStage(0)
-    setDecisionReady(false)
-    setEditingQuestionKey(null)
-    setAnswers({})
+    setSelectedType(null);
+    setPhase("selection");
+    setIntroStage(0);
+    setDecisionReady(false);
+    setEditingQuestionKey(null);
+    setAnswers({});
   }
 
   function beginPreparation() {
-    setPhase('introduction')
+    setPhase("introduction");
   }
 
   function goBack() {
-    setEditingQuestionKey(null)
+    setEditingQuestionKey(null);
 
-    if (phase === 'selected') {
-      resetSelection()
-      return
+    if (phase === "selected") {
+      resetSelection();
+      return;
     }
 
-    if (phase === 'introduction') {
-      setPhase('selected')
-      return
+    if (phase === "introduction") {
+      setPhase("selected");
+      return;
     }
 
-    if (phase === 'questions') {
-      setPhase('introduction')
-      return
+    if (phase === "questions") {
+      setPhase("introduction");
+      return;
     }
 
-    if (phase === 'decision') {
-      setPhase('questions')
-      return
+    if (phase === "decision") {
+      setPhase("questions");
+      return;
     }
 
-    if (phase === 'review') {
-      setPhase('decision')
+    if (phase === "review") {
+      setPhase("decision");
     }
   }
 
   function beginQuestions() {
-    setAnswers(loadLivePreparationSignals())
-    setEditingQuestionKey(null)
-    setPhase('questions')
+    setAnswers(loadLivePreparationSignals());
+    setEditingQuestionKey(null);
+    setPhase("questions");
   }
 
   function saveCurrentAnswer() {
-    if (!activeQuestion) return
+    if (!activeQuestion) return;
 
-    const answer = String(answers[activeQuestion.key] || '').trim()
-    if (!answer) return
+    const answer = String(answers[activeQuestion.key] || "").trim();
+    if (!answer) return;
 
     const nextSignals = {
       ...answers,
       [activeQuestion.key]: answer,
-    }
+    };
 
-    setAnswers(nextSignals)
-    saveLivePreparationSignals(nextSignals)
+    setAnswers(nextSignals);
+    saveLivePreparationSignals(nextSignals);
 
     if (editingQuestionKey) {
-      setEditingQuestionKey(null)
-      setPhase('review')
-      return
+      setEditingQuestionKey(null);
+      setPhase("review");
+      return;
     }
 
-    const nextTransition = resolveLivePreparationTransition(nextSignals)
+    const nextTransition = resolveLivePreparationTransition(nextSignals);
     if (!nextTransition.question) {
-      window.setTimeout(() => setPhase('decision'), 260)
+      window.setTimeout(() => setPhase("decision"), 260);
     }
   }
 
   function preserveHomepageHandoff() {
-    if (!selectedType || !readiness.thresholdMet) return false
+    if (!selectedType || !readiness.thresholdMet) return false;
 
     const signals = Object.fromEntries(
       Object.entries(answers)
-        .map(([key, value]) => [key, String(value || '').trim()])
+        .map(([key, value]) => [key, String(value || "").trim()])
         .filter(([, value]) => Boolean(value)),
-    )
+    );
 
-    saveLivePreparationSignals(signals)
-    markLivePreparationPreviewReady()
+    saveLivePreparationSignals(signals);
+    markLivePreparationPreviewReady();
 
     try {
       window.localStorage.setItem(
-        'GEORGE_HOMEPAGE_LIVE_HANDOFF',
+        "GEORGE_HOMEPAGE_LIVE_HANDOFF",
         JSON.stringify({
           conversationTypeId: selectedType.id,
           conversationType: selectedType.title,
@@ -265,30 +269,31 @@ export function HomeConversationTypeSurface() {
           readiness: resolveLivePreparationReadiness(signals),
           createdAt: Date.now(),
         }),
-      )
+      );
     } catch {}
 
-    return true
+    return true;
   }
 
   function approveAndContinueToLive() {
-    if (!preserveHomepageHandoff()) return
-    window.location.href = '/george/live-entry?source=homepage&stage=final-check'
+    if (!preserveHomepageHandoff()) return;
+    window.location.href =
+      "/george/live-entry?source=homepage&stage=final-check";
   }
 
   function continueBriefing() {
-    if (!preserveHomepageHandoff()) return
-    window.location.href = '/george?source=homepage-briefing'
+    if (!preserveHomepageHandoff()) return;
+    window.location.href = "/george?source=homepage-briefing";
   }
 
   return (
     <section
       className={`relative min-h-[100dvh] border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
-        selectedType ? 'bg-[#020304]' : 'bg-black'
+        selectedType ? "bg-[#020304]" : "bg-black"
       }`}
     >
       <div className="mx-auto w-full max-w-[1700px]">
-        {phase === 'selection' ? (
+        {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-5xl">
               <p className="inline-flex rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)] border-[#7EA1FF]/35 bg-[#4E7CFF] text-white shadow-[0_10px_30px_rgba(20,61,168,0.22)] transition-colors hover:bg-white hover:text-black active:bg-white active:text-black">
@@ -298,7 +303,8 @@ export function HomeConversationTypeSurface() {
                 What do you want GEORGE to help you do?
               </h1>
               <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Choose the closest conversation type, or describe what you want to accomplish.
+                Choose the closest conversation type, or describe what you want
+                to accomplish.
               </p>
 
               <label className="mt-8 block max-w-3xl">
@@ -324,12 +330,13 @@ export function HomeConversationTypeSurface() {
             <div className="mt-9">
               <div className="mb-5 flex items-center justify-between gap-2 sm:gap-3">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
-                  {visibleTypes.length} conversation {visibleTypes.length === 1 ? 'type' : 'types'}
+                  {visibleTypes.length} conversation{" "}
+                  {visibleTypes.length === 1 ? "type" : "types"}
                 </p>
                 {searchQuery.trim() && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => setSearchQuery("")}
                     className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38 transition hover:text-white/78"
                   >
                     Clear search
@@ -361,9 +368,7 @@ export function HomeConversationTypeSurface() {
             <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 sm:p-5 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-7">
               <div
                 className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
-                  phase === 'questions'
-                    ? 'border-transparent pb-3'
-                    : ''
+                  phase === "questions" ? "border-transparent pb-3" : ""
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
@@ -379,13 +384,12 @@ export function HomeConversationTypeSurface() {
 
                   <div
                     className={`shrink-0 transition-all duration-500 ${
-                      phase === 'questions'
-                        ? 'pointer-events-none -translate-y-1 opacity-0'
-                        : 'translate-y-0 opacity-100'
+                      phase === "questions"
+                        ? "pointer-events-none -translate-y-1 opacity-0"
+                        : "translate-y-0 opacity-100"
                     }`}
                   >
-
-                    {phase !== 'selected' && phase !== 'questions' && (
+                    {phase !== "selected" && phase !== "questions" && (
                       <div className="flex gap-2 flex-col items-stretch shrink-0 w-[116px] sm:w-[132px]">
                         <button
                           type="button"
@@ -400,15 +404,15 @@ export function HomeConversationTypeSurface() {
                           onClick={resetSelection}
                           className="rounded-[9px] border border-white/[0.12] bg-transparent font-mono font-semibold uppercase tracking-[0.12em] text-white/52 transition hover:border-white/25 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap order-last"
                         >
-                        Re-select
-                      </button>
+                          Re-select
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {phase === 'selected' && (
+              {phase === "selected" && (
                 <div className="pt-6 animate-[fadeIn_420ms_ease-out]">
                   <div className="max-w-3xl">
                     <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/48">
@@ -421,28 +425,26 @@ export function HomeConversationTypeSurface() {
                   </div>
 
                   <div className="mt-7 grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={beginPreparation}
+                      className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
+                    >
+                      Continue →
+                    </button>
 
                     <button
-                                          type="button"
-                                          onClick={beginPreparation}
-                                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
-                                        >
-                                          Continue →
-                                        </button>
-
-                    <button
-                                          type="button"
-                                          onClick={resetSelection}
-                                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
-                                        >
-                                            Re-select
-                                          </button>
-
+                      type="button"
+                      onClick={resetSelection}
+                      className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
+                    >
+                      Re-select
+                    </button>
                   </div>
                 </div>
               )}
 
-              {phase === 'introduction' && (
+              {phase === "introduction" && (
                 <div className="pt-6">
                   <div className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.03em] text-white sm:text-[24px] sm:leading-9">
                     {structureText}
@@ -451,8 +453,8 @@ export function HomeConversationTypeSurface() {
                   <div
                     className={`mt-6 transition-all duration-700 ${
                       introStage >= 2
-                        ? 'translate-y-0 opacity-100'
-                        : 'pointer-events-none translate-y-2 opacity-0'
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
                     }`}
                   >
                     <h3 className="font-mono text-[17px] font-semibold tracking-[-0.02em] text-white">
@@ -468,8 +470,8 @@ export function HomeConversationTypeSurface() {
                   <div
                     className={`mt-5 transition-all duration-500 ${
                       introStage >= 3
-                        ? 'translate-y-0 opacity-100'
-                        : 'pointer-events-none translate-y-2 opacity-0'
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
                     }`}
                   >
                     <button
@@ -483,7 +485,7 @@ export function HomeConversationTypeSurface() {
                 </div>
               )}
 
-              {phase === 'questions' && activeQuestion && (
+              {phase === "questions" && activeQuestion && (
                 <div
                   key={activeQuestion.key}
                   className="pt-5 animate-[fadeIn_420ms_ease-out]"
@@ -502,7 +504,7 @@ export function HomeConversationTypeSurface() {
 
                   <textarea
                     autoFocus
-                    value={answers[activeQuestion.key] || ''}
+                    value={answers[activeQuestion.key] || ""}
                     onChange={(event) =>
                       setAnswers((current) => ({
                         ...current,
@@ -510,9 +512,9 @@ export function HomeConversationTypeSurface() {
                       }))
                     }
                     onKeyDown={(event) => {
-                      if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault()
-                        saveCurrentAnswer()
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        saveCurrentAnswer();
                       }
                     }}
                     rows={2}
@@ -523,7 +525,8 @@ export function HomeConversationTypeSurface() {
                   <div className="mt-4 flex items-center justify-between gap-2 sm:gap-3">
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/26">
-                        {activeQuestionIndex + 1} of {LIVE_PREPARATION_QUESTIONS.length}
+                        {activeQuestionIndex + 1} of{" "}
+                        {LIVE_PREPARATION_QUESTIONS.length}
                       </span>
 
                       <div className="flex gap-1" aria-hidden="true">
@@ -532,8 +535,8 @@ export function HomeConversationTypeSurface() {
                             key={question.key}
                             className={`h-[3px] w-4 rounded-full transition-colors duration-300 ${
                               index <= activeQuestionIndex
-                                ? 'bg-[#7EA1FF]/68'
-                                : 'bg-white/[0.09]'
+                                ? "bg-[#7EA1FF]/68"
+                                : "bg-white/[0.09]"
                             }`}
                           />
                         ))}
@@ -543,9 +546,9 @@ export function HomeConversationTypeSurface() {
                     <button
                       type="button"
                       onClick={saveCurrentAnswer}
-                      disabled={!String(
-                        answers[activeQuestion.key] || '',
-                      ).trim()}
+                      disabled={
+                        !String(answers[activeQuestion.key] || "").trim()
+                      }
                       className="h-10 rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A] disabled:cursor-not-allowed disabled:opacity-25"
                     >
                       Continue →
@@ -554,19 +557,21 @@ export function HomeConversationTypeSurface() {
                 </div>
               )}
 
-              {phase === 'decision' && (
+              {phase === "decision" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
                   <h3 className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
                     {decisionText}
                   </h3>
                   <div
                     className={`mt-7 flex flex-wrap gap-3 transition-all duration-500 ${
-                      decisionReady ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
+                      decisionReady
+                        ? "translate-y-0 opacity-100"
+                        : "pointer-events-none translate-y-2 opacity-0"
                     }`}
                   >
                     <button
                       type="button"
-                      onClick={() => setPhase('review')}
+                      onClick={() => setPhase("review")}
                       disabled={!readiness.thresholdMet}
                       className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
@@ -583,7 +588,7 @@ export function HomeConversationTypeSurface() {
                 </div>
               )}
 
-              {phase === 'review' && (
+              {phase === "review" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
                     Review answers
@@ -606,8 +611,8 @@ export function HomeConversationTypeSurface() {
                           <button
                             type="button"
                             onClick={() => {
-                              setEditingQuestionKey(question.key)
-                              setPhase('questions')
+                              setEditingQuestionKey(question.key);
+                              setPhase("questions");
                             }}
                             className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-[#AEB6FF]/72 transition hover:text-white"
                           >
@@ -628,7 +633,7 @@ export function HomeConversationTypeSurface() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPhase('decision')}
+                      onClick={() => setPhase("decision")}
                       className="rounded-full border border-white/[0.14] py-3 font-mono font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white w-full h-8 min-w-0 px-2 text-[7px] sm:text-[8px] whitespace-nowrap"
                     >
                       Back
@@ -641,5 +646,5 @@ export function HomeConversationTypeSurface() {
         )}
       </div>
     </section>
-  )
+  );
 }

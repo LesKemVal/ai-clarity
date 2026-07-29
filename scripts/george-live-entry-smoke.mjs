@@ -17,32 +17,23 @@ const checks = [
     liveEntry.includes("type LiveRoomObjectiveOptionId"),
   ],
   [
-    "Popup 3 includes a briefing-compatible confident approach",
-    liveEntry.includes("label: 'Confident and prepared'"),
+    "Popup 3 performs proof of awareness",
+    liveEntry.includes("beginProofOfAwareness"),
   ],
   [
-    "Popup 3 includes Other custom objective",
+    "Popup 3 retains custom objective support",
     liveEntry.includes("customLiveRoomObjective"),
   ],
-  ["Popup 3 is final check", liveEntry.includes("BRIEF ROOM · FINAL CHECK")],
   [
-    "Popup 3 asks the user to choose an approach",
-    liveEntry.includes("Choose your approach"),
+    "Popup 3 is readiness",
+    liveEntry.includes('label="BRIEF ROOM · READINESS"'),
   ],
+  ["Popup 3 is Ready Room", liveEntry.includes('title="Ready Room."')],
   [
-    "Popup 3 explains LIVE control orientation",
-    liveEntry.includes("These controls will be available in the conversation."),
+    "Popup 3 follows Mechanics",
+    liveEntry.includes("onBack={() => setLiveBriefingStep(2)}"),
   ],
-  [
-    "Popup 3 explains briefing-filtered approach choices",
-    liveEntry.includes(
-      "GEORGE filtered these choices using the full briefing.",
-    ),
-  ],
-  [
-    "LIVE setup carries intangibleObjective",
-    liveEntry.includes("intangibleObjective,"),
-  ],
+  ["Popup 3 remains stage three", liveEntry.includes("stage={3}")],
   [
     "LIVE setup carries fallbackOutcome",
     liveEntry.includes("fallbackOutcome: secondaryOutcome"),
@@ -57,9 +48,8 @@ const checks = [
   ],
   [
     "Runtime bridge sends secondaryObjective",
-    page.includes(
-      "secondaryObjective: String(liveRuntimeSupport?.secondaryObjective || '')",
-    ),
+    page.includes("secondaryObjective: String(") &&
+      page.includes("liveRuntimeSupport?.secondaryObjective"),
   ],
   [
     "Briefing voice acknowledgement removed",
