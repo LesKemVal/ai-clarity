@@ -960,6 +960,8 @@ LANGUAGE MODE: SPANISH
             ? body.operationalMemoryContext
             : {}
 
+        const operationalMemoryStartedAt = performance.now()
+
         const formulaContext = buildFormulaRetrievalContext({
           userId: operationalMemoryUserId,
           roomType: normalizeFormulaRetrievalType(
@@ -986,6 +988,16 @@ LANGUAGE MODE: SPANISH
 
         operationalMemoryEvidence =
           createOperationalMemoryRuntimeEvidence(selected)
+
+        console.log('[GEORGE][OPERATIONAL_MEMORY][RETRIEVAL]', {
+          durationMs: Number(
+            (performance.now() - operationalMemoryStartedAt).toFixed(3)
+          ),
+          retrievedCount: retrieved.length,
+          selectedCount: selected.length,
+          evidenceInjected:
+            operationalMemoryEvidence.formulas.length > 0,
+        })
       } catch (error) {
         console.error(
           '[GEORGE][OPERATIONAL_MEMORY][RETRIEVAL_FAILED]',
