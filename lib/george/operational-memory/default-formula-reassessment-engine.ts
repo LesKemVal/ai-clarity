@@ -20,9 +20,9 @@ OperationalFormulaReassessmentEngine {
       let decision: OperationalFormulaReassessment['decision'] =
         'insufficient_evidence'
 
-      let confidenceBefore = input.formula.confidence
+      const confidenceBefore = input.formula.confidence
 
-      let confidenceAfter = confidenceBefore
+      const confidenceAfter = confidenceBefore
 
       const reasons: string[] = []
 
@@ -38,7 +38,6 @@ OperationalFormulaReassessmentEngine {
       ) {
 
         decision = 'confirm'
-        confidenceAfter += 0.02
 
         reasons.push(
           'Execution completed without recorded deviations.'
@@ -50,7 +49,6 @@ OperationalFormulaReassessmentEngine {
       ) {
 
         decision = 'confirm'
-        confidenceAfter += 0.05
 
         reasons.push(
           'Observed outcomes outweighed deviations.'
@@ -59,7 +57,6 @@ OperationalFormulaReassessmentEngine {
       } else {
 
         decision = 'weaken'
-        confidenceAfter -= 0.08
 
         reasons.push(
           'Execution contained more deviations than successful outcomes.'
