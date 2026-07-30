@@ -80,6 +80,26 @@ export type OperationalFormulaEvidence = {
   observedAt: number
 }
 
+export type OperationalFormulaVerification = {
+  authority: 'BRANESX'
+  verified: boolean
+  verifiedAt?: number
+  verificationVersion?: string
+}
+
+export type OperationalFormulaPublication = {
+  author?: string
+  publisher?: string
+  marketplaceReady?: boolean
+  provenBy?: string[]
+  alternatives?: string[]
+}
+
+export type OperationalFormulaScriptManagement = {
+  primaryScriptId?: string
+  latestScriptRevision?: string
+}
+
 export type OperationalFormula = {
   id: string
   version: number
@@ -92,6 +112,9 @@ export type OperationalFormula = {
   bestUsedFor?: string[]
   uses?: number
   verifiedByBranesx?: boolean
+  verification?: OperationalFormulaVerification
+  publication?: OperationalFormulaPublication
+  scriptManagement?: OperationalFormulaScriptManagement
   roomTypes: string[]
   objectiveTypes: string[]
   prerequisites: string[]
