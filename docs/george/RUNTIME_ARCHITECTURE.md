@@ -91,18 +91,24 @@ Canonical ownership remains:
 
 The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
 
-BRANESX is the formula verification authority for factual correctness, operational integrity, structural correctness, and publication readiness.
+GEORGE owns the operational formula and its lifecycle.
 
-GEORGE evaluates operational execution and may propose revisions. GEORGE does not self-publish verified formulas.
+GEORGE owns formula creation, evidence, confidence, success, contradictions, revisions, lineage, reassessment, operational learning, and the decision that a formula remains operationally valid.
+
+BRANESX verifies descriptive metadata claims attached to the formula. It does not verify or replace GEORGE's operational reasoning.
+
+The Operational Library is a presentation surface. It consumes GEORGE-owned operational data and BRANESX-verified metadata without becoming a formula owner, metadata verification authority, or mutation path.
+
+Users may edit descriptive metadata they own. BRANESX verification records are system-managed. Any change to verified metadata must stale or clear the affected verification until the updated claims are verified again.
 
 The formula lifecycle is:
 
 ```text
-Author
+GEORGE operational formula lifecycle
 ↓
-Publisher
+Descriptive metadata authoring
 ↓
-Verification Authority
+BRANESX metadata verification
 ↓
 Published Formula
 ↓

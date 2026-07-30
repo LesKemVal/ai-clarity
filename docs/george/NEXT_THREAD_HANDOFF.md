@@ -69,7 +69,7 @@ Production assets already include:
 
 The Operational Library is a consumer. It must not become another registry or runtime authority.
 
-BRANESX is the formula verification authority.
+GEORGE owns operational formulas and their lifecycle. BRANESX verifies descriptive metadata claims attached to those formulas, not the operational reasoning itself.
 
 GEORGE evaluates operational execution and may propose revisions. GEORGE does not self-publish verified formulas.
 

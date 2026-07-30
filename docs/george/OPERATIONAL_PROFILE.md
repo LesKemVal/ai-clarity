@@ -91,9 +91,13 @@ Current reasoning and operational judgment
 
 Formula confidence, success, contradictions, unknowns, evidence, Proven By records, reassessment, revisions, and lineage must remain visible and inspectable.
 
-BRANESX verifies publication readiness. GEORGE evaluates execution and may propose revisions. GEORGE does not self-publish verified formulas.
+GEORGE owns operational formulas and their lifecycle. GEORGE creates, evaluates, learns from, reassesses, revises, and determines the continuing operational validity of each formula.
 
-The Operational Library exposes canonical formula evidence and controls without becoming another formula owner, learning system, verification authority, or conversation-type registry.
+BRANESX verifies descriptive metadata claims attached to formulas, including identity, authorship, publisher, Proven By records, marketplace readiness, script references, and verification records. BRANESX does not determine whether the operational reasoning is correct.
+
+The Operational Library exposes GEORGE-owned operational evidence and BRANESX-verified metadata without becoming another formula owner, learning system, verification authority, mutation path, or conversation-type registry.
+
+Users may update descriptive metadata they own, but cannot assert or directly edit BRANESX verification status. A change to verified metadata must stale or clear the existing verification until the updated claims are verified again.
 <!-- GEORGE_OPERATIONAL_FORMULA_PROFILE_END -->
 
 ## One GEORGE
