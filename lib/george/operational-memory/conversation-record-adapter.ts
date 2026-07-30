@@ -17,6 +17,8 @@ type ConversationRecordProjection = {
     confidence?: number
     desiredOutcome?: string
   } | null
+  transcriptHighlights?: TranscriptHighlightProjection[]
+  behaviorHypotheses?: BehaviorHypothesisProjection[]
 }
 
 type TranscriptHighlightProjection = {
@@ -130,8 +132,14 @@ export function adaptConversationRecordForOperationalMemory(
 ): ConversationRecord {
   const endedAt = input.endedAt ?? Date.now()
   const startedAt = input.startedAt ?? parseTimestamp(input.record.createdAt, endedAt)
-  const transcriptHighlights = input.transcriptHighlights || []
-  const behaviorHypotheses = input.behaviorHypotheses || []
+  const transcriptHighlights =
+    input.transcriptHighlights ??
+    input.record.transcriptHighlights ??
+    []
+  const behaviorHypotheses =
+    input.behaviorHypotheses ??
+    input.record.behaviorHypotheses ??
+    []
   const signals = buildSignals(transcriptHighlights, behaviorHypotheses, startedAt)
 
   return {
