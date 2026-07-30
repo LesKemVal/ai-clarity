@@ -6,6 +6,26 @@
   color-scheme: dark;
   --background: #000000;
   --foreground: #f4f7ff;
+
+  /* Steel Material Language */
+  --steel-100: #f4f7ff;
+  --steel-200: #dce7f5;
+  --steel-300: #c7d4e3;
+  --steel-400: #a8b5c7;
+  --steel-500: #8c9aad;
+  --steel-600: #738297;
+
+  --surface-0: #000000;
+  --surface-1: #03070b;
+  --surface-2: #05070b;
+  --surface-3: #050a10;
+  --surface-4: #07101a;
+
+  --border-subtle: rgba(255,255,255,.045);
+  --border-soft: rgba(255,255,255,.06);
+
+  --accent: #72afe8;
+  --accent-bright: #7cb7ff;
 }
 
 html,
