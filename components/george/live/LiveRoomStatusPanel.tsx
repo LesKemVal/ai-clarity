@@ -279,7 +279,7 @@ function OperationalStatus({
             ? "bg-[#2EA7D7]/80 shadow-[0_0_12px_rgba(46,167,215,0.36)]"
             : isListening
               ? "bg-[#72afe8] shadow-[0_0_16px_rgba(114,175,232,0.60)]"
-              : "bg-white/18"
+              : "bg-[color:var(--steel-300)]/18"
         }`}
       />
       <span className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--steel-300)]">
