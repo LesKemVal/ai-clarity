@@ -262,7 +262,7 @@
       "path": "lib/george/runtime/live-recommendation-governor.ts",
       "role": "Detects evidence that Operational Judgment uses to decide whether LIVE may surface or be recommended from Normal GEORGE.",
       "targetedBehavior": [
-        "scripts/george-behavior/live-recommendation-threshold.mjs"
+        
       ],
       "concertBehavior": [],
       "invariants": [
