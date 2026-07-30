@@ -236,9 +236,6 @@ export type OperationalScriptDecision = {
 export type OperationalFormulaReassessmentDecision =
   | 'confirm'
   | 'weaken'
-  | 'contest'
-  | 'retire'
-  | 'evolve'
   | 'insufficient_evidence'
 
 export type OperationalFormulaReassessment = {
