@@ -1,3 +1,5 @@
+import OperationalLibraryClient from "./OperationalLibraryClient";
+
 export default function GeorgeLibraryPage() {
   return (
     <main className="min-h-screen bg-black text-white">
@@ -10,20 +12,8 @@ export default function GeorgeLibraryPage() {
           Browse operational formulas and scripts learned by GEORGE.
         </p>
 
-        <section className="mt-10 rounded-xl border border-white/10 p-6">
-          <h2 className="text-lg font-medium">Operational Formulas</h2>
-          <div id="formula-library" className="mt-4">
-            Loading…
-          </div>
-        </section>
-
-        <section className="mt-8 rounded-xl border border-white/10 p-6">
-          <h2 className="text-lg font-medium">Operational Scripts</h2>
-          <div id="script-library" className="mt-4">
-            Loading…
-          </div>
-        </section>
+        <OperationalLibraryClient />
       </div>
     </main>
-  )
+  );
 }
