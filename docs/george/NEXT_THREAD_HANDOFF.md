@@ -41,7 +41,7 @@ Production assets already include:
 - evidence;
 - scripts and script execution;
 - reassessment;
-- revision proposals;
+- revision-proposal contracts and canonical ownership foundation;
 - evolution and lineage;
 - operational learning.
 

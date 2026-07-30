@@ -65,7 +65,7 @@ Existing production assets include:
 - script execution and deviation tracking;
 - reassessment;
 - evolution;
-- revision proposals;
+- revision-proposal contracts and canonical ownership foundation;
 - lineage;
 - operational learning.
 
