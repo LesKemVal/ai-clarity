@@ -261,13 +261,19 @@ export type OperationalFormulaEvolutionKind =
   | 'merge'
   | 'retirement'
 
+export type OperationalFormulaLineageSource =
+  | 'operational_learning'
+  | 'user_edit'
+
 export type OperationalFormulaLineage = {
   id: string
   kind: OperationalFormulaEvolutionKind
+  source?: OperationalFormulaLineageSource
   parentFormulaIds: string[]
   childFormulaId?: string
-  conversationId: string
-  reassessmentId: string
+  conversationId?: string
+  reassessmentId?: string
+  createdByUserId?: string
   reasons: string[]
   createdAt: number
 }

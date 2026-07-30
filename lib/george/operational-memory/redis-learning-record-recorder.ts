@@ -85,15 +85,18 @@ OperationalLearningRecordRecorder {
 
     async saveLineage(lineage) {
       const redis = getRedis()
-
-      await redis
+      const transaction = redis
         .multi()
         .set(lineageKey(lineage.id), JSON.stringify(lineage))
-        .sAdd(
+
+      if (lineage.conversationId) {
+        transaction.sAdd(
           lineageConversationKey(lineage.conversationId),
           lineage.id
         )
-        .exec()
+      }
+
+      await transaction.exec()
     },
 
     async listReassessmentsByConversation(conversationId) {

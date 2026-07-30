@@ -47,6 +47,7 @@ OperationalFormulaEvolutionEngine {
           const lineage: OperationalFormulaLineage = {
             id: crypto.randomUUID(),
             kind: 'derived',
+            source: 'operational_learning',
             parentFormulaIds: [input.formula.id],
             childFormulaId,
             conversationId: input.conversation.id,
@@ -66,6 +67,7 @@ OperationalFormulaEvolutionEngine {
           const lineage: OperationalFormulaLineage = {
             id: crypto.randomUUID(),
             kind: 'retirement',
+            source: 'operational_learning',
             parentFormulaIds: [input.formula.id],
             conversationId: input.conversation.id,
             reassessmentId: reassessment.id,
