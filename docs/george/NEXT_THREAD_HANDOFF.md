@@ -1,174 +1,205 @@
-# GEORGE PRODUCTION CONTINUATION — NO DRIFT
+# GEORGE PRODUCT EXPERIENCE CONTINUATION — NO DRIFT
 
-Branch: `live-hub-runtime`
-
-Current inspected HEAD:
-
-```text
-d2e28a4 Consolidate browser-scoped session lifecycle
-```
+Branch: `material-language-redesign`
 
 ## FIRST
 
-Read in order:
+Read completely, in order:
 
 1. `docs/george/PRODUCTION_TRACKER.md`
 2. `docs/george/RUNTIME_ARCHITECTURE.md`
 3. `docs/george/OPERATIONAL_PROFILE.md`
 4. `docs/george/NEXT_THREAD_HANDOFF.md`
+5. `docs/george/HOMEPAGE_CONVERSATION_EXPERIENCE.md` when working on homepage-to-LIVE continuity
 
 Inspect implementation before changing anything.
 
-Do not redesign GEORGE.
+Continuation packets provide operational guidance only. The synchronized implementation, tracker, architecture, and operational profile are authoritative.
 
-Do not create another runtime, reasoning lane, support composer, delivery router, preference store, or competing authority.
+## CURRENT PHASE
 
-Do not move reasoning into `app/george/page.tsx`.
+GEORGE is in **Product Experience and Material Language Refinement**.
 
-## CURRENT VALIDATED WORK
+The runtime architecture, canonical ownership, portability, and production validation work have reached the point where product refinement is now the primary focus. Future work should improve the product experience rather than redesign the runtime unless implementation reveals a genuine defect.
 
-The LIVE runtime supports two adaptive starting preferences:
+The objective is to improve clarity, fluidity, consistency, and perceived quality without changing runtime ownership, reasoning authority, receiver policy, delivery authority, or production architecture.
 
-- **Adaptive Cue** — recommended default.
-- **Adaptive Response** — begins with concise, complete, usable language.
+Do not pull the project backward into architecture, portability, qualification reconstruction, or production-system construction unless current implementation evidence proves a concrete defect.
 
-The preference determines where GEORGE begins, not where GEORGE must remain.
+## ACTIVE WORK
 
-GEORGE adapts from observed execution unless the user explicitly requires a particular support style.
+Current sequence:
 
-Adaptive Cue seeks the smallest useful resource the user can successfully execute from.
+```text
+Motion
+↓
+Materials
+↓
+Color
+↓
+Micro-interactions
+↓
+Visual refinement
+```
 
-Adaptive Response seeks the shortest complete, speakable response likely to improve execution.
+Fluidity comes first.
 
-If complete lines are working, preserve them.
+The immediate product surface is Popup 3 / Ready Room. Correct its responsibility before the color and material pass.
 
-Do not compress merely because a cue is shorter.
+## POPUP 3 / READY ROOM
 
-Continuation remains a runtime-selected resource for lost words, sentence endings, prepared talking points, repeatable lines, interruption recovery, or language already in queue.
+Canonical flow:
 
-## ARCHITECTURE
+1. Popup 1 — Operational Briefing
+   - outcome;
+   - responsibility;
+   - participants;
+   - conversation/context;
+   - additional signals;
+   - documents.
 
-One GEORGE.
+2. Popup 2 — Mechanics
+   - support style;
+   - receiver profile;
+   - speaking style;
+   - responsibility/privacy acknowledgement.
 
-One LIVE runtime.
+3. Popup 3 — Ready Room
+   - final preparation before LIVE;
+   - explains how GEORGE will behave using the already-selected mechanics.
 
-One signal-to-support pipeline.
+Homepage/front-surface handoff may skip Popup 1 when preparation already occurred. Do not change routing while correcting Popup 3.
 
-One Support Behavior Composer.
+Popup 3 must dynamically explain:
 
-One operational-resource vocabulary.
+- Audio: GEORGE speaks through earbuds or audio glasses;
+- Glasses: GEORGE communicates visually, with audio available for immediate steering;
+- Desktop / Mobile: GEORGE presents readable guidance on the responsive workspace;
+- Adaptive Cue: brief support at the right moment;
+- Continuation: support completing a thought when the user begins and pauses;
+- Response: concise complete language when useful;
+- Presentation: structured support for delivering a complete idea;
+- adaptation when the room changes.
 
-One receiver delivery policy.
+Remove the control-card/tutorial interpretation of Ready Room. It is readiness, not configuration or a catalogue of LIVE controls.
 
-Canonical owners:
+## MATERIAL MOTION DOCTRINE
 
-- `lib/george/live-runtime/support-behavior-composer.ts`
-- `lib/george/capabilities/live-support-panels.ts`
-- `app/george/live-entry/LiveEntryClient.tsx`
-- `lib/george/live-delivery/*`
+One canonical motion authority should own the shared motion language:
 
-`app/george/page.tsx` remains a UI mount, interaction, rendering, and pass-through surface only.
+```text
+lib/george/ui/material-motion.ts
+```
 
-Do not add support-resource selection, continuation rules, response-length doctrine, signal interpretation, receiver policy, explicit style-lock authority, or duplicate LIVE runtime state there.
+### Fade
 
-## USER AUTHORITY
+Everything entering or leaving fades.
 
-Adaptive preference is a starting default.
+```text
+180–250 ms
+ease-out
+```
 
-Explicit user instruction is authoritative for the current room.
+No popping.
 
-Do not automatically promote current-room constraints into the Operational Profile.
+### Collapse
 
-## CURRENT HOMEPAGE STATE
+Size-changing regions animate height, opacity, and slight vertical translation.
 
-The homepage hero communicates:
+```text
+opacity: 0 → 1
+translateY: 6px → 0
+max-height: 0 → resolved height
+```
 
-1. Preparation before the conversation.
-2. Support during the conversation.
-3. Review after the conversation.
+### Workspace slide
 
-Each pass flips from the top, fades in the tagline, and types a short explanation.
+Whole workspaces settle away and arrive subtly.
 
-Ask GEORGE, LIVE Support, and Help appear side by side on desktop.
+```text
+150–220 ms
+```
 
-Post-conversation doctrine:
+### Machine acknowledgement
 
-- summary first;
-- transcript immediately available on request;
-- transcript treated as evidence.
+No flash, bounce, or aggressive glow. Use a restrained light sweep, then settle.
 
-## NEXT PRODUCT AREA
+### Conversation
 
-Inspect and redesign the active LIVE room.
+Streaming intelligence streams. Completed intelligence becomes perfectly still. No idle shimmer on completed thoughts.
 
-Direction:
+### Hover
 
-- remove the oversized permanent card;
-- create a quiet operating surface;
-- use realistic phone controls that can later translate to glasses;
-- do not expose internal runtime concepts;
-- do not add controls that duplicate GEORGE adaptation.
+Use 1–2 px lift, a slightly brighter edge, and a restrained reflection. No dramatic scaling.
 
-Controls to inspect:
+### Press
 
-- listening and connection state;
-- receiver;
-- pause or suspend support;
-- repeat last support;
-- discreet exit.
+Use approximately 1 px of mechanical travel, like an instrument-panel control.
 
-## VALIDATION
+## ARCHITECTURE GUARDRAILS
 
-The adaptive-preference implementation passed:
+Do not create:
 
-- LIVE Entry smoke
-- LIVE Runtime smoke
-- production build
-- LIVE Hub TypeScript build
-- `git diff --check`
+- another GEORGE;
+- another runtime or reasoning lane;
+- another support composer;
+- another operational-assessment owner;
+- another receiver-policy owner;
+- another delivery router;
+- page-level runtime intelligence;
+- local motion systems that compete with the canonical material-motion authority.
+
+`app/george/page.tsx` remains thin.
+
+Rendering and motion consume approved state. They do not recompute upstream intelligence.
+
+## READINESS REFERENCE
+
+`docs/george/PRODUCTION_TRACKER.md` is the canonical status and readiness authority.
+
+The architecture and operational profile own their respective boundaries; they should not be treated as duplicate project-status trackers.
+
+The tracker records the qualifying evidence that moved GEORGE into product refinement, including portability, ownership, interface-freeze, operational-memory, latency, resilience, and production-build results.
+
+`production-readiness-checklist.md` contains historical qualification material and must not be treated as the active phase without current implementation evidence.
 
 ## WORKING STYLE
 
-The owner does not manually edit code.
+The owner does not manually edit code or production documentation. Manual coding is less efficient for this workflow.
 
-Every patch must be one complete copy-and-paste command beginning with `cd ~/ai-clarity`.
+When the owner asks for the **next terminal command**, provide the complete, immediately runnable command that performs the agreed next action. Do not repeat the plan first. Do not provide placeholders. Do not instruct the owner to run an artifact that has not been generated.
 
-Do not use shell heredocs.
+Every local terminal command, patch command, or script-run command must begin exactly with:
 
-Use downloadable Python patch files for large changes.
+```bash
+id="031ukw"
+id="xtdj16"
+id="1dcmvv"
+cd ~/ai-clarity
+```
+
+Execution requirements:
+
+- include `cd ~/ai-clarity` in every runnable local command;
+- prefer generated patches or downloadable Python scripts over manual edits;
+- update synchronized authorities together;
+- generate the patch or script before giving the run command;
+- never use `/path/to/...` or another placeholder path;
+- do not use shell heredocs for large changes;
+- provide focused validation commands after execution.
 
 Inspect first.
 
-Patch one canonical owner.
+Patch only canonical owners.
 
-Run focused smoke tests.
+Use small commits.
 
-Run the production build.
+Build and run focused qualification after each implementation change.
 
-Run the LIVE Hub build.
+Never commit a failed build.
 
-Run `git diff --check`.
+Synchronize documentation after validated implementation changes.
 
-Synchronize documentation after implementation passes.
-
-Commit only validated work.
-
-## PRODUCTION DIRECTION
-
-Preserve adaptive behavior.
-
-Validate with real LIVE room evidence.
-
-Redesign LIVE without moving runtime authority into UI.
-
-Optimize measured latency.
-
-Preserve receiver portability.
-
-Keep `app/george/page.tsx` thin.
-
-Keep validation green.
-
-Continue toward production freeze and portable runtime extraction.
+Git is the recovery system. Do not create timestamped source backups, copied page files, `.backup-*` artifacts, or new patch-backup directories.
 
 No drift.

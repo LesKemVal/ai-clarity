@@ -20,21 +20,15 @@ The implementation remains the source of truth. This document is authoritative o
 
 ## Architectural Status
 
-Branch:
-
-```text
-live-hub-runtime
-```
-
 Current phase:
 
 ```text
-Production Completion and Product Qualification
+Product Experience and Material Language Refinement
 ```
 
-The core runtime architecture is implemented, ownership-qualified, portability-qualified, interface-freeze qualified, and production-build validated.
+The runtime architecture, canonical ownership, portability, and production validation work have reached the point where product refinement is now the primary focus. The tracker owns the detailed readiness record.
 
-Architecture is frozen for product qualification unless implementation evidence proves a genuine defect or missing production responsibility.
+Architecture remains frozen during product-experience refinement unless current implementation evidence proves a genuine defect or missing production responsibility.
 
 Do not create:
 
@@ -46,6 +40,38 @@ Do not create:
 - another receiver-policy owner;
 - another delivery router;
 - page-level runtime intelligence.
+
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_START -->
+## Material Motion Boundary
+
+Material-language refinement is downstream of runtime reasoning, behavior selection, operational assessment, receiver policy, routing, and delivery approval.
+
+Canonical flow remains:
+
+```text
+Approved product/runtime state
+↓
+Surface presentation policy
+↓
+Canonical material-motion primitives
+↓
+Component realization
+```
+
+Motion may communicate state change. Motion may not create state, reinterpret operational meaning, select support behavior, alter receiver policy, or become another runtime authority.
+
+The canonical shared motion authority should live under:
+
+```text
+lib/george/ui/material-motion.ts
+```
+
+It owns shared timing and primitives for fade, collapse, slide, press, transient shimmer, and machine acknowledgement.
+
+Components consume these primitives. They should not invent separate motion languages.
+
+Popup 3 remains owned by LIVE Entry. Its presentation may be refined, but routing, briefing ownership, mechanics ownership, receiver policy, and runtime behavior must remain in their canonical owners.
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_END -->
 
 ## One Intelligence, Two Operating Modes
 
@@ -1015,12 +1041,15 @@ Never reverse this order.
 
 ## Freeze Rule
 
-The architecture described here is the validated production architecture.
+The architecture described here is the preserved runtime baseline for product refinement.
 
-The next production authority to synchronize is:
+The synchronized production authorities are:
 
 ```text
+docs/george/PRODUCTION_TRACKER.md
+docs/george/RUNTIME_ARCHITECTURE.md
 docs/george/OPERATIONAL_PROFILE.md
+docs/george/NEXT_THREAD_HANDOFF.md
 ```
 
-After that synchronization, work proceeds to production UX inspection, release-surface cleanup, real-room LIVE acceptance, and evidence-based behavioral tuning.
+The tracker owns phase and readiness status. This document owns architectural boundaries. Current work proceeds through Popup 3 correction, canonical motion, materials, color, micro-interactions, and final product-experience refinement without reopening runtime architecture.

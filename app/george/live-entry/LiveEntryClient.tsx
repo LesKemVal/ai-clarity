@@ -56,10 +56,6 @@ import {
 } from "@/lib/george/capabilities/live-support-panels";
 import { deriveLiveCapabilityIds } from "@/lib/george/capabilities/live-capability-registry";
 
-import {
-  LiveOrientationIcon,
-  type LiveOrientationIconKind,
-} from "@/components/george/live-entry/LiveOrientationIcon";
 import { LiveReceiverProfilePanel } from "@/components/george/live-entry/LiveReceiverProfilePanel";
 import { LiveAdaptiveSupportPanel } from "@/components/george/live-entry/LiveAdaptiveSupportPanel";
 import { LiveSpeakingStylePanel } from "@/components/george/live-entry/LiveSpeakingStylePanel";
@@ -3915,63 +3911,37 @@ export default function LiveEntryClient() {
       );
     }
 
-    const liveControlOrientation: Array<{
-      kind: LiveOrientationIconKind;
-      label: string;
-      description: string;
-      state?: string;
-    }> = [
-      {
-        kind: "conversation",
-        label: "Conversation",
-        description:
-          "Open the active conversation record and preparation context.",
-      },
-      {
-        kind: "reading",
-        label: "Reading",
-        description:
-          "Expand discreet visual guidance when more detail is useful.",
-      },
-      {
-        kind: "repeat",
-        label: "Repeat",
-        description:
-          "Replay or restore the most recent guidance without interrupting the room.",
-      },
-      {
-        kind: "support",
-        label: "Support",
-        description:
-          "Adjust how GEORGE assists while preserving one intelligence.",
-        state:
-          selectedSupportStyle === "continue"
-            ? "Continuation"
-            : selectedSupportStyle === "response"
-              ? "Response"
-              : selectedSupportStyle === "presentation"
-                ? "Presentation"
-                : "Cue",
-      },
-      {
-        kind: "pause",
-        label: "Pause",
-        description:
-          "Pause or resume LIVE listening whenever you need control.",
-      },
-      {
-        kind: "audio",
-        label: "Audio",
-        description:
-          "Turn spoken guidance on or off without ending the LIVE session.",
-        state:
-          selectedReceiverProfile === "visual_only"
-            ? "Visual only"
-            : selectedReceiverProfile === "audio_visual"
-              ? "Audio + visual"
-              : "Audio",
-      },
-    ];
+    const supportLabel =
+      selectedSupportStyle === "continue"
+        ? "Continuation"
+        : selectedSupportStyle === "response"
+          ? "Response"
+          : selectedSupportStyle === "presentation"
+            ? "Presentation"
+            : "Cue";
+
+    const receiverLabel =
+      selectedReceiverProfile === "visual_only"
+        ? "Visual"
+        : selectedReceiverProfile === "audio_visual"
+          ? "Audio + visual"
+          : "Audio";
+
+    const receiverPreparation =
+      selectedReceiverProfile === "visual_only"
+        ? "Keep the LIVE surface in view. Guidance will remain visual and discreet."
+        : selectedReceiverProfile === "audio_visual"
+          ? "Keep your earbuds in and the LIVE surface nearby. I will use the clearest available channel."
+          : "Remember your earbuds. Spoken guidance will stay brief, sequential, and easy to repeat.";
+
+    const supportPreparation =
+      selectedSupportStyle === "continue"
+        ? "Begin the thought, then pause. I will help carry it forward without changing your point."
+        : selectedSupportStyle === "response"
+          ? "When a complete answer is needed, I will give you one you can adapt, repeat, hear, or read."
+          : selectedSupportStyle === "presentation"
+            ? "When the room needs structure, I will help organize the next clear sequence."
+            : "I will stay restrained and surface brief support only when it can improve the outcome.";
 
     return (
       <PanelShell
@@ -3981,108 +3951,77 @@ export default function LiveEntryClient() {
         onBack={() => setLiveBriefingStep(2)}
       >
         <div className="mt-4">
-          <div className="relative overflow-hidden rounded-[1.15rem] border border-[#8298FF]/[0.15] bg-[#080A10] px-4 py-4">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(78,124,255,0.12),transparent_42%)]" />
+          <section className="relative overflow-hidden rounded-[1.2rem] border border-[#61708A]/[0.28] bg-[#080A0D] px-5 py-5">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#8FAEFF]/45 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_0%,rgba(78,124,255,0.12),transparent_38%)]" />
 
-            <div className="relative">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#B8C6FF]/48">
-                    LIVE workspace
-                  </div>
-
-                  <div className="mt-2 text-[16px] font-semibold tracking-[-0.025em] text-[#F4F6FF]/90">
-                    Your controls are ready.
-                  </div>
+            <div className="relative flex items-start justify-between gap-5">
+              <div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#9EABC0]/52">
+                  LIVE preparation complete
                 </div>
-
-                <div className="flex items-center gap-2 rounded-full border border-emerald-300/[0.14] bg-emerald-300/[0.045] px-2.5 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300/80 shadow-[0_0_10px_rgba(110,231,183,0.55)]" />
-                  <span className="text-[8px] font-semibold uppercase tracking-[0.18em] text-emerald-100/58">
-                    Ready
-                  </span>
-                </div>
-              </div>
-
-              <p className="mt-2 max-w-[500px] text-[12px] leading-5 text-[#D7DBE4]/46">
-                These controls remain available throughout the conversation. Use
-                them without leaving LIVE.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {liveControlOrientation.map((control) => (
-              <div
-                key={control.kind}
-                className="group relative min-h-[154px] overflow-hidden rounded-[1rem] border border-white/[0.065] bg-[#07090E] px-3 py-3 transition hover:border-[#8298FF]/[0.20] hover:bg-[#0A0D15]"
-              >
-                <div className="pointer-events-none absolute right-0 top-0 h-20 w-20 bg-[radial-gradient(circle_at_top_right,rgba(78,124,255,0.09),transparent_68%)] opacity-0 transition group-hover:opacity-100" />
-
-                <div className="relative flex h-10 w-10 items-center justify-center rounded-[0.78rem] border border-white/[0.075] bg-white/[0.025] text-[#DCE6FF]/78">
-                  <LiveOrientationIcon kind={control.kind} />
-                </div>
-
-                <div className="relative mt-3 flex items-center justify-between gap-2">
-                  <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/72">
-                    {control.label}
-                  </div>
-
-                  {control.state && (
-                    <div className="truncate rounded-full border border-[#8298FF]/[0.13] bg-[#8298FF]/[0.045] px-2 py-1 text-[7px] font-semibold uppercase tracking-[0.12em] text-[#CBD5FF]/55">
-                      {control.state}
-                    </div>
-                  )}
-                </div>
-
-                <p className="relative mt-2 text-[10.5px] leading-[1.55] text-[#D7DBE4]/38">
-                  {control.description}
+                <h2 className="mt-2 max-w-[430px] text-[20px] font-semibold leading-[1.15] tracking-[-0.035em] text-[#F2F5FA]/92">
+                  The room is ready.
+                </h2>
+                <p className="mt-2 max-w-[500px] text-[12px] leading-5 text-[#C9D0DB]/48">
+                  Enter normally. I will listen for meaning, pressure, change, and opportunity—then support the outcome without taking over the room.
                 </p>
               </div>
-            ))}
-          </div>
 
-          <div className="mt-3 rounded-[1rem] border border-white/[0.06] bg-white/[0.018] px-4 py-3">
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div>
-                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
-                  Before entry
-                </div>
-                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
-                  Remember your earbuds.
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
-                  In the room
-                </div>
-                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
-                  Speak normally. Be clear.
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/26">
-                  If things change
-                </div>
-                <div className="mt-1.5 text-[11px] leading-5 text-[#D7DBE4]/58">
-                  We adapt.
-                </div>
+              <div className="flex shrink-0 items-center gap-2 rounded-full border border-[#6F92FF]/[0.22] bg-[#4E7CFF]/[0.07] px-2.5 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#7FA1FF] shadow-[0_0_10px_rgba(127,161,255,0.45)]" />
+                <span className="text-[8px] font-semibold uppercase tracking-[0.18em] text-[#C7D4FF]/66">Ready</span>
               </div>
             </div>
+          </section>
+
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <section className="relative overflow-hidden rounded-[1rem] border border-[#667286]/[0.22] bg-[#090B0E] px-4 py-4">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+              <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-[#8F9AAD]/45">Support behavior</div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="text-[14px] font-semibold tracking-[-0.02em] text-white/82">{supportLabel}</div>
+                <div className="rounded-full border border-[#7898FF]/[0.18] bg-[#4E7CFF]/[0.055] px-2 py-1 text-[7px] font-semibold uppercase tracking-[0.13em] text-[#BFCBFF]/58">Selected</div>
+              </div>
+              <p className="mt-2 text-[11px] leading-[1.6] text-[#C8CED8]/44">{supportPreparation}</p>
+            </section>
+
+            <section className="relative overflow-hidden rounded-[1rem] border border-[#667286]/[0.22] bg-[#090B0E] px-4 py-4">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+              <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-[#8F9AAD]/45">Receiver behavior</div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="text-[14px] font-semibold tracking-[-0.02em] text-white/82">{receiverLabel}</div>
+                <div className="rounded-full border border-[#7898FF]/[0.18] bg-[#4E7CFF]/[0.055] px-2 py-1 text-[7px] font-semibold uppercase tracking-[0.13em] text-[#BFCBFF]/58">Active</div>
+              </div>
+              <p className="mt-2 text-[11px] leading-[1.6] text-[#C8CED8]/44">{receiverPreparation}</p>
+            </section>
           </div>
 
+          <section className="mt-3 overflow-hidden rounded-[1rem] border border-[#5D687A]/[0.20] bg-[#07090B]">
+            <div className="grid sm:grid-cols-3">
+              {[
+                ["Before entry", "Take one breath. Let the room begin normally."],
+                ["In the room", "Speak normally. Be clear. Keep your attention on the people."],
+                ["If things change", "I will reassess the room and adapt with you."],
+              ].map(([label, line], index) => (
+                <div
+                  key={label}
+                  className={`px-4 py-3 ${index > 0 ? "border-t border-white/[0.045] sm:border-l sm:border-t-0" : ""}`}
+                >
+                  <div className="text-[8px] font-semibold uppercase tracking-[0.18em] text-[#8B96A8]/36">{label}</div>
+                  <div className="mt-1.5 text-[11px] leading-5 text-[#D4D9E1]/58">{line}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <div className="mt-4">
-            <AwakeButton
-              active
-              onClick={() => startLive(false, editableResources, true)}
-            >
+            <AwakeButton active onClick={() => startLive(false, editableResources, true)}>
               ENTER LIVE
             </AwakeButton>
           </div>
 
-          <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/24">
+          <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-[#A8B3C4]/34">
             Your voice I know. The room I understand.
           </p>
         </div>
