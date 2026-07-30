@@ -95,11 +95,6 @@ export type OperationalFormulaPublication = {
   alternatives?: string[]
 }
 
-export type OperationalFormulaScriptManagement = {
-  primaryScriptId?: string
-  latestScriptRevision?: string
-}
-
 export type OperationalFormula = {
   id: string
   version: number
@@ -114,7 +109,6 @@ export type OperationalFormula = {
   verifiedByBranesx?: boolean
   verification?: OperationalFormulaVerification
   publication?: OperationalFormulaPublication
-  scriptManagement?: OperationalFormulaScriptManagement
   roomTypes: string[]
   objectiveTypes: string[]
   prerequisites: string[]

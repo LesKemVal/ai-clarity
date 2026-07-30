@@ -159,9 +159,7 @@ export default function OperationalLibraryClient() {
                   </p>
                 ) : null}
 
-                {formula.verification ||
-                formula.publication ||
-                formula.scriptManagement ? (
+                {formula.verification || formula.publication ? (
                   <div className="mt-4 space-y-2 border-t border-white/8 pt-4 text-xs text-white/45">
                     {formula.verification ? (
                       <p>
@@ -206,15 +204,6 @@ export default function OperationalLibraryClient() {
                       </p>
                     ) : null}
 
-                    {formula.scriptManagement?.primaryScriptId ? (
-                      <p>
-                        Primary script:{" "}
-                        {formula.scriptManagement.primaryScriptId}
-                        {formula.scriptManagement.latestScriptRevision
-                          ? ` · revision ${formula.scriptManagement.latestScriptRevision}`
-                          : ""}
-                      </p>
-                    ) : null}
                   </div>
                 ) : null}
 
