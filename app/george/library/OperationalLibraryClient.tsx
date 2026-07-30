@@ -48,6 +48,16 @@ type FormulaDraft = {
   reasons: string;
 };
 
+type FormulaMetadataDraft = {
+  name: string;
+  bestUsedFor: string;
+  author: string;
+  publisher: string;
+  marketplaceReady: boolean;
+  provenBy: string;
+  alternatives: string;
+};
+
 function formatDate(value: number) {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
@@ -110,6 +120,20 @@ function createDraft(formula: OperationalFormula): FormulaDraft {
   };
 }
 
+function createMetadataDraft(
+  formula: OperationalFormula,
+): FormulaMetadataDraft {
+  return {
+    name: formula.name ?? "",
+    bestUsedFor: joinLines(formula.bestUsedFor),
+    author: formula.publication?.author ?? "",
+    publisher: formula.publication?.publisher ?? "",
+    marketplaceReady: formula.publication?.marketplaceReady ?? false,
+    provenBy: joinLines(formula.publication?.provenBy),
+    alternatives: joinLines(formula.publication?.alternatives),
+  };
+}
+
 const inputClassName =
   "mt-2 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-white outline-none transition focus:border-white/30";
 
@@ -127,6 +151,14 @@ export default function OperationalLibraryClient() {
   const [derivationError, setDerivationError] = useState("");
   const [deletingFormulaId, setDeletingFormulaId] = useState<string | null>(null);
   const [formulaMutationError, setFormulaMutationError] = useState("");
+  const [editingMetadataFormulaId, setEditingMetadataFormulaId] = useState<
+    string | null
+  >(null);
+  const [metadataDraft, setMetadataDraft] =
+    useState<FormulaMetadataDraft | null>(null);
+  const [savingMetadataFormulaId, setSavingMetadataFormulaId] = useState<
+    string | null
+  >(null);
   const [expandedHistoryFormulaId, setExpandedHistoryFormulaId] = useState<
     string | null
   >(null);
@@ -259,6 +291,100 @@ export default function OperationalLibraryClient() {
     setFormulaMutationError("");
   }
 
+  function beginMetadataEdit(formula: OperationalFormula) {
+    if (!ownedFormulaIds.has(formula.id)) return;
+
+    setEditingMetadataFormulaId(formula.id);
+    setMetadataDraft(createMetadataDraft(formula));
+    setFormulaMutationError("");
+  }
+
+  function cancelMetadataEdit() {
+    if (savingMetadataFormulaId) return;
+
+    setEditingMetadataFormulaId(null);
+    setMetadataDraft(null);
+    setFormulaMutationError("");
+  }
+
+  function updateMetadataDraft<K extends keyof FormulaMetadataDraft>(
+    key: K,
+    value: FormulaMetadataDraft[K],
+  ) {
+    setMetadataDraft((current) =>
+      current
+        ? {
+            ...current,
+            [key]: value,
+          }
+        : current,
+    );
+  }
+
+  async function saveFormulaMetadata(formula: OperationalFormula) {
+    if (
+      !ownedFormulaIds.has(formula.id) ||
+      !metadataDraft ||
+      savingMetadataFormulaId
+    ) {
+      return;
+    }
+
+    setSavingMetadataFormulaId(formula.id);
+    setFormulaMutationError("");
+
+    try {
+      const response = await fetch(
+        `/api/george/operational-memory/formulas/${encodeURIComponent(
+          formula.id,
+        )}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: metadataDraft.name.trim(),
+            bestUsedFor: parseLines(metadataDraft.bestUsedFor),
+            publication: {
+              author: metadataDraft.author.trim(),
+              publisher: metadataDraft.publisher.trim(),
+              marketplaceReady: metadataDraft.marketplaceReady,
+              provenBy: parseLines(metadataDraft.provenBy),
+              alternatives: parseLines(metadataDraft.alternatives),
+            },
+          }),
+        },
+      );
+
+      const payload = (await response.json()) as FormulaResponse;
+
+      if (!response.ok || !payload.ok || !payload.formula) {
+        throw new Error(payload.error || "Unable to update formula metadata");
+      }
+
+      const updatedFormula = payload.formula;
+
+      setFormulas((current) =>
+        current.map((currentFormula) =>
+          currentFormula.id === updatedFormula.id
+            ? updatedFormula
+            : currentFormula,
+        ),
+      );
+      setEditingMetadataFormulaId(null);
+      setMetadataDraft(null);
+    } catch (metadataError) {
+      setFormulaMutationError(
+        metadataError instanceof Error
+          ? metadataError.message
+          : "Unable to update formula metadata",
+      );
+    } finally {
+      setSavingMetadataFormulaId(null);
+    }
+  }
+
   async function deleteFormula(formula: OperationalFormula) {
     if (!ownedFormulaIds.has(formula.id) || deletingFormulaId) return;
 
@@ -315,6 +441,12 @@ export default function OperationalLibraryClient() {
       );
       setDraft((current) =>
         editingFormulaId === formula.id ? null : current,
+      );
+      setEditingMetadataFormulaId((current) =>
+        current === formula.id ? null : current,
+      );
+      setMetadataDraft((current) =>
+        editingMetadataFormulaId === formula.id ? null : current,
       );
     } catch (deleteError) {
       setFormulaMutationError(
@@ -454,6 +586,10 @@ export default function OperationalLibraryClient() {
               const isDeriving = derivingFormulaId === formula.id;
               const isOwned = ownedFormulaIds.has(formula.id);
               const isDeleting = deletingFormulaId === formula.id;
+              const isMetadataEditing =
+                editingMetadataFormulaId === formula.id;
+              const isMetadataSaving =
+                savingMetadataFormulaId === formula.id;
               const isHistoryExpanded =
                 expandedHistoryFormulaId === formula.id;
               const isHistoryLoading =
@@ -485,26 +621,49 @@ export default function OperationalLibraryClient() {
                         Updated {formatDate(formula.updatedAt)}
                       </p>
 
-                      {!isEditing ? (
+                      {!isEditing && !isMetadataEditing ? (
                         <>
                           <button
                             type="button"
                             onClick={() => beginDerivation(formula)}
-                            disabled={Boolean(derivingFormulaId || deletingFormulaId)}
+                            disabled={Boolean(
+                              derivingFormulaId ||
+                                deletingFormulaId ||
+                                savingMetadataFormulaId,
+                            )}
                             className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Derive
                           </button>
 
                           {isOwned ? (
-                            <button
-                              type="button"
-                              onClick={() => void deleteFormula(formula)}
-                              disabled={Boolean(derivingFormulaId || deletingFormulaId)}
-                              className="rounded-lg border border-red-300/20 px-3 py-1.5 text-xs text-red-200/70 transition hover:border-red-300/40 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                              {isDeleting ? "Deleting…" : "Delete"}
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => beginMetadataEdit(formula)}
+                                disabled={Boolean(
+                                  derivingFormulaId ||
+                                    deletingFormulaId ||
+                                    savingMetadataFormulaId,
+                                )}
+                                className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => void deleteFormula(formula)}
+                                disabled={Boolean(
+                                  derivingFormulaId ||
+                                    deletingFormulaId ||
+                                    savingMetadataFormulaId,
+                                )}
+                                className="rounded-lg border border-red-300/20 px-3 py-1.5 text-xs text-red-200/70 transition hover:border-red-300/40 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                {isDeleting ? "Deleting…" : "Delete"}
+                              </button>
+                            </>
                           ) : null}
                         </>
                       ) : null}
@@ -570,6 +729,142 @@ export default function OperationalLibraryClient() {
                           {formula.publication.alternatives.join(", ")}
                         </p>
                       ) : null}
+                    </div>
+                  ) : null}
+
+                  {isMetadataEditing && metadataDraft ? (
+                    <div className="mt-5 border-t border-white/10 pt-5">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h4 className="text-sm font-medium">
+                            Edit formula metadata
+                          </h4>
+                          <p className="mt-1 text-xs text-white/45">
+                            Operational steps and learning evidence remain
+                            unchanged.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={cancelMetadataEdit}
+                          disabled={isMetadataSaving}
+                          className="text-xs text-white/45 transition hover:text-white disabled:opacity-40"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                        <label className="text-xs text-white/55">
+                          Name
+                          <input
+                            value={metadataDraft.name}
+                            onChange={(event) =>
+                              updateMetadataDraft("name", event.target.value)
+                            }
+                            className={inputClassName}
+                          />
+                        </label>
+
+                        <label className="text-xs text-white/55">
+                          Best used for
+                          <textarea
+                            value={metadataDraft.bestUsedFor}
+                            onChange={(event) =>
+                              updateMetadataDraft(
+                                "bestUsedFor",
+                                event.target.value,
+                              )
+                            }
+                            rows={4}
+                            className={inputClassName}
+                            placeholder="One use per line"
+                          />
+                        </label>
+
+                        <label className="text-xs text-white/55">
+                          Author
+                          <input
+                            value={metadataDraft.author}
+                            onChange={(event) =>
+                              updateMetadataDraft("author", event.target.value)
+                            }
+                            className={inputClassName}
+                          />
+                        </label>
+
+                        <label className="text-xs text-white/55">
+                          Publisher
+                          <input
+                            value={metadataDraft.publisher}
+                            onChange={(event) =>
+                              updateMetadataDraft(
+                                "publisher",
+                                event.target.value,
+                              )
+                            }
+                            className={inputClassName}
+                          />
+                        </label>
+
+                        <label className="text-xs text-white/55">
+                          Proven by
+                          <textarea
+                            value={metadataDraft.provenBy}
+                            onChange={(event) =>
+                              updateMetadataDraft(
+                                "provenBy",
+                                event.target.value,
+                              )
+                            }
+                            rows={4}
+                            className={inputClassName}
+                            placeholder="One source per line"
+                          />
+                        </label>
+
+                        <label className="text-xs text-white/55">
+                          Alternatives
+                          <textarea
+                            value={metadataDraft.alternatives}
+                            onChange={(event) =>
+                              updateMetadataDraft(
+                                "alternatives",
+                                event.target.value,
+                              )
+                            }
+                            rows={4}
+                            className={inputClassName}
+                            placeholder="One alternative per line"
+                          />
+                        </label>
+                      </div>
+
+                      <label className="mt-5 flex items-center gap-3 text-xs text-white/55">
+                        <input
+                          type="checkbox"
+                          checked={metadataDraft.marketplaceReady}
+                          onChange={(event) =>
+                            updateMetadataDraft(
+                              "marketplaceReady",
+                              event.target.checked,
+                            )
+                          }
+                        />
+                        Marketplace ready
+                      </label>
+
+                      <div className="mt-5 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => void saveFormulaMetadata(formula)}
+                          disabled={isMetadataSaving}
+                          className="rounded-lg border border-white/20 bg-white px-4 py-2 text-xs font-medium text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {isMetadataSaving ? "Saving…" : "Save metadata"}
+                        </button>
+                      </div>
                     </div>
                   ) : null}
 
