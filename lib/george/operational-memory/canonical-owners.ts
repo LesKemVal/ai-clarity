@@ -19,3 +19,8 @@ export type {
   OperationalScriptDecisionInput,
   OperationalScriptDecisionService,
 } from "./script-decision-service";
+export type {
+  OperationalFormulaDerivationService,
+  OperationalFormulaDerivationInput,
+  OperationalFormulaDerivationResult,
+} from "./formula-derivation-service";
