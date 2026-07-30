@@ -228,3 +228,45 @@ export async function PATCH(
     formula: updatedFormula,
   });
 }
+
+export async function DELETE(
+  req: NextRequest,
+  context: RouteContext,
+) {
+  const session = await readGeorgeSession(req);
+  const userId = String(session?.email || "")
+    .trim()
+    .toLowerCase();
+
+  if (!session || !userId) {
+    return unauthorized();
+  }
+
+  const { formulaId: rawFormulaId } = await context.params;
+  const formulaId = String(rawFormulaId || "").trim();
+
+  if (!formulaId) {
+    return badRequest("Formula id is required");
+  }
+
+  const formulaLibrary = createRedisOperationalFormulaLibrary();
+  const formula = await formulaLibrary.getById(formulaId);
+
+  if (!formula) {
+    return NextResponse.json(
+      { ok: false, error: "Formula not found" },
+      { status: 404 },
+    );
+  }
+
+  if (formula.ownerId !== userId) {
+    return forbidden();
+  }
+
+  await formulaLibrary.delete(formulaId, userId);
+
+  return NextResponse.json({
+    ok: true,
+    formulaId,
+  });
+}
