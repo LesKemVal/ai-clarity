@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import type {
   OperationalFormula,
+  OperationalFormulaLineage,
+  OperationalFormulaReassessment,
   OperationalFormulaStep,
   OperationalScript,
 } from "@/lib/george/operational-memory/types";
@@ -19,6 +21,19 @@ type ScriptResponse = {
   ok: boolean;
   scripts?: OperationalScript[];
   error?: string;
+};
+
+type FormulaHistoryResponse = {
+  ok: boolean;
+  formulaId?: string;
+  reassessments?: OperationalFormulaReassessment[];
+  lineages?: OperationalFormulaLineage[];
+  error?: string;
+};
+
+type FormulaHistory = {
+  reassessments: OperationalFormulaReassessment[];
+  lineages: OperationalFormulaLineage[];
 };
 
 type FormulaDraft = {
@@ -106,6 +121,16 @@ export default function OperationalLibraryClient() {
   const [draft, setDraft] = useState<FormulaDraft | null>(null);
   const [derivingFormulaId, setDerivingFormulaId] = useState<string | null>(null);
   const [derivationError, setDerivationError] = useState("");
+  const [expandedHistoryFormulaId, setExpandedHistoryFormulaId] = useState<
+    string | null
+  >(null);
+  const [formulaHistory, setFormulaHistory] = useState<
+    Record<string, FormulaHistory>
+  >({});
+  const [historyLoadingFormulaId, setHistoryLoadingFormulaId] = useState<
+    string | null
+  >(null);
+  const [historyErrors, setHistoryErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -162,6 +187,63 @@ export default function OperationalLibraryClient() {
       cancelled = true;
     };
   }, []);
+
+  async function toggleFormulaHistory(formulaId: string) {
+    if (expandedHistoryFormulaId === formulaId) {
+      setExpandedHistoryFormulaId(null);
+      return;
+    }
+
+    setExpandedHistoryFormulaId(formulaId);
+
+    if (formulaHistory[formulaId] || historyLoadingFormulaId === formulaId) {
+      return;
+    }
+
+    setHistoryLoadingFormulaId(formulaId);
+    setHistoryErrors((current) => {
+      const next = { ...current };
+      delete next[formulaId];
+      return next;
+    });
+
+    try {
+      const response = await fetch(
+        `/api/george/operational-memory/formulas/${encodeURIComponent(
+          formulaId,
+        )}/history`,
+        {
+          cache: "no-store",
+        },
+      );
+
+      const payload = (await response.json()) as FormulaHistoryResponse;
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "Unable to load formula history");
+      }
+
+      setFormulaHistory((current) => ({
+        ...current,
+        [formulaId]: {
+          reassessments: payload.reassessments ?? [],
+          lineages: payload.lineages ?? [],
+        },
+      }));
+    } catch (historyError) {
+      setHistoryErrors((current) => ({
+        ...current,
+        [formulaId]:
+          historyError instanceof Error
+            ? historyError.message
+            : "Unable to load formula history",
+      }));
+    } finally {
+      setHistoryLoadingFormulaId((current) =>
+        current === formulaId ? null : current,
+      );
+    }
+  }
 
   function beginDerivation(formula: OperationalFormula) {
     setEditingFormulaId(formula.id);
@@ -288,6 +370,12 @@ export default function OperationalLibraryClient() {
             {formulas.map((formula) => {
               const isEditing = editingFormulaId === formula.id;
               const isDeriving = derivingFormulaId === formula.id;
+              const isHistoryExpanded =
+                expandedHistoryFormulaId === formula.id;
+              const isHistoryLoading =
+                historyLoadingFormulaId === formula.id;
+              const history = formulaHistory[formula.id];
+              const historyError = historyErrors[formula.id];
 
               return (
                 <article
@@ -392,6 +480,150 @@ export default function OperationalLibraryClient() {
                     {formula.steps.length} steps ·{" "}
                     {formula.failureConditions.length} failure conditions
                   </p>
+
+                  <button
+                    type="button"
+                    onClick={() => void toggleFormulaHistory(formula.id)}
+                    aria-expanded={isHistoryExpanded}
+                    className="mt-4 flex w-full items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-left text-xs text-white/60 transition hover:border-white/20 hover:text-white"
+                  >
+                    <span>Learning history</span>
+                    <span
+                      className={`transition-transform duration-200 ${
+                        isHistoryExpanded ? "rotate-180" : ""
+                      }`}
+                    >
+                      ⌄
+                    </span>
+                  </button>
+
+                  <div
+                    className={`grid transition-all duration-300 ease-out ${
+                      isHistoryExpanded
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="mt-3 space-y-4 border-t border-white/8 pt-4">
+                        {isHistoryLoading ? (
+                          <p className="text-xs text-white/45">
+                            Loading learning history…
+                          </p>
+                        ) : null}
+
+                        {historyError ? (
+                          <p className="text-xs text-red-200">
+                            {historyError}
+                          </p>
+                        ) : null}
+
+                        {history &&
+                        history.reassessments.length === 0 &&
+                        history.lineages.length === 0 ? (
+                          <p className="text-xs text-white/45">
+                            No learning history has been recorded for this
+                            formula yet.
+                          </p>
+                        ) : null}
+
+                        {history?.reassessments.length ? (
+                          <div>
+                            <h4 className="text-xs font-medium uppercase tracking-[0.14em] text-white/45">
+                              Reassessments
+                            </h4>
+                            <div className="mt-3 space-y-3">
+                              {history.reassessments.map((reassessment) => (
+                                <div
+                                  key={reassessment.id}
+                                  className="rounded-lg border border-white/8 bg-white/[0.02] p-3"
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <p className="text-sm text-white/70">
+                                      {reassessment.decision.replaceAll(
+                                        "_",
+                                        " ",
+                                      )}
+                                    </p>
+                                    <p className="text-xs text-white/35">
+                                      {formatDate(reassessment.assessedAt)}
+                                    </p>
+                                  </div>
+                                  <p className="mt-2 text-xs text-white/45">
+                                    Confidence{" "}
+                                    {Math.round(
+                                      reassessment.confidenceBefore * 100,
+                                    )}
+                                    % →{" "}
+                                    {Math.round(
+                                      reassessment.confidenceAfter * 100,
+                                    )}
+                                    %
+                                  </p>
+                                  {reassessment.reasons.length ? (
+                                    <p className="mt-2 text-xs leading-5 text-white/50">
+                                      {reassessment.reasons.join(" · ")}
+                                    </p>
+                                  ) : null}
+                                  <p className="mt-2 text-[11px] text-white/30">
+                                    {reassessment.evidence.length} evidence{" "}
+                                    {reassessment.evidence.length === 1
+                                      ? "record"
+                                      : "records"}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+
+                        {history?.lineages.length ? (
+                          <div>
+                            <h4 className="text-xs font-medium uppercase tracking-[0.14em] text-white/45">
+                              Lineage
+                            </h4>
+                            <div className="mt-3 space-y-3">
+                              {history.lineages.map((lineage) => (
+                                <div
+                                  key={lineage.id}
+                                  className="rounded-lg border border-white/8 bg-white/[0.02] p-3"
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <p className="text-sm text-white/70">
+                                      {lineage.kind}
+                                      {lineage.source
+                                        ? ` · ${lineage.source.replaceAll(
+                                            "_",
+                                            " ",
+                                          )}`
+                                        : ""}
+                                    </p>
+                                    <p className="text-xs text-white/35">
+                                      {formatDate(lineage.createdAt)}
+                                    </p>
+                                  </div>
+                                  {lineage.reasons.length ? (
+                                    <p className="mt-2 text-xs leading-5 text-white/50">
+                                      {lineage.reasons.join(" · ")}
+                                    </p>
+                                  ) : null}
+                                  <p className="mt-2 text-[11px] text-white/30">
+                                    {lineage.parentFormulaIds.length} parent{" "}
+                                    {lineage.parentFormulaIds.length === 1
+                                      ? "formula"
+                                      : "formulas"}
+                                    {lineage.childFormulaId
+                                      ? " · child formula recorded"
+                                      : ""}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
 
                   {isEditing && draft ? (
                     <div className="mt-5 border-t border-white/10 pt-5">
