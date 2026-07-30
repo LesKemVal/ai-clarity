@@ -101,12 +101,10 @@ export type OperationalFormula = {
   scope: OperationalMemoryScope
   ownerId?: string
   name?: string
-  publisher?: string
   visibility?: OperationalFormulaVisibility
   status?: OperationalFormulaStatus
   bestUsedFor?: string[]
   uses?: number
-  verifiedByBranesx?: boolean
   verification?: OperationalFormulaVerification
   publication?: OperationalFormulaPublication
   roomTypes: string[]
