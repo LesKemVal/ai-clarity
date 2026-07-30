@@ -98,6 +98,7 @@ export function extractOperationalFormulas(
       version: 1,
       scope,
       ownerId,
+      origin: 'observed',
       roomTypes: roomType ? [roomType] : [],
       objectiveTypes: objectiveType ? [objectiveType] : [],
       prerequisites: steps.slice(0, 2).map((step) => step.signalType),

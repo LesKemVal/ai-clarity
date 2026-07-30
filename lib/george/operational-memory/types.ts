@@ -8,6 +8,11 @@ export type OperationalFormulaStatus =
   | 'contested'
   | 'retired'
 
+export type OperationalFormulaOrigin =
+  | 'canonical'
+  | 'observed'
+  | 'derived'
+
 export type OperationalParticipantRole =
   | 'user'
   | 'counterparty'
@@ -103,6 +108,8 @@ export type OperationalFormula = {
   name?: string
   visibility?: OperationalFormulaVisibility
   status?: OperationalFormulaStatus
+  origin?: OperationalFormulaOrigin
+  parentFormulaId?: string
   bestUsedFor?: string[]
   uses?: number
   verification?: OperationalFormulaVerification

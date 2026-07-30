@@ -36,6 +36,8 @@ OperationalFormulaEvolutionEngine {
             ...input.formula,
             id: childFormulaId,
             version: 1,
+            origin: 'derived',
+            parentFormulaId: input.formula.id,
             confidence: reassessment.confidenceAfter,
             evidence: [...reassessment.evidence],
             createdAt: now,
