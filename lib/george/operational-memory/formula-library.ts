@@ -59,6 +59,11 @@ export function scoreOperationalFormula(
   context: FormulaRetrievalContext,
 ): RetrievedOperationalFormula | null {
   const reasons: string[] = [];
+  const status = formula.status;
+
+  if (status === "retired") {
+    return null;
+  }
 
   if (formula.scope === "personal" && formula.ownerId !== context.userId) {
     return null;
@@ -81,6 +86,17 @@ export function scoreOperationalFormula(
 
   let score = formula.confidence * 0.5;
   reasons.push(`confidence:${formula.confidence.toFixed(2)}`);
+
+  if (status === "validated") {
+    score += 0.08;
+    reasons.push("status:validated");
+  } else if (status === "contested") {
+    score -= 0.2;
+    reasons.push("status:contested");
+  } else if (status === "candidate") {
+    score -= 0.04;
+    reasons.push("status:candidate");
+  }
 
   if (formula.scope === "personal") {
     score += 0.3;

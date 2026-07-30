@@ -122,7 +122,10 @@ export function validateOperationalFormula(
     reasons.push(`status:${status}`)
 
     return {
-      formula: candidate,
+      formula: {
+        ...candidate,
+        status,
+      },
       status,
       changed: true,
       reasons,
@@ -202,7 +205,10 @@ export function validateOperationalFormula(
   reasons.push(`status:${status}`)
 
   return {
-    formula,
+    formula: {
+      ...formula,
+      status,
+    },
     status,
     changed: true,
     reasons,

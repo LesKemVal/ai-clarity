@@ -80,6 +80,46 @@ assert.equal(
   'Personal formulas must remain isolated to their canonical owner.'
 )
 
+assert.equal(
+  scoreOperationalFormula(
+    {
+      ...generalFormula,
+      id: 'retired-formula',
+      status: 'retired',
+    },
+    context
+  ),
+  null,
+  'Retired formulas must remain outside operational-memory retrieval.'
+)
+
+const lifecycleRanked = rankOperationalFormulas(
+  [
+    {
+      ...generalFormula,
+      id: 'candidate-formula',
+      status: 'candidate',
+    },
+    {
+      ...generalFormula,
+      id: 'contested-formula',
+      status: 'contested',
+    },
+    {
+      ...generalFormula,
+      id: 'validated-formula',
+      status: 'validated',
+    },
+  ],
+  context
+)
+
+assert.deepEqual(
+  lifecycleRanked.map((result) => result.formula.id),
+  ['validated-formula', 'candidate-formula', 'contested-formula'],
+  'Validated formulas must outrank candidates, and contested formulas must remain subordinate.'
+)
+
 const ranked = rankOperationalFormulas(
   [generalFormula, wrongOwnerFormula, personalFormula],
   context
