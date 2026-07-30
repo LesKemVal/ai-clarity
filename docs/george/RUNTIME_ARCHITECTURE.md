@@ -89,6 +89,18 @@ Canonical ownership remains:
 - conversation-type registry: `lib/george/live-entry/conversation-types.ts`;
 - Operational Library presentation: `app/george/library/*`.
 
+### Operational-learning ownership boundaries
+
+Canonical rules:
+
+- `formula-validator.ts` owns evidence aggregation, confidence calculation, and formula lifecycle status;
+- reassessment records operational judgment and emits only `confirm`, `weaken`, or `insufficient_evidence`;
+- reassessment does not mutate confidence or lifecycle state;
+- the evolution engine preserves the canonical evolution seam but performs no passive structural derivation;
+- `formula-derivation-service.ts` is the sole owner of intentional derived-formula creation and derived lineage creation;
+- the Operational Library remains a presentation surface and does not acquire learning authority.
+
+
 The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
 
 GEORGE owns the operational formula and its lifecycle.
