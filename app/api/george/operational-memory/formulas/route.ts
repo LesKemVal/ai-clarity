@@ -117,6 +117,9 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     formulas,
+    ownedFormulaIds: formulas
+      .filter((formula) => formula.ownerId === userId)
+      .map((formula) => formula.id),
   });
 }
 

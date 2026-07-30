@@ -14,6 +14,7 @@ type FormulaResponse = {
   ok: boolean;
   formulas?: OperationalFormula[];
   formula?: OperationalFormula;
+  ownedFormulaIds?: string[];
   error?: string;
 };
 
@@ -114,6 +115,9 @@ const inputClassName =
 
 export default function OperationalLibraryClient() {
   const [formulas, setFormulas] = useState<OperationalFormula[]>([]);
+  const [ownedFormulaIds, setOwnedFormulaIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [scripts, setScripts] = useState<OperationalScript[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -165,6 +169,7 @@ export default function OperationalLibraryClient() {
         if (cancelled) return;
 
         setFormulas(formulaPayload.formulas ?? []);
+        setOwnedFormulaIds(new Set(formulaPayload.ownedFormulaIds ?? []));
         setScripts(scriptPayload.scripts ?? []);
       } catch (loadError) {
         if (cancelled) return;
