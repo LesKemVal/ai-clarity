@@ -159,6 +159,65 @@ export default function OperationalLibraryClient() {
                   </p>
                 ) : null}
 
+                {formula.verification ||
+                formula.publication ||
+                formula.scriptManagement ? (
+                  <div className="mt-4 space-y-2 border-t border-white/8 pt-4 text-xs text-white/45">
+                    {formula.verification ? (
+                      <p>
+                        Verification: {formula.verification.authority} ·{" "}
+                        {formula.verification.verified
+                          ? "verified"
+                          : "not verified"}
+                        {formula.verification.verificationVersion
+                          ? ` · ${formula.verification.verificationVersion}`
+                          : ""}
+                      </p>
+                    ) : null}
+
+                    {formula.publication?.author ||
+                    formula.publication?.publisher ? (
+                      <p>
+                        Published by:{" "}
+                        {formula.publication.author ??
+                          formula.publication.publisher}
+                      </p>
+                    ) : null}
+
+                    {formula.publication?.marketplaceReady !== undefined ? (
+                      <p>
+                        Marketplace:{" "}
+                        {formula.publication.marketplaceReady
+                          ? "ready"
+                          : "not ready"}
+                      </p>
+                    ) : null}
+
+                    {formula.publication?.provenBy?.length ? (
+                      <p>
+                        Proven by: {formula.publication.provenBy.join(", ")}
+                      </p>
+                    ) : null}
+
+                    {formula.publication?.alternatives?.length ? (
+                      <p>
+                        Alternatives:{" "}
+                        {formula.publication.alternatives.join(", ")}
+                      </p>
+                    ) : null}
+
+                    {formula.scriptManagement?.primaryScriptId ? (
+                      <p>
+                        Primary script:{" "}
+                        {formula.scriptManagement.primaryScriptId}
+                        {formula.scriptManagement.latestScriptRevision
+                          ? ` · revision ${formula.scriptManagement.latestScriptRevision}`
+                          : ""}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 <p className="mt-4 text-xs text-white/35">
                   {formula.steps.length} steps ·{" "}
                   {formula.failureConditions.length} failure conditions
