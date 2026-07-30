@@ -9,6 +9,12 @@ import type {
   OperationalFormulaEvolutionResult,
 } from './formula-evolution-engine'
 import {
+  createOperationalFormulaDerivationService,
+  type OperationalFormulaDerivationInput,
+  type OperationalFormulaDerivationResult,
+  type OperationalFormulaDerivationService,
+} from './formula-derivation-service'
+import {
   extractOperationalFormulas,
   type OperationalFormulaExtractionOptions,
 } from './formula-extractor'
@@ -62,6 +68,7 @@ export type OperationalMemoryDependencies = {
   scriptExecutionRecorder?: OperationalScriptExecutionRecorder
   formulaReassessmentEngine?: OperationalFormulaReassessmentEngine
   formulaEvolutionEngine?: OperationalFormulaEvolutionEngine
+  formulaDerivationService?: OperationalFormulaDerivationService
   learningRecordRecorder?: OperationalLearningRecordRecorder
 }
 
@@ -74,6 +81,9 @@ export type OperationalMemory = {
   retrieve(
     context: FormulaRetrievalContext
   ): Promise<RetrievedOperationalFormula[]>
+  derive(
+    input: OperationalFormulaDerivationInput
+  ): Promise<OperationalFormulaDerivationResult>
   learn(
     record: ConversationRecord,
     options?: OperationalMemoryLearnOptions
@@ -92,12 +102,21 @@ export function createOperationalMemory(
       createDefaultOperationalFormulaReassessmentEngine(),
     formulaEvolutionEngine =
       createDefaultOperationalFormulaEvolutionEngine(),
+    formulaDerivationService =
+      createOperationalFormulaDerivationService({
+        formulaLibrary,
+        learningRecordRecorder: dependencies.learningRecordRecorder,
+      }),
     learningRecordRecorder,
   } = dependencies
 
   return {
     retrieve(context) {
       return formulaLibrary.retrieve(context)
+    },
+
+    derive(input) {
+      return formulaDerivationService.derive(input)
     },
 
     async learn(record, options = {}) {
