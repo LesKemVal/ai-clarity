@@ -29,22 +29,28 @@ OperationalFormulaEvolutionEngine {
         case 'contest':
         case 'evolve': {
 
+          const now = Date.now()
+          const childFormulaId = crypto.randomUUID()
+
           const evolvedFormula: OperationalFormula = {
             ...input.formula,
-            version: input.formula.version + 1,
+            id: childFormulaId,
+            version: 1,
             confidence: reassessment.confidenceAfter,
-            updatedAt: Date.now(),
+            evidence: [...reassessment.evidence],
+            createdAt: now,
+            updatedAt: now,
           }
 
           const lineage: OperationalFormulaLineage = {
             id: crypto.randomUUID(),
             kind: 'derived',
             parentFormulaIds: [input.formula.id],
-            childFormulaId: evolvedFormula.id,
+            childFormulaId,
             conversationId: input.conversation.id,
             reassessmentId: reassessment.id,
             reasons: reassessment.reasons,
-            createdAt: Date.now(),
+            createdAt: now,
           }
 
           return {
