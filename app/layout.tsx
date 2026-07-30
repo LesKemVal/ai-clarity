@@ -1,3 +1,4 @@
+import { UniversalButtonFeedback } from "@/components/ui/UniversalButtonFeedback";
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
@@ -73,6 +74,7 @@ export default function RootLayout({
       className={`h-full antialiased ${inter.variable}`}
     >
       <body className="min-h-full flex flex-col bg-black text-neutral-100 touch-manipulation font-[var(--font-inter)]">
+        <UniversalButtonFeedback />
         <MobileHeaderGate />
         <LanguageRailSupport />
         <SidebarAccountDropdownEnhancer />

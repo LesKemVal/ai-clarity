@@ -13,11 +13,29 @@ docs/george/RUNTIME_ARCHITECTURE.md
 
 The implementation remains the source of truth. This document is authoritative while synchronized with the validated production runtime.
 
-Branch:
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_START -->
+## Experience Realization
 
-```text
-live-hub-runtime
-```
+GEORGE's operational behavior is realized through a calm, precise, mechanical product experience.
+
+The interface must preserve the same principles as the intelligence:
+
+- useful movement rather than decoration;
+- acknowledgement rather than celebration;
+- restraint rather than interruption;
+- clarity rather than visual noise;
+- stillness once a thought or state is complete.
+
+Motion communicates that the system received, revealed, changed, or settled something. It must not imply confidence, urgency, success, or operational judgment that the runtime did not produce.
+
+Receiver-specific experience remains authoritative:
+
+- Audio is concise, sequential, repeatable, and low cognitive load;
+- Glasses are glanceable and readable, with audio available for immediate steering;
+- Desktop / Mobile is structured, persistent, skimmable, and readable.
+
+Ready Room uses the resolved receiver and support behavior to explain how GEORGE will work with the user in LIVE. It does not reteach controls or recreate briefing and mechanics.
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_END -->
 
 ## Purpose
 

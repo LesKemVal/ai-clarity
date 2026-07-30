@@ -4,41 +4,25 @@
    Audio hides the composer. Visual restores the existing canonical composer. */
 const GEORGE_LIVE_VISUAL_COMPOSER_STYLE = `
   @media (max-width: 639px) {
-    html[data-george-live-view="controls"]
-      .george-live-composer-region {
+    html[data-george-live-view="controls"] .george-composer-shell {
       display: none !important;
     }
 
-    html[data-george-live-view="reading"]
-      .george-live-composer-region {
+    html[data-george-live-view="reading"] .george-composer-shell {
       display: block !important;
       position: fixed !important;
-      left: 16px !important;
-      right: 16px !important;
-      bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+      left: 12px !important;
+      right: 12px !important;
+      bottom: calc(72px + env(safe-area-inset-bottom)) !important;
       width: auto !important;
-      max-width: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      z-index: 10050 !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-
-    html[data-george-live-view="reading"]
-      .george-composer-shell {
-      display: block !important;
-      width: 100% !important;
+      z-index: 10020 !important;
       visibility: visible !important;
       opacity: 1 !important;
       pointer-events: auto !important;
     }
 
     html[data-george-live-view="reading"] body {
-      padding-bottom: calc(
-        118px + env(safe-area-inset-bottom)
-      ) !important;
+      padding-bottom: calc(142px + env(safe-area-inset-bottom));
     }
   }
 `;
@@ -1107,19 +1091,11 @@ export default function Page({
     setPreLiveSignalComplete(false);
     window.localStorage.removeItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION");
 
-    const firstPreparationQuestion =
-      resolveLivePreparationStep(0).question;
-
-    if (!firstPreparationQuestion) {
-      throw new Error(
-        "[GEORGE LIVE PREPARATION] Missing initial preparation question.",
-      );
-    }
-
     const nextMessages: Message[] = [
       {
         role: "assistant",
-        content: `${firstPreparationQuestion.kicker}.\n\n${firstPreparationQuestion.question}\n\n${firstPreparationQuestion.examples}`,
+        content:
+          "Give GEORGE signal.\n\nQuestion 1\n\nWhat is your role in the conversation — your position or title?\n\nExamples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.",
         source: "system_override",
         presentationMode: "live_preparation",
       },
@@ -1130,7 +1106,7 @@ export default function Page({
     setLiveMode(false);
     setConversationMode(null);
     setActivePromptContext("pre_live_signal_acquisition");
-    setActivePromptLabel(firstPreparationQuestion.label);
+    setActivePromptLabel("Start New LIVE");
     setInput("");
     setInterimTranscript("");
     setMessages(nextMessages);
@@ -6094,7 +6070,7 @@ I’ll stay with you.`,
               type="button"
               aria-label="Close GEORGE sidebar"
               onClick={() => setShowSidebar(false)}
-              className="fixed inset-0 z-[220] cursor-default bg-black george-motion-fade-soft/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)]"
+              className="fixed inset-0 z-[220] cursor-default bg-black/[0.18] backdrop-blur-[7px] transition-[opacity,background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,0.72,0.18,1)]"
             />
           )}
 
@@ -6415,7 +6391,7 @@ I’ll stay with you.`,
                           className="fixed inset-0 z-[85] cursor-default bg-transparent"
                         />
 
-                        <div className="absolute right-0 top-full george-motion-collapse-down z-[90] mt-3 w-[168px] rounded-[18px] bg-[#07090E]/96 p-2 shadow-[0_24px_70px_rgba(0,0,0,0.5)] ring-1 ring-white/[0.055] backdrop-blur-xl">
+                        <div className="absolute right-0 top-full z-[90] mt-3 w-[168px] rounded-[18px] bg-[#07090E]/96 p-2 shadow-[0_24px_70px_rgba(0,0,0,0.5)] ring-1 ring-white/[0.055] backdrop-blur-xl">
                           {subscriberEmail ? (
                             <button
                               type="button"
@@ -6478,6 +6454,8 @@ I’ll stay with you.`,
                           ).slice(0, 3) as [string, string, string]
                         }
                         receiverProfile={liveReceiverProfile}
+                        viewMode={liveViewMode}
+                        onViewModeChange={setLiveViewMode}
                         receiverProfileLabel={activeLiveReceiverProfileLabel}
                         communicationStyle={getActiveLiveCommunicationStyle()}
                         onSupportSelected={(choice) => {
@@ -8231,7 +8209,7 @@ I’ll stay with you.`,
                       {showPromptMenu && (
                         <div
                           ref={promptMenuRef}
-                          className="absolute bottom-full george-motion-collapse-up mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-1.5.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                          className="absolute bottom-full mb-2 left-0 z-50 w-[170px] max-w-[48vw] rounded-[1.05rem] border border-white/[0.07] bg-[#05080D]/88 px-1.5.5 py-1.5 shadow-[0_22px_70px_rgba(0,0,0,0.48)]  transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                         >
                           <div className="space-y-1">
                             <button
@@ -8385,7 +8363,7 @@ I’ll stay with you.`,
                               type="button"
                               aria-label="Close structured LIVE notice"
                               onClick={() => setShowProLiveComingSoon(false)}
-                              className="fixed inset-0 z-[240] bg-black george-motion-fade-soft/68 -[10px]"
+                              className="fixed inset-0 z-[240] bg-black/68 -[10px]"
                             />
 
                             <div className="fixed inset-0 z-[141] flex items-center justify-center px-4">
@@ -8516,7 +8494,7 @@ I’ll stay with you.`,
                         lastConversationRecord &&
                         typeof document !== "undefined" &&
                         createPortal(
-                          <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]">
+                          <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]">
                             <PostLiveConversationRecordPanel
                               record={lastConversationRecord}
                               onClose={() => setShowConversationRecord(false)}
@@ -8544,7 +8522,7 @@ I’ll stay with you.`,
                                   setShowOutcomeExitReview(false);
                                 }
                               }}
-                              className="fixed inset-0 z-[220] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]"
+                              className="fixed inset-0 z-[220] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]"
                             >
                               <div
                                 onClick={(event) => event.stopPropagation()}
@@ -8745,7 +8723,7 @@ I’ll stay with you.`,
                                   setShowExitPopup(false);
                                 }
                               }}
-                              className="fixed inset-0 z-[80] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]"
+                              className="fixed inset-0 z-[80] flex items-center justify-center bg-black/58 px-4 backdrop-blur-[14px]"
                             >
                               <div
                                 onClick={(e) => e.stopPropagation()}
@@ -9223,7 +9201,7 @@ Continue from here, tell me what changed, or start fresh.`,
                 )}
 
                 {liveMode && showLiveQuickMenu && (
-                  <div className="pointer-events-none fixed inset-0 z-[71] bg-black george-motion-fade-soft/68 -[10px]" />
+                  <div className="pointer-events-none fixed inset-0 z-[71] bg-black/68 -[10px]" />
                 )}
 
                 {!(forceLive || liveMode) && (
@@ -9540,13 +9518,17 @@ Continue from here, tell me what changed, or start fresh.`,
                     forceLive || liveMode
                       ? "fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] md:bottom-[96px]"
                       : "fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] md:bottom-[112px]"
-                  } george-live-composer-region z-[190] pointer-events-auto mx-auto w-[min(720px,calc(100vw-32px))] bg-transparent px-0 py-0`}
+                  } ${
+                    (forceLive || liveMode) && liveViewMode === "controls"
+                      ? "hidden"
+                      : ""
+                  } z-[190] pointer-events-auto mx-auto w-[min(720px,calc(100vw-32px))] bg-transparent px-0 py-0`}
                 >
                   <div
                     aria-hidden="true"
                     className="pointer-events-none mb-2 select-none text-center font-mono text-[8px] font-semibold uppercase tracking-[0.34em] text-white/22"
                   >
-                    GEORGE can make mistakes. Check important information.
+                    BRANESX
                   </div>
 
                   <div
@@ -9695,7 +9677,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       }}
                     />
                     {pendingImage && (
-                      <div className="absolute left-4 bottom-full george-motion-collapse-up mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#05080D]/88 px-1.5 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
+                      <div className="absolute left-4 bottom-full mb-2 flex max-w-[180px] gap-1.5 overflow-hidden rounded-xl border border-white/[0.07] bg-[#05080D]/88 px-1.5 py-1.5 shadow-[0_14px_34px_rgba(0,0,0,0.38)] ">
                         <div className="relative h-10 w-10 shrink-0">
                           <img
                             src={pendingImage.dataUrl}
@@ -9734,7 +9716,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     </button>
 
                     {(forceLive || liveMode) && !showLiveEntrySequence && (
-                      <div className="absolute right-2 bottom-full george-motion-collapse-up mb-2 flex items-center gap-2">
+                      <div className="absolute right-2 bottom-full mb-2 flex items-center gap-2">
                         <button
                           type="button"
                           onClick={cycleLiveReceiverProfile}
@@ -9755,7 +9737,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                           </button>
 
                           {showLiveSteeringReference && (
-                            <div className="absolute bottom-full george-motion-collapse-up right-0 mb-2 w-[260px] rounded-[0.82rem] border border-white/[0.07] bg-[#05080D]/94 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
+                            <div className="absolute bottom-full right-0 mb-2 w-[260px] rounded-[0.82rem] border border-white/[0.07] bg-[#05080D]/94 px-3 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.48)] backdrop-blur-2xl">
                               {(() => {
                                 const defaults = {
                                   buyTime: "Let me think for a second...",
@@ -9947,7 +9929,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
         </div>
 
         {showWalkthrough && (
-          <div className="fixed inset-0 z-[95] bg-black george-motion-fade-soft/72 -[10px]  flex items-center justify-center px-4 ">
+          <div className="fixed inset-0 z-[95] bg-black/72 -[10px]  flex items-center justify-center px-4 ">
             <div className="w-full max-w-sm rounded-[1.65rem] border border-white/[0.07] bg-[#05080D]/88  p-5 text-center shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
               <p className="text-sm uppercase tracking-[0.18em] text-[#D7DBE4]/72 mb-2">
                 Runtime
@@ -10006,7 +9988,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
 
         {showPersonalizeModal && (
           <div
-            className="fixed inset-0 z-[92] flex items-end justify-center bg-black george-motion-fade-soft/68 px-4 -[10px] pb-4 "
+            className="fixed inset-0 z-[92] flex items-end justify-center bg-black/68 px-4 -[10px] pb-4 "
             onClick={() => setShowPersonalizeModal(false)}
           >
             <div
@@ -10120,7 +10102,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 type="button"
                 aria-label="Close access panel"
                 onClick={() => setShowTierModal(false)}
-                className="fixed inset-0 z-[200] cursor-default bg-black george-motion-fade-soft/45 backdrop-blur-[14px]"
+                className="fixed inset-0 z-[200] cursor-default bg-black/45 backdrop-blur-[14px]"
               />
 
               <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center overflow-y-auto px-4 py-6">
@@ -10220,7 +10202,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                     setShowUpgradeModal(false);
                   }
                 }}
-                className="pointer-events-auto fixed inset-0 z-[200] bg-black george-motion-fade-soft/24 -[8px]"
+                className="pointer-events-auto fixed inset-0 z-[200] bg-black/24 -[8px]"
               />
 
               <div className="pointer-events-none fixed inset-0 z-[210] flex items-center justify-center px-4 py-6 overflow-y-auto">
@@ -10437,7 +10419,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                 type="button"
                 aria-label="Close activation"
                 onClick={() => setActiveCheckout(null)}
-                className="fixed inset-0 z-[240] bg-black george-motion-fade-soft/68 -[10px]"
+                className="fixed inset-0 z-[240] bg-black/68 -[10px]"
               />
 
               <div className="fixed inset-0 z-[141] flex items-center justify-center px-4 py-6">

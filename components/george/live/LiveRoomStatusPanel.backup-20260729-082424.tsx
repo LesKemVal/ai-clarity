@@ -64,10 +64,10 @@ function LiveChoiceOverlay({
 
       <div className="relative z-10 flex max-h-[calc(100dvh-32px)] w-full max-w-[540px] flex-col overflow-hidden rounded-[1.35rem] bg-[radial-gradient(circle_at_top,rgba(46,126,215,0.12),rgba(5,8,15,0.97)_48%)] shadow-[0_26px_90px_rgba(0,0,0,0.62)] ring-1 ring-inset ring-[#7CB7FF]/[0.08]">
         <div className="shrink-0 px-4 pb-3 pt-4 text-left sm:px-5 sm:pt-5">
-          <div className="text-[15px] font-semibold leading-5 text-[color:var(--steel-100)] sm:text-[16px]">
+          <div className="text-[15px] font-semibold leading-5 text-white/90 sm:text-[16px]">
             {title}
           </div>
-          <p className="mt-1 max-w-[460px] text-[11px] leading-4 text-[color:var(--steel-400)] sm:text-[12px]">
+          <p className="mt-1 max-w-[460px] text-[11px] leading-4 text-white/40 sm:text-[12px]">
             {detail}
           </p>
         </div>
@@ -81,11 +81,11 @@ function LiveChoiceOverlay({
                 onClick={() => onSelect(option.value)}
                 className="flex min-h-[64px] flex-col justify-center rounded-[0.95rem] bg-[#2F78C9]/[0.09] px-3 py-2.5 text-left ring-1 ring-inset ring-[#82BFFF]/[0.045] transition-[transform,background-color] duration-200 ease-out hover:bg-[#3C8EE8]/[0.16] active:scale-[0.985] sm:min-h-[68px] sm:px-3.5"
               >
-                <div className="whitespace-normal text-[13px] font-semibold leading-4 text-[color:var(--steel-100)] sm:text-[14px]">
+                <div className="whitespace-normal text-[13px] font-semibold leading-4 text-white/90 sm:text-[14px]">
                   {option.label}
                 </div>
                 {option.helper && (
-                  <div className="mt-1 whitespace-normal text-[10px] leading-3.5 text-[color:var(--steel-400)] sm:text-[11px] sm:leading-4">
+                  <div className="mt-1 whitespace-normal text-[10px] leading-3.5 text-white/42 sm:text-[11px] sm:leading-4">
                     {option.helper}
                   </div>
                 )}
@@ -98,7 +98,7 @@ function LiveChoiceOverlay({
           <button
             type="button"
             onClick={onClose}
-            className="mx-auto block rounded-full bg-[#2F78C9]/[0.07] px-5 py-2 text-[9px] font-semibold uppercase tracking-[0.16em] text-[color:var(--steel-400)] transition-[background-color,transform] duration-200 hover:bg-[#3C8EE8]/[0.13] active:scale-[0.98]"
+            className="mx-auto block rounded-full bg-[#2F78C9]/[0.07] px-5 py-2 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/42 transition-[background-color,transform] duration-200 hover:bg-[#3C8EE8]/[0.13] active:scale-[0.98]"
           >
             Cancel
           </button>
@@ -200,8 +200,8 @@ function ControlPill({
 
         ${
           active
-            ? "border-[#477fb8]/70 bg-[color:var(--surface-4)] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.08)]"
-            : "border-[#263849]/70 bg-[color:var(--surface-2)] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.04)] hover:border-[#3a5875]/80 hover:bg-[color:var(--surface-4)]"
+            ? "border-[#477fb8]/70 bg-[#07111c] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.08)]"
+            : "border-[#263849]/70 bg-[#05090e] shadow-[0_10px_24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(126,181,235,0.04)] hover:border-[#3a5875]/80 hover:bg-[#070d14]"
         }
       `}
     >
@@ -221,7 +221,7 @@ function ControlPill({
       </span>
 
       <span
-        className={`relative block font-semibold uppercase leading-none text-[color:var(--steel-100)] ${
+        className={`relative block font-semibold uppercase leading-none text-white/90 ${
           compact
             ? "mt-2 max-w-full truncate text-[9px] tracking-[0.08em] sm:text-[10px]"
             : "mt-4 text-[20px] tracking-[0.075em] sm:text-[22px]"
@@ -231,7 +231,7 @@ function ControlPill({
       </span>
 
       {!compact && (
-        <span className="relative mt-3 block max-w-full truncate font-mono text-[10px] font-medium uppercase leading-4 tracking-[0.14em] text-[color:var(--steel-400)] sm:text-[11px]">
+        <span className="relative mt-3 block max-w-full truncate font-mono text-[10px] font-medium uppercase leading-4 tracking-[0.14em] text-white/42 sm:text-[11px]">
           {detail}
         </span>
       )}
@@ -278,11 +278,11 @@ function OperationalStatus({
           isThinking
             ? "bg-[#2EA7D7]/80 shadow-[0_0_12px_rgba(46,167,215,0.36)]"
             : isListening
-              ? "bg-[#72afe8] shadow-[0_0_16px_rgba(114,175,232,0.60)]"
-              : "bg-[color:var(--steel-300)]/18"
+              ? "bg-[#35D1A3] shadow-[0_0_16px_rgba(53,209,163,0.68)]"
+              : "bg-white/18"
         }`}
       />
-      <span className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--steel-300)]">
+      <span className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-white/64">
         {label}
       </span>
     </div>
@@ -321,12 +321,7 @@ export function LiveRoomStatusPanel({
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem("GEORGE_LIVE_VIEW_MODE");
-      if (stored === "controls" || stored === "reading") {
-        setViewMode(stored);
-        document.documentElement.dataset.georgeLiveView = stored;
-      } else {
-        document.documentElement.dataset.georgeLiveView = "controls";
-      }
+      if (stored === "controls" || stored === "reading") setViewMode(stored);
     } catch {}
 
     const desktopQuery = window.matchMedia("(min-width: 640px)");
@@ -345,15 +340,8 @@ export function LiveRoomStatusPanel({
 
   const setMobileView = (nextMode: LiveViewMode) => {
     setViewMode(nextMode);
-
     try {
       window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", nextMode);
-      document.documentElement.dataset.georgeLiveView = nextMode;
-      window.dispatchEvent(
-        new CustomEvent("george-live-view-change", {
-          detail: { viewMode: nextMode },
-        }),
-      );
     } catch {}
   };
 
@@ -457,25 +445,12 @@ export function LiveRoomStatusPanel({
     } catch {}
   };
 
-  // GEORGE LIVE WORKSPACE DOM CONTRACT
-  useEffect(() => {
-    document.documentElement.dataset.georgeLiveView = viewMode;
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_VIEW_MODE", viewMode);
-    } catch {}
-
-    return () => {
-      delete document.documentElement.dataset.georgeLiveView;
-    };
-  }, [viewMode]);
-
   const controlGrid = (
     <div
       className={`grid ${
         isCompactControlLayout
           ? "grid-cols-4 gap-2"
-          : "h-[48dvh] min-h-[330px] max-h-[470px] grid-cols-2 auto-rows-fr gap-3"
+          : "h-[66dvh] min-h-[480px] max-h-[680px] grid-cols-2 auto-rows-fr gap-3"
       }`}
     >
       <ControlPill
@@ -523,11 +498,11 @@ export function LiveRoomStatusPanel({
       className="min-h-[calc(100dvh-210px)] flex-1 overflow-y-auto rounded-[1.35rem] bg-[radial-gradient(circle_at_top_left,rgba(46,126,215,0.055),rgba(255,255,255,0.01)_42%)] px-5 py-5 ring-1 ring-inset ring-[#7CB7FF]/[0.045] sm:min-h-[320px] sm:px-7 sm:py-6 lg:min-h-[360px]"
       aria-live="polite"
     >
-      <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[color:var(--steel-600)]">
+      <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/24">
         GEORGE
       </div>
       <div
-        className={`mt-5 max-w-[760px] text-[17px] leading-[1.7] text-[color:var(--steel-200)] transition-opacity duration-700 sm:text-[18px] ${
+        className={`mt-5 max-w-[760px] text-[17px] leading-[1.7] text-white/82 transition-opacity duration-700 sm:text-[18px] ${
           readingIntroVisible && readingIntroText ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -555,7 +530,7 @@ export function LiveRoomStatusPanel({
             liveRoomActive={liveRoomActive}
           />
           <p
-            className={`mt-1 truncate text-[11px] text-[color:var(--steel-500)] transition-opacity duration-500 ${
+            className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
               showRoomIntro ? "opacity-100" : "opacity-0"
             }`}
             aria-hidden={!showRoomIntro}
@@ -570,7 +545,7 @@ export function LiveRoomStatusPanel({
           onClick={onReceiverPressed}
           aria-label="Change delivery or view"
           title="Change delivery or view"
-          className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[color:var(--surface-3)] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[color:var(--surface-4)] active:translate-y-[1px]"
+          className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
         >
           Controls
         </button>
@@ -594,7 +569,7 @@ export function LiveRoomStatusPanel({
                   liveRoomActive={liveRoomActive}
                 />
                 <p
-                  className={`mt-1 truncate text-[11px] text-[color:var(--steel-500)] transition-opacity duration-500 ${
+                  className={`mt-1 truncate text-[11px] text-white/30 transition-opacity duration-500 ${
                     showRoomIntro ? "opacity-100" : "opacity-0"
                   }`}
                   aria-hidden={!showRoomIntro}
@@ -609,7 +584,7 @@ export function LiveRoomStatusPanel({
                 onClick={handleViewCycle}
                 aria-label="Switch to visual reading view"
                 title="Switch to visual reading view"
-                className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[color:var(--surface-3)] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[color:var(--surface-4)] active:translate-y-[1px]"
+                className="shrink-0 rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
               >
                 Controls
               </button>
@@ -623,25 +598,8 @@ export function LiveRoomStatusPanel({
               }`}
             >
               {controlGrid}
-              <div
-                aria-label="Emergency and machine notification"
-                aria-live="assertive"
-                className="mt-3 flex min-h-[72px] shrink-0 items-center rounded-[1rem] border border-[#31506f]/55 bg-[#040910]/96 px-4 py-3 shadow-[inset_0_1px_0_rgba(120,181,240,0.04)]"
-              >
-                <div className="min-w-0">
-                  <div className="mb-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[#72afe8]/48">
-                    Emergency · Machine
-                  </div>
-                  <p className="line-clamp-2 text-[12px] leading-[1.45] text-[color:var(--steel-300)]">
-                    {signalSummary ||
-                      (liveRoomActive
-                        ? "Urgent support and machine notices will appear here."
-                        : "Support is suspended. Resume when you are ready.")}
-                  </p>
-                </div>
-              </div>
               {!isAudioOnlyLayout && (signalSummary || !liveRoomActive) && (
-                <div className="mt-2 border-t border-[color:var(--border-subtle)] px-3 py-2.5 text-center text-[10px] leading-4 text-[color:var(--steel-500)]">
+                <div className="mt-2 border-t border-white/[0.045] px-3 py-2.5 text-center text-[10px] leading-4 text-white/30">
                   {liveRoomActive
                     ? signalSummary
                     : "Support is suspended. Resume when you are ready."}
@@ -651,7 +609,7 @@ export function LiveRoomStatusPanel({
           </div>
         ) : (
           <div className="flex min-h-[calc(100dvh-150px)] flex-col gap-3">
-            <div className="flex min-h-[42px] items-center justify-between gap-2 rounded-[1rem] border border-[color:var(--border-soft)] bg-[color:var(--surface-2)]/88 px-3 py-2 shadow-[0_14px_42px_rgba(0,0,0,0.36)] backdrop-blur-xl">
+            <div className="flex min-h-[42px] items-center justify-between gap-2 rounded-[1rem] border border-white/[0.06] bg-[#05070B]/88 px-3 py-2 shadow-[0_14px_42px_rgba(0,0,0,0.36)] backdrop-blur-xl">
               <OperationalStatus
                 isListening={isListening}
                 isThinking={isThinking}
@@ -663,13 +621,13 @@ export function LiveRoomStatusPanel({
                 onClick={handleViewCycle}
                 aria-label="Switch to audio controls view"
                 title="Switch to audio controls view"
-                className="rounded-[0.8rem] border border-[#31506f]/80 bg-[color:var(--surface-3)] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[color:var(--surface-4)] active:translate-y-[1px]"
+                className="rounded-[0.8rem] border border-[#31506f]/80 bg-[#050a10] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#72afe8]/90 shadow-[0_8px_20px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(127,184,239,0.07)] transition-[transform,border-color,background-color] duration-150 hover:border-[#4777a4]/85 hover:bg-[#07101a] active:translate-y-[1px]"
               >
                 Controls
               </button>
             </div>
 
-            <div className="shrink-0 rounded-[1rem] border border-[color:var(--border-subtle)] bg-[color:var(--surface-1)]/94 p-2">
+            <div className="shrink-0 rounded-[1rem] border border-white/[0.045] bg-[#03070b]/94 p-2">
               {controlGrid}
             </div>
 
@@ -683,7 +641,7 @@ export function LiveRoomStatusPanel({
         <div className="rounded-[1.35rem] bg-[radial-gradient(circle_at_top,rgba(46,126,215,0.07),rgba(5,7,11,0.90)_52%)] p-3 shadow-[0_20px_64px_rgba(0,0,0,0.40)] ring-1 ring-inset ring-[#7CB7FF]/[0.04] backdrop-blur-xl">
           {controlGrid}
           {(signalSummary || !liveRoomActive) && (
-            <div className="mt-3 border-t border-[color:var(--border-subtle)] px-3 pt-3 text-center text-[10px] leading-4 text-[color:var(--steel-500)]">
+            <div className="mt-3 border-t border-white/[0.045] px-3 pt-3 text-center text-[10px] leading-4 text-white/28">
               {liveRoomActive
                 ? signalSummary
                 : "Support is suspended. Resume when you are ready."}

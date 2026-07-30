@@ -14,20 +14,23 @@ Continuation packets provide operational context only. They do not override impl
 
 ## Current Phase
 
-GEORGE is in **Production Completion and Product Qualification**.
+GEORGE is in **Product Experience and Material Language Refinement**.
 
-The core runtime architecture is implemented, ownership-qualified, portability-qualified, and production-build validated.
+The runtime architecture, canonical ownership, portability, and production validation work have reached the point where product refinement is now the primary focus. Future work should improve the product experience rather than redesign the runtime unless implementation reveals a genuine defect.
 
-The current work is:
+This is a product-refinement phase. The objective is to improve clarity, fluidity, consistency, and perceived quality without changing runtime ownership, reasoning authority, receiver policy, delivery authority, or production architecture.
 
-- documentation synchronization;
-- production UX inspection;
-- release-surface cleanup;
-- real-room LIVE acceptance testing;
-- behavioral tuning from measured evidence;
-- production freeze readiness.
+The active work is:
 
-The current work is not runtime redesign.
+- Popup 3 / Ready Room correction;
+- interaction fluidity;
+- one canonical motion language;
+- material-language implementation;
+- restrained color refinement;
+- fades, collapse behavior, workspace transitions, and micro-interactions;
+- final product-experience polish on validated production surfaces.
+
+The active work is not architecture, portability, runtime construction, or production-system redesign. Do not reopen prior phases unless current implementation evidence proves a concrete defect.
 
 Do not:
 
@@ -38,6 +41,179 @@ Do not:
 - move delivery policy into `app/george/page.tsx`;
 - duplicate canonical ownership;
 - manufacture architecture changes where ownership is already correct.
+
+<!-- GEORGE_READINESS_STATUS_START -->
+## Readiness Status — Product-Refinement Baseline
+
+The validated runtime baseline must be preserved while product experience is refined.
+
+The tracker is the canonical status owner. The architecture and operational profile describe their own boundaries and should refer back to this tracker rather than becoming duplicate project-status trackers.
+
+Current evidence establishes that:
+
+- GEORGE operates as one operational intelligence with one shared reasoning authority;
+- canonical ownership is established for support behavior, operational assessment, receiver policy, routing, delivery, and rendering;
+- operational learning and governed operational-memory retrieval are implemented and qualified;
+- portability, interface-freeze, ownership, resilience, latency, and production-build qualifications are recorded in the repository;
+- the project has advanced far enough that product refinement is now the primary work.
+
+Supporting evidence in the documentation set includes:
+
+- `LIVE_PORTABILITY_AUDIT.md`: PASS, 49 portable runtime files inspected, 0 portability violations;
+- this tracker's recorded build and qualification results;
+- `RUNTIME_ARCHITECTURE.md`: architecture frozen unless current implementation evidence proves a genuine defect.
+
+`production-readiness-checklist.md` is historical qualification material. Its older blocking-item language must not be mistaken for the current project phase without fresh implementation evidence.
+<!-- GEORGE_READINESS_STATUS_END -->
+
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_START -->
+## Product Experience and Material Language Doctrine
+
+### Implementation order
+
+The canonical refinement order is:
+
+```text
+Motion
+↓
+Materials
+↓
+Color
+↓
+Micro-interactions
+↓
+Visual refinement
+```
+
+Fluidity is implemented before the steel/material palette so material decisions are evaluated without abrupt state changes obscuring the experience.
+
+### One motion language
+
+GEORGE must use one calm, precise, mechanical motion language across the product.
+
+Motion is functional acknowledgement. It is never decorative, playful, elastic, or attention-seeking.
+
+A canonical motion authority should own shared timing and interaction primitives, for example:
+
+```text
+lib/george/ui/material-motion.ts
+```
+
+Shared primitives include:
+
+- fade;
+- collapse;
+- slide;
+- press;
+- shimmer where transiently justified;
+- machine acknowledgement.
+
+Do not scatter competing animation timings across components.
+
+### Fade
+
+Anything appearing or disappearing fades.
+
+Applies to menus, dropdowns, popups, machine status, indicators, and helper text.
+
+Default range:
+
+```text
+opacity: 180–250 ms
+easing: ease-out
+```
+
+No popping.
+
+### Collapse
+
+Anything changing size collapses or expands through coordinated height, opacity, and slight vertical translation.
+
+Applies to expanding cards, mode explanations, conversation types, settings, and other revealed regions.
+
+Animate the equivalent of:
+
+```text
+max-height: 0 → resolved height
+opacity: 0 → 1
+translateY: 6px → 0
+```
+
+Content must not instantly appear.
+
+### Workspace slide
+
+Whole workspaces settle away and arrive with a slight slide.
+
+Example:
+
+```text
+Audio ↔ Visual
+```
+
+Default range:
+
+```text
+150–220 ms
+```
+
+The transition should be subtle, not theatrical.
+
+### Machine acknowledgement
+
+A selected mode does not flash, bounce, or glow aggressively.
+
+The surface receives a restrained light sweep, settles, and becomes still.
+
+### Conversation and stillness
+
+Streaming intelligence remains visibly streaming.
+
+A completed thought becomes perfectly still.
+
+No idle shimmer on completed intelligence.
+
+### Hover
+
+Hover uses:
+
+- 1–2 px lift;
+- a slightly brighter edge;
+- a restrained reflection.
+
+Do not use dramatic scaling.
+
+### Press
+
+Buttons use approximately 1 px of mechanical travel and return.
+
+They should feel like instrument-panel controls, not elastic web buttons.
+
+### Branch hygiene
+
+The `material-language-redesign` branch is the visual-refinement branch.
+
+Git is the recovery system. Do not add timestamped source backups, copied page files, `.backup-*` artifacts, or new patch-backup directories.
+
+Keep visual changes reviewable and clean enough to merge selectively.
+
+### Popup 3 / Ready Room
+
+Popup 3 is the canonical Ready Room owned by LIVE Entry.
+
+It is not another briefing, mechanics screen, control tutorial, or runtime.
+
+By Popup 3, preparation and mechanics are already resolved. Ready Room must explain what will happen when the user enters LIVE, using the selected receiver and support behavior.
+
+It should communicate:
+
+- how GEORGE will reach the user: Audio, Glasses, or Desktop / Mobile;
+- how the selected support behavior will operate in the room;
+- what the user should do: speak naturally, continue toward the outcome, and allow GEORGE to adapt if the room changes;
+- that settings remain available during LIVE without turning readiness into a control catalogue.
+
+Remove the control-heavy interpretation of Ready Room. Preserve routing and runtime ownership.
+<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_END -->
 
 <!-- GEORGE_LIVE_INPUT_LATENCY_OPTIMIZATION_START -->
 ## Production Update — LIVE Input Latency Optimization
@@ -610,6 +786,34 @@ Circular dependencies observed: 0
 
 The current Next.js warning that edge runtime disables static generation for the affected page remains a warning, not a production-build failure.
 
+<!-- GEORGE_OWNER_WORKFLOW_START -->
+## Owner Execution Workflow
+
+The owner prefers automated repository changes over manual coding or manual document editing.
+
+When the owner asks for the **next terminal command**, interpret that as a request for the complete, immediately runnable command that performs the agreed next action. Do not repeat the plan, provide placeholder paths, or ask the owner to create a script that has not been generated.
+
+Every local terminal command, patch command, or script-run command must begin exactly with:
+
+```bash
+id="031ukw"
+id="xtdj16"
+id="1dcmvv"
+cd ~/ai-clarity
+```
+
+Additional execution rules:
+
+- include `cd ~/ai-clarity` in every runnable local command;
+- prefer a generated patch or downloadable script over manual edits;
+- for synchronized documentation changes, update all affected authorities in one script or patch;
+- generate the artifact before instructing the owner to run it;
+- never reference `/path/to/...`, a nonexistent file, or an uncreated script;
+- do not use shell heredocs for large changes;
+- after execution, provide validation commands that are also immediately runnable;
+- use Git as the recovery system instead of timestamped source backups.
+<!-- GEORGE_OWNER_WORKFLOW_END -->
+
 ## Production Engineering Discipline
 
 Always follow this order:
@@ -639,38 +843,38 @@ Additional rules:
 
 ## Current Production Status
 
-### Runtime architecture
+### Runtime baseline
 
-**VALIDATED AND FROZEN FOR PRODUCT QUALIFICATION**
+**PRESERVED FOR PRODUCT REFINEMENT**
 
-The runtime interface freeze, portability boundary, ownership audit, resilience qualifications, and production build pass.
+The runtime interface freeze, portability boundary, ownership audit, resilience qualifications, and production build evidence establish the baseline for the current experience work.
 
-Architecture changes now require evidence of a genuine defect or missing production responsibility. Preference, presentation, or wording changes do not justify a new runtime owner.
+Architecture changes require evidence of a genuine defect or missing production responsibility. Preference, presentation, motion, color, or wording changes do not justify a new runtime owner.
 
 ### Documentation
 
-**SYNCHRONIZED**
+**SYNCHRONIZED FOR THE CURRENT PHASE**
 
-The production authorities now reflect the validated operational-learning, retrieval, runtime-evidence, telemetry, and qualification implementation:
+The production authorities describe distinct responsibilities:
 
-1. `PRODUCTION_TRACKER.md`
-2. `RUNTIME_ARCHITECTURE.md`
-3. `OPERATIONAL_PROFILE.md`
+1. `PRODUCTION_TRACKER.md` — canonical phase, readiness, work queue, and validation status;
+2. `RUNTIME_ARCHITECTURE.md` — architectural ownership and boundaries;
+3. `OPERATIONAL_PROFILE.md` — behavioral doctrine;
+4. `NEXT_THREAD_HANDOFF.md` — active branch, immediate work, and execution instructions.
 
-These documents are authoritative while they remain synchronized with implementation.
+These documents are authoritative while synchronized with implementation.
 
-### Product completion
+### Current refinement sequence
 
-**NEXT**
+1. correct Popup 3 / Ready Room responsibility and content;
+2. establish the canonical motion authority;
+3. apply motion doctrine to the Ready Room and then shared surfaces;
+4. refine materials;
+5. refine color;
+6. refine micro-interactions;
+7. complete final product-experience polish and focused validation.
 
-After all three production authorities are synchronized:
-
-1. inspect `/george`, `/george/live-entry`, and `/george/live` as a user;
-2. identify unnecessary friction, duplicated explanation, weak hierarchy, and perceived latency;
-3. audit development-only and internal test routes before release;
-4. run real-room LIVE acceptance scenarios;
-5. tune behavior from measured evidence without redesigning architecture;
-6. complete production freeze and release-readiness review.
+Do not use product refinement as an opportunity to redesign runtime architecture.
 
 ## Real-Room LIVE Acceptance Scenarios
 

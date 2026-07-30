@@ -65,13 +65,13 @@ export function PostLiveConversationRecordPanel({
     : 0
 
   return (
-    <section className="pointer-events-auto w-full max-w-[720px] rounded-[1.25rem] border border-white/[0.07] bg-[#05070B]/88 p-4 text-[#DCEBFF]/72 shadow-[0_24px_90px_rgba(0,0,0,0.52),inset_0_1px_0_rgba(255,255,255,0.035)]">
+    <section className="pointer-events-auto w-full max-w-[720px] rounded-[1.25rem] border border-[var(--border-subtle)] bg-[color:var(--surface-2)]/88 p-4 text-[color:var(--steel-200)]/72 shadow-[0_24px_90px_rgba(0,0,0,0.52),inset_0_1px_0_rgba(255,255,255,0.035)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#8FB6C9]/72">
             LIVE Complete
           </p>
-          <h2 className="mt-1 text-[15px] font-medium text-[#F4F7FB]/86">
+          <h2 className="mt-1 text-[15px] font-medium text-[color:var(--steel-100)]/86">
             Let's see what actually happened.
           </h2>
         </div>
@@ -80,7 +80,7 @@ export function PostLiveConversationRecordPanel({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-white/[0.08] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#D7DBE4]/48 transition hover:border-white/[0.16] hover:text-[#D7DBE4]/72"
+            className="rounded-full border border-[var(--border-default)] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[color:var(--steel-300)]/48 transition hover:border-white/[0.16] hover:text-[color:var(--steel-300)]/72"
           >
             Close
           </button>
@@ -88,41 +88,41 @@ export function PostLiveConversationRecordPanel({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+        <div className="rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Desired outcome</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">{label(record.desiredOutcome)}</p>
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">{label(record.desiredOutcome)}</p>
         </div>
 
-        <div className="rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+        <div className="rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Context</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">
             {label(record.conversationType, 'Conversation')} · {label(record.conversationContext, 'Context pending')}
           </p>
         </div>
       </div>
 
-      <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+      <div className="mt-3 rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
         <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE Analysis</p>
-        <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">{label(record.summary)}</p>
+        <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">{label(record.summary)}</p>
       </div>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#8FB6C9]/54">Outcome Review</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/76">
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/76">
             {label(record.latestOutcome?.currentState || record.latestOutcome?.observedProgress)}
           </p>
-          <p className="mt-2 text-[11px] leading-5 text-[#DCEBFF]/52">
+          <p className="mt-2 text-[11px] leading-5 text-[color:var(--steel-200)]/52">
             {label(record.latestOutcome?.bestAvailablePath, 'Next path pending')}
           </p>
         </div>
 
         <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.045] p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/42">Working Together</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/72">
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">
             {label(record.latestLearning?.learning, 'No promoted partnership learning yet')}
           </p>
-          <p className="mt-2 text-[11px] leading-5 text-[#DCEBFF]/46">
+          <p className="mt-2 text-[11px] leading-5 text-[color:var(--steel-200)]/46">
             GEORGE should explain what changed during LIVE, why it changed, whether it appeared to help, and ask what should be remembered.
           </p>
         </div>
@@ -131,11 +131,11 @@ export function PostLiveConversationRecordPanel({
       {(record.operationalDebrief?.summary || debriefObservations.length > 0) && (
         <div className="mt-3 rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.04] p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">DeBriefing</p>
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/76">
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/76">
             {label(record.operationalDebrief?.summary, 'GEORGE preserved the interaction evidence for future preparation.')}
           </p>
           {debriefObservations.length > 0 && (
-            <ul className="mt-2 space-y-1 text-[11px] leading-5 text-[#DCEBFF]/56">
+            <ul className="mt-2 space-y-1 text-[11px] leading-5 text-[color:var(--steel-200)]/56">
               {debriefObservations.map((item) => (
                 <li key={`${item.label}-${item.detail}`}>
                   <span className="text-[#BFD9FF]/72">{label(item.label, 'Observation')}:</span> {label(item.detail, '')}
@@ -147,7 +147,7 @@ export function PostLiveConversationRecordPanel({
       )}
 
       {transcriptHighlights.length > 0 && (
-        <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+        <div className="mt-3 rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
           <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">Transcript Intelligence</p>
           <div className="mt-2 space-y-2">
             {transcriptHighlights.map((item) => {
@@ -165,9 +165,9 @@ export function PostLiveConversationRecordPanel({
                   >
                     {isConcern ? 'Concern' : 'Signal'} · {label(item.label, 'Operational moment')}
                   </p>
-                  <p className="mt-1 text-[12px] leading-5 text-[#F4F7FB]/76">“{label(item.excerpt, 'Transcript evidence pending')}”</p>
-                  <p className="mt-1 text-[11px] leading-5 text-[#DCEBFF]/52">{label(item.reason, '')}</p>
-                  <p className="mt-1 text-[11px] leading-5 text-[#DCEBFF]/46">{label(item.recommendedUse, '')}</p>
+                  <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-100)]/76">“{label(item.excerpt, 'Transcript evidence pending')}”</p>
+                  <p className="mt-1 text-[11px] leading-5 text-[color:var(--steel-200)]/52">{label(item.reason, '')}</p>
+                  <p className="mt-1 text-[11px] leading-5 text-[color:var(--steel-200)]/46">{label(item.recommendedUse, '')}</p>
                 </div>
               )
             })}
@@ -175,24 +175,24 @@ export function PostLiveConversationRecordPanel({
         </div>
       )}
 
-      <div className="mt-3 rounded-[0.95rem] border border-white/[0.055] bg-white/[0.025] p-3">
+      <div className="mt-3 rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
         <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE Actions</p>
         {futureActions.length > 0 ? (
-          <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[#DCEBFF]/72">
+          <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[color:var(--steel-200)]/72">
             {futureActions.map((action) => (
               <li key={action}>GEORGE can {action.charAt(0).toLowerCase()}{action.slice(1)}</li>
             ))}
           </ul>
         ) : (
-          <p className="mt-1 text-[12px] leading-5 text-[#DCEBFF]/46">No next move has been promoted yet.</p>
+          <p className="mt-1 text-[12px] leading-5 text-[color:var(--steel-200)]/46">No next move has been promoted yet.</p>
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.16em] text-[#D7DBE4]/38">
-        <span className="rounded-full border border-white/[0.055] px-3 py-1">
+      <div className="mt-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.16em] text-[color:var(--steel-300)]/38">
+        <span className="rounded-full border border-[var(--border-subtle)] px-3 py-1">
           Documents: {documentationCount}
         </span>
-        <span className="rounded-full border border-white/[0.055] px-3 py-1">
+        <span className="rounded-full border border-[var(--border-subtle)] px-3 py-1">
           Transcript evidence: {record.transcriptEvidenceAvailable ? 'Available' : 'Not attached'}
         </span>
       </div>

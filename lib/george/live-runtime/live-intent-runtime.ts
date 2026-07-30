@@ -1,3 +1,40 @@
+/*
+ * ============================================================================
+ * PRODUCTION NOTE — LIVE ENTRY ACQUISITION (DO NOT REMOVE)
+ * ============================================================================
+ *
+ * GEORGE intentionally supports multiple routes into LIVE.
+ *
+ * These are NOT duplicate runtimes.
+ *
+ * Current entry surfaces include:
+ *
+ *   • Traditional LIVE preparation
+ *   • Normal GEORGE surface → LIVE
+ *   • Homepage → LIVE
+ *
+ * The objective is NOT to merge or eliminate these entry paths.
+ *
+ * The objective is ONLY to improve how preparation information is acquired.
+ *
+ * Planned acquisition flow:
+ *
+ *   1. Ask for the user's name.
+ *   2. Ask:
+ *        "Tell me everything I need to know about this conversation."
+ *   3. Ask for the desired outcome.
+ *   4. GEORGE extracts operational signals internally.
+ *   5. Ask only the single highest-value follow-up question if needed.
+ *   6. Allow LIVE once preparation is sufficient.
+ *
+ * This replaces rigid multi-question collection while preserving every
+ * existing route into LIVE.
+ *
+ * Preparation doctrine changes information acquisition only.
+ * It does NOT change LIVE architecture or entry surfaces.
+ * ============================================================================
+ */
+
 export type LiveIntentStage =
   | 'confirm_intent'
   | 'confirm_relation'
@@ -9,18 +46,15 @@ export type LiveIntentSourceContext = {
 } | null
 
 export type LiveIntentSignals = {
-  role: string
-  counterparty: string
+  conversationContext: string
   desiredOutcome: string
   sourceContext: string
 }
 
 export const LIVE_PREPARATION_SIGNAL_KEYS = [
   'name',
-  'role',
-  'counterparty',
+  'conversationContext',
   'desiredOutcome',
-  'acceptableOutcome',
 ] as const
 
 export type LivePreparationSignalKey =
@@ -34,46 +68,67 @@ export type LivePreparationQuestion = {
   examples: string
 }
 
+
+/*
+ * ============================================================================
+ * TODO — NEXT PRODUCTION ACQUISITION MODEL
+ * ============================================================================
+ *
+ * Replace the fixed preparation interview with operational acquisition.
+ *
+ * Existing implementation:
+ *
+ *   Name
+ *   Role
+ *   Counterparty
+ *   Desired Outcome
+ *   Acceptable Outcome
+ *
+ * Planned implementation:
+ *
+ *   1. Name
+ *   2. "Tell me everything I need to know about this conversation."
+ *   3. Desired Outcome
+ *   4. GEORGE extracts:
+ *        - chair / role
+ *        - counterparty
+ *        - pressure
+ *        - risks
+ *        - leverage
+ *        - constraints
+ *        - history
+ *        - operational signals
+ *   5. Ask one additional question only if confidence requires it.
+ *   6. LIVE becomes available.
+ *
+ * IMPORTANT:
+ * Do NOT remove the three LIVE entry routes.
+ * Change only information acquisition.
+ * ============================================================================
+ */
+
 export const LIVE_PREPARATION_QUESTIONS: readonly LivePreparationQuestion[] =
   Object.freeze([
     {
       key: 'name',
-      kicker: 'Bring GEORGE up to speed',
+      kicker: 'Identity',
       label: 'Question 1',
       question: 'What should I call you in this conversation?',
-      examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel, Alex, etc.',
+      examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel.',
     },
     {
-      key: 'role',
-      kicker: 'Position signal',
+      key: 'conversationContext',
+      kicker: 'Conversation',
       label: 'Question 2',
-      question: 'What is your role in the conversation — your position or title?',
-      examples:
-        'Examples: interviewer, interviewee, CEO, founder, manager, patient, customer, candidate, etc.',
-    },
-    {
-      key: 'counterparty',
-      kicker: 'Room signal',
-      label: 'Question 3',
-      question: 'Who are you speaking with?',
-      examples:
-        'Examples: investor, hiring manager, doctor, customer, employee, client, board member, etc.',
+      question: 'Tell me everything I need to know about this conversation.',
+      examples: 'Describe the people, situation, history, concerns, constraints, and anything that matters.',
     },
     {
       key: 'desiredOutcome',
-      kicker: 'Outcome signal',
-      label: 'Question 4',
-      question: 'What do you want from this conversation?',
-      examples: 'Name the result you are trying to move toward.',
-    },
-    {
-      key: 'acceptableOutcome',
-      kicker: 'Settlement signal',
-      label: 'Question 5',
-      question:
-        'If your ideal outcome is not available, what would you settle for?',
-      examples:
-        'This helps GEORGE understand the floor, not just the target.',
+      kicker: 'Outcome',
+      label: 'Question 3',
+      question: 'What outcome are you hoping to achieve?',
+      examples: 'Describe the result you want GEORGE to help you move toward.',
     },
   ])
 
@@ -160,7 +215,7 @@ export function buildLivePreparationContinuation(input: {
   nextKey: LivePreparationSignalKey
 }): string {
   const source = input.signals || {}
-  const room = String(source.counterparty || '').trim()
+  const context = String(source.conversationContext || '').trim()
   const outcome = String(source.desiredOutcome || '').trim()
   const nextQuestion = resolveLivePreparationQuestion(input.nextKey)
 
@@ -168,8 +223,8 @@ export function buildLivePreparationContinuation(input: {
     return `We left off preparing around ${outcome}. ${nextQuestion}`
   }
 
-  if (room) {
-    return `We left off talking about the conversation you are preparing for with ${room}. ${nextQuestion}`
+  if (context) {
+    return `We left off preparing for this conversation. ${nextQuestion}`
   }
 
   return `We left off here. ${nextQuestion}`
@@ -184,14 +239,10 @@ export function buildLivePreparationAcknowledgement(input: {
   switch (input.completedKey) {
     case 'name':
       return `Good. ${nextQuestion}`
-    case 'role':
-      return `Got it. ${nextQuestion}`
-    case 'counterparty':
-      return `That helps me understand the room. ${nextQuestion}`
+    case 'conversationContext':
+      return `That gives me the context I need. ${nextQuestion}`
     case 'desiredOutcome':
       return `That gives us something concrete to work toward. ${nextQuestion}`
-    case 'acceptableOutcome':
-      return `Good. I have enough context to support you.`
     default:
       return nextQuestion
   }
@@ -216,8 +267,7 @@ export function resolveLivePreparationReadiness(
     ),
     percent,
     thresholdMet:
-      Boolean(String(source.role || '').trim()) &&
-      Boolean(String(source.counterparty || '').trim()) &&
+      Boolean(String(source.conversationContext || '').trim()) &&
       Boolean(String(source.desiredOutcome || '').trim()),
     complete: completedKeys.length === requiredKeys.length,
   })
@@ -332,8 +382,7 @@ export function resolveLiveIntentRuntime(input: {
       return {
         nextStage: 'confirm_preview',
         preLiveSignals: {
-          role: '',
-          counterparty: '',
+          conversationContext: String(sourceContext.summary || '').slice(0, 700),
           desiredOutcome: direction,
           sourceContext: String(sourceContext.summary || '').slice(0, 700),
         },
@@ -351,8 +400,7 @@ export function resolveLiveIntentRuntime(input: {
     return {
       nextStage: 'confirm_preview',
       preLiveSignals: {
-        role: '',
-        counterparty: '',
+        conversationContext: sourceContext?.summary || '',
         desiredOutcome: text,
         sourceContext: sourceContext?.summary || '',
       },
