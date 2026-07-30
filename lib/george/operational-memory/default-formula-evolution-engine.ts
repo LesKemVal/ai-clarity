@@ -26,6 +26,8 @@ OperationalFormulaEvolutionEngine {
           return {}
 
         case 'weaken':
+          return {}
+
         case 'contest':
         case 'evolve': {
 
