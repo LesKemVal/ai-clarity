@@ -11,10 +11,14 @@ const REASSESSMENT_KEY_PREFIX =
   'george:operational-memory:reassessment:v1:'
 const REASSESSMENT_CONVERSATION_INDEX_PREFIX =
   'george:operational-memory:conversation-reassessments:v1:'
+const REASSESSMENT_FORMULA_INDEX_PREFIX =
+  'george:operational-memory:formula-reassessments:v1:'
 const LINEAGE_KEY_PREFIX =
   'george:operational-memory:lineage:v1:'
 const LINEAGE_CONVERSATION_INDEX_PREFIX =
   'george:operational-memory:conversation-lineages:v1:'
+const LINEAGE_FORMULA_INDEX_PREFIX =
+  'george:operational-memory:formula-lineages:v1:'
 
 function reassessmentKey(id: string) {
   return `${REASSESSMENT_KEY_PREFIX}${encodeURIComponent(id)}`
@@ -27,8 +31,19 @@ function reassessmentConversationKey(conversationId: string) {
   )
 }
 
+function reassessmentFormulaKey(formulaId: string) {
+  return (
+    REASSESSMENT_FORMULA_INDEX_PREFIX +
+    encodeURIComponent(formulaId)
+  )
+}
+
 function lineageKey(id: string) {
   return `${LINEAGE_KEY_PREFIX}${encodeURIComponent(id)}`
+}
+
+function lineageFormulaKey(formulaId: string) {
+  return LINEAGE_FORMULA_INDEX_PREFIX + encodeURIComponent(formulaId)
 }
 
 function lineageConversationKey(conversationId: string) {
@@ -80,6 +95,10 @@ OperationalLearningRecordRecorder {
           reassessmentConversationKey(reassessment.conversationId),
           reassessment.id
         )
+        .sAdd(
+          reassessmentFormulaKey(reassessment.formulaId),
+          reassessment.id
+        )
         .exec()
     },
 
@@ -94,6 +113,15 @@ OperationalLearningRecordRecorder {
           lineageConversationKey(lineage.conversationId),
           lineage.id
         )
+      }
+
+      const formulaIds = new Set([
+        ...lineage.parentFormulaIds,
+        ...(lineage.childFormulaId ? [lineage.childFormulaId] : []),
+      ])
+
+      for (const formulaId of formulaIds) {
+        transaction.sAdd(lineageFormulaKey(formulaId), lineage.id)
       }
 
       await transaction.exec()
@@ -120,10 +148,50 @@ OperationalLearningRecordRecorder {
         .sort((a, b) => b.assessedAt - a.assessedAt)
     },
 
+    async listReassessmentsByFormula(formulaId) {
+      const redis = getRedis()
+      const ids = await redis.sMembers(
+        reassessmentFormulaKey(formulaId)
+      )
+
+      const values = await Promise.all(
+        ids.map((id) => redis.get(reassessmentKey(id)))
+      )
+
+      return values
+        .map(parseReassessment)
+        .filter(
+          (
+            reassessment
+          ): reassessment is OperationalFormulaReassessment =>
+            reassessment !== null
+        )
+        .sort((a, b) => b.assessedAt - a.assessedAt)
+    },
+
     async listLineagesByConversation(conversationId) {
       const redis = getRedis()
       const ids = await redis.sMembers(
         lineageConversationKey(conversationId)
+      )
+
+      const values = await Promise.all(
+        ids.map((id) => redis.get(lineageKey(id)))
+      )
+
+      return values
+        .map(parseLineage)
+        .filter(
+          (lineage): lineage is OperationalFormulaLineage =>
+            lineage !== null
+        )
+        .sort((a, b) => b.createdAt - a.createdAt)
+    },
+
+    async listLineagesByFormula(formulaId) {
+      const redis = getRedis()
+      const ids = await redis.sMembers(
+        lineageFormulaKey(formulaId)
       )
 
       const values = await Promise.all(

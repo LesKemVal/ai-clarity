@@ -11,7 +11,13 @@ export type OperationalLearningRecordRecorder = {
   listReassessmentsByConversation(
     conversationId: string
   ): Promise<OperationalFormulaReassessment[]>
+  listReassessmentsByFormula(
+    formulaId: string
+  ): Promise<OperationalFormulaReassessment[]>
   listLineagesByConversation(
     conversationId: string
+  ): Promise<OperationalFormulaLineage[]>
+  listLineagesByFormula(
+    formulaId: string
   ): Promise<OperationalFormulaLineage[]>
 }
