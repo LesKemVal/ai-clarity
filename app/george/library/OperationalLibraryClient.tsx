@@ -125,6 +125,8 @@ export default function OperationalLibraryClient() {
   const [draft, setDraft] = useState<FormulaDraft | null>(null);
   const [derivingFormulaId, setDerivingFormulaId] = useState<string | null>(null);
   const [derivationError, setDerivationError] = useState("");
+  const [deletingFormulaId, setDeletingFormulaId] = useState<string | null>(null);
+  const [formulaMutationError, setFormulaMutationError] = useState("");
   const [expandedHistoryFormulaId, setExpandedHistoryFormulaId] = useState<
     string | null
   >(null);
@@ -254,6 +256,75 @@ export default function OperationalLibraryClient() {
     setEditingFormulaId(formula.id);
     setDraft(createDraft(formula));
     setDerivationError("");
+    setFormulaMutationError("");
+  }
+
+  async function deleteFormula(formula: OperationalFormula) {
+    if (!ownedFormulaIds.has(formula.id) || deletingFormulaId) return;
+
+    const confirmed = window.confirm(
+      `Delete ${displayName(formula.name, "this operational formula")}? This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeletingFormulaId(formula.id);
+    setFormulaMutationError("");
+
+    try {
+      const response = await fetch(
+        `/api/george/operational-memory/formulas/${encodeURIComponent(
+          formula.id,
+        )}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const payload = (await response.json()) as FormulaResponse & {
+        formulaId?: string;
+      };
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "Unable to delete the formula");
+      }
+
+      setFormulas((current) =>
+        current.filter((currentFormula) => currentFormula.id !== formula.id),
+      );
+      setOwnedFormulaIds((current) => {
+        const next = new Set(current);
+        next.delete(formula.id);
+        return next;
+      });
+      setFormulaHistory((current) => {
+        const next = { ...current };
+        delete next[formula.id];
+        return next;
+      });
+      setHistoryErrors((current) => {
+        const next = { ...current };
+        delete next[formula.id];
+        return next;
+      });
+      setExpandedHistoryFormulaId((current) =>
+        current === formula.id ? null : current,
+      );
+      setEditingFormulaId((current) =>
+        current === formula.id ? null : current,
+      );
+      setDraft((current) =>
+        editingFormulaId === formula.id ? null : current,
+      );
+    } catch (deleteError) {
+      setFormulaMutationError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Unable to delete the formula",
+      );
+    } finally {
+      setDeletingFormulaId(null);
+    }
   }
 
   function cancelDerivation() {
@@ -366,6 +437,12 @@ export default function OperationalLibraryClient() {
           </span>
         </div>
 
+        {formulaMutationError ? (
+          <p className="mt-5 text-sm text-red-200">
+            {formulaMutationError}
+          </p>
+        ) : null}
+
         {formulas.length === 0 ? (
           <p className="mt-5 text-sm text-white/55">
             No operational formulas are available yet.
@@ -375,6 +452,8 @@ export default function OperationalLibraryClient() {
             {formulas.map((formula) => {
               const isEditing = editingFormulaId === formula.id;
               const isDeriving = derivingFormulaId === formula.id;
+              const isOwned = ownedFormulaIds.has(formula.id);
+              const isDeleting = deletingFormulaId === formula.id;
               const isHistoryExpanded =
                 expandedHistoryFormulaId === formula.id;
               const isHistoryLoading =
@@ -407,14 +486,27 @@ export default function OperationalLibraryClient() {
                       </p>
 
                       {!isEditing ? (
-                        <button
-                          type="button"
-                          onClick={() => beginDerivation(formula)}
-                          disabled={Boolean(derivingFormulaId)}
-                          className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                        >
-                          Derive
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => beginDerivation(formula)}
+                            disabled={Boolean(derivingFormulaId || deletingFormulaId)}
+                            className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            Derive
+                          </button>
+
+                          {isOwned ? (
+                            <button
+                              type="button"
+                              onClick={() => void deleteFormula(formula)}
+                              disabled={Boolean(derivingFormulaId || deletingFormulaId)}
+                              className="rounded-lg border border-red-300/20 px-3 py-1.5 text-xs text-red-200/70 transition hover:border-red-300/40 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              {isDeleting ? "Deleting…" : "Delete"}
+                            </button>
+                          ) : null}
+                        </>
                       ) : null}
                     </div>
                   </div>
