@@ -23,25 +23,101 @@ The implementation remains the source of truth. This document is authoritative o
 Current phase:
 
 ```text
-Product Experience and Material Language Refinement
+Production Completion & Operational Formula Experience
 ```
 
-The runtime architecture, canonical ownership, portability, and production validation work have reached the point where product refinement is now the primary focus. The tracker owns the detailed readiness record.
+The runtime architecture is frozen unless current implementation evidence proves a genuine architectural defect.
 
-Architecture remains frozen during product-experience refinement unless current implementation evidence proves a genuine defect or missing production responsibility.
+Operational Formula Experience work is a product-completion layer over the existing operational-memory and formula-intelligence architecture. It may extend canonical formula contracts and product surfaces, but it must not create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
+
+Canonical boundaries:
+
+- `lib/george/operational-memory/*` owns operational formula contracts, persistence, evidence, scripts, reassessment, revision proposals, evolution, and lineage;
+- `lib/george/live-entry/conversation-types.ts` owns Conversation Types;
+- `app/george/library/*` presents canonical formula and script data;
+- `app/george/page.tsx` remains a mount surface.
 
 Do not create:
 
 - another GEORGE;
 - another LIVE runtime;
 - another reasoning lane;
-- another support-behavior owner;
-- another operational-assessment owner;
-- another receiver-policy owner;
-- another delivery router;
-- page-level runtime intelligence.
+- another formula registry;
+- another conversation-type registry;
+- another operational-learning owner;
+- page-level runtime or formula intelligence.
 
-<!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_START -->
+<!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_START -->
+## Operational Formula Experience
+
+GEORGE is in **Production Completion & Operational Formula Experience**.
+
+The runtime architecture is largely complete. The active work is product completion around the existing operational-formula system. This work must document, organize, expose, and extend the current production assets without replacing them or introducing another runtime, reasoning authority, learning system, or ownership path.
+
+Existing production assets include:
+
+- operational formulas;
+- authenticated persistence and retrieval;
+- qualification evidence;
+- confidence;
+- success, contradiction, and unknown tracking;
+- scripts;
+- script execution and deviation tracking;
+- reassessment;
+- evolution;
+- revision proposals;
+- lineage;
+- operational learning.
+
+Current product-completion gaps include:
+
+- structured formula identity;
+- author and publisher metadata;
+- verification-authority metadata;
+- Proven By experience;
+- formula editing;
+- formula alternatives;
+- script management;
+- marketplace readiness;
+- conversation-type consolidation;
+- expanded Operational Library presentation.
+
+Canonical ownership remains:
+
+- formula contracts, persistence, evidence, reassessment, revision, and lineage: `lib/george/operational-memory/*`;
+- formula retrieval and runtime-evidence policy: `lib/george/operational-memory/*`;
+- conversation-type registry: `lib/george/live-entry/conversation-types.ts`;
+- Operational Library presentation: `app/george/library/*`.
+
+The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
+
+BRANESX is the formula verification authority for factual correctness, operational integrity, structural correctness, and publication readiness.
+
+GEORGE evaluates operational execution and may propose revisions. GEORGE does not self-publish verified formulas.
+
+The formula lifecycle is:
+
+```text
+Author
+↓
+Publisher
+↓
+Verification Authority
+↓
+Published Formula
+↓
+Proven By
+↓
+GEORGE Operational Learning
+↓
+Revision
+↓
+Verification
+↓
+Next Published Version
+```
+<!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_END -->
+
 ## Material Motion Boundary
 
 Material-language refinement is downstream of runtime reasoning, behavior selection, operational assessment, receiver policy, routing, and delivery approval.

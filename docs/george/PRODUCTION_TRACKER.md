@@ -14,35 +14,102 @@ Continuation packets provide operational context only. They do not override impl
 
 ## Current Phase
 
-GEORGE is in **Product Experience and Material Language Refinement**.
+GEORGE is in **Production Completion & Operational Formula Experience**.
 
-The runtime architecture, canonical ownership, portability, and production validation work have reached the point where product refinement is now the primary focus. Future work should improve the product experience rather than redesign the runtime unless implementation reveals a genuine defect.
+The runtime architecture, shared reasoning authority, LIVE runtime, receiver policy, delivery routing, behavior composition, operational assessment, portability, operational-learning foundation, and production qualification are established.
 
-This is a product-refinement phase. The objective is to improve clarity, fluidity, consistency, and perceived quality without changing runtime ownership, reasoning authority, receiver policy, delivery authority, or production architecture.
-
-The active work is:
-
-- Popup 3 / Ready Room correction;
-- interaction fluidity;
-- one canonical motion language;
-- material-language implementation;
-- restrained color refinement;
-- fades, collapse behavior, workspace transitions, and micro-interactions;
-- final product-experience polish on validated production surfaces.
-
-The active work is not architecture, portability, runtime construction, or production-system redesign. Do not reopen prior phases unless current implementation evidence proves a concrete defect.
+The active work is product completion around the existing operational-formula system.
 
 Do not:
 
+- redesign GEORGE;
+- redesign LIVE;
 - create another runtime;
 - create another reasoning lane;
-- redesign LIVE;
-- move authority into rendering;
-- move delivery policy into `app/george/page.tsx`;
-- duplicate canonical ownership;
-- manufacture architecture changes where ownership is already correct.
+- move canonical ownership;
+- move formula, learning, conversation-type, or delivery authority into `app/george/page.tsx`;
+- replace existing formula qualification, evidence, reassessment, revision, or lineage capabilities.
 
-<!-- GEORGE_READINESS_STATUS_START -->
+The immediate sequence is:
+
+1. synchronize the four production authorities from implementation evidence;
+2. inspect formula, conversation-type, and Operational Library canonical owners;
+3. identify duplicate ownership;
+4. patch canonical owners only;
+5. build and run focused qualification;
+6. begin Operational Formula Experience implementation.
+
+<!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_START -->
+## Operational Formula Experience
+
+GEORGE is in **Production Completion & Operational Formula Experience**.
+
+The runtime architecture is largely complete. The active work is product completion around the existing operational-formula system. This work must document, organize, expose, and extend the current production assets without replacing them or introducing another runtime, reasoning authority, learning system, or ownership path.
+
+Existing production assets include:
+
+- operational formulas;
+- authenticated persistence and retrieval;
+- qualification evidence;
+- confidence;
+- success, contradiction, and unknown tracking;
+- scripts;
+- script execution and deviation tracking;
+- reassessment;
+- evolution;
+- revision proposals;
+- lineage;
+- operational learning.
+
+Current product-completion gaps include:
+
+- structured formula identity;
+- author and publisher metadata;
+- verification-authority metadata;
+- Proven By experience;
+- formula editing;
+- formula alternatives;
+- script management;
+- marketplace readiness;
+- conversation-type consolidation;
+- expanded Operational Library presentation.
+
+Canonical ownership remains:
+
+- formula contracts, persistence, evidence, reassessment, revision, and lineage: `lib/george/operational-memory/*`;
+- formula retrieval and runtime-evidence policy: `lib/george/operational-memory/*`;
+- conversation-type registry: `lib/george/live-entry/conversation-types.ts`;
+- Operational Library presentation: `app/george/library/*`.
+
+The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
+
+BRANESX is the formula verification authority for factual correctness, operational integrity, structural correctness, and publication readiness.
+
+GEORGE evaluates operational execution and may propose revisions. GEORGE does not self-publish verified formulas.
+
+The formula lifecycle is:
+
+```text
+Author
+↓
+Publisher
+↓
+Verification Authority
+↓
+Published Formula
+↓
+Proven By
+↓
+GEORGE Operational Learning
+↓
+Revision
+↓
+Verification
+↓
+Next Published Version
+```
+<!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_END -->
+
 ## Readiness Status — Product-Refinement Baseline
 
 The validated runtime baseline must be preserved while product experience is refined.
