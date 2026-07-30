@@ -113,13 +113,13 @@ export default function OperationalLibraryClient() {
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="text-lg font-medium">Operational Formulas</h2>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
-            {formulas.length} saved
+            {formulas.length} available
           </span>
         </div>
 
         {formulas.length === 0 ? (
           <p className="mt-5 text-sm text-white/55">
-            No personal operational formulas have been saved yet.
+            No operational formulas are available yet.
           </p>
         ) : (
           <div className="mt-5 space-y-4">

@@ -24,7 +24,9 @@ export async function GET(req: NextRequest) {
   }
 
   const formulas =
-    await createRedisOperationalFormulaLibrary().listByOwner(userId);
+    await createRedisOperationalFormulaLibrary().listAccessible({
+      userId,
+    });
 
   return NextResponse.json({
     ok: true,

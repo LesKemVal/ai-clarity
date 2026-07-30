@@ -2,6 +2,7 @@ import "server-only";
 
 import { getRedis } from "@/lib/storage/redis";
 import {
+  canAccessOperationalFormula,
   rankOperationalFormulas,
   type OperationalFormulaLibrary,
 } from "./formula-library";
@@ -124,6 +125,14 @@ export function createRedisOperationalFormulaLibrary(): OperationalFormulaLibrar
 
       return formulas
         .filter((formula) => formula.ownerId === normalizedOwnerId)
+        .sort((left, right) => right.updatedAt - left.updatedAt);
+    },
+
+    async listAccessible(context) {
+      const formulas = await loadAllFormulas();
+
+      return formulas
+        .filter((formula) => canAccessOperationalFormula(formula, context))
         .sort((left, right) => right.updatedAt - left.updatedAt);
     },
   };

@@ -4,6 +4,11 @@ import type {
   RetrievedOperationalFormula,
 } from "./types";
 
+export type OperationalFormulaAccessContext = {
+  userId: string;
+  organizationId?: string;
+};
+
 export type OperationalFormulaLibrary = {
   retrieve(
     context: FormulaRetrievalContext,
@@ -12,9 +17,38 @@ export type OperationalFormulaLibrary = {
   save(formula: OperationalFormula): Promise<void>;
   delete(id: string, ownerId: string): Promise<void>;
   listByOwner(ownerId: string): Promise<OperationalFormula[]>;
+  listAccessible(
+    context: OperationalFormulaAccessContext,
+  ): Promise<OperationalFormula[]>;
 };
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+
+export function canAccessOperationalFormula(
+  formula: OperationalFormula,
+  context: OperationalFormulaAccessContext,
+) {
+  const userId = String(context.userId ?? "").trim();
+  const organizationId = String(context.organizationId ?? "").trim();
+
+  if (userId && formula.ownerId === userId) {
+    return true;
+  }
+
+  if (formula.scope === "personal") {
+    return false;
+  }
+
+  if (formula.scope === "organization") {
+    return (
+      !!organizationId &&
+      formula.ownerId === organizationId &&
+      formula.visibility !== "private"
+    );
+  }
+
+  return formula.visibility !== "private";
+}
 
 function includesOrUnrestricted(values: string[], value?: string) {
   return values.length === 0 || (!!value && values.includes(value));
