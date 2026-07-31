@@ -100,6 +100,21 @@ Canonical rules:
 - `formula-derivation-service.ts` is the sole owner of intentional derived-formula creation and derived lineage creation;
 - the Operational Library remains a presentation surface and does not acquire learning authority.
 
+### Canonical Ownership Inspection Completion
+
+The operational-learning, operational-memory, conversation-type, Operational Library, and LIVE Entry ownership boundaries have been inspected against implementation.
+
+Established ownership must not be reopened through broad inspection during ordinary continuation work. Inspect only the canonical owner affected by a specific production task.
+
+A broader ownership review is warranted only when:
+
+- qualification or runtime behavior indicates ownership drift;
+- the duplicate-ownership audit reports a violation;
+- a new responsibility is introduced; or
+- implementation materially diverges from this architecture.
+
+Operational-memory retrieval is complete as an architectural path unless production evidence proves a defect. LIVE completion orchestration remains browser-host responsibility and must not move into `app/george/page.tsx`.
+
 
 The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
 

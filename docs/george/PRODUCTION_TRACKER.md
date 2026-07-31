@@ -32,12 +32,12 @@ Do not:
 
 The immediate sequence is:
 
-1. synchronize the four production authorities from implementation evidence;
-2. inspect formula, conversation-type, and Operational Library canonical owners;
-3. identify duplicate ownership;
-4. patch canonical owners only;
-5. build and run focused qualification;
-6. begin Operational Formula Experience implementation.
+1. keep the production authorities synchronized with implementation evidence;
+2. continue Operational Formula Experience implementation from the established canonical owners;
+3. inspect only the canonical owner directly affected by the next production task;
+4. investigate ownership drift only when qualification, audit, or implementation evidence indicates it;
+5. patch canonical owners only;
+6. build and run focused qualification.
 
 <!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_START -->
 ## Operational Formula Experience
@@ -92,6 +92,30 @@ The operational-learning pipeline preserves one canonical owner per responsibili
 - `formula-derivation-service.ts` is the sole owner of intentional derived-formula creation and derived lineage creation.
 
 Passive reassessment must not create formulas, change confidence, or create competing lifecycle authority.
+
+### Canonical Ownership Inspection Status
+
+Canonical ownership inspection for the current Operational Formula Experience and LIVE Entry completion work is complete.
+
+The following production boundaries have been inspected and synchronized with implementation:
+
+- operational-memory ownership;
+- operational-learning ownership;
+- formula validation, reassessment, evolution, derivation, and lineage ownership;
+- conversation-type ownership;
+- Operational Library ownership;
+- LIVE Entry preparation and browser-host completion ownership.
+
+Do not repeat broad canonical-owner inspection during continuation work.
+
+Inspect only the canonical owner directly affected by the next production task unless:
+
+- a qualification fails;
+- the duplicate-ownership audit reports a violation;
+- implementation introduces a new responsibility; or
+- implementation and these production authorities materially diverge.
+
+Operational-memory retrieval is production-complete unless qualification or production evidence exposes a defect.
 
 
 The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.

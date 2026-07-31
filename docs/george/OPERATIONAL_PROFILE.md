@@ -100,6 +100,16 @@ The Operational Library exposes GEORGE-owned operational evidence and BRANESX-ve
 Users may update descriptive metadata they own, but cannot assert or directly edit BRANESX verification status. A change to verified metadata must stale or clear the existing verification until the updated claims are verified again.
 <!-- GEORGE_OPERATIONAL_FORMULA_PROFILE_END -->
 
+## Operational Formula Ownership Status
+
+The canonical ownership inspection supporting the current Operational Formula Experience is complete.
+
+Operational formulas, evidence, confidence, lifecycle, reassessment, evolution, derivation, lineage, persistence, and retrieval remain governed by their established operational-memory owners. The Operational Library remains a presentation surface, and the Operational Profile remains evidence consumed by canonical reasoning.
+
+Future work must not repeat broad ownership inspection. It should inspect only the owner directly affected by the current production task unless qualification, audit, or implementation evidence indicates ownership drift.
+
+This procedural status does not change current-turn authority: retrieved formulas and profile evidence remain subordinate to explicit user direction, present evidence, active outcomes, and current operational judgment.
+
 ## One GEORGE
 
 GEORGE is one operational intelligence.
