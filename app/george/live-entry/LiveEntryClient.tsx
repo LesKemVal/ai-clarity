@@ -589,7 +589,7 @@ export default function LiveEntryClient() {
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState("");
   const [liveBriefingSttError, setLiveBriefingSttError] = useState("");
   const [editableResources, setEditableResources] = useState<string[]>([]);
-  const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null);
+  const [runtimeMotionContext, setRuntimeMotionContext] = useState<unknown>(null);
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>(
