@@ -21,6 +21,7 @@ import {
   getActiveSessionForMode,
   getSessionsForMode,
   setActiveSessionIdForMode,
+  type GeorgeStoredSession,
 } from "@/lib/george/session/store";
 import {
   fetchGeorgeSessionAuthority,
@@ -477,7 +478,8 @@ export default function LiveEntryClient() {
     OBSERVED_REALITY_EXAMPLES.Other;
   const [sessionEmail, setSessionEmail] = useState("");
   const [relatedSessionId, setRelatedSessionId] = useState("not_related");
-  const [relatedSessions, setRelatedSessions] = useState<any[]>([]);
+  const [relatedSessions, setRelatedSessions] =
+    useState<GeorgeStoredSession[]>([]);
   const [liveToaAccepted, setLiveToaAccepted] = useState(false);
   const [liveBriefingReadyToContinue, setLiveBriefingReadyToContinue] =
     useState(false);
@@ -1487,38 +1489,26 @@ export default function LiveEntryClient() {
 
     try {
       const activeNormal = getActiveSessionForMode("normal");
-      const allSessions = JSON.parse(
-        window.localStorage.getItem("GEORGE_SESSIONS_V2") || "[]",
-      );
-      const normalSessions = Array.isArray(allSessions)
-        ? allSessions
-            .filter(
-              (session: any) =>
-                session?.mode === "normal" && !session?.archived,
-            )
-            .filter((session: any) => {
-              const email = cached.email || "";
-              if (!email) return true;
-              return (
-                !session?.metadata?.subscriberEmail ||
-                session.metadata.subscriberEmail === email
-              );
-            })
-            .sort(
-              (a: any, b: any) =>
-                (b.updatedAt || b.createdAt || 0) -
-                (a.updatedAt || a.createdAt || 0),
-            )
-        : [];
+      const email = cached.email || "";
+      const normalSessions = getSessionsForMode("normal")
+        .filter((session) => !session.archived)
+        .filter((session) => {
+          const subscriberEmail = session.metadata?.subscriberEmail;
+          return (
+            !email ||
+            typeof subscriberEmail !== "string" ||
+            subscriberEmail === email
+          );
+        })
+        .sort((a, b) => b.updatedAt - a.updatedAt);
 
       const merged = [
         ...(activeNormal ? [activeNormal] : []),
         ...normalSessions,
       ]
         .filter(
-          (session: any, index: number, list: any[]) =>
-            session?.id &&
-            list.findIndex((item: any) => item?.id === session.id) === index,
+          (session, index, list) =>
+            list.findIndex((item) => item.id === session.id) === index,
         )
         .slice(0, 5);
 
@@ -1752,7 +1742,7 @@ export default function LiveEntryClient() {
   const selectedRelatedSession =
     relatedSessions.find((session) => session?.id === relatedSessionId) || null;
 
-  const buildContinuityPackage = (session: any) => {
+  const buildContinuityPackage = (session: GeorgeStoredSession | null) => {
     if (!session) return null;
 
     return {
@@ -1797,7 +1787,6 @@ export default function LiveEntryClient() {
           desiredOutcome:
             selectedRelatedSession.metadata?.desiredOutcome ||
             selectedRelatedSession.userGoal ||
-            selectedRelatedSession.currentGoal ||
             "",
           conversationContext:
             selectedRelatedSession.lastKnownState ||
@@ -1848,12 +1837,12 @@ export default function LiveEntryClient() {
     });
   };
 
-  const resumeLiveConversation = (session: any) => {
+  const resumeLiveConversation = (session: GeorgeStoredSession) => {
     if (!session) return;
 
     const metadata = session.metadata || {};
     const restoredOutcome = String(
-      metadata.desiredOutcome || session.userGoal || session.currentGoal || "",
+      metadata.desiredOutcome || session.userGoal || "",
     ).trim();
     const restoredAudience = String(
       metadata.audience ||
@@ -2974,7 +2963,7 @@ export default function LiveEntryClient() {
 
   if (showResumeConversationList) {
     const liveSessions = getSessionsForMode("live").filter(
-      (session: any) => !session.archived,
+      (session) => !session.archived,
     );
 
     return (
@@ -3004,12 +2993,11 @@ export default function LiveEntryClient() {
                 No saved LIVE conversations yet.
               </div>
             ) : (
-              liveSessions.slice(0, 12).map((session: any) => {
+              liveSessions.slice(0, 12).map((session) => {
                 const metadata = session.metadata || {};
                 const outcome =
                   metadata.desiredOutcome ||
                   session.userGoal ||
-                  session.currentGoal ||
                   "Outcome not set";
                 const audience =
                   metadata.audience ||
