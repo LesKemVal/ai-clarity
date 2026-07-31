@@ -60,7 +60,6 @@ import { LiveAdaptiveSupportPanel } from "@/components/george/live-entry/LiveAda
 import { LiveSpeakingStylePanel } from "@/components/george/live-entry/LiveSpeakingStylePanel";
 import {
   buildBriefingObservation,
-  buildBriefingSupport,
   buildNextBriefingBenefit,
   buildProofReply,
   cleanBriefingValue,
@@ -588,7 +587,6 @@ export default function LiveEntryClient() {
   const [liveBriefingProofReply, setLiveBriefingProofReply] = useState("");
   const [liveBriefingSttError, setLiveBriefingSttError] = useState("");
   const [editableResources, setEditableResources] = useState<string[]>([]);
-  const [customResource, setCustomResource] = useState("");
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<any>(null);
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
@@ -1633,10 +1631,6 @@ export default function LiveEntryClient() {
     );
   }, [showEstimatedLiveCost, finalResourceEstimate.estimatedCents]);
 
-  const loadedSummary = useMemo(() => {
-    return `Update GEORGE’s purview. If the room changes, the pressure shifts, or something important becomes visible, adjust GEORGE’s understanding before or during LIVE.`;
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -1755,24 +1749,8 @@ export default function LiveEntryClient() {
     }
   };
 
-  const addResource = () => {
-    const clean = customResource.trim();
-    if (!clean) return;
-    setEditableResources((items) => Array.from(new Set([...items, clean])));
-    setCustomResource("");
-  };
-
-  const removeResource = (resource: string) => {
-    setEditableResources((items) => items.filter((item) => item !== resource));
-  };
-
   const selectedRelatedSession =
     relatedSessions.find((session) => session?.id === relatedSessionId) || null;
-
-  const relatedContextLabel =
-    relatedSessions.length === 0 || relatedSessionId === "not_related"
-      ? "No saved context selected"
-      : selectedRelatedSession?.title || "Selected context";
 
   const buildContinuityPackage = (session: any) => {
     if (!session) return null;
@@ -2544,22 +2522,6 @@ export default function LiveEntryClient() {
     sessionEmail,
   ]);
 
-  const getLiveRoomUserName = () => {
-    if (typeof window === "undefined") return "You";
-
-    const roomName =
-      cleanBriefingValue(window.localStorage.getItem("george_name")) ||
-      cleanBriefingValue(window.localStorage.getItem("george_profile_name")) ||
-      cleanBriefingValue(window.localStorage.getItem("george_user_name"));
-
-    if (roomName) return roomName;
-
-    return "You";
-  };
-
-  const waitForLiveEntryVoice = (ms: number) =>
-    new Promise((resolve) => window.setTimeout(resolve, ms));
-
   const liveEntryVoiceUnlockedRef = useRef(false);
 
   const unlockLiveEntryVoice = () => {
@@ -3117,12 +3079,6 @@ export default function LiveEntryClient() {
   }
 
   if (showLiveBriefingRoom) {
-    const displayName =
-      cleanBriefingValue(window.localStorage.getItem("george_profile_name")) ||
-      cleanBriefingValue(window.localStorage.getItem("george_user_name")) ||
-      cleanBriefingValue(window.localStorage.getItem("george_name")) ||
-      "You";
-
     const objectiveLabel =
       cleanBriefingValue(objective) || "the desired outcome";
     const positionLabel = titleBriefingValue(
@@ -3219,23 +3175,7 @@ export default function LiveEntryClient() {
       ),
     );
 
-    const canBeginLiveFromBriefing =
-      liveBriefingReadyToContinue &&
-      previousLiveUserRecognized &&
-      hasSeenLiveSteering;
-
-    const supportItems = buildBriefingSupport(
-      roomLabel,
-      audienceLabel,
-      objectiveLabel,
-      supportStyle,
-    );
     const briefingPreparation = buildBriefRoomPreparation();
-    const estimatedCents = Math.max(
-      0,
-      Math.round(finalResourceEstimate.estimatedCents || 0),
-    );
-    const proofReady = Boolean(liveBriefingProofReply.trim());
     const briefingUnderstandingSignals = Array.from(
       new Set(
         [
@@ -3269,21 +3209,6 @@ export default function LiveEntryClient() {
           : "Useful if it materially improves timing, judgment, or execution.",
       }),
     );
-
-    const skipLiveRecoveryConstraints = () => {
-      const selected = normalizeLiveRecoverySelection(
-        DEFAULT_LIVE_RECOVERY_SELECTION,
-      );
-      setLiveRecoveryOptions(selected);
-      setLiveRecoveryAcknowledged(true);
-
-      try {
-        window.localStorage.setItem(
-          GEORGE_LIVE_RECOVERY_STORAGE_KEY,
-          JSON.stringify({ selected }),
-        );
-      } catch {}
-    };
 
     if (liveBriefingStep === 1) {
       const toggleBriefingSection = (
@@ -3694,11 +3619,6 @@ export default function LiveEntryClient() {
       };
 
       const liveTierLabel = String(tier || "smart").toUpperCase();
-      const liveObjectiveLabel =
-        objectiveLabel && objectiveLabel !== "the desired outcome"
-          ? objectiveLabel
-          : "move toward my desired outcome";
-
       const confirmPrivacyAndContinue = () => {
         setLiveRecoveryAcknowledged(true);
         setLiveBriefingCapabilitiesConfirmed(true);
