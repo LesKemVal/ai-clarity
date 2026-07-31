@@ -27,7 +27,6 @@ import {
   readCachedGeorgeSessionAuthority,
 } from "@/lib/george/session-authority";
 import { getActiveRuntimeMotionContext } from "@/lib/george/operator/load-runtime-overlay";
-import { PrepRoomResourcePopup } from "@/components/george/PrepRoomResourcePopup";
 import { RelevantDocumentationPanel } from "@/components/george/live/RelevantDocumentationPanel";
 import type { PrepRoomResourceProfile } from "@/lib/george/prep-room/resources";
 import { deriveRoomFormation } from "@/lib/george/live/prep-room";
@@ -519,7 +518,6 @@ export default function LiveEntryClient() {
   const [hasLiveSession, setHasLiveSession] = useState(false);
   const [showResumeConversationList, setShowResumeConversationList] =
     useState(false);
-  const [showPrepPreview, setShowPrepPreview] = useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1);
   const [liveBriefingOpenSection, setLiveBriefingOpenSection] = useState<
@@ -1369,7 +1367,6 @@ export default function LiveEntryClient() {
         setOptionalSignalComplete(false);
         setShowOpenAISignalSurface(false);
         setLiveEntryReadyMessageVisible(false);
-        setShowPrepPreview(false);
         setShowLiveBriefingRoom(false);
         setLiveEntryMandatoryMode(false);
         setPreLivePreviewReady(false);
@@ -1452,7 +1449,6 @@ export default function LiveEntryClient() {
         setLiveRecoveryAcknowledged(false);
         setLiveReadyAccepted(false);
         setLiveReadinessComplete(false);
-        setShowPrepPreview(false);
         setShowLiveBriefingRoom(true);
 
         window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
@@ -1907,7 +1903,6 @@ export default function LiveEntryClient() {
     setActiveSessionIdForMode("live", session.id);
 
     setShowResumeConversationList(false);
-    setShowPrepPreview(false);
     const restoredHasOperationalSignal = Boolean(
       cleanBriefingValue(restoredContext) || cleanBriefingValue(restoredChair),
     );
@@ -1926,21 +1921,6 @@ export default function LiveEntryClient() {
     setSpokenLiveBriefingStep(null);
     setShowOpenAISignalSurface(!restoredHasOperationalSignal);
     setShowLiveBriefingRoom(restoredHasOperationalSignal);
-  };
-
-  const editPrepRoomResource = <K extends keyof PrepRoomResourceProfile>(
-    key: K,
-    value: PrepRoomResourceProfile[K],
-  ) => {
-    setPrepRoomProfile((profile) => {
-      if (!profile) return profile;
-
-      return {
-        ...profile,
-        [key]: value,
-        userOverride: true,
-      };
-    });
   };
 
   const openQuickLiveSetup = () => {
@@ -2301,7 +2281,6 @@ export default function LiveEntryClient() {
       if (typeof window !== "undefined")
         window.sessionStorage.removeItem("george_panel3_proof_started");
       setSpokenLiveBriefingStep(null);
-      setShowPrepPreview(false);
       setShowLiveBriefingRoom(true);
       return;
     }
@@ -4392,30 +4371,6 @@ export default function LiveEntryClient() {
           </p>
         )}
       </div>
-
-      <PrepRoomResourcePopup
-        open={showPrepPreview}
-        profile={prepRoomProfile}
-        room={conversationType}
-        relatedSessionTitle={
-          relatedSessionId === "not_related"
-            ? null
-            : selectedRelatedSession?.title || null
-        }
-        chairs={chair ? [chair] : chairs}
-        desiredOutcome={objective}
-        knownContext={knownContext}
-        assistMode={liveAssistMode}
-        signals={[
-          liveAssistMode,
-          knownContext ? "Context received" : "",
-          prepDocument ? prepDocument.name : "",
-        ].filter(Boolean)}
-        onClose={() => setShowPrepPreview(false)}
-        onEditResource={editPrepRoomResource}
-        sessionEmail={sessionEmail}
-        onEnterLive={() => startLive(false, editableResources)}
-      />
-    </main>
+</main>
   );
 }
