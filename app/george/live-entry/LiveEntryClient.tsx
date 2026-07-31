@@ -2335,12 +2335,10 @@ export default function LiveEntryClient() {
 
     const SpeechRecognition =
       typeof window !== "undefined"
-        ? (window as any).SpeechRecognition ||
-          (window as any).webkitSpeechRecognition
-        : null;
+        ? window.SpeechRecognition || window.webkitSpeechRecognition
+        : undefined;
 
     let heardUser = false;
-    let recognition: any = null;
 
     const listenOnce = (timeoutMs = 3200) =>
       new Promise<string>((resolve) => {
@@ -2352,7 +2350,7 @@ export default function LiveEntryClient() {
           return;
         }
 
-        recognition = new SpeechRecognition();
+        const recognition = new SpeechRecognition();
         recognition.lang = "en-US";
         recognition.continuous = false;
         recognition.interimResults = false;
@@ -2364,15 +2362,15 @@ export default function LiveEntryClient() {
           resolve("");
         }, timeoutMs);
 
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event) => {
           const transcript = String(
-            event?.results?.[0]?.[0]?.transcript || "",
+            event.results[0]?.[0]?.transcript || "",
           ).trim();
           window.clearTimeout(timer);
           resolve(transcript);
         };
 
-        recognition.onerror = (event: any) => {
+        recognition.onerror = () => {
           setLiveBriefingSttError("I could not hear that clearly. Continuing.");
           window.clearTimeout(timer);
           resolve("");
