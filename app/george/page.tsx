@@ -71,7 +71,8 @@ import {
   persistActiveLiveRuntimeSupport,
   readActiveLiveRuntimeSupport,
   readGeorgeNormalDraft,
-  reconcileActiveLiveRuntimeUsage,
+  completeLiveConversation,
+  prepareLiveCompletionReview,
   recordLiveOutcomeSignal,
   recordLiveSupportPreference,
   saveGeorgeSession,
@@ -153,10 +154,6 @@ import { buildGeorgeCoreInterpretation } from "@/lib/george/core/build-interpret
 import { tryLiveFastPath } from "@/lib/george/live-runtime/live-fast-path";
 import { buildLiveRuntimeContext } from "@/lib/george/live-runtime/live-runtime-context";
 import type { LiveOutcomeObservation } from "@/lib/george/live-runtime/live-outcome-review";
-import {
-  buildLiveInteractionContinuity,
-  buildLiveOutcomeReview,
-} from "@/lib/george/live-runtime/live-interaction-continuity";
 import { PostLiveConversationRecordPanel } from "@/components/george/live/PostLiveConversationRecordPanel";
 import { LiveRoomStatusPanel } from "@/components/george/live/LiveRoomStatusPanel";
 import { LiveHubShadowBridge } from "@/components/george/live/LiveHubShadowBridge";
@@ -2079,141 +2076,65 @@ export default function Page({
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
-  const recordActiveLiveRuntimeUsage = () => {
-    if (typeof window === "undefined") return null;
+  const openLiveOutcomeExitReview = (action: "save" | "discard") => {
+    const transcript = messagesRef.current
+      .map((message) => message.content)
+      .join("\n");
 
-    let setup: LivePrepSetup | null = null;
-
-    try {
-      const rawSetup = window.localStorage.getItem("george_live_setup_active");
-      setup = rawSetup ? JSON.parse(rawSetup) : null;
-    } catch {
-      setup = null;
-    }
-
-    const record = reconcileActiveLiveRuntimeUsage({
-      setup,
-      runtimeSupport: readActiveLiveRuntimeSupport(),
+    const { usage, outcomeReview } = prepareLiveCompletionReview({
+      desiredOutcome: getActiveLiveDesiredOutcomeTitle("LIVE Conversation"),
+      conversationContext:
+        getActiveLiveDesiredOutcomeTitle("LIVE Conversation"),
+      transcript,
+      transcriptEvidenceCount: messagesRef.current.length,
+      outcomeGovernor: outcomeGovernorSnapshot,
+      persistUsage: action === "save",
     });
 
-    if (!record) return null;
+    if (usage) {
+      const actual =
+        typeof usage.actualCents === "number"
+          ? `${usage.actualCents}¢`
+          : "not estimated";
 
-    window.localStorage.setItem(
-      "george_last_live_runtime_summary",
-      record.summary,
-    );
-
-    try {
-      const desiredOutcome =
-        activeCampaign?.desiredOutcome ||
-        activeCampaign?.currentGoal ||
-        readActiveLiveRuntimeSupport()?.objective ||
-        readActiveLiveRuntimeSupport()?.purview?.line ||
-        getActiveLiveDesiredOutcomeTitle("LIVE Conversation");
-
-      const observation = buildLiveOutcomeReview({
-        desiredOutcome,
-        transcript: messagesRef.current
-          .map((message) => message.content)
-          .join("\n"),
-        supportSummary: record.summary,
-        outcomeGovernor: outcomeGovernorSnapshot,
-      });
-
-      window.localStorage.setItem(
-        "GEORGE_LAST_LIVE_OUTCOME_OBSERVATION",
-        JSON.stringify(observation),
+      setToastMessage(
+        `Actual runtime usage: ${actual} · ${usage.summary}`,
       );
-    } catch {}
-
-    const actual =
-      typeof record.actualCents === "number"
-        ? `${record.actualCents}¢`
-        : "not estimated";
-    setToastMessage(`Actual runtime usage: ${actual} · ${record.summary}`);
-    setShowToast(true);
-
-    return record;
-  };
-
-  const openLiveOutcomeExitReview = (action: "save" | "discard") => {
-    const usage = action === "save" ? recordActiveLiveRuntimeUsage() : null;
-
-    let observation: LiveOutcomeObservation | null = null;
-
-    try {
-      observation = JSON.parse(
-        window.localStorage.getItem("GEORGE_LAST_LIVE_OUTCOME_OBSERVATION") ||
-          "null",
-      );
-    } catch {
-      observation = null;
-    }
-
-    if (!observation) {
-      observation = buildLiveOutcomeReview({
-        desiredOutcome: getActiveLiveDesiredOutcomeTitle("LIVE Conversation"),
-        transcript: messagesRef.current
-          .map((message) => message.content)
-          .join("\n"),
-        supportSummary: usage?.summary || "",
-        outcomeGovernor: outcomeGovernorSnapshot,
-      });
+      setShowToast(true);
     }
 
     setPendingLiveExitAction(action);
-    setLiveOutcomeReview(observation);
+    setLiveOutcomeReview(outcomeReview);
     setShowExitPopup(false);
     setShowOutcomeExitReview(true);
   };
 
-  const finishLiveExitAfterOutcomeReview = () => {
+  const finishLiveExitAfterOutcomeReview = async () => {
     try {
       if (liveOutcomeReview) {
-        window.localStorage.setItem(
-          "GEORGE_LAST_LIVE_OUTCOME_OBSERVATION",
-          JSON.stringify(liveOutcomeReview),
-        );
+        const transcript = messagesRef.current
+          .map((message) => message.content)
+          .join("\n");
 
-        const summary =
-          window.localStorage.getItem("george_last_live_runtime_summary") || "";
-        const continuity = buildLiveInteractionContinuity({
+        const completion = await completeLiveConversation({
           desiredOutcome: liveOutcomeReview.desiredOutcome,
           conversationContext:
             getActiveLiveDesiredOutcomeTitle("LIVE Conversation"),
-          transcript: messagesRef.current
-            .map((message) => message.content)
-            .join("\n"),
+          transcript,
           transcriptEvidenceCount: messagesRef.current.length,
-          supportSummary: summary,
           outcomeGovernor: outcomeGovernorSnapshot,
           outcomeReview: liveOutcomeReview,
         });
 
-        const record = continuity.conversationRecord;
-        window.localStorage.setItem(
-          "GEORGE_LAST_CONVERSATION_RECORD",
-          JSON.stringify(record),
-        );
-        setLastConversationRecord(record);
+        setLastConversationRecord(completion.conversationRecord);
         setShowConversationRecord(true);
-
-        void fetch("/api/george/operational-memory/learn", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            conversationRecord: record,
-          }),
-        }).catch((error) => {
-          console.error(
-            "[GEORGE][OPERATIONAL_MEMORY][LEARN_REQUEST_FAILED]",
-            error,
-          );
-        });
       }
-    } catch {}
+    } catch (error) {
+      console.error(
+        "[GEORGE][LIVE_COMPLETION][FAILED]",
+        error,
+      );
+    }
 
     if (pendingLiveExitAction === "discard") {
       window.localStorage.removeItem("george_active_live_session_id");

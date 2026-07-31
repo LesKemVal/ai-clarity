@@ -28,4 +28,10 @@ export {
 
 export { reconcileActiveLiveRuntimeUsage } from './live-runtime-usage'
 
+export {
+  completeLiveConversation,
+  prepareLiveCompletionReview,
+  readLastLiveOutcomeObservation,
+} from './live-completion'
+
 export { recordLiveSupportPreference } from './live-support-preferences'

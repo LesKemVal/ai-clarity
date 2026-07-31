@@ -11,8 +11,8 @@ const facade = readFileSync(
 )
 
 assert(
-  page.includes(
-    "from '@/lib/george/live-host/live-application-host'"
+  /from ["']@\/lib\/george\/live-host\/live-application-host["']/.test(
+    page
   ),
   'GEORGE page must consume the canonical application host boundary'
 )
@@ -36,6 +36,7 @@ for (const owner of [
   './draft-restoration',
   './live-prep-storage',
   './live-runtime-usage',
+  './live-completion',
   './live-support-preferences',
 ]) {
   assert(
