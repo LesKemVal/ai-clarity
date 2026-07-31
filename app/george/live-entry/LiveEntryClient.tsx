@@ -2110,10 +2110,10 @@ export default function LiveEntryClient() {
       .join("\n");
 
     const secondaryOutcome =
-      cleanBriefingValue((optionalSignalAnswers as any).fallbackOutcome) ||
-      cleanBriefingValue((optionalSignalAnswers as any).secondaryOutcome) ||
-      cleanBriefingValue((preLiveSignals as any).fallbackOutcome) ||
-      cleanBriefingValue((preLiveSignals as any).secondaryOutcome) ||
+      cleanBriefingValue(optionalSignalAnswers.fallbackOutcome) ||
+      cleanBriefingValue(optionalSignalAnswers.secondaryOutcome) ||
+      cleanBriefingValue(preLiveSignals.fallbackOutcome) ||
+      cleanBriefingValue(preLiveSignals.secondaryOutcome) ||
       "";
 
     const intangibleObjective = selectedLiveRoomObjectiveLabel || "";
@@ -2425,8 +2425,8 @@ export default function LiveEntryClient() {
             audience: audienceType,
             roomSignal: knownContext,
             secondaryPosition:
-              (optionalSignalAnswers as any).fallbackOutcome ||
-              (optionalSignalAnswers as any).secondaryOutcome ||
+              optionalSignalAnswers.fallbackOutcome ||
+              optionalSignalAnswers.secondaryOutcome ||
               "",
             userName:
               cleanBriefingValue(
@@ -3074,19 +3074,19 @@ export default function LiveEntryClient() {
     const audienceLabel = titleBriefingValue(audienceType, "the audience");
     const roomLabel = titleBriefingValue(resolvedConversationType, "this room");
     const secondaryPosition =
-      cleanBriefingValue((optionalSignalAnswers as any).fallbackOutcome) ||
-      cleanBriefingValue((optionalSignalAnswers as any).secondaryOutcome) ||
-      cleanBriefingValue((preLiveSignals as any).fallbackOutcome) ||
-      cleanBriefingValue((preLiveSignals as any).secondaryOutcome);
+      cleanBriefingValue(optionalSignalAnswers.fallbackOutcome) ||
+      cleanBriefingValue(optionalSignalAnswers.secondaryOutcome) ||
+      cleanBriefingValue(preLiveSignals.fallbackOutcome) ||
+      cleanBriefingValue(preLiveSignals.secondaryOutcome);
 
     const setBriefingSecondaryOutcome = (value: string) => {
-      setOptionalSignalAnswers((previous: any) => ({
+      setOptionalSignalAnswers((previous) => ({
         ...previous,
         secondaryOutcome: value,
         fallbackOutcome: value,
       }));
 
-      setPreLiveSignals((previous: any) => ({
+      setPreLiveSignals((previous) => ({
         ...previous,
         secondaryOutcome: value,
         fallbackOutcome: value,
