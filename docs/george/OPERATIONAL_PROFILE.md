@@ -1130,103 +1130,46 @@ Operational Matching produces the final recommendation.
 
 ## Operational Recommendation Doctrine
 
-Operational Memory is the canonical owner of operational knowledge.
+Operational Memory is the canonical owner of operational recommendation.
 
 Its responsibilities are:
 
 1. Retrieve operational evidence.
-2. Derive new formulas.
-3. Learn from execution.
-4. Recommend the strongest operational strategy.
+2. Derive new formulas intentionally through the canonical derivation service.
+3. Reassess the exact formula and version that were executed.
+4. Learn from execution.
+5. Recommend the strongest operational strategy for the current preparation decision.
 
-Recommendation occurs after retrieval.
+Recommendation occurs after retrieval and before execution.
 
-Retrieval identifies operationally relevant candidates.
+Recommendation may produce:
 
-Recommendation determines which candidate should become the active strategy for the current conversation.
+- a recommended formula;
+- a recommended script;
+- ranked alternatives;
+- operational rationale;
+- contextual confidence.
 
-Recommendation is based upon:
+No UI surface performs its own recommendation. Every interface consumes Operational Memory recommendations.
 
-- intended outcome
-- briefing
-- retrieved operational evidence
-- evaluated operational signals
-- contextual confidence
-
-Recommendation produces:
-
-- recommended formula
-- recommended script
-- ranked alternatives
-- operational rationale
-- contextual confidence
-
-No UI surface performs its own recommendation.
-
-Every interface consumes Operational Memory recommendations.
-
-
-## Formula Recommendation Restraint Doctrine
-
-User-selected formulas remain authoritative.
-
-Operational recommendation exists to evaluate compatibility, not to replace user judgment.
-
-During briefing:
-
-• GEORGE does not replace a user's selected formula because another formula ranks higher.
-• GEORGE does not recommend a different formula simply because it predicts a better outcome.
-• GEORGE allows users to prove formulas through execution and operational evidence.
-
-Review Formula remains quiet unless the selected formula is:
-
-- operationally contradictory
-- clearly mismatched
-- internally faulty
-
-Only then does Review Formula become visually emphasized.
-
-Review explains the incompatibility.
-
-It does not automatically recommend another formula.
-
-Alternative formulas belong to post-execution learning unless the user explicitly asks for recommendations.
-
-Operational learning—not prediction—is the primary mechanism for improving formula quality.
-
-
-## Recommendation Finality Doctrine
-
-GEORGE issues one operational recommendation before execution.
+GEORGE issues one operational recommendation for the active preparation decision.
 
 The user may:
 
-• accept GEORGE's recommendation
-• edit the recommended formula
-• select another formula
+- accept GEORGE's recommendation;
+- edit the recommended formula;
+- select another formula.
 
-Once the user intentionally selects a different formula, that selection becomes the authoritative execution strategy.
+Once the user intentionally selects a formula, that selection becomes authoritative for execution.
 
-After briefing:
+During briefing, GEORGE may confirm that the selected formula remains compatible or identify a material operational contradiction. GEORGE does not replace the user's selected formula merely because another formula ranks higher or predicts a better outcome.
 
-GEORGE evaluates compatibility.
+Review Formula remains quiet unless the selected formula is operationally contradictory, clearly mismatched, or internally faulty. Review explains the incompatibility; it does not automatically choose another formula.
 
-If the selected formula is:
+Operational learning evaluates the exact executed `formulaId` and `formulaVersion` preserved through LIVE completion, the Conversation Package, the Conversation Record, and canonical `formulaExecution`. If the exact formula or version is unavailable, Operational Memory does not infer another execution target.
 
-• compatible
-    → confirm quietly.
+Learning improves future recommendations. It does not reopen the current selection, rewrite historical execution identity, or override user choice.
 
-• operationally contradictory,
-  clearly mismatched,
-  or internally faulty
-    → Review Formula becomes visually emphasized.
+Formula evolution may produce future candidate formulas and preserved lineage. Passive reassessment does not create derived formulas, change lifecycle ownership, or mutate historical execution. Intentional derived-formula creation remains owned by the canonical derivation service.
 
-Otherwise:
-
-GEORGE does not recommend another formula.
-
-GEORGE does not continue optimizing against the user's decision.
-
-Operational evidence collected during LIVE determines whether the user's selected formula succeeds.
-
-Formula comparison and alternative recommendations belong in the post-LIVE operational report unless the user explicitly requests another recommendation.
+Alternative recommendations and formula comparison belong to post-execution learning or an explicit user request after selection.

@@ -69,18 +69,20 @@ Existing production assets include:
 - lineage;
 - operational learning.
 
-Current product-completion gaps include:
+Validated Operational Formula Experience capabilities include:
 
-- structured formula identity;
-- author and publisher metadata;
-- verification-authority metadata;
-- Proven By experience;
-- formula editing;
+- structured formula identity and version lineage;
+- author and publisher metadata contracts;
+- BRANESX verification metadata contracts;
+- Proven By records;
+- formula editing through the Operational Library and authenticated formula API;
 - formula alternatives;
-- script management;
-- marketplace readiness;
-- conversation-type consolidation;
-- expanded Operational Library presentation.
+- script generation, retrieval, and Operational Library presentation;
+- marketplace-readiness metadata;
+- one canonical conversation-type catalog;
+- expanded Operational Library formula, lineage, verification, publication, alternative, and script presentation.
+
+Remaining work is downstream product workflow, UX refinement, and qualification expansion. It does not require another runtime, formula model, recommendation owner, learning owner, conversation-type registry, or Operational Library data authority.
 
 Canonical ownership remains:
 
