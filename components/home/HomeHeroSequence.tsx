@@ -16,7 +16,7 @@ const heroSequences = [
     title: ["PREPARE"],
     lines: [
       "Before the conversation.",
-      "Understand the room, organize what matters, identify risks, and practice the moments that may determine the outcome.",
+      "GEORGE understands the value of both preparation and execution.",
     ],
   },
   {
@@ -248,9 +248,9 @@ export function HomeHeroSequence() {
         />
       </button>
 
-      <div className="relative z-10 mx-auto h-[100dvh] w-full max-w-[1500px]">
+      <div className="relative z-10 mx-auto h-[100dvh] w-full max-w-[1500px] rounded-[20px]">
         <div className="absolute left-[6.5%] right-[5%] top-[15%] z-30 max-w-[1120px] [perspective:1600px]">
-          <div className="inline-flex w-fit items-center rounded-full border border-[#7EA1FF]/32 bg-[#4E7CFF] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-white shadow-[0_8px_24px_rgba(20,61,168,0.18)]">
+          <div className="inline-flex w-fit items-center rounded-[12px] border border-[#4E7CFF]/40 bg-[#4E7CFF] px-6 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-white shadow-[0_14px_36px_rgba(78,124,255,0.28)]">
             GEORGE
           </div>
 

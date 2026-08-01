@@ -16,6 +16,176 @@ import {
   resolveLivePreparationTransition,
 } from "@/lib/george/live-runtime/live-intent-runtime";
 
+import type {
+  OperationalFormula,
+} from "@/lib/george/operational-memory/types";
+
+
+type ConversationCategory = {
+  id: string;
+  label: string;
+  description: string;
+  conversationTypeIds: readonly string[];
+};
+
+const CONVERSATION_CATEGORIES: readonly ConversationCategory[] = [
+  {
+    id: "business",
+    label: "Business",
+    description: "Meetings, proposals, partnerships, clients, and organizational decisions.",
+    conversationTypeIds: [
+      "lead-my-meeting",
+      "present-my-proposal",
+      "handle-tough-questions",
+      "executive-presentation",
+      "budget-discussion",
+      "vendor-negotiation",
+      "partnership-discussion",
+      "project-kickoff",
+      "deliver-a-status-update",
+      "crisis-communication",
+    ],
+  },
+  {
+    id: "sales",
+    label: "Sales",
+    description: "Prospecting, discovery, objections, closing, retention, and customer growth.",
+    conversationTypeIds: [
+      "negotiate-a-sale",
+      "set-professional-appointment",
+      "sell-anything",
+      "set-appointment",
+      "handle-objections",
+      "discovery-call",
+      "close-the-sale",
+      "client-follow-up",
+      "retain-a-client",
+      "resolve-customer-complaint",
+      "ask-for-referral",
+      "contract-renewal",
+      "price-increase",
+      "collections-call",
+      "customer-success-review",
+      "product-demo",
+    ],
+  },
+  {
+    id: "career",
+    label: "Career",
+    description: "Interviews, compensation, performance, leadership, and professional growth.",
+    conversationTypeIds: [
+      "prep-my-interview",
+      "ask-for-a-raise",
+      "request-a-promotion",
+      "salary-negotiation",
+      "networking-conversation",
+      "performance-review",
+      "ask-for-feedback",
+      "give-feedback",
+      "address-underperformance",
+      "manage-up",
+      "delegate-work",
+      "align-on-priorities",
+    ],
+  },
+  {
+    id: "finance",
+    label: "Finance",
+    description: "Financing, lending, investment, insurance, contracts, and property decisions.",
+    conversationTypeIds: [
+      "secure-financing",
+      "discuss-a-loan",
+      "investor-pitch",
+      "fundraising-meeting",
+      "real-estate-offer",
+      "insurance-claim",
+      "contract-discussion",
+      "estate-planning-discussion",
+      "housing-negotiation",
+    ],
+  },
+  {
+    id: "legal-civic",
+    label: "Legal / Civic",
+    description: "Cases, formal arguments, public positions, appeals, and civic communication.",
+    conversationTypeIds: [
+      "make-my-case",
+      "make-a-civil-case",
+      "make-a-criminal-case",
+      "hold-a-political-debate",
+      "public-comment",
+      "insurance-appeal",
+    ],
+  },
+  {
+    id: "media-speaking",
+    label: "Media / Speaking",
+    description: "Keynotes, broadcasts, interviews, panels, podcasts, and public delivery.",
+    conversationTypeIds: [
+      "deliver-a-keynote",
+      "create-a-broadcast-script",
+      "record-a-podcast",
+      "press-interview",
+      "media-interview",
+      "panel-discussion",
+      "moderate-a-discussion",
+    ],
+  },
+  {
+    id: "science-education",
+    label: "Science / Education",
+    description: "Complex ideas, lessons, workshops, and knowledge made understandable.",
+    conversationTypeIds: [
+      "articulate-thermonuclear-physics",
+      "teach-a-lesson",
+      "lead-a-workshop",
+    ],
+  },
+  {
+    id: "sports-culture",
+    label: "Sports / Culture",
+    description: "Sports theory, history, culture, and wider public meaning.",
+    conversationTypeIds: [
+      "explain-basketball-theory",
+      "explain-history-of-any-sport",
+      "explain-pop-culture",
+    ],
+  },
+  {
+    id: "personal",
+    label: "Personal",
+    description: "Relationships, boundaries, repair, family, care, and difficult decisions.",
+    conversationTypeIds: [
+      "have-a-difficult-conversation",
+      "resolve-a-conflict",
+      "set-a-boundary",
+      "ask-for-something-important",
+      "parent-teacher-conference",
+      "therapy-conversation",
+      "family-decision",
+      "apologize-and-repair",
+      "end-a-relationship",
+      "co-parenting-conversation",
+    ],
+  },
+];
+
+function CategoryDescriptor({ category }: { category: ConversationCategory }) {
+  return (
+    <div
+      className="flex min-h-[64px] flex-col justify-center rounded-[10px] border-l-2 border-[#6F91DE]/70 bg-[#172347]/28 px-4 py-3"
+      title={category.description}
+    >
+      <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white">
+        {category.label}
+      </div>
+      <div className="mt-1 line-clamp-2 text-[10px] leading-4 text-white/68">
+        {category.description}
+      </div>
+    </div>
+  );
+}
+
 type SurfacePhase =
   | "selection"
   | "selected"
@@ -23,6 +193,14 @@ type SurfacePhase =
   | "questions"
   | "decision"
   | "review";
+
+type FormulaSurfaceMode = "closed" | "review";
+
+type FormulaResponse = {
+  ok: boolean;
+  formulas?: OperationalFormula[];
+  error?: string;
+};
 
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
   const [value, setValue] = useState("");
@@ -55,16 +233,12 @@ function ConversationTypeCard({
     <button
       type="button"
       onClick={() => onSelect(conversationType)}
-      className={`group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border px-4 py-3 text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
-        conversationType.title === "Other"
-          ? "border-[#7EA1FF]/35 bg-[#4F7CFF] hover:bg-[#5A84FF]"
-          : "border-white/[0.08] bg-[#08090A] hover:border-white/[0.16] hover:bg-[#0D0F12]"
-      }`}
+      className="group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border border-white/[0.08] bg-[#08090A] px-4 py-3 text-left transition-[border-color,background-color,transform] duration-200 hover:border-white/[0.16] hover:bg-[#0D0F12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99]"
     >
       <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
         {conversationType.title}
       </h3>
-      <span className="shrink-0 text-[14px] text-white/24 transition group-hover:translate-x-0.5 group-hover:text-white/72">
+      <span className="shrink-0 text-[14px] text-white/72 transition group-hover:translate-x-0.5 group-hover:text-white">
         →
       </span>
     </button>
@@ -83,18 +257,130 @@ export function HomeConversationTypeSurface() {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [formulaSurfaceMode, setFormulaSurfaceMode] =
+    useState<FormulaSurfaceMode>("closed");
+  const [accessibleFormulas, setAccessibleFormulas] = useState<
+    OperationalFormula[]
+  >([]);
+  const [formulaLoading, setFormulaLoading] = useState(false);
+  const [formulaError, setFormulaError] = useState("");
 
-  const visibleTypes = useMemo(() => {
+  const activeFormula = useMemo(() => {
+    if (!selectedType || accessibleFormulas.length === 0) return null;
+
+    const conversationId = selectedType.id.trim().toLowerCase();
+    const conversationTitle = selectedType.title.trim().toLowerCase();
+
+    const ranked = accessibleFormulas
+      .filter((formula) => formula.status !== "retired")
+      .map((formula) => {
+        const roomTypes = (formula.roomTypes || []).map((value) =>
+          value.trim().toLowerCase(),
+        );
+        const bestUsedFor = (formula.bestUsedFor || []).map((value) =>
+          value.trim().toLowerCase(),
+        );
+        const formulaName = String(formula.name || "").trim().toLowerCase();
+
+        let score = formula.confidence || 0;
+
+        if (roomTypes.includes(conversationId)) score += 4;
+        if (roomTypes.includes(conversationTitle)) score += 3;
+        if (formulaName.includes(conversationTitle)) score += 2;
+        if (
+          bestUsedFor.some(
+            (value) =>
+              value.includes(conversationTitle) ||
+              conversationTitle.includes(value),
+          )
+        ) {
+          score += 1;
+        }
+
+        if (formula.status === "validated") score += 0.5;
+        if (formula.status === "candidate") score -= 0.15;
+
+        return { formula, score };
+      })
+      .sort((left, right) => right.score - left.score);
+
+    return ranked[0]?.formula || null;
+  }, [accessibleFormulas, selectedType]);
+
+  async function openFormulaReview() {
+    setFormulaSurfaceMode("review");
+    setFormulaError("");
+
+    if (accessibleFormulas.length > 0 || formulaLoading) return;
+
+    setFormulaLoading(true);
+
+    try {
+      const response = await fetch(
+        "/api/george/operational-memory/formulas",
+        { cache: "no-store" },
+      );
+      const payload = (await response.json()) as FormulaResponse;
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || "Unable to load formula");
+      }
+
+      setAccessibleFormulas(payload.formulas || []);
+    } catch (error) {
+      setFormulaError(
+        error instanceof Error ? error.message : "Unable to load formula",
+      );
+    } finally {
+      setFormulaLoading(false);
+    }
+  }
+
+  function closeFormulaReview() {
+    setFormulaSurfaceMode("closed");
+    setFormulaError("");
+  }
+
+  const visibleCategories = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return CONVERSATION_TYPES;
+    const typeById = new Map(
+      CONVERSATION_TYPES.filter((item) => item.title !== "Other").map((item) => [
+        item.id,
+        item,
+      ]),
+    );
 
-    return CONVERSATION_TYPES.filter((item) =>
-      [item.title, item.description, item.initialization]
+    return CONVERSATION_CATEGORIES.map((category) => {
+      const categoryMatches = [category.label, category.description]
         .join(" ")
         .toLowerCase()
-        .includes(query),
-    );
+        .includes(query);
+
+      const conversationTypes = category.conversationTypeIds
+        .map((id) => typeById.get(id))
+        .filter((item): item is ConversationType => Boolean(item))
+        .filter(
+          (item) =>
+            !query ||
+            categoryMatches ||
+            [item.title, item.description, item.initialization]
+              .join(" ")
+              .toLowerCase()
+              .includes(query),
+        );
+
+      return { category, conversationTypes };
+    }).filter(({ conversationTypes }) => conversationTypes.length > 0);
   }, [searchQuery]);
+
+  const visibleConversationCount = useMemo(
+    () =>
+      visibleCategories.reduce(
+        (count, category) => count + category.conversationTypes.length,
+        0,
+      ),
+    [visibleCategories],
+  );
 
   const preparationTransition = useMemo(
     () => resolveLivePreparationTransition(answers),
@@ -174,6 +460,8 @@ export function HomeConversationTypeSurface() {
   }
 
   function resetSelection() {
+    setFormulaSurfaceMode("closed");
+    setFormulaError("");
     setSelectedType(null);
     setPhase("selection");
     setIntroStage(0);
@@ -296,8 +584,8 @@ export function HomeConversationTypeSurface() {
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-5xl">
-              <p className="inline-flex rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F4F8FF]/88 shadow-[0_8px_26px_rgba(12,27,68,0.28)] border-[#7EA1FF]/35 bg-[#4E7CFF] text-white shadow-[0_10px_30px_rgba(20,61,168,0.22)] transition-colors hover:bg-white hover:text-black active:bg-white active:text-black">
-                Conversation types
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-white/88">
+                BRANESX
               </p>
               <h1 className="mt-4 font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
                 What do you want GEORGE to help you do?
@@ -309,13 +597,8 @@ export function HomeConversationTypeSurface() {
 
               <label className="mt-8 block max-w-3xl">
                 <span className="sr-only">Search conversation types</span>
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
-                    All Conversations
-                  </div>
-                  <div className="font-mono text-[8px] uppercase tracking-[0.18em] text-white/24">
-                    {visibleTypes.length}
-                  </div>
+                <div className="mb-3 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
+                  Whatever you'd like to discuss
                 </div>
                 <input
                   type="search"
@@ -329,10 +612,9 @@ export function HomeConversationTypeSurface() {
 
             <div className="mt-9">
               <div className="mb-5 flex items-center justify-between gap-2 sm:gap-3">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/38">
-                  {visibleTypes.length} conversation{" "}
-                  {visibleTypes.length === 1 ? "type" : "types"}
-                </p>
+                <div className="inline-flex rounded-[10px] border border-[#7EA1FF]/28 bg-[#4E7CFF]/72 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-[0_8px_24px_rgba(20,61,168,0.14)]">
+                  Infinite Conversations
+                </div>
                 {searchQuery.trim() && (
                   <button
                     type="button"
@@ -344,14 +626,19 @@ export function HomeConversationTypeSurface() {
                 )}
               </div>
 
-              {visibleTypes.length > 0 ? (
+              {visibleConversationCount > 0 ? (
                 <div className="grid gap-2 pb-24 sm:grid-cols-2 sm:pb-0 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                  {visibleTypes.map((conversationType) => (
-                    <ConversationTypeCard
-                      key={conversationType.id}
-                      conversationType={conversationType}
-                      onSelect={selectConversation}
-                    />
+                  {visibleCategories.map(({ category, conversationTypes }) => (
+                    <Fragment key={category.id}>
+                      <CategoryDescriptor category={category} />
+                      {conversationTypes.map((conversationType) => (
+                        <ConversationTypeCard
+                          key={conversationType.id}
+                          conversationType={conversationType}
+                          onSelect={selectConversation}
+                        />
+                      ))}
+                    </Fragment>
                   ))}
                 </div>
               ) : (
@@ -373,7 +660,7 @@ export function HomeConversationTypeSurface() {
               >
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="whitespace-nowrap font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#AEB6FF]/56">
+                    <div className="whitespace-nowrap font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white">
                       Conversation type
                     </div>
 
@@ -413,34 +700,115 @@ export function HomeConversationTypeSurface() {
               </div>
 
               {phase === "selected" && (
-                <div className="pt-6 animate-[fadeIn_420ms_ease-out]">
-                  <div className="max-w-3xl">
-                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/48">
-                      What this conversation does
+                <div className="pt-6">
+                  {formulaSurfaceMode === "closed" ? (
+                    <div className="animate-[fadeIn_420ms_ease-out]">
+                      <button
+                        type="button"
+                        onClick={openFormulaReview}
+                        className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/46 transition hover:text-white"
+                      >
+                        Review Formula →
+                      </button>
+
+                      <div className="mt-6 max-w-3xl">
+                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white">
+                          With your voice.
+                        </div>
+
+                        <p className="mt-3 text-[15px] leading-7 text-white/58">
+                          {selectedType?.description}
+                        </p>
+                      </div>
+
+                      <div className="mt-7 grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={beginPreparation}
+                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
+                        >
+                          Continue →
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={resetSelection}
+                          className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
+                        >
+                          Re-select
+                        </button>
+                      </div>
                     </div>
+                  ) : (
+                    <div className="animate-[fadeIn_320ms_ease-out]">
+                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white/42">
+                        Formula
+                      </div>
 
-                    <p className="mt-3 text-[15px] leading-7 text-white/58">
-                      {selectedType?.description}
-                    </p>
-                  </div>
+                      {formulaLoading ? (
+                        <p className="mt-4 text-[13px] text-white/42">
+                          Reviewing the formula…
+                        </p>
+                      ) : formulaError ? (
+                        <p className="mt-4 text-[13px] leading-6 text-white/52">
+                          {formulaError}
+                        </p>
+                      ) : activeFormula ? (
+                        <div className="mt-4 max-w-3xl">
+                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <h3 className="font-mono text-[17px] font-semibold uppercase tracking-[-0.02em] text-white">
+                              {activeFormula.name || selectedType?.title}
+                            </h3>
+                            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/32">
+                              Version {activeFormula.version} ·{" "}
+                              {activeFormula.status}
+                            </span>
+                          </div>
 
-                  <div className="mt-7 grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={beginPreparation}
-                      className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
-                    >
-                      Continue →
-                    </button>
+                          {(activeFormula.bestUsedFor || []).length > 0 && (
+                            <p className="mt-3 text-[13px] leading-6 text-white/46">
+                              {(activeFormula.bestUsedFor || [])[0]}
+                            </p>
+                          )}
 
-                    <button
-                      type="button"
-                      onClick={resetSelection}
-                      className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-white bg-white px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#111318] transition hover:border-[#4E7CFF] hover:bg-[#4E7CFF] hover:text-white"
-                    >
-                      Re-select
-                    </button>
-                  </div>
+                          <div className="mt-5 space-y-3">
+                            {(activeFormula.steps || []).map((step, index) => (
+                              <div
+                                key={`${activeFormula.id}-${index}`}
+                                className="border-l border-white/[0.10] pl-3"
+                              >
+                                <div className="text-[13px] leading-6 text-white/72">
+                                  {step.actionType ||
+                                    step.expectedTransition ||
+                                    step.signalType}
+                                </div>
+
+                                {step.actionType &&
+                                  step.expectedTransition && (
+                                    <div className="mt-1 text-[11px] leading-5 text-white/34">
+                                      {step.expectedTransition}
+                                    </div>
+                                  )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="mt-4 max-w-2xl text-[13px] leading-6 text-white/46">
+                          No operational formula is currently available for this
+                          conversation.
+                        </p>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={closeFormulaReview}
+                        className="mt-7 inline-flex h-9 items-center justify-center rounded-[9px] border border-white/[0.12] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/58 transition hover:border-white/28 hover:text-white"
+                      >
+                        ← Back
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -458,12 +826,11 @@ export function HomeConversationTypeSurface() {
                     }`}
                   >
                     <h3 className="font-mono text-[17px] font-semibold tracking-[-0.02em] text-white">
-                      Customize your conversation.
+                      With your voice.
                     </h3>
 
                     <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
-                      GEORGE will continue the canonical LIVE briefing and
-                      preserve any preparation signals already established.
+                      Continue shaping the conversation, then carry the same preparation into LIVE.
                     </p>
                   </div>
 
