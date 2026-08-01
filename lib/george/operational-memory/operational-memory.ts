@@ -80,7 +80,14 @@ export type OperationalMemoryLearnOptions = {
 export type OperationalRecommendationInput = FormulaRetrievalContext & {
   formulaLimit?: number
   alternativeLimit?: number
+  priorFormulaId?: string
+  briefingComplete?: boolean
 }
+
+export type OperationalRecommendationStrategyStatus =
+  | 'initial'
+  | 'confirmed'
+  | 'refined'
 
 export type OperationalRecommendation = {
   recommendedFormula: RetrievedOperationalFormula | null
@@ -88,6 +95,9 @@ export type OperationalRecommendation = {
   alternativeFormulas: RetrievedOperationalFormula[]
   contextualConfidence: number
   reasons: string[]
+  strategyStatus: OperationalRecommendationStrategyStatus
+  recommendationSummary: string
+  reviewRequired: boolean
 }
 
 export type OperationalMemory = {
@@ -170,12 +180,37 @@ export function createOperationalMemory(
             .sort((left, right) => right.updatedAt - left.updatedAt)[0] ?? null
       }
 
+      const priorFormulaId = String(input.priorFormulaId || '').trim()
+      const recommendedFormulaId = recommendedFormula?.formula.id || ''
+
+      const strategyStatus: OperationalRecommendationStrategyStatus =
+        !input.briefingComplete
+          ? 'initial'
+          : priorFormulaId && priorFormulaId === recommendedFormulaId
+            ? 'confirmed'
+            : priorFormulaId && recommendedFormulaId
+              ? 'refined'
+              : 'confirmed'
+
+      const recommendationSummary = !recommendedFormula
+        ? input.briefingComplete
+          ? 'GEORGE is preparing the strongest strategy from the briefing.'
+          : 'GEORGE is preparing an initial strategy from the available context.'
+        : strategyStatus === 'refined'
+          ? 'Based on the briefing, GEORGE recommends a refined strategy.'
+          : strategyStatus === 'confirmed'
+            ? 'The briefing supports the current strategy.'
+            : 'This is the initial strategy based on the available conversation context.'
+
       return {
         recommendedFormula,
         recommendedScript,
         alternativeFormulas,
         contextualConfidence: recommendedFormula?.score ?? 0,
         reasons: recommendedFormula?.reasons ?? [],
+        strategyStatus,
+        recommendationSummary,
+        reviewRequired: recommendedFormula !== null,
       }
     },
 
