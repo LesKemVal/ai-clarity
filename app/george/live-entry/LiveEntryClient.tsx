@@ -1844,6 +1844,14 @@ export default function LiveEntryClient() {
         conversationContext: knownContext,
         conversationWith: audienceType,
         role: userPosition || chair,
+        formulaSelection:
+          selectedFormula && selectedFormulaSource
+            ? {
+                formulaId: selectedFormula.id,
+                formulaVersion: selectedFormula.version,
+                source: selectedFormulaSource,
+              }
+            : null,
         relevantDocumentation: prepDocument
           ? [
               {
