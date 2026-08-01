@@ -1105,3 +1105,41 @@ Formulas establish strategy.
 Scripts execute strategy.
 
 Operational Matching produces the final recommendation.
+
+
+## Operational Recommendation Doctrine
+
+Operational Memory is the canonical owner of operational knowledge.
+
+Its responsibilities are:
+
+1. Retrieve operational evidence.
+2. Derive new formulas.
+3. Learn from execution.
+4. Recommend the strongest operational strategy.
+
+Recommendation occurs after retrieval.
+
+Retrieval identifies operationally relevant candidates.
+
+Recommendation determines which candidate should become the active strategy for the current conversation.
+
+Recommendation is based upon:
+
+- intended outcome
+- briefing
+- retrieved operational evidence
+- evaluated operational signals
+- contextual confidence
+
+Recommendation produces:
+
+- recommended formula
+- recommended script
+- ranked alternatives
+- operational rationale
+- contextual confidence
+
+No UI surface performs its own recommendation.
+
+Every interface consumes Operational Memory recommendations.

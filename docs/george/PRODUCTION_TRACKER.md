@@ -47,6 +47,33 @@ The operational matcher now follows a canonical seven-stage reasoning pipeline:
 
 Outcome → Briefing → Evidence Retrieval → Relevant Signal Evaluation → Formula Ranking → Script Ranking → Operational Matching Decision.
 
+
+
+### Operational Recommendation Doctrine
+
+Operational recommendation is a responsibility of Operational Memory.
+
+Operational Memory remains the single canonical owner of:
+
+- retrieval
+- derivation
+- learning
+- recommendation
+
+Recommendation consumes retrieval.
+
+Recommendation does not replace retrieval.
+
+Recommendation produces:
+
+- recommended formula
+- recommended script
+- contextual confidence
+- operational rationale
+- ranked alternatives
+
+Popup 3, Review Formula, Marketplace, and future APIs consume the recommendation produced by Operational Memory rather than implementing independent matching logic.
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.
