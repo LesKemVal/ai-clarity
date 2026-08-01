@@ -82,37 +82,75 @@ Validated Operational Formula Experience capabilities include:
 - one canonical conversation-type catalog;
 - expanded Operational Library formula, lineage, verification, publication, alternative, and script presentation.
 
-Marketplace infrastructure is established at the canonical contract, persistence, API, and presentation layers.
+Marketplace publication lifecycle ownership is established.
 
-Implemented infrastructure includes:
-
-- publication metadata;
-- marketplace-readiness metadata;
-- BRANESX verification metadata presentation;
-- script generation, persistence, retrieval, and recommendation consumption;
-- Operational Library editing, history, lineage, and derivation presentation.
-
-The remaining marketplace work is a governed product workflow:
+Canonical flow:
 
 ```text
-Draft
+Authenticated formula owner
 ↓
-Verification requested
+Formula API orchestration
 ↓
-Verified
+Publication Lifecycle Service
 ↓
-Published
+Validated publication transition
 ↓
+Operational Formula Library persistence
+```
+
+Ownership is separated:
+
+- `types.ts` owns the publication-state contract;
+- `publication-lifecycle-service.ts` alone owns legal publication transitions and transition prerequisites;
+- BRANESX-owned verification metadata authorizes transition into the verified publication state;
+- marketplace-readiness metadata authorizes transition from published to marketplace-listed;
+- the formula API route owns authentication, request normalization, formula-owner enforcement, orchestration, and HTTP responses;
+- `redis-formula-library.ts` owns persistence only;
+- formula validation continues to own operational-validity status independently from publication state.
+
+Implemented publication states are:
+
+```text
+draft
+verification_requested
+verified
+published
+marketplace_listed
+retired
+withdrawn
+```
+
+Implemented transition policy includes:
+
+```text
+draft → verification_requested
+verification_requested → verified
+verified → published
+published → marketplace_listed
+marketplace_listed → published
+verified | published | marketplace_listed → retired
+nonterminal publication state → withdrawn
+```
+
+Verified descriptive metadata changes invalidate BRANESX verification and reset publication state to `draft`. Publication state does not alter recommendation authority, user formula selection, formula learning, operational validity, or historical execution identity.
+
+The remaining marketplace architecture is downstream product workflow only:
+
+```text
 Marketplace listed
 ↓
+Discovered
+↓
 Purchased or entitled
+↓
+Payment confirmed
 ↓
 Delivered for use
 ↓
 Revised, retired, or withdrawn
 ```
 
-This workflow must consume the existing canonical formula, script, verification, publication, and entitlement systems. It must not introduce another runtime, formula model, recommendation owner, learning owner, verification authority, conversation-type registry, or Operational Library data authority.
+Entitlement, purchase, payment, and fulfillment must consume this publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis persistence, or the publication transition service.
 
 Canonical ownership remains:
 

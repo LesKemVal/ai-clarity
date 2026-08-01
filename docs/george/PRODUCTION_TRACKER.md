@@ -191,21 +191,31 @@ Validated Operational Formula Experience capabilities include:
 - one canonical conversation-type catalog;
 - expanded Operational Library formula, lineage, verification, publication, alternative, and script presentation.
 
-Marketplace infrastructure is implemented:
+Marketplace publication lifecycle ownership is implemented.
 
-- formula publication metadata is modeled and persisted;
-- author, publisher, Proven By, alternatives, and marketplace-readiness metadata are editable through the Operational Library;
-- verification metadata is displayed through the canonical Operational Library surface;
-- scripts are generated, persisted, retrieved, and presented through the canonical script library and API;
-- formula learning history, reassessment, lineage, and derivation are available in the Operational Library.
+Validated implementation now includes:
 
-Remaining production-completion work is workflow and product refinement around these established capabilities:
+- a separate `OperationalFormulaPublicationState` contract for `draft`, `verification_requested`, `verified`, `published`, `marketplace_listed`, `retired`, and `withdrawn`;
+- `publication-lifecycle-service.ts` as the sole owner of publication transition policy;
+- guarded transitions for verification request, verified state, publication, marketplace listing, unlisting, retirement, and withdrawal;
+- BRANESX verification as a prerequisite for the verified publication state;
+- marketplace-readiness metadata as a prerequisite for marketplace listing;
+- metadata-change invalidation that clears stale verification and returns publication state to `draft`;
+- Redis formula storage remaining persistence-only;
+- the formula API route remaining authentication, request normalization, ownership enforcement, orchestration, and response handling;
+- `george:publication-lifecycle:qualify` included in the production build.
 
-- define and implement the governed publication lifecycle from draft through verification, publication, listing, commerce, revision, retirement, and withdrawal;
-- complete verified-script listing, entitlement, purchase, and fulfillment workflows;
+Publication lifecycle ownership does not replace operational-validity status. `OperationalFormulaStatus` remains owned by formula validation and continues to represent `candidate`, `validated`, `contested`, and `retired`.
+
+Remaining production-completion work is downstream marketplace and commerce workflow:
+
+- connect Operational Library controls to the canonical publication transitions;
+- implement verified-script marketplace listing and discovery;
+- implement entitlement, purchase, payment confirmation, and fulfillment;
+- define revision behavior for already published or listed assets;
 - refine formula review and editing workflows without moving recommendation or selection authority into preview surfaces;
 - refine Operational Library usability and presentation;
-- expand qualification where publication and commerce workflow behavior is not yet directly protected;
+- expand qualification for UI orchestration, entitlement, commerce, and fulfillment behavior;
 - keep all three production authorities synchronized with implementation evidence.
 
 Canonical ownership remains:

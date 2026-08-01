@@ -1132,35 +1132,52 @@ Operational Matching produces the final recommendation.
 
 Marketplace readiness is descriptive metadata. It does not itself publish, verify, list, sell, entitle, or deliver a formula or script.
 
-The current implementation already supports formula publication metadata, marketplace-readiness metadata, BRANESX verification metadata presentation, script persistence and retrieval, Operational Library editing, learning history, lineage, and derivation.
+GEORGE now governs formula publication through one canonical publication lifecycle owner.
 
-A marketplace asset becomes available only through a governed lifecycle:
+Publication states are:
+
+- draft;
+- verification requested;
+- verified;
+- published;
+- marketplace listed;
+- retired;
+- withdrawn.
+
+The lifecycle observes these operational rules:
+
+- a draft may request verification;
+- only BRANESX-verified descriptive metadata may enter the verified publication state;
+- only a verified asset may be published;
+- only a published asset marked marketplace-ready may be listed;
+- a listed asset may be unlisted without losing published status;
+- verified, published, or listed assets may be retired;
+- any nonterminal publication state may be withdrawn;
+- editing verified descriptive metadata invalidates verification and returns the asset to draft.
+
+Publication state and operational validity are separate.
+
+Publication status does not determine whether a formula is operationally correct. Formula validation owns operational validity. BRANESX owns verification of descriptive metadata. The publication lifecycle owns only legal movement between publication states.
+
+The formula API may request a transition but does not decide whether it is legal. Redis persists the resulting formula but does not own transition policy.
+
+Commerce remains downstream of publication:
 
 ```text
-Draft
-↓
-Verification requested
-↓
-Verified
-↓
-Published
-↓
 Marketplace listed
+↓
+Discovered
 ↓
 Purchased or entitled
 ↓
-Delivered for use
+Payment confirmed
 ↓
-Revised, retired, or withdrawn
+Delivered for use
 ```
 
-BRANESX owns verification of descriptive metadata claims.
+Entitlement, purchase, payment confirmation, and fulfillment are not yet owned by the publication lifecycle service. Those workflows must consume marketplace-listed assets without acquiring recommendation, verification, learning, formula-validation, or publication-transition authority.
 
-GEORGE owns operational validity, formula learning, reassessment, evolution, and recommendation.
-
-The marketplace workflow owns listing, commerce, entitlement, and delivery status only. It does not become another recommendation authority, operational-learning system, verification authority, or formula owner.
-
-A verified script may be sold only after publication and listing requirements are satisfied. Commerce does not change formula validity, user selection authority, or recommendation finality.
+Commerce does not change formula validity, user selection authority, recommendation finality, or historical execution identity.
 
 ## Operational Recommendation Doctrine
 
