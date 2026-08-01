@@ -77,10 +77,26 @@ export type OperationalMemoryLearnOptions = {
   validation?: Partial<OperationalFormulaValidationPolicy>
 }
 
+export type OperationalRecommendationInput = FormulaRetrievalContext & {
+  formulaLimit?: number
+  alternativeLimit?: number
+}
+
+export type OperationalRecommendation = {
+  recommendedFormula: RetrievedOperationalFormula | null
+  recommendedScript: OperationalScript | null
+  alternativeFormulas: RetrievedOperationalFormula[]
+  contextualConfidence: number
+  reasons: string[]
+}
+
 export type OperationalMemory = {
   retrieve(
     context: FormulaRetrievalContext
   ): Promise<RetrievedOperationalFormula[]>
+  recommend(
+    input: OperationalRecommendationInput
+  ): Promise<OperationalRecommendation>
   derive(
     input: OperationalFormulaDerivationInput
   ): Promise<OperationalFormulaDerivationResult>
@@ -113,6 +129,54 @@ export function createOperationalMemory(
   return {
     retrieve(context) {
       return formulaLibrary.retrieve(context)
+    },
+
+    async recommend(input) {
+      const formulaLimit = Math.max(
+        1,
+        input.formulaLimit ?? input.limit ?? 5
+      )
+      const alternativeLimit = Math.max(
+        0,
+        input.alternativeLimit ?? Math.max(0, formulaLimit - 1)
+      )
+
+      const rankedFormulas = await formulaLibrary.retrieve({
+        userId: input.userId,
+        organizationId: input.organizationId,
+        roomType: input.roomType,
+        objectiveType: input.objectiveType,
+        observedSignalTypes: input.observedSignalTypes,
+        limit: formulaLimit,
+      })
+
+      const recommendedFormula = rankedFormulas[0] ?? null
+      const alternativeFormulas = rankedFormulas
+        .slice(1, alternativeLimit + 1)
+
+      let recommendedScript: OperationalScript | null = null
+
+      if (recommendedFormula && scriptLibrary) {
+        const ownedScripts = await scriptLibrary.listByOwner(input.userId)
+
+        recommendedScript =
+          ownedScripts
+            .filter(
+              (script) =>
+                script.status === 'active' &&
+                script.formulaId === recommendedFormula.formula.id &&
+                script.formulaVersion === recommendedFormula.formula.version
+            )
+            .sort((left, right) => right.updatedAt - left.updatedAt)[0] ?? null
+      }
+
+      return {
+        recommendedFormula,
+        recommendedScript,
+        alternativeFormulas,
+        contextualConfidence: recommendedFormula?.score ?? 0,
+        reasons: recommendedFormula?.reasons ?? [],
+      }
     },
 
     derive(input) {
