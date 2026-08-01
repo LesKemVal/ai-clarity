@@ -64,6 +64,10 @@ export function buildLiveRuntimeContext(params: {
     setup?.controlWords ||
     null
 
+  const selectedFormula = setup?.formulaSelection
+    ? `Selected Formula: ${setup.formulaSelection.formulaId} (v${setup.formulaSelection.formulaVersion}, ${setup.formulaSelection.source})`
+    : null
+
   const selectedCapabilities = Array.isArray(setup?.runtimeSupport?.selectedCapabilities)
     ? setup.runtimeSupport.selectedCapabilities
         .map((item) => `- ${item.label}: ${item.description}`)
@@ -89,6 +93,7 @@ Pressure: ${pressure}
 Language: ${language}
 Cadence: ${cadence}
 Support style: ${supportStyle}
+${selectedFormula || ""}
 
 Treat these as current operational reality.
 
