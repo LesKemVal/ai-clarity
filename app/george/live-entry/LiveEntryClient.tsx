@@ -2305,6 +2305,14 @@ export default function LiveEntryClient() {
       chair,
       relatedSessionId,
       relatedSessionTitle: selectedRelatedSession?.title || null,
+      formulaSelection:
+        selectedFormula && selectedFormulaSource
+          ? {
+              formulaId: selectedFormula.id,
+              formulaVersion: selectedFormula.version,
+              source: selectedFormulaSource,
+            }
+          : null,
       knownContext,
       briefingKnowledge,
       observedReality: knownContext,
