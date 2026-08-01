@@ -4,22 +4,15 @@ import {
   createOperationalMemory,
   type OperationalRecommendationInput,
 } from "@/lib/george/operational-memory/operational-memory";
+import type {
+  OperationalRecommendationApiResponse,
+  OperationalRecommendationRequest,
+} from "@/lib/george/operational-memory/recommendation-api";
 import { createRedisOperationalFormulaLibrary } from "@/lib/george/operational-memory/redis-formula-library";
 import { createRedisOperationalScriptLibrary } from "@/lib/george/operational-memory/redis-script-library";
 import { readGeorgeSession } from "@/lib/security/george-session";
 
 export const runtime = "nodejs";
-
-type RecommendationRequestBody = {
-  organizationId?: unknown;
-  roomType?: unknown;
-  objectiveType?: unknown;
-  observedSignalTypes?: unknown;
-  formulaLimit?: unknown;
-  alternativeLimit?: unknown;
-  priorFormulaId?: unknown;
-  briefingComplete?: unknown;
-};
 
 function unauthorized() {
   return NextResponse.json(
@@ -70,10 +63,10 @@ export async function POST(req: NextRequest) {
     return unauthorized();
   }
 
-  let body: RecommendationRequestBody;
+  let body: OperationalRecommendationRequest;
 
   try {
-    body = (await req.json()) as RecommendationRequestBody;
+    body = (await req.json()) as OperationalRecommendationRequest;
   } catch {
     return badRequest("Invalid JSON body");
   }
@@ -111,7 +104,7 @@ export async function POST(req: NextRequest) {
       Raw retrieval reasons and internal scores remain server-owned.
       Popup 3 receives the selected assets and lifecycle presentation state.
     */
-    return NextResponse.json({
+    const responseBody: OperationalRecommendationApiResponse = {
       ok: true,
       recommendation: {
         recommendedFormula:
@@ -124,7 +117,9 @@ export async function POST(req: NextRequest) {
         recommendationSummary: recommendation.recommendationSummary,
         reviewRequired: recommendation.reviewRequired,
       },
-    });
+    };
+
+    return NextResponse.json(responseBody);
   } catch (error) {
     console.error(
       "[GEORGE][OPERATIONAL_MEMORY][RECOMMEND_FAILED]",

@@ -1,4 +1,11 @@
 "use client";
+import { HomeHeroConversationTicker } from "@/components/home/HomeHeroConversationTicker";
+import { RecommendedStrategyCard } from "@/components/george/live-entry/RecommendedStrategyCard";
+import type {
+  OperationalRecommendationApiResponse,
+  OperationalRecommendationDto,
+  OperationalRecommendationRequest,
+} from "@/lib/george/operational-memory/recommendation-api";
 
 import {
   clearLivePreparationPreviewReady,
@@ -250,7 +257,7 @@ function CompactSelect({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="block rounded-[0.82rem] border border-white/[0.04] bg-black/20 px-3 py-2">
+    <label className="block rounded-[0.82rem] border border-white/[0.04] bg-[#0A0C10] px-3 py-2">
       <span className="block text-[10px] uppercase tracking-[0.22em] text-white/22">
         {label}
       </span>
@@ -590,6 +597,12 @@ export default function LiveEntryClient() {
   const [liveBriefingSttError, setLiveBriefingSttError] = useState("");
   const [editableResources, setEditableResources] = useState<string[]>([]);
   const [runtimeMotionContext, setRuntimeMotionContext] = useState<unknown>(null);
+  const [
+    operationalRecommendation,
+    setOperationalRecommendation,
+  ] = useState<OperationalRecommendationDto | null>(null);
+  const [recommendationLoading, setRecommendationLoading] = useState(false);
+  const [recommendationError, setRecommendationError] = useState("");
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>(
@@ -1837,6 +1850,85 @@ export default function LiveEntryClient() {
     });
   };
 
+  const buildOperationalRecommendationInput = () => {
+    const receiverProfile =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
+          window.localStorage.getItem(
+            "george_live_entry_receiver_profile",
+          ) ||
+          "audio_only"
+        : "visual_only";
+
+    const observedSignalTypes = Array.from(
+      new Set(
+        [
+          ...Object.keys(preLiveSignals),
+          ...Object.keys(optionalSignalAnswers),
+          resolvedConversationType
+            ? `conversation:${resolvedConversationType}`
+            : "",
+          audienceType ? `audience:${audienceType}` : "",
+          receiverProfile ? `receiver:${receiverProfile}` : "",
+          supportStyle ? `support:${supportStyle}` : "",
+          knownContext.trim() ? "context:available" : "",
+          prepDocument ? "documentation:available" : "",
+        ].filter(Boolean),
+      ),
+    );
+
+    const input: OperationalRecommendationRequest = {
+      roomType: resolvedConversationType,
+      objectiveType: objective,
+      observedSignalTypes,
+      briefingComplete: liveBriefingToaAccepted,
+    };
+
+    return input;
+  };
+
+  const loadOperationalRecommendation = async () => {
+    setRecommendationLoading(true);
+    setRecommendationError("");
+
+    try {
+      const response = await fetch(
+        "/api/george/operational-memory/recommend",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(buildOperationalRecommendationInput()),
+        },
+      );
+
+      const payload =
+        (await response.json()) as OperationalRecommendationApiResponse;
+
+      if (!payload.ok) {
+        throw new Error(
+          payload.error || "Operational recommendation failed",
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error("Operational recommendation failed");
+      }
+
+      setOperationalRecommendation(payload.recommendation);
+    } catch (error) {
+      setOperationalRecommendation(null);
+      setRecommendationError(
+        error instanceof Error
+          ? error.message
+          : "Operational recommendation failed",
+      );
+    } finally {
+      setRecommendationLoading(false);
+    }
+  };
+
   const resumeLiveConversation = (session: GeorgeStoredSession) => {
     if (!session) return;
 
@@ -2908,7 +3000,7 @@ export default function LiveEntryClient() {
                       unlockLiveEntryVoice();
                       liveEntryQuestionSurface.submit();
                     }}
-                    className="rounded-[14px] border border-white/[0.12] bg-white px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-white/90 active:scale-[0.99] disabled:opacity-40"
+                    className="rounded-[14px] border border-white/[0.12] bg-white px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-[#0A0C10] active:scale-[0.99] disabled:opacity-40"
                   >
                     {liveEntryQuestionSurface.primaryAction}
                   </button>
@@ -3270,7 +3362,7 @@ export default function LiveEntryClient() {
               </p>
             </div>
 
-            <div className="mt-4 divide-y divide-white/[0.045] rounded-[1rem] border border-white/[0.055] bg-black/20">
+            <div className="mt-4 divide-y divide-white/[0.045] rounded-[1rem] border border-white/[0.055] bg-[#0A0C10]">
               {briefingRows.map((row) => {
                 const open = liveBriefingOpenSection === row.id;
 
@@ -3316,7 +3408,7 @@ export default function LiveEntryClient() {
                                 updateBriefingObjective(event.target.value)
                               }
                               rows={3}
-                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#F2F4FF]/88 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] leading-6 text-[#F2F4FF]/88 outline-none placeholder:text-white/20 disabled:opacity-55"
                               placeholder={objectiveLabel}
                             />
                           )}
@@ -3328,7 +3420,7 @@ export default function LiveEntryClient() {
                               onChange={(event) =>
                                 setUserPosition(event.target.value)
                               }
-                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
                               placeholder={positionLabel}
                             />
                           )}
@@ -3340,7 +3432,7 @@ export default function LiveEntryClient() {
                               onChange={(event) =>
                                 setAudienceType(event.target.value)
                               }
-                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              className="w-full rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] text-[#F2F4FF]/84 outline-none placeholder:text-white/20 disabled:opacity-55"
                               placeholder={audienceLabel}
                             />
                           )}
@@ -3353,7 +3445,7 @@ export default function LiveEntryClient() {
                                 updateBriefingRoomSignal(event.target.value)
                               }
                               rows={4}
-                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
                               placeholder={observation}
                             />
                           )}
@@ -3366,7 +3458,7 @@ export default function LiveEntryClient() {
                                 setBriefingSecondaryOutcome(event.target.value)
                               }
                               rows={3}
-                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-black/25 px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
+                              className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
                               placeholder="Anything else GEORGE should understand, remember, watch for, or help accomplish."
                             />
                           )}
@@ -3398,7 +3490,7 @@ export default function LiveEntryClient() {
                               </div>
 
                               {prepDocument?.summary && (
-                                <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-black/20 px-3 py-2.5">
+                                <div className="mt-3 rounded-[0.8rem] border border-white/[0.055] bg-[#0A0C10] px-3 py-2.5">
                                   <div className="text-[9px] uppercase tracking-[0.18em] text-white/28">
                                     Incorporated from document
                                   </div>
@@ -3781,7 +3873,10 @@ export default function LiveEntryClient() {
               <button
                 type="button"
                 disabled={!liveRecoveryAcknowledged}
-                onClick={() => setLiveBriefingStep(3)}
+                onClick={() => {
+                  setLiveBriefingStep(3);
+                  void loadOperationalRecommendation();
+                }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
                   liveRecoveryAcknowledged
                     ? "border-[#4E7CFF]/65 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#7EA1FF]/80 hover:bg-[#5B86FF]"
@@ -3859,6 +3954,11 @@ export default function LiveEntryClient() {
               </div>
             </div>
           </section>
+
+          <RecommendedStrategyCard
+            recommendation={operationalRecommendation}
+            loading={recommendationLoading}
+          />
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <section className="relative overflow-hidden rounded-[1rem] border border-[#667286]/[0.22] bg-[#090B0E] px-4 py-4">
@@ -4161,19 +4261,21 @@ export default function LiveEntryClient() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-4 pb-10 pt-4 text-white sm:px-5 sm:pt-5">
-      <div className="pointer-events-none absolute inset-0 bg-black" />
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-24 bg-black" />
+    <main className="relative min-h-[100dvh] overflow-y-auto overflow-x-hidden bg-black px-4 pb-10 pt-4 text-white sm:px-5 sm:pt-5">
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <HomeHeroConversationTicker />
+      </div>
+
       <div className="pointer-events-none fixed inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent" />
 
       <div className="relative z-30 mx-auto w-full max-w-[640px]">
-        <div className="mb-5 flex items-center gap-4">
+        <div className="mb-5 inline-flex w-fit items-center rounded-[12px] border border-white/[0.04] bg-black/[0.92] px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.42)]">
           <BxPageHeader backLabel="" />
         </div>
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[640px] pt-2">
-        <section className="rounded-[1.25rem] border border-white/[0.045] bg-[linear-gradient(180deg,rgba(255,255,255,0.018),rgba(255,255,255,0.004))] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.24)] sm:p-5">
+        <section className="rounded-[1.25rem] border border-white/[0.08] bg-[#050505] p-4 shadow-[0_18px_50px_rgba(0,0,0,0.55)] sm:p-5">
           <div className="text-[10px] uppercase tracking-[0.24em] text-[#AEB6FF]/42">
             ENTER LIVE
           </div>
@@ -4191,7 +4293,7 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={openQuickLiveSetup}
-              className="rounded-[0.95rem] border border-[#4E7CFF]/28 bg-[#4E7CFF]/[0.07] px-4 py-3 text-left transition hover:border-[#4E7CFF]/44 hover:bg-[#4E7CFF]/[0.11] active:scale-[0.99]"
+              className="rounded-[0.95rem] border border-[#4E7CFF]/38 bg-[#090D18] px-4 py-3 text-left transition hover:border-[#4E7CFF]/58 hover:bg-[#0C1222] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D7DCFF]/84">
                 Enter now
@@ -4217,7 +4319,7 @@ export default function LiveEntryClient() {
                 setSelectedConversationResponsibilities([]);
                 setCustomConversationResponsibility("");
               }}
-              className="rounded-[0.95rem] border border-white/[0.07] bg-white/[0.018] px-4 py-3 text-left transition hover:border-[#D7DCFF]/20 hover:bg-[#D7DCFF]/[0.045] active:scale-[0.99]"
+              className="rounded-[0.95rem] border border-white/[0.09] bg-[#080808] px-4 py-3 text-left transition hover:border-[#D7DCFF]/24 hover:bg-[#0D0D0D] active:scale-[0.99]"
             >
               <span className="block text-[11px] font-semibold uppercase tracking-[0.22em] text-[#F2F4FF]/82">
                 Prepare with GEORGE
