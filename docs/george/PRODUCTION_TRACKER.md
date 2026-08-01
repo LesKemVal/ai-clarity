@@ -27,6 +27,12 @@ Formula capabilities are now considered core functionality.
 
 Commercial differentiation applies to verified script publication and sales rather than formula creation or editing.
 
+
+
+### Operational Asset Doctrine
+
+Operational Memory, Formulas, Scripts, Verified Scripts, and the Marketplace now form the canonical operational asset hierarchy for GEORGE.
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.

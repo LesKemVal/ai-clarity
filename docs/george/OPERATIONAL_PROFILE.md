@@ -914,3 +914,76 @@ Script = execution.
 Verification = evidence.
 
 Marketplace = verified execution.
+
+
+## Operational Asset Doctrine
+
+GEORGE's operational knowledge is organized into a single asset hierarchy.
+
+Operational Memory
+    ↓
+Formula
+    ↓
+Script
+    ↓
+Verified Script
+    ↓
+Marketplace
+
+### Operational Memory
+
+Operational Memory captures observations, outcomes, evidence, lessons, and reusable operational knowledge.
+
+Operational Memory informs future reasoning but is not directly executed.
+
+### Formula
+
+A formula is an operational strategy.
+
+A formula defines:
+
+- objectives
+- sequencing
+- priorities
+- conversational approach
+- execution philosophy
+
+Formulas guide execution but are not execution themselves.
+
+Every user may create, edit, organize, review, and select formulas.
+
+### Script
+
+A script is executable conversation.
+
+Scripts operationalize formulas into reusable conversational patterns.
+
+Multiple scripts may derive from the same formula.
+
+### Verified Script
+
+Verification applies to scripts.
+
+Verification represents accumulated operational evidence that a script consistently performs well in its intended conversational context.
+
+Verification does not change formula ownership.
+
+### Marketplace
+
+The marketplace distributes verified scripts.
+
+Marketplace assets represent proven execution rather than strategy alone.
+
+Commercial value derives from demonstrated execution quality supported by operational evidence.
+
+### Product Rule
+
+Operational Memory creates knowledge.
+
+Formulas organize strategy.
+
+Scripts execute conversations.
+
+Verification measures execution.
+
+The Marketplace distributes verified execution.
