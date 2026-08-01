@@ -803,3 +803,54 @@ Adapt from evidence.
 Preserve user agency.
 
 Reason from signals, not words alone.
+
+
+## User-Facing Conversation Doctrine
+
+User-facing conversation descriptions communicate **observable operational value**, not internal runtime behavior.
+
+Conversation descriptions answer:
+
+> **What will GEORGE help the user accomplish in this conversation?**
+
+They do **not** explain:
+
+> **How GEORGE internally accomplishes it.**
+
+Internal behaviors such as:
+
+- listening
+- observing
+- monitoring
+- detecting
+- recognizing
+- analyzing
+- reasoning
+- remembering
+- evaluating
+- inferring
+
+are runtime implementation details and should not appear in user-facing conversation descriptions, preparation surfaces, or operational formula summaries.
+
+Instead, descriptions communicate execution capabilities such as:
+
+- establish direction
+- communicate clearly
+- explain complexity
+- defend recommendations
+- answer difficult questions
+- persuade stakeholders
+- build confidence
+- reduce tension
+- rebuild trust
+- influence decisions
+- negotiate effectively
+- resolve disagreements
+- maintain momentum
+- move the conversation forward
+
+### Production Rule
+
+**Conversation = execution.**
+
+Conversation descriptions describe what GEORGE helps the user accomplish in the conversation—not the internal reasoning, signal analysis, or cognition that makes those outcomes possible.

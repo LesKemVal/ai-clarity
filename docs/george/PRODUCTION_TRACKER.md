@@ -12,6 +12,13 @@ Read in this order:
 
 Continuation packets provide operational context only. They do not override implementation or these synchronized authorities.
 
+
+### Conversation Description Doctrine
+
+Production UI now follows the **User-Facing Conversation Doctrine**.
+
+Conversation descriptions communicate observable execution capabilities rather than internal runtime behavior. Runtime cognition (listening, reasoning, observation, signal evaluation, etc.) remains implementation detail and should not appear in user-facing conversation descriptions or operational formula summaries.
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.
