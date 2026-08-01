@@ -12,6 +12,11 @@ type ConversationRecordProjection = {
   conversationType?: string
   conversationContext?: string
   createdAt?: string | number
+  formulaSelection?: {
+    formulaId?: string
+    formulaVersion?: number
+    source?: "george" | "user"
+  } | null
   latestOutcome?: {
     observedProgress?: string
     confidence?: number
@@ -164,5 +169,18 @@ export function adaptConversationRecordForOperationalMemory(
     signals,
     interventions: buildInterventions(behaviorHypotheses, startedAt, signals.length),
     outcomes: buildOutcomes(input.record, endedAt),
+    formulaExecution:
+      input.record.formulaSelection?.formulaId &&
+      typeof input.record.formulaSelection.formulaVersion === "number" &&
+      (
+        input.record.formulaSelection.source === "george" ||
+        input.record.formulaSelection.source === "user"
+      )
+        ? {
+            formulaId: input.record.formulaSelection.formulaId,
+            formulaVersion: input.record.formulaSelection.formulaVersion,
+            source: input.record.formulaSelection.source,
+          }
+        : undefined,
   }
 }
