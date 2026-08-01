@@ -26,13 +26,46 @@ OperationalFormulaReassessmentEngine {
 
       const reasons: string[] = []
 
-      if (!execution) {
+      const formulaExecution = input.conversation.formulaExecution
+      const formulaWasExecuted =
+        formulaExecution?.formulaId === input.formula.id &&
+        formulaExecution.formulaVersion === input.formula.version
+
+      if (!execution && !formulaWasExecuted) {
 
         reasons.push(
-          'No script execution available.'
+          'No matching formula or script execution available.'
         )
 
       } else if (
+        !execution &&
+        formulaWasExecuted &&
+        input.conversation.outcomes.length > 0
+      ) {
+
+        decision = input.conversation.outcomes.some(
+          (outcome) => outcome.achieved
+        )
+          ? 'confirm'
+          : 'weaken'
+
+        reasons.push(
+          decision === 'confirm'
+            ? 'Recorded outcomes support the executed formula.'
+            : 'Recorded outcomes did not support the executed formula.'
+        )
+
+      } else if (
+        !execution &&
+        formulaWasExecuted
+      ) {
+
+        reasons.push(
+          'Formula execution was recorded without sufficient outcome evidence.'
+        )
+
+      } else if (
+        execution &&
         execution.outcomes.length === 0 &&
         execution.deviations.length === 0
       ) {
@@ -44,6 +77,7 @@ OperationalFormulaReassessmentEngine {
         )
 
       } else if (
+        execution &&
         execution.outcomes.length >=
         execution.deviations.length
       ) {
