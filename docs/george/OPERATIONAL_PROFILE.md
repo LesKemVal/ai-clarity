@@ -1039,3 +1039,69 @@ Outcome determines the objective.
 Relevant signals determine execution.
 
 Operational matching determines the most appropriate formula or script.
+
+
+## Operational Matching Pipeline
+
+Operational matching follows a single canonical reasoning pipeline.
+
+### Stage 1 — User Outcome
+
+Determine what the user wants to accomplish.
+
+### Stage 2 — Briefing
+
+Collect conversation-specific operational context including room, audience, environment, delivery support, constraints, preparation, and objectives.
+
+### Stage 3 — Operational Evidence Retrieval
+
+Retrieve potentially relevant operational evidence from previous learning, verified scripts, execution history, and operational memory.
+
+Evidence retrieval is intentionally broad.
+
+### Stage 4 — Relevant Operational Signal Evaluation
+
+Evaluate which operational signals materially affect execution.
+
+Signals determine which retrieved evidence is most applicable to the current conversation.
+
+### Stage 5 — Formula Candidate Ranking
+
+Rank operational formulas using:
+
+- intended outcome
+- briefing
+- evaluated operational signals
+- weighted operational evidence
+
+### Stage 6 — Script Candidate Ranking
+
+Rank executable scripts associated with the strongest formulas.
+
+Verification remains contextual.
+
+### Stage 7 — Operational Matching Decision
+
+Produce the canonical recommendation including:
+
+- recommended formula
+- recommended script
+- contextual confidence
+- reasoning
+- alternatives
+
+### Production Rule
+
+Outcome establishes intent.
+
+Briefing establishes context.
+
+Evidence provides operational experience.
+
+Signals determine relevance.
+
+Formulas establish strategy.
+
+Scripts execute strategy.
+
+Operational Matching produces the final recommendation.

@@ -39,6 +39,14 @@ Operational Memory, Formulas, Scripts, Verified Scripts, and the Marketplace now
 
 Formula and script recommendations now derive from user outcomes together with relevant operational signal evaluation rather than keyword matching.
 
+
+
+### Operational Matching Pipeline
+
+The operational matcher now follows a canonical seven-stage reasoning pipeline:
+
+Outcome → Briefing → Evidence Retrieval → Relevant Signal Evaluation → Formula Ranking → Script Ranking → Operational Matching Decision.
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.
