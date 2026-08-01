@@ -232,6 +232,56 @@ export function createOperationalMemory(
       let persistedCount = 0
       let evolvedCount = 0
 
+      if (record.formulaExecution) {
+        const executedFormula = await formulaLibrary.getById(
+          record.formulaExecution.formulaId
+        )
+
+        if (
+          executedFormula &&
+          executedFormula.version ===
+            record.formulaExecution.formulaVersion
+        ) {
+          const reassessment =
+            await formulaReassessmentEngine.reassess({
+              formula: executedFormula,
+              conversation: record,
+            })
+
+          reassessments.push(reassessment)
+
+          if (learningRecordRecorder) {
+            await learningRecordRecorder.saveReassessment(
+              reassessment
+            )
+          }
+
+          const evolution =
+            await formulaEvolutionEngine.evolve({
+              formula: executedFormula,
+              conversation: record,
+              reassessment,
+            })
+
+          evolutions.push(evolution)
+
+          if (evolution.formula) {
+            await formulaLibrary.save(evolution.formula)
+            evolvedCount += 1
+          }
+
+          if (evolution.lineage) {
+            lineages.push(evolution.lineage)
+
+            if (learningRecordRecorder) {
+              await learningRecordRecorder.saveLineage(
+                evolution.lineage
+              )
+            }
+          }
+        }
+      }
+
       for (const candidate of candidates) {
         const existing = await formulaLibrary.getById(candidate.id)
         const validation = validateOperationalFormula(
