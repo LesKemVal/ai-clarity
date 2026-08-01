@@ -33,6 +33,12 @@ Commercial differentiation applies to verified script publication and sales rath
 
 Operational Memory, Formulas, Scripts, Verified Scripts, and the Marketplace now form the canonical operational asset hierarchy for GEORGE.
 
+
+
+### Operational Matching Doctrine
+
+Formula and script recommendations now derive from user outcomes together with relevant operational signal evaluation rather than keyword matching.
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.

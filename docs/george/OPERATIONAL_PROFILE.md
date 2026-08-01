@@ -987,3 +987,55 @@ Scripts execute conversations.
 Verification measures execution.
 
 The Marketplace distributes verified execution.
+
+
+## Operational Matching Doctrine
+
+GEORGE determines the most appropriate formula or script by evaluating the user's intended outcome together with relevant operational signals.
+
+### User Outcome
+
+The user's words establish the intended outcome.
+
+Examples include:
+
+- close the sale
+- answer difficult questions
+- negotiate the agreement
+- defend the proposal
+- resolve the conflict
+- gain alignment
+
+The intended outcome establishes what the user wants to accomplish.
+
+### Operational Signals
+
+Relevant operational signals establish how GEORGE should support that outcome.
+
+Signals may include:
+
+- conversation environment
+- delivery support (audio, visual, audio + visual)
+- audience
+- room characteristics
+- conversation stage
+- preparation state
+- operational evidence
+- verified script performance
+- operational learning
+
+GEORGE determines which signals are operationally relevant for the current conversation.
+
+### Operational Matching
+
+GEORGE does not recommend formulas or scripts from keywords alone.
+
+Instead, GEORGE evaluates the user's intended outcome together with relevant operational signals to determine the strongest operational match.
+
+### Product Rule
+
+Outcome determines the objective.
+
+Relevant signals determine execution.
+
+Operational matching determines the most appropriate formula or script.
