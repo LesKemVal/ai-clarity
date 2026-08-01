@@ -854,3 +854,63 @@ Instead, descriptions communicate execution capabilities such as:
 **Conversation = execution.**
 
 Conversation descriptions describe what GEORGE helps the user accomplish in the conversation—not the internal reasoning, signal analysis, or cognition that makes those outcomes possible.
+
+
+## Formula, Script & Marketplace Doctrine
+
+### Formula Ownership
+
+Formulas are part of GEORGE's operational thinking model.
+
+Formula capabilities are available to every user regardless of tier.
+
+Every user may:
+
+- create formulas
+- edit formulas
+- review formulas
+- save formulas
+- organize formulas
+- choose formulas
+- ask GEORGE to recommend a stronger formula
+
+Formula creation is a core product capability, not a premium feature.
+
+### Script Doctrine
+
+Scripts are executable conversational assets derived from formulas.
+
+Scripts may exist as:
+
+- personal scripts
+- shared scripts
+- verified scripts
+
+Verification applies to scripts, not formulas.
+
+### Marketplace Doctrine
+
+The marketplace distributes verified scripts.
+
+Users may browse verified scripts regardless of tier.
+
+Verified scripts help users discover proven conversational approaches and execution patterns.
+
+Paid subscriptions unlock the ability to:
+
+- publish scripts
+- distribute scripts
+- sell scripts
+- manage commercial script libraries
+
+The premium value is commercialization of verified execution—not permission to create formulas.
+
+### Product Rule
+
+Formula = strategy.
+
+Script = execution.
+
+Verification = evidence.
+
+Marketplace = verified execution.
