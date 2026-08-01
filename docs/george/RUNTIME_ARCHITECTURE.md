@@ -100,6 +100,55 @@ Canonical rules:
 - `formula-derivation-service.ts` is the sole owner of intentional derived-formula creation and derived lineage creation;
 - the Operational Library remains a presentation surface and does not acquire learning authority.
 
+### Recommendation and executed-formula learning boundary
+
+Operational Memory owns retrieval, derivation, reassessment, learning, and recommendation.
+
+Recommendation occurs once for the active preparation decision. After the user intentionally selects a formula, the selected `formulaId`, `formulaVersion`, and source become authoritative execution identity.
+
+The canonical preservation and learning chain is:
+
+```text
+LIVE Entry resolved formula selection
+↓
+LIVE setup
+↓
+browser-host LIVE completion
+↓
+Conversation Package `formulaSelection`
+↓
+Conversation Record `formulaSelection`
+↓
+Conversation Record Adapter
+↓
+`ConversationRecord.formulaExecution`
+↓
+Operational Memory
+↓
+exact formula/version reassessment
+↓
+evolution seam
+```
+
+Canonical owners:
+
+- LIVE Entry owns the user-facing recommendation and selection step;
+- LIVE setup carries resolved formula identity into execution;
+- `lib/george/live-host/live-completion.ts` owns browser-host completion orchestration;
+- `lib/george/live-runtime/live-interaction-continuity.ts` carries the selection into post-LIVE continuity without acquiring operational-memory authority;
+- `lib/george/conversation-packages/*` owns Conversation Package persistence and Conversation Record projection;
+- `lib/george/operational-memory/conversation-record-adapter.ts` owns the sole conversion from valid `formulaSelection` to `formulaExecution`;
+- `lib/george/operational-memory/operational-memory.ts` owns learning orchestration, exact-version lookup, reassessment invocation, and evolution invocation;
+- the reassessment engine owns reassessment judgment;
+- the evolution engine owns the evolution seam;
+- `formula-derivation-service.ts` alone owns intentional derived-formula and derived-lineage creation.
+
+Operational Memory must not reassess a different version when the exact executed version is unavailable. Missing or mismatched identity produces restraint rather than inferred execution.
+
+Learning may improve later recommendations. It may not reopen the current selection, override user choice, or create another recommendation authority.
+
+This path creates no second runtime, formula owner, reassessment owner, evolution owner, derivation owner, or learning owner.
+
 ### Canonical Ownership Inspection Completion
 
 The operational-learning, operational-memory, conversation-type, Operational Library, and LIVE Entry ownership boundaries have been inspected against implementation.

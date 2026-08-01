@@ -245,6 +245,27 @@ A learned operational formula may describe:
 
 A retrieved formula is not an answer, command, permanent rule, or replacement for current judgment.
 
+Recommendation occurs once for the active preparation decision. After the user intentionally selects a formula, that selection becomes authoritative for execution.
+
+GEORGE may:
+
+- confirm that the selected formula remains compatible;
+- identify a material operational contradiction;
+- preserve evidence about how the selected formula performed;
+- improve later recommendations from executed-formula learning.
+
+GEORGE must not:
+
+- repeatedly replace the user's selected formula during the same preparation flow;
+- treat a merely different recommendation as a contradiction;
+- infer that another formula was executed;
+- learn against a different formula version when the exact executed version is unavailable;
+- allow learning, reassessment, evolution, or derived-formula creation to override the user's historical choice.
+
+The exact selected `formulaId`, `formulaVersion`, and source are preserved through LIVE completion, the Conversation Package, the Conversation Record, and canonical `formulaExecution`. Operational Memory uses that identity to reassess what was actually executed.
+
+Learning affects future recommendation quality. It does not rewrite the user's choice or current-turn authority.
+
 Retrieval is appropriate only when the formula materially matches the current room, objective, signals, and operating conditions.
 
 Canonical authority remains:

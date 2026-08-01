@@ -51,68 +51,82 @@ Outcome → Briefing → Evidence Retrieval → Relevant Signal Evaluation → F
 
 ### Operational Recommendation Doctrine
 
-Operational recommendation is a responsibility of Operational Memory.
+Operational recommendation is owned by Operational Memory.
 
 Operational Memory remains the single canonical owner of:
 
-- retrieval
-- derivation
-- learning
-- recommendation
+- retrieval;
+- derivation;
+- reassessment;
+- learning;
+- recommendation.
 
-Recommendation consumes retrieval.
+Recommendation consumes retrieval evidence. It does not replace retrieval, create another matching path, or move recommendation authority into LIVE Entry, Popup 3, Review Formula, Marketplace, the Operational Library, or an API route.
 
-Recommendation does not replace retrieval.
+A recommendation may include:
 
-Recommendation produces:
+- a recommended formula;
+- a recommended script;
+- contextual confidence;
+- operational rationale;
+- ranked alternatives.
 
-- recommended formula
-- recommended script
-- contextual confidence
-- operational rationale
-- ranked alternatives
+Recommendation occurs once for the active preparation decision.
 
-Popup 3, Review Formula, Marketplace, and future APIs consume the recommendation produced by Operational Memory rather than implementing independent matching logic.
+The user may review, edit, or select another formula. Once the user intentionally selects a formula, that selection becomes authoritative for execution.
 
+Recommendation restraint requires GEORGE to:
 
+- confirm compatibility when the selected formula remains operationally sound;
+- preserve user choice quietly;
+- identify only material operational contradictions;
+- avoid treating a merely different formula as a reason to replace the user's selection;
+- avoid repeatedly reopening recommendation after an intentional selection;
+- preserve comparison and performance evidence for post-LIVE learning and reporting.
 
-### Formula Recommendation Restraint
+Learning improves future recommendation quality. It does not override, rewrite, or retroactively replace the user's choice.
 
-Recommendation confirms compatibility.
+### Executed-formula operational learning
 
-Recommendation does not override user-selected formulas.
+The production learning path preserves the exact formula selected for execution:
 
-Different is not sufficient reason to recommend replacement.
+```text
+LIVE setup formula selection
+↓
+LIVE completion
+↓
+Conversation Package `formulaSelection`
+↓
+Conversation Record `formulaSelection`
+↓
+Conversation Record Adapter
+↓
+canonical `formulaExecution`
+↓
+exact persisted formula/version reassessment
+↓
+Operational Memory learning
+```
 
-Popup 3:
+Ownership remains separated:
 
-- confirms compatible formulas
-- quietly preserves user choice
-- highlights only operational contradictions
-- allows users to generate new operational evidence
+- LIVE Entry and LIVE setup preserve the resolved `formulaId`, `formulaVersion`, and selection source;
+- the browser-host LIVE completion owner passes that selection into interaction continuity;
+- Conversation Package owns package-level `formulaSelection`;
+- Conversation Record projects that same identity for post-LIVE learning;
+- `conversation-record-adapter.ts` alone converts valid selection identity into canonical `formulaExecution`;
+- `operational-memory.ts` owns learning orchestration and reassesses only when the persisted formula exists and its version exactly matches the executed version;
+- the reassessment engine owns reassessment judgment;
+- the evolution engine owns the evolution seam and performs no passive structural derivation;
+- `formula-derivation-service.ts` remains the sole owner of intentional derived-formula creation and derived lineage.
 
-Formula comparison belongs in the post-LIVE operational report.
+If the exact executed formula or version is unavailable, Operational Memory does not infer another execution target.
 
+Qualification coverage:
 
-
-
-### Recommendation Finality
-
-Recommendation occurs once.
-
-User selection becomes authoritative.
-
-Popup 3:
-
-- recommend
-- allow edit
-- allow formula selection
-- validate compatibility
-- highlight only contradictions
-
-Popup 3 does not repeatedly recommend alternatives after the user intentionally chooses another formula.
-
-Operational evidence determines future recommendation quality.
+- `george:operational-memory:qualify` protects retrieval, recommendation ownership, reassessment, evolution, derivation, and persistence boundaries;
+- `george:executed-formula-learning:qualify` protects formula identity preservation from setup through `formulaExecution`, exact-version reassessment, mismatch restraint, and Operational Memory learning;
+- the production `build` command includes both qualifications, the duplicate-ownership audit, portability qualification, preparation qualification, and the Next.js production build.
 
 
 ## Current Phase
