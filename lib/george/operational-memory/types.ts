@@ -52,6 +52,12 @@ export type OperationalOutcome = {
   at?: number
 }
 
+export type OperationalFormulaExecution = {
+  formulaId: string
+  formulaVersion: number
+  source: "george" | "user"
+}
+
 export type ConversationRecord = {
   id: string
   userId: string
@@ -64,6 +70,7 @@ export type ConversationRecord = {
   signals: OperationalSignal[]
   interventions: OperationalIntervention[]
   outcomes: OperationalOutcome[]
+  formulaExecution?: OperationalFormulaExecution
 }
 
 export type OperationalFormulaStep = {
