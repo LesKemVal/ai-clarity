@@ -238,6 +238,11 @@ export function buildLiveInteractionContinuity(params: {
   conversationContext: string
   transcript: string
   transcriptEvidenceCount: number
+  formulaSelection?: {
+    formulaId: string
+    formulaVersion: number
+    source: "george" | "user"
+  } | null
   supportSummary?: string
   outcomeGovernor?: OutcomeGovernorSnapshot | null
   outcomeReview?: LiveOutcomeObservation | null
@@ -282,6 +287,7 @@ export function buildLiveInteractionContinuity(params: {
     desiredOutcome: outcomeReview.desiredOutcome,
     conversationType: 'LIVE',
     conversationContext: params.conversationContext,
+    formulaSelection: params.formulaSelection || null,
     conversations: params.transcriptEvidenceCount
       ? [{ type: 'live_transcript_evidence', count: params.transcriptEvidenceCount }]
       : [],

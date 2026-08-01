@@ -163,6 +163,8 @@ export async function completeLiveConversation(
       LAST_RUNTIME_SUMMARY_KEY
     ) || ""
 
+  const setup = input.setup || readStoredSetup()
+
   const outcomeReview =
     input.outcomeReview ||
     buildLiveOutcomeReview({
@@ -180,6 +182,7 @@ export async function completeLiveConversation(
     transcript: input.transcript,
     transcriptEvidenceCount:
       input.transcriptEvidenceCount,
+    formulaSelection: setup?.formulaSelection || null,
     supportSummary: runtimeSummary,
     outcomeGovernor: input.outcomeGovernor,
     outcomeReview,

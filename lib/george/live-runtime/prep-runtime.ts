@@ -65,6 +65,11 @@ export type LivePrepSetup = {
   cadence?: string
   objective?: string
   userPosition?: string
+  formulaSelection?: {
+    formulaId: string
+    formulaVersion: number
+    source: "george" | "user"
+  } | null
   controlWords?: string
   outcomeShiftPhrase?: string
   toneAdjustment?: 'softer' | 'balanced' | 'sharper'
