@@ -24,3 +24,12 @@ export type {
   OperationalFormulaDerivationInput,
   OperationalFormulaDerivationResult,
 } from "./formula-derivation-service";
+export type {
+  OperationalFormulaPublicationLifecycleService,
+  OperationalFormulaPublicationTransition,
+} from "./publication-lifecycle-service";
+export {
+  createOperationalFormulaPublicationLifecycleService,
+  invalidateOperationalFormulaPublicationVerification,
+  transitionOperationalFormulaPublication,
+} from "./publication-lifecycle-service";

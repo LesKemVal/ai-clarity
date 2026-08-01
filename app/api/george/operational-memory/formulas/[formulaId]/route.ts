@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { createOperationalFormulaPublicationLifecycleService } from "@/lib/george/operational-memory/publication-lifecycle-service";
 import { createRedisOperationalFormulaLibrary } from "@/lib/george/operational-memory/redis-formula-library";
 import type {
   OperationalFormulaPublication,
@@ -18,7 +19,30 @@ type UpdateFormulaMetadataRequestBody = {
   name?: unknown;
   bestUsedFor?: unknown;
   publication?: unknown;
+  publicationTransition?: unknown;
 };
+
+const PUBLICATION_TRANSITIONS = [
+  "request_verification",
+  "mark_verified",
+  "publish",
+  "list_marketplace",
+  "unlist_marketplace",
+  "retire",
+  "withdraw",
+] as const;
+
+type PublicationTransition = (typeof PUBLICATION_TRANSITIONS)[number];
+
+function normalizePublicationTransition(
+  value: unknown,
+): PublicationTransition | null {
+  if (typeof value !== "string") return null;
+
+  return PUBLICATION_TRANSITIONS.includes(value as PublicationTransition)
+    ? (value as PublicationTransition)
+    : null;
+}
 
 function unauthorized() {
   return NextResponse.json(
@@ -166,6 +190,45 @@ export async function PATCH(
     return forbidden();
   }
 
+  if (Object.prototype.hasOwnProperty.call(body, "publicationTransition")) {
+    if (
+      Object.prototype.hasOwnProperty.call(body, "name") ||
+      Object.prototype.hasOwnProperty.call(body, "bestUsedFor") ||
+      Object.prototype.hasOwnProperty.call(body, "publication")
+    ) {
+      return badRequest(
+        "Publication transitions cannot be combined with metadata changes",
+      );
+    }
+
+    const transition = normalizePublicationTransition(
+      body.publicationTransition,
+    );
+
+    if (!transition) {
+      return badRequest("Publication transition is invalid");
+    }
+
+    try {
+      const lifecycle =
+        createOperationalFormulaPublicationLifecycleService();
+      const updatedFormula = lifecycle.transition(formula, transition);
+
+      await formulaLibrary.save(updatedFormula);
+
+      return NextResponse.json({
+        ok: true,
+        formula: updatedFormula,
+      });
+    } catch (error) {
+      return badRequest(
+        error instanceof Error
+          ? error.message
+          : "Publication transition failed",
+      );
+    }
+  }
+
   const updates: {
     name?: string;
     bestUsedFor?: string[];
@@ -214,11 +277,15 @@ export async function PATCH(
     return badRequest("No supported formula metadata changes were provided");
   }
 
+  const now = Date.now();
+  const lifecycle = createOperationalFormulaPublicationLifecycleService();
+  const invalidatedFormula = lifecycle.invalidateVerification(formula, now);
+
   const updatedFormula = {
-    ...formula,
+    ...invalidatedFormula,
     ...updates,
     version: formula.version + 1,
-    updatedAt: Date.now(),
+    updatedAt: now,
   };
 
   await formulaLibrary.save(updatedFormula);

@@ -99,12 +99,27 @@ export type OperationalFormulaVerification = {
   verificationVersion?: string
 }
 
+export type OperationalFormulaPublicationState =
+  | 'draft'
+  | 'verification_requested'
+  | 'verified'
+  | 'published'
+  | 'marketplace_listed'
+  | 'retired'
+  | 'withdrawn'
+
 export type OperationalFormulaPublication = {
   author?: string
   publisher?: string
   marketplaceReady?: boolean
   provenBy?: string[]
   alternatives?: string[]
+  state?: OperationalFormulaPublicationState
+  verificationRequestedAt?: number
+  publishedAt?: number
+  listedAt?: number
+  retiredAt?: number
+  withdrawnAt?: number
 }
 
 export type OperationalFormula = {
