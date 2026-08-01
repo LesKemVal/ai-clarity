@@ -207,15 +207,28 @@ Validated implementation now includes:
 
 Publication lifecycle ownership does not replace operational-validity status. `OperationalFormulaStatus` remains owned by formula validation and continues to represent `candidate`, `validated`, `contested`, and `retired`.
 
+Operational Library publication controls are implemented.
+
+Validated UI orchestration now includes:
+
+- publication state displayed on each owned formula;
+- state-aware actions for verification request, BRANESX verification confirmation, publication, marketplace listing, unlisting, retirement, and withdrawal;
+- transition requests sent through the existing formula PATCH route as `publicationTransition` intent only;
+- local formula state refreshed from the canonical API response;
+- destructive retirement and withdrawal actions guarded by user confirmation;
+- BRANESX verification never created or granted by the UI;
+- `george:publication-lifecycle-ui:qualify` included in the production build.
+
+The Operational Library remains a presentation and intent surface. It does not decide whether a transition is legal. Transition policy remains owned by `publication-lifecycle-service.ts`.
+
 Remaining production-completion work is downstream marketplace and commerce workflow:
 
-- connect Operational Library controls to the canonical publication transitions;
 - implement verified-script marketplace listing and discovery;
 - implement entitlement, purchase, payment confirmation, and fulfillment;
 - define revision behavior for already published or listed assets;
 - refine formula review and editing workflows without moving recommendation or selection authority into preview surfaces;
 - refine Operational Library usability and presentation;
-- expand qualification for UI orchestration, entitlement, commerce, and fulfillment behavior;
+- expand qualification for entitlement, commerce, fulfillment, and published-asset revision behavior;
 - keep all three production authorities synchronized with implementation evidence.
 
 Canonical ownership remains:

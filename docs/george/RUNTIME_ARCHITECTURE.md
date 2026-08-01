@@ -134,6 +134,30 @@ nonterminal publication state → withdrawn
 
 Verified descriptive metadata changes invalidate BRANESX verification and reset publication state to `draft`. Publication state does not alter recommendation authority, user formula selection, formula learning, operational validity, or historical execution identity.
 
+Operational Library UI orchestration now consumes the canonical publication lifecycle.
+
+UI flow:
+
+```text
+Owned formula
+↓
+State-aware publication action
+↓
+`publicationTransition` request
+↓
+Formula API orchestration
+↓
+Publication Lifecycle Service
+↓
+Validated transition
+↓
+Persisted formula response
+↓
+Operational Library state refresh
+```
+
+The Operational Library owns presentation, user intent, loading state, confirmation for destructive actions, and local response application. It does not own transition legality, BRANESX verification, publication policy, formula validity, recommendation, learning, or persistence.
+
 The remaining marketplace architecture is downstream product workflow only:
 
 ```text
@@ -150,7 +174,7 @@ Delivered for use
 Revised, retired, or withdrawn
 ```
 
-Entitlement, purchase, payment, and fulfillment must consume this publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis persistence, or the publication transition service.
+Entitlement, purchase, payment, and fulfillment must consume this publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis persistence, the Operational Library, or the publication transition service.
 
 Canonical ownership remains:
 

@@ -1161,6 +1161,8 @@ Publication status does not determine whether a formula is operationally correct
 
 The formula API may request a transition but does not decide whether it is legal. Redis persists the resulting formula but does not own transition policy.
 
+The Operational Library presents publication state and available actions for owned formulas. It sends transition intent to the formula API and applies the returned formula state. It does not grant BRANESX verification, infer transition legality, or mutate publication state locally.
+
 Commerce remains downstream of publication:
 
 ```text
