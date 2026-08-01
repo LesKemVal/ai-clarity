@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type {
   OperationalFormula,
   OperationalFormulaLineage,
+  OperationalFormulaPublicationState,
   OperationalFormulaReassessment,
   OperationalFormulaStep,
   OperationalScript,
@@ -57,6 +58,129 @@ type FormulaMetadataDraft = {
   provenBy: string;
   alternatives: string;
 };
+
+type PublicationTransition =
+  | "request_verification"
+  | "mark_verified"
+  | "publish"
+  | "list_marketplace"
+  | "unlist_marketplace"
+  | "retire"
+  | "withdraw";
+
+type PublicationAction = {
+  transition: PublicationTransition;
+  label: string;
+  destructive?: boolean;
+};
+
+function publicationState(
+  formula: OperationalFormula,
+): OperationalFormulaPublicationState {
+  return formula.publication?.state ?? "draft";
+}
+
+function publicationActions(formula: OperationalFormula): PublicationAction[] {
+  const state = publicationState(formula);
+
+  switch (state) {
+    case "draft":
+      return [
+        {
+          transition: "request_verification",
+          label: "Request verification",
+        },
+        {
+          transition: "withdraw",
+          label: "Withdraw",
+          destructive: true,
+        },
+      ];
+
+    case "verification_requested":
+      return formula.verification?.verified
+        ? [
+            {
+              transition: "mark_verified",
+              label: "Confirm BRANESX verification",
+            },
+            {
+              transition: "withdraw",
+              label: "Withdraw",
+              destructive: true,
+            },
+          ]
+        : [
+            {
+              transition: "withdraw",
+              label: "Withdraw",
+              destructive: true,
+            },
+          ];
+
+    case "verified":
+      return [
+        {
+          transition: "publish",
+          label: "Publish",
+        },
+        {
+          transition: "retire",
+          label: "Retire",
+          destructive: true,
+        },
+        {
+          transition: "withdraw",
+          label: "Withdraw",
+          destructive: true,
+        },
+      ];
+
+    case "published":
+      return [
+        ...(formula.publication?.marketplaceReady
+          ? [
+              {
+                transition: "list_marketplace" as const,
+                label: "List marketplace",
+              },
+            ]
+          : []),
+        {
+          transition: "retire",
+          label: "Retire",
+          destructive: true,
+        },
+        {
+          transition: "withdraw",
+          label: "Withdraw",
+          destructive: true,
+        },
+      ];
+
+    case "marketplace_listed":
+      return [
+        {
+          transition: "unlist_marketplace",
+          label: "Unlist",
+        },
+        {
+          transition: "retire",
+          label: "Retire",
+          destructive: true,
+        },
+        {
+          transition: "withdraw",
+          label: "Withdraw",
+          destructive: true,
+        },
+      ];
+
+    case "retired":
+    case "withdrawn":
+      return [];
+  }
+}
 
 function formatDate(value: number) {
   return new Intl.DateTimeFormat("en-US", {
@@ -159,6 +283,10 @@ export default function OperationalLibraryClient() {
   const [savingMetadataFormulaId, setSavingMetadataFormulaId] = useState<
     string | null
   >(null);
+  const [
+    transitioningPublicationFormulaId,
+    setTransitioningPublicationFormulaId,
+  ] = useState<string | null>(null);
   const [expandedHistoryFormulaId, setExpandedHistoryFormulaId] = useState<
     string | null
   >(null);
@@ -385,6 +513,82 @@ export default function OperationalLibraryClient() {
     }
   }
 
+  async function transitionFormulaPublication(
+    formula: OperationalFormula,
+    transition: PublicationTransition,
+  ) {
+    if (
+      !ownedFormulaIds.has(formula.id) ||
+      transitioningPublicationFormulaId
+    ) {
+      return;
+    }
+
+    const action = publicationActions(formula).find(
+      (candidate) => candidate.transition === transition,
+    );
+
+    if (!action) return;
+
+    if (
+      action.destructive &&
+      !window.confirm(
+        `${action.label} ${displayName(
+          formula.name,
+          "this operational formula",
+        )}?`,
+      )
+    ) {
+      return;
+    }
+
+    setTransitioningPublicationFormulaId(formula.id);
+    setFormulaMutationError("");
+
+    try {
+      const response = await fetch(
+        `/api/george/operational-memory/formulas/${encodeURIComponent(
+          formula.id,
+        )}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            publicationTransition: transition,
+          }),
+        },
+      );
+
+      const payload = (await response.json()) as FormulaResponse;
+
+      if (!response.ok || !payload.ok || !payload.formula) {
+        throw new Error(
+          payload.error || "Unable to update formula publication",
+        );
+      }
+
+      const updatedFormula = payload.formula;
+
+      setFormulas((current) =>
+        current.map((currentFormula) =>
+          currentFormula.id === updatedFormula.id
+            ? updatedFormula
+            : currentFormula,
+        ),
+      );
+    } catch (publicationError) {
+      setFormulaMutationError(
+        publicationError instanceof Error
+          ? publicationError.message
+          : "Unable to update formula publication",
+      );
+    } finally {
+      setTransitioningPublicationFormulaId(null);
+    }
+  }
+
   async function deleteFormula(formula: OperationalFormula) {
     if (!ownedFormulaIds.has(formula.id) || deletingFormulaId) return;
 
@@ -590,6 +794,12 @@ export default function OperationalLibraryClient() {
                 editingMetadataFormulaId === formula.id;
               const isMetadataSaving =
                 savingMetadataFormulaId === formula.id;
+              const isPublicationTransitioning =
+                transitioningPublicationFormulaId === formula.id;
+              const availablePublicationActions =
+                isOwned && !isEditing && !isMetadataEditing
+                  ? publicationActions(formula)
+                  : [];
               const isHistoryExpanded =
                 expandedHistoryFormulaId === formula.id;
               const isHistoryLoading =
@@ -629,7 +839,8 @@ export default function OperationalLibraryClient() {
                             disabled={Boolean(
                               derivingFormulaId ||
                                 deletingFormulaId ||
-                                savingMetadataFormulaId,
+                                savingMetadataFormulaId ||
+                                transitioningPublicationFormulaId,
                             )}
                             className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                           >
@@ -729,6 +940,43 @@ export default function OperationalLibraryClient() {
                           {formula.publication.alternatives.join(", ")}
                         </p>
                       ) : null}
+
+                      <p>
+                        Publication:{" "}
+                        {publicationState(formula).replaceAll("_", " ")}
+                      </p>
+                    </div>
+                  ) : null}
+
+                  {availablePublicationActions.length > 0 ? (
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-white/8 pt-4">
+                      {availablePublicationActions.map((action) => (
+                        <button
+                          key={action.transition}
+                          type="button"
+                          onClick={() =>
+                            void transitionFormulaPublication(
+                              formula,
+                              action.transition,
+                            )
+                          }
+                          disabled={Boolean(
+                            derivingFormulaId ||
+                              deletingFormulaId ||
+                              savingMetadataFormulaId ||
+                              transitioningPublicationFormulaId,
+                          )}
+                          className={
+                            action.destructive
+                              ? "rounded-lg border border-red-300/20 px-3 py-1.5 text-xs text-red-200/70 transition hover:border-red-300/40 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                              : "rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                          }
+                        >
+                          {isPublicationTransitioning
+                            ? "Updating…"
+                            : action.label}
+                        </button>
+                      ))}
                     </div>
                   ) : null}
 
