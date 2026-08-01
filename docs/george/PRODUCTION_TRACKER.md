@@ -74,6 +74,26 @@ Recommendation produces:
 
 Popup 3, Review Formula, Marketplace, and future APIs consume the recommendation produced by Operational Memory rather than implementing independent matching logic.
 
+
+
+### Formula Recommendation Restraint
+
+Recommendation confirms compatibility.
+
+Recommendation does not override user-selected formulas.
+
+Different is not sufficient reason to recommend replacement.
+
+Popup 3:
+
+- confirms compatible formulas
+- quietly preserves user choice
+- highlights only operational contradictions
+- allows users to generate new operational evidence
+
+Formula comparison belongs in the post-LIVE operational report.
+
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.

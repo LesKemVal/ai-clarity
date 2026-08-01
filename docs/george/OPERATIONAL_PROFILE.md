@@ -1143,3 +1143,32 @@ Recommendation produces:
 No UI surface performs its own recommendation.
 
 Every interface consumes Operational Memory recommendations.
+
+
+## Formula Recommendation Restraint Doctrine
+
+User-selected formulas remain authoritative.
+
+Operational recommendation exists to evaluate compatibility, not to replace user judgment.
+
+During briefing:
+
+• GEORGE does not replace a user's selected formula because another formula ranks higher.
+• GEORGE does not recommend a different formula simply because it predicts a better outcome.
+• GEORGE allows users to prove formulas through execution and operational evidence.
+
+Review Formula remains quiet unless the selected formula is:
+
+- operationally contradictory
+- clearly mismatched
+- internally faulty
+
+Only then does Review Formula become visually emphasized.
+
+Review explains the incompatibility.
+
+It does not automatically recommend another formula.
+
+Alternative formulas belong to post-execution learning unless the user explicitly asks for recommendations.
+
+Operational learning—not prediction—is the primary mechanism for improving formula quality.
