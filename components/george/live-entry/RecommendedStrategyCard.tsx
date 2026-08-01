@@ -2,13 +2,26 @@
 
 import { useState } from "react";
 
+import {
+  FormulaDecisionPanel,
+  type FormulaDecisionSource,
+} from "@/components/george/live-entry/FormulaDecisionPanel";
 import type {
   OperationalRecommendationDto,
 } from "@/lib/george/operational-memory/recommendation-api";
+import type {
+  OperationalFormula,
+} from "@/lib/george/operational-memory/types";
 
 type RecommendedStrategyCardProps = {
   recommendation: OperationalRecommendationDto | null;
   loading: boolean;
+  selectedFormula: OperationalFormula | null;
+  selectedSource: FormulaDecisionSource | null;
+  reviewRequired: boolean;
+  onAcceptRecommendation: () => void;
+  onEditFormula: () => void;
+  onChooseAnother: () => void;
 };
 
 function strategyLabel(
@@ -22,6 +35,12 @@ function strategyLabel(
 export function RecommendedStrategyCard({
   recommendation,
   loading,
+  selectedFormula,
+  selectedSource,
+  reviewRequired,
+  onAcceptRecommendation,
+  onEditFormula,
+  onChooseAnother,
 }: RecommendedStrategyCardProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
 
@@ -124,6 +143,16 @@ export function RecommendedStrategyCard({
               })}
             </div>
           )}
+
+          <FormulaDecisionPanel
+            recommendedFormula={formula}
+            selectedFormula={selectedFormula}
+            selectedSource={selectedSource}
+            reviewRequired={reviewRequired}
+            onAcceptRecommendation={onAcceptRecommendation}
+            onEditFormula={onEditFormula}
+            onChooseAnother={onChooseAnother}
+          />
 
           <button
             type="button"

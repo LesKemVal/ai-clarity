@@ -2,6 +2,12 @@
 import { HomeHeroConversationTicker } from "@/components/home/HomeHeroConversationTicker";
 import { RecommendedStrategyCard } from "@/components/george/live-entry/RecommendedStrategyCard";
 import type {
+  FormulaDecisionSource,
+} from "@/components/george/live-entry/FormulaDecisionPanel";
+import type {
+  OperationalFormula,
+} from "@/lib/george/operational-memory/types";
+import type {
   OperationalRecommendationApiResponse,
   OperationalRecommendationDto,
   OperationalRecommendationRequest,
@@ -602,6 +608,10 @@ export default function LiveEntryClient() {
     setOperationalRecommendation,
   ] = useState<OperationalRecommendationDto | null>(null);
   const [recommendationLoading, setRecommendationLoading] = useState(false);
+  const [selectedFormula, setSelectedFormula] =
+    useState<OperationalFormula | null>(null);
+  const [selectedFormulaSource, setSelectedFormulaSource] =
+    useState<FormulaDecisionSource | null>(null);
   const [recommendationError, setRecommendationError] = useState("");
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
@@ -1927,6 +1937,34 @@ export default function LiveEntryClient() {
     } finally {
       setRecommendationLoading(false);
     }
+  };
+
+  const acceptOperationalRecommendation = () => {
+    const recommendedFormula =
+      operationalRecommendation?.recommendedFormula ?? null;
+
+    if (!recommendedFormula) return;
+
+    setSelectedFormula(recommendedFormula);
+    setSelectedFormulaSource("george");
+  };
+
+  const beginFormulaEdit = () => {
+    const formula =
+      selectedFormula ||
+      operationalRecommendation?.recommendedFormula ||
+      null;
+
+    if (!formula) return;
+
+    console.info("[GEORGE][LIVE_ENTRY][FORMULA_EDIT_REQUESTED]", {
+      formulaId: formula.id,
+      formulaVersion: formula.version,
+    });
+  };
+
+  const beginFormulaSelection = () => {
+    console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
   };
 
   const resumeLiveConversation = (session: GeorgeStoredSession) => {
@@ -3958,6 +3996,14 @@ export default function LiveEntryClient() {
           <RecommendedStrategyCard
             recommendation={operationalRecommendation}
             loading={recommendationLoading}
+            selectedFormula={selectedFormula}
+            selectedSource={selectedFormulaSource}
+            reviewRequired={
+              operationalRecommendation?.reviewRequired ?? false
+            }
+            onAcceptRecommendation={acceptOperationalRecommendation}
+            onEditFormula={beginFormulaEdit}
+            onChooseAnother={beginFormulaSelection}
           />
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
