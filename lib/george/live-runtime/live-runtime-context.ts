@@ -7,6 +7,12 @@ type RuntimeCapability = {
   description?: string
 }
 
+export type LiveRuntimeFormulaSelection = {
+  formulaId: string
+  formulaVersion: number
+  source: "george" | "user"
+}
+
 type LiveRuntimeContextSetup = {
   room?: string | null
   objective?: string | null
@@ -23,6 +29,7 @@ type LiveRuntimeContextSetup = {
     selectedCapabilities?: RuntimeCapability[] | null
     runtimeBias?: unknown
   } | null
+  formulaSelection?: LiveRuntimeFormulaSelection | null
 } | null
 
 type LiveRuntimeContextSupport = {
