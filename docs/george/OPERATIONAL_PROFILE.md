@@ -1172,3 +1172,40 @@ It does not automatically recommend another formula.
 Alternative formulas belong to post-execution learning unless the user explicitly asks for recommendations.
 
 Operational learning—not prediction—is the primary mechanism for improving formula quality.
+
+
+## Recommendation Finality Doctrine
+
+GEORGE issues one operational recommendation before execution.
+
+The user may:
+
+• accept GEORGE's recommendation
+• edit the recommended formula
+• select another formula
+
+Once the user intentionally selects a different formula, that selection becomes the authoritative execution strategy.
+
+After briefing:
+
+GEORGE evaluates compatibility.
+
+If the selected formula is:
+
+• compatible
+    → confirm quietly.
+
+• operationally contradictory,
+  clearly mismatched,
+  or internally faulty
+    → Review Formula becomes visually emphasized.
+
+Otherwise:
+
+GEORGE does not recommend another formula.
+
+GEORGE does not continue optimizing against the user's decision.
+
+Operational evidence collected during LIVE determines whether the user's selected formula succeeds.
+
+Formula comparison and alternative recommendations belong in the post-LIVE operational report unless the user explicitly requests another recommendation.

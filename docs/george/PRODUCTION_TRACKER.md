@@ -94,6 +94,27 @@ Popup 3:
 Formula comparison belongs in the post-LIVE operational report.
 
 
+
+
+### Recommendation Finality
+
+Recommendation occurs once.
+
+User selection becomes authoritative.
+
+Popup 3:
+
+- recommend
+- allow edit
+- allow formula selection
+- validate compatibility
+- highlight only contradictions
+
+Popup 3 does not repeatedly recommend alternatives after the user intentionally chooses another formula.
+
+Operational evidence determines future recommendation quality.
+
+
 ## Current Phase
 
 GEORGE is in **Production Completion & Operational Formula Experience**.
