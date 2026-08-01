@@ -191,12 +191,21 @@ Validated Operational Formula Experience capabilities include:
 - one canonical conversation-type catalog;
 - expanded Operational Library formula, lineage, verification, publication, alternative, and script presentation.
 
+Marketplace infrastructure is implemented:
+
+- formula publication metadata is modeled and persisted;
+- author, publisher, Proven By, alternatives, and marketplace-readiness metadata are editable through the Operational Library;
+- verification metadata is displayed through the canonical Operational Library surface;
+- scripts are generated, persisted, retrieved, and presented through the canonical script library and API;
+- formula learning history, reassessment, lineage, and derivation are available in the Operational Library.
+
 Remaining production-completion work is workflow and product refinement around these established capabilities:
 
-- refine formula review and editing workflows;
-- complete marketplace publishing and verified-script commerce workflows;
+- define and implement the governed publication lifecycle from draft through verification, publication, listing, commerce, revision, retirement, and withdrawal;
+- complete verified-script listing, entitlement, purchase, and fulfillment workflows;
+- refine formula review and editing workflows without moving recommendation or selection authority into preview surfaces;
 - refine Operational Library usability and presentation;
-- expand qualification where workflow behavior is not yet directly protected;
+- expand qualification where publication and commerce workflow behavior is not yet directly protected;
 - keep all three production authorities synchronized with implementation evidence.
 
 Canonical ownership remains:

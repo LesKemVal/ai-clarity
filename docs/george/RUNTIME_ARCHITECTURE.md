@@ -82,7 +82,37 @@ Validated Operational Formula Experience capabilities include:
 - one canonical conversation-type catalog;
 - expanded Operational Library formula, lineage, verification, publication, alternative, and script presentation.
 
-Remaining work is downstream product workflow, UX refinement, and qualification expansion. It does not require another runtime, formula model, recommendation owner, learning owner, conversation-type registry, or Operational Library data authority.
+Marketplace infrastructure is established at the canonical contract, persistence, API, and presentation layers.
+
+Implemented infrastructure includes:
+
+- publication metadata;
+- marketplace-readiness metadata;
+- BRANESX verification metadata presentation;
+- script generation, persistence, retrieval, and recommendation consumption;
+- Operational Library editing, history, lineage, and derivation presentation.
+
+The remaining marketplace work is a governed product workflow:
+
+```text
+Draft
+↓
+Verification requested
+↓
+Verified
+↓
+Published
+↓
+Marketplace listed
+↓
+Purchased or entitled
+↓
+Delivered for use
+↓
+Revised, retired, or withdrawn
+```
+
+This workflow must consume the existing canonical formula, script, verification, publication, and entitlement systems. It must not introduce another runtime, formula model, recommendation owner, learning owner, verification authority, conversation-type registry, or Operational Library data authority.
 
 Canonical ownership remains:
 

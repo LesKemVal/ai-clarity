@@ -1128,6 +1128,40 @@ Scripts execute strategy.
 Operational Matching produces the final recommendation.
 
 
+## Marketplace Publication Lifecycle Doctrine
+
+Marketplace readiness is descriptive metadata. It does not itself publish, verify, list, sell, entitle, or deliver a formula or script.
+
+The current implementation already supports formula publication metadata, marketplace-readiness metadata, BRANESX verification metadata presentation, script persistence and retrieval, Operational Library editing, learning history, lineage, and derivation.
+
+A marketplace asset becomes available only through a governed lifecycle:
+
+```text
+Draft
+↓
+Verification requested
+↓
+Verified
+↓
+Published
+↓
+Marketplace listed
+↓
+Purchased or entitled
+↓
+Delivered for use
+↓
+Revised, retired, or withdrawn
+```
+
+BRANESX owns verification of descriptive metadata claims.
+
+GEORGE owns operational validity, formula learning, reassessment, evolution, and recommendation.
+
+The marketplace workflow owns listing, commerce, entitlement, and delivery status only. It does not become another recommendation authority, operational-learning system, verification authority, or formula owner.
+
+A verified script may be sold only after publication and listing requirements are satisfied. Commerce does not change formula validity, user selection authority, or recommendation finality.
+
 ## Operational Recommendation Doctrine
 
 Operational Memory is the canonical owner of operational recommendation.
