@@ -167,17 +167,14 @@ export function createOperationalMemory(
       let recommendedScript: OperationalScript | null = null
 
       if (recommendedFormula && scriptLibrary) {
-        const ownedScripts = await scriptLibrary.listByOwner(input.userId)
+        const formulaScripts = await scriptLibrary.listByFormula(
+          input.userId,
+          recommendedFormula.formula.id,
+          recommendedFormula.formula.version
+        )
 
         recommendedScript =
-          ownedScripts
-            .filter(
-              (script) =>
-                script.status === 'active' &&
-                script.formulaId === recommendedFormula.formula.id &&
-                script.formulaVersion === recommendedFormula.formula.version
-            )
-            .sort((left, right) => right.updatedAt - left.updatedAt)[0] ?? null
+          formulaScripts.find((script) => script.status === 'active') ?? null
       }
 
       const priorFormulaId = String(input.priorFormulaId || '').trim()

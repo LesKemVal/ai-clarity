@@ -5,4 +5,9 @@ export type OperationalScriptLibrary = {
   save(script: OperationalScript): Promise<void>
   delete(id: string, ownerId: string): Promise<void>
   listByOwner(ownerId: string): Promise<OperationalScript[]>
+  listByFormula(
+    ownerId: string,
+    formulaId: string,
+    formulaVersion?: number
+  ): Promise<OperationalScript[]>
 }
