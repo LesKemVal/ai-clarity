@@ -2,6 +2,7 @@
 import { HomeHeroConversationTicker } from "@/components/home/HomeHeroConversationTicker";
 import { RecommendedStrategyCard } from "@/components/george/live-entry/RecommendedStrategyCard";
 import { FormulaScriptBrowserPanel } from "@/components/george/live-entry/FormulaScriptBrowserPanel";
+import { ScriptCustomizationPanel } from "@/components/george/live-entry/ScriptCustomizationPanel";
 import type {
   FormulaDecisionSource,
 } from "@/components/george/live-entry/FormulaDecisionPanel";
@@ -616,6 +617,12 @@ export default function LiveEntryClient() {
     useState<FormulaDecisionSource | null>(null);
   const [selectedScript, setSelectedScript] =
     useState<OperationalScript | null>(null);
+  const [sourceScript, setSourceScript] =
+    useState<OperationalScript | null>(null);
+  const [customizedScript, setCustomizedScript] =
+    useState<OperationalScript | null>(null);
+  const [scriptCustomizationOpen, setScriptCustomizationOpen] =
+    useState(false);
   const [scriptBrowserFormula, setScriptBrowserFormula] =
     useState<OperationalFormula | null>(null);
   const [scriptBrowserOpen, setScriptBrowserOpen] = useState(false);
@@ -2027,13 +2034,43 @@ export default function LiveEntryClient() {
   };
 
   const selectFormulaScript = (script: OperationalScript) => {
+    const workingCopy: OperationalScript = {
+      ...script,
+      lines: script.lines.map((line) => ({ ...line })),
+    };
+
     setSelectedScript(script);
+    setSourceScript(script);
+    setCustomizedScript(workingCopy);
     setScriptBrowserOpen(false);
+    setScriptCustomizationOpen(true);
+
     console.info("[GEORGE][LIVE_ENTRY][SCRIPT_SELECTED]", {
       scriptId: script.id,
       scriptVersion: script.version,
       formulaId: script.formulaId,
       formulaVersion: script.formulaVersion,
+    });
+  };
+
+  const resetCustomizedScript = () => {
+    if (!sourceScript) return;
+
+    setCustomizedScript({
+      ...sourceScript,
+      lines: sourceScript.lines.map((line) => ({ ...line })),
+    });
+  };
+
+  const finishScriptCustomization = () => {
+    if (!customizedScript) return;
+
+    setScriptCustomizationOpen(false);
+    console.info("[GEORGE][LIVE_ENTRY][SCRIPT_CUSTOMIZED]", {
+      scriptId: customizedScript.id,
+      scriptVersion: customizedScript.version,
+      lineCount: customizedScript.lines.length,
+      sessionOnly: true,
     });
   };
 
@@ -4094,6 +4131,15 @@ export default function LiveEntryClient() {
             error={scriptBrowserError}
             onSelectScript={selectFormulaScript}
             onClose={() => setScriptBrowserOpen(false)}
+          />
+
+          <ScriptCustomizationPanel
+            open={scriptCustomizationOpen}
+            script={customizedScript}
+            onChange={setCustomizedScript}
+            onReset={resetCustomizedScript}
+            onDone={finishScriptCustomization}
+            onClose={() => setScriptCustomizationOpen(false)}
           />
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
