@@ -104,7 +104,11 @@ Users may update descriptive metadata they own, but cannot assert or directly ed
 
 The canonical ownership inspection supporting the current Operational Formula Experience is complete.
 
-Operational formulas, evidence, confidence, lifecycle, reassessment, evolution, derivation, lineage, persistence, and retrieval remain governed by their established operational-memory owners. The Operational Library remains a presentation surface, and the Operational Profile remains evidence consumed by canonical reasoning.
+Operational formulas, evidence, confidence, lifecycle, reassessment, evolution, derivation, lineage, persistence, and formula retrieval remain governed by their established operational-memory owners.
+
+Script retrieval by formula is governed by `OperationalScriptLibrary`, with `RedisScriptLibrary` as the canonical implementation. Operational Memory consumes that retrieval contract and does not implement formula-specific script lookup.
+
+The Operational Library remains a presentation surface, and the Operational Profile remains evidence consumed by canonical reasoning.
 
 Future work must not repeat broad ownership inspection. It should inspect only the owner directly affected by the current production task unless qualification, audit, or implementation evidence indicates ownership drift.
 
