@@ -1,11 +1,13 @@
 "use client";
 import { HomeHeroConversationTicker } from "@/components/home/HomeHeroConversationTicker";
 import { RecommendedStrategyCard } from "@/components/george/live-entry/RecommendedStrategyCard";
+import { FormulaScriptBrowserPanel } from "@/components/george/live-entry/FormulaScriptBrowserPanel";
 import type {
   FormulaDecisionSource,
 } from "@/components/george/live-entry/FormulaDecisionPanel";
 import type {
   OperationalFormula,
+  OperationalScript,
 } from "@/lib/george/operational-memory/types";
 import type {
   OperationalRecommendationApiResponse,
@@ -612,6 +614,14 @@ export default function LiveEntryClient() {
     useState<OperationalFormula | null>(null);
   const [selectedFormulaSource, setSelectedFormulaSource] =
     useState<FormulaDecisionSource | null>(null);
+  const [selectedScript, setSelectedScript] =
+    useState<OperationalScript | null>(null);
+  const [scriptBrowserFormula, setScriptBrowserFormula] =
+    useState<OperationalFormula | null>(null);
+  const [scriptBrowserOpen, setScriptBrowserOpen] = useState(false);
+  const [scriptBrowserLoading, setScriptBrowserLoading] = useState(false);
+  const [formulaScripts, setFormulaScripts] = useState<OperationalScript[]>([]);
+  const [scriptBrowserError, setScriptBrowserError] = useState("");
   const [recommendationError, setRecommendationError] = useState("");
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
@@ -1973,6 +1983,58 @@ export default function LiveEntryClient() {
 
   const beginFormulaSelection = () => {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
+  };
+
+  const browseFormulaScripts = async (formula: OperationalFormula) => {
+    setScriptBrowserFormula(formula);
+    setScriptBrowserOpen(true);
+    setScriptBrowserLoading(true);
+    setScriptBrowserError("");
+
+    try {
+      const params = new URLSearchParams({ formulaId: formula.id });
+      const response = await fetch(
+        `/api/george/operational-memory/scripts?${params.toString()}`,
+        { cache: "no-store" },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | { ok?: boolean; scripts?: OperationalScript[]; error?: string }
+        | null;
+
+      if (!response.ok || payload?.ok !== true) {
+        throw new Error(payload?.error || "Script retrieval failed");
+      }
+
+      const scripts = Array.isArray(payload.scripts) ? payload.scripts : [];
+      setFormulaScripts(scripts);
+
+      const recommendedScript =
+        operationalRecommendation?.recommendedScript ?? null;
+      if (
+        recommendedScript &&
+        scripts.some((script) => script.id === recommendedScript.id)
+      ) {
+        setSelectedScript((current) => current || recommendedScript);
+      }
+    } catch (error) {
+      setFormulaScripts([]);
+      setScriptBrowserError(
+        error instanceof Error ? error.message : "Script retrieval failed",
+      );
+    } finally {
+      setScriptBrowserLoading(false);
+    }
+  };
+
+  const selectFormulaScript = (script: OperationalScript) => {
+    setSelectedScript(script);
+    setScriptBrowserOpen(false);
+    console.info("[GEORGE][LIVE_ENTRY][SCRIPT_SELECTED]", {
+      scriptId: script.id,
+      scriptVersion: script.version,
+      formulaId: script.formulaId,
+      formulaVersion: script.formulaVersion,
+    });
   };
 
   const resumeLiveConversation = (session: GeorgeStoredSession) => {
@@ -4020,6 +4082,18 @@ export default function LiveEntryClient() {
             onAcceptRecommendation={acceptOperationalRecommendation}
             onEditFormula={beginFormulaEdit}
             onChooseAnother={beginFormulaSelection}
+            onBrowseScripts={browseFormulaScripts}
+          />
+
+          <FormulaScriptBrowserPanel
+            open={scriptBrowserOpen}
+            loading={scriptBrowserLoading}
+            formula={scriptBrowserFormula}
+            scripts={formulaScripts}
+            selectedScript={selectedScript}
+            error={scriptBrowserError}
+            onSelectScript={selectFormulaScript}
+            onClose={() => setScriptBrowserOpen(false)}
           />
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">

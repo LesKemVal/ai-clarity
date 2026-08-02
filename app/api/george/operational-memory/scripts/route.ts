@@ -23,8 +23,27 @@ export async function GET(req: NextRequest) {
     return unauthorized();
   }
 
-  const scripts =
-    await createRedisOperationalScriptLibrary().listByOwner(userId);
+  const formulaId = String(
+    req.nextUrl.searchParams.get("formulaId") || "",
+  ).trim();
+  const rawFormulaVersion = req.nextUrl.searchParams.get("formulaVersion");
+  const formulaVersion =
+    rawFormulaVersion === null ? undefined : Number(rawFormulaVersion);
+
+  if (
+    rawFormulaVersion !== null &&
+    (!Number.isInteger(formulaVersion) || Number(formulaVersion) < 1)
+  ) {
+    return NextResponse.json(
+      { ok: false, error: "Formula version is invalid" },
+      { status: 400 },
+    );
+  }
+
+  const scriptLibrary = createRedisOperationalScriptLibrary();
+  const scripts = formulaId
+    ? await scriptLibrary.listByFormula(userId, formulaId, formulaVersion)
+    : await scriptLibrary.listByOwner(userId);
 
   return NextResponse.json({
     ok: true,

@@ -22,6 +22,7 @@ type RecommendedStrategyCardProps = {
   onAcceptRecommendation: () => void;
   onEditFormula: () => void;
   onChooseAnother: () => void;
+  onBrowseScripts: (formula: OperationalFormula) => void;
 };
 
 function strategyLabel(
@@ -41,6 +42,7 @@ export function RecommendedStrategyCard({
   onAcceptRecommendation,
   onEditFormula,
   onChooseAnother,
+  onBrowseScripts,
 }: RecommendedStrategyCardProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
 
@@ -185,7 +187,25 @@ export function RecommendedStrategyCard({
                   )}
                 </div>
               )}
+
+              <button
+                type="button"
+                onClick={() => onBrowseScripts(formula)}
+                className="mt-3 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#AFC0FF]/58 transition hover:text-white"
+              >
+                Browse scripts on this formula →
+              </button>
             </section>
+          )}
+
+          {!recommendedScript && (
+            <button
+              type="button"
+              onClick={() => onBrowseScripts(formula)}
+              className="mt-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#AFC0FF]/58 transition hover:text-white"
+            >
+              Browse scripts on this formula →
+            </button>
           )}
 
           <FormulaDecisionPanel
