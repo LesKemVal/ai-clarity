@@ -1163,21 +1163,36 @@ The formula API may request a transition but does not decide whether it is legal
 
 The Operational Library presents publication state and available actions for owned formulas. It sends transition intent to the formula API and applies the returned formula state. It does not grant BRANESX verification, infer transition legality, or mutate publication state locally.
 
-Commerce remains downstream of publication:
+Marketplace discovery is now governed by one canonical Marketplace Catalog owner.
+
+The catalog may expose a formula only when:
+
+- its publication state is `marketplace_listed`;
+- BRANESX verification remains valid;
+- the formula is not operationally retired;
+- the authenticated user may access the formula through the Operational Formula Library.
+
+The catalog may filter and order discoverable formulas. It does not publish, verify, recommend, entitle, sell, charge, fulfill, or deliver them.
+
+Commerce remains downstream of catalog discovery:
 
 ```text
 Marketplace listed
 ↓
-Discovered
+Catalog discovered
 ↓
-Purchased or entitled
+Entitlement checked
+↓
+Purchased when required
 ↓
 Payment confirmed
+↓
+Entitlement persisted
 ↓
 Delivered for use
 ```
 
-Entitlement, purchase, payment confirmation, and fulfillment are not yet owned by the publication lifecycle service. Those workflows must consume marketplace-listed assets without acquiring recommendation, verification, learning, formula-validation, or publication-transition authority.
+Entitlement, purchase, payment confirmation, and fulfillment are not owned by the Marketplace Catalog or publication lifecycle service. Those workflows must consume catalog entries without acquiring recommendation, verification, learning, formula-validation, publication-transition, or catalog-inclusion authority.
 
 Commerce does not change formula validity, user selection authority, recommendation finality, or historical execution identity.
 

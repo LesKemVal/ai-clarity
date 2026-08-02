@@ -221,14 +221,32 @@ Validated UI orchestration now includes:
 
 The Operational Library remains a presentation and intent surface. It does not decide whether a transition is legal. Transition policy remains owned by `publication-lifecycle-service.ts`.
 
+Marketplace Catalog ownership is implemented.
+
+Validated catalog implementation now includes:
+
+- `marketplace-catalog-service.ts` as the sole owner of marketplace browse and discovery filtering;
+- a dedicated authenticated `/api/george/marketplace/catalog` endpoint;
+- catalog retrieval through the existing `OperationalFormulaLibrary.listAccessible()` contract;
+- catalog inclusion limited to formulas in `marketplace_listed` publication state;
+- BRANESX verification required for catalog inclusion;
+- operationally retired formulas excluded from catalog results;
+- search, room type, objective type, and bounded result-limit support;
+- confidence-first and recency-second catalog ordering;
+- explicit separation from publication transitions, entitlement, checkout, payment, and fulfillment;
+- `george:marketplace-catalog:qualify` included in the production build.
+
+The Marketplace Catalog consumes the Operational Formula Library but does not become another formula store, recommendation authority, publication owner, entitlement owner, or payment system.
+
 Remaining production-completion work is downstream marketplace and commerce workflow:
 
-- implement verified-script marketplace listing and discovery;
-- implement entitlement, purchase, payment confirmation, and fulfillment;
-- define revision behavior for already published or listed assets;
-- refine formula review and editing workflows without moving recommendation or selection authority into preview surfaces;
-- refine Operational Library usability and presentation;
-- expand qualification for entitlement, commerce, fulfillment, and published-asset revision behavior;
+- integrate catalog discovery into the Operational Library presentation;
+- implement entitlement ownership and access decisions;
+- connect purchase intent to the existing checkout and payment-verification infrastructure;
+- implement payment-confirmed fulfillment and durable entitlement persistence;
+- define revision behavior for already published, listed, or entitled assets;
+- refine Operational Library marketplace usability and presentation;
+- expand qualification for catalog UI, entitlement, commerce, fulfillment, and published-asset revision behavior;
 - keep all three production authorities synchronized with implementation evidence.
 
 Canonical ownership remains:

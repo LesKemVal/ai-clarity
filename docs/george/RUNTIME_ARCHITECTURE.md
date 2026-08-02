@@ -158,23 +158,57 @@ Operational Library state refresh
 
 The Operational Library owns presentation, user intent, loading state, confirmation for destructive actions, and local response application. It does not own transition legality, BRANESX verification, publication policy, formula validity, recommendation, learning, or persistence.
 
-The remaining marketplace architecture is downstream product workflow only:
+Marketplace Catalog ownership is established.
+
+Canonical catalog flow:
+
+```text
+Authenticated user
+↓
+Marketplace Catalog API
+↓
+Marketplace Catalog Service
+↓
+Operational Formula Library access
+↓
+Verified `marketplace_listed` formulas
+↓
+Search and discovery results
+```
+
+Ownership is separated:
+
+- `marketplace-catalog-service.ts` owns catalog inclusion, search filtering, browse constraints, result limits, and catalog ordering;
+- `/api/george/marketplace/catalog` owns authentication, query normalization, orchestration, and HTTP responses;
+- `OperationalFormulaLibrary` owns formula access and retrieval;
+- Redis remains persistence-only;
+- `publication-lifecycle-service.ts` owns publication transitions;
+- BRANESX owns verification;
+- entitlement, checkout, payment confirmation, and fulfillment remain downstream owners.
+
+The catalog does not determine recommendation, formula validity, publication legality, user entitlement, payment success, or fulfillment. It only exposes discoverable marketplace-listed assets that already satisfy publication and verification requirements.
+
+The remaining marketplace architecture is downstream product workflow:
 
 ```text
 Marketplace listed
 ↓
-Discovered
+Catalog discovered
 ↓
-Purchased or entitled
+Entitlement checked
+↓
+Purchase initiated when required
 ↓
 Payment confirmed
 ↓
-Delivered for use
+Entitlement persisted
+↓
+Asset delivered for use
 ↓
 Revised, retired, or withdrawn
 ```
 
-Entitlement, purchase, payment, and fulfillment must consume this publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis persistence, the Operational Library, or the publication transition service.
+Entitlement, purchase, payment confirmation, and fulfillment must consume the catalog and publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis formula persistence, the Operational Library, the catalog service, or the publication transition service.
 
 Canonical ownership remains:
 
