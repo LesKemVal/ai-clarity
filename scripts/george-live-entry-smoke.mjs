@@ -10,6 +10,10 @@ const runtimeTypes = fs.readFileSync(
   "lib/george/live-runtime/prep-runtime.ts",
   "utf8",
 );
+const entryResolution = fs.readFileSync(
+  "lib/george/live-entry/entry-resolution.ts",
+  "utf8",
+);
 
 const checks = [
   [
@@ -30,8 +34,23 @@ const checks = [
   ],
   ["Popup 3 is Ready Room", liveEntry.includes('title="Ready Room."')],
   [
-    "Popup 3 follows Mechanics",
-    liveEntry.includes("onBack={() => setLiveBriefingStep(2)}"),
+    "Traditional and Normal reach Popup 3 after Mechanics",
+    liveEntry.includes("setLiveBriefingStep(3);") &&
+      liveEntry.includes('entryResolution.firstStep === "mechanics"') &&
+      liveEntry.includes("setLiveBriefingStep(2);"),
+  ],
+  [
+    "Homepage enters shared Popup 3 prep",
+    entryResolution.includes("| 'prep'") &&
+      entryResolution.includes("? 'prep'") &&
+      liveEntry.includes('entryResolution.firstStep === "prep"') &&
+      liveEntry.includes("setLiveBriefingStep(3);"),
+  ],
+  [
+    "Popup 3 carries Formula and Script preparation",
+    liveEntry.includes("<RecommendedStrategyCard") &&
+      liveEntry.includes("<FormulaScriptBrowserPanel") &&
+      liveEntry.includes("<ScriptCustomizationPanel"),
   ],
   ["Popup 3 remains stage three", liveEntry.includes("stage={3}")],
   [

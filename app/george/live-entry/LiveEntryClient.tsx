@@ -303,7 +303,7 @@ function PanelShell({
 }: {
   label: string;
   title: string;
-  stage: 1 | 2 | 3 | 4;
+  stage: 1 | 2 | 3;
   onBack?: () => void;
   children: React.ReactNode;
 }) {
@@ -536,7 +536,7 @@ export default function LiveEntryClient() {
   const [showResumeConversationList, setShowResumeConversationList] =
     useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
-  const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3 | 4>(1);
+  const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1);
   const [liveBriefingOpenSection, setLiveBriefingOpenSection] = useState<
     | "outcome"
     | "responsibility"
@@ -1453,11 +1453,11 @@ export default function LiveEntryClient() {
 
       setPreLivePreviewReady(preLiveReady);
 
-      if (entryResolution.firstStep === "mechanics" && homepageHandoff) {
+      if (entryResolution.firstStep === "prep" && homepageHandoff) {
         setPreLiveSignals(acquiredSignalsForAccess);
         setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
-        setShowOpenAISignalSurface(true);
+        setShowOpenAISignalSurface(false);
 
         const homepageConversationType = String(
           homepageHandoff.conversationType || "",
@@ -1478,14 +1478,28 @@ export default function LiveEntryClient() {
         }
 
         /*
-         * The front surface has already completed its preparation work.
-         * LIVE Entry remains the canonical owner of Mechanics and Ready Room,
-         * so this route resumes at the first unresolved popup: Mechanics.
+         * Homepage owns briefing and mechanics. LIVE Entry joins at the
+         * shared preparation surface seen by every route.
          */
-        setLiveBriefingStep(2);
+        setLiveBriefingStep(3);
         window.setTimeout(() => {
           void loadOperationalRecommendation();
         }, 0);
+        setLiveBriefingToaAccepted(true);
+        setLiveBriefingSupportAccepted(true);
+        setLiveBriefingCommunicationConfirmed(true);
+        setLiveRecoveryAcknowledged(true);
+        setLiveReadyAccepted(false);
+        setLiveReadinessComplete(false);
+        setShowLiveBriefingRoom(true);
+
+        window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
+      } else if (entryResolution.firstStep === "mechanics") {
+        setPreLiveSignals(acquiredSignalsForAccess);
+        setLiveEntryMandatoryMode(false);
+        setLiveEntryReadyMessageVisible(false);
+        setShowOpenAISignalSurface(false);
+        setLiveBriefingStep(2);
         setLiveBriefingToaAccepted(true);
         setLiveBriefingSupportAccepted(false);
         setLiveBriefingCommunicationConfirmed(false);
@@ -1493,8 +1507,6 @@ export default function LiveEntryClient() {
         setLiveReadyAccepted(false);
         setLiveReadinessComplete(false);
         setShowLiveBriefingRoom(true);
-
-        window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
       }
 
       const saved = JSON.parse(
@@ -2924,7 +2936,7 @@ export default function LiveEntryClient() {
 
   useEffect(() => {
     if (!showLiveBriefingRoom) return;
-    if (liveBriefingStep !== 4) return;
+    if (liveBriefingStep !== 3) return;
     if (proofInProgress || proofComplete) return;
 
     const timer = window.setTimeout(() => {
@@ -3166,21 +3178,6 @@ export default function LiveEntryClient() {
                   >
                     {liveEntryQuestionSurface.primaryAction}
                   </button>
-
-                  {showOpenAISignalSurface &&
-                    currentOptionalSignalQuestion &&
-                    !liveEntryQuestionSurface.readinessMessage && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          unlockLiveEntryVoice();
-                          void requestNextOptionalSignalQuestion();
-                        }}
-                        className="rounded-[0.95rem] border border-white/[0.08] bg-transparent px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-white/46 transition hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035] hover:text-[#D7DCFF]/78"
-                      >
-                        Skip
-                      </button>
-                    )}
 
                   <button
                     type="button"
@@ -3736,7 +3733,6 @@ export default function LiveEntryClient() {
             active={liveBriefingReadyToContinue}
             onClick={() => {
               setLiveBriefingStep(2);
-              void loadOperationalRecommendation();
             }}
           >
             Continue
@@ -3763,83 +3759,6 @@ export default function LiveEntryClient() {
     }
 
     if (liveBriefingStep === 2) {
-      const formulaReady = Boolean(
-        selectedFormula || operationalRecommendation?.recommendedFormula,
-      );
-      const homepageSource =
-        typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).get("source") ===
-          "homepage";
-
-      return (
-        <PanelShell
-          label="BRIEF ROOM · STRATEGY"
-          title="Recommended Formula"
-          stage={2}
-          onBack={() => {
-            if (homepageSource) {
-              window.history.back();
-              return;
-            }
-
-            setLiveBriefingStep(1);
-          }}
-        >
-          <div className="mt-4">
-          <RecommendedStrategyCard
-            recommendation={operationalRecommendation}
-            loading={recommendationLoading}
-            selectedFormula={selectedFormula}
-            selectedSource={selectedFormulaSource}
-            reviewRequired={
-              operationalRecommendation?.reviewRequired ?? false
-            }
-            onAcceptRecommendation={acceptOperationalRecommendation}
-            onEditFormula={beginFormulaEdit}
-            onChooseAnother={beginFormulaSelection}
-            onBrowseScripts={browseFormulaScripts}
-          />
-
-          <FormulaScriptBrowserPanel
-            open={scriptBrowserOpen}
-            loading={scriptBrowserLoading}
-            formula={scriptBrowserFormula}
-            scripts={formulaScripts}
-            selectedScript={selectedScript}
-            error={scriptBrowserError}
-            onSelectScript={selectFormulaScript}
-            onClose={() => setScriptBrowserOpen(false)}
-          />
-
-          <ScriptCustomizationPanel
-            open={scriptCustomizationOpen}
-            script={customizedScript}
-            onChange={setCustomizedScript}
-            onReset={resetCustomizedScript}
-            onDone={finishScriptCustomization}
-            onClose={() => setScriptCustomizationOpen(false)}
-          />
-
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                disabled={!formulaReady}
-                onClick={() => setLiveBriefingStep(3)}
-                className={`min-w-[190px] rounded-[10px] border px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
-                  formulaReady
-                    ? "border-[#4E7CFF]/65 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#7EA1FF]/80 hover:bg-[#5B86FF]"
-                    : "cursor-default border-white/[0.05] bg-transparent text-white/20"
-                }`}
-              >
-                Continue to Mechanics
-              </button>
-            </div>
-          </div>
-        </PanelShell>
-      );
-    }
-
-    if (liveBriefingStep === 3) {
       const storedReceiverProfile =
         typeof window !== "undefined"
           ? window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
@@ -3981,8 +3900,8 @@ export default function LiveEntryClient() {
         <PanelShell
           label="BRIEF ROOM · MECHANICS"
           title="Mechanics"
-          stage={3}
-          onBack={() => setLiveBriefingStep(2)}
+          stage={2}
+          onBack={() => setLiveBriefingStep(1)}
         >
           <div className="mt-3 space-y-3">
             <LiveAdaptiveSupportPanel
@@ -4116,7 +4035,8 @@ export default function LiveEntryClient() {
                 type="button"
                 disabled={!liveRecoveryAcknowledged}
                 onClick={() => {
-                  setLiveBriefingStep(4);
+                  setLiveBriefingStep(3);
+                  void loadOperationalRecommendation();
                 }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
                   liveRecoveryAcknowledged
@@ -4168,8 +4088,20 @@ export default function LiveEntryClient() {
       <PanelShell
         label="BRIEF ROOM · READINESS"
         title="Ready Room."
-        stage={4}
-        onBack={() => setLiveBriefingStep(3)}
+        stage={3}
+        onBack={() => {
+          const homepageSource =
+            typeof window !== "undefined" &&
+            new URLSearchParams(window.location.search).get("source") ===
+              "homepage";
+
+          if (homepageSource) {
+            window.history.back();
+            return;
+          }
+
+          setLiveBriefingStep(2);
+        }}
       >
         <div className="mt-4">
           <section className="relative overflow-hidden rounded-[1.2rem] border border-[#61708A]/[0.28] bg-[#080A0D] px-5 py-5">
@@ -4195,6 +4127,43 @@ export default function LiveEntryClient() {
               </div>
             </div>
           </section>
+
+          <div className="mt-3">
+          <RecommendedStrategyCard
+            recommendation={operationalRecommendation}
+            loading={recommendationLoading}
+            selectedFormula={selectedFormula}
+            selectedSource={selectedFormulaSource}
+            reviewRequired={
+              operationalRecommendation?.reviewRequired ?? false
+            }
+            onAcceptRecommendation={acceptOperationalRecommendation}
+            onEditFormula={beginFormulaEdit}
+            onChooseAnother={beginFormulaSelection}
+            onBrowseScripts={browseFormulaScripts}
+          />
+
+          <FormulaScriptBrowserPanel
+            open={scriptBrowserOpen}
+            loading={scriptBrowserLoading}
+            formula={scriptBrowserFormula}
+            scripts={formulaScripts}
+            selectedScript={selectedScript}
+            error={scriptBrowserError}
+            onSelectScript={selectFormulaScript}
+            onClose={() => setScriptBrowserOpen(false)}
+          />
+
+          <ScriptCustomizationPanel
+            open={scriptCustomizationOpen}
+            script={customizedScript}
+            onChange={setCustomizedScript}
+            onReset={resetCustomizedScript}
+            onDone={finishScriptCustomization}
+            onClose={() => setScriptCustomizationOpen(false)}
+          />
+
+          </div>
 
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <section className="relative overflow-hidden rounded-[1rem] border border-[#667286]/[0.22] bg-[#090B0E] px-4 py-4">
