@@ -3,6 +3,7 @@ export type LiveEntryRoute = 'homepage' | 'normal' | 'direct'
 export type LiveEntryFirstStep =
   | 'questions'
   | 'mechanics'
+  | 'prep'
   | 'ready-room'
   | 'enter-live'
 
@@ -75,7 +76,9 @@ export function resolveLiveEntry(
     preLiveReady,
     firstStep:
       route === 'homepage' && input.homepageHandoff
-        ? 'mechanics'
-        : 'questions',
+        ? 'prep'
+        : route === 'normal'
+          ? 'mechanics'
+          : 'questions',
   }
 }
