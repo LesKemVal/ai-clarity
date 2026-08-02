@@ -41,3 +41,20 @@ export type {
 export {
   createMarketplaceCatalogService,
 } from "./marketplace-catalog-service";
+export type {
+  MarketplaceAccessDecision,
+  MarketplaceAccessSource,
+  MarketplaceEntitlementDecisionInput,
+  MarketplaceEntitlementGrantInput,
+  MarketplaceEntitlementRecord,
+  MarketplaceEntitlementService,
+  MarketplaceEntitlementSource,
+  MarketplaceEntitlementStatus,
+  MarketplaceEntitlementStore,
+} from "./marketplace-entitlement-service";
+export {
+  createMarketplaceEntitlementService,
+} from "./marketplace-entitlement-service";
+export {
+  createRedisMarketplaceEntitlementStore,
+} from "./redis-marketplace-entitlement-store";

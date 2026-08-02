@@ -108,6 +108,11 @@ export type OperationalFormulaPublicationState =
   | 'retired'
   | 'withdrawn'
 
+export type OperationalFormulaMarketplaceTier =
+  | 'smart'
+  | 'intelligent'
+  | 'brilliant'
+
 export type OperationalFormulaPublication = {
   author?: string
   publisher?: string
@@ -115,6 +120,9 @@ export type OperationalFormulaPublication = {
   provenBy?: string[]
   alternatives?: string[]
   state?: OperationalFormulaPublicationState
+  requiredTier?: OperationalFormulaMarketplaceTier
+  includedWithTier?: boolean
+  purchasable?: boolean
   verificationRequestedAt?: number
   publishedAt?: number
   listedAt?: number
