@@ -188,6 +188,52 @@ Ownership is separated:
 
 The catalog does not determine recommendation, formula validity, publication legality, user entitlement, payment success, or fulfillment. It only exposes discoverable marketplace-listed assets that already satisfy publication and verification requirements.
 
+Marketplace Entitlement ownership is established.
+
+Canonical entitlement decision flow:
+
+```text
+Authenticated user and verified tier
+↓
+Marketplace Entitlement API
+↓
+Marketplace Entitlement Service
+↓
+Creator ownership check
+↓
+Durable entitlement check
+↓
+Tier-inclusion policy check
+↓
+Authoritative access decision
+```
+
+Ownership is separated:
+
+- `marketplace-entitlement-service.ts` owns access-decision order, entitlement-source interpretation, tier-threshold comparison, grant construction, revocation orchestration, and entitlement listing;
+- `redis-marketplace-entitlement-store.ts` owns durable entitlement persistence only;
+- `/api/george/marketplace/entitlements/[formulaId]` owns authentication, formula lookup, orchestration, and HTTP responses;
+- `GeorgeSession` and the subscriber system own the user's verified subscription tier;
+- formula publication metadata declares `requiredTier`, `includedWithTier`, and `purchasable`;
+- Marketplace Catalog owns discovery only;
+- Publication Lifecycle owns publication state transitions;
+- checkout and Stripe verification own payment initiation and confirmation;
+- fulfillment remains downstream.
+
+Access-decision precedence is:
+
+```text
+Creator ownership
+↓
+Active durable entitlement
+↓
+Verified tier inclusion
+↓
+Denied
+```
+
+Durable entitlement sources may be purchase, founder, promotion, or administrative. Tier-derived access is temporary and follows the current verified subscription tier. It is never persisted as a purchase entitlement.
+
 The remaining marketplace architecture is downstream product workflow:
 
 ```text
@@ -201,14 +247,14 @@ Purchase initiated when required
 ↓
 Payment confirmed
 ↓
-Entitlement persisted
+Durable entitlement granted
 ↓
 Asset delivered for use
 ↓
 Revised, retired, or withdrawn
 ```
 
-Entitlement, purchase, payment confirmation, and fulfillment must consume the catalog and publication lifecycle. They must not be added to Operational Memory recommendation, learning, formula validation, Redis formula persistence, the Operational Library, the catalog service, or the publication transition service.
+Purchase, payment confirmation, and fulfillment must consume the entitlement owner. They must not be added to Operational Memory recommendation, learning, formula validation, Redis formula persistence, Marketplace Catalog, Publication Lifecycle, or subscription-tier authority.
 
 Canonical ownership remains:
 

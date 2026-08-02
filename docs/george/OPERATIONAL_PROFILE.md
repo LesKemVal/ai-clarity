@@ -1174,7 +1174,30 @@ The catalog may expose a formula only when:
 
 The catalog may filter and order discoverable formulas. It does not publish, verify, recommend, entitle, sell, charge, fulfill, or deliver them.
 
-Commerce remains downstream of catalog discovery:
+Marketplace access is now governed by one canonical Marketplace Entitlement owner.
+
+An access decision may be granted through:
+
+- creator ownership;
+- an active durable purchase entitlement;
+- an active founder, promotional, or administrative entitlement;
+- inclusion with the user's current verified Smart, Intelligent, or Brilliant tier.
+
+Tier-derived access and durable entitlement are different:
+
+- tier-derived access follows the current verified subscription tier and ends when that tier no longer qualifies;
+- a durable entitlement remains until expiration or explicit revocation;
+- a subscription change must not remove a separately purchased entitlement.
+
+Marketplace policy is explicit on the formula:
+
+- `requiredTier` declares the minimum qualifying tier;
+- `includedWithTier` declares whether tier access applies;
+- `purchasable` declares whether individual purchase is available.
+
+The entitlement owner does not determine the user's tier. It consumes the verified tier from session and subscriber authority. It does not publish, list, discover, charge, verify payment, or fulfill an asset.
+
+Commerce remains downstream of entitlement:
 
 ```text
 Marketplace listed
@@ -1187,12 +1210,12 @@ Purchased when required
 ↓
 Payment confirmed
 ↓
-Entitlement persisted
+Durable entitlement granted
 ↓
 Delivered for use
 ```
 
-Entitlement, purchase, payment confirmation, and fulfillment are not owned by the Marketplace Catalog or publication lifecycle service. Those workflows must consume catalog entries without acquiring recommendation, verification, learning, formula-validation, publication-transition, or catalog-inclusion authority.
+Purchase, payment confirmation, and fulfillment must consume the entitlement decision without acquiring recommendation, verification, learning, formula-validation, publication-transition, catalog-inclusion, tier-determination, or entitlement-decision authority.
 
 Commerce does not change formula validity, user selection authority, recommendation finality, or historical execution identity.
 

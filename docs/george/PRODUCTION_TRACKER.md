@@ -238,15 +238,31 @@ Validated catalog implementation now includes:
 
 The Marketplace Catalog consumes the Operational Formula Library but does not become another formula store, recommendation authority, publication owner, entitlement owner, or payment system.
 
+Marketplace Entitlement ownership is implemented.
+
+Validated entitlement implementation now includes:
+
+- `marketplace-entitlement-service.ts` as the sole owner of marketplace access decisions;
+- explicit formula marketplace policy through `requiredTier`, `includedWithTier`, and `purchasable`;
+- creator ownership access;
+- durable purchase, founder, promotion, and administrative entitlement sources;
+- tier-derived access using the verified `smart`, `intelligent`, or `brilliant` tier from `GeorgeSession`;
+- Redis-backed durable entitlement persistence, expiration handling, listing, and revocation;
+- a dedicated authenticated `/api/george/marketplace/entitlements/[formulaId]` decision endpoint;
+- entitlement decisions restricted to verified, non-retired, marketplace-listed formulas except creator ownership;
+- strict separation from catalog discovery, publication transitions, subscription-tier determination, checkout, Stripe verification, and fulfillment;
+- `george:marketplace-entitlement:qualify` included in the production build.
+
+Tier-derived access is not a durable entitlement. When a subscription tier changes, tier-derived access changes with it. Purchased or otherwise durable entitlements remain independent of subscription tier until expiration or revocation.
+
 Remaining production-completion work is downstream marketplace and commerce workflow:
 
-- integrate catalog discovery into the Operational Library presentation;
-- implement entitlement ownership and access decisions;
+- integrate catalog discovery and entitlement state into the Operational Library presentation;
 - connect purchase intent to the existing checkout and payment-verification infrastructure;
-- implement payment-confirmed fulfillment and durable entitlement persistence;
-- define revision behavior for already published, listed, or entitled assets;
+- implement payment-confirmed entitlement granting and fulfillment;
+- define revision behavior for already published, listed, purchased, or otherwise entitled assets;
 - refine Operational Library marketplace usability and presentation;
-- expand qualification for catalog UI, entitlement, commerce, fulfillment, and published-asset revision behavior;
+- expand qualification for catalog UI, commerce, payment-confirmed entitlement grants, fulfillment, and published-asset revision behavior;
 - keep all three production authorities synchronized with implementation evidence.
 
 Canonical ownership remains:
