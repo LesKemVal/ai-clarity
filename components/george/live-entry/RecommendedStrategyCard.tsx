@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  FormulaDecisionPanel,
-  type FormulaDecisionSource,
-} from "@/components/george/live-entry/FormulaDecisionPanel";
-import type {
-  OperationalRecommendationDto,
-} from "@/lib/george/operational-memory/recommendation-api";
-import type {
-  OperationalFormula,
-} from "@/lib/george/operational-memory/types";
+import type { FormulaDecisionSource } from "@/components/george/live-entry/FormulaDecisionPanel";
+import type { OperationalRecommendationDto } from "@/lib/george/operational-memory/recommendation-api";
+import type { OperationalFormula } from "@/lib/george/operational-memory/types";
 
 type RecommendedStrategyCardProps = {
   recommendation: OperationalRecommendationDto | null;
@@ -25,31 +18,80 @@ type RecommendedStrategyCardProps = {
   onBrowseScripts: (formula: OperationalFormula) => void;
 };
 
-function strategyLabel(
-  status: OperationalRecommendationDto["strategyStatus"],
-) {
-  if (status === "confirmed") return "Strategy confirmed";
-  if (status === "refined") return "Strategy refined";
-  return "Initial strexport function RecommendedStrategyCard({
+const EXPLANATION_STORAGE_KEY =
+  "GEORGE_LIVE_FORMULA_EXPLANATION_OPEN";
+const EXPLANATION_IDLE_MS = 9000;
+
+export function RecommendedStrategyCard({
   recommendation,
   loading,
   selectedFormula,
   onChooseAnother,
 }: RecommendedStrategyCardProps) {
   const [explanationOpen, setExplanationOpen] = useState(false);
+  const idleTimerRef = useRef<number | null>(null);
 
   const formula =
     selectedFormula || recommendation?.recommendedFormula || null;
 
+  const clearIdleTimer = useCallback(() => {
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = null;
+    }
+  }, []);
+
+  const closeExplanation = useCallback(() => {
+    clearIdleTimer();
+    setExplanationOpen(false);
+
+    try {
+      window.sessionStorage.removeItem(EXPLANATION_STORAGE_KEY);
+    } catch {}
+  }, [clearIdleTimer]);
+
+  const restartIdleTimer = useCallback(() => {
+    if (!formula) return;
+
+    clearIdleTimer();
+    idleTimerRef.current = window.setTimeout(() => {
+      closeExplanation();
+    }, EXPLANATION_IDLE_MS);
+  }, [clearIdleTimer, closeExplanation, formula]);
+
+  const openExplanation = useCallback(() => {
+    setExplanationOpen(true);
+
+    try {
+      window.sessionStorage.setItem(EXPLANATION_STORAGE_KEY, "1");
+    } catch {}
+  }, []);
+
   useEffect(() => {
-    if (!explanationOpen || !formula) return;
+    try {
+      if (
+        formula &&
+        window.sessionStorage.getItem(EXPLANATION_STORAGE_KEY) === "1"
+      ) {
+        setExplanationOpen(true);
+      }
+    } catch {}
+  }, [formula]);
 
-    const timer = window.setTimeout(() => {
-      setExplanationOpen(false);
-    }, 9000);
+  useEffect(() => {
+    if (!explanationOpen || !formula) {
+      clearIdleTimer();
+      return;
+    }
 
-    return () => window.clearTimeout(timer);
-  }, [explanationOpen, formula]);
+    restartIdleTimer();
+    return clearIdleTimer;
+  }, [
+    clearIdleTimer,
+    explanationOpen,
+    formula,
+    restartIdleTimer,
+  ]);
 
   if (loading) {
     return (
@@ -85,9 +127,10 @@ function strategyLabel(
   }
 
   const formulaName =
-    formula.name?.trim() || `Formula ${formula.id || formula.version}`;
-  const steps = formula.steps || [];
-  const explanationItems = steps
+    formula.name?.trim() ||
+    `Formula ${String(formula.id || formula.version)}`;
+
+  const explanationItems = (formula.steps || [])
     .map(
       (step) =>
         step.actionType ||
@@ -100,10 +143,17 @@ function strategyLabel(
 
   if (explanationOpen) {
     return (
-      <section className="mt-3 rounded-[1rem] border border-[#65728A]/[0.24] bg-[#080A0D] px-4 py-4">
+      <section
+        className="mt-3 rounded-[1rem] border border-[#65728A]/[0.24] bg-[#080A0D] px-4 py-4"
+        onPointerDown={restartIdleTimer}
+        onPointerMove={restartIdleTimer}
+        onKeyDown={restartIdleTimer}
+        onWheel={restartIdleTimer}
+        onTouchMove={restartIdleTimer}
+      >
         <button
           type="button"
-          onClick={() => setExplanationOpen(false)}
+          onClick={closeExplanation}
           className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/62 transition hover:text-white"
         >
           Back
@@ -159,7 +209,7 @@ function strategyLabel(
 
       <button
         type="button"
-        onClick={() => setExplanationOpen(true)}
+        onClick={openExplanation}
         className="mt-4 block font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-[#AFC0FF]/68 transition hover:text-white"
       >
         What this formula does
@@ -175,4 +225,3 @@ function strategyLabel(
     </section>
   );
 }
-

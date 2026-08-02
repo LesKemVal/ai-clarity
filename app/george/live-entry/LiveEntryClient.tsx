@@ -760,6 +760,29 @@ export default function LiveEntryClient() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    let savedScrollY = "";
+
+    try {
+      savedScrollY =
+        window.sessionStorage.getItem("GEORGE_LIVE_PREP_SCROLL_Y") || "";
+      window.sessionStorage.removeItem("GEORGE_LIVE_PREP_SCROLL_Y");
+    } catch {}
+
+    if (!savedScrollY) return;
+
+    const parsedScrollY = Number(savedScrollY);
+    if (!Number.isFinite(parsedScrollY)) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: parsedScrollY, behavior: "auto" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
     try {
       const stored = JSON.parse(
         window.localStorage.getItem(GEORGE_LIVE_RECOVERY_STORAGE_KEY) || "null",
@@ -2005,6 +2028,18 @@ export default function LiveEntryClient() {
 
   const beginFormulaSelection = () => {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
+
+    try {
+      window.sessionStorage.setItem(
+        "GEORGE_LIVE_PREP_RETURN_URL",
+        window.location.href,
+      );
+      window.sessionStorage.setItem(
+        "GEORGE_LIVE_PREP_SCROLL_Y",
+        String(window.scrollY),
+      );
+    } catch {}
+
     window.location.href = "/george/library?asset=formulas&source=live-prep";
   };
 
