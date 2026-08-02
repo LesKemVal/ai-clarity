@@ -92,6 +92,33 @@ export type OperationalFormulaEvidence = {
   observedAt: number
 }
 
+export type OperationalMarketplaceDistribution =
+  | "private"
+  | "free"
+  | "premium";
+
+export type OperationalMarketplaceAuthority = "BRANESX" | "user";
+
+export type OperationalAssetCommercialPolicy = {
+  distribution: OperationalMarketplaceDistribution;
+  publicationAuthority: OperationalMarketplaceAuthority;
+  priceAuthority: OperationalMarketplaceAuthority;
+  priceCents?: number;
+};
+
+export type OperationalFormulaOwnership =
+  | {
+      kind: "branesx";
+    }
+  | {
+      kind: "co_owned";
+      userId: string;
+    }
+  | {
+      kind: "user";
+      userId: string;
+    };
+
 export type OperationalFormulaVerification = {
   authority: 'BRANESX'
   verified: boolean
@@ -133,6 +160,8 @@ export type OperationalFormulaPublication = {
 export type OperationalFormula = {
   id: string
   version: number
+  ownership?: OperationalFormulaOwnership
+  commercial?: OperationalAssetCommercialPolicy
   scope: OperationalMemoryScope
   ownerId?: string
   name?: string
@@ -198,6 +227,7 @@ export type OperationalScript = {
   id: string
   version: number
   ownerId: string
+  commercial?: OperationalAssetCommercialPolicy
   organizationId?: string
   formulaId: string
   formulaVersion: number

@@ -44,7 +44,8 @@
     "george:publication-lifecycle:qualify": "node scripts/george-publication-lifecycle-qualification.mjs",
     "george:publication-lifecycle-ui:qualify": "node scripts/george-publication-lifecycle-ui-qualification.mjs",
     "george:marketplace-catalog:qualify": "node scripts/george-marketplace-catalog-qualification.mjs",
-    "george:marketplace-entitlement:qualify": "node scripts/george-marketplace-entitlement-qualification.mjs"
+    "george:marketplace-entitlement:qualify": "node scripts/george-marketplace-entitlement-qualification.mjs",
+    "george:marketplace-governance:qualify": "node scripts/george-marketplace-governance-qualification.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",
