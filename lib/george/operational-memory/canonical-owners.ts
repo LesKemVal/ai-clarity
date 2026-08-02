@@ -58,3 +58,14 @@ export {
 export {
   createRedisMarketplaceEntitlementStore,
 } from "./redis-marketplace-entitlement-store";
+export type {
+  OperationalFormulaGovernanceDecision,
+} from "./marketplace-governance-policy";
+export {
+  canUserControlFormulaPublication,
+  canUserControlScriptCommerce,
+  canUserSetFormulaPrice,
+  resolveOperationalFormulaGovernance,
+  resolveOperationalFormulaOwnership,
+  validateOperationalCommercialPolicy,
+} from "./marketplace-governance-policy";
