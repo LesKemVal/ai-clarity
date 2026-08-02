@@ -2345,6 +2345,18 @@ export default function Page({
           "",
       ).trim();
       const liveChair = String((liveSetup as any)?.chair || "").trim();
+      const liveExecutionScript = liveSetup?.customizedScript ?? null;
+
+      if (liveExecutionScript) {
+        console.info("[GEORGE][LIVE][CUSTOMIZED_SCRIPT_READY]", {
+          scriptId: liveExecutionScript.id,
+          scriptVersion: liveExecutionScript.version,
+          formulaId: liveExecutionScript.formulaId,
+          formulaVersion: liveExecutionScript.formulaVersion,
+          lineCount: liveExecutionScript.lines.length,
+          sessionOnly: true,
+        });
+      }
 
       const subscriberMetadata = getSubscriberSessionMetadata();
       if (subscriberMetadata) {

@@ -2412,6 +2412,12 @@ export default function LiveEntryClient() {
               source: selectedFormulaSource,
             }
           : null,
+      customizedScript: customizedScript
+        ? {
+            ...customizedScript,
+            lines: customizedScript.lines.map((line) => ({ ...line })),
+          }
+        : null,
       knownContext,
       briefingKnowledge,
       observedReality: knownContext,

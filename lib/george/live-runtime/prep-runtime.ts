@@ -1,4 +1,5 @@
 import type { LegacyLiveAssistMode, LiveSupportStyle } from './support-style'
+import type { OperationalScript } from '../operational-memory/types'
 
 export type LiveAssistMode = LegacyLiveAssistMode
 
@@ -70,6 +71,11 @@ export type LivePrepSetup = {
     formulaVersion: number
     source: "george" | "user"
   } | null
+  /**
+   * Session-only execution copy selected and customized during LIVE Entry.
+   * This must never be persisted back to the script library.
+   */
+  customizedScript?: OperationalScript | null
   controlWords?: string
   outcomeShiftPhrase?: string
   toneAdjustment?: 'softer' | 'balanced' | 'sharper'
