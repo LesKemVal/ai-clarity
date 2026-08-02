@@ -53,6 +53,7 @@ export type LiveIntentSignals = {
 
 export const LIVE_PREPARATION_SIGNAL_KEYS = [
   'name',
+  'role',
   'conversationContext',
   'desiredOutcome',
 ] as const
@@ -117,16 +118,23 @@ export const LIVE_PREPARATION_QUESTIONS: readonly LivePreparationQuestion[] =
       examples: 'Examples: Lester, Mr. Sawyer, Coach, Dr. Patel.',
     },
     {
+      key: 'role',
+      kicker: 'Role',
+      label: 'Question 2',
+      question: 'What is your role or responsibility in this conversation?',
+      examples: 'Examples: candidate, manager, founder, buyer, seller, parent, advisor.',
+    },
+    {
       key: 'conversationContext',
       kicker: 'Conversation',
-      label: 'Question 2',
+      label: 'Question 3',
       question: 'Tell me everything I need to know about this conversation.',
       examples: 'Describe the people, situation, history, concerns, constraints, and anything that matters.',
     },
     {
       key: 'desiredOutcome',
       kicker: 'Outcome',
-      label: 'Question 3',
+      label: 'Question 4',
       question: 'What outcome are you hoping to achieve?',
       examples: 'Describe the result you want GEORGE to help you move toward.',
     },
@@ -239,6 +247,8 @@ export function buildLivePreparationAcknowledgement(input: {
   switch (input.completedKey) {
     case 'name':
       return `Good. ${nextQuestion}`
+    case 'role':
+      return `I understand your position. ${nextQuestion}`
     case 'conversationContext':
       return `That gives me the context I need. ${nextQuestion}`
     case 'desiredOutcome':
@@ -267,6 +277,8 @@ export function resolveLivePreparationReadiness(
     ),
     percent,
     thresholdMet:
+      Boolean(String(source.name || '').trim()) &&
+      Boolean(String(source.role || '').trim()) &&
       Boolean(String(source.conversationContext || '').trim()) &&
       Boolean(String(source.desiredOutcome || '').trim()),
     complete: completedKeys.length === requiredKeys.length,

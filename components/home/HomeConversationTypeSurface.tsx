@@ -195,9 +195,6 @@ type SurfacePhase =
   | "review";
 
 type FormulaSurfaceMode = "closed" | "review";
-type HomepageDeliveryProfile = "audio_only" | "visual_only" | "audio_visual";
-type HomepageSupportStyle = "advice" | "response";
-type HomepageSpeakingStyle = "Adaptive" | "Executive" | "Conversational";
 
 type FormulaResponse = {
   ok: boolean;
@@ -270,12 +267,6 @@ export function HomeConversationTypeSurface() {
   >([]);
   const [formulaLoading, setFormulaLoading] = useState(false);
   const [formulaError, setFormulaError] = useState("");
-  const [deliveryProfile, setDeliveryProfile] =
-    useState<HomepageDeliveryProfile>("audio_only");
-  const [supportStyle, setSupportStyle] =
-    useState<HomepageSupportStyle>("advice");
-  const [speakingStyle, setSpeakingStyle] =
-    useState<HomepageSpeakingStyle>("Adaptive");
 
   const activeFormula = useMemo(() => {
     if (!selectedType || accessibleFormulas.length === 0) return null;
@@ -471,9 +462,6 @@ export function HomeConversationTypeSurface() {
   function resetSelection() {
     setFormulaSurfaceMode("closed");
     setFormulaError("");
-    setDeliveryProfile("audio_only");
-    setSupportStyle("advice");
-    setSpeakingStyle("Adaptive");
     setSelectedType(null);
     setPhase("selection");
     setIntroStage(0);
@@ -564,48 +552,6 @@ export function HomeConversationTypeSurface() {
     window.setTimeout(() => setPhase("decision"), 260);
   }
 
-  function selectDeliveryProfile(profile: HomepageDeliveryProfile) {
-    const defaultSupportStyle: HomepageSupportStyle =
-      profile === "audio_only" ? "advice" : "response";
-
-    setDeliveryProfile(profile);
-    setSupportStyle(defaultSupportStyle);
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_RECEIVER_PROFILE", profile);
-      window.localStorage.setItem("george_live_entry_receiver_profile", profile);
-      window.localStorage.setItem("george_live_entry_support_preference", profile);
-      window.localStorage.setItem("GEORGE_LIVE_SUPPORT_STYLE", defaultSupportStyle);
-      window.localStorage.setItem("GEORGE_LIVE_DELIVERY_STYLE", defaultSupportStyle);
-      window.localStorage.setItem(
-        "george_live_adaptive_support_preference",
-        defaultSupportStyle === "response" ? "response" : "cue",
-      );
-    } catch {}
-  }
-
-  function selectSupportStyle(style: HomepageSupportStyle) {
-    setSupportStyle(style);
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_SUPPORT_STYLE", style);
-      window.localStorage.setItem("GEORGE_LIVE_DELIVERY_STYLE", style);
-      window.localStorage.setItem(
-        "george_live_adaptive_support_preference",
-        style === "response" ? "response" : "cue",
-      );
-    } catch {}
-  }
-
-  function selectSpeakingStyle(style: HomepageSpeakingStyle) {
-    setSpeakingStyle(style);
-
-    try {
-      window.localStorage.setItem("GEORGE_LIVE_SPEAKING_STYLE", style);
-      window.localStorage.setItem("george_live_entry_speaking_style", style);
-    } catch {}
-  }
-
   function preserveHomepageHandoff() {
     if (!selectedType || !readiness.thresholdMet) return false;
 
@@ -627,11 +573,6 @@ export function HomeConversationTypeSurface() {
           conversationGroup: selectedType.group,
           signals,
           readiness: resolveLivePreparationReadiness(signals),
-          mechanics: {
-            deliveryProfile,
-            supportStyle,
-            speakingStyle,
-          },
           createdAt: Date.now(),
         }),
       );
@@ -1002,7 +943,7 @@ export function HomeConversationTypeSurface() {
                     {decisionText}
                   </h3>
                   <div
-                    className={`mt-7 flex justify-center transition-all duration-500 ${
+                    className={`mt-7 flex flex-wrap justify-center gap-3 transition-all duration-500 ${
                       decisionReady
                         ? "translate-y-0 opacity-100"
                         : "pointer-events-none translate-y-2 opacity-0"
@@ -1010,9 +951,21 @@ export function HomeConversationTypeSurface() {
                   >
                     <button
                       type="button"
-                      onClick={() => setPhase("review")}
+                      onClick={() => {
+                        setEditingQuestionKey("conversationContext");
+                        setActiveQuestionKey("conversationContext");
+                        setPhase("questions");
+                      }}
                       disabled={!readiness.thresholdMet}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      Continue briefing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPhase("review")}
+                      disabled={!readiness.thresholdMet}
+                      className="min-w-[160px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Review briefing
                     </button>
@@ -1055,99 +1008,6 @@ export function HomeConversationTypeSurface() {
                       </div>
                     ))}
                   </div>
-                  <section className="mt-6 rounded-[16px] border border-[#7EA1FF]/[0.16] bg-[#101629]/45 p-4">
-                    <div className="text-center">
-                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/64">
-                        How GEORGE will support you
-                      </div>
-                      <p className="mt-2 text-[12px] leading-5 text-white/48">
-                        Choose how support should reach you. GEORGE uses this
-                        when recommending the formula and script.
-                      </p>
-                    </div>
-
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                      {([
-                        ["audio_only", "Audio", "Adaptive cues"],
-                        ["visual_only", "Visual", "Adaptive response"],
-                        ["audio_visual", "Audio + Visual", "Adaptive response"],
-                      ] as const).map(([id, label, helper]) => {
-                        const active = deliveryProfile === id;
-
-                        return (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={() => selectDeliveryProfile(id)}
-                            className={`rounded-[10px] border px-3 py-3 text-left transition ${
-                              active
-                                ? "border-[#7EA1FF]/55 bg-[#172347]"
-                                : "border-white/[0.08] bg-white/[0.02] hover:border-white/[0.18]"
-                            }`}
-                          >
-                            <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-white/82">
-                              {label}
-                            </span>
-                            <span className="mt-1 block text-[10px] text-white/40">
-                              {helper}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-[12px] border border-white/[0.07] bg-black/15 p-3">
-                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/36">
-                          Adaptive support
-                        </div>
-                        <div className="mt-2 flex gap-2">
-                          {([
-                            ["advice", "Cues"],
-                            ["response", "Response"],
-                          ] as const).map(([id, label]) => (
-                            <button
-                              key={id}
-                              type="button"
-                              onClick={() => selectSupportStyle(id)}
-                              className={`flex-1 rounded-[9px] border px-3 py-2 font-mono text-[8px] font-semibold uppercase tracking-[0.14em] transition ${
-                                supportStyle === id
-                                  ? "border-[#7EA1FF]/45 bg-[#172347] text-white"
-                                  : "border-white/[0.08] text-white/46 hover:text-white"
-                              }`}
-                            >
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="rounded-[12px] border border-white/[0.07] bg-black/15 p-3">
-                        <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/36">
-                          Speaking style
-                        </div>
-                        <div className="mt-2 grid grid-cols-3 gap-2">
-                          {(["Adaptive", "Executive", "Conversational"] as const).map(
-                            (style) => (
-                              <button
-                                key={style}
-                                type="button"
-                                onClick={() => selectSpeakingStyle(style)}
-                                className={`rounded-[9px] border px-2 py-2 font-mono text-[7px] font-semibold uppercase tracking-[0.1em] transition ${
-                                  speakingStyle === style
-                                    ? "border-[#7EA1FF]/45 bg-[#172347] text-white"
-                                    : "border-white/[0.08] text-white/42 hover:text-white"
-                                }`}
-                              >
-                                {style}
-                              </button>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
                   <div className="mt-7 flex justify-center gap-3">
                     <button
                       type="button"
