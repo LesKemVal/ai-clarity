@@ -2005,6 +2005,7 @@ export default function LiveEntryClient() {
 
   const beginFormulaSelection = () => {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
+    window.location.href = "/george/library?asset=formulas&source=live-prep";
   };
 
   const browseFormulaScripts = async (formula: OperationalFormula) => {
