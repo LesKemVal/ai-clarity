@@ -290,6 +290,8 @@ Canonical ownership remains:
 
 - formula contracts, persistence, evidence, reassessment, revision, and lineage: `lib/george/operational-memory/*`;
 - formula retrieval and runtime-evidence policy: `lib/george/operational-memory/*`;
+- script retrieval by formula: `OperationalScriptLibrary`;
+- script retrieval implementation: `RedisScriptLibrary`;
 - conversation-type registry: `lib/george/live-entry/conversation-types.ts`;
 - Operational Library presentation: `app/george/library/*`.
 
@@ -306,7 +308,9 @@ Canonical rules:
 
 ### Recommendation and executed-formula learning boundary
 
-Operational Memory owns retrieval, derivation, reassessment, learning, and recommendation.
+Operational Memory owns formula retrieval, derivation, reassessment, learning, and recommendation.
+
+`OperationalScriptLibrary` owns script retrieval by formula. `RedisScriptLibrary` implements that contract. Operational Memory consumes the contract and does not perform formula-specific script filtering itself.
 
 Recommendation occurs once for the active preparation decision. After the user intentionally selects a formula, the selected `formulaId`, `formulaVersion`, and source become authoritative execution identity.
 

@@ -85,11 +85,17 @@ Operational recommendation is owned by Operational Memory.
 
 Operational Memory remains the single canonical owner of:
 
-- retrieval;
+- formula retrieval;
 - derivation;
 - reassessment;
 - learning;
 - recommendation.
+
+`OperationalScriptLibrary` is the canonical owner of script retrieval by formula. It owns formula matching, optional formula-version matching, and retrieval ordering.
+
+`RedisScriptLibrary` is the canonical implementation of that retrieval contract.
+
+Operational Memory consumes the script-library retrieval contract and does not implement formula-specific script lookup.
 
 Recommendation consumes retrieval evidence. It does not replace retrieval, create another matching path, or move recommendation authority into LIVE Entry, Popup 3, Review Formula, Marketplace, the Operational Library, or an API route.
 
