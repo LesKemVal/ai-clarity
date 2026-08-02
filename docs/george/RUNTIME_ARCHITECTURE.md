@@ -160,6 +160,36 @@ The Operational Library owns presentation, user intent, loading state, confirmat
 
 Marketplace Catalog ownership is established.
 
+### Marketplace Governance Doctrine
+
+Operational formulas and scripts are distinct marketplace assets with separate ownership, publication, and pricing authority.
+
+Formula ownership is one of:
+
+- BRANESX;
+- BRANESX and one user as co-owners;
+- one user.
+
+A formula may never have more than two owners. When co-owned, one owner is always BRANESX.
+
+Formula governance is:
+
+- BRANESX-owned formula: BRANESX controls publication and price;
+- co-owned formula: the user controls whether and how it is published, while BRANESX sets the premium price;
+- user-owned formula: the user controls publication and price.
+
+Script governance is:
+
+- one user owns and names the script;
+- the user decides whether the script is private, free, or premium;
+- the user alone sets the script price;
+- each script is built on one exact formula identity;
+- multiple scripts may be built on the same formula.
+
+Ownership, publication authority, pricing authority, entitlement, verification, and operational validity are separate concerns.
+
+`marketplace-governance-policy.ts` is the canonical governance-policy owner. It does not own publication transitions, entitlement decisions, payment confirmation, fulfillment, formula validation, recommendation, or operational learning.
+
 Canonical catalog flow:
 
 ```text
@@ -341,9 +371,9 @@ Operational-memory retrieval is complete as an architectural path unless product
 
 The Operational Library consumes canonical formula and conversation data. It must not become another registry, formula owner, verification authority, learning system, or runtime.
 
-GEORGE owns the operational formula and its lifecycle.
+Formula ownership is modeled separately from runtime and learning authority. A formula may be owned by BRANESX, co-owned by BRANESX and one user, or owned by one user.
 
-GEORGE owns formula creation, evidence, confidence, success, contradictions, revisions, lineage, reassessment, operational learning, and the decision that a formula remains operationally valid.
+GEORGE owns formula creation, evidence, confidence, success, contradictions, revisions, lineage, reassessment, operational learning, and the decision that a formula remains operationally valid. This authority does not collapse ownership, publication, pricing, entitlement, or commerce into the learning runtime.
 
 BRANESX verifies descriptive metadata claims attached to the formula. It does not verify or replace GEORGE's operational reasoning.
 

@@ -91,7 +91,7 @@ Current reasoning and operational judgment
 
 Formula confidence, success, contradictions, unknowns, evidence, Proven By records, reassessment, revisions, and lineage must remain visible and inspectable.
 
-GEORGE owns operational formulas and their lifecycle. GEORGE creates, evaluates, learns from, reassesses, revises, and determines the continuing operational validity of each formula.
+Formula ownership is separate from operational stewardship. A formula may be owned by BRANESX, co-owned by BRANESX and one user, or owned by one user. GEORGE creates, evaluates, learns from, reassesses, revises, and determines the continuing operational validity of each formula.
 
 BRANESX verifies descriptive metadata claims attached to formulas, including identity, authorship, publisher, Proven By records, marketplace readiness, script references, and verification records. BRANESX does not determine whether the operational reasoning is correct.
 
@@ -907,11 +907,41 @@ Scripts may exist as:
 - shared scripts
 - verified scripts
 
-Verification applies to scripts, not formulas.
+Script-performance verification applies to scripts. Formula verification and publication metadata remain governed separately by BRANESX and the canonical formula lifecycle.
 
 ### Marketplace Doctrine
 
-The marketplace distributes verified scripts.
+### Marketplace Governance Doctrine
+
+Operational formulas and scripts are distinct marketplace assets with separate ownership, publication, and pricing authority.
+
+Formula ownership is one of:
+
+- BRANESX;
+- BRANESX and one user as co-owners;
+- one user.
+
+A formula may never have more than two owners. When co-owned, one owner is always BRANESX.
+
+Formula governance is:
+
+- BRANESX-owned formula: BRANESX controls publication and price;
+- co-owned formula: the user controls whether and how it is published, while BRANESX sets the premium price;
+- user-owned formula: the user controls publication and price.
+
+Script governance is:
+
+- one user owns and names the script;
+- the user decides whether the script is private, free, or premium;
+- the user alone sets the script price;
+- each script is built on one exact formula identity;
+- multiple scripts may be built on the same formula.
+
+Ownership, publication authority, pricing authority, entitlement, verification, and operational validity are separate concerns.
+
+`marketplace-governance-policy.ts` is the canonical governance-policy owner. It does not own publication transitions, entitlement decisions, payment confirmation, fulfillment, formula validation, recommendation, or operational learning.
+
+The marketplace may distribute eligible formulas and scripts under their distinct governance, verification, publication, pricing, and entitlement rules.
 
 Users may browse verified scripts regardless of tier.
 
@@ -932,9 +962,9 @@ Formula = strategy.
 
 Script = execution.
 
-Verification = evidence.
+Verification = governed trust and evidence.
 
-Marketplace = verified execution.
+Marketplace = governed formula and script distribution.
 
 
 ## Operational Asset Doctrine
@@ -991,11 +1021,11 @@ Verification does not change formula ownership.
 
 ### Marketplace
 
-The marketplace distributes verified scripts.
+The marketplace may distribute eligible formulas and scripts under their distinct governance, verification, publication, pricing, and entitlement rules.
 
-Marketplace assets represent proven execution rather than strategy alone.
+Marketplace assets may represent operational strategy through formulas or executable conversation through scripts.
 
-Commercial value derives from demonstrated execution quality supported by operational evidence.
+Commercial value may derive from formula utility, script execution quality, operational evidence, ownership, and the applicable pricing authority.
 
 ### Product Rule
 
@@ -1007,7 +1037,7 @@ Scripts execute conversations.
 
 Verification measures execution.
 
-The Marketplace distributes verified execution.
+The Marketplace distributes governed formulas and governed execution assets.
 
 
 ## Operational Matching Doctrine
