@@ -584,12 +584,7 @@ export function HomeConversationTypeSurface() {
   function approveAndContinueToLive() {
     if (!preserveHomepageHandoff()) return;
     window.location.href =
-      "/george/live-entry?source=homepage&stage=final-check";
-  }
-
-  function continueBriefing() {
-    if (!preserveHomepageHandoff()) return;
-    window.location.href = "/george?source=homepage-briefing";
+      "/george/live-entry?source=homepage&stage=formula";
   }
 
   return (
@@ -948,7 +943,7 @@ export function HomeConversationTypeSurface() {
                     {decisionText}
                   </h3>
                   <div
-                    className={`mt-7 flex flex-wrap gap-3 transition-all duration-500 ${
+                    className={`mt-7 flex justify-center transition-all duration-500 ${
                       decisionReady
                         ? "translate-y-0 opacity-100"
                         : "pointer-events-none translate-y-2 opacity-0"
@@ -958,16 +953,9 @@ export function HomeConversationTypeSurface() {
                       type="button"
                       onClick={() => setPhase("review")}
                       disabled={!readiness.thresholdMet}
-                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                      className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      Continue to LIVE
-                    </button>
-                    <button
-                      type="button"
-                      onClick={continueBriefing}
-                      className="rounded-full border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/72 transition hover:border-white/30 hover:text-white"
-                    >
-                      Continue briefing
+                      Review briefing
                     </button>
                   </div>
                 </div>
@@ -1013,7 +1001,7 @@ export function HomeConversationTypeSurface() {
                       type="button"
                       onClick={approveAndContinueToLive}
                       disabled={!readiness.thresholdMet}
-                      className="rounded-full border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
+                      className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Approve and continue
                     </button>
