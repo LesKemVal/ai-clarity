@@ -256,6 +256,9 @@ export function HomeConversationTypeSurface() {
   const [editingQuestionKey, setEditingQuestionKey] = useState<string | null>(
     null,
   );
+  const [activeQuestionKey, setActiveQuestionKey] = useState<string | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [formulaSurfaceMode, setFormulaSurfaceMode] =
     useState<FormulaSurfaceMode>("closed");
@@ -382,19 +385,15 @@ export function HomeConversationTypeSurface() {
     [visibleCategories],
   );
 
-  const preparationTransition = useMemo(
-    () => resolveLivePreparationTransition(answers),
-    [answers],
-  );
   const readiness = useMemo(
     () => resolveLivePreparationReadiness(answers),
     [answers],
   );
-  const activeQuestion = editingQuestionKey
-    ? LIVE_PREPARATION_QUESTIONS.find(
-        (question) => question.key === editingQuestionKey,
-      ) || null
-    : preparationTransition.question;
+  const activeQuestion =
+    LIVE_PREPARATION_QUESTIONS.find(
+      (question) =>
+        question.key === (editingQuestionKey || activeQuestionKey),
+    ) || null;
   const activeQuestionIndex = activeQuestion
     ? LIVE_PREPARATION_QUESTIONS.findIndex(
         (question) => question.key === activeQuestion.key,
@@ -457,6 +456,7 @@ export function HomeConversationTypeSurface() {
     setIntroStage(0);
     setDecisionReady(false);
     setEditingQuestionKey(null);
+    setActiveQuestionKey(null);
   }
 
   function resetSelection() {
@@ -467,6 +467,7 @@ export function HomeConversationTypeSurface() {
     setIntroStage(0);
     setDecisionReady(false);
     setEditingQuestionKey(null);
+    setActiveQuestionKey(null);
     setAnswers({});
   }
 
@@ -503,8 +504,19 @@ export function HomeConversationTypeSurface() {
   }
 
   function beginQuestions() {
-    setAnswers(loadLivePreparationSignals());
+    const loadedAnswers = loadLivePreparationSignals();
+    const transition = resolveLivePreparationTransition(loadedAnswers);
+
+    setAnswers(loadedAnswers);
     setEditingQuestionKey(null);
+
+    if (!transition.question) {
+      setActiveQuestionKey(null);
+      setPhase("decision");
+      return;
+    }
+
+    setActiveQuestionKey(transition.question.key);
     setPhase("questions");
   }
 
@@ -524,14 +536,20 @@ export function HomeConversationTypeSurface() {
 
     if (editingQuestionKey) {
       setEditingQuestionKey(null);
+      setActiveQuestionKey(null);
       setPhase("review");
       return;
     }
 
     const nextTransition = resolveLivePreparationTransition(nextSignals);
-    if (!nextTransition.question) {
-      window.setTimeout(() => setPhase("decision"), 260);
+
+    if (nextTransition.question) {
+      setActiveQuestionKey(nextTransition.question.key);
+      return;
     }
+
+    setActiveQuestionKey(null);
+    window.setTimeout(() => setPhase("decision"), 260);
   }
 
   function preserveHomepageHandoff() {
@@ -979,6 +997,7 @@ export function HomeConversationTypeSurface() {
                             type="button"
                             onClick={() => {
                               setEditingQuestionKey(question.key);
+                              setActiveQuestionKey(question.key);
                               setPhase("questions");
                             }}
                             className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-[#AEB6FF]/72 transition hover:text-white"
