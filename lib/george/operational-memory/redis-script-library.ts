@@ -118,5 +118,24 @@ export function createRedisOperationalScriptLibrary(): OperationalScriptLibrary 
         .filter((script) => script.ownerId === normalizedOwnerId)
         .sort((left, right) => right.updatedAt - left.updatedAt)
     },
+
+    async listByFormula(ownerId, formulaId, formulaVersion) {
+      const normalizedOwnerId = String(ownerId ?? '').trim()
+      const normalizedFormulaId = String(formulaId ?? '').trim()
+
+      if (!normalizedOwnerId || !normalizedFormulaId) return []
+
+      const scripts = await loadAllScripts()
+
+      return scripts
+        .filter(
+          (script) =>
+            script.ownerId === normalizedOwnerId &&
+            script.formulaId === normalizedFormulaId &&
+            (formulaVersion === undefined ||
+              script.formulaVersion === formulaVersion)
+        )
+        .sort((left, right) => right.updatedAt - left.updatedAt)
+    },
   }
 }
