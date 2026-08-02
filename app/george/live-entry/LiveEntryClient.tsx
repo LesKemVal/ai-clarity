@@ -325,7 +325,7 @@ function PanelShell({
     <main className="relative flex min-h-[100dvh] items-start justify-center overflow-y-auto bg-black px-4 py-5 text-white">
       <div className="relative z-10 w-full max-w-[640px]">
         <div className="mb-2 flex items-center gap-4">
-          <BxPageHeader backLabel="BACK" onBack={onBack} backHref="/" />
+          <BxPageHeader backLabel="BACK" onBack={onBack} />
         </div>
 
         <section className="relative mt-4 w-full overflow-hidden rounded-[28px] bg-[#050505] p-5 shadow-none  sm:p-6">
@@ -537,6 +537,87 @@ export default function LiveEntryClient() {
     useState(false);
   const [showLiveBriefingRoom, setShowLiveBriefingRoom] = useState(false);
   const [liveBriefingStep, setLiveBriefingStep] = useState<1 | 2 | 3>(1);
+  type LivePreparationWorkflowState =
+    | "questions"
+    | "popup1"
+    | "brief_review"
+    | "mechanics"
+    | "prep";
+
+  const livePreparationHistoryRef = useRef<LivePreparationWorkflowState[]>([]);
+
+  const pushLivePreparationState = (
+    state: LivePreparationWorkflowState,
+  ) => {
+    const history = livePreparationHistoryRef.current;
+    if (history[history.length - 1] === state) return;
+    history.push(state);
+  };
+
+  const transitionToLivePreparationState = ({
+    previousState,
+    nextStep,
+  }: {
+    previousState: LivePreparationWorkflowState;
+    nextStep: 1 | 2 | 3;
+  }) => {
+    pushLivePreparationState(previousState);
+    setShowLiveBriefingRoom(true);
+    setLiveBriefingStep(nextStep);
+  };
+
+  const goToPreviousLivePreparationState = () => {
+    const previous = livePreparationHistoryRef.current.pop();
+
+    if (previous === "questions") {
+      setShowLiveBriefingRoom(false);
+      setLiveEntryReadyMessageVisible(false);
+      setShowOpenAISignalSurface(true);
+      return;
+    }
+
+    if (previous === "popup1") {
+      setShowLiveBriefingRoom(true);
+      setLiveBriefingStep(1);
+      return;
+    }
+
+    if (previous === "mechanics") {
+      setShowLiveBriefingRoom(true);
+      setLiveBriefingStep(2);
+      return;
+    }
+
+    if (previous === "prep") {
+      setShowLiveBriefingRoom(true);
+      setLiveBriefingStep(3);
+      return;
+    }
+
+    if (previous === "brief_review") {
+      try {
+        window.sessionStorage.setItem(
+          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
+          "1",
+        );
+      } catch {}
+
+      if (typeof window !== "undefined" && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      window.location.href = "/";
+      return;
+    }
+
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    window.location.href = "/";
+  };
   const [liveBriefingOpenSection, setLiveBriefingOpenSection] = useState<
     | "outcome"
     | "responsibility"
@@ -1443,6 +1524,7 @@ export default function LiveEntryClient() {
         setCustomChair("");
         setLiveRoomObjectiveOption("");
         setCustomLiveRoomObjective("");
+        livePreparationHistoryRef.current = [];
         setLiveBriefingStep(1);
         setLiveBriefingToaAccepted(false);
         setLiveRecoveryAcknowledged(false);
@@ -1504,6 +1586,7 @@ export default function LiveEntryClient() {
          * Homepage owns briefing and mechanics. LIVE Entry joins at the
          * shared preparation surface seen by every route.
          */
+        livePreparationHistoryRef.current = ["brief_review"];
         setLiveBriefingStep(3);
         window.setTimeout(() => {
           void loadOperationalRecommendation();
@@ -1522,6 +1605,7 @@ export default function LiveEntryClient() {
         setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
         setShowOpenAISignalSurface(false);
+        livePreparationHistoryRef.current = [];
         setLiveBriefingStep(2);
         setLiveBriefingToaAccepted(true);
         setLiveBriefingSupportAccepted(false);
@@ -3063,7 +3147,10 @@ export default function LiveEntryClient() {
       <main className="relative min-h-[100dvh] overflow-y-auto bg-black px-5 py-14 text-white sm:px-8 sm:py-20">
         <div className="relative z-10 mx-auto w-full max-w-5xl">
           <div className="mb-6 flex items-center gap-4">
-            <BxPageHeader backLabel="BACK" backHref="/george" />
+            <BxPageHeader
+              backLabel="BACK"
+              onBack={goToPreviousLivePreparationState}
+            />
           </div>
 
           <section className="relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#050505] px-5 py-6 sm:px-8 sm:py-8">
@@ -3224,6 +3311,7 @@ export default function LiveEntryClient() {
                       setCurrentOptionalSignalQuestion(null);
                       setOptionalSignalLoading(false);
                       setLiveEntryMandatoryMode(false);
+                      livePreparationHistoryRef.current = ["questions"];
                       setShowLiveBriefingRoom(true);
                       setLiveBriefingStep(1);
                     }}
@@ -3768,7 +3856,10 @@ export default function LiveEntryClient() {
           <AwakeButton
             active={liveBriefingReadyToContinue}
             onClick={() => {
-              setLiveBriefingStep(2);
+              transitionToLivePreparationState({
+                previousState: "popup1",
+                nextStep: 2,
+              });
             }}
           >
             Continue
@@ -3937,7 +4028,7 @@ export default function LiveEntryClient() {
           label="BRIEF ROOM · MECHANICS"
           title="Mechanics"
           stage={2}
-          onBack={() => setLiveBriefingStep(1)}
+          onBack={goToPreviousLivePreparationState}
         >
           <div className="mt-3 space-y-3">
             <LiveAdaptiveSupportPanel
@@ -4071,7 +4162,10 @@ export default function LiveEntryClient() {
                 type="button"
                 disabled={!liveRecoveryAcknowledged}
                 onClick={() => {
-                  setLiveBriefingStep(3);
+                  transitionToLivePreparationState({
+                    previousState: "mechanics",
+                    nextStep: 3,
+                  });
                   void loadOperationalRecommendation();
                 }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
@@ -4125,19 +4219,7 @@ export default function LiveEntryClient() {
         label="BRIEF ROOM · READINESS"
         title="Ready Room."
         stage={3}
-        onBack={() => {
-          const homepageSource =
-            typeof window !== "undefined" &&
-            new URLSearchParams(window.location.search).get("source") ===
-              "homepage";
-
-          if (homepageSource) {
-            window.history.back();
-            return;
-          }
-
-          setLiveBriefingStep(2);
-        }}
+        onBack={goToPreviousLivePreparationState}
       >
         <div className="mt-4">
           <section className="relative overflow-hidden rounded-[1.2rem] border border-[#61708A]/[0.28] bg-[#080A0D] px-5 py-5">

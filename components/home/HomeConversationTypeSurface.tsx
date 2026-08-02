@@ -401,6 +401,33 @@ export function HomeConversationTypeSurface() {
     : LIVE_PREPARATION_QUESTIONS.length;
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    let shouldRestoreBriefReview = false;
+
+    try {
+      shouldRestoreBriefReview =
+        window.sessionStorage.getItem(
+          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
+        ) === "1";
+
+      if (shouldRestoreBriefReview) {
+        window.sessionStorage.removeItem(
+          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
+        );
+      }
+    } catch {}
+
+    if (!shouldRestoreBriefReview) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      setPhase("review");
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
     if (phase !== "introduction") return;
 
     setIntroStage(0);

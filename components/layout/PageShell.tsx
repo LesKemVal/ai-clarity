@@ -11,6 +11,7 @@ type PageShellProps = {
   title?: string
   eyebrow?: string
   backToGeorge?: boolean
+  backFallbackHref?: string
   withSidebar?: boolean
 }
 
@@ -19,6 +20,7 @@ export default function PageShell({
   title,
   eyebrow,
   backToGeorge = false,
+  backFallbackHref = '/',
   withSidebar = true,
 }: PageShellProps) {
   const [showSidebar, setShowSidebar] = useState(false)
@@ -51,7 +53,7 @@ export default function PageShell({
       return
     }
 
-    window.location.href = '/george'
+    window.location.href = backFallbackHref
   }
 
   const handleInstallGeorge = () => {
