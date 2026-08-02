@@ -166,6 +166,30 @@ export function resolveLivePreparationStep(step: number) {
   })
 }
 
+export function extractEmbeddedDesiredOutcome(
+  value: string | null | undefined,
+): string {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const patterns = [
+    /(?:my goal is|the goal is|my objective is|the objective is)\s+([^.!?]{3,180})/i,
+    /(?:i want|i need|i hope|i'm hoping|i am hoping|i would like|i'd like)\s+to\s+([^.!?]{3,180})/i,
+    /(?:so that|in order to)\s+([^.!?]{3,180})/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    const outcome = String(match?.[1] || "").trim();
+
+    if (outcome) {
+      return outcome.charAt(0).toUpperCase() + outcome.slice(1);
+    }
+  }
+
+  return "";
+}
+
 export function resolveLivePreparationTransition(
   signals: Record<string, unknown> | null | undefined
 ) {

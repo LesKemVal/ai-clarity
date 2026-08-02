@@ -12,6 +12,7 @@ import {
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
   LIVE_PREPARATION_QUESTIONS,
+  extractEmbeddedDesiredOutcome,
   resolveLivePreparationReadiness,
   resolveLivePreparationTransition,
 } from "@/lib/george/live-runtime/live-intent-runtime";
@@ -403,25 +404,20 @@ export function HomeConversationTypeSurface() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    let shouldRestoreBriefReview = false;
-
-    try {
-      shouldRestoreBriefReview =
-        window.sessionStorage.getItem(
-          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
-        ) === "1";
-
-      if (shouldRestoreBriefReview) {
-        window.sessionStorage.removeItem(
-          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
-        );
-      }
-    } catch {}
+    const params = new URLSearchParams(window.location.search);
+    const shouldRestoreBriefReview =
+      params.get("restore") === "brief-review";
 
     if (!shouldRestoreBriefReview) return;
 
+    const restoredAnswers = loadLivePreparationSignals();
+    setAnswers(restoredAnswers);
+    setEditingQuestionKey(null);
+    setActiveQuestionKey(null);
+
     const frame = window.requestAnimationFrame(() => {
       setPhase("review");
+      window.history.replaceState({}, "", window.location.pathname);
     });
 
     return () => window.cancelAnimationFrame(frame);
@@ -553,9 +549,17 @@ export function HomeConversationTypeSurface() {
     const answer = String(answers[activeQuestion.key] || "").trim();
     if (!answer) return;
 
+    const embeddedOutcome =
+      activeQuestion.key === "conversationContext"
+        ? extractEmbeddedDesiredOutcome(answer)
+        : "";
+
     const nextSignals = {
       ...answers,
       [activeQuestion.key]: answer,
+      ...(embeddedOutcome && !String(answers.desiredOutcome || "").trim()
+        ? { desiredOutcome: embeddedOutcome }
+        : {}),
     };
 
     setAnswers(nextSignals);
@@ -667,7 +671,7 @@ export function HomeConversationTypeSurface() {
               </div>
 
               {visibleConversationCount > 0 ? (
-                <div className="grid gap-2 pb-24 sm:grid-cols-2 sm:pb-0 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                <div className="grid grid-cols-2 gap-2 pb-24 sm:pb-0 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                   {visibleCategories.map(({ category, conversationTypes }) => (
                     <Fragment key={category.id}>
                       <CategoryDescriptor category={category} />

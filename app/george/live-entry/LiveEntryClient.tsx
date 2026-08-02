@@ -595,19 +595,7 @@ export default function LiveEntryClient() {
     }
 
     if (previous === "brief_review") {
-      try {
-        window.sessionStorage.setItem(
-          "GEORGE_RETURN_TO_HOME_BRIEF_REVIEW",
-          "1",
-        );
-      } catch {}
-
-      if (typeof window !== "undefined" && window.history.length > 1) {
-        window.history.back();
-        return;
-      }
-
-      window.location.href = "/";
+      window.location.href = "/?restore=brief-review";
       return;
     }
 
