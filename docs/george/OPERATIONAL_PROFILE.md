@@ -114,6 +114,20 @@ Future work must not repeat broad ownership inspection. It should inspect only t
 
 This procedural status does not change current-turn authority: retrieved formulas and profile evidence remain subordinate to explicit user direction, present evidence, active outcomes, and current operational judgment.
 
+## Session Script Customization
+
+A user may customize a selected script for the current LIVE session.
+
+The customized script is a session-only working copy:
+
+- it preserves the selected script and formula identity;
+- it may change execution wording for the present room;
+- it travels through the canonical `LivePrepSetup.customizedScript` handoff;
+- it does not alter the saved, published, marketplace, or source script;
+- it is not persisted back to the script library through the LIVE preparation path.
+
+Session customization supports the current outcome without transferring ownership, changing price, changing publication state, or rewriting historical evidence.
+
 ## One GEORGE
 
 GEORGE is one operational intelligence.

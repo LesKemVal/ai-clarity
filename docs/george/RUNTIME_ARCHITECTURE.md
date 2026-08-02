@@ -357,6 +357,30 @@ Learning may improve later recommendations. It may not reopen the current select
 
 This path creates no second runtime, formula owner, reassessment owner, evolution owner, derivation owner, or learning owner.
 
+### Session-Only Customized Script Handoff
+
+Canonical flow:
+
+```text
+Selected source script
+↓
+Session-only working copy
+↓
+LiveEntryClient
+↓
+LivePrepSetup.customizedScript
+↓
+existing GEORGE_LIVE_SETUP preparation storage
+↓
+LIVE consumer
+↓
+current-session execution context
+```
+
+`LivePrepSetup` owns the handoff contract. LIVE Entry populates it, existing preparation storage transports it, and LIVE consumes it.
+
+The customized copy is execution context only. It must not overwrite the source script, mutate the script library, create another local-storage key, introduce another preparation payload, or establish a second runtime path.
+
 ### Canonical Ownership Inspection Completion
 
 The operational-learning, operational-memory, conversation-type, Operational Library, and LIVE Entry ownership boundaries have been inspected against implementation.

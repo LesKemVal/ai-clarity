@@ -122,6 +122,19 @@ Recommendation restraint requires GEORGE to:
 
 Learning improves future recommendation quality. It does not override, rewrite, or retroactively replace the user's choice.
 
+### Session-Only Customized Script Handoff
+
+`LivePrepSetup` is the canonical payload owner for carrying a customized script from LIVE Entry into LIVE execution.
+
+Ownership remains separated:
+
+- `LiveEntryClient` creates and places the session-only customized working copy into `LivePrepSetup.customizedScript`;
+- the existing `GEORGE_LIVE_SETUP` preparation-storage path transports the complete setup payload;
+- LIVE consumes the optional customized script from that same payload for the current session;
+- the source script, published script, and script-library record remain immutable through this path.
+
+This handoff does not create another storage key, preparation object, runtime, script persistence path, recommendation owner, or execution authority.
+
 ### Executed-formula operational learning
 
 The production learning path preserves the exact formula selected for execution:
