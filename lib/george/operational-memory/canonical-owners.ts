@@ -33,3 +33,11 @@ export {
   invalidateOperationalFormulaPublicationVerification,
   transitionOperationalFormulaPublication,
 } from "./publication-lifecycle-service";
+export type {
+  MarketplaceCatalogEntry,
+  MarketplaceCatalogQuery,
+  MarketplaceCatalogService,
+} from "./marketplace-catalog-service";
+export {
+  createMarketplaceCatalogService,
+} from "./marketplace-catalog-service";
