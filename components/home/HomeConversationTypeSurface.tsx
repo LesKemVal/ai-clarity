@@ -272,6 +272,8 @@ export function HomeConversationTypeSurface() {
   const [optionalQuestion, setOptionalQuestion] =
     useState<HomepageOptionalQuestion | null>(null);
   const [optionalAnswer, setOptionalAnswer] = useState("");
+  const [editingOptionalQuestionKey, setEditingOptionalQuestionKey] =
+    useState<string | null>(null);
   const [optionalAnswers, setOptionalAnswers] = useState<Record<string, string>>({});
   const [optionalQuestionHistory, setOptionalQuestionHistory] =
     useState<Record<string, string>>({});
@@ -759,6 +761,12 @@ export function HomeConversationTypeSurface() {
       );
     } catch {}
 
+    if (editingOptionalQuestionKey) {
+      setEditingOptionalQuestionKey(null);
+      setPhase("review");
+      return;
+    }
+
     void requestHomepageOptionalQuestion(nextAnswers, skippedOptionalQuestions);
   }
 
@@ -774,7 +782,26 @@ export function HomeConversationTypeSurface() {
     void requestHomepageOptionalQuestion(optionalAnswers, nextSkipped);
   }
 
+  function editHomepageOptionalAnswer(key: string) {
+    const question = String(optionalQuestionHistory[key] || "").trim();
+    const answer = String(optionalAnswers[key] || "");
+
+    if (!question) return;
+
+    setEditingOptionalQuestionKey(key);
+    setOptionalQuestion({
+      key,
+      label: "Additional briefing",
+      question,
+      why: "Update this answer without restarting the briefing.",
+      example: "Revise your answer.",
+    });
+    setOptionalAnswer(answer);
+    setPhase("optional");
+  }
+
   function reviewHomepageAnswers() {
+    setEditingOptionalQuestionKey(null);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setPhase("review");
@@ -1349,12 +1376,23 @@ export function HomeConversationTypeSurface() {
                             key={key}
                             className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
                           >
-                            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
-                              {optionalQuestionHistory[key] || "Additional signal"}
-                            </p>
-                            <p className="mt-2 text-[14px] leading-6 text-white/76">
-                              {value}
-                            </p>
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
+                                  {optionalQuestionHistory[key] || "Additional signal"}
+                                </p>
+                                <p className="mt-2 text-[14px] leading-6 text-white/76">
+                                  {value}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => editHomepageOptionalAnswer(key)}
+                                className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-[#AEB6FF]/72 transition hover:text-white"
+                              >
+                                Edit
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
