@@ -297,6 +297,37 @@ export default function OperationalLibraryClient() {
     string | null
   >(null);
   const [historyErrors, setHistoryErrors] = useState<Record<string, string>>({});
+  const [livePrepReturnAvailable, setLivePrepReturnAvailable] =
+    useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const returnUrl = window.sessionStorage.getItem(
+      "GEORGE_LIVE_PREP_RETURN_URL",
+    );
+
+    setLivePrepReturnAvailable(
+      params.get("source") === "live-prep" && Boolean(returnUrl),
+    );
+  }, []);
+
+  function returnToLivePrep() {
+    try {
+      const returnUrl = window.sessionStorage.getItem(
+        "GEORGE_LIVE_PREP_RETURN_URL",
+      );
+
+      if (returnUrl) {
+        window.location.href = returnUrl;
+        return;
+      }
+    } catch {}
+
+    window.location.href =
+      "/george/live-entry?source=homepage&stage=formula&return=live-prep";
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -765,6 +796,18 @@ export default function OperationalLibraryClient() {
 
   return (
     <div className="mt-10 space-y-8">
+      {livePrepReturnAvailable ? (
+        <div className="flex justify-start">
+          <button
+            type="button"
+            onClick={returnToLivePrep}
+            className="rounded-[10px] border border-[#7EA1FF]/35 bg-[#11182A] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/65 hover:bg-[#18213A]"
+          >
+            Back to Ready Room
+          </button>
+        </div>
+      ) : null}
+
       <section className="rounded-xl border border-white/10 p-6">
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="text-lg font-medium">Operational Formulas</h2>

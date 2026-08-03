@@ -705,6 +705,75 @@ export default function LiveEntryClient() {
   const [formulaScripts, setFormulaScripts] = useState<OperationalScript[]>([]);
   const [scriptBrowserError, setScriptBrowserError] = useState("");
   const [recommendationError, setRecommendationError] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("return") !== "live-prep") return;
+
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const rawSnapshot = window.sessionStorage.getItem(
+          "GEORGE_LIVE_PREP_RETURN_STATE",
+        );
+
+        if (!rawSnapshot) return;
+
+        const snapshot = JSON.parse(rawSnapshot) as {
+          livePrepOpenSection?: "formula" | "receiver" | "support" | "brief" | "ready";
+          liveBriefingSupportAccepted?: boolean;
+          liveBriefingActiveSupportStyle?: LiveBriefingSupportPanelId | null;
+          selectedReceiverProfile?: LiveReceiverProfilePanelId;
+          selectedFormula?: OperationalFormula | null;
+          selectedFormulaSource?: FormulaDecisionSource | null;
+          selectedScript?: OperationalScript | null;
+          sourceScript?: OperationalScript | null;
+          customizedScript?: OperationalScript | null;
+          scriptBrowserOpen?: boolean;
+          scriptBrowserFormula?: OperationalFormula | null;
+          livePreparationHistory?: LivePreparationWorkflowState[];
+        };
+
+        setShowLiveBriefingRoom(true);
+        setLiveBriefingStep(3);
+        setLivePrepOpenSection(snapshot.livePrepOpenSection || "formula");
+        setLiveBriefingSupportAccepted(
+          Boolean(snapshot.liveBriefingSupportAccepted),
+        );
+        setLiveBriefingActiveSupportStyle(
+          snapshot.liveBriefingActiveSupportStyle ?? null,
+        );
+
+        if (snapshot.selectedReceiverProfile) {
+          setSelectedReceiverProfile(snapshot.selectedReceiverProfile);
+        }
+
+        setSelectedFormula(snapshot.selectedFormula ?? null);
+        setSelectedFormulaSource(snapshot.selectedFormulaSource ?? null);
+        setSelectedScript(snapshot.selectedScript ?? null);
+        setSourceScript(snapshot.sourceScript ?? null);
+        setCustomizedScript(snapshot.customizedScript ?? null);
+        setScriptBrowserOpen(Boolean(snapshot.scriptBrowserOpen));
+        setScriptBrowserFormula(snapshot.scriptBrowserFormula ?? null);
+
+        if (Array.isArray(snapshot.livePreparationHistory)) {
+          livePreparationHistoryRef.current = snapshot.livePreparationHistory;
+        }
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("return");
+        window.history.replaceState({}, "", cleanUrl.toString());
+      } catch (error) {
+        console.warn(
+          "[GEORGE][LIVE_ENTRY][PREP_RETURN_RESTORE_FAILED]",
+          error,
+        );
+      }
+    }, 0);
+
+    return () => window.clearTimeout(restoreTimer);
+  }, []);
   const [prepRoomProfile, setPrepRoomProfile] =
     useState<PrepRoomResourceProfile | null>(null);
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>(
@@ -2240,15 +2309,40 @@ export default function LiveEntryClient() {
     console.info("[GEORGE][LIVE_ENTRY][FORMULA_SELECTION_REQUESTED]");
 
     try {
+      const returnUrl = new URL(window.location.href);
+      returnUrl.searchParams.set("return", "live-prep");
+
       window.sessionStorage.setItem(
         "GEORGE_LIVE_PREP_RETURN_URL",
-        window.location.href,
+        returnUrl.toString(),
       );
       window.sessionStorage.setItem(
         "GEORGE_LIVE_PREP_SCROLL_Y",
         String(window.scrollY),
       );
-    } catch {}
+      window.sessionStorage.setItem(
+        "GEORGE_LIVE_PREP_RETURN_STATE",
+        JSON.stringify({
+          livePrepOpenSection,
+          liveBriefingSupportAccepted,
+          liveBriefingActiveSupportStyle,
+          selectedReceiverProfile,
+          selectedFormula,
+          selectedFormulaSource,
+          selectedScript,
+          sourceScript,
+          customizedScript,
+          scriptBrowserOpen,
+          scriptBrowserFormula,
+          livePreparationHistory: livePreparationHistoryRef.current,
+        }),
+      );
+    } catch (error) {
+      console.warn(
+        "[GEORGE][LIVE_ENTRY][PREP_RETURN_SAVE_FAILED]",
+        error,
+      );
+    }
 
     window.location.href = "/george/library?asset=formulas&source=live-prep";
   };
