@@ -1318,3 +1318,55 @@ Validated checkpoint:
 - circular dependencies: 0.
 <!-- GEORGE_HOMEPAGE_BRIEFING_VALIDATED_END -->
 
+
+-------------------------------------------------------------------------------
+HOMEPAGE PRODUCT DIRECTION
+-------------------------------------------------------------------------------
+
+The homepage continues evolving toward an outcome-oriented experience.
+
+Conversation types are no longer the primary organizing principle.
+
+Conversation outcomes are effectively unbounded.
+
+The homepage collects only enough operational signal to begin an adaptive
+briefing.
+
+Current direction:
+
+Outcome
+↓
+Role
+↓
+Adaptive Briefing
+↓
+Support Mechanics
+↓
+Formula
+↓
+LIVE
+
+Outcome remains the governing objective.
+
+Role supplies operational context.
+
+OpenAI owns adaptive briefing after the initial homepage selections.
+
+Additional context is discovered during briefing rather than encoded into
+homepage branching.
+
+Preparation is available, not required.
+
+GEORGE cannot determine with certainty how prepared a user is before entering
+LIVE.
+
+The decision to enter LIVE always belongs to the user.
+
+Recommended product copy:
+
+"Prepare with GEORGE first if you'd like. When you're ready, enter LIVE."
+
+If the user enters LIVE immediately, GEORGE adapts using the best operational
+signal available and continues adapting throughout the conversation.
+
+

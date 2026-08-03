@@ -150,3 +150,61 @@ Do not move homepage briefing ownership into LIVE Entry.
 Do not create another optional-question runtime.
 <!-- GEORGE_HOMEPAGE_BRIEFING_CHECKPOINT_END -->
 
+
+-------------------------------------------------------------------------------
+CURRENT PRODUCT DIRECTION
+-------------------------------------------------------------------------------
+
+Immediate priorities
+
+1. Popup 3 navigation recovery
+2. Marketplace presentation
+3. My Library experience
+4. Homepage evolution
+
+Homepage
+
+Outcome remains primary.
+
+Role provides operational context.
+
+OpenAI owns adaptive briefing after initial selections.
+
+Preparation remains optional.
+
+Recommended copy:
+
+"Prepare with GEORGE first if you'd like. When you're ready, enter LIVE."
+
+Marketplace
+
+Formula is the primary operational asset.
+
+Marketplace acquires operational capabilities.
+
+My Library activates operational capabilities.
+
+Ready Room activates assets from My Library.
+
+Formula card standard
+
+Published by BRANESX
+
+Conversation Environment
+
+Conversation Formula
+
+Associated Scripts
+
+Associated Screeners
+
+Future direction
+
+• Formula recommendation from briefing
+• Role-aware adaptive briefing
+• Marketplace recommendation engine
+• Popup 3 refinement
+• Marketplace ↔ Ready Room continuity
+• Formula-first operational marketplace
+
+

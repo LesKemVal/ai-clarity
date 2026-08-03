@@ -1505,3 +1505,84 @@ It must not degrade into a generic homepage redirect when homepage review was th
 
 This architecture introduces no new runtime, OpenAI lane, session authority, readiness owner, or briefing engine.
 <!-- GEORGE_HOMEPAGE_BRIEFING_ARCHITECTURE_END -->
+
+
+-------------------------------------------------------------------------------
+FORMULA & MARKETPLACE DOCTRINE
+-------------------------------------------------------------------------------
+
+Everything in GEORGE exists to improve the user's outcome.
+
+Conversation, preparation, formulas, scripts, screeners, and LIVE are
+operational means toward that end.
+
+Operational Formula is the primary runtime asset.
+
+Formula
+↓
+Scripts
+↓
+Screeners
+
+Formula defines operational strategy.
+
+Scripts implement a Formula.
+
+Screeners support Script execution.
+
+Scripts and Screeners exist in service of a Formula.
+
+Formula remains the canonical operational authority.
+
+Operational Marketplace exists inside the GEORGE ecosystem.
+
+Marketplace distributes operational capabilities.
+
+Marketplace does not distribute downloadable documents.
+
+Operational capabilities influence GEORGE's behavior after activation.
+
+Marketplace
+---------
+Discover
+Acquire
+Save
+
+My Library
+----------
+Owned
+Saved
+Pinned
+Recent
+Favorites
+Activate for this Room
+
+Ready Room activates operational assets from My Library.
+
+Marketplace remains optional after acquisition.
+
+Publisher workflow remains separate from user workflow.
+
+Formula presentation standard:
+
+Formula Name
+
+Published by BRANESX
+
+Conversation Environment
+
+Conversation Formula
+
+Associated Scripts
+
+Associated Screeners
+
+Expanded sections may include:
+
+Versions
+
+Evidence
+
+Related Formulas
+
+
