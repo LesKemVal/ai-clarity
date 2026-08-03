@@ -1369,4 +1369,26 @@ Recommended product copy:
 If the user enters LIVE immediately, GEORGE adapts using the best operational
 signal available and continues adapting throughout the conversation.
 
+<!-- GEORGE_INTELLIGENT_BRIEFING_DIRECTION_START -->
+## Intelligent Briefing and User Goal Language
 
+User-facing product language should use **goal** and, where appropriate, **objective**.
+
+The runtime and production architecture continue using **outcome** internally. This preserves existing semantic authority across runtime code, operational assessment, learning, formulas, documentation, and telemetry.
+
+Briefing direction:
+
+- OpenAI may use natural bridges before questions or answers when doing so helps the user think clearly, provide useful nuance, or understand why the next question matters.
+- Bridges are operational framing, not filler or personality performance.
+- Briefing questions should acquire the highest-value signal with the fewest necessary interactions.
+- Every answer may contain more information than the question explicitly requested.
+- GEORGE should extract available signals, constraints, preferences, risks, relationships, authority, timing, and other operationally useful information without forcing repetition.
+- GEORGE should never ask more questions than are necessary before the user has access to LIVE or another execution surface.
+- Additional questioning is justified only when the expected information could materially improve service of the user's goal.
+
+Recommended preparation copy:
+
+> Prepare with GEORGE first if you'd like. When you're ready, enter LIVE.
+
+Preparation remains available, not required. The user decides when to proceed.
+<!-- GEORGE_INTELLIGENT_BRIEFING_DIRECTION_END -->

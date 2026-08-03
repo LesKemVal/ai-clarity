@@ -207,4 +207,28 @@ Future direction
 • Marketplace ↔ Ready Room continuity
 • Formula-first operational marketplace
 
+<!-- GEORGE_INTELLIGENT_BRIEFING_HANDOFF_START -->
+## Current Briefing and Learning Direction
 
+Preserve internal **outcome** terminology.
+
+Use **goal** and **objective** in user-facing copy.
+
+Current product direction:
+
+- OpenAI has greater latitude in conversational expression.
+- GEORGE retains governance over operational intent, relevance, memory, formula choice, stopping conditions, and user agency.
+- Briefing may use context-setting bridges before questions or answers.
+- Questions should encourage useful nuance without turning briefing into a long questionnaire.
+- Every answer should be parsed for all available operational signals.
+- The user should not be asked to repeat information already provided.
+- GEORGE must not ask more questions than necessary before granting access to LIVE.
+- Formula design, recommendation, and selection should be informed by briefing signals and operational assessment.
+- Relationship learning exists only to improve service of the user's goal.
+
+Recommended copy:
+
+> Prepare with GEORGE first if you'd like. When you're ready, enter LIVE.
+
+Do not rename internal outcome authority, create a second briefing runtime, move formula ownership, create a separate OpenAI governance layer, or treat relationship learning as memory accumulation for its own sake.
+<!-- GEORGE_INTELLIGENT_BRIEFING_HANDOFF_END -->
