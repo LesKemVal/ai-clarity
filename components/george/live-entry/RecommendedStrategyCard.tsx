@@ -231,7 +231,7 @@ export function RecommendedStrategyCard({
           onClick={onContinue}
           className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7898FF]/55 bg-[#4E7CFF] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:bg-[#5B86FF]"
         >
-          Continue
+          Use this formula
         </button>
       )}
     </section>
