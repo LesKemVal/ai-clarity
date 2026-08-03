@@ -583,7 +583,13 @@ export function HomeConversationTypeSurface() {
     window.setTimeout(() => setPhase("decision"), 260);
   }
 
-  function preserveHomepageHandoff() {
+  type HomepageBriefingAction =
+    | "continue_briefing"
+    | "review_brief";
+
+  function preserveHomepageHandoff(
+    workflowAction: HomepageBriefingAction,
+  ) {
     if (!selectedType || !readiness.thresholdMet) return false;
 
     const signals = Object.fromEntries(
@@ -604,6 +610,7 @@ export function HomeConversationTypeSurface() {
           conversationGroup: selectedType.group,
           signals,
           readiness: resolveLivePreparationReadiness(signals),
+          workflowAction,
           createdAt: Date.now(),
         }),
       );
@@ -612,8 +619,16 @@ export function HomeConversationTypeSurface() {
     return true;
   }
 
+  function continueHomepageBriefing() {
+    if (!preserveHomepageHandoff("continue_briefing")) return;
+
+    window.location.href =
+      "/george/live-entry?source=homepage&stage=briefing";
+  }
+
   function approveAndContinueToLive() {
-    if (!preserveHomepageHandoff()) return;
+    if (!preserveHomepageHandoff("review_brief")) return;
+
     window.location.href =
       "/george/live-entry?source=homepage&stage=formula";
   }
@@ -982,11 +997,7 @@ export function HomeConversationTypeSurface() {
                   >
                     <button
                       type="button"
-                      onClick={() => {
-                        setEditingQuestionKey("conversationContext");
-                        setActiveQuestionKey("conversationContext");
-                        setPhase("questions");
-                      }}
+                      onClick={continueHomepageBriefing}
                       disabled={!readiness.thresholdMet}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >

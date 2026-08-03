@@ -1484,6 +1484,16 @@ export default function LiveEntryClient() {
         }
       }
 
+      const homepageWorkflowAction = String(
+        (
+          homepageHandoff as
+            | (HomepageLiveHandoff & {
+                workflowAction?: "continue_briefing" | "review_brief";
+              })
+            | null
+        )?.workflowAction || "",
+      );
+
       const isStartSource = source === "start";
 
       if (isStartSource) {
@@ -1555,7 +1565,71 @@ export default function LiveEntryClient() {
 
       setPreLivePreviewReady(preLiveReady);
 
-      if (entryResolution.firstStep === "prep" && homepageHandoff) {
+      if (
+        homepageWorkflowAction === "continue_briefing" &&
+        homepageHandoff
+      ) {
+        setPreLiveSignals(acquiredSignalsForAccess);
+        setLiveEntryMandatoryMode(false);
+        setLiveEntryReadyMessageVisible(false);
+        setCurrentOptionalSignalQuestion(null);
+        setOptionalSignalInput("");
+        setOptionalSignalLoading(false);
+        setOptionalSignalComplete(false);
+        setShowLiveBriefingRoom(false);
+        setShowOpenAISignalSurface(true);
+
+        const homepageConversationType = String(
+          homepageHandoff.conversationType || "",
+        ).trim();
+
+        if (homepageConversationType) {
+          const knownHomepageRoom = CONVERSATION_TYPES.some(
+            (option) => option.label === homepageConversationType,
+          );
+
+          setConversationType(
+            knownHomepageRoom ? homepageConversationType : "Other",
+          );
+
+          if (!knownHomepageRoom) {
+            setCustomConversationType(homepageConversationType);
+          }
+        }
+
+        const homepageSignals =
+          acquiredSignalsForAccess as Record<string, unknown>;
+
+        const homepageOutcome = String(
+          homepageSignals.desiredOutcome || "",
+        ).trim();
+        const homepageContext = String(
+          homepageSignals.conversationContext || "",
+        ).trim();
+        const homepageRole = String(
+          homepageSignals.role || "",
+        ).trim();
+
+        if (homepageOutcome) {
+          setObjective(homepageOutcome);
+        }
+
+        if (homepageContext) {
+          setKnownContext(homepageContext);
+        }
+
+        if (homepageRole) {
+          setUserPosition(homepageRole);
+        }
+
+        window.localStorage.removeItem(
+          "GEORGE_HOMEPAGE_LIVE_HANDOFF",
+        );
+      } else if (
+        homepageWorkflowAction === "review_brief" &&
+        entryResolution.firstStep === "prep" &&
+        homepageHandoff
+      ) {
         setPreLiveSignals(acquiredSignalsForAccess);
         setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
