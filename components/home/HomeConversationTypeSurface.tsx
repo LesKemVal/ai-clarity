@@ -193,6 +193,7 @@ type SurfacePhase =
   | "introduction"
   | "questions"
   | "decision"
+  | "optional"
   | "review";
 
 type FormulaSurfaceMode = "closed" | "review";
@@ -201,6 +202,14 @@ type FormulaResponse = {
   ok: boolean;
   formulas?: OperationalFormula[];
   error?: string;
+};
+
+type HomepageOptionalQuestion = {
+  key: string;
+  label: string;
+  question: string;
+  why: string;
+  example: string;
 };
 
 function useTypewriter(text: string, enabled: boolean, speed = 28) {
@@ -260,6 +269,15 @@ export function HomeConversationTypeSurface() {
   const [activeQuestionKey, setActiveQuestionKey] = useState<string | null>(
     null,
   );
+  const [optionalQuestion, setOptionalQuestion] =
+    useState<HomepageOptionalQuestion | null>(null);
+  const [optionalAnswer, setOptionalAnswer] = useState("");
+  const [optionalAnswers, setOptionalAnswers] = useState<Record<string, string>>({});
+  const [optionalQuestionHistory, setOptionalQuestionHistory] =
+    useState<Record<string, string>>({});
+  const [skippedOptionalQuestions, setSkippedOptionalQuestions] =
+    useState<string[]>([]);
+  const [optionalQuestionLoading, setOptionalQuestionLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [formulaSurfaceMode, setFormulaSurfaceMode] =
     useState<FormulaSurfaceMode>("closed");
@@ -415,6 +433,41 @@ export function HomeConversationTypeSurface() {
     setEditingQuestionKey(null);
     setActiveQuestionKey(null);
 
+    try {
+      const rawSnapshot = window.sessionStorage.getItem(
+        "GEORGE_HOMEPAGE_BRIEF_REVIEW_SNAPSHOT",
+      );
+
+      if (rawSnapshot) {
+        const snapshot = JSON.parse(rawSnapshot) as {
+          conversationTypeId?: string;
+          answers?: Record<string, string>;
+          optionalAnswers?: Record<string, string>;
+          optionalQuestionHistory?: Record<string, string>;
+        };
+
+        const restoredConversation = CONVERSATION_TYPES.find(
+          (option) => option.id === snapshot.conversationTypeId,
+        );
+
+        if (restoredConversation) {
+          setSelectedType(restoredConversation);
+        }
+
+        if (snapshot.answers) {
+          setAnswers(snapshot.answers);
+        }
+
+        if (snapshot.optionalAnswers) {
+          setOptionalAnswers(snapshot.optionalAnswers);
+        }
+
+        if (snapshot.optionalQuestionHistory) {
+          setOptionalQuestionHistory(snapshot.optionalQuestionHistory);
+        }
+      }
+    } catch {}
+
     const frame = window.requestAnimationFrame(() => {
       setPhase("review");
       window.history.replaceState({}, "", window.location.pathname);
@@ -468,9 +521,14 @@ export function HomeConversationTypeSurface() {
     24,
   );
   const decisionText = useTypewriter(
-    "You can continue directly into LIVE now, or remain here and continue briefing GEORGE.",
+    "GEORGE has enough information to prepare for LIVE. Review the brief now, or continue briefing with optional follow-up questions.",
     phase === "decision",
     24,
+  );
+  const optionalQuestionText = useTypewriter(
+    optionalQuestion?.question || "",
+    phase === "optional" && Boolean(optionalQuestion),
+    18,
   );
 
   function selectConversation(conversationType: ConversationType) {
@@ -480,6 +538,13 @@ export function HomeConversationTypeSurface() {
     setDecisionReady(false);
     setEditingQuestionKey(null);
     setActiveQuestionKey(null);
+    setAnswers({});
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setOptionalAnswers({});
+    setOptionalQuestionHistory({});
+    setSkippedOptionalQuestions([]);
+    setOptionalQuestionLoading(false);
   }
 
   function resetSelection() {
@@ -492,6 +557,12 @@ export function HomeConversationTypeSurface() {
     setEditingQuestionKey(null);
     setActiveQuestionKey(null);
     setAnswers({});
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setOptionalAnswers({});
+    setOptionalQuestionHistory({});
+    setSkippedOptionalQuestions([]);
+    setOptionalQuestionLoading(false);
   }
 
   function beginPreparation() {
@@ -521,16 +592,22 @@ export function HomeConversationTypeSurface() {
       return;
     }
 
-    if (phase === "review") {
+    if (phase === "optional") {
       setPhase("decision");
+      return;
+    }
+
+    if (phase === "review") {
+      setPhase(Object.keys(optionalAnswers).length > 0 ? "optional" : "decision");
     }
   }
 
   function beginQuestions() {
-    const loadedAnswers = loadLivePreparationSignals();
-    const transition = resolveLivePreparationTransition(loadedAnswers);
+    const freshAnswers: Record<string, string> = {};
+    const transition = resolveLivePreparationTransition(freshAnswers);
 
-    setAnswers(loadedAnswers);
+    setAnswers(freshAnswers);
+    saveLivePreparationSignals(freshAnswers);
     setEditingQuestionKey(null);
 
     if (!transition.question) {
@@ -583,9 +660,127 @@ export function HomeConversationTypeSurface() {
     window.setTimeout(() => setPhase("decision"), 260);
   }
 
-  type HomepageBriefingAction =
-    | "continue_briefing"
-    | "review_brief";
+  async function requestHomepageOptionalQuestion(
+    priorAnswers = optionalAnswers,
+    skippedQuestions = skippedOptionalQuestions,
+  ) {
+    if (!selectedType) return;
+
+    setOptionalQuestionLoading(true);
+
+    try {
+      const response = await fetch("/api/george/live/signal-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: answers.role || "",
+          desiredOutcome: answers.desiredOutcome || "",
+          acceptableOutcome: "",
+          audience: "",
+          room: selectedType.title,
+          knownContext: answers.conversationContext || "",
+          documentSummary: "",
+          priorAnswers,
+          skippedQuestions,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (
+        payload?.status === "sufficient" ||
+        !String(payload?.question || "").trim()
+      ) {
+        setOptionalQuestion(null);
+        setOptionalAnswer("");
+        setPhase("review");
+        return;
+      }
+
+      const nextQuestion: HomepageOptionalQuestion = {
+        key: String(payload.key || `signal_${Date.now()}`),
+        label: String(payload.label || "Additional signal"),
+        question: String(payload.question || ""),
+        why: String(
+          payload.why ||
+            payload.helper ||
+            "This answer may materially improve GEORGE's preparation.",
+        ),
+        example: String(payload.example || "Answer if useful, or skip."),
+      };
+
+      setOptionalQuestion(nextQuestion);
+      setOptionalQuestionHistory((current) => ({
+        ...current,
+        [nextQuestion.key]: nextQuestion.question,
+      }));
+      setOptionalAnswer("");
+      setPhase("optional");
+    } catch {
+      const fallbackQuestion: HomepageOptionalQuestion = {
+        key: `fallback_${Date.now()}`,
+        label: "Additional signal",
+        question: "What should GEORGE be especially ready for in this room?",
+        why: "This answer may materially improve GEORGE's preparation.",
+        example: "Answer if useful, or skip.",
+      };
+
+      setOptionalQuestion(fallbackQuestion);
+      setOptionalQuestionHistory((current) => ({
+        ...current,
+        [fallbackQuestion.key]: fallbackQuestion.question,
+      }));
+      setOptionalAnswer("");
+      setPhase("optional");
+    } finally {
+      setOptionalQuestionLoading(false);
+    }
+  }
+
+  function submitHomepageOptionalAnswer() {
+    if (!optionalQuestion) return;
+
+    const answer = optionalAnswer.trim();
+    if (!answer) return;
+
+    const nextAnswers = {
+      ...optionalAnswers,
+      [optionalQuestion.key]: answer,
+    };
+
+    setOptionalAnswers(nextAnswers);
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+
+    try {
+      window.localStorage.setItem(
+        "GEORGE_PRE_LIVE_OPTIONAL_SIGNALS",
+        JSON.stringify(nextAnswers),
+      );
+    } catch {}
+
+    void requestHomepageOptionalQuestion(nextAnswers, skippedOptionalQuestions);
+  }
+
+  function skipHomepageOptionalQuestion() {
+    if (!optionalQuestion) return;
+
+    const nextSkipped = [...skippedOptionalQuestions, optionalQuestion.key];
+
+    setSkippedOptionalQuestions(nextSkipped);
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+
+    void requestHomepageOptionalQuestion(optionalAnswers, nextSkipped);
+  }
+
+  function reviewHomepageAnswers() {
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setPhase("review");
+  }
+
+  type HomepageBriefingAction = "review_brief";
 
   function preserveHomepageHandoff(
     workflowAction: HomepageBriefingAction,
@@ -610,6 +805,7 @@ export function HomeConversationTypeSurface() {
           conversationGroup: selectedType.group,
           signals,
           readiness: resolveLivePreparationReadiness(signals),
+          optionalSignals: optionalAnswers,
           workflowAction,
           createdAt: Date.now(),
         }),
@@ -620,14 +816,28 @@ export function HomeConversationTypeSurface() {
   }
 
   function continueHomepageBriefing() {
-    if (!preserveHomepageHandoff("continue_briefing")) return;
+    if (!selectedType || !readiness.thresholdMet) return;
 
-    window.location.href =
-      "/george/live-entry?source=homepage&stage=briefing";
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setPhase("optional");
+    void requestHomepageOptionalQuestion();
   }
 
   function approveAndContinueToLive() {
     if (!preserveHomepageHandoff("review_brief")) return;
+
+    try {
+      window.sessionStorage.setItem(
+        "GEORGE_HOMEPAGE_BRIEF_REVIEW_SNAPSHOT",
+        JSON.stringify({
+          conversationTypeId: selectedType?.id || "",
+          answers,
+          optionalAnswers,
+          optionalQuestionHistory,
+        }),
+      );
+    } catch {}
 
     window.location.href =
       "/george/live-entry?source=homepage&stage=formula";
@@ -983,9 +1193,86 @@ export function HomeConversationTypeSurface() {
                 </div>
               )}
 
+              {phase === "optional" && (
+                <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
+                    {optionalQuestion?.label || "Optional briefing"}
+                  </div>
+
+                  {optionalQuestionLoading && !optionalQuestion ? (
+                    <div className="mt-5 rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-5">
+                      <p className="font-mono text-[14px] leading-7 text-white/68">
+                        GEORGE is reviewing the brief for the next useful question...
+                      </p>
+                    </div>
+                  ) : optionalQuestion ? (
+                    <>
+                      <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
+                        {optionalQuestionText}
+                      </h3>
+                      <p className="mt-2 max-w-3xl text-[12px] leading-5 text-white/42">
+                        {optionalQuestion.why}
+                      </p>
+                      <textarea
+                        autoFocus
+                        value={optionalAnswer}
+                        onChange={(event) => setOptionalAnswer(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && !event.shiftKey) {
+                            event.preventDefault();
+                            submitHomepageOptionalAnswer();
+                          }
+                        }}
+                        rows={3}
+                        placeholder={optionalQuestion.example}
+                        className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
+                      />
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                        <button
+                          type="button"
+                          onClick={reviewHomepageAnswers}
+                          className="rounded-[10px] border border-white/[0.14] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/68 transition hover:border-white/30 hover:text-white"
+                        >
+                          Start Live
+                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={skipHomepageOptionalQuestion}
+                            disabled={optionalQuestionLoading}
+                            className="rounded-[10px] border border-white/[0.12] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/25 hover:text-white disabled:opacity-30"
+                          >
+                            Skip
+                          </button>
+                          <button
+                            type="button"
+                            onClick={submitHomepageOptionalAnswer}
+                            disabled={optionalQuestionLoading || !optionalAnswer.trim()}
+                            className="rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-30"
+                          >
+                            Continue
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={reviewHomepageAnswers}
+                      className="mt-5 rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white"
+                    >
+                          Start Live
+                        </button>
+                  )}
+                </div>
+              )}
+
               {phase === "decision" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  <h3 className="min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
+                    ✓ Core briefing complete
+                  </div>
+                  <h3 className="mt-3 min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
                     {decisionText}
                   </h3>
                   <div
@@ -1009,7 +1296,7 @@ export function HomeConversationTypeSurface() {
                       disabled={!readiness.thresholdMet}
                       className="min-w-[160px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      Review briefing
+                      Start Live
                     </button>
                   </div>
                 </div>
@@ -1050,6 +1337,30 @@ export function HomeConversationTypeSurface() {
                       </div>
                     ))}
                   </div>
+
+                  {Object.keys(optionalAnswers).length > 0 && (
+                    <div className="mt-6">
+                      <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/46">
+                        Additional briefing
+                      </div>
+                      <div className="mt-3 space-y-3">
+                        {Object.entries(optionalAnswers).map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
+                          >
+                            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
+                              {optionalQuestionHistory[key] || "Additional signal"}
+                            </p>
+                            <p className="mt-2 text-[14px] leading-6 text-white/76">
+                              {value}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mt-7 flex justify-center gap-3">
                     <button
                       type="button"
