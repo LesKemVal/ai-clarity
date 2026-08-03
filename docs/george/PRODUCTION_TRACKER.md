@@ -1264,3 +1264,57 @@ The next change after this tracker synchronization is synchronization of:
 ```text
 docs/george/RUNTIME_ARCHITECTURE.md
 ```
+
+<!-- GEORGE_HOMEPAGE_BRIEFING_VALIDATED_START -->
+## Homepage LIVE Briefing — Validated
+
+The homepage now owns homepage-origin LIVE briefing from conversation selection through approved brief review.
+
+Validated flow:
+
+```text
+Homepage conversation selection
+↓
+fresh mandatory briefing
+↓
+core briefing complete
+↓
+user decision
+├─ Continue Briefing
+│  ↓
+│  optional OpenAI follow-up on the homepage
+│  ↓
+│  Start Live
+│
+└─ Start Live
+   ↓
+   homepage brief review
+   ↓
+   Popup 3 readiness review
+   ↓
+   LIVE
+```
+
+Validated production behavior:
+
+- selecting a new conversation starts a fresh homepage briefing;
+- stale answers from another conversation do not silently satisfy readiness;
+- mandatory briefing is sufficient to continue toward LIVE;
+- optional OpenAI questioning begins only after explicit user choice;
+- optional questioning remains on the homepage and reuses the canonical `/api/george/live/signal-question` authority;
+- **Start Live** preserves review-first routing;
+- homepage-origin preparation does not enter Quick LIVE, Traditional briefing, Popup 1, or Mechanics;
+- Popup 3 Back restores the exact homepage brief-review state, including selected conversation and optional briefing answers.
+
+Validated checkpoint:
+
+- branch: `homepage-fresh-briefing-owner`;
+- commit: `f4ef6b0`;
+- recovery tag: `homepage-briefing-stable-20260803-022911`;
+- production build: PASS;
+- duplicate canonical owners: 0;
+- non-canonical imports: 0;
+- layer violations: 0;
+- circular dependencies: 0.
+<!-- GEORGE_HOMEPAGE_BRIEFING_VALIDATED_END -->
+

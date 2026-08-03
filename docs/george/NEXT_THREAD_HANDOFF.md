@@ -1,6 +1,6 @@
 # GEORGE PRODUCTION CONTINUATION — NO DRIFT
 
-Branch: `live-hub-runtime`
+Branch: `homepage-fresh-briefing-owner`
 
 ## FIRST
 
@@ -95,3 +95,58 @@ Small commits only.
 Never commit a failed build.
 
 No drift.
+
+<!-- GEORGE_HOMEPAGE_BRIEFING_CHECKPOINT_START -->
+## CURRENT VALIDATED CHECKPOINT
+
+Branch: `homepage-fresh-briefing-owner`
+
+Commit: `f4ef6b0`
+
+Recovery tag: `homepage-briefing-stable-20260803-022911`
+
+Production build: PASS.
+
+Validated homepage flow:
+
+```text
+Conversation selection
+↓
+fresh mandatory briefing
+↓
+core briefing complete
+↓
+Continue Briefing or Start Live
+↓
+optional OpenAI follow-up on homepage, when chosen
+↓
+homepage brief review
+↓
+Popup 3
+↓
+LIVE
+```
+
+Validated behavior:
+
+- stale answers do not skip a newly selected conversation's mandatory briefing;
+- optional OpenAI follow-up stays on the homepage;
+- Start Live routes through homepage brief review before Popup 3;
+- homepage-origin preparation does not enter Quick LIVE, Traditional briefing, Popup 1, or Mechanics;
+- Popup 3 Back restores the exact homepage review state;
+- full production build and ownership audit pass.
+
+Current next work:
+
+- inspect and repair the next Popup 3 issue shown in product validation;
+- complete Formula Library return behavior and empty-state formula experience;
+- continue Traditional Popup 1 progressive-disclosure polish;
+- preserve the validated homepage briefing architecture.
+
+Do not redesign the briefing system.
+
+Do not move homepage briefing ownership into LIVE Entry.
+
+Do not create another optional-question runtime.
+<!-- GEORGE_HOMEPAGE_BRIEFING_CHECKPOINT_END -->
+

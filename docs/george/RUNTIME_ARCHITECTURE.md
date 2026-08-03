@@ -1443,3 +1443,65 @@ docs/george/NEXT_THREAD_HANDOFF.md
 ```
 
 The tracker owns phase and readiness status. This document owns architectural boundaries. Current work proceeds through Popup 3 correction, canonical motion, materials, color, micro-interactions, and final product-experience refinement without reopening runtime architecture.
+
+<!-- GEORGE_HOMEPAGE_BRIEFING_ARCHITECTURE_START -->
+## Homepage and Traditional Briefing Surfaces
+
+GEORGE has one briefing capability and one optional-question reasoning authority.
+
+Homepage and Traditional are different presentation surfaces over that same intelligence. They are not separate briefing runtimes, separate reasoning systems, or separate session authorities.
+
+Canonical surface flow:
+
+```text
+Shared briefing capability
+├─ Homepage surface
+│  ├─ conversation selection
+│  ├─ fresh mandatory briefing
+│  ├─ optional OpenAI follow-up
+│  ├─ homepage brief review
+│  └─ approved `review_brief` handoff
+│
+└─ Traditional surface
+   ├─ traditional questioning
+   ├─ Popup 1
+   ├─ Mechanics
+   └─ preparation progression
+
+Both surfaces converge at Popup 3
+↓
+LIVE
+```
+
+Canonical ownership:
+
+- `components/home/HomeConversationTypeSurface.tsx` owns homepage briefing presentation, homepage-local progression, mandatory-question display, optional-question display, and homepage brief review;
+- `/api/george/live/signal-question` remains the shared optional-question reasoning authority;
+- `lib/george/live-runtime/live-intent-runtime.ts` remains the canonical preparation-readiness and mandatory-transition authority;
+- `app/george/live-entry/LiveEntryClient.tsx` consumes the approved homepage handoff and owns Popup 3 and LIVE-entry continuation;
+- Popup 1 and Mechanics remain Traditional preparation surfaces;
+- Popup 3 is the convergence surface before LIVE.
+
+Homepage-origin preparation must not fall through to:
+
+```text
+Quick LIVE picker
+Traditional briefing
+Popup 1
+Mechanics
+```
+
+The homepage handoff carries approved briefing state into LIVE Entry. LIVE Entry must not restart or reinterpret the homepage briefing.
+
+Back navigation is semantic state restoration:
+
+```text
+Popup 3 Back
+↓
+homepage brief-review state restoration
+```
+
+It must not degrade into a generic homepage redirect when homepage review was the prior state.
+
+This architecture introduces no new runtime, OpenAI lane, session authority, readiness owner, or briefing engine.
+<!-- GEORGE_HOMEPAGE_BRIEFING_ARCHITECTURE_END -->
