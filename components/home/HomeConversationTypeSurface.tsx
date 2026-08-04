@@ -788,7 +788,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setIntroStage(0);
 
     const introductionText =
-      "The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.";
+      selectedRole?.summary ||
+      "GEORGE will carry the selected role and goal into preparation.";
     const typewriterDuration = introductionText.length * 24;
 
     const typewriterTimer = window.setTimeout(() => setIntroStage(1), 180);
