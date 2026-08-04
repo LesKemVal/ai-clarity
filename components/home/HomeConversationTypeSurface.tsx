@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CONVERSATION_TYPES,
   type ConversationType,
@@ -28,6 +28,274 @@ type ConversationCategory = {
   description: string;
   conversationTypeIds: readonly string[];
 };
+
+type HomepageRole = {
+  id: string;
+  label: string;
+  category: string;
+  conversationTypeId: string;
+  featured?: boolean;
+  summary: string;
+  capabilities: readonly string[];
+};
+
+function SelectionAcknowledgement({ label }: { label: string }) {
+  return (
+    <div className="mt-2 inline-flex max-w-full items-center rounded-[12px] border border-white/[0.14] bg-white/[0.03] px-4 py-2">
+      <span className="truncate font-mono text-[14px] font-semibold uppercase tracking-[0.12em] text-white sm:text-[15px]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+const HOMEPAGE_ROLES: readonly HomepageRole[] = [
+  {
+    id: "telemarketer",
+    label: "Telemarketer",
+    category: "Sales & Outreach",
+    conversationTypeId: "set-appointment",
+    featured: true,
+    summary:
+      "Make repeated calls with a consistent opening, recover quickly, handle objections, and adapt as the session produces evidence.",
+    capabilities: [
+      "Openings and first impressions",
+      "Pacing and conversational control",
+      "Gatekeeper and screener handling",
+      "Objection handling",
+      "Recovery after difficult moments",
+      "Appointment setting",
+      "Consistency across high call volume",
+      "Adapting when another strategy performs better",
+    ],
+  },
+  {
+    id: "salesperson",
+    label: "Salesperson",
+    category: "Sales & Outreach",
+    conversationTypeId: "discovery-call",
+    featured: true,
+    summary:
+      "Move a prospect toward the next decision with stronger discovery, explanation, objection handling, and closing language.",
+    capabilities: [
+      "Discovery and qualification",
+      "Rhetorical flow",
+      "Value framing",
+      "Objection handling",
+      "Transitions",
+      "Closing and next steps",
+      "Recovery",
+      "Adapting to buyer reaction",
+    ],
+  },
+  {
+    id: "influencer",
+    label: "Influencer",
+    category: "Presentation & Media",
+    conversationTypeId: "create-a-broadcast-script",
+    featured: true,
+    summary:
+      "Present from a teleprompter, laptop, camera, microphone, livestream, or interview with greater control and audience awareness.",
+    capabilities: [
+      "Rhetorical flow",
+      "Pacing",
+      "Emphasis",
+      "Transitions",
+      "Recovery",
+      "Audience engagement",
+      "Clarity and confidence",
+      "Adapting to audience reaction",
+    ],
+  },
+  {
+    id: "founder",
+    label: "Founder",
+    category: "Business & Leadership",
+    conversationTypeId: "investor-pitch",
+    featured: true,
+    summary:
+      "Lead consequential conversations with investors, partners, customers, teams, and the public while staying anchored to the goal.",
+    capabilities: [
+      "Pitch structure",
+      "Executive presence",
+      "Clear explanation",
+      "Handling difficult questions",
+      "Negotiation",
+      "Transitions",
+      "Recovery",
+      "Maintaining the objective",
+    ],
+  },
+  {
+    id: "attorney",
+    label: "Attorney",
+    category: "Legal",
+    conversationTypeId: "make-my-case",
+    featured: true,
+    summary:
+      "Organize arguments, question effectively, respond under pressure, and present a position with precision.",
+    capabilities: [
+      "Argument structure",
+      "Question sequencing",
+      "Rhetorical emphasis",
+      "Responding under pressure",
+      "Transitions",
+      "Recovery",
+      "Clarity",
+      "Adapting to the listener or forum",
+    ],
+  },
+  {
+    id: "recruiter",
+    label: "Recruiter",
+    category: "Sales & Outreach",
+    conversationTypeId: "networking-conversation",
+    featured: true,
+    summary:
+      "Attract, evaluate, and move candidates through conversations while adapting to motivation, hesitation, and fit.",
+    capabilities: [
+      "Candidate engagement",
+      "Discovery",
+      "Opportunity framing",
+      "Handling hesitation",
+      "Pacing",
+      "Follow-up",
+      "Recovery",
+      "Adapting to candidate reaction",
+    ],
+  },
+  {
+    id: "account-executive",
+    label: "Account Executive",
+    category: "Sales & Outreach",
+    conversationTypeId: "close-the-sale",
+    summary: "Advance complex opportunities through discovery, negotiation, stakeholder alignment, and closing.",
+    capabilities: ["Discovery", "Stakeholder alignment", "Negotiation", "Objection handling", "Closing", "Recovery"],
+  },
+  {
+    id: "customer-service-representative",
+    label: "Customer Service Representative",
+    category: "Service & Support",
+    conversationTypeId: "resolve-customer-complaint",
+    summary: "Identify the issue quickly, de-escalate when needed, explain clearly, and move toward resolution.",
+    capabilities: ["Issue identification", "De-escalation", "Clarity", "Empathy", "Resolution", "Escalation judgment"],
+  },
+  {
+    id: "real-estate-agent",
+    label: "Real Estate Agent",
+    category: "Advisory & Property",
+    conversationTypeId: "real-estate-offer",
+    summary: "Guide buyers, sellers, and prospects through offers, objections, negotiation, and next steps.",
+    capabilities: ["Prospecting", "Needs discovery", "Offer presentation", "Negotiation", "Objection handling", "Closing"],
+  },
+  {
+    id: "financial-advisor",
+    label: "Financial Advisor",
+    category: "Advisory & Property",
+    conversationTypeId: "secure-financing",
+    summary: "Explain complex choices clearly, build trust, surface concerns, and guide a client toward an informed decision.",
+    capabilities: ["Trust building", "Clear explanation", "Discovery", "Risk communication", "Questions", "Next steps"],
+  },
+  {
+    id: "insurance-agent",
+    label: "Insurance Agent",
+    category: "Advisory & Property",
+    conversationTypeId: "insurance-claim",
+    summary: "Explain coverage, identify needs, answer objections, and guide the conversation toward an appropriate decision.",
+    capabilities: ["Needs discovery", "Coverage explanation", "Objection handling", "Trust", "Follow-up", "Closing"],
+  },
+  {
+    id: "manager",
+    label: "Manager",
+    category: "Business & Leadership",
+    conversationTypeId: "performance-review",
+    summary: "Lead meetings, feedback, performance, alignment, and difficult conversations with clarity and control.",
+    capabilities: ["Meeting leadership", "Feedback", "Alignment", "Difficult conversations", "Clarity", "Recovery"],
+  },
+  {
+    id: "consultant",
+    label: "Consultant",
+    category: "Business & Leadership",
+    conversationTypeId: "present-my-proposal",
+    summary: "Present recommendations, explain tradeoffs, answer challenges, and move clients toward a decision.",
+    capabilities: ["Recommendation structure", "Presentation", "Question handling", "Clarity", "Persuasion", "Next steps"],
+  },
+  {
+    id: "plaintiff",
+    label: "Plaintiff",
+    category: "Legal",
+    conversationTypeId: "make-a-civil-case",
+    summary: "Prepare to explain events, impact, evidence, and the result being sought with clarity and consistency.",
+    capabilities: ["Chronology", "Clarity", "Evidence framing", "Question response", "Composure", "Recovery"],
+  },
+  {
+    id: "defendant",
+    label: "Defendant",
+    category: "Legal",
+    conversationTypeId: "make-a-criminal-case",
+    summary: "Prepare to communicate clearly under pressure while preserving consistency, composure, and the intended position.",
+    capabilities: ["Clear response", "Composure", "Question handling", "Consistency", "Recovery", "Pacing"],
+  },
+  {
+    id: "witness",
+    label: "Witness",
+    category: "Legal",
+    conversationTypeId: "make-my-case",
+    summary: "Answer carefully, stay within what is known, maintain clarity, and recover when questioning becomes difficult.",
+    capabilities: ["Question response", "Pacing", "Clarity", "Composure", "Consistency", "Recovery"],
+  },
+  {
+    id: "podcaster",
+    label: "Podcaster",
+    category: "Presentation & Media",
+    conversationTypeId: "record-a-podcast",
+    summary: "Structure episodes and interviews, maintain flow, recover naturally, and keep listeners engaged.",
+    capabilities: ["Flow", "Interview transitions", "Pacing", "Emphasis", "Recovery", "Audience engagement"],
+  },
+  {
+    id: "public-speaker",
+    label: "Public Speaker",
+    category: "Presentation & Media",
+    conversationTypeId: "deliver-a-keynote",
+    summary: "Deliver presentations with stronger pacing, emphasis, transitions, audience engagement, and recovery.",
+    capabilities: ["Rhetorical flow", "Pacing", "Emphasis", "Transitions", "Audience engagement", "Recovery"],
+  },
+  {
+    id: "teacher",
+    label: "Teacher",
+    category: "Education",
+    conversationTypeId: "teach-a-lesson",
+    summary: "Explain ideas clearly, maintain attention, transition between concepts, and adapt to learner response.",
+    capabilities: ["Explanation", "Pacing", "Transitions", "Engagement", "Questions", "Adaptation"],
+  },
+  {
+    id: "student",
+    label: "Student",
+    category: "Education",
+    conversationTypeId: "present-my-proposal",
+    summary: "Present, interview, participate, and explain ideas with greater clarity, confidence, and structure.",
+    capabilities: ["Presentation", "Interview response", "Clarity", "Confidence", "Pacing", "Recovery"],
+  },
+];
+
+const FEATURED_HOMEPAGE_ROLES = HOMEPAGE_ROLES.filter((role) => role.featured);
+
+const HOMEPAGE_GOALS = [
+  "Close a sale",
+  "Set an appointment",
+  "Negotiate",
+  "Present an idea",
+  "Win an interview",
+  "Resolve a conflict",
+  "Educate",
+  "Persuade",
+  "Defend a position",
+  "Build trust",
+  "Explain something",
+  "Other...",
+] as const;
+
+
 
 const CONVERSATION_CATEGORIES: readonly ConversationCategory[] = [
   {
@@ -190,6 +458,7 @@ function CategoryDescriptor({ category }: { category: ConversationCategory }) {
 type SurfacePhase =
   | "selection"
   | "selected"
+  | "goal"
   | "introduction"
   | "questions"
   | "decision"
@@ -232,22 +501,35 @@ function useTypewriter(text: string, enabled: boolean, speed = 28) {
   return value;
 }
 
-function ConversationTypeCard({
-  conversationType,
+function HomepageRoleCard({
+  role,
   onSelect,
+  featured = false,
 }: {
-  conversationType: ConversationType;
-  onSelect: (conversationType: ConversationType) => void;
+  role: HomepageRole;
+  onSelect: (role: HomepageRole) => void;
+  featured?: boolean;
 }) {
   return (
     <button
       type="button"
-      onClick={() => onSelect(conversationType)}
-      className="group flex min-h-[64px] items-center justify-between gap-3 rounded-[14px] border border-white/[0.08] bg-[#08090A] px-4 py-3 text-left transition-[border-color,background-color,transform] duration-200 hover:border-white/[0.16] hover:bg-[#0D0F12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99]"
+      onClick={() => onSelect(role)}
+      className={`group flex items-center justify-between gap-3 rounded-[14px] border text-left transition-[border-color,background-color,transform] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7EA1FF]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-[0.99] ${
+        featured
+          ? "min-h-[88px] border-[#7EA1FF]/28 bg-[#10172A] px-5 py-4 hover:border-[#AEB6FF]/55 hover:bg-[#151F39]"
+          : "min-h-[64px] border-white/[0.08] bg-[#08090A] px-4 py-3 hover:border-white/[0.16] hover:bg-[#0D0F12]"
+      }`}
     >
-      <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
-        {conversationType.title}
-      </h3>
+      <div>
+        <h3 className="font-mono text-[11px] font-semibold uppercase leading-5 tracking-[0.16em] text-white">
+          {role.label}
+        </h3>
+        {featured ? (
+          <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-white/48">
+            {role.summary}
+          </p>
+        ) : null}
+      </div>
       <span className="shrink-0 text-[14px] text-white/72 transition group-hover:translate-x-0.5 group-hover:text-white">
         →
       </span>
@@ -260,6 +542,11 @@ export function HomeConversationTypeSurface() {
   const [selectedType, setSelectedType] = useState<ConversationType | null>(
     null,
   );
+  const [selectedRole, setSelectedRole] = useState<HomepageRole | null>(null);
+
+const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+
+  const [showAllRoles, setShowAllRoles] = useState(false);
   const [phase, setPhase] = useState<SurfacePhase>("selection");
   const [introStage, setIntroStage] = useState(0);
   const [decisionReady, setDecisionReady] = useState(false);
@@ -366,45 +653,42 @@ export function HomeConversationTypeSurface() {
     setFormulaError("");
   }
 
-  const visibleCategories = useMemo(() => {
+  const visibleRoleGroups = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const typeById = new Map(
-      CONVERSATION_TYPES.filter((item) => item.title !== "Other").map((item) => [
-        item.id,
-        item,
-      ]),
-    );
-
-    return CONVERSATION_CATEGORIES.map((category) => {
-      const categoryMatches = [category.label, category.description]
+    const roles = HOMEPAGE_ROLES.filter((role) => {
+      if (!query) return true;
+      return [
+        role.label,
+        role.category,
+        role.summary,
+        ...role.capabilities,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(query);
+    });
 
-      const conversationTypes = category.conversationTypeIds
-        .map((id) => typeById.get(id))
-        .filter((item): item is ConversationType => Boolean(item))
-        .filter(
-          (item) =>
-            !query ||
-            categoryMatches ||
-            [item.title, item.description, item.initialization]
-              .join(" ")
-              .toLowerCase()
-              .includes(query),
-        );
+    const groups = new Map<string, HomepageRole[]>();
 
-      return { category, conversationTypes };
-    }).filter(({ conversationTypes }) => conversationTypes.length > 0);
+    for (const role of roles) {
+      const current = groups.get(role.category) || [];
+      current.push(role);
+      groups.set(role.category, current);
+    }
+
+    return Array.from(groups.entries()).map(([category, categoryRoles]) => ({
+      category,
+      roles: categoryRoles,
+    }));
   }, [searchQuery]);
 
-  const visibleConversationCount = useMemo(
+  const visibleRoleCount = useMemo(
     () =>
-      visibleCategories.reduce(
-        (count, category) => count + category.conversationTypes.length,
+      visibleRoleGroups.reduce(
+        (count, group) => count + group.roles.length,
         0,
       ),
-    [visibleCategories],
+    [visibleRoleGroups],
   );
 
   const readiness = useMemo(
@@ -455,6 +739,11 @@ export function HomeConversationTypeSurface() {
 
         if (restoredConversation) {
           setSelectedType(restoredConversation);
+          setSelectedRole(
+            HOMEPAGE_ROLES.find(
+              (role) => role.conversationTypeId === restoredConversation.id,
+            ) || null,
+          );
         }
 
         if (snapshot.answers) {
@@ -548,8 +837,16 @@ export function HomeConversationTypeSurface() {
     18,
   );
 
-  function selectConversation(conversationType: ConversationType) {
+  function selectRole(role: HomepageRole) {
+    const conversationType = CONVERSATION_TYPES.find(
+      (option) => option.id === role.conversationTypeId,
+    );
+
+    if (!conversationType) return;
+
+    setSelectedRole(role);
     setSelectedType(conversationType);
+    setSelectedGoal(null);
     setPhase("selected");
     setIntroStage(0);
     setDecisionReady(false);
@@ -568,6 +865,8 @@ export function HomeConversationTypeSurface() {
     setFormulaSurfaceMode("closed");
     setFormulaError("");
     setSelectedType(null);
+    setSelectedRole(null);
+    setSelectedGoal(null);
     setPhase("selection");
     setIntroStage(0);
     setDecisionReady(false);
@@ -582,6 +881,22 @@ export function HomeConversationTypeSurface() {
     setOptionalQuestionLoading(false);
   }
 
+  function selectGoal(goal: string) {
+    const normalizedGoal = goal.trim();
+    if (!normalizedGoal || normalizedGoal === "Other...") return;
+
+    const nextSignals = {
+      ...answers,
+      role: selectedRole?.label || answers.role || "",
+      desiredOutcome: normalizedGoal,
+    };
+
+    setSelectedGoal(normalizedGoal);
+    setAnswers(nextSignals);
+    saveLivePreparationSignals(nextSignals);
+    setPhase("introduction");
+  }
+
   function beginPreparation() {
     setPhase("introduction");
   }
@@ -591,6 +906,11 @@ export function HomeConversationTypeSurface() {
 
     if (phase === "selected") {
       resetSelection();
+      return;
+    }
+
+    if (phase === "goal") {
+      setPhase("selected");
       return;
     }
 
@@ -620,7 +940,11 @@ export function HomeConversationTypeSurface() {
   }
 
   function beginQuestions() {
-    const freshAnswers: Record<string, string> = {};
+    const freshAnswers: Record<string, string> = {
+      ...answers,
+      role: answers.role || selectedRole?.label || "",
+      desiredOutcome: answers.desiredOutcome || selectedGoal || "",
+    };
     const transition = resolveLivePreparationTransition(freshAnswers);
 
     setAnswers(freshAnswers);
@@ -895,71 +1219,87 @@ export function HomeConversationTypeSurface() {
       <div className="mx-auto w-full max-w-[1700px]">
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
-            <div className="max-w-5xl">
+            <div className="max-w-6xl">
               <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-white/88">
                 BRANESX
               </p>
-              <h1 className="mt-4 font-mono text-[34px] font-black uppercase leading-[0.94] tracking-[-0.065em] sm:text-[54px]">
-                What do you want GEORGE to help you do?
+              <h1 className="mt-4 max-w-6xl font-mono text-[34px] font-black uppercase leading-[0.98] tracking-[-0.06em] sm:text-[54px]">
+                If success depends on what you say, how you say it, or how you adapt while saying it, GEORGE can help.
               </h1>
               <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Choose the closest conversation type, or describe what you want
-                to accomplish.
+                Choose the role that feels most like you. GEORGE will show how it can help before asking what you are trying to accomplish.
               </p>
 
-              <label className="mt-8 block max-w-3xl">
-                <span className="sr-only">Search conversation types</span>
-                <div className="mb-3 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white/42">
-                  Whatever you'd like to discuss
+              <div className="mt-10">
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-white/46">
+                  Featured roles
                 </div>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Describe what you want to accomplish"
-                  className="w-full rounded-[16px] border border-white/[0.1] bg-[#08090A] px-5 py-4 text-[15px] text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-                />
-              </label>
-            </div>
-
-            <div className="mt-9">
-              <div className="mb-5 flex items-center justify-between gap-2 sm:gap-3">
-                <div className="inline-flex rounded-[10px] border border-[#7EA1FF]/28 bg-[#4E7CFF]/72 px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white shadow-[0_8px_24px_rgba(20,61,168,0.14)]">
-                  Infinite Conversations
-                </div>
-                {searchQuery.trim() && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38 transition hover:text-white/78"
-                  >
-                    Clear search
-                  </button>
-                )}
-              </div>
-
-              {visibleConversationCount > 0 ? (
-                <div className="grid grid-cols-2 gap-2 pb-24 sm:pb-0 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                  {visibleCategories.map(({ category, conversationTypes }) => (
-                    <Fragment key={category.id}>
-                      <CategoryDescriptor category={category} />
-                      {conversationTypes.map((conversationType) => (
-                        <ConversationTypeCard
-                          key={conversationType.id}
-                          conversationType={conversationType}
-                          onSelect={selectConversation}
-                        />
-                      ))}
-                    </Fragment>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {FEATURED_HOMEPAGE_ROLES.map((role) => (
+                    <HomepageRoleCard
+                      key={role.id}
+                      role={role}
+                      featured
+                      onSelect={selectRole}
+                    />
                   ))}
                 </div>
-              ) : (
-                <div className="rounded-[18px] border border-white/[0.08] bg-[#08090A] px-5 py-6">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/48">
-                    No close match yet. Try a broader description.
-                  </p>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAllRoles((current) => !current)}
+                  className="rounded-[10px] border border-white/[0.14] bg-white/[0.025] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white"
+                >
+                  {showAllRoles ? "Hide roles" : "View all roles"}
+                </button>
+                <span className="text-[12px] text-white/38">
+                  Roles are included when conversation or presentation materially affects success.
+                </span>
+              </div>
+
+              {showAllRoles ? (
+                <div className="mt-8 animate-[fadeIn_320ms_ease-out]">
+                  <label className="block max-w-3xl">
+                    <span className="sr-only">Search roles</span>
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      placeholder="Search roles or describe how you communicate"
+                      className="w-full rounded-[16px] border border-white/[0.1] bg-[#08090A] px-5 py-4 text-[15px] text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
+                    />
+                  </label>
+
+                  {visibleRoleCount > 0 ? (
+                    <div className="mt-7 space-y-8 pb-24 sm:pb-0">
+                      {visibleRoleGroups.map((group) => (
+                        <section key={group.category}>
+                          <div className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/46">
+                            {group.category}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                            {group.roles.map((role) => (
+                              <HomepageRoleCard
+                                key={role.id}
+                                role={role}
+                                onSelect={selectRole}
+                              />
+                            ))}
+                          </div>
+                        </section>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-6 rounded-[18px] border border-white/[0.08] bg-[#08090A] px-5 py-6">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/48">
+                        No close role match yet. Choose the nearest role; OpenAI will adapt during briefing.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         ) : (
@@ -973,12 +1313,12 @@ export function HomeConversationTypeSurface() {
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="whitespace-nowrap font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-white">
-                      Conversation type
+                      How GEORGE Can Help
                     </div>
 
-                    <h2 className="mt-2 font-mono text-[21px] font-semibold uppercase leading-tight tracking-[-0.025em] text-white sm:text-[25px]">
-                      {selectedType?.title}
-                    </h2>
+                    <SelectionAcknowledgement
+                      label={selectedRole?.label || selectedType?.title || "Selected role"}
+                    />
                   </div>
 
                   <div
@@ -1015,28 +1355,29 @@ export function HomeConversationTypeSurface() {
                 <div className="pt-6">
                   {formulaSurfaceMode === "closed" ? (
                     <div className="animate-[fadeIn_420ms_ease-out]">
-                      <button
-                        type="button"
-                        onClick={openFormulaReview}
-                        className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/46 transition hover:text-white"
-                      >
-                        Review Formula →
-                      </button>
-
-                      <div className="mt-6 max-w-3xl">
-                        <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-white">
-                          With your voice.
-                        </div>
-
-                        <p className="mt-3 text-[15px] leading-7 text-white/58">
-                          {selectedType?.description}
+                      <div className="mt-4 max-w-3xl">
+                        <p className="text-[14px] leading-6 text-white/62 sm:text-[15px]">
+                          {selectedRole?.summary || selectedType?.description}
                         </p>
+
+                        {selectedRole ? (
+                          <div className="mt-5 grid gap-1.5 sm:grid-cols-2">
+                            {selectedRole.capabilities.map((capability) => (
+                              <div
+                                key={capability}
+                                className="min-h-[44px] rounded-[10px] border border-white/[0.07] bg-white/[0.018] px-3 py-2.5 text-[12px] leading-5 text-white/62"
+                              >
+                                {capability}
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
 
-                      <div className="mt-7 grid grid-cols-2 gap-3">
+                      <div className="mt-6 grid grid-cols-2 gap-3">
                         <button
                           type="button"
-                          onClick={beginPreparation}
+                          onClick={() => setPhase("goal")}
                           className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-150 hover:border-white hover:bg-white hover:text-[#111318] focus-visible:border-white focus-visible:bg-white focus-visible:text-[#111318]"
                         >
                           Continue →
@@ -1121,6 +1462,82 @@ export function HomeConversationTypeSurface() {
                       </button>
                     </div>
                   )}
+                </div>
+              )}
+
+              {phase === "goal" && (
+                <div className="pt-6 animate-[fadeIn_360ms_ease-out]">
+                  <div className="max-w-3xl">
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
+                      Goal
+                    </div>
+
+                    <h3 className="mt-3 font-mono text-[22px] font-semibold leading-8 tracking-[-0.035em] text-white sm:text-[28px] sm:leading-9">
+                      What is your goal?
+                    </h3>
+
+                    <p className="mt-2 text-[13px] leading-6 text-white/42">
+                      Choose the outcome that best describes what you need this
+                      conversation or presentation to accomplish.
+                    </p>
+                  </div>
+
+                  <div className="mt-6 grid gap-2 sm:grid-cols-2">
+                    {HOMEPAGE_GOALS.filter((goal) => goal !== "Other...").map(
+                      (goal) => (
+                        <button
+                          key={goal}
+                          type="button"
+                          onClick={() => selectGoal(goal)}
+                          className="min-h-[48px] rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-white/72 transition hover:border-[#7EA1FF]/45 hover:bg-[#11182A] hover:text-white"
+                        >
+                          {goal}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <div className="mt-5 rounded-[12px] border border-white/[0.08] bg-white/[0.015] p-3">
+                    <label
+                      htmlFor="homepage-custom-goal"
+                      className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white/42"
+                    >
+                      Or describe your goal
+                    </label>
+
+                    <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                      <input
+                        id="homepage-custom-goal"
+                        value={selectedGoal || ""}
+                        onChange={(event) => setSelectedGoal(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            selectGoal(selectedGoal || "");
+                          }
+                        }}
+                        placeholder="What needs to happen?"
+                        className="h-11 min-w-0 flex-1 rounded-[9px] border border-white/[0.09] bg-black/40 px-3 text-[14px] text-white outline-none placeholder:text-white/24 focus:border-[#7EA1FF]/55"
+                      />
+
+                      <button
+                        type="button"
+                        disabled={!String(selectedGoal || "").trim()}
+                        onClick={() => selectGoal(selectedGoal || "")}
+                        className="h-11 rounded-[9px] border border-[#7EA1FF]/42 bg-[#11182A] px-5 font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-white transition hover:border-white disabled:cursor-not-allowed disabled:opacity-35"
+                      >
+                        Continue →
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    className="mt-5 h-9 rounded-[9px] border border-white/[0.10] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/52 transition hover:border-white/25 hover:text-white"
+                  >
+                    ← Back
+                  </button>
                 </div>
               )}
 
