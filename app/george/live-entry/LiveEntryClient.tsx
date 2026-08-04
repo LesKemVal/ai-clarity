@@ -57,7 +57,6 @@ import {
 } from "@/lib/george/live-voice/runtime/recovery-options";
 import { buildOutcomeTestedBriefingSupport } from "@/lib/george/live-runtime/live-entry-briefing";
 import { prepareConversationFromPackage } from "@/lib/george/preparation/runtime.mjs";
-import { getConversationResponsibilityOptions } from "@/lib/george/live-entry/responsibility-options";
 import {
   estimateResources,
   estimateWithResources,
@@ -805,21 +804,8 @@ export default function LiveEntryClient() {
   >([]);
   const [exampleIndex, setExampleIndex] = useState(0);
   const [preLivePreviewReady, setPreLivePreviewReady] = useState(false);
-  const [liveEntryMandatoryMode, setLiveEntryMandatoryMode] = useState(false);
   const [liveEntryReadyMessageVisible, setLiveEntryReadyMessageVisible] =
     useState(false);
-  const [mandatorySignalStep, setMandatorySignalStep] = useState(0);
-  const [mandatorySignalInput, setMandatorySignalInput] = useState("");
-  const [
-    selectedConversationResponsibilities,
-    setSelectedConversationResponsibilities,
-  ] = useState<string[]>([]);
-  const [
-    customConversationResponsibility,
-    setCustomConversationResponsibility,
-  ] = useState("");
-  const [typedMandatorySignalQuestion, setTypedMandatorySignalQuestion] =
-    useState("");
   const [founderAccessReady, setFounderAccessReady] = useState(false);
 
   const [proofTranscript, setProofTranscript] = useState<
@@ -1005,178 +991,6 @@ export default function LiveEntryClient() {
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== "not_related";
 
-  const responsibilitySelectionLimit =
-    tier === "brilliant" ? 12 : tier === "intelligent" ? 2 : 1;
-
-  const responsibilityLimitCopy =
-    tier === "brilliant"
-      ? "Select every role you carry in this conversation."
-      : tier === "intelligent"
-        ? "Select up to 2 responsibilities."
-        : "Select the responsibility that matters most.";
-
-  const suggestedConversationResponsibilities = useMemo(
-    () =>
-      getConversationResponsibilityOptions(
-        preLiveSignals.desiredOutcome || objective || "",
-      ),
-    [objective, preLiveSignals.desiredOutcome],
-  );
-
-  const toggleConversationResponsibility = (value: string) => {
-    setSelectedConversationResponsibilities((current) => {
-      if (current.includes(value))
-        return current.filter((item) => item !== value);
-      if (current.length >= responsibilitySelectionLimit) return current;
-      return [...current, value];
-    });
-  };
-
-  const conversationResponsibilityAnswer = useMemo(() => {
-    const selected = selectedConversationResponsibilities.filter(
-      (item) => item !== "Other",
-    );
-    const other = customConversationResponsibility.trim();
-
-    return [...selected, other ? `Other: ${other}` : ""]
-      .filter(Boolean)
-      .join(", ");
-  }, [customConversationResponsibility, selectedConversationResponsibilities]);
-
-  const liveEntryMandatoryQuestions = useMemo(
-    () => [
-      {
-        key: "name",
-        kicker: "LIVE ENTRY",
-        label: "Signal 1",
-        question: "What should I call you in this conversation?",
-        helper:
-          "Name, title, nickname, or whatever people in the conversation will recognize.",
-        example: "Lester, Mr. Sawyer, Dr. Patel, Alex, Coach, etc.",
-      },
-      {
-        key: "desiredOutcome",
-        kicker: "OUTCOME SIGNAL",
-        label: "Signal 2",
-        question: "What outcome do you want from this conversation?",
-        helper: "Minimum signal for competence. More signal for excellence.",
-        example:
-          "Secure a second meeting. Leave with a treatment plan. Get agreement on next steps.",
-      },
-      {
-        key: "role",
-        kicker: "RESPONSIBILITY SIGNAL",
-        label: "Signal 3",
-        question: "Who are you and what is your role in this conversation?",
-        helper:
-          "Your role helps GEORGE understand your perspective, responsibilities, authority, and how best to support you.",
-        example:
-          "Interviewee, founder, CEO, presenter, decision maker, parent, advisor, lead negotiator, coach, etc.",
-      },
-    ],
-    [],
-  );
-
-  const currentMandatorySignalQuestion = liveEntryMandatoryMode
-    ? liveEntryMandatoryQuestions[mandatorySignalStep]
-    : null;
-
-  useEffect(() => {
-    if (!currentMandatorySignalQuestion?.question) {
-      setTypedMandatorySignalQuestion("");
-      return;
-    }
-
-    let index = 0;
-    setTypedMandatorySignalQuestion("");
-
-    const timer = window.setInterval(() => {
-      index += 1;
-      setTypedMandatorySignalQuestion(
-        currentMandatorySignalQuestion.question.slice(0, index),
-      );
-
-      if (index >= currentMandatorySignalQuestion.question.length) {
-        window.clearInterval(timer);
-      }
-    }, 26);
-
-    return () => window.clearInterval(timer);
-  }, [currentMandatorySignalQuestion?.key]);
-
-  const submitMandatoryLiveEntrySignal = () => {
-    if (!currentMandatorySignalQuestion) return false;
-
-    const key = currentMandatorySignalQuestion.key;
-    const answer =
-      key === "role"
-        ? conversationResponsibilityAnswer.trim()
-        : mandatorySignalInput.trim();
-
-    if (!answer) return false;
-    const nextSignals = {
-      ...preLiveSignals,
-      [key]: answer,
-    };
-
-    setPreLiveSignals(nextSignals);
-
-    if (key === "name") {
-      try {
-        window.localStorage.setItem("george_name", answer);
-        window.localStorage.setItem("george_profile_name", answer);
-        window.localStorage.setItem("george_user_name", answer);
-      } catch {}
-    }
-
-    if (key === "role") {
-      setUserPosition(answer);
-      setChairs(["Other"]);
-      setCustomChair(answer);
-    }
-
-    if (key === "desiredOutcome") {
-      setObjective(answer);
-      setKnownContext((current) => {
-        const existing = current.trim();
-        const line = `Desired outcome: ${answer}`;
-        return existing ? `${existing}\n${line}` : line;
-      });
-    }
-
-    try {
-      saveLivePreparationSignals(nextSignals);
-      window.localStorage.setItem(
-        `GEORGE_PRE_LIVE_${key.toUpperCase()}`,
-        answer,
-      );
-    } catch {}
-
-    setMandatorySignalInput("");
-    setSelectedConversationResponsibilities([]);
-    setCustomConversationResponsibility("");
-
-    const nextStep = mandatorySignalStep + 1;
-
-    if (nextStep >= liveEntryMandatoryQuestions.length) {
-      setLiveEntryMandatoryMode(false);
-      setLiveEntryReadyMessageVisible(true);
-      setMandatorySignalStep(0);
-      setPreLivePreviewReady(true);
-      setShowOpenAISignalSurface(true);
-
-      try {
-        markLivePreparationPreviewReady();
-        window.localStorage.setItem("george_start_new_live", "1");
-      } catch {}
-
-      return true;
-    }
-
-    setMandatorySignalStep(nextStep);
-    return true;
-  };
-
   const requestNextOptionalSignalQuestion = async (
     answers = optionalSignalAnswers,
     skipped = skippedOptionalSignalKeys,
@@ -1196,6 +1010,7 @@ export default function LiveEntryClient() {
             chairs.join(", ") ||
             customChair ||
             userPosition,
+          broadGoal: preLiveSignals.broadGoal || "",
           desiredOutcome: preLiveSignals.desiredOutcome || objective,
           acceptableOutcome: preLiveSignals.acceptableOutcome || "",
           audience: preLiveSignals.counterparty || audienceType,
@@ -1213,16 +1028,16 @@ export default function LiveEntryClient() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || data?.status === "sufficient" || !data?.question) {
-        setCurrentOptionalSignalQuestion({
-          key: `ready_signal_${Date.now()}`,
-          label: "User signal",
-          question:
-            "LIVE is ready. Add anything else GEORGE should know, or go to LIVE.",
-          why: "OpenAI does not have a sharper question right now. You may still add signal if it matters.",
-          example:
-            "E.g. Board approval is required. Timeline is 60 days. Do not press on valuation.",
-        });
+        setCurrentOptionalSignalQuestion(null);
         setOptionalSignalComplete(true);
+        setLiveEntryReadyMessageVisible(true);
+        setPreLivePreviewReady(true);
+
+        try {
+          markLivePreparationPreviewReady();
+          window.localStorage.setItem("george_start_new_live", "1");
+        } catch {}
+
         return;
       }
 
@@ -1645,10 +1460,7 @@ export default function LiveEntryClient() {
         setShowOpenAISignalSurface(false);
         setLiveEntryReadyMessageVisible(false);
         setShowLiveBriefingRoom(false);
-        setLiveEntryMandatoryMode(false);
         setPreLivePreviewReady(false);
-        setMandatorySignalStep(0);
-        setMandatorySignalInput("");
         setObjective("");
         setKnownContext("");
         setAudienceType("");
@@ -1696,7 +1508,6 @@ export default function LiveEntryClient() {
         homepageHandoff
       ) {
         setPreLiveSignals(acquiredSignalsForAccess);
-        setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
         setCurrentOptionalSignalQuestion(null);
         setOptionalSignalInput("");
@@ -1757,7 +1568,6 @@ export default function LiveEntryClient() {
         homepageHandoff
       ) {
         setPreLiveSignals(acquiredSignalsForAccess);
-        setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
         setShowOpenAISignalSurface(false);
 
@@ -1799,7 +1609,6 @@ export default function LiveEntryClient() {
         window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
       } else if (entryResolution.firstStep === "mechanics") {
         setPreLiveSignals(acquiredSignalsForAccess);
-        setLiveEntryMandatoryMode(false);
         setLiveEntryReadyMessageVisible(false);
         setShowOpenAISignalSurface(false);
         livePreparationHistoryRef.current = [];
@@ -2470,7 +2279,7 @@ export default function LiveEntryClient() {
 
     setCurrentOptionalSignalQuestion(null);
     setOptionalSignalLoading(false);
-    setLiveEntryMandatoryMode(!restoredHasOperationalSignal);
+    setShowOpenAISignalSurface(true);
     setLiveBriefingStep(1);
     setLiveBriefingToaAccepted(false);
     setLiveBriefingSupportAccepted(false);
@@ -3291,24 +3100,7 @@ export default function LiveEntryClient() {
   if (!ready) return null;
 
   const liveEntryQuestionSurface =
-    liveEntryMandatoryMode && currentMandatorySignalQuestion
-      ? {
-          kicker: currentMandatorySignalQuestion.kicker,
-          label: currentMandatorySignalQuestion.label,
-          question: typedMandatorySignalQuestion,
-          helper: currentMandatorySignalQuestion.helper,
-          example: currentMandatorySignalQuestion.example,
-          inputValue: mandatorySignalInput,
-          setInputValue: setMandatorySignalInput,
-          submit: submitMandatoryLiveEntrySignal,
-          loading: false,
-          step: `${mandatorySignalStep + 1}/${liveEntryMandatoryQuestions.length}`,
-          primaryAction:
-            currentMandatorySignalQuestion.key === "role" ? "Send" : "Continue",
-          canBeginLive: false,
-          readinessMessage: false,
-        }
-      : showOpenAISignalSurface && liveEntryReadyMessageVisible
+    showOpenAISignalSurface && liveEntryReadyMessageVisible
         ? {
             kicker: "LIVE READY",
             label: "Minimum signal acquired",
@@ -3424,74 +3216,7 @@ export default function LiveEntryClient() {
                   )}
 
                 {!liveEntryQuestionSurface.loading &&
-                  !liveEntryQuestionSurface.readinessMessage &&
-                  currentMandatorySignalQuestion?.key === "role" && (
-                    <div className="mt-3">
-                      <div className="text-[10px] uppercase tracking-[0.2em] text-white/28">
-                        Suggested roles
-                      </div>
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {[
-                          ...suggestedConversationResponsibilities,
-                          "Other",
-                        ].map((option) => {
-                          const active =
-                            selectedConversationResponsibilities.includes(
-                              option,
-                            );
-                          const disabled =
-                            !active &&
-                            selectedConversationResponsibilities.length >=
-                              responsibilitySelectionLimit;
-
-                          return (
-                            <button
-                              key={option}
-                              type="button"
-                              disabled={disabled}
-                              onClick={() =>
-                                toggleConversationResponsibility(option)
-                              }
-                              className={`rounded-full border px-3 py-2 text-[11px] transition ${
-                                active
-                                  ? "border-[#4E7CFF]/42 bg-[#4E7CFF]/[0.12] text-white"
-                                  : disabled
-                                    ? "cursor-not-allowed border-white/[0.035] bg-white/[0.012] text-white/20"
-                                    : "border-white/[0.065] bg-white/[0.018] text-white/48 hover:border-[#D7DCFF]/20 hover:text-white/72"
-                              }`}
-                            >
-                              {option}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div className="mt-3 text-[12px] leading-5 text-white/34">
-                        {responsibilityLimitCopy}
-                      </div>
-
-                      {selectedConversationResponsibilities.includes(
-                        "Other",
-                      ) && (
-                        <input
-                          value={customConversationResponsibility}
-                          onChange={(event) =>
-                            setCustomConversationResponsibility(
-                              event.target.value,
-                            )
-                          }
-                          autoFocus
-                          className="mt-4 w-full rounded-[16px] border border-white/[0.10] bg-[#08090A] px-5 py-4 text-[15px] leading-7 text-white outline-none transition placeholder:text-white/28 focus:border-[#7EA1FF]/55"
-                          placeholder="write another responsibility..."
-                        />
-                      )}
-                    </div>
-                  )}
-
-                {!liveEntryQuestionSurface.loading &&
-                  !liveEntryQuestionSurface.readinessMessage &&
-                  currentMandatorySignalQuestion?.key !== "role" && (
+                  !liveEntryQuestionSurface.readinessMessage && (
                     <input
                       value={liveEntryQuestionSurface.inputValue}
                       onChange={(event) =>
@@ -3532,7 +3257,6 @@ export default function LiveEntryClient() {
                       setLiveEntryReadyMessageVisible(false);
                       setCurrentOptionalSignalQuestion(null);
                       setOptionalSignalLoading(false);
-                      setLiveEntryMandatoryMode(false);
                       livePreparationHistoryRef.current = ["questions"];
                       setShowLiveBriefingRoom(true);
                       setLiveBriefingStep(1);
@@ -5009,15 +4733,12 @@ export default function LiveEntryClient() {
             <button
               type="button"
               onClick={() => {
-                setShowOpenAISignalSurface(false);
+                setShowOpenAISignalSurface(true);
                 setCurrentOptionalSignalQuestion(null);
                 setOptionalSignalLoading(false);
+                setOptionalSignalComplete(false);
+                setLiveEntryReadyMessageVisible(false);
                 setShowLiveBriefingRoom(false);
-                setLiveEntryMandatoryMode(true);
-                setMandatorySignalStep(0);
-                setMandatorySignalInput("");
-                setSelectedConversationResponsibilities([]);
-                setCustomConversationResponsibility("");
               }}
               className="rounded-[0.95rem] border border-white/[0.09] bg-[#080808] px-4 py-3 text-left transition hover:border-[#D7DCFF]/24 hover:bg-[#0D0D0D] active:scale-[0.99]"
             >
