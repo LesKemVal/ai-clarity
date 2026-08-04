@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { loadLivePreparationSignals } from "@/lib/george/live-browser/live-preparation-browser-storage";
+
 import type {
   OperationalFormula,
   OperationalFormulaLineage,
@@ -189,6 +191,77 @@ function formatDate(value: number) {
   }).format(new Date(value));
 }
 
+function normalizeRecommendationText(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map(normalizeRecommendationText).join(" ");
+  }
+
+  if (typeof value === "string") {
+    return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  }
+
+  return "";
+}
+
+function recommendationTermScore(
+  searchText: string,
+  signal: string | undefined,
+  weight: number,
+): number {
+  const normalizedSignal = normalizeRecommendationText(signal);
+  if (!normalizedSignal) return 0;
+
+  const terms = normalizedSignal
+    .split(" ")
+    .filter((term) => term.length > 2);
+
+  if (!terms.length) return 0;
+
+  const matchedTerms = terms.filter((term) => searchText.includes(term));
+  return (matchedTerms.length / terms.length) * weight;
+}
+
+function marketplaceRecommendationScore(
+  formula: OperationalFormula,
+  role: string | undefined,
+  goal: string | undefined,
+): number {
+  const searchText = normalizeRecommendationText([
+    formula.name,
+    formula.roomTypes,
+    formula.bestUsedFor,
+    formula.objectiveTypes,
+    formula.prerequisites,
+  ]);
+
+  const publicationPriority: Record<
+    OperationalFormulaPublicationState,
+    number
+  > = {
+    marketplace_listed: 12,
+    published: 10,
+    verified: 8,
+    verification_requested: 5,
+    draft: 3,
+    retired: -100,
+    withdrawn: -100,
+  };
+
+  const roleScore = recommendationTermScore(searchText, role, 45);
+  const goalScore = recommendationTermScore(searchText, goal, 55);
+  const evidenceScore = Math.min(Number(formula.successCount ?? 0), 10) * 2;
+  const maturityScore = publicationPriority[publicationState(formula)];
+  const confidenceScore = Math.max(0, Math.min(formula.confidence, 1)) * 10;
+
+  return (
+    roleScore +
+    goalScore +
+    evidenceScore +
+    maturityScore +
+    confidenceScore
+  );
+}
+
 function displayName(name: string | undefined, fallback: string) {
   const normalized = String(name ?? "").trim();
   return normalized || fallback;
@@ -299,6 +372,9 @@ export default function OperationalLibraryClient() {
   const [historyErrors, setHistoryErrors] = useState<Record<string, string>>({});
   const [livePrepReturnAvailable, setLivePrepReturnAvailable] =
     useState(false);
+  const [homepagePreparationSignals] = useState(() =>
+    loadLivePreparationSignals(),
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -846,33 +922,37 @@ export default function OperationalLibraryClient() {
     (formula) => formula.status === "validated",
   );
 
-  const recommendedFormula = [...formulas].sort((left, right) => {
-    const statePriority: Record<OperationalFormulaPublicationState, number> = {
-      marketplace_listed: 6,
-      published: 5,
-      verified: 4,
-      verification_requested: 3,
-      draft: 2,
-      retired: 1,
-      withdrawn: 0,
-    };
+  const recommendationRole =
+    String(homepagePreparationSignals.role || "").trim() || "Professional";
 
-    const stateDifference =
-      statePriority[publicationState(right)] -
-      statePriority[publicationState(left)];
+  const recommendationGoal =
+    String(homepagePreparationSignals.desiredOutcome || "").trim() ||
+    "Improve execution in the next important conversation.";
 
-    if (stateDifference !== 0) return stateDifference;
-    return right.confidence - left.confidence;
-  })[0];
+  const recommendedFormula = [...activeMarketplaceFormulas].sort(
+    (left, right) => {
+      const scoreDifference =
+        marketplaceRecommendationScore(
+          right,
+          recommendationRole,
+          recommendationGoal,
+        ) -
+        marketplaceRecommendationScore(
+          left,
+          recommendationRole,
+          recommendationGoal,
+        );
 
-  const recommendationRole = recommendedFormula
-    ? recommendedFormula.roomTypes?.[0] || "Professional"
-    : "Professional";
-  const recommendationGoal = recommendedFormula
-    ? recommendedFormula.bestUsedFor?.[0] ||
-      recommendedFormula.objectiveTypes?.[0] ||
-      "Improve execution in the next important conversation."
-    : "Improve execution in the next important conversation.";
+      if (scoreDifference !== 0) return scoreDifference;
+
+      const successDifference =
+        Number(right.successCount ?? 0) - Number(left.successCount ?? 0);
+
+      if (successDifference !== 0) return successDifference;
+
+      return right.confidence - left.confidence;
+    },
+  )[0];
   const recommendationReason = recommendedFormula
     ? recommendedFormula.bestUsedFor?.join(" · ") ||
       "Selected from available operational evidence and readiness."
