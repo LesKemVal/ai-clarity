@@ -260,3 +260,34 @@ Marketplace and learning direction:
 
 Continue the Formula-first Operational Marketplace implementation without moving Formula ownership, briefing ownership, LIVE ownership, or runtime authority.
 <!-- ROLE_GOAL_EXECUTION_HANDOFF_END -->
+
+--------------------------------------------------
+NEXT IMPLEMENTATION
+--------------------------------------------------
+
+Current production milestone:
+
+Operational Session Runtime.
+
+Implement:
+
+• repeated-session classification
+• Conversation Runtime retirement
+• Conversation Record production
+• Next Call workflow
+• multi-level Conversation Summary
+• adaptive Formula / Script recommendations
+
+Do not redesign LIVE.
+
+Do not introduce another runtime.
+
+Conversation Runtime is ephemeral.
+
+Conversation Record is permanent.
+
+Operational Learning evaluates Conversation Records.
+
+Operational Memory accumulates validated evidence.
+
+Optimize for users executing dozens or hundreds of conversations within one Operational Session.
