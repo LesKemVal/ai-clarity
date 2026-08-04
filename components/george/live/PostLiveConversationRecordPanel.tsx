@@ -6,6 +6,11 @@ type ConversationRecordProjection = {
   desiredOutcome?: string
   conversationType?: string
   conversationContext?: string
+  formulaSelection?: {
+    formulaId?: string
+    formulaVersion?: number
+    source?: "george" | "user"
+  } | null
   summary?: string
   latestOutcome?: {
     observedProgress?: string
@@ -71,6 +76,16 @@ export function PostLiveConversationRecordPanel({
   const documentationCount = Array.isArray(record.relevantDocumentation)
     ? record.relevantDocumentation.length
     : 0
+
+  const formulaId = label(record.formulaSelection?.formulaId, "")
+  const formulaVersion =
+    typeof record.formulaSelection?.formulaVersion === "number"
+      ? record.formulaSelection.formulaVersion
+      : null
+  const formulaSource = record.formulaSelection?.source
+  const formulaExecutionAvailable = Boolean(
+    formulaId && formulaVersion !== null && formulaSource,
+  )
 
   const reviewText = [
     record.summary,
@@ -216,6 +231,19 @@ export function PostLiveConversationRecordPanel({
                 </p>
               </div>
             </div>
+
+            {formulaExecutionAvailable && (
+              <div className="rounded-[0.95rem] border border-[#8FB6C9]/[0.12] bg-[#8FB6C9]/[0.035] p-3">
+                <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/40">
+                  Executed Formula
+                </p>
+                <div className="mt-2 inline-flex max-w-full items-center rounded-[10px] border border-white/[0.11] bg-white/[0.025] px-3 py-2">
+                  <span className="truncate font-mono text-[10px] uppercase tracking-[0.11em] text-white/72">
+                    {formulaId} · v{formulaVersion} · {formulaSource}
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="rounded-[0.95rem] border border-[var(--border-subtle)] bg-[color:var(--surface-3)]/70 p-3">
               <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/36">GEORGE analysis</p>
