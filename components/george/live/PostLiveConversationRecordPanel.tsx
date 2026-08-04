@@ -11,6 +11,13 @@ type ConversationRecordProjection = {
     formulaVersion?: number
     source?: "george" | "user"
   } | null
+  scriptSelection?: {
+    scriptId?: string
+    scriptVersion?: number
+    formulaId?: string
+    formulaVersion?: number
+    lineCount?: number
+  } | null
   summary?: string
   latestOutcome?: {
     observedProgress?: string
@@ -85,6 +92,27 @@ export function PostLiveConversationRecordPanel({
   const formulaSource = record.formulaSelection?.source
   const formulaExecutionAvailable = Boolean(
     formulaId && formulaVersion !== null && formulaSource,
+  )
+
+  const scriptId = label(record.scriptSelection?.scriptId, "")
+  const scriptVersion =
+    typeof record.scriptSelection?.scriptVersion === "number"
+      ? record.scriptSelection.scriptVersion
+      : null
+  const scriptFormulaId = label(record.scriptSelection?.formulaId, "")
+  const scriptFormulaVersion =
+    typeof record.scriptSelection?.formulaVersion === "number"
+      ? record.scriptSelection.formulaVersion
+      : null
+  const scriptLineCount =
+    typeof record.scriptSelection?.lineCount === "number"
+      ? record.scriptSelection.lineCount
+      : null
+  const scriptExecutionAvailable = Boolean(
+    scriptId &&
+      scriptVersion !== null &&
+      scriptFormulaId &&
+      scriptFormulaVersion !== null,
   )
 
   const reviewText = [
@@ -242,6 +270,22 @@ export function PostLiveConversationRecordPanel({
                     {formulaId} · v{formulaVersion} · {formulaSource}
                   </span>
                 </div>
+              </div>
+            )}
+
+            {scriptExecutionAvailable && (
+              <div className="rounded-[0.95rem] border border-[#AEB6FF]/[0.12] bg-[#AEB6FF]/[0.035] p-3">
+                <p className="text-[9px] uppercase tracking-[0.18em] text-[#D9DDFF]/42">
+                  Executed Script
+                </p>
+                <div className="mt-2 inline-flex max-w-full items-center rounded-[10px] border border-white/[0.11] bg-white/[0.025] px-3 py-2">
+                  <span className="truncate font-mono text-[10px] uppercase tracking-[0.11em] text-white/72">
+                    {scriptId} · v{scriptVersion} · {scriptLineCount ?? 0} lines
+                  </span>
+                </div>
+                <p className="mt-2 text-[10px] leading-5 text-white/36">
+                  Formula {scriptFormulaId} · v{scriptFormulaVersion}
+                </p>
               </div>
             )}
 
