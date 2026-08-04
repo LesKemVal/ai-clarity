@@ -1312,3 +1312,18 @@ Learning improves future recommendations. It does not reopen the current selecti
 Formula evolution may produce future candidate formulas and preserved lineage. Passive reassessment does not create derived formulas, change lifecycle ownership, or mutate historical execution. Intentional derived-formula creation remains owned by the canonical derivation service.
 
 Alternative recommendations and formula comparison belong to post-execution learning or an explicit user request after selection.
+
+--------------------------------------------------
+FORMULA OWNERSHIP
+--------------------------------------------------
+
+Operational Learning evaluates execution.
+
+Operational Learning may recommend creation of a Formula Candidate.
+
+Operational Learning never edits an existing Formula.
+
+The user decides whether a Formula Candidate becomes a retained Formula.
+
+Scripts remain independently retainable regardless of conversation outcome.
+

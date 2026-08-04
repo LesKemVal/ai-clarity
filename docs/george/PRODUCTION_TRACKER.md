@@ -1572,3 +1572,83 @@ The amount of feedback GEORGE presents should be proportional to execution veloc
 High-volume users should receive less information, not more.
 
 Only information that improves the next conversation should appear by default.
+
+--------------------------------------------------
+FORMULA IMMUTABILITY DOCTRINE
+--------------------------------------------------
+
+A Formula is immutable.
+
+A Formula is an operational hypothesis frozen at the time it is is created.
+
+Operational Learning never edits an existing Formula.
+
+Operational Learning never replaces an existing Formula.
+
+A Formula either gains evidence or remains unchanged.
+
+--------------------------------------------------
+FORMULA DISCOVERY
+--------------------------------------------------
+
+Execution may improvise.
+
+Improvisation does not modify the originating Formula.
+
+If operational assessment determines that success resulted from a materially different operational strategy, GEORGE recognizes a Formula Candidate.
+
+The originating Formula remains unchanged.
+
+The Formula Candidate preserves lineage by referencing its originating Formula.
+
+--------------------------------------------------
+SCRIPT RETENTION
+--------------------------------------------------
+
+Scripts are execution artifacts.
+
+Script retention is independent of Formula evaluation.
+
+The user may retain a Script regardless of outcome.
+
+Examples:
+
+• unsuccessful conversation + retain Script
+• successful conversation + discard Script
+
+Script ownership belongs to the user.
+
+--------------------------------------------------
+FORMULA CREATION
+--------------------------------------------------
+
+A Formula Candidate becomes a Formula only after user approval.
+
+Creating a new Formula does not replace the originating Formula.
+
+Both Formulas remain available.
+
+Each accumulates evidence independently.
+
+--------------------------------------------------
+BASELINE FORMULAS
+--------------------------------------------------
+
+Early Formulas are operational baselines.
+
+They are experiments.
+
+Their purpose is to establish operational hypotheses from which future operational strategies may emerge.
+
+As execution evidence accumulates:
+
+Baseline Formula
+        ↓
+Formula Candidates
+        ↓
+Additional Formulas
+
+This preserves operational lineage.
+
+GEORGE grows by expanding operational strategy rather than overwriting previous operational knowledge.
+
