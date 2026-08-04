@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   CONVERSATION_TYPES,
   type ConversationType,
@@ -256,6 +256,7 @@ function ConversationTypeCard({
 }
 
 export function HomeConversationTypeSurface() {
+  const surfaceRef = useRef<HTMLElement | null>(null);
   const [selectedType, setSelectedType] = useState<ConversationType | null>(
     null,
   );
@@ -470,12 +471,26 @@ export function HomeConversationTypeSurface() {
       }
     } catch {}
 
-    const frame = window.requestAnimationFrame(() => {
+    let firstFrame = 0;
+    let secondFrame = 0;
+
+    firstFrame = window.requestAnimationFrame(() => {
       setPhase("review");
-      window.history.replaceState({}, "", window.location.pathname);
+
+      secondFrame = window.requestAnimationFrame(() => {
+        surfaceRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+
+        window.history.replaceState({}, "", window.location.pathname);
+      });
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -872,7 +887,8 @@ export function HomeConversationTypeSurface() {
 
   return (
     <section
-      className={`relative min-h-[100dvh] border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
+      ref={surfaceRef}
+      className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
         selectedType ? "bg-[#020304]" : "bg-black"
       }`}
     >

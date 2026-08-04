@@ -927,9 +927,9 @@ export default function LiveEntryClient() {
 
     const text =
       livePrepOpenSection === "support"
-        ? "How should GEORGE support you in this room?"
+        ? "How GEORGE supports you changes how the room feels. Choose the support you want available."
         : livePrepOpenSection === "formula"
-          ? "Choose the operational formula GEORGE should use to guide this room."
+          ? "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
           : livePrepOpenSection === "ready"
             ? `GEORGE will use ${formulaName} as the operational reference for this room.`
             : "";
@@ -948,7 +948,7 @@ export default function LiveEntryClient() {
         window.clearInterval(timer);
         setReadyRoomPromptComplete(true);
       }
-    }, 18);
+    }, 10);
 
     return () => window.clearInterval(timer);
   }, [
@@ -1357,7 +1357,7 @@ export default function LiveEntryClient() {
       if (index >= text.length) {
         window.clearInterval(timer);
       }
-    }, 18);
+    }, 10);
 
     return () => window.clearInterval(timer);
   }, [currentOptionalSignalQuestion?.key]);
@@ -4450,9 +4450,9 @@ export default function LiveEntryClient() {
       <button
         type="button"
         onClick={onClick}
-        className="flex w-full translate-y-0 items-center justify-between gap-4 rounded-[12px] border border-[#8FAEFF]/20 bg-[#091329] px-4 py-3 text-left transition-all duration-500 ease-out hover:-translate-y-0.5 hover:border-[#8FAEFF]/40"
+        className="flex w-full -translate-y-1 items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-[#8FAEFF]/32"
       >
-        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-[#AFC0FF]/48">
+        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
           {label}
         </span>
         <span className="text-[12px] font-semibold text-white/82">
@@ -4461,6 +4461,12 @@ export default function LiveEntryClient() {
       </button>
     );
 
+    const activeSupportPanelId: LiveBriefingSupportPanelId =
+      liveBriefingActiveSupportStyle === "response" ||
+      selectedSupportStyle === "response"
+        ? "response"
+        : "advice";
+
     return (
       <PanelShell
         label="BRIEF ROOM · READINESS"
@@ -4468,164 +4474,250 @@ export default function LiveEntryClient() {
         stage={3}
         onBack={goToPreviousPrepSection}
       >
-        <div className="mt-6 overflow-hidden rounded-[18px] border border-[#7898FF]/30 bg-[#0B1B3E] px-5 py-5 shadow-[0_22px_70px_rgba(20,57,135,0.22)]">
-          <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#C2CEFF]/66">
-            Preparing your room
+        <div className="mt-5">
+          <div className="inline-flex rounded-[10px] border border-[#7898FF]/34 bg-[#11224A] px-4 py-2.5 shadow-[0_10px_30px_rgba(20,57,135,0.16)]">
+            <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#D1DAFF]/78">
+              Ready Room
+            </span>
           </div>
 
-          <div className="mt-5 space-y-3">
-            {livePrepOpenSection !== "support" &&
-              compactChoice(
-                "Support",
-                supportLabel,
-                () => setLivePrepOpenSection("support"),
-              )}
+          <div className="mt-4 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[#07090D] px-5 py-5">
+            <div className="space-y-3">
+              {livePrepOpenSection !== "support" &&
+                compactChoice(
+                  "Support",
+                  supportLabel,
+                  () => setLivePrepOpenSection("support"),
+                )}
 
-            {livePrepOpenSection === "ready" &&
-              compactChoice(
-                "Formula",
-                `${activeFormulaLabel} · ${formulaProofLabel}`,
-                () => setLivePrepOpenSection("formula"),
-              )}
-          </div>
+              {livePrepOpenSection === "ready" &&
+                compactChoice(
+                  "Formula",
+                  `${activeFormulaLabel} · ${formulaProofLabel}`,
+                  () => setLivePrepOpenSection("formula"),
+                )}
+            </div>
 
-          <div
-            className={`transition-all duration-500 ease-out ${
-              livePrepOpenSection === "support"
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none h-0 -translate-y-6 overflow-hidden opacity-0"
-            }`}
-          >
-            <h2 className="mt-6 min-h-[62px] max-w-[520px] font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
-              {readyRoomTypedPrompt}
-            </h2>
+            <section
+              className={`grid transition-all duration-500 ease-out ${
+                livePrepOpenSection === "support"
+                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
+                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <h2 className="min-h-[70px] max-w-[560px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
+                  {readyRoomTypedPrompt}
+                </h2>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              {(["advice", "response"] as const).map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActiveAdaptiveSupport(id)}
-                  className={`rounded-[13px] border px-4 py-4 text-left transition-all duration-300 ${
-                    (
-                      liveBriefingActiveSupportStyle === "response" ||
-                      selectedSupportStyle === "response"
-                        ? "response"
-                        : "advice"
-                    ) === id
-                      ? "border-[#AFC0FF]/65 bg-[#17346D] -translate-y-0.5"
-                      : "border-white/[0.10] bg-white/[0.035] hover:-translate-y-0.5 hover:border-white/25"
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {(["advice", "response"] as const).map((id) => {
+                    const selected = activeSupportPanelId === id;
+
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setActiveAdaptiveSupport(id)}
+                        className={`flex items-start gap-3 rounded-[12px] border px-4 py-4 text-left transition-all duration-300 ${
+                          selected
+                            ? "border-[#8FAEFF]/55 bg-[#101A31] -translate-y-0.5"
+                            : "border-white/[0.09] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/22"
+                        }`}
+                      >
+                        <span
+                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] transition ${
+                            selected
+                              ? "border-[#8FAEFF]/70 bg-[#4E7CFF] text-white"
+                              : "border-white/22 text-transparent"
+                          }`}
+                        >
+                          ✓
+                        </span>
+                        <span>
+                          <span className="block text-[13px] font-semibold text-white/86">
+                            {id === "advice"
+                              ? "Adaptive cues"
+                              : "Adaptive response"}
+                          </span>
+                          <span className="mt-1 block text-[11px] leading-5 text-white/42">
+                            {id === "advice"
+                              ? "Brief support at the right moment."
+                              : "A complete response when the room requires one."}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-4">
+                  <input
+                    type="checkbox"
+                    checked={liveBriefingSupportAccepted}
+                    onChange={(event) => {
+                      const accepted = event.target.checked;
+                      setLiveBriefingSupportAccepted(accepted);
+
+                      if (accepted) {
+                        window.setTimeout(() => {
+                          setLivePrepOpenSection("formula");
+                        }, 360);
+                      }
+                    }}
+                    className="mt-0.5 h-4 w-4 accent-[#7898FF]"
+                  />
+                  <span className="text-[12px] leading-5 text-white/56">
+                    I understand how GEORGE will support me, and I remain
+                    responsible for what I say in the room.
+                  </span>
+                </label>
+              </div>
+            </section>
+
+            <section
+              className={`grid transition-all duration-500 ease-out ${
+                livePrepOpenSection === "formula"
+                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
+                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <h2 className="min-h-[70px] max-w-[580px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
+                  {readyRoomTypedPrompt}
+                </h2>
+
+                <RecommendedStrategyCard
+                  recommendation={operationalRecommendation}
+                  loading={recommendationLoading}
+                  selectedFormula={selectedFormula}
+                  selectedSource={selectedFormulaSource}
+                  reviewRequired={
+                    operationalRecommendation?.reviewRequired ?? false
+                  }
+                  onAcceptRecommendation={acceptOperationalRecommendation}
+                  onEditFormula={beginFormulaEdit}
+                  onChooseAnother={beginFormulaSelection}
+                  onBrowseScripts={browseFormulaScripts}
+                  onContinue={() => setLivePrepOpenSection("ready")}
+                />
+
+                <FormulaScriptBrowserPanel
+                  open={scriptBrowserOpen}
+                  loading={scriptBrowserLoading}
+                  formula={scriptBrowserFormula}
+                  scripts={formulaScripts}
+                  selectedScript={selectedScript}
+                  error={scriptBrowserError}
+                  onSelectScript={selectFormulaScript}
+                  onClose={() => setScriptBrowserOpen(false)}
+                />
+
+                <ScriptCustomizationPanel
+                  open={scriptCustomizationOpen}
+                  script={customizedScript}
+                  onChange={setCustomizedScript}
+                  onReset={resetCustomizedScript}
+                  onDone={finishScriptCustomization}
+                  onClose={() => setScriptCustomizationOpen(false)}
+                />
+              </div>
+            </section>
+
+            <section
+              className={`grid transition-all duration-500 ease-out ${
+                livePrepOpenSection === "ready"
+                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
+                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-white/34">
+                  Formula reference
+                </div>
+
+                <p className="mt-3 min-h-[72px] max-w-[620px] text-[14px] leading-7 text-white/66">
+                  {readyRoomTypedPrompt}
+                </p>
+
+                <div className="mt-5 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4">
+                  <div className="text-[15px] font-semibold tracking-[-0.02em] text-white/88">
+                    {activeFormulaLabel}
+                  </div>
+                  <div className="mt-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#AFC0FF]/58">
+                    Published by BRANESX · {formulaProofLabel}
+                  </div>
+
+                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                    <div className="rounded-[9px] border border-white/[0.07] px-3 py-3">
+                      <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/30">
+                        Conversation Formula
+                      </div>
+                      <div className="mt-1 text-[11px] text-white/66">
+                        View operational structure
+                      </div>
+                    </div>
+                    <div className="rounded-[9px] border border-white/[0.07] px-3 py-3">
+                      <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/30">
+                        Associated Scripts
+                      </div>
+                      <div className="mt-1 text-[11px] text-white/66">
+                        {formulaScripts.length}
+                      </div>
+                    </div>
+                    <div className="rounded-[9px] border border-white/[0.07] px-3 py-3">
+                      <div className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/30">
+                        Associated Screeners
+                      </div>
+                      <div className="mt-1 text-[11px] text-white/66">
+                        0
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setLivePrepOpenSection("formula")}
+                      className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-[#AFC0FF]/68 transition hover:text-white"
+                    >
+                      View Formula
+                    </button>
+                    <button
+                      type="button"
+                      onClick={beginFormulaSelection}
+                      className="font-mono text-[8px] font-semibold uppercase tracking-[0.16em] text-white/44 transition hover:text-white"
+                    >
+                      Browse Library
+                    </button>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-center text-[12px] leading-5 text-white/52">
+                  Prepare with GEORGE first if you'd like. When you're ready,
+                  enter LIVE.
+                </p>
+
+                <div
+                  className={`transition-all duration-500 ${
+                    readyRoomPromptComplete && activeFormula
+                      ? "opacity-100"
+                      : "opacity-30"
                   }`}
                 >
-                  <span className="block text-[14px] font-semibold text-white/88">
-                    {id === "advice"
-                      ? "Adaptive cues"
-                      : "Adaptive response"}
-                  </span>
-                  <span className="mt-1 block text-[11px] leading-5 text-white/42">
-                    {id === "advice"
-                      ? "Brief support at the right moment."
-                      : "A complete response when the room requires one."}
-                  </span>
-                </button>
-              ))}
-            </div>
+                  <AwakeButton
+                    active={readyRoomPromptComplete && Boolean(activeFormula)}
+                    onClick={() => startLive(false, editableResources, true)}
+                  >
+                    ENTER LIVE
+                  </AwakeButton>
+                </div>
 
-            <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[12px] border border-white/[0.09] bg-black/15 px-4 py-4">
-              <input
-                type="checkbox"
-                checked={liveBriefingSupportAccepted}
-                onChange={(event) => {
-                  const accepted = event.target.checked;
-                  setLiveBriefingSupportAccepted(accepted);
-
-                  if (accepted) {
-                    window.setTimeout(() => {
-                      setLivePrepOpenSection("formula");
-                    }, 280);
-                  }
-                }}
-                className="mt-0.5 h-4 w-4 accent-[#7898FF]"
-              />
-              <span className="text-[12px] leading-5 text-white/58">
-                I understand how GEORGE will begin supporting me, and I remain
-                responsible for what I say in the room.
-              </span>
-            </label>
-          </div>
-
-          <div
-            className={`transition-all duration-500 ease-out ${
-              livePrepOpenSection === "formula"
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none h-0 -translate-y-6 overflow-hidden opacity-0"
-            }`}
-          >
-            <h2 className="mt-6 min-h-[62px] max-w-[540px] font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px]">
-              {readyRoomTypedPrompt}
-            </h2>
-
-            <RecommendedStrategyCard
-              recommendation={operationalRecommendation}
-              loading={recommendationLoading}
-              selectedFormula={selectedFormula}
-              selectedSource={selectedFormulaSource}
-              reviewRequired={
-                operationalRecommendation?.reviewRequired ?? false
-              }
-              onAcceptRecommendation={acceptOperationalRecommendation}
-              onEditFormula={beginFormulaEdit}
-              onChooseAnother={beginFormulaSelection}
-              onBrowseScripts={browseFormulaScripts}
-              onContinue={() => setLivePrepOpenSection("ready")}
-            />
-
-            <FormulaScriptBrowserPanel
-              open={scriptBrowserOpen}
-              loading={scriptBrowserLoading}
-              formula={scriptBrowserFormula}
-              scripts={formulaScripts}
-              selectedScript={selectedScript}
-              error={scriptBrowserError}
-              onSelectScript={selectFormulaScript}
-              onClose={() => setScriptBrowserOpen(false)}
-            />
-
-            <ScriptCustomizationPanel
-              open={scriptCustomizationOpen}
-              script={customizedScript}
-              onChange={setCustomizedScript}
-              onReset={resetCustomizedScript}
-              onDone={finishScriptCustomization}
-              onClose={() => setScriptCustomizationOpen(false)}
-            />
-          </div>
-
-          <div
-            className={`transition-all duration-500 ease-out ${
-              livePrepOpenSection === "ready"
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none h-0 -translate-y-6 overflow-hidden opacity-0"
-            }`}
-          >
-            <div className="mt-6 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-[#C2CEFF]/58">
-              Formula reference
-            </div>
-
-            <p className="mt-3 min-h-[72px] text-[14px] leading-7 text-white/68">
-              {readyRoomTypedPrompt}
-            </p>
-
-            <AwakeButton
-              active={readyRoomPromptComplete && Boolean(activeFormula)}
-              onClick={() => startLive(false, editableResources, true)}
-            >
-              ENTER LIVE
-            </AwakeButton>
-
-            <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-[#C2CEFF]/36">
-              Your voice I know. The room I understand.
-            </p>
+                <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/26">
+                  Your voice I know. The room I understand.
+                </p>
+              </div>
+            </section>
           </div>
         </div>
       </PanelShell>

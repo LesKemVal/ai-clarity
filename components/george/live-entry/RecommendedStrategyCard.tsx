@@ -110,7 +110,7 @@ export function RecommendedStrategyCard({
 
   if (!formula) {
     return (
-      <section className="mt-3 rounded-[1rem] border border-[#65728A]/[0.24] bg-[#080A0D] px-4 py-4">
+      <section className="mt-3 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4 transition-all duration-500 ease-out">
         <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-[#9BA8BC]/42">
           Recommended formula
         </div>
@@ -146,7 +146,7 @@ export function RecommendedStrategyCard({
   if (explanationOpen) {
     return (
       <section
-        className="mt-3 rounded-[1rem] border border-[#65728A]/[0.24] bg-[#080A0D] px-4 py-4"
+        className="mt-3 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4 transition-all duration-500 ease-out"
         onPointerDown={restartIdleTimer}
         onPointerMove={restartIdleTimer}
         onKeyDown={restartIdleTimer}
@@ -200,7 +200,7 @@ export function RecommendedStrategyCard({
   }
 
   return (
-    <section className="mt-3 rounded-[1rem] border border-[#65728A]/[0.24] bg-[#080A0D] px-4 py-4">
+    <section className="mt-3 rounded-[12px] border border-white/[0.08] bg-white/[0.02] px-4 py-4 transition-all duration-500 ease-out">
       <div className="text-[8px] font-semibold uppercase tracking-[0.2em] text-[#9BA8BC]/42">
         Recommended formula
       </div>
