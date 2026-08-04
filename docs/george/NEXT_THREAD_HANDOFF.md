@@ -232,3 +232,31 @@ Recommended copy:
 
 Do not rename internal outcome authority, create a second briefing runtime, move formula ownership, create a separate OpenAI governance layer, or treat relationship learning as memory accumulation for its own sake.
 <!-- GEORGE_INTELLIGENT_BRIEFING_HANDOFF_END -->
+
+<!-- ROLE_GOAL_EXECUTION_HANDOFF_START -->
+## Current Role, Goal, and Execution Direction
+
+Immediate product direction:
+
+- simplify LIVE around Role → Goal → Execution;
+- present recognizable roles on the homepage;
+- give OpenAI control of intelligent, execution-oriented briefing after role selection;
+- keep questions tied to what can be accomplished through the user's voice in the conversation;
+- ask no more than necessary before LIVE access;
+- support single and repeated-conversation sessions;
+- automatically reset transient conversation state for the next call while retaining session state;
+- allow GEORGE to recommend strategy changes only when session evidence warrants it;
+- present the user with Keep Current or Adjust Strategy.
+
+Marketplace and learning direction:
+
+- Formula = operational strategy;
+- Script = delivery layer;
+- one Formula may produce many Scripts;
+- successful Formula use proves the Formula;
+- a successful Script supplies evidence for its Formula;
+- a genuinely different successful operational adaptation creates or proves another Formula;
+- users decide whether changed Scripts are saved, discarded, shared, free, or premium.
+
+Continue the Formula-first Operational Marketplace implementation without moving Formula ownership, briefing ownership, LIVE ownership, or runtime authority.
+<!-- ROLE_GOAL_EXECUTION_HANDOFF_END -->

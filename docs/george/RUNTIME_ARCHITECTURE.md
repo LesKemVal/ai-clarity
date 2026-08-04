@@ -1644,3 +1644,58 @@ Internal runtime language: outcome, operational assessment, signal, formula, sup
 
 This boundary avoids semantic drift while preserving established runtime terminology.
 <!-- GEORGE_CONVERSATIONAL_LATITUDE_AND_LEARNING_END -->
+
+<!-- FORMULA_SCRIPT_EXECUTION_LEARNING_START -->
+## Formula, Script, Execution, and Learning
+
+Canonical execution flow:
+
+Role
+↓
+Goal
+↓
+Intelligent Briefing
+↓
+Operational Assessment
+↓
+Formula
+↓
+Script or Cue Expression
+↓
+Execution
+
+A Formula is the operational strategy. It determines what operational move should occur.
+
+A Formula is proven when it is used successfully to achieve the relevant outcome.
+
+A successful execution may prove the Formula used, add evidence to an already proven Formula, prove an existing alternate Formula, or create a new Formula when GEORGE's successful adaptation constitutes a genuinely different operational strategy.
+
+The original Formula is preserved.
+
+A Script is a delivery layer built on a Formula.
+
+One Formula may produce many Scripts.
+
+A Script may vary by wording, semantics, role, audience, environment, platform, language, delivery style, branches, openings, closings, recovery paths, timing, LIVE cues, and follow-up without necessarily changing the underlying Formula.
+
+Cues are generated in service of the Formula. The user may create their own wording from those cues.
+
+A successful Script is evidence for the Formula it implements. Script evidence cannot be separated from Formula evidence.
+
+After execution, the user decides whether observed wording or delivery changes should be discarded, update an existing Script, be saved as a new Script, remain private, be shared, be published for free, or be published for premium consumption.
+
+For repeated-conversation sessions, role, goal, active Formula, Script, support style, steering phrases, and operational context persist. Transient conversation state resets between interactions.
+
+GEORGE may retain the current strategy or recommend an adjustment when sufficient session evidence justifies doing so.
+
+Recommendation contract:
+
+> Your call.
+
+- Keep Current
+- Adjust Strategy
+
+OpenAI's LIVE reasoning remains within conversational execution: what GEORGE and the user can accomplish together through the user's voice, and how to improve the likelihood of reaching the user's goal.
+
+Normal and LIVE remain modes of one intelligence. No separate runtime or separate reasoning authority is introduced.
+<!-- FORMULA_SCRIPT_EXECUTION_LEARNING_END -->
