@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 type ConversationRecordProjection = {
+  id?: string
   desiredOutcome?: string
   conversationType?: string
   conversationContext?: string
@@ -72,6 +73,10 @@ export function PostLiveConversationRecordPanel({
   const [showWhy, setShowWhy] = useState(false)
   const [showExecutionReview, setShowExecutionReview] = useState(false)
   const [showTranscriptEvidence, setShowTranscriptEvidence] = useState(false)
+  const [retentionState, setRetentionState] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle")
+  const [retentionMessage, setRetentionMessage] = useState("")
 
   const futureActions = list(record.futureActions)
   const debriefObservations = Array.isArray(record.operationalDebrief?.observations)
@@ -148,6 +153,67 @@ export function PostLiveConversationRecordPanel({
   const strategyStatus = strategyAdjustmentSuggested
     ? 'GEORGE suggests an adjustment before the next conversation.'
     : 'Current Formula and Script remain appropriate for the next conversation.'
+
+  async function retainExecutedAssets(
+    disposition: "formula" | "script" | "both" | "neither",
+  ) {
+    const conversationId = label(record.id, "")
+
+    if (!conversationId) {
+      setRetentionState("error")
+      setRetentionMessage("Conversation identity is unavailable.")
+      return
+    }
+
+    setRetentionState("saving")
+    setRetentionMessage("")
+
+    try {
+      const response = await fetch(
+        "/api/george/operational-memory/retention",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            conversationId,
+            disposition,
+            formulaSelection: record.formulaSelection || null,
+            scriptSelection: record.scriptSelection || null,
+          }),
+        },
+      )
+
+      const result = (await response.json().catch(() => null)) as
+        | { ok?: boolean; error?: string }
+        | null
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(
+          result?.error || "Unable to retain the selected assets.",
+        )
+      }
+
+      setRetentionState("saved")
+      setRetentionMessage(
+        disposition === "neither"
+          ? "Nothing retained."
+          : disposition === "both"
+            ? "Formula and Script retained."
+            : disposition === "formula"
+              ? "Formula retained."
+              : "Script retained.",
+      )
+    } catch (error) {
+      setRetentionState("error")
+      setRetentionMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to retain the selected assets.",
+      )
+    }
+  }
 
   const whyText = label(
     record.latestOutcome?.bestAvailablePath ||
@@ -235,6 +301,77 @@ export function PostLiveConversationRecordPanel({
           </button>
         )}
       </div>
+
+      {(formulaExecutionAvailable || scriptExecutionAvailable) && (
+        <div className="mt-5 rounded-[1rem] border border-[#8FB6C9]/[0.14] bg-[#8FB6C9]/[0.035] p-4">
+          <p className="text-[9px] uppercase tracking-[0.18em] text-[#BFD9FF]/48">
+            Retain Learning
+          </p>
+          <p className="mt-2 text-[12px] leading-5 text-white/54">
+            Choose what should remain available after this conversation.
+          </p>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {formulaExecutionAvailable && (
+              <button
+                type="button"
+                disabled={retentionState === "saving"}
+                onClick={() => retainExecutedAssets("formula")}
+                className="rounded-[0.75rem] border border-white/[0.11] px-3 py-2.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/72 transition hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Save Formula
+              </button>
+            )}
+
+            {scriptExecutionAvailable && (
+              <button
+                type="button"
+                disabled={retentionState === "saving"}
+                onClick={() => retainExecutedAssets("script")}
+                className="rounded-[0.75rem] border border-white/[0.11] px-3 py-2.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/72 transition hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Save Script
+              </button>
+            )}
+
+            {formulaExecutionAvailable && scriptExecutionAvailable && (
+              <button
+                type="button"
+                disabled={retentionState === "saving"}
+                onClick={() => retainExecutedAssets("both")}
+                className="rounded-[0.75rem] border border-[#BFD9FF]/30 bg-[#BFD9FF]/[0.07] px-3 py-2.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/88 transition hover:border-[#DCE9FF]/48 hover:bg-[#BFD9FF]/[0.12] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Save Both
+              </button>
+            )}
+
+            <button
+              type="button"
+              disabled={retentionState === "saving"}
+              onClick={() => retainExecutedAssets("neither")}
+              className="rounded-[0.75rem] border border-white/[0.08] px-3 py-2.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/42 transition hover:border-white/20 hover:text-white/68 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Save Neither
+            </button>
+          </div>
+
+          {retentionState !== "idle" && (
+            <p
+              className={`mt-3 text-[11px] leading-5 ${
+                retentionState === "error"
+                  ? "text-[#FFC8C8]"
+                  : retentionState === "saved"
+                    ? "text-[#AEE8C8]"
+                    : "text-white/42"
+              }`}
+            >
+              {retentionState === "saving"
+                ? "Saving retention decision…"
+                : retentionMessage}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-4 border-t border-white/[0.07] pt-3">
         <button
