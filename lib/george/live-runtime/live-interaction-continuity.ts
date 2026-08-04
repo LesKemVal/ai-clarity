@@ -243,6 +243,13 @@ export function buildLiveInteractionContinuity(params: {
     formulaVersion: number
     source: "george" | "user"
   } | null
+  scriptSelection?: {
+    scriptId: string
+    scriptVersion: number
+    formulaId: string
+    formulaVersion: number
+    lineCount: number
+  } | null
   supportSummary?: string
   outcomeGovernor?: OutcomeGovernorSnapshot | null
   outcomeReview?: LiveOutcomeObservation | null
@@ -325,6 +332,7 @@ export function buildLiveInteractionContinuity(params: {
     conversationPackage: updatedPackage,
     conversationRecord: {
       ...conversationRecord,
+      scriptSelection: params.scriptSelection || null,
       operationalDebrief,
       behaviorHypotheses,
       transcriptHighlights,

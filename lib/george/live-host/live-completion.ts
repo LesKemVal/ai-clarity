@@ -211,6 +211,15 @@ export async function completeLiveConversation(
     transcriptEvidenceCount:
       input.transcriptEvidenceCount,
     formulaSelection: setup?.formulaSelection || null,
+    scriptSelection: setup?.customizedScript
+      ? {
+          scriptId: setup.customizedScript.id,
+          scriptVersion: setup.customizedScript.version,
+          formulaId: setup.customizedScript.formulaId,
+          formulaVersion: setup.customizedScript.formulaVersion,
+          lineCount: setup.customizedScript.lines.length,
+        }
+      : null,
     supportSummary: runtimeSummary,
     outcomeGovernor: input.outcomeGovernor,
     outcomeReview,
