@@ -117,13 +117,22 @@ export function RecommendedStrategyCard({
         <div className="mt-2 text-[13px] font-semibold text-white/76">
           No formula selected yet.
         </div>
-        <button
-          type="button"
-          onClick={onChooseAnother}
-          className="mt-4 inline-flex h-9 items-center justify-center rounded-[9px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.08] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D4DCFF]/72 transition hover:border-[#7898FF]/45 hover:text-white"
-        >
-          Browse Formula Library
-        </button>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onChooseAnother}
+            className="inline-flex h-9 items-center justify-center rounded-[9px] border border-[#7898FF]/[0.24] bg-[#4E7CFF]/[0.08] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-[#D4DCFF]/72 transition hover:border-[#7898FF]/45 hover:text-white"
+          >
+            Browse Formula Library
+          </button>
+          <button
+            type="button"
+            onClick={onContinue}
+            className="inline-flex h-9 items-center justify-center rounded-[9px] border border-white/[0.12] px-4 font-mono text-[8px] font-semibold uppercase tracking-[0.15em] text-white/58 transition hover:border-white/28 hover:text-white"
+          >
+            Continue without formula
+          </button>
+        </div>
       </section>
     );
   }

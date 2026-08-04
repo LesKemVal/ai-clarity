@@ -931,7 +931,9 @@ export default function LiveEntryClient() {
         : livePrepOpenSection === "formula"
           ? "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
           : livePrepOpenSection === "ready"
-            ? `GEORGE will use ${formulaName} as the operational reference for this room.`
+            ? activeFormula
+              ? `GEORGE will use ${formulaName} as the operational reference for this room.`
+              : "No formula is required. GEORGE will adapt from the briefing and the room as the conversation unfolds."
             : "";
 
     setReadyRoomTypedPrompt("");
@@ -4512,13 +4514,22 @@ export default function LiveEntryClient() {
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {(["advice", "response"] as const).map((id) => {
-                    const selected = activeSupportPanelId === id;
+                    const selected =
+                      liveBriefingSupportAccepted &&
+                      activeSupportPanelId === id;
 
                     return (
                       <button
                         key={id}
                         type="button"
-                        onClick={() => setActiveAdaptiveSupport(id)}
+                        onClick={() => {
+                          setActiveAdaptiveSupport(id);
+                          setLiveBriefingSupportAccepted(true);
+
+                          window.setTimeout(() => {
+                            setLivePrepOpenSection("formula");
+                          }, 360);
+                        }}
                         className={`flex items-start gap-3 rounded-[12px] border px-4 py-4 text-left transition-all duration-300 ${
                           selected
                             ? "border-[#8FAEFF]/55 bg-[#101A31] -translate-y-0.5"
@@ -4551,27 +4562,6 @@ export default function LiveEntryClient() {
                   })}
                 </div>
 
-                <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[11px] border border-white/[0.08] bg-white/[0.018] px-4 py-4">
-                  <input
-                    type="checkbox"
-                    checked={liveBriefingSupportAccepted}
-                    onChange={(event) => {
-                      const accepted = event.target.checked;
-                      setLiveBriefingSupportAccepted(accepted);
-
-                      if (accepted) {
-                        window.setTimeout(() => {
-                          setLivePrepOpenSection("formula");
-                        }, 360);
-                      }
-                    }}
-                    className="mt-0.5 h-4 w-4 accent-[#7898FF]"
-                  />
-                  <span className="text-[12px] leading-5 text-white/56">
-                    I understand how GEORGE will support me, and I remain
-                    responsible for what I say in the room.
-                  </span>
-                </label>
               </div>
             </section>
 
@@ -4700,13 +4690,13 @@ export default function LiveEntryClient() {
 
                 <div
                   className={`transition-all duration-500 ${
-                    readyRoomPromptComplete && activeFormula
+                    readyRoomPromptComplete
                       ? "opacity-100"
                       : "opacity-30"
                   }`}
                 >
                   <AwakeButton
-                    active={readyRoomPromptComplete && Boolean(activeFormula)}
+                    active={readyRoomPromptComplete}
                     onClick={() => startLive(false, editableResources, true)}
                   >
                     ENTER LIVE
