@@ -8,6 +8,7 @@ const openai = new OpenAI({
 
 type SignalQuestionRequest = {
   role?: string
+  broadGoal?: string
   desiredOutcome?: string
   acceptableOutcome?: string
   audience?: string
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
 
     const knownSignal = {
       role: clean(body.role),
+      broadGoal: clean(body.broadGoal),
       desiredOutcome: clean(body.desiredOutcome),
       acceptableOutcome: clean(body.acceptableOutcome),
       audience: clean(body.audience),

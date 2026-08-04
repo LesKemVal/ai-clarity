@@ -11,10 +11,7 @@ import {
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
-  LIVE_PREPARATION_QUESTIONS,
-  extractEmbeddedDesiredOutcome,
   resolveLivePreparationReadiness,
-  resolveLivePreparationTransition,
 } from "@/lib/george/live-runtime/live-intent-runtime";
 
 import type {
@@ -460,7 +457,6 @@ type SurfacePhase =
   | "selected"
   | "goal"
   | "introduction"
-  | "questions"
   | "decision"
   | "optional"
   | "review";
@@ -551,12 +547,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [introStage, setIntroStage] = useState(0);
   const [decisionReady, setDecisionReady] = useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [editingQuestionKey, setEditingQuestionKey] = useState<string | null>(
-    null,
-  );
-  const [activeQuestionKey, setActiveQuestionKey] = useState<string | null>(
-    null,
-  );
+  const [briefingSufficient, setBriefingSufficient] = useState(false);
   const [optionalQuestion, setOptionalQuestion] =
     useState<HomepageOptionalQuestion | null>(null);
   const [optionalAnswer, setOptionalAnswer] = useState("");
@@ -691,21 +682,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     [visibleRoleGroups],
   );
 
-  const readiness = useMemo(
-    () => resolveLivePreparationReadiness(answers),
-    [answers],
-  );
-  const activeQuestion =
-    LIVE_PREPARATION_QUESTIONS.find(
-      (question) =>
-        question.key === (editingQuestionKey || activeQuestionKey),
-    ) || null;
-  const activeQuestionIndex = activeQuestion
-    ? LIVE_PREPARATION_QUESTIONS.findIndex(
-        (question) => question.key === activeQuestion.key,
-      )
-    : LIVE_PREPARATION_QUESTIONS.length;
-
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -717,8 +693,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     const restoredAnswers = loadLivePreparationSignals();
     setAnswers(restoredAnswers);
-    setEditingQuestionKey(null);
-    setActiveQuestionKey(null);
 
     try {
       const rawSnapshot = window.sessionStorage.getItem(
@@ -822,11 +796,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     phase === "introduction" && introStage >= 1,
     24,
   );
-  const questionText = useTypewriter(
-    activeQuestion?.question || "",
-    phase === "questions" && Boolean(activeQuestion),
-    24,
-  );
   const decisionText = useTypewriter(
     "GEORGE has enough information to prepare for LIVE. Review the brief now, or continue briefing with optional follow-up questions.",
     phase === "decision",
@@ -851,8 +820,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setPhase("selected");
     setIntroStage(0);
     setDecisionReady(false);
-    setEditingQuestionKey(null);
-    setActiveQuestionKey(null);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -871,8 +838,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setPhase("selection");
     setIntroStage(0);
     setDecisionReady(false);
-    setEditingQuestionKey(null);
-    setActiveQuestionKey(null);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -903,8 +868,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function goBack() {
-    setEditingQuestionKey(null);
-
     if (phase === "selected") {
       resetSelection();
       return;
@@ -920,23 +883,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       return;
     }
 
-    if (phase === "questions") {
+    if (phase === "decision" || phase === "optional") {
       setPhase("introduction");
       return;
     }
 
-    if (phase === "decision") {
-      setPhase("questions");
-      return;
-    }
-
-    if (phase === "optional") {
-      setPhase("decision");
-      return;
-    }
-
     if (phase === "review") {
-      setPhase(Object.keys(optionalAnswers).length > 0 ? "optional" : "decision");
+      setPhase("decision");
     }
   }
 
@@ -944,62 +897,16 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const freshAnswers: Record<string, string> = {
       ...answers,
       role: answers.role || selectedRole?.label || "",
-      desiredOutcome: answers.desiredOutcome || selectedGoal || "",
+      broadGoal: answers.broadGoal || selectedGoal || "",
     };
-    const transition = resolveLivePreparationTransition(freshAnswers);
 
     setAnswers(freshAnswers);
     saveLivePreparationSignals(freshAnswers);
-    setEditingQuestionKey(null);
-
-    if (!transition.question) {
-      setActiveQuestionKey(null);
-      setPhase("decision");
-      return;
-    }
-
-    setActiveQuestionKey(transition.question.key);
-    setPhase("questions");
-  }
-
-  function saveCurrentAnswer() {
-    if (!activeQuestion) return;
-
-    const answer = String(answers[activeQuestion.key] || "").trim();
-    if (!answer) return;
-
-    const embeddedOutcome =
-      activeQuestion.key === "conversationContext"
-        ? extractEmbeddedDesiredOutcome(answer)
-        : "";
-
-    const nextSignals = {
-      ...answers,
-      [activeQuestion.key]: answer,
-      ...(embeddedOutcome && !String(answers.desiredOutcome || "").trim()
-        ? { desiredOutcome: embeddedOutcome }
-        : {}),
-    };
-
-    setAnswers(nextSignals);
-    saveLivePreparationSignals(nextSignals);
-
-    if (editingQuestionKey) {
-      setEditingQuestionKey(null);
-      setActiveQuestionKey(null);
-      setPhase("review");
-      return;
-    }
-
-    const nextTransition = resolveLivePreparationTransition(nextSignals);
-
-    if (nextTransition.question) {
-      setActiveQuestionKey(nextTransition.question.key);
-      return;
-    }
-
-    setActiveQuestionKey(null);
-    window.setTimeout(() => setPhase("decision"), 260);
+    setBriefingSufficient(false);
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setPhase("optional");
+    void requestHomepageOptionalQuestion({}, []);
   }
 
   async function requestHomepageOptionalQuestion(
@@ -1015,7 +922,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          role: answers.role || "",
+          role: answers.role || selectedRole?.label || "",
+          broadGoal: answers.broadGoal || selectedGoal || "",
           desiredOutcome: answers.desiredOutcome || "",
           acceptableOutcome: "",
           audience: "",
@@ -1035,7 +943,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       ) {
         setOptionalQuestion(null);
         setOptionalAnswer("");
-        setPhase("review");
+        setBriefingSufficient(true);
+        setPhase("decision");
         return;
       }
 
@@ -1051,6 +960,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
         example: String(payload.example || "Answer if useful, or skip."),
       };
 
+      setBriefingSufficient(false);
       setOptionalQuestion(nextQuestion);
       setOptionalQuestionHistory((current) => ({
         ...current,
@@ -1152,10 +1062,13 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   function preserveHomepageHandoff(
     workflowAction: HomepageBriefingAction,
   ) {
-    if (!selectedType || !readiness.thresholdMet) return false;
+    if (!selectedType || !briefingSufficient) return false;
 
     const signals = Object.fromEntries(
-      Object.entries(answers)
+      Object.entries({
+        ...answers,
+        ...optionalAnswers,
+      })
         .map(([key, value]) => [key, String(value || "").trim()])
         .filter(([, value]) => Boolean(value)),
     );
@@ -1171,7 +1084,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           conversationType: selectedType.title,
           conversationGroup: selectedType.group,
           signals,
-          readiness: resolveLivePreparationReadiness(signals),
+          readiness: {
+            ...resolveLivePreparationReadiness(signals),
+            source: "openai",
+            thresholdMet: briefingSufficient,
+            complete: briefingSufficient,
+          },
           optionalSignals: optionalAnswers,
           workflowAction,
           createdAt: Date.now(),
@@ -1183,8 +1101,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function continueHomepageBriefing() {
-    if (!selectedType || !readiness.thresholdMet) return;
+    if (!selectedType) return;
 
+    setBriefingSufficient(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setPhase("optional");
@@ -1308,7 +1227,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 sm:p-5 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-7">
               <div
                 className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
-                  phase === "questions" ? "border-transparent pb-3" : ""
+                  phase === "optional" ? "border-transparent pb-3" : ""
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 sm:gap-3">
@@ -1324,12 +1243,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
                   <div
                     className={`shrink-0 transition-all duration-500 ${
-                      phase === "questions"
+                      phase === "optional"
                         ? "pointer-events-none -translate-y-1 opacity-0"
                         : "translate-y-0 opacity-100"
                     }`}
                   >
-                    {phase !== "selected" && phase !== "questions" && (
+                    {phase !== "selected" && phase !== "optional" && (
                       <div className="flex gap-2 flex-col items-stretch shrink-0 w-[116px] sm:w-[132px]">
                         <button
                           type="button"
@@ -1582,78 +1501,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 </div>
               )}
 
-              {phase === "questions" && activeQuestion && (
-                <div
-                  key={activeQuestion.key}
-                  className="pt-5 animate-[fadeIn_420ms_ease-out]"
-                >
-                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/52">
-                    {activeQuestion.kicker}
-                  </div>
-
-                  <h3 className="mt-3 min-h-[58px] max-w-4xl font-mono text-[18px] leading-7 tracking-[-0.025em] text-white sm:text-[21px]">
-                    {questionText}
-                  </h3>
-
-                  <p className="mt-2 max-w-3xl text-[12px] leading-5 text-white/36">
-                    {activeQuestion.examples}
-                  </p>
-
-                  <textarea
-                    autoFocus
-                    value={answers[activeQuestion.key] || ""}
-                    onChange={(event) =>
-                      setAnswers((current) => ({
-                        ...current,
-                        [activeQuestion.key]: event.target.value,
-                      }))
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" && !event.shiftKey) {
-                        event.preventDefault();
-                        saveCurrentAnswer();
-                      }
-                    }}
-                    rows={2}
-                    placeholder="Type your answer"
-                    className="mt-4 min-h-[104px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/18 focus:border-[#7EA1FF]/45 focus:bg-black/30"
-                  />
-
-                  <div className="mt-4 flex items-center justify-between gap-2 sm:gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/26">
-                        {activeQuestionIndex + 1} of{" "}
-                        {LIVE_PREPARATION_QUESTIONS.length}
-                      </span>
-
-                      <div className="flex gap-1" aria-hidden="true">
-                        {LIVE_PREPARATION_QUESTIONS.map((question, index) => (
-                          <span
-                            key={question.key}
-                            className={`h-[3px] w-4 rounded-full transition-colors duration-300 ${
-                              index <= activeQuestionIndex
-                                ? "bg-[#7EA1FF]/68"
-                                : "bg-white/[0.09]"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={saveCurrentAnswer}
-                      disabled={
-                        !String(answers[activeQuestion.key] || "").trim()
-                      }
-                      className="h-10 rounded-[10px] border border-[#7EA1FF]/42 bg-[#11182A] px-4 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/70 hover:bg-[#18213A] disabled:cursor-not-allowed disabled:opacity-25"
-                    >
-                      Continue →
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {phase === "optional" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
                   <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
@@ -1688,14 +1535,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                         placeholder={optionalQuestion.example}
                         className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                       />
-                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={reviewHomepageAnswers}
-                          className="rounded-[10px] border border-white/[0.14] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white/68 transition hover:border-white/30 hover:text-white"
-                        >
-                          Start Live
-                        </button>
+                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
                         <div className="flex gap-2">
                           <button
                             type="button"
@@ -1722,7 +1562,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       onClick={reviewHomepageAnswers}
                       className="mt-5 rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.17em] text-white"
                     >
-                          Start Live
+                          Continue
                         </button>
                   )}
                 </div>
@@ -1746,7 +1586,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     <button
                       type="button"
                       onClick={continueHomepageBriefing}
-                      disabled={!readiness.thresholdMet}
+                      disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Continue briefing
@@ -1754,7 +1594,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     <button
                       type="button"
                       onClick={() => setPhase("review")}
-                      disabled={!readiness.thresholdMet}
+                      disabled={!briefingSufficient}
                       className="min-w-[160px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Start Live
@@ -1769,34 +1609,32 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     Review answers
                   </div>
                   <div className="mt-5 space-y-3">
-                    {LIVE_PREPARATION_QUESTIONS.map((question) => (
-                      <div
-                        key={question.key}
-                        className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
-                      >
-                        <div className="flex items-start justify-between gap-2 sm:gap-3">
-                          <div>
-                            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
-                              {question.question}
-                            </p>
-                            <p className="mt-2 text-[14px] leading-6 text-white/76">
-                              {answers[question.key]}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingQuestionKey(question.key);
-                              setActiveQuestionKey(question.key);
-                              setPhase("questions");
-                            }}
-                            className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-[#AEB6FF]/72 transition hover:text-white"
-                          >
-                            Edit
-                          </button>
+                    {[
+                      {
+                        key: "role",
+                        label: "Role",
+                        value: answers.role || selectedRole?.label || "",
+                      },
+                      {
+                        key: "broadGoal",
+                        label: "Goal",
+                        value: answers.broadGoal || selectedGoal || "",
+                      },
+                    ]
+                      .filter((item) => String(item.value || "").trim())
+                      .map((item) => (
+                        <div
+                          key={item.key}
+                          className="rounded-[16px] border border-white/[0.08] bg-white/[0.02] p-4"
+                        >
+                          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/38">
+                            {item.label}
+                          </p>
+                          <p className="mt-2 text-[14px] leading-6 text-white/76">
+                            {item.value}
+                          </p>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
 
                   {Object.keys(optionalAnswers).length > 0 && (
@@ -1837,7 +1675,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}
-                      disabled={!readiness.thresholdMet}
+                      disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Approve and continue
