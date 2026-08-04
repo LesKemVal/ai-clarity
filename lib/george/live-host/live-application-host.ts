@@ -29,6 +29,7 @@ export {
 export { reconcileActiveLiveRuntimeUsage } from './live-runtime-usage'
 
 export {
+  beginNextLiveConversation,
   completeLiveConversation,
   prepareLiveCompletionReview,
   readLastLiveOutcomeObservation,

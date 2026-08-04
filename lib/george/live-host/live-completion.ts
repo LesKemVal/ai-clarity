@@ -46,6 +46,13 @@ export type LiveCompletionResult = {
   >["conversationRecord"]
 }
 
+export type BeginNextLiveConversationInput = {
+  enterLiveMode: () => void
+  startListening: () => void
+  onReady?: () => void
+  restartDelayMs?: number
+}
+
 function readStoredSetup() {
   if (typeof window === "undefined") return null
 
@@ -87,6 +94,27 @@ async function requestOperationalLearning(
       `Operational learning request failed: ${response.status}`
     )
   }
+}
+
+export function beginNextLiveConversation(
+  input: BeginNextLiveConversationInput
+) {
+  if (typeof window === "undefined") {
+    throw new Error(
+      "Beginning the next LIVE conversation requires the browser host"
+    )
+  }
+
+  window.localStorage.removeItem(
+    LAST_OUTCOME_OBSERVATION_KEY
+  )
+
+  input.enterLiveMode()
+
+  window.setTimeout(() => {
+    input.startListening()
+    input.onReady?.()
+  }, input.restartDelayMs ?? 180)
 }
 
 export function readLastLiveOutcomeObservation() {

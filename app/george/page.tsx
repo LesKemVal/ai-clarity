@@ -71,6 +71,7 @@ import {
   persistActiveLiveRuntimeSupport,
   readActiveLiveRuntimeSupport,
   readGeorgeNormalDraft,
+  beginNextLiveConversation,
   completeLiveConversation,
   prepareLiveCompletionReview,
   recordLiveOutcomeSignal,
@@ -3456,6 +3457,22 @@ export default function Page({
 
   const requestExitLiveMode = () => {
     setShowExitPopup(true);
+  };
+
+  const beginNextRepeatedConversation = () => {
+    setShowConversationRecord(false);
+    setLastConversationRecord(null);
+    setLiveOutcomeReview(null);
+    setPendingLiveExitAction(null);
+
+    beginNextLiveConversation({
+      enterLiveMode,
+      startListening,
+      onReady: () => {
+        setToastMessage("Ready for next call");
+        setShowToast(true);
+      },
+    });
   };
 
   const exitLiveMode = () => {
@@ -8453,6 +8470,7 @@ I’ll stay with you.`,
                             <PostLiveConversationRecordPanel
                               record={lastConversationRecord}
                               onClose={() => setShowConversationRecord(false)}
+                              onNextCall={beginNextRepeatedConversation}
                             />
                           </div>,
                           document.body,
