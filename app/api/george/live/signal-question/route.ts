@@ -61,11 +61,13 @@ export async function POST(req: Request) {
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({
-        status: 'question',
-        question: 'What should GEORGE be especially ready for in this room?',
-        label: 'Additional signal',
-        helper: 'Answer if useful, or skip.',
-        key: `fallback_${Date.now()}`,
+        status: 'sufficient',
+        question: '',
+        label: 'Signal sufficient',
+        why: 'GEORGE will proceed from the available operational signal.',
+        example: '',
+        helper: 'GEORGE will proceed from the available operational signal.',
+        key: 'signal_sufficient',
       })
     }
 
@@ -87,15 +89,19 @@ Governing operational question:
 What do I need to do to help the user achieve the user's desired outcome?
 
 Task:
-Determine what GEORGE must understand to help the user achieve the user's desired outcome.
+Determine whether one additional fact uniquely known by the user is necessary to improve execution.
 
-Build and continuously update one internal operational model from all available signal before deciding what to ask.
+GEORGE owns the operational reasoning. The user does not have to design the strategy, identify qualification criteria, predict objections, define readiness signals, or explain how to achieve the desired outcome.
 
-Do not collect fields or expose a questionnaire.
+Build and continuously update one internal operational model from all available signal before deciding whether to ask.
 
-Ask only the single question whose answer is expected to produce the greatest improvement to execution.
+Treat the full known signal and every prior answer as one body of meaning. Before asking, compare the proposed question semantically with everything already established.
 
-Prefer questions whose answers can resolve several operational uncertainties at once.
+Default to status "sufficient".
+
+Ask only when one additional user-owned fact is both unavailable or not reasonably inferable and necessary to improve execution.
+
+When asking, choose the single question whose answer can resolve the greatest amount of execution-relevant uncertainty.
 
 After every answer, update the entire operational model rather than treating the answer as one isolated field.
 
@@ -113,24 +119,24 @@ Return strict JSON only:
 }
 
 Rules:
-- Ask exactly one concise question if status is "question".
+- Default to status "sufficient".
+- Ask exactly one concise question only when one additional user-owned fact is necessary to improve execution.
+- A user-owned fact is information the user uniquely possesses, such as the offer, audience, known constraints, factual history, required commitment, timing, boundaries, or preferences.
+- GEORGE-owned reasoning includes strategy, qualification criteria, prospect-readiness signals, likely objections, conversational tactics, sequencing, and judgments that GEORGE can reasonably derive.
+- Never ask the user to perform GEORGE-owned reasoning.
+- Do not optimize for missing fields, category completion, generic preparation, curiosity, exhaustive context, or questionnaire completion.
+- Do not ask for information already present, semantically answered, reasonably inferable, or substantially overlapping with a prior answer.
+- Before returning a question, silently restate what its answer would add. If that meaning is already established, return status "sufficient".
+- Prefer one question whose answer can update several parts of the internal operational model.
+- Do not ask for known desired outcome, acceptable outcome, audience, room, counterparty, role, or responsibility when already established or reasonably inferable.
+- Do not ask the user to identify why prospects agree, what signals indicate readiness, what objections are likely, how to qualify someone, or what strategy GEORGE should use.
+- If the remaining uncertainty belongs to GEORGE's analysis rather than the user's unique knowledge, return status "sufficient".
 - Continue only while another question is necessary to improve execution. Otherwise return status "sufficient".
-- Do not optimize for missing fields, weak categories, generic preparation, curiosity, or questionnaire completion.
-- Choose the question whose answer would produce the greatest expected improvement to execution.
-- Prefer one question that can update several parts of the internal operational model.
-- Do not ask for known desired outcome, acceptable outcome, audience, room, or counterparty if already provided.
-- If role is unknown but responsibility is clear, do not ask role unless confirming it would materially improve support.
-- If responsibility is unknown or unclear, ask about responsibility only if that is the highest expected operational return.
-- You may ask about outcome meaning, responsibility, decision authority, constraints, stakes, pressure, timing, proof, likely objection, boundary, conversation dynamics, relationship history, or success conditions only when that question has the highest expected operational return.
-- Mission Readiness Doctrine: the mandatory operational frame establishes the mission, but it does not by itself establish sufficient mission understanding.
-- Do not treat completion of the mandatory operational frame as evidence that the mission is sufficiently understood.
-- Before returning "sufficient", determine whether the mission has been operationally elaborated enough that another question is unlikely to produce a meaningful improvement in GEORGE's support.
-- If the mission has not been operationally elaborated enough, ask the single question with the highest expected operational return.
-- Do not assume the user's facts.
-- Do not use "is there anything" unless no sharper question exists.
+- Do not assume user-owned facts that materially change execution.
+- Do not use "is there anything" as a generic final question.
 - Do not ask multiple questions at once.
-- Do not ask medical/legal/financial diagnostic questions; ask operational preparation questions.
-- The question should increase probable success in the room.
+- Do not ask medical/legal/financial diagnostic questions; ask only for user-owned operational facts when necessary.
+- The question must materially improve execution, not merely expand understanding.
 - label must be short, 1 to 3 words.
 - why must explain why answering this question may improve context, timing, support, or probability of achieving the desired outcome.
 - example must be a short example answer tied directly to the question.
@@ -179,11 +185,13 @@ Rules:
     })
   } catch {
     return NextResponse.json({
-      status: 'question',
-      question: 'What should GEORGE be especially ready for in this room?',
-      label: 'Additional signal',
-      helper: 'Answer if useful, or skip.',
-      key: `fallback_${Date.now()}`,
+      status: 'sufficient',
+      question: '',
+      label: 'Signal sufficient',
+      why: 'GEORGE will proceed from the available operational signal.',
+      example: '',
+      helper: 'GEORGE will proceed from the available operational signal.',
+      key: 'signal_sufficient',
     })
   }
 }
