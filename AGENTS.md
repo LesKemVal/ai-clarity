@@ -28,7 +28,46 @@ Always follow this order:
 5. Make the smallest change that satisfies the milestone.
 6. Build after every change.
 7. Never leave the repository in a failing build state.
-8. Do not commit unless explicitly instructed.
+8. ## Commit Authority
+
+DO NOT commit.
+
+After implementation:
+
+- Run all required validation.
+- Stop.
+- Present the diff.
+- Wait for explicit user approval.
+
+Never create a commit automatically.
+Never create a pull request automatically.
+Never push automatically.
+
+---
+
+## Architectural Authority
+
+Implementation is authoritative.
+
+When implementation and documentation differ:
+
+1. Inspect implementation.
+2. Identify the canonical owner.
+3. Patch implementation if required.
+4. Synchronize documentation afterward.
+
+Do not redesign architecture because documentation appears outdated.
+
+---
+
+## Multi-Owner Changes
+
+If a milestone appears to require changes across multiple canonical owners:
+
+- stop
+- explain why
+- propose the smallest implementation sequence
+- wait for approval before modifying additional owners
 
 ---
 
