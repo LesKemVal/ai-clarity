@@ -5,8 +5,8 @@ import { LiveHubDeliveryBridge } from './LiveHubDeliveryBridge'
 import { markRuntimeEvent } from '@/lib/george/live-metrics/runtime-metrics'
 import { subscribeGeorgeApprovedDeliveryReplay } from '@/lib/george/live-runtime/approved-delivery-history'
 import {
-  resolveGeorgeVisualPresentationDecision,
-  resolveGeorgeVisualPresentationHoldMs,
+  resolveGeorgeVisualPresentationPlan,
+  type GeorgeVisualPresentationPlan,
 } from '@/lib/george/live-delivery/visual-presentation-policy'
 import type { GeorgeLiveHubContext } from '@/lib/george/live-hub/types'
 import type {
@@ -31,6 +31,11 @@ type VisualCueState = {
   at: number
 }
 
+type VisualCueSource = Pick<
+  GeorgeDeliveryCue,
+  'turnId' | 'priority' | 'confidence' | 'source'
+>
+
 export function LiveHubVisualCueBridge({
   active,
   context,
@@ -42,12 +47,103 @@ export function LiveHubVisualCueBridge({
   const lastCueRef = useRef('')
   const currentPriorityRef = useRef(0)
   const lastRenderedAtRef = useRef(0)
+  const sequenceTimerRef = useRef<number | null>(null)
+  const sequenceTokenRef = useRef(0)
+  const activeRef = useRef(active)
+
+  const cancelVisualSequence = useCallback(() => {
+    sequenceTokenRef.current += 1
+
+    if (sequenceTimerRef.current !== null) {
+      window.clearTimeout(sequenceTimerRef.current)
+      sequenceTimerRef.current = null
+    }
+  }, [])
+
+  const executeVisualPresentationPlan = useCallback(
+    (cue: VisualCueSource, plan: GeorgeVisualPresentationPlan) => {
+      if (
+        plan.decision.action !== 'present' ||
+        plan.stages.length === 0
+      ) {
+        return
+      }
+
+      cancelVisualSequence()
+      const sequenceToken = sequenceTokenRef.current
+
+      lastCueRef.current = plan.decision.text
+      currentPriorityRef.current = plan.priority
+      lastRenderedAtRef.current = plan.decision.now
+
+      markRuntimeEvent(
+        cue.turnId || plan.decision.text,
+        'visual_cue_received'
+      )
+
+      const renderStage = (stageIndex: number) => {
+        if (
+          !activeRef.current ||
+          sequenceTokenRef.current !== sequenceToken
+        ) {
+          return
+        }
+
+        const stage = plan.stages[stageIndex]
+        if (!stage) return
+        const renderedAt =
+          stageIndex === 0 ? plan.decision.now : Date.now()
+
+        lastRenderedAtRef.current = renderedAt
+
+        setVisualCue({
+          turnId: cue.turnId,
+          text: stage.text,
+          priority: cue.priority,
+          confidence: cue.confidence,
+          source: cue.source,
+          at: renderedAt,
+        })
+
+        const isFinalStage = stageIndex === plan.stages.length - 1
+
+        if (stage.durationMs <= 0) {
+          if (!isFinalStage) renderStage(stageIndex + 1)
+          return
+        }
+
+        sequenceTimerRef.current = window.setTimeout(() => {
+          sequenceTimerRef.current = null
+
+          if (
+            !activeRef.current ||
+            sequenceTokenRef.current !== sequenceToken
+          ) {
+            return
+          }
+
+          if (!isFinalStage) {
+            renderStage(stageIndex + 1)
+            return
+          }
+
+          currentPriorityRef.current = 0
+          setVisualCue(null)
+        }, stage.durationMs)
+      }
+
+      renderStage(0)
+    },
+    [cancelVisualSequence]
+  )
 
   const handleVisualCue = useCallback(
     (cue: GeorgeDeliveryCue) => {
-      const decision = resolveGeorgeVisualPresentationDecision({
-        text: cue.text,
+      const plan = resolveGeorgeVisualPresentationPlan({
+        fallbackText: cue.text,
+        operationalAssessment: cue.operationalAssessment,
         candidatePriority: cue.priority,
+        receiverProfile,
         currentText: lastCueRef.current,
         currentPriority: currentPriorityRef.current,
         hasCurrentCue: Boolean(visualCue),
@@ -55,7 +151,7 @@ export function LiveHubVisualCueBridge({
       })
 
       console.info('[LIVE][visual-bridge][candidate]', {
-        clean: decision.text,
+        clean: plan.decision.text,
         source: cue.source,
         priority: cue.priority,
         confidence: cue.confidence,
@@ -66,37 +162,22 @@ export function LiveHubVisualCueBridge({
         currentPriority: currentPriorityRef.current,
         ageMs: Date.now() - lastRenderedAtRef.current,
         turnId: cue.turnId,
-        presentationAction: decision.action,
-        presentationReason: decision.reason,
+        presentationAction: plan.decision.action,
+        presentationReason: plan.decision.reason,
+        presentationStageCount: plan.stages.length,
       })
 
-      if (decision.action === 'suppress') {
+      if (plan.decision.action === 'suppress') {
         console.info(
           '[LIVE][visual-bridge][blocked]',
-          decision.reason
+          plan.decision.reason
         )
         return
       }
 
-      lastCueRef.current = decision.text
-      currentPriorityRef.current = cue.priority
-      lastRenderedAtRef.current = decision.now
-
-      markRuntimeEvent(
-        cue.turnId || decision.text,
-        'visual_cue_received'
-      )
-
-      setVisualCue({
-        turnId: cue.turnId,
-        text: decision.text,
-        priority: cue.priority,
-        confidence: cue.confidence,
-        source: cue.source,
-        at: decision.now,
-      })
+      executeVisualPresentationPlan(cue, plan)
     },
-    [receiverProfile, visualCue, voiceEnabled]
+    [executeVisualPresentationPlan, receiverProfile, visualCue, voiceEnabled]
   )
 
   const handleVoiceCue = useCallback(
@@ -117,13 +198,24 @@ export function LiveHubVisualCueBridge({
   )
 
   useEffect(() => {
+    activeRef.current = active
+
     if (!active) {
+      cancelVisualSequence()
       lastCueRef.current = ''
       currentPriorityRef.current = 0
       lastRenderedAtRef.current = 0
       setVisualCue(null)
     }
-  }, [active])
+  }, [active, cancelVisualSequence])
+
+  useEffect(
+    () => () => {
+      activeRef.current = false
+      cancelVisualSequence()
+    },
+    [cancelVisualSequence]
+  )
 
   useEffect(() => {
     if (!active) return
@@ -131,27 +223,19 @@ export function LiveHubVisualCueBridge({
     return subscribeGeorgeApprovedDeliveryReplay(({ delivery }) => {
       if (receiverProfile === 'audio_only') return
 
-      const now = Date.now()
-
-      lastCueRef.current = delivery.text
-      currentPriorityRef.current = delivery.priority
-      lastRenderedAtRef.current = now
-
-      setVisualCue({
-        turnId: delivery.turnId,
-        text: delivery.text,
-        priority: delivery.priority,
-        confidence: delivery.confidence,
-        source: delivery.source,
-        at: now,
+      const plan = resolveGeorgeVisualPresentationPlan({
+        fallbackText: delivery.text,
+        candidatePriority: delivery.priority,
+        receiverProfile,
+        currentText: '',
+        currentPriority: 0,
+        hasCurrentCue: false,
+        lastRenderedAt: 0,
       })
 
-      markRuntimeEvent(
-        delivery.turnId || delivery.text,
-        'visual_cue_received'
-      )
+      executeVisualPresentationPlan(delivery, plan)
     })
-  }, [active, receiverProfile])
+  }, [active, executeVisualPresentationPlan, receiverProfile])
 
   useEffect(() => {
     if (!visualCue) return
@@ -160,19 +244,7 @@ export function LiveHubVisualCueBridge({
       visualCue.turnId || visualCue.text,
       'visual_cue_rendered'
     )
-
-    const holdMs =
-      resolveGeorgeVisualPresentationHoldMs(receiverProfile)
-
-    if (holdMs <= 0) return
-
-    const timeout = window.setTimeout(() => {
-      currentPriorityRef.current = 0
-      setVisualCue(null)
-    }, holdMs)
-
-    return () => window.clearTimeout(timeout)
-  }, [receiverProfile, visualCue])
+  }, [visualCue])
 
   return (
     <>
