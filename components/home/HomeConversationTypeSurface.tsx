@@ -797,7 +797,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     24,
   );
   const decisionText = useTypewriter(
-    "GEORGE has enough information to prepare for LIVE. Review the brief now, or continue briefing with optional follow-up questions.",
+    "GEORGE has enough information to prepare for LIVE.",
     phase === "decision",
     24,
   );
@@ -1098,16 +1098,6 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     } catch {}
 
     return true;
-  }
-
-  function continueHomepageBriefing() {
-    if (!selectedType) return;
-
-    setBriefingSufficient(false);
-    setOptionalQuestion(null);
-    setOptionalAnswer("");
-    setPhase("optional");
-    void requestHomepageOptionalQuestion();
   }
 
   function approveAndContinueToLive() {
@@ -1585,17 +1575,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                   >
                     <button
                       type="button"
-                      onClick={continueHomepageBriefing}
+                      onClick={approveAndContinueToLive}
                       disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
-                    >
-                      Continue briefing
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPhase("review")}
-                      disabled={!briefingSufficient}
-                      className="min-w-[160px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                     >
                       Start Live
                     </button>
