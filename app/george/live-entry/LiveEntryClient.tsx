@@ -709,6 +709,8 @@ export default function LiveEntryClient() {
     useState<LiveMechanicsSection | null>("support");
   const [popup3EditingMechanic, setPopup3EditingMechanic] =
     useState<LiveMechanicsSection | null>(null);
+  const [supportAssessmentExplanationOpen, setSupportAssessmentExplanationOpen] =
+    useState(false);
   const [
     liveBriefingExpandedSupportPanel,
     setLiveBriefingExpandedSupportPanel,
@@ -1019,21 +1021,30 @@ export default function LiveEntryClient() {
           liveBriefingCommunicationConfirmed &&
           (liveEntryRoute === "homepage" || liveRecoveryAcknowledged),
       );
+      const hasConfirmedSupportAssessment =
+        liveEntryRoute === "homepage"
+          ? hasCompletedSupportConfiguration && liveBriefingSupportAccepted
+          : hasCompletedSupportConfiguration;
 
       setLivePrepOpenSection((current) =>
-        hasCompletedSupportConfiguration
+        hasConfirmedSupportAssessment
           ? current === "ready"
             ? "ready"
             : "formula"
           : "support",
       );
-      setLiveBriefingSupportAccepted(hasCompletedSupportConfiguration);
+      if (liveEntryRoute !== "homepage") {
+        setLiveBriefingSupportAccepted(hasCompletedSupportConfiguration);
+      } else if (!hasCompletedSupportConfiguration) {
+        setLiveBriefingSupportAccepted(false);
+      }
       setReadyRoomTypedPrompt("");
       setReadyRoomPromptComplete(false);
     }
   }, [
     liveBriefingActiveSupportStyle,
     liveBriefingCommunicationConfirmed,
+    liveBriefingSupportAccepted,
     liveBriefingStep,
     liveEntryRoute,
     liveRecoveryAcknowledged,
@@ -1058,7 +1069,9 @@ export default function LiveEntryClient() {
 
     const text =
       livePrepOpenSection === "support"
-        ? "How GEORGE supports you changes how the room feels. Choose the support you want available."
+        ? liveEntryRoute === "homepage"
+          ? "Review GEORGE's recommended support configuration for this briefing."
+          : "Your completed mechanics carry forward into this room."
         : livePrepOpenSection === "formula"
           ? preparationResumeMessage ||
             "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
@@ -1087,6 +1100,7 @@ export default function LiveEntryClient() {
     return () => window.clearInterval(timer);
   }, [
     liveBriefingStep,
+    liveEntryRoute,
     livePrepOpenSection,
     operationalRecommendation,
     preparationResumeMessage,
@@ -1720,7 +1734,8 @@ export default function LiveEntryClient() {
         setReceiverProfileConfirmed(true);
         setCommunicationStyle(homepageRecommendation.communicationStyle);
         setLiveBriefingCommunicationConfirmed(true);
-        setLiveBriefingSupportAccepted(true);
+        setLiveBriefingSupportAccepted(false);
+        setSupportAssessmentExplanationOpen(false);
 
         window.localStorage.setItem(
           "GEORGE_LIVE_SUPPORT_STYLE",
@@ -1896,7 +1911,8 @@ export default function LiveEntryClient() {
           void loadOperationalRecommendation();
         }, 0);
         setLiveBriefingToaAccepted(true);
-        setLiveBriefingSupportAccepted(true);
+        setLiveBriefingSupportAccepted(false);
+        setSupportAssessmentExplanationOpen(false);
         setLiveBriefingCommunicationConfirmed(true);
         setLiveRecoveryAcknowledged(true);
         setLiveReadyAccepted(false);
@@ -3746,7 +3762,8 @@ export default function LiveEntryClient() {
 
     setLiveBriefingActiveSupportStyle(panelId);
     setSelectedSupportStyle(normalizeLiveSupportStyle(runtimeStyle));
-    setLiveBriefingSupportAccepted(true);
+    setLiveBriefingSupportAccepted(false);
+    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
@@ -3773,7 +3790,8 @@ export default function LiveEntryClient() {
   ) => {
     setSelectedReceiverProfile(profile);
     setReceiverProfileConfirmed(true);
-    setLiveBriefingSupportAccepted(true);
+    setLiveBriefingSupportAccepted(false);
+    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
@@ -3815,7 +3833,8 @@ export default function LiveEntryClient() {
   const setActiveCommunicationStyle = (style: string) => {
     setCommunicationStyle(style);
     setLiveBriefingCommunicationConfirmed(true);
-    setLiveBriefingSupportAccepted(true);
+    setLiveBriefingSupportAccepted(false);
+    setSupportAssessmentExplanationOpen(false);
     setLiveRecoveryAcknowledged(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
@@ -4598,29 +4617,15 @@ export default function LiveEntryClient() {
       goToPreviousLivePreparationState();
     };
 
-    const compactChoice = (
-      label: string,
-      value: string,
-      onClick: () => void,
-    ) => (
-      <button
-        type="button"
-        onClick={onClick}
-        className="flex w-full -translate-y-1 items-center justify-between gap-4 rounded-[11px] border border-white/[0.09] bg-white/[0.025] px-4 py-3 text-left transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-[#8FAEFF]/32"
-      >
-        <span className="font-mono text-[8px] font-semibold uppercase tracking-[0.18em] text-white/34">
-          {label}
-        </span>
-        <span className="text-[12px] font-semibold text-white/82">
-          ✓ {value}
-        </span>
-      </button>
-    );
+    const supportAssessmentSummary = `${activeAdaptiveSupportPanel.label} · ${activeReceiverPanel.label} · ${communicationStyle}`;
 
     const changeMechanicFromReadyRoom = (
       section: LiveMechanicsSection,
     ) => {
       if (liveEntryRoute === "homepage") {
+        setLiveBriefingSupportAccepted(false);
+        setSupportAssessmentExplanationOpen(false);
+        setLivePrepOpenSection("support");
         setPopup3EditingMechanic(section);
         return;
       }
@@ -4629,6 +4634,25 @@ export default function LiveEntryClient() {
       setLiveBriefingOpenMechanicsPanel(section);
       setLiveBriefingStep(2);
       setShowLiveBriefingRoom(true);
+    };
+
+    const reopenSupportAssessment = () => {
+      if (liveEntryRoute !== "homepage") {
+        changeMechanicFromReadyRoom("support");
+        return;
+      }
+
+      setPopup3EditingMechanic(null);
+      setSupportAssessmentExplanationOpen(false);
+      setLiveBriefingSupportAccepted(false);
+      setLivePrepOpenSection("support");
+    };
+
+    const confirmSupportAssessment = () => {
+      setPopup3EditingMechanic(null);
+      setSupportAssessmentExplanationOpen(false);
+      setLiveBriefingSupportAccepted(true);
+      setLivePrepOpenSection("formula");
     };
 
     return (
@@ -4647,107 +4671,184 @@ export default function LiveEntryClient() {
 
           <div className="mt-4 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[#07090D] px-5 py-5">
             <div className="space-y-3">
+              {liveBriefingSupportAccepted &&
+                compactMechanicsChoice({
+                  label:
+                    liveEntryRoute === "homepage"
+                      ? "Support assessment"
+                      : "Popup 2 mechanics",
+                  value:
+                    liveEntryRoute === "homepage"
+                      ? "I agree with this assessment"
+                      : "Mechanics acknowledged",
+                  summary: supportAssessmentSummary,
+                  onChange: reopenSupportAssessment,
+                })}
+
               {livePrepOpenSection === "ready" &&
-                compactChoice(
-                  "Formula",
-                  `${activeFormulaLabel} · ${formulaProofLabel}`,
-                    () => setLivePrepOpenSection("formula"),
-                )}
-
-              <div className="rounded-[14px] border border-[#7EA1FF]/[0.14] bg-[#4E7CFF]/[0.035] p-3">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D7DCFF]/52">
-                      Current-session support
-                    </div>
-                    <div className="mt-1 text-[11px] leading-5 text-white/42">
-                      {liveEntryRoute === "homepage"
-                        ? "Recommended from this Homepage briefing."
-                        : "Completed in Mechanics and carried into readiness."}
-                    </div>
-                  </div>
-                  <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.17em] text-[#AFC0FF]/52">
-                    {liveBriefingSupportAccepted ? "Configured" : "Review"}
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {compactMechanicsChoice({
-                    label: "Support behavior",
-                    value: activeAdaptiveSupportPanel.label,
-                    summary: activeAdaptiveSupportPanel.line,
-                    recommended: liveEntryRoute === "homepage",
-                    onChange: () =>
-                      changeMechanicFromReadyRoom("support"),
-                  })}
-                  {compactMechanicsChoice({
-                    label: "Delivery profile",
-                    value: activeReceiverPanel.label,
-                    summary: activeReceiverPanel.line,
-                    recommended: liveEntryRoute === "homepage",
-                    onChange: () =>
-                      changeMechanicFromReadyRoom("receiver"),
-                  })}
-                  {compactMechanicsChoice({
-                    label: "Speaking style",
-                    value: communicationStyle,
-                    summary: "Support will follow this speaking style in LIVE.",
-                    recommended: liveEntryRoute === "homepage",
-                    onChange: () =>
-                      changeMechanicFromReadyRoom("speaking"),
-                  })}
-                </div>
-
-                {liveEntryRoute === "homepage" &&
-                  popup3EditingMechanic === "support" && (
-                    <div className="mt-3">
-                      <LiveAdaptiveSupportPanel
-                        activePanel={activeAdaptiveSupportPanel}
-                        open={true}
-                        panels={LIVE_SUPPORT_PANELS}
-                        onToggle={() => setPopup3EditingMechanic(null)}
-                        onSelect={(panelId) => {
-                          setActiveAdaptiveSupport(panelId);
-                          setPopup3EditingMechanic(null);
-                        }}
-                      />
-                    </div>
-                  )}
-
-                {liveEntryRoute === "homepage" &&
-                  popup3EditingMechanic === "receiver" && (
-                    <div className="mt-3">
-                      <LiveReceiverProfilePanel
-                        activePanel={activeReceiverPanel}
-                        open={true}
-                        panels={LIVE_RECEIVER_PROFILE_PANELS}
-                        onToggle={() => setPopup3EditingMechanic(null)}
-                        onSelect={(profile) => {
-                          setActiveReceiverProfile(profile);
-                          setPopup3EditingMechanic(null);
-                        }}
-                      />
-                    </div>
-                  )}
-
-                {liveEntryRoute === "homepage" &&
-                  popup3EditingMechanic === "speaking" && (
-                    <div className="mt-3">
-                      <LiveSpeakingStylePanel
-                        confirmed={false}
-                        open={true}
-                        selectedStyle={communicationStyle}
-                        onEdit={() => setPopup3EditingMechanic("speaking")}
-                        onOpen={() => setPopup3EditingMechanic("speaking")}
-                        onSelect={(style) => {
-                          setActiveCommunicationStyle(style);
-                          setPopup3EditingMechanic(null);
-                        }}
-                      />
-                    </div>
-                  )}
-              </div>
+                compactMechanicsChoice({
+                  label: "Formula",
+                  value: activeFormulaLabel,
+                  summary: formulaProofLabel,
+                  onChange: () => setLivePrepOpenSection("formula"),
+                })}
             </div>
+
+            <section
+              className={`grid transition-all duration-500 ease-out ${
+                livePrepOpenSection === "support" &&
+                !liveBriefingSupportAccepted
+                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
+                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <h2 className="min-h-[70px] max-w-[580px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
+                  {readyRoomTypedPrompt}
+                </h2>
+
+                <div className="rounded-[14px] border border-[#7EA1FF]/[0.14] bg-[#4E7CFF]/[0.035] p-3">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D7DCFF]/52">
+                        Current-session support
+                      </div>
+                      <div className="mt-1 text-[11px] leading-5 text-white/42">
+                        {liveEntryRoute === "homepage"
+                          ? "Recommended from this Homepage briefing."
+                          : "Complete these selections in Mechanics before continuing."}
+                      </div>
+                    </div>
+                    <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.17em] text-[#AFC0FF]/52">
+                      Review
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {compactMechanicsChoice({
+                      label: "Support behavior",
+                      value: activeAdaptiveSupportPanel.label,
+                      summary: activeAdaptiveSupportPanel.line,
+                      recommended: liveEntryRoute === "homepage",
+                      onChange: () =>
+                        changeMechanicFromReadyRoom("support"),
+                    })}
+                    {compactMechanicsChoice({
+                      label: "Delivery profile",
+                      value: activeReceiverPanel.label,
+                      summary: activeReceiverPanel.line,
+                      recommended: liveEntryRoute === "homepage",
+                      onChange: () =>
+                        changeMechanicFromReadyRoom("receiver"),
+                    })}
+                    {compactMechanicsChoice({
+                      label: "Speaking style",
+                      value: communicationStyle,
+                      summary:
+                        "Support will follow this speaking style in LIVE.",
+                      recommended: liveEntryRoute === "homepage",
+                      onChange: () =>
+                        changeMechanicFromReadyRoom("speaking"),
+                    })}
+                  </div>
+
+                  {liveEntryRoute === "homepage" &&
+                    popup3EditingMechanic === "support" && (
+                      <div className="mt-3">
+                        <LiveAdaptiveSupportPanel
+                          activePanel={activeAdaptiveSupportPanel}
+                          open={true}
+                          panels={LIVE_SUPPORT_PANELS}
+                          onToggle={() => setPopup3EditingMechanic(null)}
+                          onSelect={(panelId) => {
+                            setActiveAdaptiveSupport(panelId);
+                            setPopup3EditingMechanic(null);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                  {liveEntryRoute === "homepage" &&
+                    popup3EditingMechanic === "receiver" && (
+                      <div className="mt-3">
+                        <LiveReceiverProfilePanel
+                          activePanel={activeReceiverPanel}
+                          open={true}
+                          panels={LIVE_RECEIVER_PROFILE_PANELS}
+                          onToggle={() => setPopup3EditingMechanic(null)}
+                          onSelect={(profile) => {
+                            setActiveReceiverProfile(profile);
+                            setPopup3EditingMechanic(null);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                  {liveEntryRoute === "homepage" &&
+                    popup3EditingMechanic === "speaking" && (
+                      <div className="mt-3">
+                        <LiveSpeakingStylePanel
+                          confirmed={false}
+                          open={true}
+                          selectedStyle={communicationStyle}
+                          onEdit={() => setPopup3EditingMechanic("speaking")}
+                          onOpen={() => setPopup3EditingMechanic("speaking")}
+                          onSelect={(style) => {
+                            setActiveCommunicationStyle(style);
+                            setPopup3EditingMechanic(null);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                  {liveEntryRoute === "homepage" ? (
+                    <div className="mt-4 rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-3">
+                      <label className="flex cursor-pointer items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={liveBriefingSupportAccepted}
+                          onChange={(event) => {
+                            if (!supportAssessmentExplanationOpen) {
+                              setSupportAssessmentExplanationOpen(true);
+                              setLiveBriefingSupportAccepted(false);
+                              return;
+                            }
+
+                            if (event.target.checked) {
+                              confirmSupportAssessment();
+                            }
+                          }}
+                          className="mt-1 h-4 w-4 accent-[#D7DCFF]"
+                        />
+                        <span className="text-[12px] font-semibold leading-5 text-[#F2F4FF]/82">
+                          Do you agree with this assessment?
+                        </span>
+                      </label>
+
+                      {supportAssessmentExplanationOpen && (
+                        <div className="mt-3 border-l border-[#D7DCFF]/18 pl-3 text-[12px] leading-5 text-[#D7DBE4]/64">
+                          GEORGE will support you with {activeAdaptiveSupportPanel.label.toLowerCase()} through {activeReceiverPanel.label.toLowerCase()}, using a {communicationStyle.toLowerCase()} speaking style. This assessment fits the current briefing for {objectiveLabel} in {roomLabel}. You may still change any selection. Agreement authorizes GEORGE to use these settings in LIVE.
+                        </div>
+                      )}
+
+                      {!supportAssessmentExplanationOpen && (
+                        <div className="mt-2 pl-7 text-[10px] leading-4 text-[#D7DBE4]/46">
+                          Check once to review. Check again to agree.
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => changeMechanicFromReadyRoom("support")}
+                      className="mt-4 w-full rounded-[0.75rem] border border-[#4E7CFF]/45 bg-[#4E7CFF]/10 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#D7DCFF]/76 transition hover:border-[#7EA1FF]/70 hover:text-white"
+                    >
+                      Return to Mechanics
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
 
             <section
               className={`grid transition-all duration-500 ease-out ${
