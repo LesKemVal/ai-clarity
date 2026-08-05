@@ -809,6 +809,8 @@ export default function LiveEntryClient() {
   const [optionalSignalAnswers, setOptionalSignalAnswers] = useState<
     Record<string, string>
   >({});
+  const [optionalSignalQuestionHistory, setOptionalSignalQuestionHistory] =
+    useState<Record<string, string>>({});
   const [showOpenAISignalSurface, setShowOpenAISignalSurface] = useState(false);
   const [typedOptionalSignalQuestion, setTypedOptionalSignalQuestion] =
     useState("");
@@ -1026,6 +1028,24 @@ export default function LiveEntryClient() {
       setOptionalSignalLoading(true);
       setOptionalSignalComplete(false);
 
+      const answeredQuestionKeys = new Set(Object.keys(answers));
+      const priorInteractions = [
+        ...Object.entries(answers).map(([key, answer]) => ({
+          key,
+          question: optionalSignalQuestionHistory[key] || "",
+          answer: String(answer || "").trim(),
+          status: "answered" as const,
+        })),
+        ...Array.from(new Set(skipped))
+          .filter((key) => !answeredQuestionKeys.has(key))
+          .map((key) => ({
+            key,
+            question: optionalSignalQuestionHistory[key] || "",
+            answer: "",
+            status: "skipped" as const,
+          })),
+      ];
+
       const response = await fetch("/api/george/live/signal-question", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1046,6 +1066,7 @@ export default function LiveEntryClient() {
           knownContext,
           documentSummary: prepDocument?.summary || "",
           priorAnswers: answers,
+          priorInteractions,
           skippedQuestions: skipped,
         }),
       });
@@ -1066,7 +1087,7 @@ export default function LiveEntryClient() {
         return;
       }
 
-      setCurrentOptionalSignalQuestion({
+      const nextQuestion = {
         key: String(data.key || `signal_${Date.now()}`),
         label: String(data.label || "Additional signal"),
         question: String(data.question || ""),
@@ -1076,15 +1097,29 @@ export default function LiveEntryClient() {
             "This may improve GEORGE’s context, timing, and support.",
         ),
         example: String(data.example || "Answer if useful, or skip."),
-      });
+      };
+
+      setCurrentOptionalSignalQuestion(nextQuestion);
+      setOptionalSignalQuestionHistory((current) => ({
+        ...current,
+        [nextQuestion.key]:
+          current[nextQuestion.key] || nextQuestion.question,
+      }));
     } catch {
-      setCurrentOptionalSignalQuestion({
+      const fallbackQuestion = {
         key: `fallback_${Date.now()}`,
         label: "Additional signal",
         question: "What should GEORGE be especially ready for in this room?",
         why: "This may improve GEORGE’s context, timing, and support.",
         example: "Answer if useful, or skip.",
-      });
+      };
+
+      setCurrentOptionalSignalQuestion(fallbackQuestion);
+      setOptionalSignalQuestionHistory((current) => ({
+        ...current,
+        [fallbackQuestion.key]:
+          current[fallbackQuestion.key] || fallbackQuestion.question,
+      }));
     } finally {
       setOptionalSignalLoading(false);
     }
@@ -1478,6 +1513,7 @@ export default function LiveEntryClient() {
 
         setPreLiveSignals({});
         setOptionalSignalAnswers({});
+        setOptionalSignalQuestionHistory({});
         setSkippedOptionalSignalKeys([]);
         setCurrentOptionalSignalQuestion(null);
         setOptionalSignalInput("");
