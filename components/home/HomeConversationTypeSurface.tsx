@@ -552,7 +552,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [showAllRoles, setShowAllRoles] = useState(false);
   const [phase, setPhase] = useState<SurfacePhase>("selection");
   const [introStage, setIntroStage] = useState(0);
-  const [decisionReady, setDecisionReady] = useState(false);
+  const [showInitialBriefingDecisionMessage, setShowInitialBriefingDecisionMessage] =
+    useState(false);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [briefingSufficient, setBriefingSufficient] = useState(false);
   const [optionalQuestion, setOptionalQuestion] =
@@ -796,22 +797,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     };
   }, [phase]);
 
-  useEffect(() => {
-    if (phase !== "decision") return;
-
-    setDecisionReady(false);
-    const timer = window.setTimeout(() => setDecisionReady(true), 2450);
-    return () => window.clearTimeout(timer);
-  }, [phase]);
-
   const structureText = useTypewriter(
     "The structure is ready. GEORGE will help sequence the facts, impact, explanation, empathy, and next steps.",
     phase === "introduction" && introStage >= 1,
-    24,
-  );
-  const decisionText = useTypewriter(
-    "GEORGE has enough information to prepare for LIVE.",
-    phase === "decision",
     24,
   );
   const optionalQuestionText = useTypewriter(
@@ -832,7 +820,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedGoal(null);
     setPhase("selected");
     setIntroStage(0);
-    setDecisionReady(false);
+    setShowInitialBriefingDecisionMessage(false);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -850,7 +838,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setSelectedGoal(null);
     setPhase("selection");
     setIntroStage(0);
-    setDecisionReady(false);
+    setShowInitialBriefingDecisionMessage(false);
     setAnswers({});
     setOptionalQuestion(null);
     setOptionalAnswer("");
@@ -916,6 +904,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setAnswers(freshAnswers);
     saveLivePreparationSignals(freshAnswers);
     setBriefingSufficient(false);
+    setShowInitialBriefingDecisionMessage(false);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setPhase("optional");
@@ -1049,6 +1038,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       return;
     }
 
+    const isFirstCompletedInteraction =
+      Object.keys(optionalAnswers).length === 0 &&
+      skippedOptionalQuestions.length === 0;
+
+    setShowInitialBriefingDecisionMessage(isFirstCompletedInteraction);
     setBriefingSufficient(true);
     setPhase("decision");
   }
@@ -1056,12 +1050,16 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   function skipHomepageOptionalQuestion() {
     if (!optionalQuestion) return;
 
+    const isFirstCompletedInteraction =
+      Object.keys(optionalAnswers).length === 0 &&
+      skippedOptionalQuestions.length === 0;
     const nextSkipped = [...skippedOptionalQuestions, optionalQuestion.key];
 
     setSkippedOptionalQuestions(nextSkipped);
     setOptionalQuestion(null);
     setOptionalAnswer("");
 
+    setShowInitialBriefingDecisionMessage(isFirstCompletedInteraction);
     setBriefingSufficient(true);
     setPhase("decision");
   }
@@ -1071,6 +1069,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalQuestion(null);
     setOptionalAnswer("");
     setBriefingSufficient(false);
+    setShowInitialBriefingDecisionMessage(false);
     setPhase("optional");
     void requestHomepageOptionalQuestion(
       optionalAnswers,
@@ -1632,33 +1631,31 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
               {phase === "decision" && (
                 <div className="pt-7 animate-[fadeIn_420ms_ease-out]">
-                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/56">
-                    ✓ Core briefing complete
-                  </div>
-                  <h3 className="mt-3 min-h-[96px] max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
-                    {decisionText}
-                  </h3>
-                  <div
-                    className={`mt-7 flex flex-wrap justify-center gap-3 transition-all duration-500 ${
-                      decisionReady
-                        ? "translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-2 opacity-0"
-                    }`}
-                  >
+                  {showInitialBriefingDecisionMessage && (
+                    <div>
+                      <h3 className="max-w-4xl font-mono text-[20px] leading-8 tracking-[-0.025em] text-white sm:text-[24px] sm:leading-9">
+                        Continue Briefing?
+                      </h3>
+                      <p className="mt-3 max-w-3xl text-[13px] leading-6 text-white/52">
+                        Additional briefing can improve timing, context, and execution.
+                      </p>
+                    </div>
+                  )}
+                  <div className={`${showInitialBriefingDecisionMessage ? "mt-7" : "mt-1"} flex flex-wrap justify-center gap-3`}>
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}
                       disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      Start LIVE
+                      START LIVE
                     </button>
                     <button
                       type="button"
                       onClick={continueHomepageBriefing}
                       className="min-w-[190px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white"
                     >
-                      Continue Briefing
+                      NEXT QUESTION
                     </button>
                   </div>
                 </div>
