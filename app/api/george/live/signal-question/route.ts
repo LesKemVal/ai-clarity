@@ -6,6 +6,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
+type PriorInteractionStatus = 'answered' | 'skipped' | 'unknown'
+
+type PriorInteraction = {
+  key: string
+  question: string
+  answer: string
+  status: PriorInteractionStatus
+}
+
 type SignalQuestionRequest = {
   role?: string
   broadGoal?: string
@@ -27,6 +36,60 @@ type SignalQuestionRequest = {
 
 function clean(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
+}
+
+function preserveText(value: unknown) {
+  return typeof value === 'string' ? value : ''
+}
+
+function normalizePriorInteractions(
+  priorInteractions: SignalQuestionRequest['priorInteractions'],
+  priorAnswers: Record<string, string>,
+  skippedQuestions: string[]
+): PriorInteraction[] {
+  const interactions = Array.isArray(priorInteractions)
+    ? priorInteractions.map((interaction) => ({
+        key: preserveText(interaction?.key),
+        question: preserveText(interaction?.question),
+        answer: preserveText(interaction?.answer),
+        status:
+          interaction?.status === 'answered' ||
+          interaction?.status === 'skipped' ||
+          interaction?.status === 'unknown'
+            ? interaction.status
+            : 'unknown',
+      }))
+    : []
+
+  const representedKeys = new Set(
+    interactions.map((interaction) => clean(interaction.key))
+  )
+
+  for (const [key, answer] of Object.entries(priorAnswers)) {
+    if (representedKeys.has(clean(key))) continue
+
+    interactions.push({
+      key,
+      question: '',
+      answer: preserveText(answer),
+      status: 'answered',
+    })
+    representedKeys.add(clean(key))
+  }
+
+  for (const key of skippedQuestions) {
+    if (representedKeys.has(clean(key))) continue
+
+    interactions.push({
+      key,
+      question: '',
+      answer: '',
+      status: 'skipped',
+    })
+    representedKeys.add(clean(key))
+  }
+
+  return interactions
 }
 
 export async function POST(req: Request) {
@@ -51,6 +114,18 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json()) as SignalQuestionRequest
+    const priorAnswers =
+      body.priorAnswers && typeof body.priorAnswers === 'object'
+        ? body.priorAnswers
+        : {}
+    const skippedQuestions = Array.isArray(body.skippedQuestions)
+      ? body.skippedQuestions.map(String)
+      : []
+    const priorInteractions = normalizePriorInteractions(
+      body.priorInteractions,
+      priorAnswers,
+      skippedQuestions
+    )
 
     const knownSignal = {
       role: clean(body.role),
@@ -61,11 +136,9 @@ export async function POST(req: Request) {
       room: clean(body.room),
       knownContext: clean(body.knownContext),
       documentSummary: clean(body.documentSummary),
-      priorAnswers: body.priorAnswers && typeof body.priorAnswers === 'object' ? body.priorAnswers : {},
-      priorInteractions: Array.isArray(body.priorInteractions)
-        ? body.priorInteractions
-        : [],
-      skippedQuestions: Array.isArray(body.skippedQuestions) ? body.skippedQuestions.map(String) : [],
+      priorAnswers,
+      priorInteractions,
+      skippedQuestions,
     }
 
     if (!process.env.OPENAI_API_KEY) {
@@ -97,6 +170,8 @@ Outcome clarification is one of GEORGE's first reasoning responsibilities. GEORG
 GEORGE selects every question as though it is the final opportunity before LIVE to materially increase the user's likelihood of achieving the desired outcome.
 
 Reason from the entire briefing conversation and all available operational signal, not only the most recent answer.
+
+Treat priorInteractions as the canonical accumulated briefing conversation. Use priorAnswers and skippedQuestions only as backward-compatible supporting fields, and do not count equivalent history more than once.
 
 When another briefing interaction is appropriate, generate:
 
