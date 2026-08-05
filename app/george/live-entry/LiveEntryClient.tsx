@@ -91,6 +91,19 @@ import {
   type HomepageLiveHandoff,
 } from "@/lib/george/live-entry/entry-resolution";
 
+type HomepageBriefingHandoff = HomepageLiveHandoff & {
+  workflowAction?: "continue_briefing" | "review_brief";
+  optionalSignals?: Record<string, string>;
+  optionalQuestionHistory?: Record<string, string>;
+  skippedOptionalQuestions?: string[];
+  priorInteractions?: Array<{
+    key: string;
+    question: string;
+    answer: string;
+    status: "answered" | "skipped";
+  }>;
+};
+
 type Tier = "smart" | "intelligent" | "brilliant";
 
 type BriefingSpeechRecognitionResultLike = {
@@ -1506,7 +1519,7 @@ export default function LiveEntryClient() {
       const params = new URLSearchParams(window.location.search);
       const source = params.get("source");
 
-      let homepageHandoff: HomepageLiveHandoff | null = null;
+      let homepageHandoff: HomepageBriefingHandoff | null = null;
 
       if (source === "homepage") {
         try {
@@ -1523,13 +1536,7 @@ export default function LiveEntryClient() {
       }
 
       const homepageWorkflowAction = String(
-        (
-          homepageHandoff as
-            | (HomepageLiveHandoff & {
-                workflowAction?: "continue_briefing" | "review_brief";
-              })
-            | null
-        )?.workflowAction || "",
+        homepageHandoff?.workflowAction || "",
       );
 
       const isStartSource = source === "start";
@@ -1600,6 +1607,62 @@ export default function LiveEntryClient() {
       } = entryResolution;
 
       setPreLivePreviewReady(preLiveReady);
+
+      if (homepageHandoff) {
+        const canonicalInteractions = Array.isArray(
+          homepageHandoff.priorInteractions,
+        )
+          ? homepageHandoff.priorInteractions
+          : null;
+
+        if (canonicalInteractions) {
+          const answeredQuestionKeys = new Set(
+            canonicalInteractions
+              .filter((interaction) => interaction.status === "answered")
+              .map((interaction) => String(interaction.key || "").trim())
+              .filter(Boolean),
+          );
+          const hydratedAnswers: Record<string, string> = {};
+          const hydratedQuestionHistory: Record<string, string> = {
+            ...(homepageHandoff.optionalQuestionHistory || {}),
+          };
+
+          for (const interaction of canonicalInteractions) {
+            const key = String(interaction.key || "").trim();
+            const question = String(interaction.question || "").trim();
+
+            if (!key) continue;
+            if (question) hydratedQuestionHistory[key] = question;
+
+            if (interaction.status === "answered") {
+              hydratedAnswers[key] = String(interaction.answer || "").trim();
+            }
+          }
+
+          const hydratedSkippedKeys = Array.from(
+            new Set(
+              canonicalInteractions
+                .filter((interaction) => interaction.status === "skipped")
+                .map((interaction) => String(interaction.key || "").trim())
+                .filter(Boolean),
+            ),
+          ).filter((key) => !answeredQuestionKeys.has(key));
+
+          setOptionalSignalAnswers(hydratedAnswers);
+          setOptionalSignalQuestionHistory(hydratedQuestionHistory);
+          setSkippedOptionalSignalKeys(hydratedSkippedKeys);
+        } else {
+          setOptionalSignalAnswers(homepageHandoff.optionalSignals || {});
+          setOptionalSignalQuestionHistory(
+            homepageHandoff.optionalQuestionHistory || {},
+          );
+          setSkippedOptionalSignalKeys(
+            Array.isArray(homepageHandoff.skippedOptionalQuestions)
+              ? Array.from(new Set(homepageHandoff.skippedOptionalQuestions))
+              : [],
+          );
+        }
+      }
 
       if (
         homepageWorkflowAction === "continue_briefing" &&
