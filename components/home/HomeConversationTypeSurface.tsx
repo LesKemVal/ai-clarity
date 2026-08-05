@@ -36,6 +36,13 @@ type HomepageRole = {
   capabilities: readonly string[];
 };
 
+type HomepagePriorInteraction = {
+  key: string;
+  question: string;
+  answer: string;
+  status: "answered" | "skipped";
+};
+
 function SelectionAcknowledgement({ label }: { label: string }) {
   return (
     <div className="mt-2 inline-flex max-w-full items-center rounded-[12px] border border-white/[0.14] bg-white/[0.03] px-4 py-2">
@@ -705,6 +712,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           answers?: Record<string, string>;
           optionalAnswers?: Record<string, string>;
           optionalQuestionHistory?: Record<string, string>;
+          skippedOptionalQuestions?: string[];
+          priorInteractions?: HomepagePriorInteraction[];
         };
 
         const restoredConversation = CONVERSATION_TYPES.find(
@@ -730,6 +739,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
         if (snapshot.optionalQuestionHistory) {
           setOptionalQuestionHistory(snapshot.optionalQuestionHistory);
+        }
+
+        if (Array.isArray(snapshot.skippedOptionalQuestions)) {
+          setSkippedOptionalQuestions(snapshot.skippedOptionalQuestions);
         }
       }
     } catch {}
@@ -1092,6 +1105,27 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
   type HomepageBriefingAction = "review_brief";
 
+  function buildHomepagePriorInteractions() {
+    const answeredQuestionKeys = new Set(Object.keys(optionalAnswers));
+
+    return [
+      ...Object.entries(optionalAnswers).map(([key, answer]) => ({
+        key,
+        question: optionalQuestionHistory[key] || "",
+        answer: String(answer || "").trim(),
+        status: "answered" as const,
+      })),
+      ...Array.from(new Set(skippedOptionalQuestions))
+        .filter((key) => !answeredQuestionKeys.has(key))
+        .map((key) => ({
+          key,
+          question: optionalQuestionHistory[key] || "",
+          answer: "",
+          status: "skipped" as const,
+        })),
+    ];
+  }
+
   function preserveHomepageHandoff(
     workflowAction: HomepageBriefingAction,
   ) {
@@ -1124,6 +1158,9 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             complete: briefingSufficient,
           },
           optionalSignals: optionalAnswers,
+          optionalQuestionHistory,
+          skippedOptionalQuestions,
+          priorInteractions: buildHomepagePriorInteractions(),
           workflowAction,
           createdAt: Date.now(),
         }),
@@ -1144,6 +1181,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           answers,
           optionalAnswers,
           optionalQuestionHistory,
+          skippedOptionalQuestions,
+          priorInteractions: buildHomepagePriorInteractions(),
         }),
       );
     } catch {}
