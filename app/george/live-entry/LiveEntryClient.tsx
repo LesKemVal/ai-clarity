@@ -557,6 +557,7 @@ export default function LiveEntryClient() {
     | "prep";
 
   const livePreparationHistoryRef = useRef<LivePreparationWorkflowState[]>([]);
+  const returnToReadyRoomAfterBriefingRef = useRef(false);
 
   const pushLivePreparationState = (
     state: LivePreparationWorkflowState,
@@ -738,6 +739,9 @@ export default function LiveEntryClient() {
           customizedScript?: OperationalScript | null;
           scriptBrowserOpen?: boolean;
           scriptBrowserFormula?: OperationalFormula | null;
+          optionalSignalAnswers?: Record<string, string>;
+          optionalSignalQuestionHistory?: Record<string, string>;
+          skippedOptionalSignalKeys?: string[];
           livePreparationHistory?: LivePreparationWorkflowState[];
         };
 
@@ -762,6 +766,20 @@ export default function LiveEntryClient() {
         setCustomizedScript(snapshot.customizedScript ?? null);
         setScriptBrowserOpen(Boolean(snapshot.scriptBrowserOpen));
         setScriptBrowserFormula(snapshot.scriptBrowserFormula ?? null);
+
+        if (snapshot.optionalSignalAnswers) {
+          setOptionalSignalAnswers(snapshot.optionalSignalAnswers);
+        }
+
+        if (snapshot.optionalSignalQuestionHistory) {
+          setOptionalSignalQuestionHistory(
+            snapshot.optionalSignalQuestionHistory,
+          );
+        }
+
+        if (Array.isArray(snapshot.skippedOptionalSignalKeys)) {
+          setSkippedOptionalSignalKeys(snapshot.skippedOptionalSignalKeys);
+        }
 
         if (Array.isArray(snapshot.livePreparationHistory)) {
           livePreparationHistoryRef.current = snapshot.livePreparationHistory;
@@ -1018,6 +1036,38 @@ export default function LiveEntryClient() {
     Boolean(runtimeMotionContext) ||
     relatedSessionId !== "not_related";
 
+  const returnToLiveEntryReadiness = () => {
+    setCurrentOptionalSignalQuestion(null);
+    setOptionalSignalComplete(true);
+    setPreLivePreviewReady(true);
+
+    try {
+      markLivePreparationPreviewReady();
+      window.localStorage.setItem("george_start_new_live", "1");
+    } catch {}
+
+    if (returnToReadyRoomAfterBriefingRef.current) {
+      returnToReadyRoomAfterBriefingRef.current = false;
+      setShowOpenAISignalSurface(false);
+      setLiveEntryReadyMessageVisible(false);
+      setShowLiveBriefingRoom(true);
+      setLiveBriefingStep(3);
+      return;
+    }
+
+    setLiveEntryReadyMessageVisible(true);
+  };
+
+  const continueBriefingFromReadyRoom = () => {
+    returnToReadyRoomAfterBriefingRef.current = true;
+    setShowOpenAISignalSurface(true);
+    setLiveEntryReadyMessageVisible(false);
+    setCurrentOptionalSignalQuestion(null);
+    setOptionalSignalInput("");
+    setOptionalSignalLoading(false);
+    setOptionalSignalComplete(false);
+  };
+
   const requestNextOptionalSignalQuestion = async (
     answers = optionalSignalAnswers,
     skipped = skippedOptionalSignalKeys,
@@ -1074,16 +1124,7 @@ export default function LiveEntryClient() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || data?.status === "sufficient" || !data?.question) {
-        setCurrentOptionalSignalQuestion(null);
-        setOptionalSignalComplete(true);
-        setLiveEntryReadyMessageVisible(true);
-        setPreLivePreviewReady(true);
-
-        try {
-          markLivePreparationPreviewReady();
-          window.localStorage.setItem("george_start_new_live", "1");
-        } catch {}
-
+        returnToLiveEntryReadiness();
         return;
       }
 
@@ -1269,11 +1310,7 @@ export default function LiveEntryClient() {
       );
     } catch {}
 
-    setCurrentOptionalSignalQuestion(null);
-    void requestNextOptionalSignalQuestion(
-      nextAnswers,
-      skippedOptionalSignalKeys,
-    );
+    returnToLiveEntryReadiness();
     return true;
   };
 
@@ -1285,8 +1322,8 @@ export default function LiveEntryClient() {
       currentOptionalSignalQuestion.key,
     ];
     setSkippedOptionalSignalKeys(nextSkipped);
-    setCurrentOptionalSignalQuestion(null);
-    void requestNextOptionalSignalQuestion(optionalSignalAnswers, nextSkipped);
+    setOptionalSignalInput("");
+    returnToLiveEntryReadiness();
   };
 
   /*
@@ -2206,6 +2243,9 @@ export default function LiveEntryClient() {
           customizedScript,
           scriptBrowserOpen,
           scriptBrowserFormula,
+          optionalSignalAnswers,
+          optionalSignalQuestionHistory,
+          skippedOptionalSignalKeys,
           livePreparationHistory: livePreparationHistoryRef.current,
         }),
       );
@@ -3160,6 +3200,38 @@ export default function LiveEntryClient() {
 
   if (!ready) return null;
 
+  const goBackFromLiveEntryQuestionSurface = () => {
+    if (!returnToReadyRoomAfterBriefingRef.current) {
+      goToPreviousLivePreparationState();
+      return;
+    }
+
+    returnToReadyRoomAfterBriefingRef.current = false;
+    setShowOpenAISignalSurface(false);
+    setLiveEntryReadyMessageVisible(false);
+    setCurrentOptionalSignalQuestion(null);
+    setOptionalSignalLoading(false);
+    setOptionalSignalComplete(true);
+    setShowLiveBriefingRoom(true);
+    setLiveBriefingStep(3);
+  };
+
+  const enterLiveFromBriefingSurface = () => {
+    if (returnToReadyRoomAfterBriefingRef.current) {
+      returnToReadyRoomAfterBriefingRef.current = false;
+      startLive(false, editableResources, true);
+      return;
+    }
+
+    setShowOpenAISignalSurface(false);
+    setLiveEntryReadyMessageVisible(false);
+    setCurrentOptionalSignalQuestion(null);
+    setOptionalSignalLoading(false);
+    livePreparationHistoryRef.current = ["questions"];
+    setShowLiveBriefingRoom(true);
+    setLiveBriefingStep(1);
+  };
+
   const liveEntryQuestionSurface =
     showOpenAISignalSurface && liveEntryReadyMessageVisible
         ? {
@@ -3224,7 +3296,7 @@ export default function LiveEntryClient() {
           <div className="mb-6 flex items-center gap-4">
             <BxPageHeader
               backLabel="BACK"
-              onBack={goToPreviousLivePreparationState}
+              onBack={goBackFromLiveEntryQuestionSurface}
             />
           </div>
 
@@ -3313,15 +3385,7 @@ export default function LiveEntryClient() {
                   <button
                     type="button"
                     disabled={!liveEntryQuestionSurface.canBeginLive}
-                    onClick={() => {
-                      setShowOpenAISignalSurface(false);
-                      setLiveEntryReadyMessageVisible(false);
-                      setCurrentOptionalSignalQuestion(null);
-                      setOptionalSignalLoading(false);
-                      livePreparationHistoryRef.current = ["questions"];
-                      setShowLiveBriefingRoom(true);
-                      setLiveBriefingStep(1);
-                    }}
+                    onClick={enterLiveFromBriefingSurface}
                     className={`rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
                       liveEntryQuestionSurface.canBeginLive
                         ? "border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]"
@@ -3333,6 +3397,26 @@ export default function LiveEntryClient() {
                       : "Add signal for LIVE"}
                   </button>
                 </div>
+
+                {!liveEntryQuestionSurface.loading &&
+                  !liveEntryQuestionSurface.readinessMessage && (
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={skipOptionalSignalQuestion}
+                        className="rounded-[14px] border border-white/[0.10] px-4 py-3 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/24 hover:text-white"
+                      >
+                        Skip
+                      </button>
+                      <button
+                        type="button"
+                        onClick={skipOptionalSignalQuestion}
+                        className="rounded-[14px] border border-white/[0.10] px-4 py-3 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-white/52 transition hover:border-white/24 hover:text-white"
+                      >
+                        I don&apos;t know
+                      </button>
+                    </div>
+                  )}
               </div>
             </div>
           </section>
@@ -4486,6 +4570,14 @@ export default function LiveEntryClient() {
                   >
                     ENTER LIVE
                   </AwakeButton>
+                  <button
+                    type="button"
+                    disabled={!readyRoomPromptComplete}
+                    onClick={continueBriefingFromReadyRoom}
+                    className="mt-3 w-full rounded-[1rem] border border-white/[0.10] px-4 py-2.5 text-center text-[12px] font-semibold uppercase tracking-[0.24em] text-white/58 transition hover:border-white/24 hover:text-white disabled:cursor-default disabled:opacity-30"
+                  >
+                    CONTINUE BRIEFING
+                  </button>
                 </div>
 
                 <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-white/26">
