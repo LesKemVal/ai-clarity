@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 
 import { loadLivePreparationSignals } from "@/lib/george/live-browser/live-preparation-browser-storage";
+import {
+  GEORGE_PREPARATION_RESUME_EVENT_KEY,
+  createGeorgePreparationResumeEvent,
+} from "@/lib/george/live-entry/preparation-resume";
 
 import type {
   OperationalFormula,
@@ -863,15 +867,60 @@ export default function OperationalLibraryClient() {
     };
 
     try {
+      const rawSnapshot = window.sessionStorage.getItem(
+        "GEORGE_LIVE_PREP_RETURN_STATE",
+      );
+      const snapshot = rawSnapshot ? JSON.parse(rawSnapshot) : {};
+      const previousFormulaId = String(
+        snapshot?.selectedFormula?.id || "",
+      ).trim();
+      const change =
+        previousFormulaId && previousFormulaId !== formula.id
+          ? "formula_changed"
+          : "formula_selected";
+
       window.sessionStorage.setItem(
         "GEORGE_MARKETPLACE_FORMULA_SELECTION",
         JSON.stringify(selection),
       );
+      window.sessionStorage.setItem(
+        "GEORGE_LIVE_PREP_RETURN_STATE",
+        JSON.stringify({
+          ...snapshot,
+          selectedFormula: formula,
+          selectedFormulaSource: "user",
+          livePrepOpenSection: "formula",
+        }),
+      );
+      window.sessionStorage.setItem(
+        GEORGE_PREPARATION_RESUME_EVENT_KEY,
+        JSON.stringify(
+          createGeorgePreparationResumeEvent({
+            source: "marketplace",
+            changes: [change],
+            formula: {
+              id: formula.id,
+              version: formula.version,
+              name: formula.name,
+            },
+          }),
+        ),
+      );
+
+      const returnUrl = window.sessionStorage.getItem(
+        "GEORGE_LIVE_PREP_RETURN_URL",
+      );
+
+      if (returnUrl) {
+        window.location.href = returnUrl;
+        return;
+      }
     } catch {}
 
     const params = new URLSearchParams({
       source: "marketplace",
       stage: "formula",
+      return: "live-prep",
       formulaId: formula.id,
       formulaVersion: String(formula.version),
     });

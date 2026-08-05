@@ -15,6 +15,11 @@ import type {
   OperationalRecommendationDto,
   OperationalRecommendationRequest,
 } from "@/lib/george/operational-memory/recommendation-api";
+import {
+  GEORGE_PREPARATION_RESUME_EVENT_KEY,
+  describeGeorgePreparationResume,
+  parseGeorgePreparationResumeEvent,
+} from "@/lib/george/live-entry/preparation-resume";
 
 import {
   clearLivePreparationPreviewReady,
@@ -542,6 +547,8 @@ export default function LiveEntryClient() {
   const [readyRoomTypedPrompt, setReadyRoomTypedPrompt] = useState("");
   const [readyRoomPromptComplete, setReadyRoomPromptComplete] =
     useState(false);
+  const [preparationResumeMessage, setPreparationResumeMessage] =
+    useState("");
   type LivePreparationWorkflowState =
     | "questions"
     | "popup1"
@@ -760,6 +767,22 @@ export default function LiveEntryClient() {
           livePreparationHistoryRef.current = snapshot.livePreparationHistory;
         }
 
+        const rawResumeEvent = window.sessionStorage.getItem(
+          GEORGE_PREPARATION_RESUME_EVENT_KEY,
+        );
+        const resumeEvent = parseGeorgePreparationResumeEvent(
+          rawResumeEvent ? JSON.parse(rawResumeEvent) : null,
+        );
+
+        if (resumeEvent) {
+          setPreparationResumeMessage(
+            describeGeorgePreparationResume(resumeEvent),
+          );
+          window.sessionStorage.removeItem(
+            GEORGE_PREPARATION_RESUME_EVENT_KEY,
+          );
+        }
+
         const cleanUrl = new URL(window.location.href);
         cleanUrl.searchParams.delete("return");
         window.history.replaceState({}, "", cleanUrl.toString());
@@ -915,7 +938,8 @@ export default function LiveEntryClient() {
       livePrepOpenSection === "support"
         ? "How GEORGE supports you changes how the room feels. Choose the support you want available."
         : livePrepOpenSection === "formula"
-          ? "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
+          ? preparationResumeMessage ||
+            "The formula gives GEORGE an operational path for this room. Choose the one you want to use."
           : livePrepOpenSection === "ready"
             ? activeFormula
               ? `GEORGE will use ${formulaName} as the operational reference for this room.`
@@ -943,6 +967,7 @@ export default function LiveEntryClient() {
     liveBriefingStep,
     livePrepOpenSection,
     operationalRecommendation,
+    preparationResumeMessage,
     selectedFormula,
     showLiveBriefingRoom,
   ]);
