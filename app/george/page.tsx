@@ -5215,6 +5215,7 @@ I’ll stay with you.`,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             messages: updatedMessages,
+            mode: liveMode ? "conversation" : "normal",
             voiceMode: liveMode ? voiceOn : false,
             liveRuntimeContext: liveRuntimePrefix || null,
             isFirstSession: updatedMessages.length <= 2,
@@ -5267,7 +5268,7 @@ I’ll stay with you.`,
 
         let finalContent = data.message;
 
-        if (typeof finalContent === "string" && liveMode) {
+        if (typeof finalContent === "string" && liveMode && voiceOn) {
           finalContent = governLiveResponse(finalContent, {
             audio: voiceOn,
             userText: text,
