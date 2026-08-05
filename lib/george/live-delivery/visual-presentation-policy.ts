@@ -1,3 +1,4 @@
+import type { GeorgeOperationalAssessment } from '@/lib/george/live-hub/types'
 import type { GeorgeLiveReceiverProfile } from './types'
 
 const VISUAL_INTERRUPTION_WINDOW_MS = 2600
@@ -28,6 +29,18 @@ export type GeorgeVisualPresentationDecision =
         | 'current_cue_hold'
         | 'lower_priority'
     }
+
+export type GeorgeVisualPresentationStage = {
+  kind: 'evidence' | 'action'
+  text: string
+  durationMs: number
+}
+
+export type GeorgeVisualPresentationPlan = {
+  decision: GeorgeVisualPresentationDecision
+  priority: number
+  stages: GeorgeVisualPresentationStage[]
+}
 
 export function resolveGeorgeVisualPresentationDecision(input: {
   text: unknown
@@ -95,6 +108,99 @@ export function resolveGeorgeVisualPresentationDecision(input: {
     text,
     now,
     reason: 'Visual cue satisfies presentation policy.',
+  }
+}
+
+function comparisonKey(value: string) {
+  return value.toLocaleLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+function resolveEvidenceStageText(input: {
+  action: string
+  evidence: string
+  outcomeImpact: string
+}) {
+  const evidenceKey = comparisonKey(input.evidence)
+  const outcomeImpactKey = comparisonKey(input.outcomeImpact)
+  const actionKey = comparisonKey(input.action)
+  const outcomeImpactClarifiesEvidence =
+    Boolean(outcomeImpactKey) &&
+    outcomeImpactKey !== evidenceKey &&
+    outcomeImpactKey !== actionKey
+
+  return [
+    input.evidence,
+    outcomeImpactClarifiesEvidence ? input.outcomeImpact : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
+}
+
+export function resolveGeorgeVisualPresentationPlan(input: {
+  fallbackText: unknown
+  operationalAssessment?: GeorgeOperationalAssessment
+  candidatePriority: number
+  receiverProfile: GeorgeLiveReceiverProfile
+  currentText?: string
+  currentPriority?: number
+  hasCurrentCue: boolean
+  lastRenderedAt?: number
+  now?: number
+}): GeorgeVisualPresentationPlan {
+  const fallbackText = normalizeVisualCueText(input.fallbackText)
+  const action = normalizeVisualCueText(
+    input.operationalAssessment?.action
+  )
+  const evidence = normalizeVisualCueText(
+    input.operationalAssessment?.evidence
+  )
+  const outcomeImpact = normalizeVisualCueText(
+    input.operationalAssessment?.outcomeImpact
+  )
+  const hasMeaningfulEvidence =
+    Boolean(evidence) && comparisonKey(evidence) !== comparisonKey(action)
+  const shouldStage = hasMeaningfulEvidence && Boolean(action)
+  const holdMs = resolveGeorgeVisualPresentationHoldMs(
+    input.receiverProfile
+  )
+  const stages: GeorgeVisualPresentationStage[] = shouldStage
+    ? [
+        {
+          kind: 'evidence',
+          text: resolveEvidenceStageText({
+            action,
+            evidence,
+            outcomeImpact,
+          }),
+          durationMs: VISUAL_INTERRUPTION_WINDOW_MS,
+        },
+        {
+          kind: 'action',
+          text: action,
+          durationMs: holdMs,
+        },
+      ]
+    : [
+        {
+          kind: 'action',
+          text: fallbackText,
+          durationMs: holdMs,
+        },
+      ]
+  const decision = resolveGeorgeVisualPresentationDecision({
+    text: fallbackText,
+    candidatePriority: input.candidatePriority,
+    currentText: input.currentText,
+    currentPriority: input.currentPriority,
+    hasCurrentCue: input.hasCurrentCue,
+    lastRenderedAt: input.lastRenderedAt,
+    now: input.now,
+  })
+
+  return {
+    decision,
+    priority: input.candidatePriority,
+    stages: decision.action === 'present' ? stages : [],
   }
 }
 
