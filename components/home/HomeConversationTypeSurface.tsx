@@ -1036,7 +1036,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       return;
     }
 
-    void requestHomepageOptionalQuestion(nextAnswers, skippedOptionalQuestions);
+    setBriefingSufficient(true);
+    setPhase("decision");
   }
 
   function skipHomepageOptionalQuestion() {
@@ -1048,7 +1049,20 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalQuestion(null);
     setOptionalAnswer("");
 
-    void requestHomepageOptionalQuestion(optionalAnswers, nextSkipped);
+    setBriefingSufficient(true);
+    setPhase("decision");
+  }
+
+  function continueHomepageBriefing() {
+    setEditingOptionalQuestionKey(null);
+    setOptionalQuestion(null);
+    setOptionalAnswer("");
+    setBriefingSufficient(false);
+    setPhase("optional");
+    void requestHomepageOptionalQuestion(
+      optionalAnswers,
+      skippedOptionalQuestions,
+    );
   }
 
   function editHomepageOptionalAnswer(key: string) {
@@ -1598,7 +1612,14 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                       disabled={!briefingSufficient}
                       className="min-w-[190px] rounded-[10px] border border-[#7EA1FF]/48 bg-[#172347] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition hover:border-[#AEB6FF]/75 hover:bg-[#203268] disabled:cursor-not-allowed disabled:opacity-35"
                     >
-                      Start Live
+                      Start LIVE
+                    </button>
+                    <button
+                      type="button"
+                      onClick={continueHomepageBriefing}
+                      className="min-w-[190px] rounded-[10px] border border-white/[0.14] px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/30 hover:text-white"
+                    >
+                      Continue Briefing
                     </button>
                   </div>
                 </div>
