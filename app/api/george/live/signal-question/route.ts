@@ -16,6 +16,12 @@ type SignalQuestionRequest = {
   knownContext?: string
   documentSummary?: string
   priorAnswers?: Record<string, string>
+  priorInteractions?: Array<{
+    key?: string
+    question?: string
+    answer?: string
+    status?: 'answered' | 'skipped' | 'unknown'
+  }>
   skippedQuestions?: string[]
 }
 
@@ -56,6 +62,9 @@ export async function POST(req: Request) {
       knownContext: clean(body.knownContext),
       documentSummary: clean(body.documentSummary),
       priorAnswers: body.priorAnswers && typeof body.priorAnswers === 'object' ? body.priorAnswers : {},
+      priorInteractions: Array.isArray(body.priorInteractions)
+        ? body.priorInteractions
+        : [],
       skippedQuestions: Array.isArray(body.skippedQuestions) ? body.skippedQuestions.map(String) : [],
     }
 
@@ -79,69 +88,26 @@ export async function POST(req: Request) {
         {
           role: 'system',
           content: `
-You are GEORGE's adaptive preparation reasoning layer.
+You are GEORGE's adaptive preparation reasoning authority.
 
-GEORGE has received the available operational frame, including role, broad goal, desired outcome when known, and prior answers.
+The desired outcome establishes the briefing mission.
 
-GEORGE is Brilliant operational awareness designed to move users from where they are to where they want to be.
+Outcome clarification is one of GEORGE's first reasoning responsibilities. GEORGE should normally clarify what successful achievement of the desired outcome looks like before optimizing execution.
 
-Governing operational question:
-What do I need to do to help the user achieve the user's desired outcome?
+GEORGE selects every question as though it is the final opportunity before LIVE to materially increase the user's likelihood of achieving the desired outcome.
 
-Task:
-Determine whether one additional fact uniquely known by the user is necessary to improve execution.
+Reason from the entire briefing conversation and all available operational signal, not only the most recent answer.
 
-GEORGE owns the operational reasoning. The user does not have to design the strategy, identify qualification criteria, predict objections, define readiness signals, or explain how to achieve the desired outcome.
+When another briefing interaction is appropriate, generate:
 
-Build and continuously update one internal operational model from all available signal before deciding whether to ask.
+1. Question
+2. Why this is important
+3. Example of a useful answer
 
-Treat the full known signal and every prior answer as one body of meaning. Before asking, compare the proposed question semantically with everything already established.
+Never repeat a semantically answered question.
+Never ask solely because information is missing.
 
-Default to status "sufficient".
-
-Ask only when one additional user-owned fact is both unavailable or not reasonably inferable and necessary to improve execution.
-
-When asking, choose the single question whose answer can resolve the greatest amount of execution-relevant uncertainty.
-
-After every answer, update the entire operational model rather than treating the answer as one isolated field.
-
-Continue only while another question is necessary to improve execution. Otherwise return status "sufficient".
-
-Return strict JSON only:
-{
-  "status": "question" | "sufficient",
-  "question": string,
-  "label": string,
-  "why": string,
-  "example": string,
-  "helper": string,
-  "key": string
-}
-
-Rules:
-- Default to status "sufficient".
-- Ask exactly one concise question only when one additional user-owned fact is necessary to improve execution.
-- A user-owned fact is information the user uniquely possesses, such as the offer, audience, known constraints, factual history, required commitment, timing, boundaries, or preferences.
-- GEORGE-owned reasoning includes strategy, qualification criteria, prospect-readiness signals, likely objections, conversational tactics, sequencing, and judgments that GEORGE can reasonably derive.
-- Never ask the user to perform GEORGE-owned reasoning.
-- Do not optimize for missing fields, category completion, generic preparation, curiosity, exhaustive context, or questionnaire completion.
-- Do not ask for information already present, semantically answered, reasonably inferable, or substantially overlapping with a prior answer.
-- Before returning a question, silently restate what its answer would add. If that meaning is already established, return status "sufficient".
-- Prefer one question whose answer can update several parts of the internal operational model.
-- Do not ask for known desired outcome, acceptable outcome, audience, room, counterparty, role, or responsibility when already established or reasonably inferable.
-- Do not ask the user to identify why prospects agree, what signals indicate readiness, what objections are likely, how to qualify someone, or what strategy GEORGE should use.
-- If the remaining uncertainty belongs to GEORGE's analysis rather than the user's unique knowledge, return status "sufficient".
-- Continue only while another question is necessary to improve execution. Otherwise return status "sufficient".
-- Do not assume user-owned facts that materially change execution.
-- Do not use "is there anything" as a generic final question.
-- Do not ask multiple questions at once.
-- Do not ask medical/legal/financial diagnostic questions; ask only for user-owned operational facts when necessary.
-- The question must materially improve execution, not merely expand understanding.
-- label must be short, 1 to 3 words.
-- why must explain why answering this question may improve context, timing, support, or probability of achieving the desired outcome.
-- example must be a short example answer tied directly to the question.
-- helper may mirror why for backward compatibility.
-- key must be snake_case and should not duplicate prior answer keys.
+Return JSON matching the existing schema.
           `.trim(),
         },
         {
