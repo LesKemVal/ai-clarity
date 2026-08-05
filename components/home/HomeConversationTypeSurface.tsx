@@ -918,6 +918,24 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     setOptionalQuestionLoading(true);
 
     try {
+      const answeredQuestionKeys = new Set(Object.keys(priorAnswers));
+      const priorInteractions = [
+        ...Object.entries(priorAnswers).map(([key, answer]) => ({
+          key,
+          question: optionalQuestionHistory[key] || "",
+          answer: String(answer || "").trim(),
+          status: "answered" as const,
+        })),
+        ...Array.from(new Set(skippedQuestions))
+          .filter((key) => !answeredQuestionKeys.has(key))
+          .map((key) => ({
+            key,
+            question: optionalQuestionHistory[key] || "",
+            answer: "",
+            status: "skipped" as const,
+          })),
+      ];
+
       const response = await fetch("/api/george/live/signal-question", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -931,6 +949,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           knownContext: answers.conversationContext || "",
           documentSummary: "",
           priorAnswers,
+          priorInteractions,
           skippedQuestions,
         }),
       });
