@@ -89,6 +89,7 @@ import {
 import {
   resolveLiveEntry,
   type HomepageLiveHandoff,
+  type LiveEntryRoute,
 } from "@/lib/george/live-entry/entry-resolution";
 
 type HomepageBriefingHandoff = HomepageLiveHandoff & {
@@ -103,6 +104,45 @@ type HomepageBriefingHandoff = HomepageLiveHandoff & {
     status: "answered" | "skipped";
   }>;
 };
+
+type LiveMechanicsSection = "support" | "receiver" | "speaking";
+
+function resolveHomepageSupportRecommendation(
+  signals: Record<string, unknown>,
+  room: string,
+) {
+  const sessionSignal = [room, ...Object.values(signals)]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const presentationSession =
+    /broadcast|camera|demo|interview|media|pitch|presentation|script|speech|teleprompter/.test(
+      sessionSignal,
+    );
+  const executiveSession =
+    /board|executive|founder|investor|leadership|negotiat|stakeholder/.test(
+      sessionSignal,
+    );
+  const conversationalSession =
+    /appointment|customer|discovery|network|recruit|relationship|service/.test(
+      sessionSignal,
+    );
+
+  return {
+    supportStyle: presentationSession ? "response" : "advice",
+    receiverProfile: presentationSession ? "audio_visual" : "audio_only",
+    communicationStyle: executiveSession
+      ? "Executive"
+      : conversationalSession
+        ? "Conversational"
+        : "Adaptive",
+  } satisfies {
+    supportStyle: LiveBriefingSupportPanelId;
+    receiverProfile: LiveReceiverProfilePanelId;
+    communicationStyle: string;
+  };
+}
 
 type Tier = "smart" | "intelligent" | "brilliant";
 
@@ -493,6 +533,8 @@ function buildLiveBriefingSupportPanels({
 
 export default function LiveEntryClient() {
   const [ready, setReady] = useState(false);
+  const [liveEntryRoute, setLiveEntryRoute] =
+    useState<LiveEntryRoute>("direct");
   const [tier, setTier] = useState<Tier>("smart");
   const [conversationType, setConversationType] = useState("Meeting");
   const [customConversationType, setCustomConversationType] = useState("");
@@ -571,6 +613,7 @@ export default function LiveEntryClient() {
 
   const livePreparationHistoryRef = useRef<LivePreparationWorkflowState[]>([]);
   const returnToReadyRoomAfterBriefingRef = useRef(false);
+  const returnToReadyRoomAfterMechanicsRef = useRef(false);
 
   const pushLivePreparationState = (
     state: LivePreparationWorkflowState,
@@ -660,8 +703,12 @@ export default function LiveEntryClient() {
     useState<LiveBriefingSupportPanelId | null>(null);
   const [selectedReceiverProfile, setSelectedReceiverProfile] =
     useState<LiveReceiverProfilePanelId>("audio_only");
+  const [receiverProfileConfirmed, setReceiverProfileConfirmed] =
+    useState(false);
   const [liveBriefingOpenMechanicsPanel, setLiveBriefingOpenMechanicsPanel] =
-    useState<"support" | "receiver" | "speaking" | null>("support");
+    useState<LiveMechanicsSection | null>("support");
+  const [popup3EditingMechanic, setPopup3EditingMechanic] =
+    useState<LiveMechanicsSection | null>(null);
   const [
     liveBriefingExpandedSupportPanel,
     setLiveBriefingExpandedSupportPanel,
@@ -745,6 +792,11 @@ export default function LiveEntryClient() {
           liveBriefingSupportAccepted?: boolean;
           liveBriefingActiveSupportStyle?: LiveBriefingSupportPanelId | null;
           selectedReceiverProfile?: LiveReceiverProfilePanelId;
+          receiverProfileConfirmed?: boolean;
+          communicationStyle?: string;
+          liveBriefingCommunicationConfirmed?: boolean;
+          liveRecoveryAcknowledged?: boolean;
+          liveBriefingCapabilitiesConfirmed?: boolean;
           selectedFormula?: OperationalFormula | null;
           selectedFormulaSource?: FormulaDecisionSource | null;
           selectedScript?: OperationalScript | null;
@@ -771,6 +823,22 @@ export default function LiveEntryClient() {
         if (snapshot.selectedReceiverProfile) {
           setSelectedReceiverProfile(snapshot.selectedReceiverProfile);
         }
+        setReceiverProfileConfirmed(
+          Boolean(snapshot.receiverProfileConfirmed),
+        );
+
+        if (snapshot.communicationStyle) {
+          setCommunicationStyle(snapshot.communicationStyle);
+        }
+        setLiveBriefingCommunicationConfirmed(
+          Boolean(snapshot.liveBriefingCommunicationConfirmed),
+        );
+        setLiveRecoveryAcknowledged(
+          Boolean(snapshot.liveRecoveryAcknowledged),
+        );
+        setLiveBriefingCapabilitiesConfirmed(
+          Boolean(snapshot.liveBriefingCapabilitiesConfirmed),
+        );
 
         setSelectedFormula(snapshot.selectedFormula ?? null);
         setSelectedFormulaSource(snapshot.selectedFormulaSource ?? null);
@@ -945,12 +1013,33 @@ export default function LiveEntryClient() {
 
   useEffect(() => {
     if (showLiveBriefingRoom && liveBriefingStep === 3) {
-      setLivePrepOpenSection("support");
-      setLiveBriefingSupportAccepted(false);
+      const hasCompletedSupportConfiguration = Boolean(
+        liveBriefingActiveSupportStyle &&
+          receiverProfileConfirmed &&
+          liveBriefingCommunicationConfirmed &&
+          (liveEntryRoute === "homepage" || liveRecoveryAcknowledged),
+      );
+
+      setLivePrepOpenSection((current) =>
+        hasCompletedSupportConfiguration
+          ? current === "ready"
+            ? "ready"
+            : "formula"
+          : "support",
+      );
+      setLiveBriefingSupportAccepted(hasCompletedSupportConfiguration);
       setReadyRoomTypedPrompt("");
       setReadyRoomPromptComplete(false);
     }
-  }, [liveBriefingStep, showLiveBriefingRoom]);
+  }, [
+    liveBriefingActiveSupportStyle,
+    liveBriefingCommunicationConfirmed,
+    liveBriefingStep,
+    liveEntryRoute,
+    liveRecoveryAcknowledged,
+    receiverProfileConfirmed,
+    showLiveBriefingRoom,
+  ]);
 
   useEffect(() => {
     if (!showLiveBriefingRoom || liveBriefingStep !== 3) {
@@ -1606,7 +1695,54 @@ export default function LiveEntryClient() {
         preLiveReady,
       } = entryResolution;
 
+      setLiveEntryRoute(entryResolution.route);
       setPreLivePreviewReady(preLiveReady);
+
+      if (
+        entryResolution.route === "homepage" &&
+        (homepageHandoff || Object.keys(acquiredSignalsForAccess).length > 0)
+      ) {
+        const homepageRecommendation = resolveHomepageSupportRecommendation(
+          acquiredSignalsForAccess,
+          String(homepageHandoff?.conversationType || ""),
+        );
+        const runtimeSupportStyle = toRuntimeSupportStyle(
+          homepageRecommendation.supportStyle,
+        );
+
+        setLiveBriefingActiveSupportStyle(
+          homepageRecommendation.supportStyle,
+        );
+        setSelectedSupportStyle(
+          normalizeLiveSupportStyle(runtimeSupportStyle),
+        );
+        setSelectedReceiverProfile(homepageRecommendation.receiverProfile);
+        setReceiverProfileConfirmed(true);
+        setCommunicationStyle(homepageRecommendation.communicationStyle);
+        setLiveBriefingCommunicationConfirmed(true);
+        setLiveBriefingSupportAccepted(true);
+
+        window.localStorage.setItem(
+          "GEORGE_LIVE_SUPPORT_STYLE",
+          runtimeSupportStyle,
+        );
+        window.localStorage.setItem(
+          "GEORGE_LIVE_DELIVERY_STYLE",
+          runtimeSupportStyle,
+        );
+        window.localStorage.setItem(
+          "GEORGE_LIVE_RECEIVER_PROFILE",
+          homepageRecommendation.receiverProfile,
+        );
+        window.localStorage.setItem(
+          "george_live_entry_receiver_profile",
+          homepageRecommendation.receiverProfile,
+        );
+        window.localStorage.setItem(
+          "george_live_communication_style",
+          homepageRecommendation.communicationStyle,
+        );
+      }
 
       if (homepageHandoff) {
         const canonicalInteractions = Array.isArray(
@@ -1751,8 +1887,8 @@ export default function LiveEntryClient() {
         }
 
         /*
-         * Homepage owns briefing and mechanics. LIVE Entry joins at the
-         * shared preparation surface seen by every route.
+         * Homepage owns its briefing. LIVE Entry provides a current-session
+         * support recommendation at the shared readiness surface.
          */
         livePreparationHistoryRef.current = ["brief_review"];
         setLiveBriefingStep(3);
@@ -1769,6 +1905,7 @@ export default function LiveEntryClient() {
 
         window.localStorage.removeItem("GEORGE_HOMEPAGE_LIVE_HANDOFF");
       } else if (entryResolution.firstStep === "mechanics") {
+        returnToReadyRoomAfterMechanicsRef.current = false;
         setPreLiveSignals(acquiredSignalsForAccess);
         setLiveEntryReadyMessageVisible(false);
         setShowOpenAISignalSurface(false);
@@ -1787,27 +1924,31 @@ export default function LiveEntryClient() {
         window.localStorage.getItem("GEORGE_LAST_LIVE_SETUP") || "null",
       );
 
-      if (!isFreshLiveStart) {
-        if (saved?.room) {
-          const knownRoom = CONVERSATION_TYPES.some(
-            (option) => option.label === saved.room,
-          );
-          setConversationType(knownRoom ? saved.room : "Other");
-          if (!knownRoom) setCustomConversationType(saved.room);
+      if (entryResolution.route !== "homepage") {
+        if (!isFreshLiveStart) {
+          if (saved?.room) {
+            const knownRoom = CONVERSATION_TYPES.some(
+              (option) => option.label === saved.room,
+            );
+            setConversationType(knownRoom ? saved.room : "Other");
+            if (!knownRoom) setCustomConversationType(saved.room);
+          }
+          if (saved?.audienceType) setAudienceType(saved.audienceType);
+          if (saved?.userPosition) setUserPosition(saved.userPosition);
         }
-        if (saved?.audienceType) setAudienceType(saved.audienceType);
-        if (saved?.userPosition) setUserPosition(saved.userPosition);
-      }
 
-      if (saved?.cadence) setPacing(saved.cadence);
-      if (saved?.supportStyle || saved?.liveAssistMode) {
-        setSelectedSupportStyle(
-          normalizeLiveSupportStyle(saved.supportStyle || saved.liveAssistMode),
-        );
+        if (saved?.cadence) setPacing(saved.cadence);
+        if (saved?.supportStyle || saved?.liveAssistMode) {
+          setSelectedSupportStyle(
+            normalizeLiveSupportStyle(
+              saved.supportStyle || saved.liveAssistMode,
+            ),
+          );
+        }
+        if (saved?.controlWords) setControlWords(saved.controlWords);
+        if (saved?.communicationStyle)
+          setCommunicationStyle(saved.communicationStyle);
       }
-      if (saved?.controlWords) setControlWords(saved.controlWords);
-      if (saved?.communicationStyle)
-        setCommunicationStyle(saved.communicationStyle);
     } catch {}
 
     try {
@@ -2299,6 +2440,11 @@ export default function LiveEntryClient() {
           liveBriefingSupportAccepted,
           liveBriefingActiveSupportStyle,
           selectedReceiverProfile,
+          receiverProfileConfirmed,
+          communicationStyle,
+          liveBriefingCommunicationConfirmed,
+          liveRecoveryAcknowledged,
+          liveBriefingCapabilitiesConfirmed,
           selectedFormula,
           selectedFormulaSource,
           selectedScript,
@@ -3600,6 +3746,7 @@ export default function LiveEntryClient() {
 
     setLiveBriefingActiveSupportStyle(panelId);
     setSelectedSupportStyle(normalizeLiveSupportStyle(runtimeStyle));
+    setLiveBriefingSupportAccepted(true);
     setLiveRecoveryAcknowledged(false);
     setLiveBriefingCapabilitiesConfirmed(false);
     setLiveBriefingOpenMechanicsPanel(null);
@@ -3625,6 +3772,7 @@ export default function LiveEntryClient() {
     profile: LiveReceiverProfilePanelId,
   ) => {
     setSelectedReceiverProfile(profile);
+    setReceiverProfileConfirmed(true);
     setLiveBriefingSupportAccepted(true);
     setLiveRecoveryAcknowledged(false);
     setLiveBriefingCapabilitiesConfirmed(false);
@@ -3664,6 +3812,19 @@ export default function LiveEntryClient() {
     } catch {}
   };
 
+  const setActiveCommunicationStyle = (style: string) => {
+    setCommunicationStyle(style);
+    setLiveBriefingCommunicationConfirmed(true);
+    setLiveBriefingSupportAccepted(true);
+    setLiveRecoveryAcknowledged(false);
+    setLiveBriefingCapabilitiesConfirmed(false);
+    setLiveBriefingOpenMechanicsPanel(null);
+
+    try {
+      window.localStorage.setItem("george_live_communication_style", style);
+    } catch {}
+  };
+
   if (showLiveBriefingRoom) {
     const objectiveLabel =
       cleanBriefingValue(objective) || "the desired outcome";
@@ -3694,6 +3855,66 @@ export default function LiveEntryClient() {
     };
 
     const briefingInputsLocked = liveBriefingToaAccepted;
+    const activeSupportPanelId: LiveBriefingSupportPanelId =
+      liveBriefingActiveSupportStyle === "response" ||
+      selectedSupportStyle === "response"
+        ? "response"
+        : "advice";
+    const activeAdaptiveSupportPanel =
+      LIVE_SUPPORT_PANELS.find(
+        (panel) => panel.id === activeSupportPanelId,
+      ) || LIVE_SUPPORT_PANELS[0];
+    const activeReceiverPanel =
+      LIVE_RECEIVER_PROFILE_PANELS.find(
+        (panel) => panel.id === selectedReceiverProfile,
+      ) || LIVE_RECEIVER_PROFILE_PANELS[0];
+    const mechanicsSelectionsComplete = Boolean(
+      liveBriefingActiveSupportStyle &&
+        receiverProfileConfirmed &&
+        liveBriefingCommunicationConfirmed,
+    );
+
+    const compactMechanicsChoice = ({
+      label,
+      value,
+      summary,
+      onChange,
+      recommended = false,
+    }: {
+      label: string;
+      value: string;
+      summary: string;
+      onChange: () => void;
+      recommended?: boolean;
+    }) => (
+      <div className="rounded-[0.82rem] border border-white/[0.08] bg-[#080A10]/[0.72] px-4 py-3">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.22em] text-white/34">
+              <span>{label}</span>
+              {recommended && (
+                <span className="rounded-full border border-[#7EA1FF]/24 bg-[#4E7CFF]/[0.08] px-2 py-0.5 text-[7px] text-[#D7DCFF]/64">
+                  Recommended
+                </span>
+              )}
+            </div>
+            <div className="mt-1.5 text-[13px] font-semibold text-[#F2F4FF]/88">
+              ✓ {value}
+            </div>
+            <div className="mt-1 text-[10px] leading-4 text-[#D7DBE4]/46">
+              {summary}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onChange}
+            className="shrink-0 rounded-[0.6rem] border border-white/[0.09] px-2.5 py-1 text-[8px] font-semibold uppercase tracking-[0.15em] text-white/48 transition hover:border-white/20 hover:text-white/76"
+          >
+            Change
+          </button>
+        </div>
+      </div>
+    );
 
     const observation = buildBriefingObservation(
       roomLabel,
@@ -4111,43 +4332,22 @@ export default function LiveEntryClient() {
     }
 
     if (liveBriefingStep === 2) {
-      const storedReceiverProfile =
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-            window.localStorage.getItem("george_live_entry_receiver_profile") ||
-            window.localStorage.getItem("george_live_entry_support_preference")
-          : null;
-
-      const validStoredReceiverProfile =
-        storedReceiverProfile === "visual_only" ||
-        storedReceiverProfile === "audio_only" ||
-        storedReceiverProfile === "audio_visual"
-          ? storedReceiverProfile
-          : null;
-
-      const activeReceiverProfile =
-        selectedReceiverProfile || validStoredReceiverProfile || "audio_only";
-
-      const activeReceiverPanel =
-        LIVE_RECEIVER_PROFILE_PANELS.find(
-          (panel) => panel.id === activeReceiverProfile,
-        ) || LIVE_RECEIVER_PROFILE_PANELS[0];
-
-      const activeAdaptiveSupportId: LiveBriefingSupportPanelId =
-        liveBriefingActiveSupportStyle === "response" ||
-        selectedSupportStyle === "response"
-          ? "response"
-          : "advice";
-
-      const activeAdaptiveSupportPanel =
-        LIVE_SUPPORT_PANELS.find(
-          (panel) => panel.id === activeAdaptiveSupportId,
-        ) || LIVE_SUPPORT_PANELS[0];
-
       const liveTierLabel = String(tier || "smart").toUpperCase();
+      const goBackFromMechanics = () => {
+        if (returnToReadyRoomAfterMechanicsRef.current) {
+          returnToReadyRoomAfterMechanicsRef.current = false;
+          setLiveBriefingStep(3);
+          return;
+        }
+
+        goToPreviousLivePreparationState();
+      };
       const confirmPrivacyAndContinue = () => {
+        if (!mechanicsSelectionsComplete) return;
+
         setLiveRecoveryAcknowledged(true);
         setLiveBriefingCapabilitiesConfirmed(true);
+        setLiveBriefingSupportAccepted(true);
         setLiveBriefingExpandedSupportPanel(null);
 
         try {
@@ -4168,9 +4368,7 @@ export default function LiveEntryClient() {
             "george_live_entry_support_preference",
             activeReceiverPanel.id,
           );
-          const activeRuntimeStyle = toRuntimeSupportStyle(
-            activeAdaptiveSupportId,
-          );
+          const activeRuntimeStyle = toRuntimeSupportStyle(activeSupportPanelId);
 
           window.localStorage.setItem(
             "GEORGE_LIVE_SUPPORT_STYLE",
@@ -4188,78 +4386,106 @@ export default function LiveEntryClient() {
           label="BRIEF ROOM · MECHANICS"
           title="Mechanics"
           stage={2}
-          onBack={goToPreviousLivePreparationState}
+          onBack={goBackFromMechanics}
         >
           <div className="mt-3 space-y-3">
-            <LiveAdaptiveSupportPanel
-              activePanel={activeAdaptiveSupportPanel}
-              open={liveBriefingOpenMechanicsPanel === "support"}
-              panels={LIVE_SUPPORT_PANELS}
-              onToggle={() =>
-                setLiveBriefingOpenMechanicsPanel(
-                  liveBriefingOpenMechanicsPanel === "support"
-                    ? null
-                    : "support",
-                )
-              }
-              onSelect={setActiveAdaptiveSupport}
-            />
+            {liveBriefingActiveSupportStyle &&
+            liveBriefingOpenMechanicsPanel !== "support"
+              ? compactMechanicsChoice({
+                  label: "GEORGE's support",
+                  value: activeAdaptiveSupportPanel.label,
+                  summary: activeAdaptiveSupportPanel.line,
+                  onChange: () =>
+                    setLiveBriefingOpenMechanicsPanel("support"),
+                })
+              : (
+                  <LiveAdaptiveSupportPanel
+                    activePanel={activeAdaptiveSupportPanel}
+                    open={true}
+                    panels={LIVE_SUPPORT_PANELS}
+                    onToggle={() => {
+                      if (liveBriefingActiveSupportStyle) {
+                        setLiveBriefingOpenMechanicsPanel(null);
+                      }
+                    }}
+                    onSelect={setActiveAdaptiveSupport}
+                  />
+                )}
 
-            <LiveReceiverProfilePanel
-              activePanel={activeReceiverPanel}
-              open={liveBriefingOpenMechanicsPanel === "receiver"}
-              panels={LIVE_RECEIVER_PROFILE_PANELS}
-              onToggle={() =>
-                setLiveBriefingOpenMechanicsPanel(
-                  liveBriefingOpenMechanicsPanel === "receiver"
-                    ? null
-                    : "receiver",
-                )
-              }
-              onSelect={setActiveReceiverProfile}
-            />
+            {receiverProfileConfirmed &&
+            liveBriefingOpenMechanicsPanel !== "receiver"
+              ? compactMechanicsChoice({
+                  label: "Delivery profile",
+                  value: activeReceiverPanel.label,
+                  summary: activeReceiverPanel.line,
+                  onChange: () =>
+                    setLiveBriefingOpenMechanicsPanel("receiver"),
+                })
+              : (
+                  <LiveReceiverProfilePanel
+                    activePanel={activeReceiverPanel}
+                    open={true}
+                    panels={LIVE_RECEIVER_PROFILE_PANELS}
+                    onToggle={() => {
+                      if (receiverProfileConfirmed) {
+                        setLiveBriefingOpenMechanicsPanel(null);
+                      }
+                    }}
+                    onSelect={setActiveReceiverProfile}
+                  />
+                )}
 
-            <LiveSpeakingStylePanel
-              confirmed={liveBriefingCommunicationConfirmed}
-              open={liveBriefingOpenMechanicsPanel === "speaking"}
-              selectedStyle={communicationStyle}
-              onEdit={() => {
-                setLiveBriefingCommunicationConfirmed(false);
-                setLiveRecoveryAcknowledged(false);
-                setLiveBriefingCapabilitiesConfirmed(false);
-                setLiveBriefingOpenMechanicsPanel("speaking");
-              }}
-              onOpen={() => setLiveBriefingOpenMechanicsPanel("speaking")}
-              onSelect={(style) => {
-                setCommunicationStyle(style);
-                setLiveBriefingCommunicationConfirmed(true);
-                setLiveRecoveryAcknowledged(false);
-                setLiveBriefingCapabilitiesConfirmed(false);
-                setLiveBriefingOpenMechanicsPanel(null);
+            {liveBriefingCommunicationConfirmed &&
+            liveBriefingOpenMechanicsPanel !== "speaking"
+              ? compactMechanicsChoice({
+                  label: "Speaking style",
+                  value: communicationStyle,
+                  summary: "Support will follow this speaking style in LIVE.",
+                  onChange: () =>
+                    setLiveBriefingOpenMechanicsPanel("speaking"),
+                })
+              : (
+                  <LiveSpeakingStylePanel
+                    confirmed={false}
+                    open={true}
+                    selectedStyle={communicationStyle}
+                    onEdit={() =>
+                      setLiveBriefingOpenMechanicsPanel("speaking")
+                    }
+                    onOpen={() =>
+                      setLiveBriefingOpenMechanicsPanel("speaking")
+                    }
+                    onSelect={setActiveCommunicationStyle}
+                  />
+                )}
 
-                try {
-                  window.localStorage.setItem(
-                    "george_live_communication_style",
-                    style,
-                  );
-                } catch {}
-              }}
-            />
-
-            <div
-              className={`rounded-[0.82rem] border px-4 py-3 transition ${
-                liveRecoveryAcknowledged
-                  ? "border-[#D7DCFF]/28 bg-[#D7DCFF]/[0.06] text-[#F2F4FF]/86"
-                  : liveRecoveryAcknowledgementOpen
+            {liveRecoveryAcknowledged ? (
+              compactMechanicsChoice({
+                label: "Mechanics acknowledgement",
+                value: "Acknowledged",
+                summary: "You remain the final authority in LIVE.",
+                onChange: () => {
+                  setLiveRecoveryAcknowledged(false);
+                  setLiveBriefingCapabilitiesConfirmed(false);
+                  setLiveRecoveryAcknowledgementOpen(true);
+                },
+              })
+            ) : (
+              <div
+                className={`rounded-[0.82rem] border px-4 py-3 transition ${
+                  liveRecoveryAcknowledgementOpen
                     ? "border-[#D7DCFF]/18 bg-[#D7DCFF]/[0.035] text-[#D7DBE4]/72"
                     : "border-white/[0.08] bg-[#080A10]/[0.52] text-[#D7DBE4]/58 hover:border-[#D7DCFF]/18 hover:bg-[#D7DCFF]/[0.035]"
-              }`}
-            >
+                }`}
+              >
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
+                  disabled={!mechanicsSelectionsComplete}
                   checked={liveRecoveryAcknowledged}
                   onChange={(event) => {
+                    if (!mechanicsSelectionsComplete) return;
+
                     if (!liveRecoveryAcknowledgementOpen) {
                       setLiveRecoveryAcknowledgementOpen(true);
                       setLiveRecoveryAcknowledged(false);
@@ -4287,14 +4513,15 @@ export default function LiveEntryClient() {
                   {!liveRecoveryAcknowledgementOpen &&
                     !liveRecoveryAcknowledged && (
                       <span className="mt-1 block text-[#D7DBE4]/50">
-                        Check once to review. Check again to acknowledge.
+                        {mechanicsSelectionsComplete
+                          ? "Check once to review. Check again to acknowledge."
+                          : "Choose support, delivery, and speaking style first."}
                       </span>
                     )}
                 </span>
               </label>
 
-              {(liveRecoveryAcknowledgementOpen ||
-                liveRecoveryAcknowledged) && (
+              {liveRecoveryAcknowledgementOpen && (
                 <div className="mt-3 border-l border-[#D7DCFF]/18 pl-3 text-[12px] leading-5 text-[#D7DBE4]/64">
                   I understand that GEORGE is {liveTierLabel}, but I remain the
                   final authority. GEORGE supports me by adapting how it
@@ -4315,13 +4542,17 @@ export default function LiveEntryClient() {
                   </button>
                 </div>
               )}
-            </div>
+              </div>
+            )}
 
             <div className="grid gap-2 sm:grid-cols-2">
               <button
                 type="button"
-                disabled={!liveRecoveryAcknowledged}
+                disabled={
+                  !mechanicsSelectionsComplete || !liveRecoveryAcknowledged
+                }
                 onClick={() => {
+                  returnToReadyRoomAfterMechanicsRef.current = false;
                   transitionToLivePreparationState({
                     previousState: "mechanics",
                     nextStep: 3,
@@ -4329,7 +4560,7 @@ export default function LiveEntryClient() {
                   void loadOperationalRecommendation();
                 }}
                 className={`rounded-[0.75rem] border px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
-                  liveRecoveryAcknowledged
+                  mechanicsSelectionsComplete && liveRecoveryAcknowledged
                     ? "border-[#4E7CFF]/65 bg-[#4E7CFF] text-white shadow-[0_10px_28px_rgba(78,124,255,0.26)] hover:border-[#7EA1FF]/80 hover:bg-[#5B86FF]"
                     : "cursor-default border-white/[0.05] bg-transparent text-white/20"
                 }`}
@@ -4341,15 +4572,6 @@ export default function LiveEntryClient() {
         </PanelShell>
       );
     }
-
-    const supportLabel =
-      selectedSupportStyle === "continue"
-        ? "Continuation"
-        : selectedSupportStyle === "response"
-          ? "Response"
-          : selectedSupportStyle === "presentation"
-            ? "Presentation"
-            : "Cue";
 
     const activeFormula =
       selectedFormula || operationalRecommendation?.recommendedFormula || null;
@@ -4369,7 +4591,7 @@ export default function LiveEntryClient() {
       }
 
       if (livePrepOpenSection === "formula") {
-        setLivePrepOpenSection("support");
+        goToPreviousLivePreparationState();
         return;
       }
 
@@ -4395,11 +4617,19 @@ export default function LiveEntryClient() {
       </button>
     );
 
-    const activeSupportPanelId: LiveBriefingSupportPanelId =
-      liveBriefingActiveSupportStyle === "response" ||
-      selectedSupportStyle === "response"
-        ? "response"
-        : "advice";
+    const changeMechanicFromReadyRoom = (
+      section: LiveMechanicsSection,
+    ) => {
+      if (liveEntryRoute === "homepage") {
+        setPopup3EditingMechanic(section);
+        return;
+      }
+
+      returnToReadyRoomAfterMechanicsRef.current = true;
+      setLiveBriefingOpenMechanicsPanel(section);
+      setLiveBriefingStep(2);
+      setShowLiveBriefingRoom(true);
+    };
 
     return (
       <PanelShell
@@ -4417,85 +4647,107 @@ export default function LiveEntryClient() {
 
           <div className="mt-4 overflow-hidden rounded-[16px] border border-white/[0.075] bg-[#07090D] px-5 py-5">
             <div className="space-y-3">
-              {livePrepOpenSection !== "support" &&
-                compactChoice(
-                  "Support",
-                  supportLabel,
-                  () => setLivePrepOpenSection("support"),
-                )}
-
               {livePrepOpenSection === "ready" &&
                 compactChoice(
                   "Formula",
                   `${activeFormulaLabel} · ${formulaProofLabel}`,
-                  () => setLivePrepOpenSection("formula"),
+                    () => setLivePrepOpenSection("formula"),
                 )}
-            </div>
 
-            <section
-              className={`grid transition-all duration-500 ease-out ${
-                livePrepOpenSection === "support"
-                  ? "mt-5 grid-rows-[1fr] translate-y-0 opacity-100"
-                  : "pointer-events-none grid-rows-[0fr] -translate-y-5 opacity-0"
-              }`}
-            >
-              <div className="overflow-hidden">
-                <h2 className="min-h-[70px] max-w-[560px] font-mono text-[19px] leading-8 tracking-[-0.025em] text-white sm:text-[23px]">
-                  {readyRoomTypedPrompt}
-                </h2>
+              <div className="rounded-[14px] border border-[#7EA1FF]/[0.14] bg-[#4E7CFF]/[0.035] p-3">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-mono text-[8px] font-semibold uppercase tracking-[0.2em] text-[#D7DCFF]/52">
+                      Current-session support
+                    </div>
+                    <div className="mt-1 text-[11px] leading-5 text-white/42">
+                      {liveEntryRoute === "homepage"
+                        ? "Recommended from this Homepage briefing."
+                        : "Completed in Mechanics and carried into readiness."}
+                    </div>
+                  </div>
+                  <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.17em] text-[#AFC0FF]/52">
+                    {liveBriefingSupportAccepted ? "Configured" : "Review"}
+                  </span>
+                </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {(["advice", "response"] as const).map((id) => {
-                    const selected =
-                      liveBriefingSupportAccepted &&
-                      activeSupportPanelId === id;
-
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => {
-                          setActiveAdaptiveSupport(id);
-                          setLiveBriefingSupportAccepted(true);
-
-                          window.setTimeout(() => {
-                            setLivePrepOpenSection("formula");
-                          }, 360);
-                        }}
-                        className={`flex items-start gap-3 rounded-[12px] border px-4 py-4 text-left transition-all duration-300 ${
-                          selected
-                            ? "border-[#8FAEFF]/55 bg-[#101A31] -translate-y-0.5"
-                            : "border-white/[0.09] bg-white/[0.02] hover:-translate-y-0.5 hover:border-white/22"
-                        }`}
-                      >
-                        <span
-                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border text-[10px] transition ${
-                            selected
-                              ? "border-[#8FAEFF]/70 bg-[#4E7CFF] text-white"
-                              : "border-white/22 text-transparent"
-                          }`}
-                        >
-                          ✓
-                        </span>
-                        <span>
-                          <span className="block text-[13px] font-semibold text-white/86">
-                            {id === "advice"
-                              ? "Adaptive cues"
-                              : "Adaptive response"}
-                          </span>
-                          <span className="mt-1 block text-[11px] leading-5 text-white/42">
-                            {id === "advice"
-                              ? "Brief support at the right moment."
-                              : "A complete response when the room requires one."}
-                          </span>
-                        </span>
-                      </button>
-                    );
+                <div className="space-y-2">
+                  {compactMechanicsChoice({
+                    label: "Support behavior",
+                    value: activeAdaptiveSupportPanel.label,
+                    summary: activeAdaptiveSupportPanel.line,
+                    recommended: liveEntryRoute === "homepage",
+                    onChange: () =>
+                      changeMechanicFromReadyRoom("support"),
+                  })}
+                  {compactMechanicsChoice({
+                    label: "Delivery profile",
+                    value: activeReceiverPanel.label,
+                    summary: activeReceiverPanel.line,
+                    recommended: liveEntryRoute === "homepage",
+                    onChange: () =>
+                      changeMechanicFromReadyRoom("receiver"),
+                  })}
+                  {compactMechanicsChoice({
+                    label: "Speaking style",
+                    value: communicationStyle,
+                    summary: "Support will follow this speaking style in LIVE.",
+                    recommended: liveEntryRoute === "homepage",
+                    onChange: () =>
+                      changeMechanicFromReadyRoom("speaking"),
                   })}
                 </div>
 
+                {liveEntryRoute === "homepage" &&
+                  popup3EditingMechanic === "support" && (
+                    <div className="mt-3">
+                      <LiveAdaptiveSupportPanel
+                        activePanel={activeAdaptiveSupportPanel}
+                        open={true}
+                        panels={LIVE_SUPPORT_PANELS}
+                        onToggle={() => setPopup3EditingMechanic(null)}
+                        onSelect={(panelId) => {
+                          setActiveAdaptiveSupport(panelId);
+                          setPopup3EditingMechanic(null);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                {liveEntryRoute === "homepage" &&
+                  popup3EditingMechanic === "receiver" && (
+                    <div className="mt-3">
+                      <LiveReceiverProfilePanel
+                        activePanel={activeReceiverPanel}
+                        open={true}
+                        panels={LIVE_RECEIVER_PROFILE_PANELS}
+                        onToggle={() => setPopup3EditingMechanic(null)}
+                        onSelect={(profile) => {
+                          setActiveReceiverProfile(profile);
+                          setPopup3EditingMechanic(null);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                {liveEntryRoute === "homepage" &&
+                  popup3EditingMechanic === "speaking" && (
+                    <div className="mt-3">
+                      <LiveSpeakingStylePanel
+                        confirmed={false}
+                        open={true}
+                        selectedStyle={communicationStyle}
+                        onEdit={() => setPopup3EditingMechanic("speaking")}
+                        onOpen={() => setPopup3EditingMechanic("speaking")}
+                        onSelect={(style) => {
+                          setActiveCommunicationStyle(style);
+                          setPopup3EditingMechanic(null);
+                        }}
+                      />
+                    </div>
+                  )}
               </div>
-            </section>
+            </div>
 
             <section
               className={`grid transition-all duration-500 ease-out ${
