@@ -141,6 +141,18 @@ export async function POST(req: Request) {
       skippedQuestions,
     }
 
+    if (!knownSignal.desiredOutcome) {
+      return NextResponse.json({
+        status: 'question',
+        question: 'What outcome are you hoping to achieve?',
+        label: 'Desired outcome',
+        why: 'The desired outcome establishes what GEORGE should help you move toward.',
+        example: 'Describe the result that would make this conversation successful.',
+        helper: 'The desired outcome establishes what GEORGE should help you move toward.',
+        key: 'desiredOutcome',
+      })
+    }
+
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({
         status: 'sufficient',

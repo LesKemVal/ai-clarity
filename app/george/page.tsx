@@ -49,13 +49,14 @@ import {
   isLivePreparationPreviewReady,
   loadPreparationSession,
   loadLivePreparationSignals,
-  markLivePreparationPreviewReady,
   savePreparationSession,
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
   createPreparationSession,
+  normalizePreparationInteractions,
   type PreparationCheckpoint,
+  type PreparationQuestion,
   type PreparationSessionV1,
 } from "@/lib/george/live-runtime/live-preparation-controller";
 import { buildOpportunitySignalAcquisitionMessage } from "@/lib/george/runtime/conversation-strategy";
@@ -186,9 +187,6 @@ import {
   isLiveIdentityQuestion,
 } from "@/lib/george/identity/live-self-description";
 import {
-  resolveLivePreparationReadiness,
-  resolveLivePreparationStep,
-  resolveLivePreparationTransition,
   resolveLiveIntentRuntime,
   resolveLiveMessageBarSetup,
 } from "@/lib/george/live-runtime/live-intent-runtime";
@@ -875,6 +873,7 @@ export default function Page({
   const liveSessionWriteReadyRef = useRef(false);
   const preLiveSessionIdRef = useRef<string | null>(null);
   const normalLiveExplicitObjectiveRef = useRef("");
+  const normalAdaptiveQuestionRequestRef = useRef(false);
   const liveEntryBootedRef = useRef(false);
   const [pendingImage, setPendingImage] = useState<{
     dataUrl: string;
@@ -1071,7 +1070,8 @@ export default function Page({
   );
   const [showPreLiveSignalSurface, setShowPreLiveSignalSurface] =
     useState(false);
-  const [preLiveSignalStep, setPreLiveSignalStep] = useState(0);
+  const [currentPreLiveQuestion, setCurrentPreLiveQuestion] =
+    useState<PreparationQuestion | null>(null);
   const [preLiveSignals, setPreLiveSignals] = useState<Record<string, string>>(
     {},
   );
@@ -1095,67 +1095,8 @@ export default function Page({
       }
     } catch {}
   }, []);
-
-  const livePreparationReadiness = useMemo(
-    () => resolveLivePreparationReadiness(preLiveSignals),
-    [preLiveSignals],
-  );
   const isManualLive =
     conversationMode === "manual_live" || activePromptContext === "manual_live";
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (liveEntryBootedRef.current) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const pendingLiveSignal =
-      window.localStorage.getItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION") ===
-      "start";
-
-    const shouldStartNewLive =
-      pendingLiveSignal ||
-      params.get("start") === "1" ||
-      (params.get("live") === "1" && params.get("start") === "1");
-
-    if (!shouldStartNewLive) return;
-
-    liveEntryBootedRef.current = true;
-    setShowPreLiveSignalSurface(true);
-    setPreLiveSignalStep(0);
-    setPreLiveSignals({});
-    setPreLiveSignalComplete(false);
-    window.localStorage.removeItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION");
-
-    const firstPreparationQuestion =
-      resolveLivePreparationStep(0).question;
-
-    if (!firstPreparationQuestion) {
-      throw new Error(
-        "[GEORGE LIVE PREPARATION] Missing initial preparation question.",
-      );
-    }
-
-    const nextMessages: Message[] = [
-      {
-        role: "assistant",
-        content: `${firstPreparationQuestion.kicker}.\n\n${firstPreparationQuestion.question}\n\n${firstPreparationQuestion.examples}`,
-        source: "system_override",
-        presentationMode: "live_preparation",
-      },
-    ];
-
-    // Start New LIVE begins in normal GEORGE.
-    // GEORGE collects signal first; LIVE starts only after enough signal exists.
-    setLiveMode(false);
-    setConversationMode(null);
-    setActivePromptContext("pre_live_signal_acquisition");
-    setActivePromptLabel(firstPreparationQuestion.label);
-    setInput("");
-    setInterimTranscript("");
-    setMessages(nextMessages);
-    messagesRef.current = nextMessages;
-    setActiveMode("normal");
-  }, []);
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([]);
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
   const [showCampaignMenu, setShowCampaignMenu] = useState(false);
@@ -3249,11 +3190,13 @@ export default function Page({
     signals = {},
     explicitObjective = "",
     sourceContext = "",
+    briefing,
     checkpoint,
   }: {
     signals?: Record<string, string>;
     explicitObjective?: string;
     sourceContext?: string;
+    briefing?: PreparationSessionV1["briefing"];
     checkpoint: PreparationCheckpoint;
   }): PreparationSessionV1 | null => {
     if (typeof window === "undefined") return null;
@@ -3399,7 +3342,7 @@ export default function Page({
         additionalSignals: canonicalSignals,
         documents: existingSession?.knowledge.documents || [],
       },
-      briefing: existingSession?.briefing,
+      briefing: briefing || existingSession?.briefing,
       assets: existingSession?.assets,
       support: existingSession?.support || { overrides: {} },
       workflow: {
@@ -3444,10 +3387,9 @@ export default function Page({
     }
 
     const fromPreparedMessage =
-      preLiveSignalComplete &&
       window.localStorage.getItem("GEORGE_PRE_LIVE_FROM_MESSAGE") === "1";
 
-    if (fromPreparedMessage) {
+    if (preLiveSignalComplete) {
       const preparationSession = beginNormalLivePreparation({
         signals: preLiveSignals,
         explicitObjective: preLiveSignals.desiredOutcome || "",
@@ -3457,7 +3399,7 @@ export default function Page({
 
       window.location.href = buildNormalLiveEntryUrl(
         preparationSession,
-        "message",
+        fromPreparedMessage ? "message" : "signal",
       );
       return;
     }
@@ -3532,6 +3474,182 @@ export default function Page({
     setSuggestedSignal(Date.now());
   };
 
+  const presentNormalAdaptiveQuestion = (question: PreparationQuestion) => {
+    setCurrentPreLiveQuestion(question);
+    setPreLiveSignalComplete(false);
+    setShowPreLiveSignalSurface(true);
+    setActivePromptContext("pre_live_signal_acquisition");
+    setActivePromptLabel(question.label || "LIVE");
+
+    const questionContent = [
+      question.question,
+      question.why,
+      question.example,
+    ]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+      .join("\n\n");
+    const latestMessage = messagesRef.current[messagesRef.current.length - 1];
+
+    if (
+      latestMessage?.role !== "assistant" ||
+      String(latestMessage.content || "").trim() !== questionContent
+    ) {
+      const questionMessage: Message = {
+        role: "assistant",
+        content: questionContent,
+        source: "system_override",
+        presentationMode: "live_preparation",
+      };
+
+      setMessages((prev) => {
+        const visible = prev.filter(
+          (message) => String(message.content || "").trim() !== "GEORGE",
+        );
+        const next = [...visible, questionMessage];
+        messagesRef.current = next;
+        return next;
+      });
+    }
+
+    setInput("");
+    setInterimTranscript("");
+    setVoiceError("");
+    setSuggestedPrompts([]);
+    setSuggestedSignal(Date.now());
+    setRerouteSignal(0);
+  };
+
+  const requestNormalAdaptiveQuestion = async (
+    preparationSession: PreparationSessionV1,
+  ) => {
+    if (normalAdaptiveQuestionRequestRef.current) return;
+
+    const existingQuestion = preparationSession.briefing.currentQuestion;
+    if (existingQuestion) {
+      presentNormalAdaptiveQuestion(existingQuestion);
+      return;
+    }
+
+    normalAdaptiveQuestionRequestRef.current = true;
+
+    try {
+      const priorInteractions =
+        preparationSession.briefing.priorInteractions;
+      const priorAnswers = Object.fromEntries(
+        priorInteractions
+          .filter((interaction) => interaction.status === "answered")
+          .map((interaction) => [interaction.key, interaction.answer]),
+      );
+      const skippedQuestions = priorInteractions
+        .filter((interaction) => interaction.status === "skipped")
+        .map((interaction) => interaction.key);
+      const documentSummary = preparationSession.knowledge.documents
+        .map((document) => document.summary || document.name)
+        .filter(Boolean)
+        .join("\n");
+
+      const response = await fetch("/api/george/live/signal-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: preparationSession.knowledge.role || "",
+          broadGoal:
+            preparationSession.knowledge.additionalSignals.broadGoal || "",
+          desiredOutcome: preparationSession.knowledge.objective,
+          acceptableOutcome:
+            preparationSession.knowledge.acceptableOutcome || "",
+          audience: preparationSession.knowledge.audience || "",
+          room: preparationSession.knowledge.conversation.title || "",
+          knownContext: preparationSession.knowledge.knownContext || "",
+          documentSummary,
+          priorAnswers,
+          priorInteractions,
+          skippedQuestions,
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error("Adaptive briefing question request failed.");
+      }
+
+      if (
+        payload?.status === "sufficient" ||
+        !String(payload?.question || "").trim()
+      ) {
+        const decisionSession = beginNormalLivePreparation({
+          signals: preparationSession.knowledge.additionalSignals,
+          explicitObjective: preparationSession.knowledge.objective,
+          briefing: {
+            priorInteractions,
+            currentQuestion: undefined,
+          },
+          checkpoint: { surface: "briefing", phase: "decision" },
+        });
+        const objective = normalizeExplicitNormalPreparationObjective(
+          decisionSession?.knowledge.objective,
+        );
+
+        setCurrentPreLiveQuestion(null);
+        setShowPreLiveSignalSurface(true);
+        setPreLiveSignalComplete(Boolean(objective));
+        setActivePromptContext(
+          objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
+        );
+        setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
+        return;
+      }
+
+      const nextQuestion: PreparationQuestion = {
+        key: String(payload.key || `signal_${Date.now()}`),
+        label: String(payload.label || "Additional signal"),
+        question: String(payload.question || ""),
+        why: String(
+          payload.why ||
+            payload.helper ||
+            "This answer may materially improve GEORGE's preparation.",
+        ),
+        example: String(payload.example || "Answer if useful, or skip."),
+      };
+      const questionSession = beginNormalLivePreparation({
+        signals: preparationSession.knowledge.additionalSignals,
+        explicitObjective: preparationSession.knowledge.objective,
+        briefing: {
+          priorInteractions,
+          currentQuestion: nextQuestion,
+        },
+        checkpoint: { surface: "briefing", phase: "questions" },
+      });
+
+      presentNormalAdaptiveQuestion(
+        questionSession?.briefing.currentQuestion || nextQuestion,
+      );
+    } catch {
+      const objective = normalizeExplicitNormalPreparationObjective(
+        preparationSession.knowledge.objective,
+      );
+
+      beginNormalLivePreparation({
+        signals: preparationSession.knowledge.additionalSignals,
+        explicitObjective: objective,
+        briefing: preparationSession.briefing,
+        checkpoint: objective
+          ? { surface: "briefing", phase: "decision" }
+          : { surface: "briefing", phase: "questions" },
+      });
+      setCurrentPreLiveQuestion(null);
+      setShowPreLiveSignalSurface(true);
+      setPreLiveSignalComplete(Boolean(objective));
+      setActivePromptContext(
+        objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
+      );
+      setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
+    } finally {
+      normalAdaptiveQuestionRequestRef.current = false;
+    }
+  };
+
   const startLiveSignalAcquisition = () => {
     if (typeof window === "undefined") return;
 
@@ -3542,91 +3660,54 @@ export default function Page({
     setActivePromptLabel("LIVE");
     setContextTurnCount(0);
 
-    beginNormalLivePreparation({
+    const preparationSession = beginNormalLivePreparation({
       checkpoint: { surface: "briefing", phase: "questions" },
     });
+    if (!preparationSession) return;
 
-    let storedSignals: Record<string, string> = {};
-
-    try {
-      const raw = window.localStorage.getItem("GEORGE_PRE_LIVE_SIGNALS");
-      const parsed = raw ? JSON.parse(raw) : null;
-
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        storedSignals = Object.fromEntries(
-          Object.entries(parsed)
-            .map(([key, value]) => [key, String(value || "").trim()])
-            .filter(([, value]) => Boolean(value)),
-        );
-      }
-    } catch {}
-
-    setPreLiveSignals(storedSignals);
-
-    const preparationTransition =
-      resolveLivePreparationTransition(storedSignals);
-
-    if (preparationTransition.complete) {
-      setPreLiveSignalStep(preparationTransition.total);
-      setPreLiveSignalComplete(true);
-      setShowPreLiveSignalSurface(true);
-      setActivePromptContext("pre_live_signal_ready");
-      setActivePromptLabel("LIVE Ready");
-
-      try {
-        markLivePreparationPreviewReady();
-        window.localStorage.setItem("george_start_new_live", "1");
-      } catch {}
-
-      const preparationSession = beginNormalLivePreparation({
-        signals: storedSignals,
-        checkpoint: { surface: "ready_room", phase: "mechanics" },
-      });
-      if (!preparationSession) return;
-
-      window.location.href = buildNormalLiveEntryUrl(
-        preparationSession,
-        "signal",
-      );
-      return;
-    }
-
-    const question = preparationTransition.question;
-
-    if (!question) {
-      throw new Error(
-        "[GEORGE LIVE PREPARATION] Missing preparation question.",
-      );
-    }
-
-    setPreLiveSignalStep(preparationTransition.step);
-    setPreLiveSignalComplete(false);
-    setShowPreLiveSignalSurface(true);
-    setActivePromptContext("pre_live_signal_acquisition");
-    setActivePromptLabel(question.label);
-    const liveSignalMessage: Message = {
-      role: "assistant",
-      content: `${question.kicker}.\n\n${question.question}\n\n${question.examples}`,
-      source: "system_override",
-      presentationMode: "live_preparation",
-    };
-
-    setMessages((prev) => {
-      const visible = prev.filter(
-        (message) => String(message.content || "").trim() !== "GEORGE",
-      );
-      const next = [...visible, liveSignalMessage];
-      messagesRef.current = next;
-      return next;
+    setPreLiveSignals({
+      ...preparationSession.knowledge.additionalSignals,
+      ...(preparationSession.knowledge.objective
+        ? { desiredOutcome: preparationSession.knowledge.objective }
+        : {}),
     });
+    setShowPreLiveSignalSurface(true);
+    setPreLiveSignalComplete(false);
+    setCurrentPreLiveQuestion(null);
+    setActivePromptContext("pre_live_signal_acquisition");
 
+    void requestNormalAdaptiveQuestion(preparationSession);
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (liveEntryBootedRef.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const pendingLiveSignal =
+      window.localStorage.getItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION") ===
+      "start";
+    const shouldStartNewLive =
+      pendingLiveSignal ||
+      params.get("start") === "1" ||
+      (params.get("live") === "1" && params.get("start") === "1");
+
+    if (!shouldStartNewLive) return;
+
+    liveEntryBootedRef.current = true;
+    setLiveMode(false);
+    setConversationMode(null);
+    setPreLiveSignals({});
+    setPreLiveSignalComplete(false);
+    setCurrentPreLiveQuestion(null);
     setInput("");
     setInterimTranscript("");
-    setVoiceError("");
-    setSuggestedPrompts([]);
-    setSuggestedSignal(Date.now());
-    setRerouteSignal(0);
-  };
+    setActiveMode("normal");
+    window.localStorage.removeItem("GEORGE_PENDING_LIVE_SIGNAL_ACQUISITION");
+
+    const timer = window.setTimeout(startLiveSignalAcquisition, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -3818,7 +3899,7 @@ export default function Page({
     // A new workspace must begin in a clean normal-GEORGE state.
     // LIVE preparation cannot survive into the new workspace.
     setShowPreLiveSignalSurface(false);
-    setPreLiveSignalStep(0);
+    setCurrentPreLiveQuestion(null);
     setPreLiveSignals({});
     setPreLiveSignalComplete(false);
     setActivePromptContext(null);
@@ -5979,19 +6060,6 @@ I’ll stay with you.`,
     });
   }, [showMobileHero, liveMode]);
 
-  const preLivePreparationStep = resolveLivePreparationStep(preLiveSignalStep);
-
-  const currentPreLiveQuestion = showPreLiveSignalSurface
-    ? preLivePreparationStep.question
-    : null;
-
-  const isPreLiveEarbudReady =
-    showPreLiveSignalSurface && preLiveSignalComplete;
-
-  const livePreparationConversationActive =
-    showPreLiveSignalSurface &&
-    (!preLiveSignalComplete || typedMessageIndex === messages.length - 1);
-
   const submitPreLiveSignalAnswer = () => {
     const answer = input.trim();
 
@@ -5999,10 +6067,50 @@ I’ll stay with you.`,
       return false;
     }
 
+    const preparationSession = loadPreparationSession();
+    const activeNormalSession = getActiveSessionForMode("normal");
+
+    if (
+      preparationSession?.provenance.entrySource !== "normal" ||
+      !activeNormalSession?.id ||
+      preparationSession.relations.normalSessionId !== activeNormalSession.id ||
+      preparationSession.briefing.currentQuestion?.key !==
+        currentPreLiveQuestion.key
+    ) {
+      return false;
+    }
+
+    const normalizedAnswer = answer.toLowerCase().replace(/[.!?]+$/g, "");
+    const interactionStatus =
+      normalizedAnswer === "skip" ||
+      normalizedAnswer === "skipped" ||
+      normalizedAnswer === "pass"
+        ? ("skipped" as const)
+        : normalizedAnswer === "i don't know" ||
+            normalizedAnswer === "i dont know" ||
+            normalizedAnswer === "unknown"
+          ? ("unknown" as const)
+          : ("answered" as const);
     const nextSignals = {
-      ...preLiveSignals,
-      [currentPreLiveQuestion.key]: answer,
+      ...preparationSession.knowledge.additionalSignals,
+      ...(interactionStatus === "answered"
+        ? { [currentPreLiveQuestion.key]: answer }
+        : {}),
     };
+    const nextObjective =
+      interactionStatus === "answered" &&
+      currentPreLiveQuestion.key === "desiredOutcome"
+        ? normalizeExplicitNormalPreparationObjective(answer)
+        : preparationSession.knowledge.objective;
+    const priorInteractions = normalizePreparationInteractions([
+      ...preparationSession.briefing.priorInteractions,
+      {
+        key: currentPreLiveQuestion.key,
+        question: currentPreLiveQuestion.question,
+        answer: interactionStatus === "answered" ? answer : "",
+        status: interactionStatus,
+      },
+    ]);
 
     const preparationAnswerMessage: Message = {
       role: "user",
@@ -6027,92 +6135,35 @@ I’ll stay with you.`,
 
     try {
       saveLivePreparationSignals(nextSignals);
-      window.localStorage.setItem(
-        `GEORGE_PRE_LIVE_${currentPreLiveQuestion.key.toUpperCase()}`,
-        answer,
-      );
+      if (interactionStatus === "answered") {
+        window.localStorage.setItem(
+          `GEORGE_PRE_LIVE_${currentPreLiveQuestion.key.toUpperCase()}`,
+          answer,
+        );
+      }
     } catch {}
 
     setInput("");
-
-    const preparationTransition = resolveLivePreparationTransition(nextSignals);
-
-    if (preparationTransition.complete) {
-      setPreLiveSignalStep(preparationTransition.total);
-      setPreLiveSignalComplete(true);
-      setShowPreLiveSignalSurface(true);
-      setActivePromptContext("pre_live_signal_ready");
-      setActivePromptLabel("LIVE Ready");
-
-      try {
-        markLivePreparationPreviewReady();
-        window.localStorage.setItem("george_start_new_live", "1");
-      } catch {}
-
-      let fromMessageLive = false;
-      try {
-        fromMessageLive =
-          window.localStorage.getItem("GEORGE_PRE_LIVE_FROM_MESSAGE") === "1";
-      } catch {}
-
-      if (fromMessageLive) {
-        const readyMessage: Message = {
-          role: "assistant",
-          content:
-            "You’re all set. I’ll be ready to support you in real time. Start whenever you’re ready—just tap Start.",
-          source: "system_override",
-          presentationMode: "live_preparation",
-        };
-
-        setMessages((prev) => {
-          const next = [...prev, readyMessage];
-          messagesRef.current = next;
-          return next;
-        });
-
-        return true;
-      }
-
-      window.setTimeout(() => {
-        const preparationSession = beginNormalLivePreparation({
-          signals: nextSignals,
-          explicitObjective: nextSignals.desiredOutcome || "",
-          checkpoint: { surface: "ready_room", phase: "mechanics" },
-        });
-        if (!preparationSession) return;
-
-        window.location.href = buildNormalLiveEntryUrl(
-          preparationSession,
-          "signal",
-        );
-      }, 900);
-
-      return true;
-    }
-
-    const nextQuestion = preparationTransition.question;
-
-    if (!nextQuestion) {
-      throw new Error(
-        "[GEORGE LIVE PREPARATION] Missing next preparation question.",
-      );
-    }
-
-    setPreLiveSignalStep(preparationTransition.step);
-    setActivePromptContext("pre_live_signal_acquisition");
-    setActivePromptLabel(nextQuestion.label);
-    const nextQuestionMessage: Message = {
-      role: "assistant",
-      content: `${nextQuestion.kicker}.\n\n${nextQuestion.question}\n\n${nextQuestion.examples}`,
-      source: "system_override",
-      presentationMode: "live_preparation",
-    };
-
-    setMessages((prev) => {
-      const next = [...prev, nextQuestionMessage];
-      messagesRef.current = next;
-      return next;
+    const decisionSession = beginNormalLivePreparation({
+      signals: nextSignals,
+      explicitObjective: nextObjective,
+      briefing: {
+        priorInteractions,
+        currentQuestion: undefined,
+      },
+      checkpoint: { surface: "briefing", phase: "decision" },
     });
+    const objective = normalizeExplicitNormalPreparationObjective(
+      decisionSession?.knowledge.objective,
+    );
+
+    setCurrentPreLiveQuestion(null);
+    setPreLiveSignalComplete(Boolean(objective));
+    setShowPreLiveSignalSurface(true);
+    setActivePromptContext(
+      objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
+    );
+    setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
 
     return true;
   };
@@ -6387,7 +6438,7 @@ I’ll stay with you.`,
               } catch {}
 
               setShowPreLiveSignalSurface(false);
-              setPreLiveSignalStep(0);
+              setCurrentPreLiveQuestion(null);
               setPreLiveSignals({});
               setPreLiveSignalComplete(false);
               setConversationMode(null);
@@ -7041,75 +7092,6 @@ I’ll stay with you.`,
                               <p>Start with your desired outcome.</p>
                             )}
 
-                          {false && showPreLiveSignalSurface && (
-                            <div className="mt-7 max-w-[860px] xl:max-w-[980px] md:max-w-[860px] xl:max-w-[1080px] md:max-w-[780px] xl:max-w-[920px] md:max-w-[780px] xl:max-w-[920px] border-l border-[#AEB6FF]/24 pl-5 text-left">
-                              {!isPreLiveEarbudReady &&
-                                currentPreLiveQuestion && (
-                                  <>
-                                    <div className="mb-5 flex items-center justify-end border-b border-white/[0.06] pb-3">
-                                      {preLiveSignalStep > 0 && (
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setPreLiveSignalStep((step) =>
-                                              Math.max(0, step - 1),
-                                            );
-                                            setActivePromptContext(
-                                              "pre_live_signal_acquisition",
-                                            );
-                                            setActivePromptLabel(
-                                              `Question ${Math.max(1, preLiveSignalStep)}`,
-                                            );
-                                          }}
-                                          className="mr-auto text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D7DBE4]/38 transition hover:text-white"
-                                        >
-                                          Previous signal
-                                        </button>
-                                      )}
-
-                                      <div className="text-[10px] uppercase tracking-[0.2em] text-[#D7DBE4]/24">
-                                        {preLiveSignalStep + 1}/
-                                        {preLivePreparationStep.total}
-                                      </div>
-                                    </div>
-                                    {currentPreLiveQuestion && (
-                                      <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                                        {currentPreLiveQuestion?.kicker}
-                                      </div>
-                                    )}
-
-                                    <div className="mt-4 text-[13px] uppercase tracking-[0.2em] text-white/34">
-                                      {currentPreLiveQuestion?.label}
-                                    </div>
-
-                                    <div className="mt-3 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
-                                      {currentPreLiveQuestion?.question}
-                                    </div>
-
-                                    <div className="mt-4 max-w-[34rem] rounded-[0.95rem] border border-white/[0.05] bg-white/[0.015] px-4 py-3">
-                                      <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/24">
-                                        Example
-                                      </div>
-
-                                      <div className="mt-2 break-words text-[12.5px] leading-6 text-white/44">
-                                        {currentPreLiveQuestion?.examples}
-                                      </div>
-                                    </div>
-                                  </>
-                                )}
-
-                              {isPreLiveEarbudReady && (
-                                <div>
-                                  <div className="text-[10px] uppercase tracking-[0.26em] text-[#AEB6FF]/48">
-                                    LIVE Entry ready
-                                  </div>
-                                  <div className="mt-4 text-[19px] leading-8 tracking-[-0.02em] text-white/76">
-                                    Opening Brief Room.
-                                  </div>{" "}
-                                </div>
-                              )}
-                            </div>
-                          )}
                         </div>
                       </div>
                     </section>
@@ -10083,6 +10065,7 @@ Tell me what this is, what matters most, and how GEORGE can help me use it effec
                       onKeyDown={(e) => {
                         if (
                           showPreLiveSignalSurface &&
+                          currentPreLiveQuestion &&
                           input.trim() &&
                           e.key === "Enter" &&
                           !e.shiftKey
