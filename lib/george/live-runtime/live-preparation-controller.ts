@@ -605,9 +605,14 @@ export function resolvePreparationSession(session: PreparationSessionV1) {
       session.knowledge.additionalSignals.secondaryOutcome,
   })
   const preparationState = resolveLivePreparationState(signals)
+  const supportConfiguration = Object.freeze({
+    ...(session.support.recommendation || {}),
+    ...session.support.overrides,
+  })
 
   return Object.freeze({
     session,
+    supportConfiguration,
     ...preparationState,
   })
 }

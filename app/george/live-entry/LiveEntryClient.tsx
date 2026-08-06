@@ -644,6 +644,10 @@ export default function LiveEntryClient() {
     preparationSessionId: string;
     createdAt: number;
   } | null>(null);
+  const quickLivePreparationIdentityRef = useRef<{
+    preparationSessionId: string;
+    createdAt: number;
+  } | null>(null);
   const liveBriefingRoomSignalEditedRef = useRef(false);
   const generatedBriefingRoomSignalRef = useRef("");
   const [liveBriefingEditAcknowledged, setLiveBriefingEditAcknowledged] =
@@ -1564,7 +1568,7 @@ export default function LiveEntryClient() {
   */
 
   const traditionalPreparationSession = useMemo(() => {
-    if (!isFreshTraditionalPreparation) return null;
+    if (!isFreshTraditionalPreparation || showQuickLiveSetup) return null;
 
     if (!traditionalPreparationIdentityRef.current) {
       const seed = createPreparationSession({
@@ -1790,6 +1794,7 @@ export default function LiveEntryClient() {
     selectedReceiverProfile,
     selectedScript,
     selectedSupportStyle,
+    showQuickLiveSetup,
     skippedOptionalSignalKeys,
     useRoomPhrases,
     userPosition,
@@ -1799,6 +1804,100 @@ export default function LiveEntryClient() {
     if (!traditionalPreparationSession) return;
     savePreparationSession(traditionalPreparationSession);
   }, [traditionalPreparationSession]);
+
+  const quickLivePreparationSession = useMemo(() => {
+    if (!showQuickLiveSetup) return null;
+
+    if (!quickLivePreparationIdentityRef.current) {
+      const seed = createPreparationSession({
+        provenance: { entrySource: "quick_live" },
+      });
+
+      quickLivePreparationIdentityRef.current = {
+        preparationSessionId: seed.preparationSessionId,
+        createdAt: seed.createdAt,
+      };
+    }
+
+    const identity = quickLivePreparationIdentityRef.current;
+
+    return createPreparationSession({
+      preparationSessionId: identity.preparationSessionId,
+      provenance: { entrySource: "quick_live" },
+      createdAt: identity.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective: quickLiveDesiredOutcome,
+        participants: quickLiveAudience ? [quickLiveAudience] : [],
+        audience: quickLiveAudience,
+        perspectives: [],
+        conversation: { title: "Quick LIVE" },
+        knownContext: quickLiveContext,
+        communicationMedium: quickLiveCommunicationMedium,
+        receiverEvidence: quickLiveReceiverEvidence || undefined,
+        additionalSignals: {},
+        documents: [],
+      },
+      briefing: {
+        priorInteractions: [],
+      },
+      support: {
+        recommendation: {
+          behavior:
+            quickLiveRecommendation.supportStyle === "response"
+              ? "response"
+              : "cue",
+          receiver: quickLiveRecommendation.receiverProfile,
+          speakingStyle: quickLiveRecommendation.speakingStyle,
+        },
+        overrides: {
+          ...(quickLiveSupportOverride
+            ? {
+                behavior:
+                  quickLiveSupportOverride === "response"
+                    ? ("response" as const)
+                    : ("cue" as const),
+              }
+            : {}),
+          ...(quickLiveReceiverOverride
+            ? { receiver: quickLiveReceiverOverride }
+            : {}),
+          ...(quickLiveSpeakingOverride
+            ? { speakingStyle: quickLiveSpeakingOverride }
+            : {}),
+        },
+        runtimePreferences: {
+          recoveryOptionIds: [],
+          steeringEnabled: true,
+          steeringPhrases: Object.values(quickLiveSteeringPhrases),
+          selectedResources: [],
+        },
+      },
+      workflow: {
+        current: { surface: "briefing", phase: "review" },
+        history: [],
+      },
+    });
+  }, [
+    quickLiveAudience,
+    quickLiveCommunicationMedium,
+    quickLiveContext,
+    quickLiveDesiredOutcome,
+    quickLiveReceiverEvidence,
+    quickLiveReceiverOverride,
+    quickLiveRecommendation.receiverProfile,
+    quickLiveRecommendation.speakingStyle,
+    quickLiveRecommendation.supportStyle,
+    quickLiveSpeakingOverride,
+    quickLiveSteeringPhrases,
+    quickLiveSupportOverride,
+    showQuickLiveSetup,
+  ]);
+
+  useEffect(() => {
+    if (!quickLivePreparationSession) return;
+    savePreparationSession(quickLivePreparationSession);
+  }, [quickLivePreparationSession]);
 
   const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim();
@@ -3007,6 +3106,8 @@ export default function LiveEntryClient() {
   };
 
   const openQuickLiveSetup = () => {
+    quickLivePreparationIdentityRef.current = null;
+    clearPreparationSession();
     setQuickLiveDesiredOutcome("");
     setQuickLiveContext("");
     setQuickLiveAudience("");
@@ -3026,7 +3127,13 @@ export default function LiveEntryClient() {
   const startQuickLive = () => {
     if (typeof window === "undefined") return;
 
-    const desiredOutcome = quickLiveDesiredOutcome.trim();
+    const quickLivePreparation = quickLivePreparationSession
+      ? resolvePreparationSession(quickLivePreparationSession)
+      : null;
+    const desiredOutcome = (
+      quickLivePreparation?.session.knowledge.objective ||
+      quickLiveDesiredOutcome
+    ).trim();
 
     if (!isValidQuickLiveDesiredOutcome(desiredOutcome)) {
       setQuickLiveValidationError(
@@ -3038,15 +3145,40 @@ export default function LiveEntryClient() {
     setQuickLiveValidationError("");
 
     try {
-      const runtimeSupportStyle = toRuntimeSupportStyle(quickLiveSupportStyle);
+      const sessionSupportBehavior =
+        quickLivePreparation?.supportConfiguration.behavior;
+      const resolvedQuickLiveSupportStyle: QuickLiveSupportStyle =
+        sessionSupportBehavior === "response" ? "response" : "advice";
+      const resolvedQuickLiveReceiverProfile =
+        quickLivePreparation?.supportConfiguration.receiver ||
+        quickLiveReceiverProfile;
+      const sessionSpeakingStyle =
+        quickLivePreparation?.supportConfiguration.speakingStyle;
+      const resolvedQuickLiveSpeakingStyle: QuickLiveSpeakingStyle =
+        sessionSpeakingStyle === "Executive" ||
+        sessionSpeakingStyle === "Conversational" ||
+        sessionSpeakingStyle === "Adaptive"
+          ? sessionSpeakingStyle
+          : quickLiveSpeakingStyle;
+      const runtimeSupportStyle = toRuntimeSupportStyle(
+        resolvedQuickLiveSupportStyle,
+      );
       const supportStyle = normalizeLiveSupportStyle(runtimeSupportStyle);
-      const medium = quickLiveCommunicationMedium
-        ? quickLiveCommunicationMedium.replace("_", " ")
+      const communicationMedium =
+        quickLivePreparation?.session.knowledge.communicationMedium ||
+        quickLiveCommunicationMedium;
+      const sessionContext =
+        quickLivePreparation?.session.knowledge.knownContext ||
+        quickLiveContext;
+      const sessionAudience =
+        quickLivePreparation?.session.knowledge.audience || quickLiveAudience;
+      const medium = communicationMedium
+        ? communicationMedium.replace("_", " ")
         : "";
       const currentSessionContext = [
-        quickLiveContext.trim(),
-        quickLiveAudience.trim()
-          ? `Conversation with: ${quickLiveAudience.trim()}`
+        sessionContext.trim(),
+        sessionAudience.trim()
+          ? `Conversation with: ${sessionAudience.trim()}`
           : "",
         medium ? `Communication medium: ${medium}` : "",
       ]
@@ -3057,8 +3189,8 @@ export default function LiveEntryClient() {
         objective: desiredOutcome,
         knownContext: currentSessionContext,
         observedReality: currentSessionContext,
-        communicationStyle: quickLiveSpeakingStyle,
-        receiverProfile: quickLiveReceiverProfile,
+        communicationStyle: resolvedQuickLiveSpeakingStyle,
+        receiverProfile: resolvedQuickLiveReceiverProfile,
         supportStyle,
         liveAssistMode: legacyAssistModeFromSupportStyle(supportStyle),
         skipPrep: true,
@@ -3070,6 +3202,10 @@ export default function LiveEntryClient() {
         },
         createdAt: Date.now(),
       };
+
+      if (quickLivePreparationSession) {
+        savePreparationSession(quickLivePreparationSession);
+      }
 
       window.localStorage.removeItem("GEORGE_LAST_LIVE_SETUP");
       window.localStorage.removeItem("george_live_runtime_support_active");
@@ -3093,23 +3229,23 @@ export default function LiveEntryClient() {
       );
       window.localStorage.setItem(
         "george_live_entry_support_preference",
-        quickLiveSupportStyle,
+        resolvedQuickLiveSupportStyle,
       );
       window.localStorage.setItem(
         "george_live_entry_support_default",
-        quickLiveSupportStyle,
+        resolvedQuickLiveSupportStyle,
       );
       window.localStorage.setItem(
         "GEORGE_LIVE_RECEIVER_PROFILE",
-        quickLiveReceiverProfile,
+        resolvedQuickLiveReceiverProfile,
       );
       window.localStorage.setItem(
         "george_live_entry_receiver_profile",
-        quickLiveReceiverProfile,
+        resolvedQuickLiveReceiverProfile,
       );
       window.localStorage.setItem(
         "george_live_communication_style",
-        quickLiveSpeakingStyle,
+        resolvedQuickLiveSpeakingStyle,
       );
       window.localStorage.setItem("george_start_new_live", "1");
       window.localStorage.setItem("george_quick_live_entry", "1");
