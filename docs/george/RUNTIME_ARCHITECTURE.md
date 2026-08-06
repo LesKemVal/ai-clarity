@@ -4,7 +4,7 @@
 
 This document is the architectural authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -30,12 +30,12 @@ The implementation remains the source of truth. This document is authoritative o
 Current phase:
 
 ```text
-Production Completion & Operational Formula Experience
+Production Completion — canonical Preparation Runtime route migration
 ```
 
 The runtime architecture is frozen unless current implementation evidence proves a genuine architectural defect.
 
-Operational Formula Experience work is a product-completion layer over the existing operational-memory and formula-intelligence architecture. It may extend canonical formula contracts and product surfaces, but it must not create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
+Preparation Session route migration is product-completion work over the existing runtime. Operational Formula Experience remains an established product layer over the operational-memory and formula-intelligence architecture. Neither may create another runtime, reasoning authority, retrieval path, learning owner, conversation-type registry, or page-level intelligence.
 
 Canonical boundaries:
 
@@ -57,6 +57,51 @@ Do not create:
 ## Synchronized Runtime Ownership — 2026-08-05
 
 GEORGE remains one operational intelligence with one shared runtime and one reasoning authority. Normal and LIVE are operating modes over that same intelligence.
+
+### Preparation Runtime and Preparation Session
+
+The Preparation Runtime is the canonical lifecycle authority. `PreparationSessionV1` is the versioned state for one preparation. Entry routes seed or restore that session; routes do not own preparation state, and route-specific screens do not create separate preparation runtimes.
+
+Canonical owners:
+
+- `lib/george/live-runtime/live-preparation-controller.ts` owns the Preparation Session contract, construction, normalization, canonical interaction normalization, semantic workflow checkpoints, preparation-state resolution, and derived readiness;
+- `lib/george/live-runtime/live-preparation-storage.ts` owns portable session serialization under `GEORGE_PREPARATION_SESSION_V1` while retaining legacy preparation-signal compatibility;
+- `lib/george/live-browser/live-preparation-browser-storage.ts` owns browser access to canonical and legacy preparation storage;
+- `components/home/HomeConversationTypeSurface.tsx` and `app/george/live-entry/LiveEntryClient.tsx` are route adapters and presentation hosts. They seed, restore, persist, and consume the canonical session without becoming a second lifecycle authority.
+
+A Preparation Session may carry:
+
+- stable identity, version, timestamps, provenance, and entry source;
+- objective, role or responsibility, participants or audience, conversation identity, known context, communication medium, receiver evidence, and additional briefing signals;
+- document references;
+- canonical `priorInteractions`, including original question text and answered, skipped, or unknown status, plus the current unanswered question when one exists;
+- Formula selection, Script selection, and a session-only customized Script;
+- GEORGE support, receiver, and speaking-style recommendations separately from user overrides;
+- confirmations and runtime preferences relevant to the prepared room;
+- semantic workflow checkpoint, checkpoint history, and return target;
+- valid related Normal and LIVE session identities.
+
+Readiness, missing evidence, confidence, and recommended next step are derived selectors recomputed by the preparation controller. They are not persisted as canonical Preparation Session truth. `LivePrepSetup` and runtime-support payloads are outputs derived for existing consumers; they are not canonical preparation state, and their external contracts remain unchanged.
+
+Current route status:
+
+- Traditional is migrated and seeds the shared session while preserving questions → Popup 1 → Popup 2 → Popup 3 → LIVE;
+- Quick LIVE is migrated and seeds the shared session while preserving its narrow outcome-first gate and direct entry;
+- Homepage is migrated and preserves stable session identity through briefing, handoff, Continue Briefing, Popup 3 / Ready Room, Library or Marketplace return, and LIVE entry;
+- Normal GEORGE is pending migration and continues to use its legacy handoff;
+- Resume is pending meaningful eligibility and must eventually restore a valid Preparation Session rather than a popup or mere storage key;
+- Strategy will operate on this same session through semantic workflow transitions after the remaining route migrations. It will not introduce another preparation runtime.
+
+Popup numbers are presentation details. Canonical workflow checkpoints are:
+
+- `briefing/questions`;
+- `briefing/decision`;
+- `briefing/review`;
+- `ready_room/brief`;
+- `ready_room/mechanics`;
+- `ready_room/readiness`.
+
+The routes remain visually and behaviorally distinct even though preparation authority is shared.
 
 ### Adaptive briefing continuity
 
@@ -124,7 +169,7 @@ Audio remains concise and low cognitive load. Visual delivery may persist and st
 
 ## Documentation Synchronization Rule
 
-A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, product doctrine, canonical preparation ownership, route migration status, session contract, persistence, or workflow semantics is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
 
 Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 

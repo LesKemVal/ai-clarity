@@ -4,7 +4,7 @@
 
 This document is the primary production authority for the current GEORGE implementation.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -23,10 +23,19 @@ Continuation packets provide operational context only. They do not override impl
 
 Current branch: `conversation-summary-runtime`
 
-Current validated phase: **Production Completion — user-directed briefing, route-aware preparation, and receiver-specific LIVE presentation**.
+Current validated phase: **Production Completion — canonical Preparation Runtime route migration**.
 
 The local implementation has one GEORGE intelligence, one runtime, and one reasoning authority. The current branch preserves that architecture while completing these production behaviors:
 
+- the Preparation Runtime is the canonical lifecycle authority, and the versioned `PreparationSessionV1` is the canonical state for one preparation;
+- `lib/george/live-runtime/live-preparation-controller.ts` owns session construction, normalization, interaction normalization, semantic workflow checkpoints, and derived preparation resolution;
+- `lib/george/live-runtime/live-preparation-storage.ts` owns the portable `GEORGE_PREPARATION_SESSION_V1` persistence contract, and `lib/george/live-browser/live-preparation-browser-storage.ts` owns browser storage access;
+- fresh Traditional, Quick LIVE, and Homepage entry paths now seed and persist the same Preparation Session while preserving their distinct user experiences;
+- Homepage preserves one stable preparation identity through briefing, LIVE Entry handoff, Continue Briefing, Popup 3 / Ready Room, Library or Marketplace return, and LIVE entry;
+- preparation recommendations and explicit user overrides remain distinct; Formula, Script, customized Script, documents, confirmations, workflow checkpoints, and valid related-session identities may travel with the session;
+- preparation readiness, missing evidence, confidence, and recommended next step are recomputed controller results rather than persisted canonical truth;
+- existing `LivePrepSetup` and runtime-support payloads remain output contracts rather than Preparation Session state;
+- the Normal GEORGE handoff is still legacy and is the next route migration; meaningful Resume restoration, legacy cleanup, and Strategy integration remain pending;
 - Homepage and LIVE Entry construct canonical `priorInteractions` from accumulated answers, skipped questions, and original question text;
 - `app/api/george/live/signal-question/route.ts` normalizes canonical briefing history while retaining `priorAnswers` and `skippedQuestions` compatibility;
 - Homepage returns control after each optional question and requests another question only through **NEXT QUESTION**;
@@ -38,22 +47,34 @@ The local implementation has one GEORGE intelligence, one runtime, and one reaso
 - `lib/george/live-delivery/visual-presentation-policy.ts` plans evidence-first visual stages from existing operational assessment, and `components/george/live/LiveHubVisualCueBridge.tsx` executes those plans without becoming a reasoning owner;
 - staged visual execution is cancellable, lifecycle-safe, and build-qualified by `scripts/george-live-delivery-policy-smoke.mjs`.
 
-Current qualification status: the current HEAD entered this synchronization milestone with its production build passing. This documentation milestone must pass `george:documentation:qualify` and the full `npm run build` before it is considered a validated handoff.
+Current qualification status: **PASS** at `2fe3cbda` after `git diff --check`, `george:documentation:qualify`, the complete production qualification chain, TypeScript, and the Next.js production build. Legacy preparation keys remain read-compatible while route migrations are incomplete.
+
+### Route migration status
+
+| Entry path | Canonical session status | Preserved experience |
+| --- | --- | --- |
+| Traditional | Migrated | Full questions → Popup 1 → Popup 2 → Popup 3 → LIVE |
+| Quick LIVE | Migrated | Minimum outcome-first setup → LIVE |
+| Homepage | Migrated | Adaptive briefing → Popup 3 / Ready Room → LIVE |
+| Normal GEORGE | Pending | Existing legacy handoff remains active until explicit session identity and hydration are implemented |
+| Resume | Pending | Must restore meaningful preparation, not infer eligibility from a storage key |
+
+Strategy remains future workflow over the same Preparation Session. It must not introduce another preparation runtime or semantic layer.
 
 ### Current remaining production priorities
 
-1. Improve Homepage current-session support recommendation quality using structured briefing evidence instead of flattened text heuristics.
-2. Ensure the desired outcome remains a hard readiness requirement wherever the production flow requires it.
-3. Finish Formula/Marketplace recommendation and empty-state experience.
-4. Manually verify Homepage → Library → Ready Room continuity, including Formula and Script preservation.
-5. Continue progressive-disclosure polish, including traditional Popup 1.
-6. Inspect no-intervention reason propagation and deliberate visual-only support through existing canonical owners; do not create another support mode or reasoning authority.
-7. Preserve evidence-first staged visual behavior through qualification.
+1. Migrate the deliberate Normal GEORGE → LIVE handoff to the canonical Preparation Session with both `preparationSessionId` and `normalSessionId`.
+2. Add focused Normal-handoff qualification after the production migration.
+3. Implement meaningful Resume eligibility and restoration using canonical session evidence rather than storage-key existence.
+4. Retire legacy preparation compatibility only after all route migrations are validated.
+5. Integrate future Strategy transitions into the same Preparation Session lifecycle after Normal and Resume are canonical.
+6. Continue product priorities including recommendation quality, Formula/Marketplace empty states, manual Homepage → Library → Ready Room continuity, and progressive-disclosure polish.
+7. Preserve adaptive briefing and staged visual behavior through their build-gated qualifications.
 8. Keep the authority set synchronized as production behavior changes.
 
 ## Documentation Synchronization Rule
 
-A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, product doctrine, canonical preparation ownership, route migration status, session contract, persistence, or workflow semantics is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
 
 Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 
@@ -223,13 +244,13 @@ Qualification coverage:
 - the production `build` command includes both qualifications, the duplicate-ownership audit, portability qualification, preparation qualification, and the Next.js production build.
 
 
-## Current Phase
+## Historical Phase — Operational Formula Experience
 
-GEORGE is in **Production Completion & Operational Formula Experience**.
+This section records the earlier **Production Completion & Operational Formula Experience** phase.
 
 The runtime architecture, shared reasoning authority, LIVE runtime, receiver policy, delivery routing, behavior composition, operational assessment, portability, operational-learning foundation, and production qualification are established.
 
-The active work is product completion around the existing operational-formula system.
+The active work in that phase was product completion around the existing operational-formula system.
 
 Do not:
 
@@ -241,7 +262,7 @@ Do not:
 - move formula, learning, conversation-type, or delivery authority into `app/george/page.tsx`;
 - replace existing formula qualification, evidence, reassessment, revision, or lineage capabilities.
 
-The immediate sequence is:
+The sequence recorded for that phase was:
 
 1. keep the production authorities synchronized with implementation evidence;
 2. continue Operational Formula Experience implementation from the established canonical owners;
@@ -253,9 +274,9 @@ The immediate sequence is:
 <!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_START -->
 ## Operational Formula Experience
 
-GEORGE is in **Production Completion & Operational Formula Experience**.
+This section preserves the completed **Production Completion & Operational Formula Experience** program history.
 
-The runtime architecture is largely complete. The active work is product completion around the existing operational-formula system. This work must document, organize, expose, and extend the current production assets without replacing them or introducing another runtime, reasoning authority, learning system, or ownership path.
+The runtime architecture was largely complete. That work documented, organized, exposed, and extended the production operational-formula assets without replacing them or introducing another runtime, reasoning authority, learning system, or ownership path.
 
 Existing production assets include:
 
@@ -1247,7 +1268,7 @@ Additional rules:
 - no redesign during qualification;
 - no drift from user agency and outcome orientation.
 
-## Current Production Status
+## Historical Production Status — Before Preparation Session Route Migration
 
 ### Runtime baseline
 
@@ -1259,7 +1280,7 @@ Architecture changes require evidence of a genuine defect or missing production 
 
 ### Documentation
 
-**SYNCHRONIZED FOR THE CURRENT PHASE**
+**SYNCHRONIZED FOR THE PRECEDING PHASE**
 
 The production authorities describe distinct responsibilities:
 
@@ -1270,7 +1291,7 @@ The production authorities describe distinct responsibilities:
 
 These documents are authoritative while synchronized with implementation.
 
-### Current refinement sequence
+### Historical refinement sequence
 
 1. improve current-session support recommendation quality from structured briefing evidence;
 2. qualify desired-outcome readiness requirements;

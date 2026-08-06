@@ -4,7 +4,7 @@
 
 This document is the behavioral authority for how GEORGE works with an individual user.
 
-`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing`
 
 `IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
 
@@ -29,6 +29,22 @@ The implementation remains the source of truth. This document is authoritative w
 
 GEORGE improves the probability of the user's desired outcome while keeping explicit user direction and agency authoritative.
 
+### Shared preparation authority with route-specific depth
+
+The Preparation Runtime owns one versioned Preparation Session for the upcoming room. Preparation knowledge is current-session knowledge materially relevant to that room; the entire Normal chat transcript is not preparation knowledge.
+
+The objective remains stable unless the user explicitly changes it. Inferred direction may supply context or a proposed outcome, but it must not silently replace an established objective. GEORGE's recommendations and the user's overrides are distinct: a recommendation may be reviewed or changed without rewriting the evidence that produced it.
+
+Traditional, Quick LIVE, and Homepage Preparation Session migrations are complete. The current route experiences intentionally have different depth while sharing preparation authority:
+
+- Traditional remains the full path: questions, Popup 1, Popup 2, Popup 3, then LIVE;
+- Quick LIVE remains minimum outcome-first preparation and enters LIVE without the full Traditional sequence;
+- Homepage remains adaptive briefing followed by Popup 3 / Ready Room and LIVE;
+- Normal GEORGE remains on its legacy handoff pending canonical Preparation Session migration;
+- Resume must eventually restore meaningful preparation, not merely reopen a popup or trust that a storage key exists.
+
+Continuation remains an adaptive LIVE runtime behavior chosen moment by moment. It is not Preparation Session state and is not a selectable preparation support option.
+
 ### User-directed briefing
 
 - Outcome clarification precedes adaptive briefing in the intended preparation flow.
@@ -42,6 +58,8 @@ GEORGE improves the probability of the user's desired outcome while keeping expl
 Current-session support recommendations are assessments, not commands. The user may review and change support behavior, delivery profile, and speaking style before agreement.
 
 Ready Room progressively reveals the unresolved decision and collapses completed decisions into compact summaries. This reduces cognitive load without erasing state or moving ownership. Motion communicates that information was received, revealed, changed, or settled; it is not decorative confidence.
+
+The approved product direction applies this progressive-disclosure principle across popups, briefing, Formula and Script sections, future Strategy, and composer content: resolved decisions should collapse to concise summaries and remain reopenable. Current implementation proves this behavior in the Ready Room; it does not yet establish universal composer collapse.
 
 Traditional routes confirm mechanics in Popup 2 and summarize them in Popup 3. Homepage routes review the current-session recommendation in Popup 3. The two routes share one LIVE Entry runtime.
 
@@ -63,7 +81,7 @@ Continuation is an adaptive runtime support resource selected from current evide
 
 ## Documentation Synchronization Rule
 
-A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, product doctrine, canonical preparation ownership, route migration status, session contract, persistence, or workflow semantics is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
 
 Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 

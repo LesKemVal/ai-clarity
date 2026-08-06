@@ -14,7 +14,7 @@ const authorityPaths = [
   'docs/george/NEXT_THREAD_HANDOFF.md',
 ]
 const syncMarker =
-  'GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime'
+  'GEORGE_DOCUMENTATION_SYNC: 2026-08-05-preparation-session-routing'
 const implementationAuthority =
   'IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.'
 const readOrder =
@@ -66,6 +66,8 @@ assert(
 
 const requiredTermsByDocument = {
   'docs/george/PRODUCTION_TRACKER.md': [
+    'Preparation Runtime',
+    'Preparation Session',
     'priorInteractions',
     'ContextFraming',
     'visual-presentation-policy.ts',
@@ -74,6 +76,8 @@ const requiredTermsByDocument = {
     'progressive Ready Room',
   ],
   'docs/george/RUNTIME_ARCHITECTURE.md': [
+    'Preparation Runtime',
+    'Preparation Session',
     'priorInteractions',
     'ContextFraming',
     'visual-presentation-policy.ts',
@@ -82,6 +86,8 @@ const requiredTermsByDocument = {
     'progressive Ready Room',
   ],
   'docs/george/OPERATIONAL_PROFILE.md': [
+    'Preparation Runtime',
+    'Preparation Session',
     'priorInteractions',
     'ContextFraming',
     'evidence-first',
@@ -96,6 +102,9 @@ for (const [path, terms] of Object.entries(requiredTermsByDocument)) {
 }
 
 const canonicalArchitectureOwners = [
+  'lib/george/live-runtime/live-preparation-controller.ts',
+  'lib/george/live-runtime/live-preparation-storage.ts',
+  'lib/george/live-browser/live-preparation-browser-storage.ts',
   'components/home/HomeConversationTypeSurface.tsx',
   'app/api/george/live/signal-question/route.ts',
   'app/george/live-entry/LiveEntryClient.tsx',
@@ -121,6 +130,42 @@ for (const ownerPath of canonicalArchitectureOwners) {
   )
 }
 
+const preparationStatusDocs = [tracker, architecture, profile, handoff].map(
+  (source) => source.split('## Documentation Synchronization Rule')[0]
+)
+
+for (const [index, source] of preparationStatusDocs.entries()) {
+  const path = authorityPaths[index]
+  assert(
+    source.includes('Preparation Runtime') && source.includes('Preparation Session'),
+    `${path} is missing the canonical preparation terms`
+  )
+  assert(
+    /Traditional[\s\S]{0,180}(?:Migrated|Complete|is migrated)/i.test(source),
+    `${path} does not represent Traditional as migrated`
+  )
+  assert(
+    /Quick LIVE[\s\S]{0,180}(?:Migrated|Complete|is migrated)/i.test(source),
+    `${path} does not represent Quick LIVE as migrated`
+  )
+  assert(
+    /Homepage[\s\S]{0,180}(?:Migrated|Complete|is migrated)/i.test(source),
+    `${path} does not represent Homepage as migrated`
+  )
+  assert(
+    /Normal GEORGE[\s\S]{0,180}(?:Pending|pending migration|remains on its legacy handoff)/i.test(
+      source
+    ),
+    `${path} does not represent Normal GEORGE migration as pending`
+  )
+  assert(
+    /Resume[\s\S]{0,180}(?:Pending|pending meaningful|must eventually restore meaningful)/i.test(
+      source
+    ),
+    `${path} does not represent meaningful Resume restoration as pending`
+  )
+}
+
 const contradictoryCurrentClaims = [
   /Continuation is a user-selectable support option/i,
   /Continuation remains a user-selectable support option/i,
@@ -128,6 +173,14 @@ const contradictoryCurrentClaims = [
   /Popup 3 is the canonical traditional mechanics owner/i,
   /(?:visual and audio|audio and visual) (?:are|use) identical delivery/i,
   /LiveHubVisualCueBridge(?:\.tsx)? (?:is|owns|provides) (?:the )?(?:reasoning|evidence) authority/i,
+  /^#+\s+Operational Preparation\b/im,
+  /Operational Preparation (?:is|owns|serves as|becomes) (?:a|the) /i,
+  /routes? own preparation(?: state)?/i,
+  /all routes (?:use|have|share) (?:an? )?identical UI/i,
+  /(?:derived )?readiness (?:is|remains) (?:persisted as )?canonical (?:Preparation Session|session) truth/i,
+  /Continuation (?:is|remains) (?:a )?(?:Preparation Session|preparation) state/i,
+  /runtime setup (?:is|remains) canonical preparation state/i,
+  /Normal GEORGE\s*\|\s*(?:Migrated|Complete)/i,
 ]
 
 for (const claim of contradictoryCurrentClaims) {
