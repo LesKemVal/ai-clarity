@@ -61,6 +61,7 @@ import {
   type LiveRecoveryOptionId,
 } from "@/lib/george/live-voice/runtime/recovery-options";
 import { buildOutcomeTestedBriefingSupport } from "@/lib/george/live-runtime/live-entry-briefing";
+import { resolveLivePreparationReadiness } from "@/lib/george/live-runtime/live-intent-runtime";
 import { prepareConversationFromPackage } from "@/lib/george/preparation/runtime.mjs";
 import {
   estimateResources,
@@ -535,6 +536,12 @@ export default function LiveEntryClient() {
   const [ready, setReady] = useState(false);
   const [liveEntryRoute, setLiveEntryRoute] =
     useState<LiveEntryRoute>("direct");
+  const [isFreshTraditionalPreparation, setIsFreshTraditionalPreparation] =
+    useState(false);
+  const [
+    priorPreparationExplicitlyRestored,
+    setPriorPreparationExplicitlyRestored,
+  ] = useState(false);
   const [tier, setTier] = useState<Tier>("smart");
   const [conversationType, setConversationType] = useState("Meeting");
   const [customConversationType, setCustomConversationType] = useState("");
@@ -1503,6 +1510,28 @@ export default function LiveEntryClient() {
     objectiveSignalMet &&
     completedMandatoryLiveSignalCount >= 2 &&
     missingMandatoryLiveSignals.length === 0;
+  const canonicalPreparationReadiness = useMemo(
+    () =>
+      resolveLivePreparationReadiness({
+        ...preLiveSignals,
+        role:
+          preLiveSignals.role ||
+          chairs.join(", ") ||
+          customChair ||
+          userPosition,
+        conversationContext:
+          preLiveSignals.conversationContext || knownContext,
+        desiredOutcome: preLiveSignals.desiredOutcome || objective,
+      }),
+    [
+      chairs,
+      customChair,
+      knownContext,
+      objective,
+      preLiveSignals,
+      userPosition,
+    ],
+  );
 
   useEffect(() => {
     const cached = readCachedGeorgeSessionAuthority();
@@ -1643,6 +1672,8 @@ export default function LiveEntryClient() {
       );
 
       const isStartSource = source === "start";
+      setIsFreshTraditionalPreparation(isStartSource);
+      setPriorPreparationExplicitlyRestored(false);
 
       if (isStartSource) {
         clearLivePreparationPreviewReady();
@@ -1669,6 +1700,8 @@ export default function LiveEntryClient() {
         setLiveEntryReadyMessageVisible(false);
         setShowLiveBriefingRoom(false);
         setPreLivePreviewReady(false);
+        setConversationType("");
+        setCustomConversationType("");
         setObjective("");
         setKnownContext("");
         setAudienceType("");
@@ -1999,7 +2032,10 @@ export default function LiveEntryClient() {
         .slice(0, 5);
 
       setRelatedSessions(merged);
-      setRelatedSessionId(merged[0]?.id || "not_related");
+      const source = new URLSearchParams(window.location.search).get("source");
+      setRelatedSessionId(
+        source === "start" ? "not_related" : merged[0]?.id || "not_related",
+      );
     } catch {
       setRelatedSessions([]);
       setRelatedSessionId("not_related");
@@ -2327,7 +2363,9 @@ export default function LiveEntryClient() {
           : [],
       },
       relatedConversationPackages: relatedPackage ? [relatedPackage] : [],
-      conversationRecord: readLastConversationRecord() || undefined,
+      conversationRecord: isFreshTraditionalPreparation
+        ? undefined
+        : readLastConversationRecord() || undefined,
     });
   };
 
@@ -2602,6 +2640,11 @@ export default function LiveEntryClient() {
     const restoredHasOperationalSignal = Boolean(
       cleanBriefingValue(restoredContext) || cleanBriefingValue(restoredChair),
     );
+    setPriorPreparationExplicitlyRestored(
+      Boolean(cleanBriefingValue(restoredOutcome)) &&
+        restoredHasOperationalSignal,
+    );
+    setIsFreshTraditionalPreparation(false);
 
     setCurrentOptionalSignalQuestion(null);
     setOptionalSignalLoading(false);
@@ -3460,10 +3503,18 @@ export default function LiveEntryClient() {
   const liveEntryQuestionSurface =
     showOpenAISignalSurface && liveEntryReadyMessageVisible
         ? {
-            kicker: "LIVE READY",
-            label: "Minimum signal acquired",
-            question:
-              "You're ready for LIVE.\n\nI have enough information to begin supporting you.\n\nAdditional briefing can make my guidance more specific as I learn more about the room.",
+            kicker: canonicalPreparationReadiness.thresholdMet
+              ? "LIVE READY"
+              : "LIVE AVAILABLE",
+            label: canonicalPreparationReadiness.thresholdMet
+              ? "Minimum signal acquired"
+              : "Preparation in progress",
+            headline: canonicalPreparationReadiness.thresholdMet
+              ? "You're ready for LIVE."
+              : "LIVE is available.",
+            question: canonicalPreparationReadiness.thresholdMet
+              ? "You're ready for LIVE.\n\nI have enough information to begin supporting you.\n\nAdditional briefing can make my guidance more specific as I learn more about the room."
+              : "Continue preparing, or review the briefing before entering LIVE.\n\nAdditional briefing can make my guidance more specific as I learn more about the room.",
             helper: nextBriefingBenefit,
             example: "",
             inputValue: "",
@@ -3476,13 +3527,16 @@ export default function LiveEntryClient() {
             loading: false,
             step: "Ready",
             primaryAction: "Continue Briefing",
-            canBeginLive: true,
+            liveAvailable: true,
             readinessMessage: true,
           }
         : showOpenAISignalSurface && currentOptionalSignalQuestion
           ? {
               kicker: "ADDITIONAL SIGNAL",
               label: currentOptionalSignalQuestion.label || "Optional signal",
+              headline: canonicalPreparationReadiness.thresholdMet
+                ? "GEORGE has enough signal."
+                : "Bring GEORGE up to speed.",
               question: typedOptionalSignalQuestion,
               helper: currentOptionalSignalQuestion.why,
               example: currentOptionalSignalQuestion.example,
@@ -3492,13 +3546,16 @@ export default function LiveEntryClient() {
               loading: false,
               step: "Optional",
               primaryAction: "Continue preparing",
-              canBeginLive: true,
+              liveAvailable: true,
               readinessMessage: false,
             }
           : showOpenAISignalSurface && optionalSignalLoading
             ? {
                 kicker: "ADDITIONAL SIGNAL",
                 label: "GEORGE is determining the next useful signal",
+                headline: canonicalPreparationReadiness.thresholdMet
+                  ? "GEORGE has enough signal."
+                  : "Bring GEORGE up to speed.",
                 question: "One moment.",
                 helper:
                   "OpenAI is reasoning over the room signal to sharpen GEORGE's support.",
@@ -3509,7 +3566,7 @@ export default function LiveEntryClient() {
                 loading: true,
                 step: "Optional",
                 primaryAction: "Continue",
-                canBeginLive: true,
+                liveAvailable: true,
                 readinessMessage: false,
               }
             : null;
@@ -3537,11 +3594,7 @@ export default function LiveEntryClient() {
               </div>
 
               <h1 className="mt-5 font-mono text-[28px] font-black uppercase leading-[0.98] tracking-[-0.055em] text-white sm:text-[36px]">
-                {liveEntryQuestionSurface.readinessMessage
-                  ? "You're ready for LIVE."
-                  : liveEntryQuestionSurface.canBeginLive
-                    ? "GEORGE has enough signal."
-                    : "Bring GEORGE up to speed."}
+                {liveEntryQuestionSurface.headline}
               </h1>
 
               <div className="mt-7 text-left">
@@ -3609,15 +3662,15 @@ export default function LiveEntryClient() {
 
                   <button
                     type="button"
-                    disabled={!liveEntryQuestionSurface.canBeginLive}
+                    disabled={!liveEntryQuestionSurface.liveAvailable}
                     onClick={enterLiveFromBriefingSurface}
                     className={`rounded-[14px] border px-4 py-3.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.99] ${
-                      liveEntryQuestionSurface.canBeginLive
+                      liveEntryQuestionSurface.liveAvailable
                         ? "border-[#4E7CFF]/35 bg-[#4E7CFF] text-white hover:border-[#5A84FF] hover:bg-[#5A84FF]"
                         : "cursor-default border-[#4E7CFF]/25 bg-[#4E7CFF] text-white opacity-35"
                     }`}
                   >
-                    {liveEntryQuestionSurface.canBeginLive
+                    {liveEntryQuestionSurface.liveAvailable
                       ? "Enter LIVE"
                       : "Add signal for LIVE"}
                   </button>
@@ -3942,7 +3995,10 @@ export default function LiveEntryClient() {
       knownContext,
     );
 
-    if (!generatedBriefingRoomSignalRef.current) {
+    if (
+      !isFreshTraditionalPreparation &&
+      !generatedBriefingRoomSignalRef.current
+    ) {
       generatedBriefingRoomSignalRef.current = observation;
     }
 
@@ -3958,7 +4014,10 @@ export default function LiveEntryClient() {
 
       setObjective(value);
 
-      if (!liveBriefingRoomSignalEditedRef.current) {
+      if (
+        !isFreshTraditionalPreparation &&
+        !liveBriefingRoomSignalEditedRef.current
+      ) {
         generatedBriefingRoomSignalRef.current = nextObservation;
         setKnownContext(nextObservation);
       }
@@ -4055,22 +4114,24 @@ export default function LiveEntryClient() {
         {
           id: "outcome" as const,
           label: "Desired outcome",
-          summary: objective || objectiveLabel || "Outcome pending",
+          summary: cleanBriefingValue(objective) || "Outcome pending",
         },
         {
           id: "responsibility" as const,
           label: "Your responsibility",
-          summary: userPosition || positionLabel || "Responsibility pending",
+          summary:
+            cleanBriefingValue(userPosition || chair) ||
+            "Responsibility pending",
         },
         {
           id: "participants" as const,
           label: "Conversation with",
-          summary: audienceType || audienceLabel || "Participants pending",
+          summary: cleanBriefingValue(audienceType) || "Participants pending",
         },
         {
           id: "context" as const,
           label: "Conversation and known context",
-          summary: knownContext || observation || "Context pending",
+          summary: cleanBriefingValue(knownContext) || "Context pending",
         },
         {
           id: "additional" as const,
@@ -4087,12 +4148,12 @@ export default function LiveEntryClient() {
       return (
         <PanelShell
           label={
-            relatedSessionId !== "not_related"
+            priorPreparationExplicitlyRestored
               ? "BRIEF ROOM · UPDATE"
               : "BRIEF ROOM · EDITABLE"
           }
           title={
-            relatedSessionId !== "not_related"
+            priorPreparationExplicitlyRestored
               ? "Before we begin..."
               : "Here’s what I understand"
           }
@@ -4104,9 +4165,11 @@ export default function LiveEntryClient() {
                 Operational briefing
               </div>
               <p className="mt-2 max-w-[650px] text-[12px] leading-5 text-[#D7DBE4]/50">
-                {relatedSessionId !== "not_related"
+                {priorPreparationExplicitlyRestored
                   ? "Has anything changed?"
-                  : "Review everything GEORGE learned about the conversation. Open one section at a time to edit it."}
+                  : isFreshTraditionalPreparation
+                    ? "Review the briefing. Open one section at a time to add or edit it."
+                    : "Review everything GEORGE learned about the conversation. Open one section at a time to edit it."}
               </p>
             </div>
 
@@ -4194,7 +4257,11 @@ export default function LiveEntryClient() {
                               }
                               rows={4}
                               className="w-full resize-none rounded-[0.85rem] border border-white/[0.06] bg-[#0A0C10] px-3 py-2.5 text-[13px] leading-6 text-[#D7DBE4]/80 outline-none placeholder:text-white/20 disabled:opacity-55"
-                              placeholder={observation}
+                              placeholder={
+                                isFreshTraditionalPreparation
+                                  ? "Context pending"
+                                  : observation
+                              }
                             />
                           )}
 
