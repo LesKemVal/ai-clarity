@@ -47,10 +47,17 @@ import {
   clearLivePreparationPreviewReady,
   clearLivePreparationSignals,
   isLivePreparationPreviewReady,
+  loadPreparationSession,
   loadLivePreparationSignals,
   markLivePreparationPreviewReady,
+  savePreparationSession,
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
+import {
+  createPreparationSession,
+  type PreparationCheckpoint,
+  type PreparationSessionV1,
+} from "@/lib/george/live-runtime/live-preparation-controller";
 import { buildOpportunitySignalAcquisitionMessage } from "@/lib/george/runtime/conversation-strategy";
 
 import {
@@ -195,6 +202,19 @@ import type { OperationalResourceMonitorState } from "@/lib/george/runtime/opera
 import type { GeorgeRuntimeAuthoritySnapshot } from "@/lib/george/runtime/runtime-pipeline";
 
 const GEORGE_LAST_NORMAL_DRAFT = "george_last_normal_draft";
+const NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES = new Set([
+  "in progress",
+  "outcome not set",
+  "the desired outcome",
+  "carry this session into live",
+]);
+
+function normalizeExplicitNormalPreparationObjective(value: unknown) {
+  const objective = String(value || "").trim();
+  return NORMAL_PREPARATION_PLACEHOLDER_OUTCOMES.has(objective.toLowerCase())
+    ? ""
+    : objective;
+}
 
 const LIVE_ENTRY_RESPONSIBILITY_MARKER = "[RESPONSIBILITY_CHECKPOINT]";
 const LIVE_ENTRY_TOA_MARKER = "[TOA_CHECKPOINT]";
@@ -854,6 +874,7 @@ export default function Page({
   const normalSessionWriteReadyRef = useRef(false);
   const liveSessionWriteReadyRef = useRef(false);
   const preLiveSessionIdRef = useRef<string | null>(null);
+  const normalLiveExplicitObjectiveRef = useRef("");
   const liveEntryBootedRef = useRef(false);
   const [pendingImage, setPendingImage] = useState<{
     dataUrl: string;
@@ -3224,6 +3245,194 @@ export default function Page({
     }
   };
 
+  const beginNormalLivePreparation = ({
+    signals = {},
+    explicitObjective = "",
+    sourceContext = "",
+    checkpoint,
+  }: {
+    signals?: Record<string, string>;
+    explicitObjective?: string;
+    sourceContext?: string;
+    checkpoint: PreparationCheckpoint;
+  }): PreparationSessionV1 | null => {
+    if (typeof window === "undefined") return null;
+
+    const subscriberMetadata = getSubscriberSessionMetadata() || {};
+    const activeNormalSession =
+      getActiveSessionForMode("normal") ||
+      createSession(
+        "normal",
+        messagesRef.current,
+        deriveNormalSessionTitleFromMessages(
+          messagesRef.current,
+          "GEORGE Session",
+        ),
+        subscriberMetadata,
+      );
+    const normalSessionId = String(activeNormalSession.id || "").trim();
+    if (!normalSessionId) return null;
+
+    const storedSession = loadPreparationSession();
+    const existingSession =
+      storedSession?.provenance.entrySource === "normal" &&
+      storedSession.relations.normalSessionId === normalSessionId
+        ? storedSession
+        : null;
+    const normalizedSignals = Object.fromEntries(
+      Object.entries(signals)
+        .map(([key, value]) => [key, String(value || "").trim()])
+        .filter(([, value]) => Boolean(value)),
+    );
+    const explicitCurrentObjective =
+      normalizeExplicitNormalPreparationObjective(explicitObjective);
+    const metadataObjective = normalizeExplicitNormalPreparationObjective(
+      activeNormalSession.metadata?.desiredOutcome,
+    );
+    const objective =
+      explicitCurrentObjective ||
+      metadataObjective ||
+      existingSession?.knowledge.objective ||
+      "";
+    const inferredDirection =
+      !objective && normalizedSignals.desiredOutcome
+        ? normalizedSignals.desiredOutcome
+        : "";
+    const canonicalSignals = {
+      ...(existingSession?.knowledge.additionalSignals || {}),
+      ...normalizedSignals,
+    };
+
+    if (objective) {
+      canonicalSignals.desiredOutcome = objective;
+      delete canonicalSignals.proposedOutcome;
+    } else {
+      delete canonicalSignals.desiredOutcome;
+      if (inferredDirection) {
+        canonicalSignals.proposedOutcome = inferredDirection;
+      }
+    }
+
+    const role = String(
+      normalizedSignals.role ||
+        activeNormalSession.metadata?.role ||
+        activeNormalSession.metadata?.responsibility ||
+        existingSession?.knowledge.role ||
+        "",
+    ).trim();
+    const audience = String(
+      normalizedSignals.counterparty ||
+        normalizedSignals.audience ||
+        activeNormalSession.metadata?.targetAudience ||
+        activeNormalSession.metadata?.audience ||
+        existingSession?.knowledge.audience ||
+        "",
+    ).trim();
+    const knownContext = Array.from(
+      new Set(
+        [
+          normalizedSignals.conversationContext,
+          sourceContext,
+          inferredDirection ? `Proposed outcome: ${inferredDirection}` : "",
+          existingSession?.knowledge.knownContext,
+          activeNormalSession.summary,
+          activeNormalSession.lastKnownState,
+        ]
+          .map((value) => String(value || "").trim())
+          .filter(Boolean),
+      ),
+    ).join("\n");
+    const previousCheckpoint = existingSession?.workflow.current;
+    const checkpointChanged =
+      previousCheckpoint &&
+      JSON.stringify(previousCheckpoint) !== JSON.stringify(checkpoint);
+    const checkpointHistory = existingSession
+      ? [
+          ...existingSession.workflow.history,
+          ...(checkpointChanged ? [previousCheckpoint] : []),
+        ]
+      : [];
+    const session = createPreparationSession({
+      preparationSessionId: existingSession?.preparationSessionId,
+      provenance:
+        existingSession?.provenance || {
+          entrySource: "normal",
+          restoredFrom: {
+            kind: "normal_session",
+            id: normalSessionId,
+          },
+        },
+      createdAt: existingSession?.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective,
+        name: existingSession?.knowledge.name,
+        role,
+        participants: audience
+          ? [audience]
+          : existingSession?.knowledge.participants || [],
+        audience,
+        perspectives: existingSession?.knowledge.perspectives || [],
+        conversation: {
+          id: normalSessionId,
+          title: String(
+            activeNormalSession.metadata?.conversationType ||
+              activeNormalSession.metadata?.room ||
+              existingSession?.knowledge.conversation.title ||
+              "",
+          ).trim(),
+          group: existingSession?.knowledge.conversation.group,
+        },
+        knownContext,
+        communicationMedium:
+          normalizedSignals.communicationMedium ||
+          existingSession?.knowledge.communicationMedium,
+        receiverEvidence: existingSession?.knowledge.receiverEvidence,
+        acceptableOutcome:
+          normalizedSignals.acceptableOutcome ||
+          existingSession?.knowledge.acceptableOutcome,
+        secondaryOutcome:
+          normalizedSignals.secondaryOutcome ||
+          normalizedSignals.fallbackOutcome ||
+          existingSession?.knowledge.secondaryOutcome,
+        roomObjective: existingSession?.knowledge.roomObjective,
+        additionalSignals: canonicalSignals,
+        documents: existingSession?.knowledge.documents || [],
+      },
+      briefing: existingSession?.briefing,
+      assets: existingSession?.assets,
+      support: existingSession?.support || { overrides: {} },
+      workflow: {
+        current: checkpoint,
+        history: checkpointHistory,
+        ...(existingSession?.workflow.returnTo
+          ? { returnTo: existingSession.workflow.returnTo }
+          : {}),
+      },
+      relations: {
+        ...existingSession?.relations,
+        normalSessionId,
+      },
+    });
+
+    savePreparationSession(session);
+    return session;
+  };
+
+  const buildNormalLiveEntryUrl = (
+    session: PreparationSessionV1,
+    source?: "signal" | "message",
+  ) => {
+    const params = new URLSearchParams();
+    if (source) params.set("source", source);
+    params.set("preparationSessionId", session.preparationSessionId);
+    params.set(
+      "normalSessionId",
+      String(session.relations.normalSessionId || ""),
+    );
+    return `/george/live-entry?${params.toString()}`;
+  };
+
   const openLiveEntry = () => {
     if (typeof window === "undefined") return;
 
@@ -3234,7 +3443,31 @@ export default function Page({
       return;
     }
 
-    window.location.href = "/george/live-entry";
+    const fromPreparedMessage =
+      preLiveSignalComplete &&
+      window.localStorage.getItem("GEORGE_PRE_LIVE_FROM_MESSAGE") === "1";
+
+    if (fromPreparedMessage) {
+      const preparationSession = beginNormalLivePreparation({
+        signals: preLiveSignals,
+        explicitObjective: preLiveSignals.desiredOutcome || "",
+        checkpoint: { surface: "ready_room", phase: "mechanics" },
+      });
+      if (!preparationSession) return;
+
+      window.location.href = buildNormalLiveEntryUrl(
+        preparationSession,
+        "message",
+      );
+      return;
+    }
+
+    const preparationSession = beginNormalLivePreparation({
+      checkpoint: { surface: "briefing", phase: "questions" },
+    });
+    if (!preparationSession) return;
+
+    window.location.href = buildNormalLiveEntryUrl(preparationSession);
   };
 
   const openLiveEntryFromMessage = (message: Message) => {
@@ -3248,6 +3481,12 @@ export default function Page({
       setShowUpgradeModal(true);
       return;
     }
+
+    normalLiveExplicitObjectiveRef.current = "";
+    beginNormalLivePreparation({
+      sourceContext: content,
+      checkpoint: { surface: "briefing", phase: "questions" },
+    });
 
     try {
       window.localStorage.setItem(
@@ -3303,6 +3542,10 @@ export default function Page({
     setActivePromptLabel("LIVE");
     setContextTurnCount(0);
 
+    beginNormalLivePreparation({
+      checkpoint: { surface: "briefing", phase: "questions" },
+    });
+
     let storedSignals: Record<string, string> = {};
 
     try {
@@ -3335,7 +3578,16 @@ export default function Page({
         window.localStorage.setItem("george_start_new_live", "1");
       } catch {}
 
-      window.location.href = "/george/live-entry?source=signal";
+      const preparationSession = beginNormalLivePreparation({
+        signals: storedSignals,
+        checkpoint: { surface: "ready_room", phase: "mechanics" },
+      });
+      if (!preparationSession) return;
+
+      window.location.href = buildNormalLiveEntryUrl(
+        preparationSession,
+        "signal",
+      );
       return;
     }
 
@@ -4984,11 +5236,12 @@ I’ll stay with you.`,
           );
         } catch {}
 
+        const liveIntentStage =
+          window.localStorage.getItem("GEORGE_LIVE_INTENT_STAGE") ||
+          "confirm_intent";
         const liveIntentResult = resolveLiveIntentRuntime({
           text,
-          stage:
-            window.localStorage.getItem("GEORGE_LIVE_INTENT_STAGE") ||
-            "confirm_intent",
+          stage: liveIntentStage,
           sourceContext,
         });
 
@@ -5016,10 +5269,29 @@ I’ll stay with you.`,
             "GEORGE_PRE_LIVE_SIGNALS",
             JSON.stringify(liveIntentResult.preLiveSignals),
           );
+
+          normalLiveExplicitObjectiveRef.current =
+            liveIntentStage === "collect_signal"
+              ? String(
+                  liveIntentResult.preLiveSignals.desiredOutcome || "",
+                ).trim()
+              : "";
         }
 
         if (liveIntentResult.navigateToLiveEntry) {
-          window.location.href = "/george/live-entry?source=message";
+          const normalSignals = loadLivePreparationSignals();
+          const preparationSession = beginNormalLivePreparation({
+            signals: normalSignals,
+            explicitObjective: normalLiveExplicitObjectiveRef.current,
+            sourceContext: String(sourceContext?.summary || ""),
+            checkpoint: { surface: "ready_room", phase: "mechanics" },
+          });
+          if (!preparationSession) return;
+
+          window.location.href = buildNormalLiveEntryUrl(
+            preparationSession,
+            "message",
+          );
           return;
         }
 
@@ -5802,7 +6074,17 @@ I’ll stay with you.`,
       }
 
       window.setTimeout(() => {
-        window.location.href = "/george/live-entry?source=signal";
+        const preparationSession = beginNormalLivePreparation({
+          signals: nextSignals,
+          explicitObjective: nextSignals.desiredOutcome || "",
+          checkpoint: { surface: "ready_room", phase: "mechanics" },
+        });
+        if (!preparationSession) return;
+
+        window.location.href = buildNormalLiveEntryUrl(
+          preparationSession,
+          "signal",
+        );
       }, 900);
 
       return true;

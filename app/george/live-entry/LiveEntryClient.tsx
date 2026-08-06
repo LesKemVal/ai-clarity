@@ -656,6 +656,7 @@ export default function LiveEntryClient() {
     createdAt: number;
   } | null>(null);
   const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
+  const normalPreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const liveBriefingRoomSignalEditedRef = useRef(false);
   const generatedBriefingRoomSignalRef = useRef("");
   const [liveBriefingEditAcknowledged, setLiveBriefingEditAcknowledged] =
@@ -943,6 +944,24 @@ export default function LiveEntryClient() {
         ) {
           homepagePreparationSeedRef.current = restoredPreparationSession;
           savePreparationSession(restoredPreparationSession);
+        } else {
+          const preparationSessionId = params.get("preparationSessionId");
+          const normalSessionId = params.get("normalSessionId");
+          const activeNormalSession = getActiveSessionForMode("normal");
+
+          if (
+            preparationSessionId &&
+            normalSessionId &&
+            activeNormalSession?.id === normalSessionId &&
+            restoredPreparationSession?.provenance.entrySource === "normal" &&
+            restoredPreparationSession.preparationSessionId ===
+              preparationSessionId &&
+            restoredPreparationSession.relations.normalSessionId ===
+              normalSessionId
+          ) {
+            normalPreparationSeedRef.current = restoredPreparationSession;
+            savePreparationSession(restoredPreparationSession);
+          }
         }
 
         setShowLiveBriefingRoom(true);
@@ -2118,6 +2137,205 @@ export default function LiveEntryClient() {
     savePreparationSession(homepagePreparationSession);
   }, [homepagePreparationSession]);
 
+  const normalPreparationSession = useMemo(() => {
+    const seed = normalPreparationSeedRef.current;
+    if (!seed) return null;
+
+    const resolvedAudience = String(
+      preLiveSignals.counterparty || seed.knowledge.audience || "",
+    ).trim();
+    const currentCheckpoint: PreparationCheckpoint = showOpenAISignalSurface
+      ? { surface: "briefing", phase: "questions" }
+      : showLiveBriefingRoom
+        ? liveBriefingStep === 1
+          ? { surface: "ready_room", phase: "brief" }
+          : liveBriefingStep === 2
+            ? { surface: "ready_room", phase: "mechanics" }
+            : {
+                surface: "ready_room",
+                phase: "readiness",
+                section:
+                  livePrepOpenSection === "formula"
+                    ? "formula"
+                    : livePrepOpenSection === "ready"
+                      ? "ready"
+                      : "support",
+              }
+        : liveEntryReadyMessageVisible
+          ? { surface: "briefing", phase: "decision" }
+          : seed.workflow.current;
+    const currentInteractions = buildPreparationInteractions({
+      answers: optionalSignalAnswers,
+      questionHistory: optionalSignalQuestionHistory,
+      skippedKeys: skippedOptionalSignalKeys,
+    });
+    const selectedBehavior = liveBriefingActiveSupportStyle
+      ? liveBriefingActiveSupportStyle === "response"
+        ? ("response" as const)
+        : ("cue" as const)
+      : undefined;
+
+    return createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective: objective || seed.knowledge.objective,
+        name: preLiveSignals.name || seed.knowledge.name,
+        role: preLiveSignals.role || seed.knowledge.role,
+        participants: resolvedAudience
+          ? [resolvedAudience]
+          : seed.knowledge.participants,
+        audience: resolvedAudience,
+        perspectives: seed.knowledge.perspectives,
+        conversation: seed.knowledge.conversation,
+        knownContext:
+          preLiveSignals.conversationContext ||
+          knownContext ||
+          seed.knowledge.knownContext,
+        communicationMedium: seed.knowledge.communicationMedium,
+        receiverEvidence: seed.knowledge.receiverEvidence,
+        acceptableOutcome:
+          preLiveSignals.acceptableOutcome ||
+          seed.knowledge.acceptableOutcome,
+        secondaryOutcome:
+          preLiveSignals.secondaryOutcome ||
+          preLiveSignals.fallbackOutcome ||
+          seed.knowledge.secondaryOutcome,
+        roomObjective:
+          liveRoomObjectiveOption === "other"
+            ? customLiveRoomObjective
+            : liveRoomObjectiveOption || seed.knowledge.roomObjective,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          ...preLiveSignals,
+        },
+        documents: prepDocument
+          ? [
+              {
+                id: prepDocument.name,
+                name: prepDocument.name,
+                kind: prepDocument.kind,
+                summary: prepDocument.summary,
+              },
+            ]
+          : seed.knowledge.documents,
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions,
+          ...currentInteractions,
+        ]),
+        currentQuestion: currentOptionalSignalQuestion,
+      },
+      assets: {
+        ...(selectedFormula && selectedFormulaSource
+          ? {
+              formula: {
+                id: selectedFormula.id,
+                version: selectedFormula.version,
+                source: selectedFormulaSource,
+              },
+            }
+          : seed.assets.formula
+            ? { formula: seed.assets.formula }
+            : {}),
+        ...(selectedScript
+          ? {
+              script: {
+                id: selectedScript.id,
+                version: selectedScript.version,
+              },
+            }
+          : seed.assets.script
+            ? { script: seed.assets.script }
+            : {}),
+        ...(customizedScript
+          ? { customizedScript }
+          : seed.assets.customizedScript
+            ? { customizedScript: seed.assets.customizedScript }
+            : {}),
+      },
+      support: {
+        recommendation: seed.support.recommendation,
+        overrides: {
+          ...seed.support.overrides,
+          ...(selectedBehavior ? { behavior: selectedBehavior } : {}),
+          ...(receiverProfileConfirmed
+            ? { receiver: selectedReceiverProfile }
+            : {}),
+          ...(liveBriefingCommunicationConfirmed
+            ? { speakingStyle: communicationStyle }
+            : {}),
+        },
+        confirmations: {
+          briefingReviewed: liveBriefingToaAccepted,
+          supportAssessmentAgreed: liveBriefingSupportAccepted,
+          receiverConfirmed: receiverProfileConfirmed,
+          speakingStyleConfirmed: liveBriefingCommunicationConfirmed,
+          mechanicsConfirmed: liveBriefingCapabilitiesConfirmed,
+          recoveryAcknowledged: liveRecoveryAcknowledged,
+          readyRoomConfirmed: liveReadyAccepted || liveReadinessComplete,
+        },
+        runtimePreferences: {
+          ...seed.support.runtimePreferences,
+          ...(liveBriefingCapabilitiesConfirmed ? { pacing } : {}),
+          recoveryOptionIds: liveRecoveryOptions,
+          selectedResources: editableResources,
+        },
+      },
+      workflow: {
+        current: currentCheckpoint,
+        history: seed.workflow.history,
+        ...(seed.workflow.returnTo
+          ? { returnTo: seed.workflow.returnTo }
+          : {}),
+      },
+      relations: seed.relations,
+    });
+  }, [
+    communicationStyle,
+    currentOptionalSignalQuestion,
+    customLiveRoomObjective,
+    customizedScript,
+    editableResources,
+    knownContext,
+    liveBriefingActiveSupportStyle,
+    liveBriefingCapabilitiesConfirmed,
+    liveBriefingCommunicationConfirmed,
+    liveBriefingStep,
+    liveBriefingSupportAccepted,
+    liveBriefingToaAccepted,
+    liveEntryReadyMessageVisible,
+    livePrepOpenSection,
+    liveReadinessComplete,
+    liveReadyAccepted,
+    liveRecoveryAcknowledged,
+    liveRecoveryOptions,
+    liveRoomObjectiveOption,
+    objective,
+    optionalSignalAnswers,
+    optionalSignalQuestionHistory,
+    pacing,
+    preLiveSignals,
+    prepDocument,
+    receiverProfileConfirmed,
+    selectedFormula,
+    selectedFormulaSource,
+    selectedReceiverProfile,
+    selectedScript,
+    showLiveBriefingRoom,
+    showOpenAISignalSurface,
+    skippedOptionalSignalKeys,
+  ]);
+
+  useEffect(() => {
+    if (!normalPreparationSession) return;
+    normalPreparationSeedRef.current = normalPreparationSession;
+    savePreparationSession(normalPreparationSession);
+  }, [normalPreparationSession]);
+
   const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim();
     const hasObjective = cleanObjective.length > 0;
@@ -2413,6 +2631,39 @@ export default function LiveEntryClient() {
         }
       }
 
+      const handedPreparationSessionId = params.get("preparationSessionId");
+      const handedNormalSessionId = params.get("normalSessionId");
+      const activeNormalSession = getActiveSessionForMode("normal");
+      const storedNormalPreparationSession = loadPreparationSession();
+      const normalPreparationSeed =
+        (source === null || source === "signal" || source === "message") &&
+        handedPreparationSessionId &&
+        handedNormalSessionId &&
+        activeNormalSession?.id === handedNormalSessionId &&
+        storedNormalPreparationSession?.provenance.entrySource === "normal" &&
+        storedNormalPreparationSession.preparationSessionId ===
+          handedPreparationSessionId &&
+        storedNormalPreparationSession.relations.normalSessionId ===
+          handedNormalSessionId
+          ? storedNormalPreparationSession
+          : null;
+
+      if (normalPreparationSeed) {
+        normalPreparationSeedRef.current = normalPreparationSeed;
+        savePreparationSession(normalPreparationSeed);
+
+        const normalDocument = normalPreparationSeed.knowledge.documents[0];
+        if (normalDocument) {
+          setPrepDocument({
+            name: normalDocument.name,
+            summary: normalDocument.summary || "",
+            kind: normalDocument.kind,
+          });
+        }
+      } else {
+        normalPreparationSeedRef.current = null;
+      }
+
       const homepageWorkflowAction = String(
         homepageHandoff?.workflowAction || "",
       );
@@ -2468,7 +2719,9 @@ export default function LiveEntryClient() {
 
       const storedPreparationSignals = isStartSource
         ? {}
-        : loadLivePreparationSignals();
+        : normalPreparationSeed
+          ? resolvePreparationSession(normalPreparationSeed).signals
+          : loadLivePreparationSignals();
 
       const entryResolution = resolveLiveEntry({
         source,
@@ -2500,6 +2753,112 @@ export default function LiveEntryClient() {
 
       setLiveEntryRoute(entryResolution.route);
       setPreLivePreviewReady(preLiveReady);
+
+      if (normalPreparationSeed) {
+        const resolvedNormalPreparation = resolvePreparationSession(
+          normalPreparationSeed,
+        );
+        const normalSignals = resolvedNormalPreparation.signals;
+        const normalAudience = String(
+          normalPreparationSeed.knowledge.audience ||
+            normalSignals.counterparty ||
+            "",
+        ).trim();
+        const normalRole = String(
+          normalPreparationSeed.knowledge.role || normalSignals.role || "",
+        ).trim();
+        const normalRoom = String(
+          normalPreparationSeed.knowledge.conversation.title || "",
+        ).trim();
+        const normalContext = String(
+          normalPreparationSeed.knowledge.knownContext ||
+            normalSignals.conversationContext ||
+            "",
+        ).trim();
+
+        setPreLiveSignals(normalSignals);
+        setObjective(normalPreparationSeed.knowledge.objective);
+        if (normalContext) setKnownContext(normalContext);
+        if (normalAudience) {
+          const matchedAudience = AUDIENCE_TYPES.find(
+            (option) =>
+              option.label.toLowerCase() === normalAudience.toLowerCase() ||
+              option.label.toLowerCase() ===
+                normalAudience.toLowerCase().replace(/s$/, ""),
+          );
+          setAudienceType(matchedAudience?.label || normalAudience);
+        }
+        if (normalRole) {
+          const matchedRole = CHAIR_OPTIONS.find(
+            (option) =>
+              option.label.toLowerCase() === normalRole.toLowerCase(),
+          );
+          if (matchedRole) {
+            setChairs([matchedRole.label]);
+            setUserPosition(matchedRole.label);
+          } else {
+            setChairs(["Other"]);
+            setCustomChair(normalRole);
+            setUserPosition(normalRole);
+          }
+        }
+        if (normalRoom) {
+          const knownRoom = CONVERSATION_TYPES.some(
+            (option) => option.label === normalRoom,
+          );
+          setConversationType(knownRoom ? normalRoom : "Other");
+          if (!knownRoom) setCustomConversationType(normalRoom);
+        }
+
+        const normalSupport = resolvedNormalPreparation.supportConfiguration;
+        if (normalSupport.behavior) {
+          const supportPanel =
+            normalSupport.behavior === "response" ? "response" : "advice";
+          setLiveBriefingActiveSupportStyle(supportPanel);
+          setSelectedSupportStyle(
+            normalizeLiveSupportStyle(toRuntimeSupportStyle(supportPanel)),
+          );
+        }
+        if (normalSupport.receiver) {
+          setSelectedReceiverProfile(normalSupport.receiver);
+          setReceiverProfileConfirmed(
+            normalPreparationSeed.support.confirmations.receiverConfirmed,
+          );
+        }
+        if (normalSupport.speakingStyle) {
+          setCommunicationStyle(normalSupport.speakingStyle);
+          setLiveBriefingCommunicationConfirmed(
+            normalPreparationSeed.support.confirmations
+              .speakingStyleConfirmed,
+          );
+        }
+        setLiveBriefingCapabilitiesConfirmed(
+          normalPreparationSeed.support.confirmations.mechanicsConfirmed,
+        );
+        setLiveBriefingSupportAccepted(
+          normalPreparationSeed.support.confirmations.supportAssessmentAgreed,
+        );
+        setLiveRecoveryAcknowledged(
+          normalPreparationSeed.support.confirmations.recoveryAcknowledged,
+        );
+        setLiveReadyAccepted(
+          normalPreparationSeed.support.confirmations.readyRoomConfirmed,
+        );
+        if (normalPreparationSeed.support.runtimePreferences.pacing) {
+          setPacing(normalPreparationSeed.support.runtimePreferences.pacing);
+        }
+        if (
+          normalPreparationSeed.support.runtimePreferences.recoveryOptionIds
+            .length > 0
+        ) {
+          setLiveRecoveryOptions(
+            normalizeLiveRecoverySelection(
+              normalPreparationSeed.support.runtimePreferences
+                .recoveryOptionIds,
+            ),
+          );
+        }
+      }
 
       if (
         entryResolution.route === "homepage" &&
@@ -2810,7 +3169,7 @@ export default function LiveEntryClient() {
         window.localStorage.getItem("GEORGE_LAST_LIVE_SETUP") || "null",
       );
 
-      if (entryResolution.route !== "homepage") {
+      if (entryResolution.route !== "homepage" && !normalPreparationSeed) {
         if (!isFreshLiveStart) {
           if (saved?.room) {
             const knownRoom = CONVERSATION_TYPES.some(
@@ -2870,10 +3229,12 @@ export default function LiveEntryClient() {
 
       setRelatedSessions(merged);
       const source = new URLSearchParams(window.location.search).get("source");
+      const validatedNormalSessionId =
+        normalPreparationSeedRef.current?.relations.normalSessionId;
       setRelatedSessionId(
         source === "start" || source === "homepage"
           ? "not_related"
-          : merged[0]?.id || "not_related",
+          : validatedNormalSessionId || merged[0]?.id || "not_related",
       );
     } catch {
       setRelatedSessions([]);
@@ -3349,12 +3710,15 @@ export default function LiveEntryClient() {
           optionalSignalQuestionHistory,
           skippedOptionalSignalKeys,
           livePreparationHistory: livePreparationHistoryRef.current,
-          preparationSession: homepagePreparationSession,
+          preparationSession:
+            homepagePreparationSession || normalPreparationSession,
         }),
       );
 
-      if (homepagePreparationSession) {
-        savePreparationSession(homepagePreparationSession);
+      const activePreparationSession =
+        homepagePreparationSession || normalPreparationSession;
+      if (activePreparationSession) {
+        savePreparationSession(activePreparationSession);
       }
     } catch (error) {
       console.warn(
@@ -3674,15 +4038,23 @@ export default function LiveEntryClient() {
       liveEntryRoute === "homepage" && homepagePreparationSession
         ? resolvePreparationSession(homepagePreparationSession)
         : null;
+    const resolvedNormalPreparation = normalPreparationSession
+      ? resolvePreparationSession(normalPreparationSession)
+      : null;
+    const resolvedCanonicalPreparation =
+      resolvedHomepagePreparation || resolvedNormalPreparation;
 
     if (homepagePreparationSession) {
       savePreparationSession(homepagePreparationSession);
     }
+    if (normalPreparationSession) {
+      savePreparationSession(normalPreparationSession);
+    }
 
-    const entrySupportStyle = resolvedHomepagePreparation
+    const entrySupportStyle = resolvedCanonicalPreparation
       ? normalizeLiveSupportStyle(
           toRuntimeSupportStyle(
-            resolvedHomepagePreparation.supportConfiguration.behavior ===
+            resolvedCanonicalPreparation.supportConfiguration.behavior ===
               "response"
               ? "response"
               : "advice",
@@ -3690,12 +4062,16 @@ export default function LiveEntryClient() {
         )
       : supportStyle;
     const entryReceiverProfile =
-      resolvedHomepagePreparation?.supportConfiguration.receiver ||
-      window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-      window.localStorage.getItem("george_live_entry_receiver_profile") ||
-      "audio_only";
+      resolvedCanonicalPreparation?.supportConfiguration.receiver ||
+      (resolvedNormalPreparation
+        ? selectedReceiverProfile
+        : window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
+          window.localStorage.getItem(
+            "george_live_entry_receiver_profile",
+          ) ||
+          "audio_only");
     const entryCommunicationStyle =
-      resolvedHomepagePreparation?.supportConfiguration.speakingStyle ||
+      resolvedCanonicalPreparation?.supportConfiguration.speakingStyle ||
       communicationStyle;
     const entryLiveAssistMode = legacyAssistModeFromSupportStyle(
       entrySupportStyle,
