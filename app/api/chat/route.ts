@@ -57,7 +57,7 @@ import { buildEarbudRuntimeNote, detectEarbudRuntime } from '@/lib/george/runtim
 import { arbitrateRuntimeSignals } from '@/lib/george/runtime/runtime-signal-arbitrator'
 import { buildContinuityRestorationState } from '@/lib/george/runtime/continuity-restoration'
 
-import { buildPresentationAuthorityNote, determinePresentationMode, enforceLiveRecommendationPresentation, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
+import { buildPresentationAuthorityNote, determinePresentationMode, enforcePresentationMode } from '@/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '@/lib/george/chat/operational-excellence'
 import { buildArbitrationResponseShape } from '@/lib/george/chat/arbitration-response-shaping'
 import { DEFAULT_ADAPTIVE_USER_PROFILE, adaptUserProfile, buildAdaptiveUserProfileNote } from '@/lib/george/runtime/adaptive-user-profile'
@@ -1072,8 +1072,6 @@ LANGUAGE MODE: SPANISH
     })
 
     const {
-      contextFraming,
-      liveRecommendationPresentation,
       operationalResourceMonitor,
       providerRequest,
       providerResolution,
@@ -1199,12 +1197,6 @@ LANGUAGE MODE: SPANISH
       reply,
       presentationMode,
       latestUserText,
-    })
-
-    reply = enforceLiveRecommendationPresentation({
-      reply,
-      presentation: liveRecommendationPresentation,
-      contextFraming,
     })
 
     reply = appendPostResponseNotices({

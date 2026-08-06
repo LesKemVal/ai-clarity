@@ -2,9 +2,6 @@ import type { CurrentGeorgeRuntime } from '@/lib/george/chat/current-runtime-pol
 import type { OperationalSignal } from '@/lib/george/runtime/operational-signals'
 import {
   buildContextFramingPresentationNote,
-  buildLiveRecommendationPresentationNote,
-  resolveLiveRecommendationPresentation,
-  type LiveRecommendationPresentation,
 } from '@/lib/george/chat/presentation-authority'
 import {
   resolveGeorgeOutcomeState,
@@ -78,7 +75,6 @@ export const GEORGE_RUNTIME_PIPELINE = {
     'conversation_strategy',
     'conversation_move_resolution',
     'context_framing',
-    'live_recommendation_presentation',
     'operational_resource_monitor',
     'execution_policy',
     'runtime_note_assembly',
@@ -179,7 +175,6 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
   conversationStrategy: GeorgeConversationStrategy
   conversationMoveDefinition: GeorgeConversationMoveDefinition
   contextFraming: ContextFraming
-  liveRecommendationPresentation: LiveRecommendationPresentation
   operationalResourceMonitor: OperationalResourceMonitorState
   executionPolicy: GeorgeExecutionPolicy
   runtimeContextBlock: string
@@ -194,7 +189,6 @@ export type GeorgeRuntimePipelineSnapshot = Readonly<{
     conversationStrategyNote: string
     conversationMoveDefinitionNote: string
     contextFramingNote: string
-    liveRecommendationPresentationNote: string
     executionPolicyNote: string
     providerExecutionAuthority: string
   }>
@@ -331,16 +325,6 @@ export function resolveGeorgeRuntimePipeline(
     })
   )
 
-  const liveRecommendationPresentation = measureStage(
-    'live_recommendation_presentation',
-    () =>
-      resolveLiveRecommendationPresentation({
-        liveSupport: operationalJudgment.liveSupport,
-        latestUserText: input.latestUserText,
-        voiceMode: input.voiceMode,
-      })
-  )
-
   const operationalResourceMonitor = measureStage(
     'operational_resource_monitor',
     () =>
@@ -349,7 +333,6 @@ export function resolveGeorgeRuntimePipeline(
         conversationStrategy,
         operationalJudgment,
         trajectory: trajectoryAssessment,
-        liveRecommendationPresentation,
       })
   )
 
@@ -380,9 +363,6 @@ export function resolveGeorgeRuntimePipeline(
         conversationStrategy.assumptions
       ),
       contextFramingNote: buildContextFramingPresentationNote(contextFraming),
-      liveRecommendationPresentationNote: buildLiveRecommendationPresentationNote(
-        liveRecommendationPresentation
-      ),
       executionPolicyNote: buildExecutionPolicyNote(executionPolicy),
       providerExecutionAuthority: buildProviderExecutionAuthority({
         runtime: input.currentRuntime,
@@ -445,8 +425,6 @@ export function resolveGeorgeRuntimePipeline(
               notes.conversationMoveDefinitionNote,
             executionPolicyNote: notes.executionPolicyNote,
             contextFramingNote: notes.contextFramingNote,
-            liveRecommendationPresentationNote:
-              notes.liveRecommendationPresentationNote,
           })
   )
 
@@ -475,7 +453,6 @@ export function resolveGeorgeRuntimePipeline(
     conversationStrategy,
     conversationMoveDefinition,
     contextFraming,
-    liveRecommendationPresentation,
     operationalResourceMonitor,
     executionPolicy,
     runtimeContextBlock,

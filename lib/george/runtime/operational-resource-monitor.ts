@@ -5,11 +5,8 @@ import type {
 } from '@/lib/george/runtime/conversation-strategy'
 import type { OperationalJudgment } from '@/lib/george/runtime/operational-judgment'
 import type { TrajectoryAssessment } from '@/lib/george/runtime/trajectory-engine'
-import type { LiveRecommendationPresentation } from '@/lib/george/chat/presentation-authority'
 
 export type OperationalResourceType =
-  | 'live_readiness'
-  | 'preparation_gap'
   | 'missing_signal'
   | 'strategy_reminder'
   | 'opportunity'
@@ -26,7 +23,6 @@ export type OperationalResource = {
 }
 
 export type OpportunityReadinessKind =
-  | 'live_support'
   | 'pitch_deck'
   | 'brief'
 
@@ -51,7 +47,6 @@ type OpportunityReadinessInput = {
   conversationStrategy: GeorgeConversationStrategy
   operationalJudgment: OperationalJudgment
   trajectory: TrajectoryAssessment
-  liveRecommendationPresentation: LiveRecommendationPresentation
 }
 
 type OpportunityDefinition = {
@@ -68,25 +63,6 @@ type OpportunityDefinition = {
 }
 
 export const OPPORTUNITY_READINESS_REGISTRY: readonly OpportunityDefinition[] = [
-    {
-      kind: 'live_support',
-      title: 'LIVE',
-      applies: (input) =>
-        input.liveRecommendationPresentation.show ||
-        input.trajectory.potentialFutureNeeds.includes('live'),
-      confidence: (input) =>
-        input.liveRecommendationPresentation.show
-          ? input.operationalJudgment.liveSupport.strength === 'strong'
-            ? 0.92
-            : 0.78
-          : input.trajectory.confidence,
-      suggestion: 'You may be ready for LIVE support.',
-      sessionActivation: 'Let’s prepare LIVE support for this session.',
-      signalNeed: 'desired_outcome',
-      executionLabel: 'Tap to go LIVE',
-      tapAction: 'continue_preparation',
-      threshold: 0.68,
-    },
     {
       kind: 'pitch_deck',
       title: 'Pitch Deck',
@@ -167,38 +143,14 @@ export function resolveOperationalResourceMonitor(
     })
   }
 
-  if (input.liveRecommendationPresentation.show) {
-    resources.push({
-      type: 'live_readiness',
-      title: input.liveRecommendationPresentation.title,
-      value: input.liveRecommendationPresentation.message,
-      reason: 'Execution is imminent and LIVE is operationally viable.',
-      confidence: input.operationalJudgment.liveSupport.strength === 'strong' ? 0.92 : 0.78,
-      actionableNow: true,
-      expiresWithContext: true,
-    })
-  }
-
   if (input.operationalJudgment.action === 'acquire_smallest_signal' && input.operationalJudgment.smallestSignal) {
     resources.push({
       type: 'missing_signal',
-      title: 'One signal would improve LIVE readiness',
+      title: 'One signal would improve the next move',
       value: input.operationalJudgment.smallestSignal,
       reason: 'This is the smallest missing signal that materially improves the next move.',
       confidence: input.operationalJudgment.confidence,
       actionableNow: true,
-      expiresWithContext: true,
-    })
-  }
-
-  if (input.outcomeState.phase === 'preparation' && input.trajectory.potentialFutureNeeds.includes('live')) {
-    resources.push({
-      type: 'preparation_gap',
-      title: 'Preparing for LIVE',
-      value: input.outcomeState.immediateOutcome,
-      reason: 'The current conversation is building signal that can transfer directly into LIVE.',
-      confidence: input.outcomeState.confidence,
-      actionableNow: false,
       expiresWithContext: true,
     })
   }

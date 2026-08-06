@@ -30,7 +30,7 @@ import { resolveContextFraming } from '${process.cwd()}/lib/george/runtime/conte
 import { OPPORTUNITY_READINESS_REGISTRY, resolveOperationalResourceMonitor } from '${process.cwd()}/lib/george/runtime/operational-resource-monitor'
 import { buildOpportunitySignalAcquisitionMessage } from '${process.cwd()}/lib/george/runtime/conversation-strategy'
 import { buildExecutionPolicyNote, resolveGeorgeExecutionPolicy, resolveNormalExecutionPosture } from '${process.cwd()}/lib/george/runtime/execution-policy'
-import { buildContextFramingPresentationNote, buildLiveRecommendationPresentationNote, enforceLiveRecommendationPresentation, resolveLiveRecommendationPresentation } from '${process.cwd()}/lib/george/chat/presentation-authority'
+import { buildContextFramingPresentationNote } from '${process.cwd()}/lib/george/chat/presentation-authority'
 import { renderOperationalExcellenceOutput } from '${process.cwd()}/lib/george/chat/operational-excellence'
 import { buildGeorgeProviderRequest, GEORGE_RUNTIME_PIPELINE, isStandaloneAmbiguousKnowledgeQuestion, resolveGeorgeRuntimePipeline, resolveGeorgeRuntimeProvider } from '${process.cwd()}/lib/george/runtime/runtime-pipeline'
 import { buildNormalKnowledgeCoreBlock } from '${process.cwd()}/lib/george/chat/system-blocks'
@@ -698,52 +698,11 @@ assert(
   'Normal context framing should guide reasoning without forcing user-facing scaffolding'
 )
 
-const liveRecommendationPresentation = resolveLiveRecommendationPresentation({
-  liveSupport: operationalJudgment.liveSupport,
-  latestUserText: 'The meeting starts in five minutes. I have my audio glasses with me.',
-  voiceMode: false,
-})
-
-assert(liveRecommendationPresentation.show, 'imminent execution should surface the LIVE presentation notice')
 assert(
-  liveRecommendationPresentation.receiverLabel === 'audio glasses',
-  'LIVE presentation should use the known receiver profile'
-)
-assert(
-  liveRecommendationPresentation.contextLabel === 'Your meeting',
-  'LIVE presentation should preserve the current execution context'
-)
-
-const liveRecommendationPresentationNote = buildLiveRecommendationPresentationNote(
-  liveRecommendationPresentation
-)
-
-assert(
-  liveRecommendationPresentationNote.includes('After Context Framing and before preparation guidance'),
-  'presentation authority should place the LIVE notice after context framing'
-)
-
-const presentedLiveRecommendation = enforceLiveRecommendationPresentation({
-  reply:
-    'Current Situation\\n' +
-    'Objective: Engage the investor with confidence and clarity.\\n' +
-    'Pressure: Real-time pressure now as the meeting is imminent.\\n' +
-    'Priority: Deliver a compelling opener to capture interest quickly.\\n' +
-    'Unknown: How familiar the investor is with your business details.\\n\\n' +
-    'Preparation\\n' +
-    'Open with the strongest proof.',
-  presentation: liveRecommendationPresentation,
-  contextFraming: preparationFraming,
-})
-
-assert(
-  presentedLiveRecommendation.indexOf('Current Situation') < presentedLiveRecommendation.indexOf('LIVE Available') &&
-    presentedLiveRecommendation.indexOf('LIVE Available') < presentedLiveRecommendation.indexOf('Preparation'),
-  'LIVE notice should render between context framing and preparation'
-)
-assert(
-  presentedLiveRecommendation.includes('audio glasses') && presentedLiveRecommendation.includes('Your meeting is imminent'),
-  'LIVE notice should preserve receiver and room context'
+  !/LIVE Available|LIVE is available|Real-time execution is imminent/i.test(
+    buildContextFramingPresentationNote(preparationFraming)
+  ),
+  'normal reasoning should not manufacture a predictive LIVE presentation notice'
 )
 
 const governedRuntimeContext = buildGovernedRuntimeContext({
@@ -755,7 +714,6 @@ const governedRuntimeContext = buildGovernedRuntimeContext({
   conversationMoveDefinitionNote: 'CONVERSATION MOVE',
   executionPolicyNote: 'EXECUTION POLICY',
   contextFramingNote: 'CONTEXT FRAMING',
-  liveRecommendationPresentationNote: 'LIVE RECOMMENDATION PRESENTATION',
   responseShapeNote: 'RESPONSE SHAPE',
   outputGovernanceNote: 'OUTPUT GOVERNANCE',
 })
@@ -768,8 +726,7 @@ assert(
     governedRuntimeContext.indexOf('CONVERSATION STRATEGY') < governedRuntimeContext.indexOf('CONVERSATION MOVE') &&
     governedRuntimeContext.indexOf('CONVERSATION MOVE') < governedRuntimeContext.indexOf('EXECUTION POLICY') &&
     governedRuntimeContext.indexOf('EXECUTION POLICY') < governedRuntimeContext.indexOf('CONTEXT FRAMING') &&
-    governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') &&
-    governedRuntimeContext.indexOf('LIVE RECOMMENDATION PRESENTATION') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
+    governedRuntimeContext.indexOf('CONTEXT FRAMING') < governedRuntimeContext.indexOf('RESPONSE SHAPE') &&
     governedRuntimeContext.indexOf('RESPONSE SHAPE') < governedRuntimeContext.indexOf('OUTPUT GOVERNANCE'),
   'governed runtime context should preserve canonical composition order'
 )
@@ -781,7 +738,6 @@ for (const canonicalNote of [
   'CONVERSATION MOVE',
   'EXECUTION POLICY',
   'CONTEXT FRAMING',
-  'LIVE RECOMMENDATION PRESENTATION',
 ]) {
   assert(
     governedRuntimeContext.split(canonicalNote).length - 1 === 1,
@@ -987,15 +943,14 @@ const operationalResourceMonitor = resolveOperationalResourceMonitor({
   trajectory: {
     currentMove: outcomeState.immediateOutcome,
     likelyNextMoves: ['execute'],
-    potentialFutureNeeds: ['live'],
+    potentialFutureNeeds: ['prepare'],
     confidence: 0.68,
   },
-  liveRecommendationPresentation,
 })
 assert(operationalResourceMonitor.resources.length > 0, 'operational resource monitor should surface at least one high-value resource')
 assert(operationalResourceMonitor.resources.length <= 3, 'operational resource monitor should remain bounded')
 assert(
-  OPPORTUNITY_READINESS_REGISTRY.length === 3 &&
+  OPPORTUNITY_READINESS_REGISTRY.length === 2 &&
     new Set(OPPORTUNITY_READINESS_REGISTRY.map((item) => item.kind)).size ===
       OPPORTUNITY_READINESS_REGISTRY.length &&
     OPPORTUNITY_READINESS_REGISTRY.every(
@@ -1006,10 +961,8 @@ assert(
   'opportunity readiness should be registered once per capability with a declarative consumer action'
 )
 assert(
-  operationalResourceMonitor.opportunity?.kind === 'live_support' &&
-    operationalResourceMonitor.opportunity.readiness >= 68 &&
-    operationalResourceMonitor.opportunity.thresholdMet,
-  'operational resource monitor should expose the highest-confidence readiness opportunity'
+  operationalResourceMonitor.opportunity === null,
+  'operational resource monitor should not predict LIVE before explicit user action'
 )
 
 const pitchDeckOpportunityMonitor = resolveOperationalResourceMonitor({
@@ -1021,10 +974,6 @@ const pitchDeckOpportunityMonitor = resolveOperationalResourceMonitor({
     likelyNextMoves: ['prepare'],
     potentialFutureNeeds: ['deck', 'brief'],
     confidence: 0.82,
-  },
-  liveRecommendationPresentation: {
-    ...liveRecommendationPresentation,
-    show: false,
   },
 })
 

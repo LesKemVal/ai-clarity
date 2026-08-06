@@ -19,7 +19,6 @@ export type GovernedRuntimeContextInput = {
   conversationMoveDefinitionNote?: string | null
   executionPolicyNote?: string | null
   contextFramingNote?: string | null
-  liveRecommendationPresentationNote?: string | null
   responseShapeNote?: string | null
   continuityGovernanceNote?: string | null
   outputGovernanceNote?: string | null
@@ -156,7 +155,6 @@ export function buildGovernedRuntimeContext(input: GovernedRuntimeContextInput) 
     input.conversationMoveDefinitionNote,
     input.executionPolicyNote,
     input.contextFramingNote,
-    input.liveRecommendationPresentationNote,
     input.responseShapeNote,
     input.continuityGovernanceNote,
     input.outputGovernanceNote,
