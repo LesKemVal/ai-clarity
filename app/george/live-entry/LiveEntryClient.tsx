@@ -22,11 +22,13 @@ import {
 } from "@/lib/george/live-entry/preparation-resume";
 
 import {
+  clearPreparationSession,
   clearLivePreparationPreviewReady,
   clearLivePreparationSignals,
   isLivePreparationPreviewReady,
   loadLivePreparationSignals,
   markLivePreparationPreviewReady,
+  savePreparationSession,
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 
@@ -61,7 +63,13 @@ import {
   type LiveRecoveryOptionId,
 } from "@/lib/george/live-voice/runtime/recovery-options";
 import { buildOutcomeTestedBriefingSupport } from "@/lib/george/live-runtime/live-entry-briefing";
-import { resolveLivePreparationState } from "@/lib/george/live-runtime/live-preparation-controller";
+import {
+  buildPreparationInteractions,
+  createPreparationSession,
+  resolveLivePreparationState,
+  resolvePreparationSession,
+  type PreparationCheckpoint,
+} from "@/lib/george/live-runtime/live-preparation-controller";
 import { prepareConversationFromPackage } from "@/lib/george/preparation/runtime.mjs";
 import {
   estimateResources,
@@ -632,6 +640,10 @@ export default function LiveEntryClient() {
   const liveEntryAudioRef = useRef<HTMLAudioElement | null>(null);
   const liveEntryAudioUrlRef = useRef<string | null>(null);
   const liveEntrySpeechRequestRef = useRef(0);
+  const traditionalPreparationIdentityRef = useRef<{
+    preparationSessionId: string;
+    createdAt: number;
+  } | null>(null);
   const liveBriefingRoomSignalEditedRef = useRef(false);
   const generatedBriefingRoomSignalRef = useRef("");
   const [liveBriefingEditAcknowledged, setLiveBriefingEditAcknowledged] =
@@ -1551,6 +1563,243 @@ export default function LiveEntryClient() {
     Support prioritizes truth.
   */
 
+  const traditionalPreparationSession = useMemo(() => {
+    if (!isFreshTraditionalPreparation) return null;
+
+    if (!traditionalPreparationIdentityRef.current) {
+      const seed = createPreparationSession({
+        provenance: { entrySource: "traditional" },
+      });
+
+      traditionalPreparationIdentityRef.current = {
+        preparationSessionId: seed.preparationSessionId,
+        createdAt: seed.createdAt,
+      };
+    }
+
+    const identity = traditionalPreparationIdentityRef.current;
+    const resolvedRoom =
+      conversationType === "Other" && customConversationType.trim()
+        ? customConversationType.trim()
+        : conversationType;
+    const resolvedRole =
+      preLiveSignals.role ||
+      chairs.join(", ") ||
+      customChair ||
+      userPosition;
+    const resolvedContext =
+      preLiveSignals.conversationContext || knownContext;
+    const resolvedObjective =
+      preLiveSignals.desiredOutcome || objective;
+    const secondaryOutcome =
+      cleanBriefingValue(optionalSignalAnswers.fallbackOutcome) ||
+      cleanBriefingValue(optionalSignalAnswers.secondaryOutcome) ||
+      cleanBriefingValue(preLiveSignals.fallbackOutcome) ||
+      cleanBriefingValue(preLiveSignals.secondaryOutcome);
+    const roomObjective =
+      liveRoomObjectiveOption === "other"
+        ? customLiveRoomObjective
+        : liveRoomObjectiveOption;
+    const toCheckpoint = (
+      state: LivePreparationWorkflowState,
+    ): PreparationCheckpoint => {
+      if (state === "questions") {
+        return { surface: "briefing", phase: "questions" };
+      }
+
+      if (state === "brief_review") {
+        return { surface: "briefing", phase: "review" };
+      }
+
+      if (state === "popup1") {
+        return { surface: "ready_room", phase: "brief" };
+      }
+
+      if (state === "mechanics") {
+        return { surface: "ready_room", phase: "mechanics" };
+      }
+
+      return { surface: "ready_room", phase: "readiness" };
+    };
+    const currentCheckpoint: PreparationCheckpoint = showLiveBriefingRoom
+      ? liveBriefingStep === 1
+        ? { surface: "ready_room", phase: "brief" }
+        : liveBriefingStep === 2
+          ? { surface: "ready_room", phase: "mechanics" }
+          : {
+              surface: "ready_room",
+              phase: "readiness",
+              section:
+                livePrepOpenSection === "formula"
+                  ? "formula"
+                  : livePrepOpenSection === "ready"
+                    ? "ready"
+                    : "support",
+            }
+      : {
+          surface: "briefing",
+          phase: liveEntryReadyMessageVisible ? "decision" : "questions",
+        };
+    const returnCheckpoint: PreparationCheckpoint | undefined =
+      returnToReadyRoomAfterBriefingRef.current ||
+      returnToReadyRoomAfterMechanicsRef.current
+        ? { surface: "ready_room", phase: "readiness" }
+        : undefined;
+    const steeringPhrases = useRoomPhrases
+      ? (customRoomPhrases.trim() || controlWords)
+          .split(",")
+          .map((phrase) => phrase.trim())
+          .filter(Boolean)
+      : [];
+
+    return createPreparationSession({
+      preparationSessionId: identity.preparationSessionId,
+      provenance: { entrySource: "traditional" },
+      createdAt: identity.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective: resolvedObjective,
+        name: preLiveSignals.name,
+        role: resolvedRole,
+        participants: audienceType ? [audienceType] : [],
+        audience: preLiveSignals.counterparty || audienceType,
+        perspectives: chairs,
+        conversation: {
+          title: resolvedRoom,
+        },
+        knownContext: resolvedContext,
+        acceptableOutcome: preLiveSignals.acceptableOutcome,
+        secondaryOutcome,
+        roomObjective,
+        additionalSignals: preLiveSignals,
+        documents: prepDocument
+          ? [
+              {
+                id: prepDocument.name,
+                name: prepDocument.name,
+                kind: prepDocument.kind,
+                summary: prepDocument.summary,
+              },
+            ]
+          : [],
+      },
+      briefing: {
+        priorInteractions: buildPreparationInteractions({
+          answers: optionalSignalAnswers,
+          questionHistory: optionalSignalQuestionHistory,
+          skippedKeys: skippedOptionalSignalKeys,
+        }),
+        currentQuestion: currentOptionalSignalQuestion,
+      },
+      assets: {
+        ...(selectedFormula && selectedFormulaSource
+          ? {
+              formula: {
+                id: selectedFormula.id,
+                version: selectedFormula.version,
+                source: selectedFormulaSource,
+              },
+            }
+          : {}),
+        ...(selectedScript
+          ? {
+              script: {
+                id: selectedScript.id,
+                version: selectedScript.version,
+              },
+            }
+          : {}),
+        ...(customizedScript ? { customizedScript } : {}),
+      },
+      support: {
+        overrides: {
+          behavior:
+            liveBriefingActiveSupportStyle === "response" ||
+            selectedSupportStyle === "response"
+              ? "response"
+              : "cue",
+          receiver: selectedReceiverProfile,
+          speakingStyle: communicationStyle,
+        },
+        confirmations: {
+          briefingReviewed: liveBriefingToaAccepted,
+          supportAssessmentAgreed: liveBriefingSupportAccepted,
+          receiverConfirmed: receiverProfileConfirmed,
+          speakingStyleConfirmed: liveBriefingCommunicationConfirmed,
+          mechanicsConfirmed: liveBriefingCapabilitiesConfirmed,
+          recoveryAcknowledged: liveRecoveryAcknowledged,
+          readyRoomConfirmed: liveReadyAccepted || liveReadinessComplete,
+        },
+        runtimePreferences: {
+          pacing,
+          recoveryOptionIds: liveRecoveryOptions,
+          steeringEnabled: useRoomPhrases,
+          steeringPhrases,
+          selectedResources: editableResources,
+        },
+      },
+      workflow: {
+        current: currentCheckpoint,
+        history: livePreparationHistoryRef.current.map(toCheckpoint),
+        ...(returnCheckpoint ? { returnTo: returnCheckpoint } : {}),
+      },
+      relations: {
+        ...(relatedSessionId !== "not_related"
+          ? { normalSessionId: relatedSessionId }
+          : {}),
+      },
+    });
+  }, [
+    audienceType,
+    chairs,
+    communicationStyle,
+    conversationType,
+    controlWords,
+    currentOptionalSignalQuestion,
+    customChair,
+    customConversationType,
+    customizedScript,
+    customLiveRoomObjective,
+    customRoomPhrases,
+    editableResources,
+    isFreshTraditionalPreparation,
+    knownContext,
+    liveBriefingActiveSupportStyle,
+    liveBriefingCapabilitiesConfirmed,
+    liveBriefingCommunicationConfirmed,
+    liveBriefingStep,
+    liveBriefingSupportAccepted,
+    liveBriefingToaAccepted,
+    liveEntryReadyMessageVisible,
+    livePrepOpenSection,
+    liveReadinessComplete,
+    liveReadyAccepted,
+    liveRecoveryAcknowledged,
+    liveRecoveryOptions,
+    liveRoomObjectiveOption,
+    objective,
+    optionalSignalAnswers,
+    optionalSignalQuestionHistory,
+    pacing,
+    preLiveSignals,
+    prepDocument,
+    receiverProfileConfirmed,
+    relatedSessionId,
+    selectedFormula,
+    selectedFormulaSource,
+    selectedReceiverProfile,
+    selectedScript,
+    selectedSupportStyle,
+    skippedOptionalSignalKeys,
+    useRoomPhrases,
+    userPosition,
+  ]);
+
+  useEffect(() => {
+    if (!traditionalPreparationSession) return;
+    savePreparationSession(traditionalPreparationSession);
+  }, [traditionalPreparationSession]);
+
   const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim();
     const hasObjective = cleanObjective.length > 0;
@@ -1597,8 +1846,13 @@ export default function LiveEntryClient() {
     completedMandatoryLiveSignalCount >= 2 &&
     missingMandatoryLiveSignals.length === 0;
   const canonicalPreparationReadiness = useMemo(
-    () =>
-      resolveLivePreparationState({
+    () => {
+      if (traditionalPreparationSession) {
+        return resolvePreparationSession(traditionalPreparationSession)
+          .readiness;
+      }
+
+      return resolveLivePreparationState({
         ...preLiveSignals,
         role:
           preLiveSignals.role ||
@@ -1608,13 +1862,15 @@ export default function LiveEntryClient() {
         conversationContext:
           preLiveSignals.conversationContext || knownContext,
         desiredOutcome: preLiveSignals.desiredOutcome || objective,
-      }).readiness,
+      }).readiness;
+    },
     [
       chairs,
       customChair,
       knownContext,
       objective,
       preLiveSignals,
+      traditionalPreparationSession,
       userPosition,
     ],
   );
@@ -1762,6 +2018,8 @@ export default function LiveEntryClient() {
       setPriorPreparationExplicitlyRestored(false);
 
       if (isStartSource) {
+        traditionalPreparationIdentityRef.current = null;
+        clearPreparationSession();
         clearLivePreparationPreviewReady();
         clearLivePreparationSignals();
         window.localStorage.removeItem("GEORGE_PRE_LIVE_OPTIONAL_SIGNALS");

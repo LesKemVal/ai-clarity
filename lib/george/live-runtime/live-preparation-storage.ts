@@ -1,3 +1,8 @@
+import {
+  normalizePreparationSession,
+  type PreparationSessionV1,
+} from './live-preparation-controller'
+
 export type LivePreparationSignals = Record<string, string>
 
 export type LivePreparationStorage = {
@@ -7,9 +12,43 @@ export type LivePreparationStorage = {
 }
 
 export const LIVE_PREPARATION_STORAGE_KEYS = Object.freeze({
+  session: 'GEORGE_PREPARATION_SESSION_V1',
   signals: 'GEORGE_PRE_LIVE_SIGNALS',
   previewReady: 'GEORGE_PRE_LIVE_PREVIEW_READY',
 })
+
+export function loadPreparationSession(
+  storage: LivePreparationStorage,
+): PreparationSessionV1 | null {
+  try {
+    const raw = storage.getItem(LIVE_PREPARATION_STORAGE_KEYS.session)
+    if (!raw) return null
+
+    return normalizePreparationSession(JSON.parse(raw))
+  } catch {
+    return null
+  }
+}
+
+export function savePreparationSession(
+  storage: LivePreparationStorage,
+  session: PreparationSessionV1,
+): void {
+  try {
+    storage.setItem(
+      LIVE_PREPARATION_STORAGE_KEYS.session,
+      JSON.stringify(session),
+    )
+  } catch {}
+}
+
+export function clearPreparationSession(
+  storage: LivePreparationStorage,
+): void {
+  try {
+    storage.removeItem(LIVE_PREPARATION_STORAGE_KEYS.session)
+  } catch {}
+}
 
 export function loadLivePreparationSignals(
   storage: LivePreparationStorage
