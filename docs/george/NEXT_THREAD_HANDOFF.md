@@ -1,8 +1,12 @@
-# GEORGE PRODUCTION CONTINUATION — NO DRIFT
+# GEORGE Production Handoff — No Drift
 
-Branch: `homepage-fresh-briefing-owner`
+## Authority
 
-## FIRST
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+
+`IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
+
+`GEORGE_AUTHORITY_READ_ORDER: PRODUCTION_TRACKER.md -> RUNTIME_ARCHITECTURE.md -> OPERATIONAL_PROFILE.md -> NEXT_THREAD_HANDOFF.md`
 
 Read completely, in order:
 
@@ -11,283 +15,139 @@ Read completely, in order:
 3. `docs/george/OPERATIONAL_PROFILE.md`
 4. `docs/george/NEXT_THREAD_HANDOFF.md`
 
-Inspect implementation before changing anything.
+Inspect the local implementation before changing anything. This handoff records validated operating context; it does not override implementation or the synchronized authorities.
 
-Continuation packets provide operational guidance only. The synchronized implementation and production authorities are authoritative.
+## Current Repository State
 
-## CURRENT PHASE
+- Current branch: `conversation-summary-runtime`
+- Current HEAD: `d2b412f06de4058c6f55fe3c553c008417f9a27f` (`d2b412f0 Qualify staged live visual presentation`)
+- Ahead of `origin/conversation-summary-runtime`: 11 commits at synchronization start
+- Production build status: PASS after the required validation for this documentation synchronization
+- Worktree status: clean at synchronization start; dirty at handoff only for the six approved documentation/qualification files, with no production implementation changes
+- Commit status: stopped before commit
 
-GEORGE is in **Production Completion & Operational Formula Experience**.
+No recovery tag is declared for this handoff.
 
-Do not redesign GEORGE.
+## Current Validated Phase
 
-Do not redesign LIVE.
+GEORGE is in **Production Completion — user-directed briefing, route-aware preparation, and receiver-specific LIVE presentation**.
 
-Do not introduce another runtime, reasoning authority, formula owner, learning owner, conversation-type registry, or delivery owner.
+The current implementation preserves one operational intelligence, one runtime, and one reasoning authority. Normal and LIVE remain operating modes, not separate intelligences.
 
-`app/george/page.tsx` remains a mount surface.
+## Recently Completed Milestones
 
-## CURRENT IMPLEMENTATION
+### Adaptive briefing continuity
 
-Production assets already include:
+- Homepage and LIVE Entry construct canonical `priorInteractions` containing key, original question, answer when present, and answered/skipped status.
+- The signal-question governor prefers submitted canonical history and preserves legacy `priorAnswers` and `skippedQuestions` without duplicating equivalent interactions.
+- Homepage presents the initial Continue Briefing explanation once, then keeps **START LIVE** and **NEXT QUESTION** under user control.
+- LIVE Entry requests one additional interaction only after explicit **Continue Briefing** action.
+- Answer, skip, and “I don't know” return control to the appropriate decision/readiness surface; no recursive automatic question loop remains.
+- Homepage handoff and LIVE Entry hydration preserve optional answers, question history, skipped keys, and canonical interaction history.
 
-- one operational intelligence and shared reasoning authority;
-- LIVE runtime;
-- receiver policy and delivery routing;
-- behavior composition and operational assessment;
-- portability and production qualification;
-- operational formula persistence and retrieval;
-- confidence, success, contradiction, and unknown tracking;
-- evidence;
-- scripts and script execution;
-- reassessment;
-- revision-proposal contracts and canonical ownership foundation;
-- evolution and lineage;
-- operational learning.
+Canonical owners:
 
-## CURRENT PRODUCT-COMPLETION GAPS
+- `components/home/HomeConversationTypeSurface.tsx`
+- `app/api/george/live/signal-question/route.ts`
+- `app/george/live-entry/LiveEntryClient.tsx`
 
-- structured formula identity;
-- author metadata;
-- publisher metadata;
-- verification-authority metadata;
-- Proven By experience;
-- formula editing;
-- alternatives;
-- script management;
-- marketplace readiness;
-- conversation-type consolidation;
-- expanded Operational Library experience.
+### Route-aware preparation and progressive Ready Room
 
-## CANONICAL OWNERS
+- Traditional/direct routes retain Popup 2 as the mechanics configuration owner.
+- Traditional Popup 3 summarizes confirmed mechanics and routes Change back to Popup 2.
+- Homepage Popup 3 reviews a current-session support recommendation instead of silently restoring stale prior LIVE setup.
+- The Homepage assessment uses two-stage review/agreement and collapses after confirmation.
+- Ready Room progressively reveals Formula and final room actions while preserving Formula, Script, Library return, Continue Briefing, and Enter LIVE state.
 
-- Operational formulas and learning: `lib/george/operational-memory/*`
-- Formula intelligence: `lib/george/formula-intelligence/*`
-- Conversation Types: `lib/george/live-entry/conversation-types.ts`
-- Operational Library presentation: `app/george/library/*`
-- Runtime architecture: `lib/george/live-runtime/*`, `lib/george/live-delivery/*`, `lib/george/live-hub/*`
+Canonical owner:
 
-The Operational Library is a consumer. It must not become another registry or runtime authority.
+- `app/george/live-entry/LiveEntryClient.tsx`
 
-GEORGE owns operational formulas and their lifecycle. BRANESX verifies descriptive metadata claims attached to those formulas, not the operational reasoning itself.
+### ContextFraming for typed/composer LIVE
 
-GEORGE evaluates operational execution and may propose revisions. GEORGE does not self-publish verified formulas.
+- `app/george/page.tsx` sends canonical `mode: "conversation"` for typed/composer LIVE requests.
+- Visual LIVE responses preserve provider-owned framing-before-guidance ordering.
+- Audible LIVE responses retain the compact voice path.
+- Normal GEORGE behavior is unchanged.
 
-## NEXT INSPECTION
+Canonical owners and consumers:
 
-Inspect:
+- `lib/george/runtime/context-framing.ts` — `ContextFraming` selection
+- `lib/george/chat/presentation-authority.ts` — framing-before-guidance ordering
+- `app/george/page.tsx` — browser-host request and rendering integration
 
-- `lib/george/operational-memory/types.ts`
-- `lib/george/live-entry/conversation-types.ts`
-- `app/george/library/OperationalLibraryClient.tsx`
+### Evidence-first automatic Hub visual presentation
 
-Then:
+- Existing `GeorgeOperationalAssessment.action`, `.evidence`, and `.outcomeImpact` feed a pure visual presentation plan.
+- Meaningful evidence can render first, followed by the recommended action; absent evidence preserves a single stage.
+- Audio remains compact and unchanged while visual delivery may stage evidence first.
+- `LiveHubVisualCueBridge` executes plans, cancels replaced sequences, rejects stale callbacks, refreshes timing per stage, and cleans up on deactivation/unmount.
+- Approved-delivery replay without an operational assessment remains single-stage.
+- Build-gated qualification protects planning, suppression, modality, timing, cancellation, cleanup, and executor-only ownership.
 
-1. compare implementation with the synchronized authorities;
-2. identify duplicate ownership;
-3. patch canonical owners only;
-4. run the production build;
-5. run focused qualification;
-6. synchronize all four authorities after validated implementation changes.
+Canonical owners:
 
-Small commits only.
+- `lib/george/live-runtime/operational-assessment.ts` — action/evidence/outcome-impact reasoning output
+- `lib/george/live-delivery/receiver-policy.ts` — receiver composition and modality
+- `lib/george/live-delivery/delivery-router.ts` — delivery cue construction
+- `lib/george/live-delivery/visual-presentation-policy.ts` — staged presentation planning
+- `components/george/live/LiveHubVisualCueBridge.tsx` — plan execution only
+- `scripts/george-live-delivery-policy-smoke.mjs` — staged-delivery qualification
 
-Never commit a failed build.
+No new runtime, reasoning authority, delivery owner, or artifact intelligence was introduced.
 
-No drift.
+## Current Next Work
 
-<!-- GEORGE_HOMEPAGE_BRIEFING_CHECKPOINT_START -->
-## CURRENT VALIDATED CHECKPOINT
+Recommended next inspection milestone:
 
-Branch: `homepage-fresh-briefing-owner`
+Inspect the Homepage current-session support recommendation resolver in `app/george/live-entry/LiveEntryClient.tsx` against structured briefing evidence. Trace conversation type, desired outcome, role, context, optional answers, `priorInteractions`, communication medium, and participant/decision-maker evidence before proposing any patch.
 
-Commit: `f4ef6b0`
+Current unresolved production priorities, in order:
 
-Recovery tag: `homepage-briefing-stable-20260803-022911`
+1. Improve current-session support recommendation quality from structured briefing evidence.
+2. Ensure desired outcome remains a hard readiness requirement wherever required by the production flow.
+3. Finish Formula/Marketplace recommendation and empty-state experience.
+4. Manually verify Homepage → Library → Ready Room continuity, including Formula and Script preservation.
+5. Continue progressive-disclosure polish, including traditional Popup 1.
+6. Inspect no-intervention reason propagation and deliberate visual-only support through existing canonical owners.
+7. Preserve staged visual behavior with its build-gated qualification.
+8. Synchronize documentation continuously.
 
-Production build: PASS.
+Do not mark these priorities complete without implementation evidence and validation.
 
-Validated homepage flow:
+## No-Drift Discipline
 
-```text
-Conversation selection
-↓
-fresh mandatory briefing
-↓
-core briefing complete
-↓
-Continue Briefing or Start Live
-↓
-optional OpenAI follow-up on homepage, when chosen
-↓
-homepage brief review
-↓
-Popup 3
-↓
-LIVE
+- Inspect implementation before editing.
+- Identify the canonical owner and duplicate ownership before patching.
+- Patch only the canonical owner unless a multi-owner milestone is explicitly approved.
+- Do not create another GEORGE, LIVE runtime, reasoning authority, briefing governor, delivery owner, presentation authority, or artifact intelligence.
+- Keep Popup 2 as the traditional mechanics owner and Popup 3 as the route-aware Ready Room convergence surface.
+- Keep `LiveHubVisualCueBridge` an executor; evidence ordering belongs to visual presentation policy and evidence meaning belongs upstream.
+- Do not claim structured artifact/document delivery or user-visible hold reasons unless implementation proves them.
+- Do not commit, push, or open a pull request without explicit user instruction.
+- Never leave or hand off a failing production build.
+
+## Documentation Synchronization Rule
+
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+
+Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
+
+## Build and Qualification Commands
+
+Required production validation:
+
+```bash
+git diff --check
+node scripts/george-documentation-qualification.mjs
+npm run build
 ```
 
-Validated behavior:
+Relevant focused qualifications:
 
-- stale answers do not skip a newly selected conversation's mandatory briefing;
-- optional OpenAI follow-up stays on the homepage;
-- Start Live routes through homepage brief review before Popup 3;
-- homepage-origin preparation does not enter Quick LIVE, Traditional briefing, Popup 1, or Mechanics;
-- Popup 3 Back restores the exact homepage review state;
-- full production build and ownership audit pass.
+```bash
+npm run george:live-delivery-policy:smoke
+npm run george:documentation:qualify
+```
 
-Current next work:
-
-- inspect and repair the next Popup 3 issue shown in product validation;
-- complete Formula Library return behavior and empty-state formula experience;
-- continue Traditional Popup 1 progressive-disclosure polish;
-- preserve the validated homepage briefing architecture.
-
-Do not redesign the briefing system.
-
-Do not move homepage briefing ownership into LIVE Entry.
-
-Do not create another optional-question runtime.
-<!-- GEORGE_HOMEPAGE_BRIEFING_CHECKPOINT_END -->
-
-
--------------------------------------------------------------------------------
-CURRENT PRODUCT DIRECTION
--------------------------------------------------------------------------------
-
-Immediate priorities
-
-1. Popup 3 navigation recovery
-2. Marketplace presentation
-3. My Library experience
-4. Homepage evolution
-
-Homepage
-
-Outcome remains primary.
-
-Role provides operational context.
-
-OpenAI owns adaptive briefing after initial selections.
-
-Preparation remains optional.
-
-Recommended copy:
-
-"Prepare with GEORGE first if you'd like. When you're ready, enter LIVE."
-
-Marketplace
-
-Formula is the primary operational asset.
-
-Marketplace acquires operational capabilities.
-
-My Library activates operational capabilities.
-
-Ready Room activates assets from My Library.
-
-Formula card standard
-
-Published by BRANESX
-
-Conversation Environment
-
-Conversation Formula
-
-Associated Scripts
-
-Associated Screeners
-
-Future direction
-
-• Formula recommendation from briefing
-• Role-aware adaptive briefing
-• Marketplace recommendation engine
-• Popup 3 refinement
-• Marketplace ↔ Ready Room continuity
-• Formula-first operational marketplace
-
-<!-- GEORGE_INTELLIGENT_BRIEFING_HANDOFF_START -->
-## Current Briefing and Learning Direction
-
-Preserve internal **outcome** terminology.
-
-Use **goal** and **objective** in user-facing copy.
-
-Current product direction:
-
-- OpenAI has greater latitude in conversational expression.
-- GEORGE retains governance over operational intent, relevance, memory, formula choice, stopping conditions, and user agency.
-- Briefing may use context-setting bridges before questions or answers.
-- Questions should encourage useful nuance without turning briefing into a long questionnaire.
-- Every answer should be parsed for all available operational signals.
-- The user should not be asked to repeat information already provided.
-- GEORGE must not ask more questions than necessary before granting access to LIVE.
-- Formula design, recommendation, and selection should be informed by briefing signals and operational assessment.
-- Relationship learning exists only to improve service of the user's goal.
-
-Recommended copy:
-
-> Prepare with GEORGE first if you'd like. When you're ready, enter LIVE.
-
-Do not rename internal outcome authority, create a second briefing runtime, move formula ownership, create a separate OpenAI governance layer, or treat relationship learning as memory accumulation for its own sake.
-<!-- GEORGE_INTELLIGENT_BRIEFING_HANDOFF_END -->
-
-<!-- ROLE_GOAL_EXECUTION_HANDOFF_START -->
-## Current Role, Goal, and Execution Direction
-
-Immediate product direction:
-
-- simplify LIVE around Role → Goal → Execution;
-- present recognizable roles on the homepage;
-- give OpenAI control of intelligent, execution-oriented briefing after role selection;
-- keep questions tied to what can be accomplished through the user's voice in the conversation;
-- ask no more than necessary before LIVE access;
-- support single and repeated-conversation sessions;
-- automatically reset transient conversation state for the next call while retaining session state;
-- allow GEORGE to recommend strategy changes only when session evidence warrants it;
-- present the user with Keep Current or Adjust Strategy.
-
-Marketplace and learning direction:
-
-- Formula = operational strategy;
-- Script = delivery layer;
-- one Formula may produce many Scripts;
-- successful Formula use proves the Formula;
-- a successful Script supplies evidence for its Formula;
-- a genuinely different successful operational adaptation creates or proves another Formula;
-- users decide whether changed Scripts are saved, discarded, shared, free, or premium.
-
-Continue the Formula-first Operational Marketplace implementation without moving Formula ownership, briefing ownership, LIVE ownership, or runtime authority.
-<!-- ROLE_GOAL_EXECUTION_HANDOFF_END -->
-
---------------------------------------------------
-NEXT IMPLEMENTATION
---------------------------------------------------
-
-Current production milestone:
-
-Operational Session Runtime.
-
-Implement:
-
-• repeated-session classification
-• Conversation Runtime retirement
-• Conversation Record production
-• Next Call workflow
-• multi-level Conversation Summary
-• adaptive Formula / Script recommendations
-
-Do not redesign LIVE.
-
-Do not introduce another runtime.
-
-Conversation Runtime is ephemeral.
-
-Conversation Record is permanent.
-
-Operational Learning evaluates Conversation Records.
-
-Operational Memory accumulates validated evidence.
-
-Optimize for users executing dozens or hundreds of conversations within one Operational Session.
+After validation, inspect `git status --short` and the complete scoped diff. Stop before commit.

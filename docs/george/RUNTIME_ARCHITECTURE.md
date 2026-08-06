@@ -4,6 +4,12 @@
 
 This document is the architectural authority for the current GEORGE implementation.
 
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+
+`IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
+
+`GEORGE_AUTHORITY_READ_ORDER: PRODUCTION_TRACKER.md -> RUNTIME_ARCHITECTURE.md -> OPERATIONAL_PROFILE.md -> NEXT_THREAD_HANDOFF.md`
+
 Read after:
 
 ```text
@@ -14,6 +20,7 @@ Read before:
 
 ```text
 docs/george/OPERATIONAL_PROFILE.md
+docs/george/NEXT_THREAD_HANDOFF.md
 ```
 
 The implementation remains the source of truth. This document is authoritative only while synchronized with the validated production runtime.
@@ -35,7 +42,7 @@ Canonical boundaries:
 - `lib/george/operational-memory/*` owns operational formula contracts, persistence, evidence, scripts, reassessment, revision proposals, evolution, and lineage;
 - `lib/george/live-entry/conversation-types.ts` owns Conversation Types;
 - `app/george/library/*` presents canonical formula and script data;
-- `app/george/page.tsx` remains a mount surface.
+- `app/george/page.tsx` owns browser-host integration: request transport and LIVE mode identification, browser session state, approved rendering, voice playback, host controls, and bridge mounting. It does not own runtime reasoning, presentation policy, receiver policy, or delivery routing.
 
 Do not create:
 
@@ -46,6 +53,80 @@ Do not create:
 - another conversation-type registry;
 - another operational-learning owner;
 - page-level runtime or formula intelligence.
+
+## Synchronized Runtime Ownership — 2026-08-05
+
+GEORGE remains one operational intelligence with one shared runtime and one reasoning authority. Normal and LIVE are operating modes over that same intelligence.
+
+### Adaptive briefing continuity
+
+```text
+Homepage or LIVE Entry briefing surface
+↓
+accumulated priorAnswers + skippedQuestions + priorInteractions
+↓
+app/api/george/live/signal-question/route.ts
+↓
+canonical normalized interaction history
+↓
+one adaptive question or readiness response
+↓
+control returns to the user
+```
+
+Ownership is explicit:
+
+- `components/home/HomeConversationTypeSurface.tsx` owns Homepage briefing state, the user-directed **START LIVE / NEXT QUESTION** decision surface, and the Homepage handoff snapshot;
+- `app/george/live-entry/LiveEntryClient.tsx` owns LIVE Entry briefing state, handoff hydration, preparation progression, Popup 2, Popup 3, Continue Briefing, and Enter LIVE;
+- `app/api/george/live/signal-question/route.ts` is the single adaptive-question governor and normalization owner;
+- both callers produce `priorInteractions`; the governor prefers them and supplements only missing legacy history from `priorAnswers` and `skippedQuestions`;
+- each interaction preserves `key`, original `question`, optional `answer`, and `status: answered | skipped | unknown`;
+- another question is requested only through explicit **NEXT QUESTION** or **Continue Briefing** action.
+
+### Route-aware preparation and progressive Ready Room
+
+- Traditional and direct preparation keep canonical mechanics configuration in Popup 2. Popup 3 summarizes the selections already confirmed there, and Change returns to the appropriate Popup 2 section.
+- Homepage preparation bypasses duplicate traditional mechanics. Popup 3 reviews the current-session support recommendation derived from the Homepage briefing and lets the user change support behavior, receiver/delivery profile, and speaking style before agreement.
+- LIVE Entry prefers canonical Homepage handoff data when present and remains compatible with older `optionalSignals`-only handoffs.
+- Ready Room progressively resolves assessment → review → agreement → collapse → Formula → final room actions. Only the unresolved decision remains visually primary.
+- Formula and Script selections remain part of the LIVE Entry preparation state across Marketplace/Library return.
+
+### Context and receiver-specific presentation
+
+Typed/composer LIVE requests identify themselves with canonical `mode: "conversation"` in `app/george/page.tsx`. `lib/george/runtime/context-framing.ts` owns `ContextFraming` selection, including **What Matters Now**, and `lib/george/chat/presentation-authority.ts` owns framing-before-guidance ordering. Audible LIVE replies remain compact through the existing voice path.
+
+Automatic Hub presentation is a distinct path:
+
+```text
+lib/george/live-runtime/operational-assessment.ts
+  owns action + evidence + outcomeImpact
+↓
+lib/george/live-delivery/receiver-policy.ts
+  owns receiver-specific composition and modality
+↓
+lib/george/live-delivery/delivery-router.ts
+  owns delivery cue construction
+↓
+lib/george/live-delivery/visual-presentation-policy.ts
+  owns pure one-stage or evidence-first visual planning
+↓
+components/george/live/LiveHubVisualCueBridge.tsx
+  executes accepted plans, timers, cancellation, and cleanup only
+```
+
+Audio remains concise and low cognitive load. Visual delivery may persist and stage meaningful evidence/context before the recommended action. Audio-visual delivery is coordinated but not identical: spoken delivery stays compact while visual delivery can stage evidence first. Voice-disabled audio-visual routing can remain visual. No owner in this chain manufactures evidence or creates a second artifact intelligence.
+
+### Qualification ownership
+
+- `scripts/george-live-delivery-policy-smoke.mjs` qualifies planning, suppression, modality preservation, and bridge execution contracts;
+- `scripts/george-documentation-qualification.mjs` qualifies synchronization markers, ownership references, required current claims, and selected contradiction guards;
+- `package.json` build registration gates both qualifications before the Next.js production build.
+
+## Documentation Synchronization Rule
+
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+
+Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 
 <!-- GEORGE_OPERATIONAL_FORMULA_EXPERIENCE_START -->
 ## Operational Formula Experience
@@ -1008,6 +1089,10 @@ Responsibilities:
 - suppress duplicate presentation;
 - enforce priority replacement safeguards;
 - resolve receiver-profile-specific visual persistence timing;
+- return a pure `GeorgeVisualPresentationPlan`;
+- when existing `GeorgeOperationalAssessment.evidence` is meaningful, plan evidence/context first and the recommended action second;
+- include `outcomeImpact` in the evidence stage only when it is distinct from the evidence and action;
+- return the existing single-stage plan when evidence is absent;
 - preserve Receiver Policy output without reshaping it;
 - remain portable and independent of React rendering.
 
@@ -1027,16 +1112,20 @@ Responsibilities:
 
 - subscribe to approved delivery;
 - invoke Visual Presentation Policy;
-- render approved visual guidance unchanged;
+- execute approved presentation stages without deciding their content or order;
+- cancel an unfinished sequence when a newer cue is accepted, while leaving the active sequence intact when a new cue is suppressed;
+- invalidate stale callbacks with a sequence token;
+- refresh presentation timing for every rendered stage;
+- clear timers and visual state on LIVE deactivation and invalidate callbacks on unmount;
 - preserve policy-created newline structure;
 - allow normal word wrapping;
 - report visual telemetry;
-- replay approved delivery when appropriate;
+- replay approved delivery as a single stage when no operational assessment is available;
 - avoid receiver-specific text shaping.
 
 Rendering preserves structure. It does not create structure.
 
-The Visual Bridge does not own interruption, replacement, priority, duplicate-suppression, or persistence policy.
+The Visual Bridge does not own reasoning, evidence authority, evidence ordering, interruption, replacement, priority, duplicate-suppression, or persistence policy.
 
 Current validated persistence policy:
 
@@ -1151,13 +1240,15 @@ It does not move support behavior, receiver policy, routing, or delivery authori
 
 ## Application Host Boundary
 
-`app/george/page.tsx` is the application host and mount surface.
+`app/george/page.tsx` is the browser application host and integration surface. Mounting is one responsibility, not its entire boundary.
 
 Permitted host responsibilities:
 
 - hydrate and persist user-selected host preferences;
 - mount LIVE bridges;
 - integrate microphone lifecycle;
+- identify typed/composer LIVE requests with the canonical conversation mode;
+- preserve provider-owned `ContextFraming` and guidance order in visual responses;
 - expose approved host voice execution;
 - execute approved TTS and playback;
 - record playback telemetry;
@@ -1380,6 +1471,7 @@ Current validated suite includes:
 - LIVE Entry smoke;
 - conversation package smoke;
 - LIVE runtime smoke;
+- staged LIVE delivery and visual-presentation policy smoke;
 - LIVE latency qualification;
 - LIVE input latency qualification;
 - early reasoning qualification;
@@ -1396,6 +1488,7 @@ Current validated suite includes:
 - LIVE restart continuity qualification;
 - runtime interface freeze qualification;
 - duplicate ownership audit;
+- documentation synchronization qualification;
 - LIVE portability qualification;
 - preparation smoke;
 - Next.js production build.
@@ -1442,7 +1535,7 @@ docs/george/OPERATIONAL_PROFILE.md
 docs/george/NEXT_THREAD_HANDOFF.md
 ```
 
-The tracker owns phase and readiness status. This document owns architectural boundaries. Current work proceeds through Popup 3 correction, canonical motion, materials, color, micro-interactions, and final product-experience refinement without reopening runtime architecture.
+The tracker owns phase and readiness status. This document owns architectural boundaries. Current work proceeds through structured support-recommendation quality, desired-outcome readiness qualification, Formula/Marketplace completion, manual return-path qualification, and progressive-disclosure polish without reopening runtime architecture.
 
 <!-- GEORGE_HOMEPAGE_BRIEFING_ARCHITECTURE_START -->
 ## Homepage and Traditional Briefing Surfaces
@@ -1458,14 +1551,15 @@ Shared briefing capability
 ├─ Homepage surface
 │  ├─ conversation selection
 │  ├─ fresh mandatory briefing
-│  ├─ optional OpenAI follow-up
+│  ├─ START LIVE / NEXT QUESTION decision
+│  ├─ exactly one optional OpenAI interaction per NEXT QUESTION action
 │  ├─ homepage brief review
 │  └─ approved `review_brief` handoff
 │
 └─ Traditional surface
    ├─ traditional questioning
    ├─ Popup 1
-   ├─ Mechanics
+   ├─ Popup 2 Mechanics
    └─ preparation progression
 
 Both surfaces converge at Popup 3
@@ -1475,11 +1569,11 @@ LIVE
 
 Canonical ownership:
 
-- `components/home/HomeConversationTypeSurface.tsx` owns homepage briefing presentation, homepage-local progression, mandatory-question display, optional-question display, and homepage brief review;
-- `/api/george/live/signal-question` remains the shared optional-question reasoning authority;
+- `components/home/HomeConversationTypeSurface.tsx` owns Homepage briefing presentation, local progression, accumulated answers/skips/question history, canonical `priorInteractions`, the user decision surface, and Homepage brief review/handoff;
+- `app/api/george/live/signal-question/route.ts` remains the shared optional-question reasoning and canonical history-normalization authority;
 - `lib/george/live-runtime/live-intent-runtime.ts` remains the canonical preparation-readiness and mandatory-transition authority;
-- `app/george/live-entry/LiveEntryClient.tsx` consumes the approved homepage handoff and owns Popup 3 and LIVE-entry continuation;
-- Popup 1 and Mechanics remain Traditional preparation surfaces;
+- `app/george/live-entry/LiveEntryClient.tsx` consumes and hydrates the approved Homepage handoff and owns Popup 2, Popup 3, LIVE-entry continuation, and Marketplace/Library return state;
+- Popup 1 and Popup 2 Mechanics remain Traditional preparation surfaces;
 - Popup 3 is the convergence surface before LIVE.
 
 Homepage-origin preparation must not fall through to:
@@ -1491,7 +1585,7 @@ Popup 1
 Mechanics
 ```
 
-The homepage handoff carries approved briefing state into LIVE Entry. LIVE Entry must not restart or reinterpret the homepage briefing.
+The Homepage handoff carries optional answers, question history, skipped-question state, canonical `priorInteractions`, and preparation selections into LIVE Entry. LIVE Entry hydrates its existing state from canonical handoff data when present and falls back to older `optionalSignals` handoffs without creating a second history owner.
 
 Back navigation is semantic state restoration:
 
@@ -1502,6 +1596,10 @@ homepage brief-review state restoration
 ```
 
 It must not degrade into a generic homepage redirect when homepage review was the prior state.
+
+After each optional answer or skip, control returns to the user. **Continue Briefing** in LIVE Entry and **NEXT QUESTION** on Homepage are the only paths that request one more adaptive interaction; no recursive automatic question loop is an owner.
+
+Traditional Popup 2 remains the mechanics owner. Homepage Popup 3 reviews and confirms a current-session recommendation. Progressive Ready Room presentation collapses confirmed support assessment and Formula sections without transferring their underlying state ownership.
 
 This architecture introduces no new runtime, OpenAI lane, session authority, readiness owner, or briefing engine.
 <!-- GEORGE_HOMEPAGE_BRIEFING_ARCHITECTURE_END -->

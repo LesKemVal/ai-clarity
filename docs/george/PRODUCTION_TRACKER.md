@@ -4,13 +4,58 @@
 
 This document is the primary production authority for the current GEORGE implementation.
 
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+
+`IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
+
+`GEORGE_AUTHORITY_READ_ORDER: PRODUCTION_TRACKER.md -> RUNTIME_ARCHITECTURE.md -> OPERATIONAL_PROFILE.md -> NEXT_THREAD_HANDOFF.md`
+
 Read in this order:
 
 1. `docs/george/PRODUCTION_TRACKER.md`
 2. `docs/george/RUNTIME_ARCHITECTURE.md`
 3. `docs/george/OPERATIONAL_PROFILE.md`
+4. `docs/george/NEXT_THREAD_HANDOFF.md`
 
 Continuation packets provide operational context only. They do not override implementation or these synchronized authorities.
+
+## Synchronized Current Status — 2026-08-05
+
+Current branch: `conversation-summary-runtime`
+
+Current validated phase: **Production Completion — user-directed briefing, route-aware preparation, and receiver-specific LIVE presentation**.
+
+The local implementation has one GEORGE intelligence, one runtime, and one reasoning authority. The current branch preserves that architecture while completing these production behaviors:
+
+- Homepage and LIVE Entry construct canonical `priorInteractions` from accumulated answers, skipped questions, and original question text;
+- `app/api/george/live/signal-question/route.ts` normalizes canonical briefing history while retaining `priorAnswers` and `skippedQuestions` compatibility;
+- Homepage returns control after each optional question and requests another question only through **NEXT QUESTION**;
+- LIVE Entry returns control after answer, skip, or “I don’t know” and requests one additional interaction only through **Continue Briefing**;
+- Homepage handoff and LIVE Entry hydration preserve answers, question history, skips, and canonical interaction history;
+- traditional preparation keeps mechanics ownership in Popup 2, while Homepage-origin Popup 3 reviews a current-session support recommendation;
+- the progressive Ready Room follows assessment → review → agreement → collapse → Formula → final room actions;
+- typed/composer LIVE requests activate `ContextFraming` through canonical `mode: "conversation"`, preserving framing before guidance while audible LIVE output remains compact;
+- `lib/george/live-delivery/visual-presentation-policy.ts` plans evidence-first visual stages from existing operational assessment, and `components/george/live/LiveHubVisualCueBridge.tsx` executes those plans without becoming a reasoning owner;
+- staged visual execution is cancellable, lifecycle-safe, and build-qualified by `scripts/george-live-delivery-policy-smoke.mjs`.
+
+Current qualification status: the current HEAD entered this synchronization milestone with its production build passing. This documentation milestone must pass `george:documentation:qualify` and the full `npm run build` before it is considered a validated handoff.
+
+### Current remaining production priorities
+
+1. Improve Homepage current-session support recommendation quality using structured briefing evidence instead of flattened text heuristics.
+2. Ensure the desired outcome remains a hard readiness requirement wherever the production flow requires it.
+3. Finish Formula/Marketplace recommendation and empty-state experience.
+4. Manually verify Homepage → Library → Ready Room continuity, including Formula and Script preservation.
+5. Continue progressive-disclosure polish, including traditional Popup 1.
+6. Inspect no-intervention reason propagation and deliberate visual-only support through existing canonical owners; do not create another support mode or reasoning authority.
+7. Preserve evidence-first staged visual behavior through qualification.
+8. Keep the authority set synchronized as production behavior changes.
+
+## Documentation Synchronization Rule
+
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+
+Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 
 
 ### Conversation Description Doctrine
@@ -541,9 +586,9 @@ Buttons use approximately 1 px of mechanical travel and return.
 
 They should feel like instrument-panel controls, not elastic web buttons.
 
-### Branch hygiene
+### Historical branch hygiene
 
-The `material-language-redesign` branch is the visual-refinement branch.
+The former `material-language-redesign` branch carried an earlier visual-refinement checkpoint. It is historical context, not the current branch declaration.
 
 Git is the recovery system. Do not add timestamped source backups, copied page files, `.backup-*` artifacts, or new patch-backup directories.
 
@@ -555,7 +600,7 @@ Popup 3 is the canonical Ready Room owned by LIVE Entry.
 
 It is not another briefing, mechanics screen, control tutorial, or runtime.
 
-By Popup 3, preparation and mechanics are already resolved. Ready Room must explain what will happen when the user enters LIVE, using the selected receiver and support behavior.
+Traditional routes resolve mechanics in Popup 2, and Popup 3 summarizes those confirmed choices without reopening ownership. Homepage routes use Popup 3 to review and confirm the current-session support recommendation derived from the active Homepage briefing. Ready Room then progressively collapses completed decisions and reveals Formula and final room actions.
 
 It should communicate:
 
@@ -824,6 +869,9 @@ Responsibilities:
 - own presentation interruption and replacement policy;
 - own duplicate suppression and priority replacement policy;
 - own visual persistence timing;
+- return a pure visual presentation plan;
+- stage meaningful `GeorgeOperationalAssessment.evidence` before its recommended action and include distinct `outcomeImpact` only when it clarifies why the evidence matters;
+- preserve a single-stage fallback when meaningful evidence is absent;
 - preserve Receiver Policy output without reshaping it;
 - remain portable and rendering-independent.
 
@@ -841,13 +889,15 @@ Responsibilities:
 
 - subscribe to approved delivery;
 - invoke Visual Presentation Policy;
-- render approved visual guidance;
+- execute approved one-stage or multi-stage visual plans;
+- cancel unfinished accepted sequences when a newer cue is accepted;
+- invalidate stale callbacks and clean up timers when LIVE becomes inactive or the bridge unmounts;
 - preserve Receiver Policy line structure;
 - report visual delivery telemetry;
 - replay approved delivery history when appropriate;
 - avoid reshaping or recomposing receiver-policy text.
 
-The Visual Bridge renders approved presentation. It does not own interruption, replacement, priority, duplicate-suppression, or persistence policy.
+The Visual Bridge executes approved presentation plans. It does not own reasoning, evidence selection or ordering, interruption, replacement, priority, duplicate-suppression, or persistence policy.
 
 Validated presentation policy:
 
@@ -902,12 +952,14 @@ Responsibilities include:
 
 ### Application Host
 
-`app/george/page.tsx` is the application host and mount surface.
+`app/george/page.tsx` is the browser application host and integration surface. It mounts LIVE bridges and also owns browser/session transport, approved rendering, host controls, and voice playback integration.
 
 Valid responsibilities:
 
 - hydrate and persist host preferences;
 - mount LIVE bridges;
+- identify typed/composer LIVE requests with canonical conversation mode;
+- preserve provider-owned `ContextFraming` and guidance order for visual responses;
 - expose host voice execution;
 - execute approved speech;
 - support user-controlled repeat, pause, stop, and compression actions;
@@ -1024,11 +1076,13 @@ Stopping or superseding voice invalidates older asynchronous TTS and playback wo
 
 ## Validation Baseline
 
-Latest validated branch:
+Current validated branch:
 
 ```text
-live-hub-runtime
+conversation-summary-runtime
 ```
+
+Current synchronized HEAD: `d2b412f06de4058c6f55fe3c553c008417f9a27f`.
 
 ## Canonical Execution-Imminence Ownership — Validated
 
@@ -1218,13 +1272,13 @@ These documents are authoritative while synchronized with implementation.
 
 ### Current refinement sequence
 
-1. correct Popup 3 / Ready Room responsibility and content;
-2. establish the canonical motion authority;
-3. apply motion doctrine to the Ready Room and then shared surfaces;
-4. refine materials;
-5. refine color;
-6. refine micro-interactions;
-7. complete final product-experience polish and focused validation.
+1. improve current-session support recommendation quality from structured briefing evidence;
+2. qualify desired-outcome readiness requirements;
+3. finish Formula/Marketplace recommendation and empty states;
+4. manually qualify Homepage → Library → Ready Room continuity;
+5. continue progressive-disclosure polish, including traditional Popup 1;
+6. inspect no-intervention reason propagation and deliberate visual-only support through existing owners;
+7. preserve staged visual presentation and documentation synchronization through build-gated qualification.
 
 Do not use product refinement as an opportunity to redesign runtime architecture.
 
@@ -1259,18 +1313,14 @@ Behavioral tuning must patch the canonical behavior, assessment, receiver-policy
 
 Until implementation evidence proves otherwise, the canonical runtime architecture is frozen.
 
-The next change after this tracker synchronization is synchronization of:
-
-```text
-docs/george/RUNTIME_ARCHITECTURE.md
-```
+The four production authorities are synchronized together. No document-specific follow-up is implied by this freeze rule.
 
 <!-- GEORGE_HOMEPAGE_BRIEFING_VALIDATED_START -->
 ## Homepage LIVE Briefing — Validated
 
 The homepage now owns homepage-origin LIVE briefing from conversation selection through approved brief review.
 
-Validated flow:
+Current validated flow:
 
 ```text
 Homepage conversation selection
@@ -1279,14 +1329,14 @@ fresh mandatory briefing
 ↓
 core briefing complete
 ↓
-user decision
-├─ Continue Briefing
+user decision: START LIVE or NEXT QUESTION
+├─ NEXT QUESTION
 │  ↓
-│  optional OpenAI follow-up on the homepage
+│  exactly one optional OpenAI interaction
 │  ↓
-│  Start Live
+│  answer or skip returns to the same user decision
 │
-└─ Start Live
+└─ START LIVE
    ↓
    homepage brief review
    ↓
@@ -1301,17 +1351,18 @@ Validated production behavior:
 - stale answers from another conversation do not silently satisfy readiness;
 - mandatory briefing is sufficient to continue toward LIVE;
 - optional OpenAI questioning begins only after explicit user choice;
-- optional questioning remains on the homepage and reuses the canonical `/api/george/live/signal-question` authority;
+- optional questioning remains on the homepage, requests exactly one interaction, and reuses the canonical `/api/george/live/signal-question` authority;
+- answers, skips, original question text, and canonical `priorInteractions` persist through the Homepage handoff and LIVE Entry hydration;
 - **Start Live** preserves review-first routing;
 - homepage-origin preparation does not enter Quick LIVE, Traditional briefing, Popup 1, or Mechanics;
 - Popup 3 Back restores the exact homepage brief-review state, including selected conversation and optional briefing answers.
 
-Validated checkpoint:
+Historical checkpoint that established the Homepage owner (retained for production history):
 
-- branch: `homepage-fresh-briefing-owner`;
+- historical branch: `homepage-fresh-briefing-owner`;
 - commit: `f4ef6b0`;
 - recovery tag: `homepage-briefing-stable-20260803-022911`;
-- production build: PASS;
+- production build at that checkpoint: PASS;
 - duplicate canonical owners: 0;
 - non-canonical imports: 0;
 - layer violations: 0;
@@ -1651,4 +1702,3 @@ Additional Formulas
 This preserves operational lineage.
 
 GEORGE grows by expanding operational strategy rather than overwriting previous operational knowledge.
-

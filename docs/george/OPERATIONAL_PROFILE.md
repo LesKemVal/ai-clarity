@@ -4,6 +4,12 @@
 
 This document is the behavioral authority for how GEORGE works with an individual user.
 
+`GEORGE_DOCUMENTATION_SYNC: 2026-08-05-conversation-summary-runtime`
+
+`IMPLEMENTATION_AUTHORITY: Implementation is authoritative; these documents are authoritative only while synchronized with the validated local implementation.`
+
+`GEORGE_AUTHORITY_READ_ORDER: PRODUCTION_TRACKER.md -> RUNTIME_ARCHITECTURE.md -> OPERATIONAL_PROFILE.md -> NEXT_THREAD_HANDOFF.md`
+
 Read after:
 
 ```text
@@ -11,7 +17,55 @@ docs/george/PRODUCTION_TRACKER.md
 docs/george/RUNTIME_ARCHITECTURE.md
 ```
 
+Read before:
+
+```text
+docs/george/NEXT_THREAD_HANDOFF.md
+```
+
 The implementation remains the source of truth. This document is authoritative while synchronized with the validated production runtime.
+
+## Synchronized Production Behavior — 2026-08-05
+
+GEORGE improves the probability of the user's desired outcome while keeping explicit user direction and agency authoritative.
+
+### User-directed briefing
+
+- Outcome clarification precedes adaptive briefing in the intended preparation flow.
+- Briefing depth is user-directed. After a completed optional interaction, control returns to the user.
+- Another adaptive interaction occurs only when the user explicitly selects **NEXT QUESTION** on Homepage or **Continue Briefing** in LIVE Entry.
+- GEORGE gives the initial “Continue Briefing?” explanation once; it does not repeatedly announce that it has enough information after every later answer or skip.
+- Accumulated answers, skips, original question text, and `priorInteractions` remain available to the adaptive-question governor and through the Homepage-to-LIVE handoff.
+
+### Recommendations and progressive readiness
+
+Current-session support recommendations are assessments, not commands. The user may review and change support behavior, delivery profile, and speaking style before agreement.
+
+Ready Room progressively reveals the unresolved decision and collapses completed decisions into compact summaries. This reduces cognitive load without erasing state or moving ownership. Motion communicates that information was received, revealed, changed, or settled; it is not decorative confidence.
+
+Traditional routes confirm mechanics in Popup 2 and summarize them in Popup 3. Homepage routes review the current-session recommendation in Popup 3. The two routes share one LIVE Entry runtime.
+
+### Receiver-specific behavior
+
+- Audio is concise, sequential, and low cognitive load.
+- Visual delivery is persistent, structured, and glanceable.
+- Audio-visual delivery is coordinated but not identical: audio can carry the compact immediate action while visual presentation carries persistent context and may stage meaningful evidence before the recommended action.
+- Typed/composer LIVE `ContextFraming` and automatic Hub evidence-first visual planning are distinct existing paths. `ContextFraming` selects context before subsequent guidance; the Hub policy stages existing operational-assessment evidence before action.
+- Neither path creates structured artifact or document delivery, and neither manufactures evidence.
+
+### Operational presence and restraint
+
+GEORGE remains operationally present even when it does not speak. The runtime can select silence or hold a response when intervention would not materially improve execution, and it preserves internal reasons and telemetry for that restraint. The inspected production path does not establish that every hold reason is communicated to the user.
+
+Visual evidence can remain active when an approved visual or audio-visual delivery cue exists, including voice-disabled visual fallback. Current implementation does not guarantee a visual evidence cue when an upstream no-intervention decision suppresses delivery entirely. Deliberate visual-only support during held spoken intervention therefore remains an inspection priority, not a completed doctrine claim.
+
+Continuation is an adaptive runtime support resource selected from current evidence. It is not a user-selectable support option or separate UI mode.
+
+## Documentation Synchronization Rule
+
+A production milestone that changes observable behavior, ownership, runtime flow, qualification, or product doctrine is not complete until either the synchronized authority set is updated in the same milestone, or the change is explicitly recorded as implementation-ahead documentation debt in `PRODUCTION_TRACKER.md` and `NEXT_THREAD_HANDOFF.md`.
+
+Documentation debt must not survive a production checkpoint or branch push intended as a validated handoff.
 
 <!-- GEORGE_MATERIAL_LANGUAGE_DOCTRINE_START -->
 ## Experience Realization
@@ -501,6 +555,8 @@ Response is not permission for unnecessary verbosity.
 
 Continuation helps complete language already sufficiently evidenced.
 
+It is selected adaptively by the runtime. It is not a selectable support option, preparation setting, or separate product mode.
+
 It is appropriate when the user:
 
 - loses a word;
@@ -602,6 +658,8 @@ Visual support may be:
 - more explanatory than audio;
 - formatted in multiple short lines when useful.
 
+When an approved operational assessment contains meaningful evidence, visual presentation may show that evidence or context first and the recommended action second. Distinct outcome impact may accompany the evidence only when it clarifies why the evidence matters. This stages existing reasoning output; it does not create a new artifact, proof, or document intelligence.
+
 Visual-only is not audio with sound removed.
 
 The user can glance, reread, and choose without waiting for playback.
@@ -617,6 +675,8 @@ Audio carries immediate steering.
 Visual carries persistent reference.
 
 Audio and visual may express the same selected support resource differently because the surfaces have different cognitive and temporal constraints.
+
+Spoken delivery remains compact even when visual delivery uses an evidence-first sequence. The surfaces are coordinated, not mirrored.
 
 This does not create separate behavior decisions.
 
@@ -1326,4 +1386,3 @@ Operational Learning never edits an existing Formula.
 The user decides whether a Formula Candidate becomes a retained Formula.
 
 Scripts remain independently retainable regardless of conversation outcome.
-
