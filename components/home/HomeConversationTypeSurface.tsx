@@ -6,13 +6,22 @@ import {
   type ConversationType,
 } from "@/lib/george/live-entry/conversation-types";
 import {
+  clearPreparationSession,
+  loadPreparationSession,
   loadLivePreparationSignals,
   markLivePreparationPreviewReady,
+  savePreparationSession,
   saveLivePreparationSignals,
 } from "@/lib/george/live-browser/live-preparation-browser-storage";
 import {
   resolveLivePreparationReadiness,
 } from "@/lib/george/live-runtime/live-intent-runtime";
+import {
+  createPreparationSession,
+  normalizePreparationInteractions,
+  type PreparationCheckpoint,
+  type PreparationSessionV1,
+} from "@/lib/george/live-runtime/live-preparation-controller";
 
 import type {
   OperationalFormula,
@@ -542,6 +551,7 @@ function HomepageRoleCard({
 
 export function HomeConversationTypeSurface() {
   const surfaceRef = useRef<HTMLElement | null>(null);
+  const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const [selectedType, setSelectedType] = useState<ConversationType | null>(
     null,
   );
@@ -702,6 +712,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     const restoredAnswers = loadLivePreparationSignals();
     setAnswers(restoredAnswers);
 
+    const restoredPreparationSession = loadPreparationSession();
+    if (restoredPreparationSession?.provenance.entrySource === "homepage") {
+      homepagePreparationSeedRef.current = restoredPreparationSession;
+    }
+
     try {
       const rawSnapshot = window.sessionStorage.getItem(
         "GEORGE_HOMEPAGE_BRIEF_REVIEW_SNAPSHOT",
@@ -815,6 +830,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     if (!conversationType) return;
 
+    if (loadPreparationSession()?.provenance.entrySource === "homepage") {
+      clearPreparationSession();
+    }
+    homepagePreparationSeedRef.current = null;
+
     setSelectedRole(role);
     setSelectedType(conversationType);
     setSelectedGoal(null);
@@ -831,6 +851,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function resetSelection() {
+    if (loadPreparationSession()?.provenance.entrySource === "homepage") {
+      clearPreparationSession();
+    }
+    homepagePreparationSeedRef.current = null;
     setFormulaSurfaceMode("closed");
     setFormulaError("");
     setSelectedType(null);
@@ -857,6 +881,14 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
       role: selectedRole?.label || answers.role || "",
       desiredOutcome: normalizedGoal,
     };
+
+    if (!homepagePreparationSeedRef.current) {
+      clearPreparationSession();
+      const seed = createPreparationSession({
+        provenance: { entrySource: "homepage" },
+      });
+      homepagePreparationSeedRef.current = seed;
+    }
 
     setSelectedGoal(normalizedGoal);
     setAnswers(nextSignals);
@@ -895,6 +927,14 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   }
 
   function beginQuestions() {
+    if (!homepagePreparationSeedRef.current) {
+      clearPreparationSession();
+      const seed = createPreparationSession({
+        provenance: { entrySource: "homepage" },
+      });
+      homepagePreparationSeedRef.current = seed;
+    }
+
     const freshAnswers: Record<string, string> = {
       ...answers,
       role: answers.role || selectedRole?.label || "",
@@ -1125,10 +1165,100 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     ];
   }
 
+  const homepagePreparationSession = useMemo(() => {
+    const seed = homepagePreparationSeedRef.current;
+    if (!seed || !selectedType) return null;
+
+    const additionalSignals = Object.fromEntries(
+      Object.entries({
+        ...seed.knowledge.additionalSignals,
+        ...answers,
+        ...optionalAnswers,
+      })
+        .map(([key, value]) => [key, String(value || "").trim()])
+        .filter(([, value]) => Boolean(value)),
+    );
+    const audience = String(
+      additionalSignals.counterparty || additionalSignals.audience || "",
+    ).trim();
+    const checkpoint: PreparationCheckpoint =
+      phase === "review"
+        ? { surface: "briefing", phase: "review" }
+        : phase === "decision"
+          ? { surface: "briefing", phase: "decision" }
+          : { surface: "briefing", phase: "questions" };
+
+    return createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective:
+          answers.desiredOutcome || selectedGoal || seed.knowledge.objective,
+        name: answers.name || seed.knowledge.name,
+        role: answers.role || selectedRole?.label || seed.knowledge.role,
+        participants: audience ? [audience] : seed.knowledge.participants,
+        audience: audience || seed.knowledge.audience,
+        perspectives: seed.knowledge.perspectives,
+        conversation: {
+          id: selectedType.id,
+          title: selectedType.title,
+          group: selectedType.group,
+        },
+        knownContext:
+          answers.conversationContext || seed.knowledge.knownContext,
+        communicationMedium: seed.knowledge.communicationMedium,
+        receiverEvidence: seed.knowledge.receiverEvidence,
+        acceptableOutcome: seed.knowledge.acceptableOutcome,
+        secondaryOutcome: seed.knowledge.secondaryOutcome,
+        roomObjective: seed.knowledge.roomObjective,
+        additionalSignals,
+        documents: seed.knowledge.documents,
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions,
+          ...buildHomepagePriorInteractions(),
+        ]),
+        currentQuestion: optionalQuestion,
+      },
+      assets: seed.assets,
+      support: seed.support,
+      workflow: {
+        current: checkpoint,
+        history: seed.workflow.history,
+      },
+      relations: seed.relations,
+    });
+  }, [
+    answers,
+    optionalAnswers,
+    optionalQuestion,
+    optionalQuestionHistory,
+    phase,
+    selectedGoal,
+    selectedRole,
+    selectedType,
+    skippedOptionalQuestions,
+  ]);
+
+  useEffect(() => {
+    if (!homepagePreparationSession) return;
+    homepagePreparationSeedRef.current = homepagePreparationSession;
+    savePreparationSession(homepagePreparationSession);
+  }, [homepagePreparationSession]);
+
   function preserveHomepageHandoff(
     workflowAction: HomepageBriefingAction,
   ) {
-    if (!selectedType || !briefingSufficient) return false;
+    if (
+      !selectedType ||
+      !briefingSufficient ||
+      !homepagePreparationSession
+    ) {
+      return false;
+    }
 
     const signals = Object.fromEntries(
       Object.entries({
@@ -1141,6 +1271,34 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
     saveLivePreparationSignals(signals);
     markLivePreparationPreviewReady();
+
+    const readyRoomPreparationSession: PreparationSessionV1 =
+      createPreparationSession({
+        preparationSessionId:
+          homepagePreparationSession.preparationSessionId,
+        provenance: homepagePreparationSession.provenance,
+        createdAt: homepagePreparationSession.createdAt,
+        updatedAt: Date.now(),
+        knowledge: homepagePreparationSession.knowledge,
+        briefing: {
+          priorInteractions:
+            homepagePreparationSession.briefing.priorInteractions,
+          currentQuestion: null,
+        },
+        assets: homepagePreparationSession.assets,
+        support: homepagePreparationSession.support,
+        workflow: {
+          current: {
+            surface: "ready_room",
+            phase: "readiness",
+            section: "support",
+          },
+          history: [homepagePreparationSession.workflow.current],
+        },
+        relations: homepagePreparationSession.relations,
+      });
+
+    savePreparationSession(readyRoomPreparationSession);
 
     try {
       window.localStorage.setItem(
@@ -1160,6 +1318,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           optionalQuestionHistory,
           skippedOptionalQuestions,
           priorInteractions: buildHomepagePriorInteractions(),
+          preparationSession: readyRoomPreparationSession,
           workflowAction,
           createdAt: Date.now(),
         }),
@@ -1182,6 +1341,8 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
           optionalQuestionHistory,
           skippedOptionalQuestions,
           priorInteractions: buildHomepagePriorInteractions(),
+          preparationSessionId:
+            homepagePreparationSession?.preparationSessionId || "",
         }),
       );
     } catch {}

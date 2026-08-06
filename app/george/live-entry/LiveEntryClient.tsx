@@ -26,6 +26,7 @@ import {
   clearLivePreparationPreviewReady,
   clearLivePreparationSignals,
   isLivePreparationPreviewReady,
+  loadPreparationSession,
   loadLivePreparationSignals,
   markLivePreparationPreviewReady,
   savePreparationSession,
@@ -66,9 +67,12 @@ import { buildOutcomeTestedBriefingSupport } from "@/lib/george/live-runtime/liv
 import {
   buildPreparationInteractions,
   createPreparationSession,
+  normalizePreparationInteractions,
+  normalizePreparationSession,
   resolveLivePreparationState,
   resolvePreparationSession,
   type PreparationCheckpoint,
+  type PreparationSessionV1,
 } from "@/lib/george/live-runtime/live-preparation-controller";
 import { prepareConversationFromPackage } from "@/lib/george/preparation/runtime.mjs";
 import {
@@ -103,6 +107,8 @@ import {
 
 type HomepageBriefingHandoff = HomepageLiveHandoff & {
   workflowAction?: "continue_briefing" | "review_brief";
+  conversationTypeId?: string;
+  conversationGroup?: string;
   optionalSignals?: Record<string, string>;
   optionalQuestionHistory?: Record<string, string>;
   skippedOptionalQuestions?: string[];
@@ -112,6 +118,7 @@ type HomepageBriefingHandoff = HomepageLiveHandoff & {
     answer: string;
     status: "answered" | "skipped";
   }>;
+  preparationSession?: unknown;
 };
 
 type LiveMechanicsSection = "support" | "receiver" | "speaking";
@@ -648,6 +655,7 @@ export default function LiveEntryClient() {
     preparationSessionId: string;
     createdAt: number;
   } | null>(null);
+  const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
   const liveBriefingRoomSignalEditedRef = useRef(false);
   const generatedBriefingRoomSignalRef = useRef("");
   const [liveBriefingEditAcknowledged, setLiveBriefingEditAcknowledged] =
@@ -919,7 +927,23 @@ export default function LiveEntryClient() {
           optionalSignalQuestionHistory?: Record<string, string>;
           skippedOptionalSignalKeys?: string[];
           livePreparationHistory?: LivePreparationWorkflowState[];
+          preparationSession?: unknown;
         };
+
+        const restoredPreparationSession = normalizePreparationSession(
+          snapshot.preparationSession,
+        );
+        const source = new URLSearchParams(window.location.search).get(
+          "source",
+        );
+
+        if (
+          source === "homepage" &&
+          restoredPreparationSession?.provenance.entrySource === "homepage"
+        ) {
+          homepagePreparationSeedRef.current = restoredPreparationSession;
+          savePreparationSession(restoredPreparationSession);
+        }
 
         setShowLiveBriefingRoom(true);
         setLiveBriefingStep(3);
@@ -1899,6 +1923,201 @@ export default function LiveEntryClient() {
     savePreparationSession(quickLivePreparationSession);
   }, [quickLivePreparationSession]);
 
+  const homepagePreparationSession = useMemo(() => {
+    const seed = homepagePreparationSeedRef.current;
+    if (liveEntryRoute !== "homepage" || !seed) return null;
+
+    const resolvedAudience = String(
+      preLiveSignals.counterparty || seed.knowledge.audience || "",
+    ).trim();
+    const recommendation = seed.support.recommendation;
+    const currentBehavior =
+      liveBriefingActiveSupportStyle === "response" ||
+      selectedSupportStyle === "response"
+        ? ("response" as const)
+        : ("cue" as const);
+    const currentCheckpoint: PreparationCheckpoint = showOpenAISignalSurface
+      ? { surface: "briefing", phase: "questions" }
+      : {
+          surface: "ready_room",
+          phase: "readiness",
+          section:
+            livePrepOpenSection === "formula"
+              ? "formula"
+              : livePrepOpenSection === "ready"
+                ? "ready"
+                : "support",
+        };
+    const currentInteractions = buildPreparationInteractions({
+      answers: optionalSignalAnswers,
+      questionHistory: optionalSignalQuestionHistory,
+      skippedKeys: skippedOptionalSignalKeys,
+    });
+
+    return createPreparationSession({
+      preparationSessionId: seed.preparationSessionId,
+      provenance: seed.provenance,
+      createdAt: seed.createdAt,
+      updatedAt: Date.now(),
+      knowledge: {
+        objective:
+          preLiveSignals.desiredOutcome ||
+          objective ||
+          seed.knowledge.objective,
+        name: preLiveSignals.name || seed.knowledge.name,
+        role: preLiveSignals.role || seed.knowledge.role,
+        participants: resolvedAudience
+          ? [resolvedAudience]
+          : seed.knowledge.participants,
+        audience: resolvedAudience,
+        perspectives: seed.knowledge.perspectives,
+        conversation: seed.knowledge.conversation,
+        knownContext:
+          preLiveSignals.conversationContext ||
+          knownContext ||
+          seed.knowledge.knownContext,
+        communicationMedium: seed.knowledge.communicationMedium,
+        receiverEvidence: seed.knowledge.receiverEvidence,
+        acceptableOutcome:
+          preLiveSignals.acceptableOutcome ||
+          seed.knowledge.acceptableOutcome,
+        secondaryOutcome:
+          preLiveSignals.secondaryOutcome ||
+          preLiveSignals.fallbackOutcome ||
+          seed.knowledge.secondaryOutcome,
+        roomObjective:
+          liveRoomObjectiveOption === "other"
+            ? customLiveRoomObjective
+            : liveRoomObjectiveOption || seed.knowledge.roomObjective,
+        additionalSignals: {
+          ...seed.knowledge.additionalSignals,
+          ...preLiveSignals,
+        },
+        documents: prepDocument
+          ? [
+              {
+                id: prepDocument.name,
+                name: prepDocument.name,
+                kind: prepDocument.kind,
+                summary: prepDocument.summary,
+              },
+            ]
+          : seed.knowledge.documents,
+      },
+      briefing: {
+        priorInteractions: normalizePreparationInteractions([
+          ...seed.briefing.priorInteractions,
+          ...currentInteractions,
+        ]),
+        currentQuestion: currentOptionalSignalQuestion,
+      },
+      assets: {
+        ...(selectedFormula && selectedFormulaSource
+          ? {
+              formula: {
+                id: selectedFormula.id,
+                version: selectedFormula.version,
+                source: selectedFormulaSource,
+              },
+            }
+          : seed.assets.formula
+            ? { formula: seed.assets.formula }
+            : {}),
+        ...(selectedScript
+          ? {
+              script: {
+                id: selectedScript.id,
+                version: selectedScript.version,
+              },
+            }
+          : seed.assets.script
+            ? { script: seed.assets.script }
+            : {}),
+        ...(customizedScript
+          ? { customizedScript }
+          : seed.assets.customizedScript
+            ? { customizedScript: seed.assets.customizedScript }
+            : {}),
+      },
+      support: {
+        recommendation,
+        overrides: {
+          ...(recommendation?.behavior !== currentBehavior
+            ? { behavior: currentBehavior }
+            : {}),
+          ...(recommendation?.receiver !== selectedReceiverProfile
+            ? { receiver: selectedReceiverProfile }
+            : {}),
+          ...(recommendation?.speakingStyle !== communicationStyle
+            ? { speakingStyle: communicationStyle }
+            : {}),
+        },
+        confirmations: {
+          briefingReviewed: liveBriefingToaAccepted,
+          supportAssessmentAgreed: liveBriefingSupportAccepted,
+          receiverConfirmed: receiverProfileConfirmed,
+          speakingStyleConfirmed: liveBriefingCommunicationConfirmed,
+          mechanicsConfirmed: liveBriefingCapabilitiesConfirmed,
+          recoveryAcknowledged: liveRecoveryAcknowledged,
+          readyRoomConfirmed: liveReadyAccepted || liveReadinessComplete,
+        },
+        runtimePreferences: {
+          ...seed.support.runtimePreferences,
+          pacing,
+          recoveryOptionIds: liveRecoveryOptions,
+          selectedResources: editableResources,
+        },
+      },
+      workflow: {
+        current: currentCheckpoint,
+        history: seed.workflow.history,
+        ...(seed.workflow.returnTo
+          ? { returnTo: seed.workflow.returnTo }
+          : {}),
+      },
+      relations: seed.relations,
+    });
+  }, [
+    communicationStyle,
+    currentOptionalSignalQuestion,
+    customLiveRoomObjective,
+    customizedScript,
+    editableResources,
+    knownContext,
+    liveBriefingActiveSupportStyle,
+    liveBriefingCapabilitiesConfirmed,
+    liveBriefingCommunicationConfirmed,
+    liveBriefingSupportAccepted,
+    liveBriefingToaAccepted,
+    liveEntryRoute,
+    livePrepOpenSection,
+    liveReadinessComplete,
+    liveReadyAccepted,
+    liveRecoveryAcknowledged,
+    liveRecoveryOptions,
+    liveRoomObjectiveOption,
+    objective,
+    optionalSignalAnswers,
+    optionalSignalQuestionHistory,
+    pacing,
+    preLiveSignals,
+    prepDocument,
+    receiverProfileConfirmed,
+    selectedFormula,
+    selectedFormulaSource,
+    selectedReceiverProfile,
+    selectedScript,
+    selectedSupportStyle,
+    showOpenAISignalSurface,
+    skippedOptionalSignalKeys,
+  ]);
+
+  useEffect(() => {
+    if (!homepagePreparationSession) return;
+    homepagePreparationSeedRef.current = homepagePreparationSession;
+    savePreparationSession(homepagePreparationSession);
+  }, [homepagePreparationSession]);
+
   const mandatoryLiveSignals = useMemo(() => {
     const cleanObjective = objective.trim();
     const hasObjective = cleanObjective.length > 0;
@@ -2108,6 +2327,92 @@ export default function LiveEntryClient() {
         }
       }
 
+      let homepagePreparationSeed: PreparationSessionV1 | null = null;
+
+      if (source === "homepage") {
+        const submittedPreparationSession = normalizePreparationSession(
+          homepageHandoff?.preparationSession,
+        );
+        const storedPreparationSession =
+          params.get("return") === "live-prep"
+            ? loadPreparationSession()
+            : null;
+
+        if (
+          submittedPreparationSession?.provenance.entrySource === "homepage"
+        ) {
+          homepagePreparationSeed = submittedPreparationSession;
+        } else if (
+          storedPreparationSession?.provenance.entrySource === "homepage"
+        ) {
+          homepagePreparationSeed = storedPreparationSession;
+        } else if (homepageHandoff) {
+          const legacySignals = homepageHandoff.signals || {};
+          const legacyAudience = String(
+            legacySignals.counterparty || legacySignals.audience || "",
+          ).trim();
+          const legacyInteractions = Array.isArray(
+            homepageHandoff.priorInteractions,
+          )
+            ? normalizePreparationInteractions(
+                homepageHandoff.priorInteractions,
+              )
+            : buildPreparationInteractions({
+                answers: homepageHandoff.optionalSignals,
+                questionHistory: homepageHandoff.optionalQuestionHistory,
+                skippedKeys: homepageHandoff.skippedOptionalQuestions,
+              });
+
+          homepagePreparationSeed = createPreparationSession({
+            provenance: { entrySource: "homepage" },
+            knowledge: {
+              objective: legacySignals.desiredOutcome || "",
+              role: legacySignals.role || "",
+              participants: legacyAudience ? [legacyAudience] : [],
+              audience: legacyAudience,
+              perspectives: [],
+              conversation: {
+                id: homepageHandoff.conversationTypeId,
+                title: homepageHandoff.conversationType,
+                group: homepageHandoff.conversationGroup,
+              },
+              knownContext: legacySignals.conversationContext,
+              additionalSignals: legacySignals,
+              documents: [],
+            },
+            briefing: {
+              priorInteractions: legacyInteractions,
+            },
+            support: {
+              overrides: {},
+            },
+            workflow: {
+              current: {
+                surface: "ready_room",
+                phase: "readiness",
+                section: "support",
+              },
+              history: [],
+            },
+          });
+        }
+
+        if (homepagePreparationSeed) {
+          homepagePreparationSeedRef.current = homepagePreparationSeed;
+          savePreparationSession(homepagePreparationSeed);
+
+          const homepageDocument =
+            homepagePreparationSeed.knowledge.documents[0];
+          if (homepageDocument) {
+            setPrepDocument({
+              name: homepageDocument.name,
+              summary: homepageDocument.summary || "",
+              kind: homepageDocument.kind,
+            });
+          }
+        }
+      }
+
       const homepageWorkflowAction = String(
         homepageHandoff?.workflowAction || "",
       );
@@ -2167,7 +2472,15 @@ export default function LiveEntryClient() {
 
       const entryResolution = resolveLiveEntry({
         source,
-        homepageHandoff,
+        homepageHandoff: homepagePreparationSeed
+          ? {
+              ...(homepageHandoff || {}),
+              conversationType:
+                homepagePreparationSeed.knowledge.conversation.title,
+              signals: resolvePreparationSession(homepagePreparationSeed)
+                .signals,
+            }
+          : homepageHandoff,
         storedPreparationSignals,
         preparationPreviewReady: isLivePreparationPreviewReady(),
         devPreview: params.get("devPreview") === "1",
@@ -2192,25 +2505,100 @@ export default function LiveEntryClient() {
         entryResolution.route === "homepage" &&
         (homepageHandoff || Object.keys(acquiredSignalsForAccess).length > 0)
       ) {
-        const homepageRecommendation = resolveHomepageSupportRecommendation(
-          acquiredSignalsForAccess,
-          String(homepageHandoff?.conversationType || ""),
-        );
+        const preservedHomepageRecommendation =
+          homepagePreparationSeed?.support.recommendation;
+        const generatedHomepageRecommendation =
+          preservedHomepageRecommendation?.behavior &&
+          preservedHomepageRecommendation.receiver &&
+          preservedHomepageRecommendation.speakingStyle
+            ? {
+                supportStyle:
+                  preservedHomepageRecommendation.behavior === "response"
+                    ? ("response" as const)
+                    : ("advice" as const),
+                receiverProfile: preservedHomepageRecommendation.receiver,
+                communicationStyle:
+                  preservedHomepageRecommendation.speakingStyle,
+              }
+            : resolveHomepageSupportRecommendation(
+                acquiredSignalsForAccess,
+                String(
+                  homepagePreparationSeed?.knowledge.conversation.title ||
+                    homepageHandoff?.conversationType ||
+                    "",
+                ),
+              );
+        const recommendation = {
+          behavior:
+            homepagePreparationSeed?.support.recommendation?.behavior ||
+            (generatedHomepageRecommendation.supportStyle === "response"
+              ? ("response" as const)
+              : ("cue" as const)),
+          receiver:
+            homepagePreparationSeed?.support.recommendation?.receiver ||
+            generatedHomepageRecommendation.receiverProfile,
+          speakingStyle:
+            homepagePreparationSeed?.support.recommendation?.speakingStyle ||
+            generatedHomepageRecommendation.communicationStyle,
+        };
+        const recommendedHomepageSession = homepagePreparationSeed
+          ? createPreparationSession({
+              preparationSessionId:
+                homepagePreparationSeed.preparationSessionId,
+              provenance: homepagePreparationSeed.provenance,
+              createdAt: homepagePreparationSeed.createdAt,
+              updatedAt: Date.now(),
+              knowledge: homepagePreparationSeed.knowledge,
+              briefing: homepagePreparationSeed.briefing,
+              assets: homepagePreparationSeed.assets,
+              support: {
+                ...homepagePreparationSeed.support,
+                recommendation,
+              },
+              workflow: homepagePreparationSeed.workflow,
+              relations: homepagePreparationSeed.relations,
+            })
+          : null;
+        const effectiveHomepageSupport = recommendedHomepageSession
+          ? resolvePreparationSession(recommendedHomepageSession)
+              .supportConfiguration
+          : recommendation;
+        const homepageSupportStyle: LiveBriefingSupportPanelId =
+          effectiveHomepageSupport.behavior === "response"
+            ? "response"
+            : "advice";
+        const homepageReceiverProfile =
+          effectiveHomepageSupport.receiver ||
+          generatedHomepageRecommendation.receiverProfile;
+        const homepageCommunicationStyle =
+          effectiveHomepageSupport.speakingStyle ||
+          generatedHomepageRecommendation.communicationStyle;
         const runtimeSupportStyle = toRuntimeSupportStyle(
-          homepageRecommendation.supportStyle,
+          homepageSupportStyle,
         );
 
+        if (recommendedHomepageSession) {
+          homepagePreparationSeed = recommendedHomepageSession;
+          homepagePreparationSeedRef.current = recommendedHomepageSession;
+          savePreparationSession(recommendedHomepageSession);
+        }
+
         setLiveBriefingActiveSupportStyle(
-          homepageRecommendation.supportStyle,
+          homepageSupportStyle,
         );
         setSelectedSupportStyle(
           normalizeLiveSupportStyle(runtimeSupportStyle),
         );
-        setSelectedReceiverProfile(homepageRecommendation.receiverProfile);
+        setSelectedReceiverProfile(homepageReceiverProfile);
         setReceiverProfileConfirmed(true);
-        setCommunicationStyle(homepageRecommendation.communicationStyle);
+        setCommunicationStyle(homepageCommunicationStyle);
         setLiveBriefingCommunicationConfirmed(true);
-        setLiveBriefingSupportAccepted(false);
+        setLiveBriefingSupportAccepted(
+          Boolean(
+            recommendedHomepageSession?.support.confirmations
+              .supportAssessmentAgreed,
+          ),
+        );
         setSupportAssessmentExplanationOpen(false);
 
         window.localStorage.setItem(
@@ -2223,24 +2611,24 @@ export default function LiveEntryClient() {
         );
         window.localStorage.setItem(
           "GEORGE_LIVE_RECEIVER_PROFILE",
-          homepageRecommendation.receiverProfile,
+          homepageReceiverProfile,
         );
         window.localStorage.setItem(
           "george_live_entry_receiver_profile",
-          homepageRecommendation.receiverProfile,
+          homepageReceiverProfile,
         );
         window.localStorage.setItem(
           "george_live_communication_style",
-          homepageRecommendation.communicationStyle,
+          homepageCommunicationStyle,
         );
       }
 
       if (homepageHandoff) {
-        const canonicalInteractions = Array.isArray(
-          homepageHandoff.priorInteractions,
-        )
-          ? homepageHandoff.priorInteractions
-          : null;
+        const canonicalInteractions = homepagePreparationSeed
+          ? homepagePreparationSeed.briefing.priorInteractions
+          : Array.isArray(homepageHandoff.priorInteractions)
+            ? homepageHandoff.priorInteractions
+            : null;
 
         if (canonicalInteractions) {
           const answeredQuestionKeys = new Set(
@@ -2287,6 +2675,12 @@ export default function LiveEntryClient() {
             Array.isArray(homepageHandoff.skippedOptionalQuestions)
               ? Array.from(new Set(homepageHandoff.skippedOptionalQuestions))
               : [],
+          );
+        }
+
+        if (homepagePreparationSeed?.briefing.currentQuestion) {
+          setCurrentOptionalSignalQuestion(
+            homepagePreparationSeed.briefing.currentQuestion,
           );
         }
       }
@@ -2477,7 +2871,9 @@ export default function LiveEntryClient() {
       setRelatedSessions(merged);
       const source = new URLSearchParams(window.location.search).get("source");
       setRelatedSessionId(
-        source === "start" ? "not_related" : merged[0]?.id || "not_related",
+        source === "start" || source === "homepage"
+          ? "not_related"
+          : merged[0]?.id || "not_related",
       );
     } catch {
       setRelatedSessions([]);
@@ -2953,8 +3349,13 @@ export default function LiveEntryClient() {
           optionalSignalQuestionHistory,
           skippedOptionalSignalKeys,
           livePreparationHistory: livePreparationHistoryRef.current,
+          preparationSession: homepagePreparationSession,
         }),
       );
+
+      if (homepagePreparationSession) {
+        savePreparationSession(homepagePreparationSession);
+      }
     } catch (error) {
       console.warn(
         "[GEORGE][LIVE_ENTRY][PREP_RETURN_SAVE_FAILED]",
@@ -3269,6 +3670,37 @@ export default function LiveEntryClient() {
   ) => {
     if (typeof window === "undefined") return;
 
+    const resolvedHomepagePreparation =
+      liveEntryRoute === "homepage" && homepagePreparationSession
+        ? resolvePreparationSession(homepagePreparationSession)
+        : null;
+
+    if (homepagePreparationSession) {
+      savePreparationSession(homepagePreparationSession);
+    }
+
+    const entrySupportStyle = resolvedHomepagePreparation
+      ? normalizeLiveSupportStyle(
+          toRuntimeSupportStyle(
+            resolvedHomepagePreparation.supportConfiguration.behavior ===
+              "response"
+              ? "response"
+              : "advice",
+          ),
+        )
+      : supportStyle;
+    const entryReceiverProfile =
+      resolvedHomepagePreparation?.supportConfiguration.receiver ||
+      window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
+      window.localStorage.getItem("george_live_entry_receiver_profile") ||
+      "audio_only";
+    const entryCommunicationStyle =
+      resolvedHomepagePreparation?.supportConfiguration.speakingStyle ||
+      communicationStyle;
+    const entryLiveAssistMode = legacyAssistModeFromSupportStyle(
+      entrySupportStyle,
+    );
+
     if (
       !sessionEmail.trim() &&
       !preLivePreviewReady &&
@@ -3439,14 +3871,9 @@ export default function LiveEntryClient() {
       prepRoomProfile,
       preparationRuntime,
       recoveryConstraints: liveRecoveryConstraints,
-      supportStyle,
-      deliveryStyle: supportStyle,
-      receiverProfile:
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-            window.localStorage.getItem("george_live_entry_receiver_profile") ||
-            "audio_only"
-          : "visual_only",
+      supportStyle: entrySupportStyle,
+      deliveryStyle: entrySupportStyle,
+      receiverProfile: entryReceiverProfile,
     };
 
     const liveSetup = {
@@ -3491,8 +3918,8 @@ export default function LiveEntryClient() {
         : "",
       useRoomPhrases,
       customRoomPhrases,
-      communicationStyle,
-      liveAssistMode,
+      communicationStyle: entryCommunicationStyle,
+      liveAssistMode: entryLiveAssistMode,
       skipPrep,
       runtimeSupport,
       selectedCapacityCents: finalEstimate.estimatedCents,
@@ -3501,30 +3928,21 @@ export default function LiveEntryClient() {
       compactPrep: true,
       prepRoomProfile,
       recoveryConstraints: liveRecoveryConstraints,
-      supportStyle,
-      deliveryStyle: supportStyle,
-      receiverProfile:
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-            window.localStorage.getItem("george_live_entry_receiver_profile") ||
-            "audio_only"
-          : "visual_only",
+      supportStyle: entrySupportStyle,
+      deliveryStyle: entrySupportStyle,
+      receiverProfile: entryReceiverProfile,
       createdAt: Date.now(),
     };
 
-    window.localStorage.setItem("GEORGE_LIVE_SUPPORT_STYLE", supportStyle);
-    window.localStorage.setItem("GEORGE_LIVE_DELIVERY_STYLE", supportStyle);
+    window.localStorage.setItem("GEORGE_LIVE_SUPPORT_STYLE", entrySupportStyle);
+    window.localStorage.setItem("GEORGE_LIVE_DELIVERY_STYLE", entrySupportStyle);
     window.localStorage.setItem(
       "GEORGE_LIVE_RECEIVER_PROFILE",
-      window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-        window.localStorage.getItem("george_live_entry_receiver_profile") ||
-        "audio_only",
+      entryReceiverProfile,
     );
     window.localStorage.setItem(
       "george_live_entry_receiver_profile",
-      window.localStorage.getItem("GEORGE_LIVE_RECEIVER_PROFILE") ||
-        window.localStorage.getItem("george_live_entry_receiver_profile") ||
-        "audio_only",
+      entryReceiverProfile,
     );
     window.localStorage.setItem(
       "george_live_entry_support_preference",
@@ -3538,7 +3956,7 @@ export default function LiveEntryClient() {
         window.localStorage.getItem("george_live_entry_receiver_profile") ||
         "audio_only",
     );
-    window.localStorage.setItem("george_live_assist_mode", liveAssistMode);
+    window.localStorage.setItem("george_live_assist_mode", entryLiveAssistMode);
 
     if (!bypassBriefing) {
       setLiveBriefingStep(1);
@@ -3587,7 +4005,10 @@ export default function LiveEntryClient() {
       "george_live_setup_active",
       JSON.stringify(liveSetup),
     );
-    window.localStorage.setItem("george_live_assist_mode", liveAssistMode);
+    window.localStorage.setItem(
+      "george_live_assist_mode",
+      entryLiveAssistMode,
+    );
     window.localStorage.setItem(
       "george_live_runtime_support",
       JSON.stringify(runtimeSupport),
