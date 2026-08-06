@@ -44,6 +44,7 @@ import {
 import {
   getActiveSessionForMode,
   getSessionsForMode,
+  setActiveMode,
   setActiveSessionIdForMode,
   type GeorgeStoredSession,
 } from "@/lib/george/session/store";
@@ -727,6 +728,48 @@ export default function LiveEntryClient() {
     setLiveBriefingStep(nextStep);
   };
 
+  const restoreValidatedNormalOrigin = () => {
+    if (typeof window === "undefined") return false;
+
+    const preparationSession = normalPreparationSeedRef.current;
+    const normalSessionId = String(
+      preparationSession?.relations.normalSessionId || "",
+    ).trim();
+
+    if (
+      preparationSession?.provenance.entrySource !== "normal" ||
+      !normalSessionId ||
+      !getSessionsForMode("normal").some(
+        (session) => session.id === normalSessionId,
+      )
+    ) {
+      return false;
+    }
+
+    setActiveSessionIdForMode("normal", normalSessionId);
+    setActiveMode("normal");
+
+    const referrerReturnsToGeorge = (() => {
+      try {
+        const referrer = new URL(window.document.referrer);
+        return (
+          referrer.origin === window.location.origin &&
+          referrer.pathname === "/george"
+        );
+      } catch {
+        return false;
+      }
+    })();
+
+    if (referrerReturnsToGeorge && window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/george";
+    }
+
+    return true;
+  };
+
   const goToPreviousLivePreparationState = () => {
     const previous = livePreparationHistoryRef.current.pop();
 
@@ -759,6 +802,8 @@ export default function LiveEntryClient() {
       window.location.href = "/?restore=brief-review";
       return;
     }
+
+    if (restoreValidatedNormalOrigin()) return;
 
     if (typeof window !== "undefined" && window.history.length > 1) {
       window.history.back();
