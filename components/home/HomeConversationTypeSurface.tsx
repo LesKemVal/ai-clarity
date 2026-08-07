@@ -64,6 +64,66 @@ function SelectionAcknowledgement({ label }: { label: string }) {
 
 const HOMEPAGE_ROLES: readonly HomepageRole[] = [
   {
+    id: "sales",
+    label: "Sales",
+    category: "Conversation starters",
+    conversationTypeId: "discovery-call",
+    featured: true,
+    summary:
+      "Keep the buyer focused while I help surface the strongest proof, response, and next move.",
+    capabilities: ["Discovery", "Value framing", "Objection handling", "Next steps"],
+  },
+  {
+    id: "executive",
+    label: "Executive",
+    category: "Conversation starters",
+    conversationTypeId: "executive-presentation",
+    featured: true,
+    summary:
+      "Keep the room focused while I help surface the decision, evidence, risks, and concise framing that matter.",
+    capabilities: ["Decision framing", "Evidence", "Risk", "Executive clarity"],
+  },
+  {
+    id: "job-seeker",
+    label: "Job Seeker",
+    category: "Conversation starters",
+    conversationTypeId: "prep-my-interview",
+    featured: true,
+    summary:
+      "Stay focused on the interviewer while I help surface the accomplishment, metric, or example that fits the moment.",
+    capabilities: ["Accomplishments", "Metrics", "Examples", "Recovery"],
+  },
+  {
+    id: "healthcare",
+    label: "Healthcare",
+    category: "Conversation starters",
+    conversationTypeId: "other-work",
+    featured: true,
+    summary:
+      "Stay focused on the conversation while I help you recall the relevant facts, questions, and next step.",
+    capabilities: ["Relevant facts", "Questions", "Clarity", "Next steps"],
+  },
+  {
+    id: "educator",
+    label: "Educator",
+    category: "Conversation starters",
+    conversationTypeId: "teach-a-lesson",
+    featured: true,
+    summary:
+      "Keep learners with you while I help surface the clearest explanation, example, or transition for the moment.",
+    capabilities: ["Explanation", "Examples", "Pacing", "Adaptation"],
+  },
+  {
+    id: "other",
+    label: "Other",
+    category: "Conversation starters",
+    conversationTypeId: "other-work",
+    featured: true,
+    summary:
+      "Stay focused on the conversation while I help surface the fact, response, or next move that supports your objective.",
+    capabilities: ["Clarity", "Recall", "Adaptation", "Next steps"],
+  },
+  {
     id: "telemarketer",
     label: "Telemarketer",
     category: "Sales & Outreach",
@@ -549,6 +609,22 @@ function HomepageRoleCard({
   );
 }
 
+function homepageOperationalPromise(
+  role: HomepageRole | null,
+  goal: string | null,
+  fallback: string,
+) {
+  const summary = String(role?.summary || fallback).trim();
+  const sentence = /^I['’]ll\b/i.test(summary)
+    ? summary
+    : `I’ll help you ${summary.charAt(0).toLowerCase()}${summary.slice(1)}`;
+  const objective = String(goal || "").trim();
+
+  return objective
+    ? `${sentence} I’ll keep “${objective}” in view as we prepare.`
+    : sentence;
+}
+
 export function HomeConversationTypeSurface() {
   const surfaceRef = useRef<HTMLElement | null>(null);
   const homepagePreparationSeedRef = useRef<PreparationSessionV1 | null>(null);
@@ -585,6 +661,24 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   >([]);
   const [formulaLoading, setFormulaLoading] = useState(false);
   const [formulaError, setFormulaError] = useState("");
+
+  useEffect(() => {
+    if (!selectedType || typeof window === "undefined") return;
+
+    const media = window.matchMedia("(max-width: 767px)");
+    const previousOverflow = document.body.style.overflow;
+    const syncScrollLock = () => {
+      document.body.style.overflow = media.matches ? "hidden" : previousOverflow;
+    };
+
+    syncScrollLock();
+    media.addEventListener?.("change", syncScrollLock);
+
+    return () => {
+      media.removeEventListener?.("change", syncScrollLock);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedType]);
 
   const activeFormula = useMemo(() => {
     if (!selectedType || accessibleFormulas.length === 0) return null;
@@ -821,6 +915,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     optionalQuestion?.question || "",
     phase === "optional" && Boolean(optionalQuestion),
     18,
+  );
+
+  const currentOperationalPromise = homepageOperationalPromise(
+    selectedRole,
+    selectedGoal,
+    selectedType?.description || "move the conversation toward your objective.",
   );
 
   function selectRole(role: HomepageRole) {
@@ -1355,10 +1455,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
     <section
       ref={surfaceRef}
       className={`relative min-h-[100dvh] scroll-mt-4 border-t border-white/10 px-5 py-14 transition-colors duration-700 sm:px-8 sm:py-20 ${
-        selectedType ? "bg-[#020304]" : "bg-black"
+        selectedType
+          ? "bg-[#020304] max-sm:h-[100dvh] max-sm:overflow-hidden max-sm:px-3 max-sm:py-3"
+          : "bg-black"
       }`}
     >
-      <div className="mx-auto w-full max-w-[1700px]">
+      <div className={`mx-auto w-full max-w-[1700px] ${selectedType ? "max-sm:h-full" : ""}`}>
         {phase === "selection" ? (
           <div className="animate-[fadeIn_420ms_ease-out]">
             <div className="max-w-6xl">
@@ -1369,12 +1471,12 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                 If success depends on what you say, how you say it, or how you adapt while saying it, GEORGE can help.
               </h1>
               <p className="mt-6 max-w-3xl text-[16px] leading-8 text-white/68">
-                Choose the role that feels most like you. GEORGE will show how it can help before asking what you are trying to accomplish.
+                Choose the starting point that feels closest to your conversation. I’ll show how I can help before asking what you are trying to accomplish.
               </p>
 
               <div className="mt-10">
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-white/46">
-                  Featured roles
+                  Conversation starters
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {FEATURED_HOMEPAGE_ROLES.map((role) => (
@@ -1445,10 +1547,10 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
             </div>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out]">
-            <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 sm:p-5 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-7">
+          <div className="mx-auto w-full max-w-4xl animate-[fadeIn_420ms_ease-out] max-sm:h-full">
+            <div className="rounded-[18px] border border-white/[0.08] bg-[#050607] p-3 shadow-[0_18px_70px_rgba(0,0,0,0.42)] sm:p-5 sm:p-7 max-sm:flex max-sm:h-full max-sm:min-h-0 max-sm:flex-col max-sm:overflow-y-auto max-sm:overscroll-contain">
               <div
-                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 ${
+                className={`border-b border-white/[0.07] pb-5 transition-all duration-500 max-sm:sticky max-sm:top-0 max-sm:z-10 max-sm:bg-[#050607] ${
                   phase === "optional" ? "border-transparent pb-3" : ""
                 }`}
               >
@@ -1499,7 +1601,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     <div className="animate-[fadeIn_420ms_ease-out]">
                       <div className="mt-4 max-w-3xl">
                         <p className="text-[14px] leading-6 text-white/62 sm:text-[15px]">
-                          {selectedRole?.summary || selectedType?.description}
+                          {currentOperationalPromise}
                         </p>
 
                         {selectedRole ? (
@@ -1697,11 +1799,11 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     }`}
                   >
                     <h3 className="font-mono text-[17px] font-semibold tracking-[-0.02em] text-white">
-                      With your voice.
+                      With you in the conversation.
                     </h3>
 
                     <p className="mt-3 max-w-3xl text-[14px] leading-7 text-white/52">
-                      Continue shaping the conversation, then carry the same preparation into LIVE.
+                      {currentOperationalPromise}
                     </p>
                   </div>
 
@@ -1757,7 +1859,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                         placeholder={optionalQuestion.example}
                         className="mt-4 min-h-[118px] w-full resize-none rounded-[11px] border border-white/[0.09] bg-black/20 px-4 py-3 text-[14px] leading-6 text-white outline-none transition placeholder:text-white/22 focus:border-[#7EA1FF]/45 focus:bg-black/30"
                       />
-                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+                      <div className="mt-4 flex flex-wrap items-center justify-end gap-3 max-sm:sticky max-sm:bottom-0 max-sm:z-10 max-sm:bg-[#050607] max-sm:py-3">
                         <div className="flex gap-2">
                           <button
                             type="button"
@@ -1890,7 +1992,7 @@ const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
                     </div>
                   )}
 
-                  <div className="mt-7 flex justify-center gap-3">
+                  <div className="mt-7 flex justify-center gap-3 max-sm:sticky max-sm:bottom-0 max-sm:z-10 max-sm:bg-[#050607] max-sm:py-3">
                     <button
                       type="button"
                       onClick={approveAndContinueToLive}

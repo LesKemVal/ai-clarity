@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 export type LiveCapabilityPhase =
   | 'available'
+  | 'orientation'
   | 'preparing'
   | 'ready'
 
@@ -21,7 +22,7 @@ export function LiveCapabilitySurface({
   const [flipped, setFlipped] = useState(false)
 
   useEffect(() => {
-    if (phase === 'preparing') return
+    if (phase === 'preparing' || phase === 'orientation') return
 
     const runFlip = () => {
       setFlipped(true)
@@ -53,6 +54,19 @@ export function LiveCapabilitySurface({
       >
         Preparing LIVE
       </div>
+    )
+  }
+
+  if (phase === 'orientation') {
+    return (
+      <button
+        type="button"
+        onClick={onStart}
+        className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-red-200/[0.22] bg-red-100/[0.08] px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-red-100/78 transition hover:border-red-100/[0.38] hover:bg-red-100/[0.12] hover:text-red-50 active:scale-[0.97]"
+        aria-label="Continue to LIVE preparation"
+      >
+        LIVE
+      </button>
     )
   }
 

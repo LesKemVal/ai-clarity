@@ -462,6 +462,62 @@ type Message = {
   presentationMode?: "live_preparation";
 };
 
+function buildNormalPreparationConversationEvidence(messages: Message[]) {
+  const conversationEvidence = messages
+    .filter(
+      (message) =>
+        (message.role === "user" || message.role === "assistant") &&
+        message.presentationMode !== "live_preparation" &&
+        message.source !== "system_override" &&
+        String(message.content || "").trim(),
+    )
+    .slice(-8)
+    .map((message) => {
+      const speaker = message.role === "user" ? "User" : "GEORGE";
+      return `${speaker}: ${String(message.content || "").trim()}`;
+    })
+    .join("\n")
+    .slice(0, 2800)
+    .trim();
+
+  return conversationEvidence
+    ? `Current-session conversation evidence (provisional until qualified for LIVE preparation):\n${conversationEvidence}`
+    : "";
+}
+
+const UNIVERSAL_NORMAL_LIVE_ORIENTATION = `Bring me into your next meeting, interview, negotiation, sales call, presentation, or other important conversation.
+
+While you speak and lead naturally, I’ll listen in real time and quietly support you through your audio or visual device.
+
+I’ll help you stay on message, recover when the conversation changes, surface the right fact or argument at the moment it matters, and keep moving toward your objective.
+
+Tap LIVE again to tailor my support for this conversation.`;
+
+function buildNormalLiveOrientationMessage(objective = "") {
+  const normalizedObjective = String(objective || "").trim();
+  if (!normalizedObjective) return UNIVERSAL_NORMAL_LIVE_ORIENTATION;
+
+  return `I’ll be with you during this conversation while you continue speaking and leading naturally. I’ll listen in real time and quietly support you through your audio or visual device, helping you move toward “${normalizedObjective}” by surfacing the right fact, argument, recovery, or next move when it matters.
+
+Tap LIVE again and I’ll tailor that support for this conversation.`;
+}
+
+function buildNormalPreparationQuestionContent(question: PreparationQuestion) {
+  const questionText = String(question.question || "").trim();
+  const rawExample = String(question.example || "").trim();
+  const exampleIsInterfaceGuidance =
+    /^(answer if useful,? or skip|this (?:answer )?may improve george(?:'s|’s) context, timing, and support)\.?$/i.test(
+      rawExample,
+    );
+  const answerFormula = !rawExample || exampleIsInterfaceGuidance
+    ? ""
+    : /^for example:/i.test(rawExample)
+      ? rawExample
+      : `For example: ${rawExample.replace(/^example:\s*/i, "")}`;
+
+  return [questionText, answerFormula].filter(Boolean).join("\n\n");
+}
+
 type PromptSelection = {
   label: string;
   text: string;
@@ -1076,6 +1132,12 @@ export default function Page({
     {},
   );
   const [preLiveSignalComplete, setPreLiveSignalComplete] = useState(false);
+  const [normalPreparationSession, setNormalPreparationSession] =
+    useState<PreparationSessionV1 | null>(null);
+  const [normalLiveOrientationActive, setNormalLiveOrientationActive] =
+    useState(false);
+  const [normalLiveOrientationSessionId, setNormalLiveOrientationSessionId] =
+    useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1095,6 +1157,21 @@ export default function Page({
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    if (!normalLiveOrientationActive) return;
+
+    const activeNormalSession = getActiveSessionForMode("normal");
+    if (
+      messages.length === 0 ||
+      (normalLiveOrientationSessionId &&
+        activeNormalSession?.id !== normalLiveOrientationSessionId)
+    ) {
+      setNormalLiveOrientationActive(false);
+      setNormalLiveOrientationSessionId(null);
+    }
+  }, [messages, normalLiveOrientationActive, normalLiveOrientationSessionId]);
+
   const isManualLive =
     conversationMode === "manual_live" || activePromptContext === "manual_live";
   const [campaigns, setCampaigns] = useState<GeorgeCampaign[]>([]);
@@ -2385,6 +2462,17 @@ export default function Page({
           mode: "normal",
           subscriberEmail,
         });
+    const storedPreparationSession = loadPreparationSession();
+
+    setNormalPreparationSession(
+      storedPreparationSession?.provenance.entrySource === "normal" &&
+        activeSession?.id &&
+        storedPreparationSession.relations.normalSessionId === activeSession.id
+        ? storedPreparationSession
+        : null,
+    );
+    setNormalLiveOrientationActive(false);
+    setNormalLiveOrientationSessionId(null);
 
     const transientDraft = freshNormalEntryRequested
       ? { restored: false as const, messages: [] }
@@ -3186,6 +3274,23 @@ export default function Page({
     }
   };
 
+  const loadValidatedNormalPreparationSession = () => {
+    if (typeof window === "undefined") return null;
+
+    const preparationSession = loadPreparationSession();
+    const activeNormalSession = getActiveSessionForMode("normal");
+
+    if (
+      preparationSession?.provenance.entrySource !== "normal" ||
+      !activeNormalSession?.id ||
+      preparationSession.relations.normalSessionId !== activeNormalSession.id
+    ) {
+      return null;
+    }
+
+    return preparationSession;
+  };
+
   const beginNormalLivePreparation = ({
     signals = {},
     explicitObjective = "",
@@ -3271,12 +3376,16 @@ export default function Page({
         existingSession?.knowledge.audience ||
         "",
     ).trim();
+    const currentSessionConversationEvidence = existingSession
+      ? ""
+      : buildNormalPreparationConversationEvidence(messagesRef.current);
     const knownContext = Array.from(
       new Set(
         [
           normalizedSignals.conversationContext,
           sourceContext,
           inferredDirection ? `Proposed outcome: ${inferredDirection}` : "",
+          currentSessionConversationEvidence,
           existingSession?.knowledge.knownContext,
           activeNormalSession.summary,
           activeNormalSession.lastKnownState,
@@ -3359,6 +3468,7 @@ export default function Page({
     });
 
     savePreparationSession(session);
+    setNormalPreparationSession(session);
     return session;
   };
 
@@ -3388,11 +3498,17 @@ export default function Page({
 
     const fromPreparedMessage =
       window.localStorage.getItem("GEORGE_PRE_LIVE_FROM_MESSAGE") === "1";
+    const validatedPreparationSession =
+      loadValidatedNormalPreparationSession();
+    const objective = normalizeExplicitNormalPreparationObjective(
+      validatedPreparationSession?.knowledge.objective,
+    );
 
-    if (preLiveSignalComplete) {
+    if (validatedPreparationSession && objective) {
       const preparationSession = beginNormalLivePreparation({
-        signals: preLiveSignals,
-        explicitObjective: preLiveSignals.desiredOutcome || "",
+        signals: validatedPreparationSession.knowledge.additionalSignals,
+        explicitObjective: objective,
+        briefing: validatedPreparationSession.briefing,
         checkpoint: { surface: "ready_room", phase: "mechanics" },
       });
       if (!preparationSession) return;
@@ -3481,14 +3597,7 @@ export default function Page({
     setActivePromptContext("pre_live_signal_acquisition");
     setActivePromptLabel(question.label || "LIVE");
 
-    const questionContent = [
-      question.question,
-      question.why,
-      question.example,
-    ]
-      .map((value) => String(value || "").trim())
-      .filter(Boolean)
-      .join("\n\n");
+    const questionContent = buildNormalPreparationQuestionContent(question);
     const latestMessage = messagesRef.current[messagesRef.current.length - 1];
 
     if (
@@ -3610,7 +3719,7 @@ export default function Page({
             payload.helper ||
             "This answer may materially improve GEORGE's preparation.",
         ),
-        example: String(payload.example || "Answer if useful, or skip."),
+        example: String(payload.example || ""),
       };
       const questionSession = beginNormalLivePreparation({
         signals: preparationSession.knowledge.additionalSignals,
@@ -3677,6 +3786,125 @@ export default function Page({
     setActivePromptContext("pre_live_signal_acquisition");
 
     void requestNormalAdaptiveQuestion(preparationSession);
+  };
+
+  const continueNormalAdaptiveBriefing = () => {
+    const preparationSession = loadValidatedNormalPreparationSession();
+    const objective = normalizeExplicitNormalPreparationObjective(
+      preparationSession?.knowledge.objective,
+    );
+
+    if (
+      !preparationSession ||
+      preparationSession.workflow.current.surface !== "briefing" ||
+      preparationSession.workflow.current.phase !== "decision" ||
+      !objective
+    ) {
+      return;
+    }
+
+    const questionSession = beginNormalLivePreparation({
+      signals: preparationSession.knowledge.additionalSignals,
+      explicitObjective: objective,
+      briefing: preparationSession.briefing,
+      checkpoint: { surface: "briefing", phase: "questions" },
+    });
+    if (!questionSession) return;
+
+    setShowPreLiveSignalSurface(true);
+    setCurrentPreLiveQuestion(null);
+    setPreLiveSignalComplete(false);
+    setActivePromptContext("pre_live_signal_acquisition");
+    setActivePromptLabel("LIVE");
+    void requestNormalAdaptiveQuestion(questionSession);
+  };
+
+  const closeNormalPreparationBriefing = () => {
+    const preparationSession = loadValidatedNormalPreparationSession();
+    if (!preparationSession) return;
+
+    setNormalPreparationSession(preparationSession);
+    setShowPreLiveSignalSurface(false);
+    setCurrentPreLiveQuestion(null);
+    setPreLiveSignalComplete(false);
+    setActivePromptContext(null);
+    setActivePromptLabel(null);
+  };
+
+  const resumeNormalPreparationBriefing = () => {
+    const preparationSession = loadValidatedNormalPreparationSession();
+
+    if (
+      !preparationSession ||
+      preparationSession.workflow.current.surface !== "briefing"
+    ) {
+      startLiveSignalAcquisition();
+      return;
+    }
+
+    const objective = normalizeExplicitNormalPreparationObjective(
+      preparationSession.knowledge.objective,
+    );
+
+    setNormalPreparationSession(preparationSession);
+    setPreLiveSignals({
+      ...preparationSession.knowledge.additionalSignals,
+      ...(objective ? { desiredOutcome: objective } : {}),
+    });
+    setShowPreLiveSignalSurface(true);
+
+    if (preparationSession.briefing.currentQuestion) {
+      presentNormalAdaptiveQuestion(
+        preparationSession.briefing.currentQuestion,
+      );
+      return;
+    }
+
+    setCurrentPreLiveQuestion(null);
+    setPreLiveSignalComplete(Boolean(objective));
+    setActivePromptContext(
+      objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
+    );
+    setActivePromptLabel(objective ? "LIVE Ready" : "LIVE");
+  };
+
+  const orientNormalLive = () => {
+    if (typeof window === "undefined" || normalLiveOrientationActive) return;
+
+    const activeNormalSession = getActiveSessionForMode("normal");
+    const validatedPreparationSession = loadValidatedNormalPreparationSession();
+    const knownObjective = normalizeExplicitNormalPreparationObjective(
+      validatedPreparationSession?.knowledge.objective ||
+        activeNormalSession?.metadata?.desiredOutcome,
+    );
+    const orientationMessage: Message = {
+      role: "assistant",
+      content: buildNormalLiveOrientationMessage(knownObjective),
+      source: "system_override",
+    };
+
+    setMessages((prev) => {
+      const next = [...prev, orientationMessage];
+      messagesRef.current = next;
+      return next;
+    });
+    setNormalLiveOrientationSessionId(activeNormalSession?.id || null);
+    setNormalLiveOrientationActive(true);
+    setInput("");
+    setInterimTranscript("");
+    setSuggestedPrompts([]);
+    setSuggestedSignal(Date.now());
+  };
+
+  const handleNormalLiveControl = () => {
+    if (normalLiveOrientationActive) {
+      setNormalLiveOrientationActive(false);
+      setNormalLiveOrientationSessionId(null);
+      startLiveSignalAcquisition();
+      return;
+    }
+
+    orientNormalLive();
   };
 
   useEffect(() => {
@@ -3899,6 +4127,9 @@ export default function Page({
     // A new workspace must begin in a clean normal-GEORGE state.
     // LIVE preparation cannot survive into the new workspace.
     setShowPreLiveSignalSurface(false);
+    setNormalPreparationSession(null);
+    setNormalLiveOrientationActive(false);
+    setNormalLiveOrientationSessionId(null);
     setCurrentPreLiveQuestion(null);
     setPreLiveSignals({});
     setPreLiveSignalComplete(false);
@@ -6060,8 +6291,47 @@ I’ll stay with you.`,
     });
   }, [showMobileHero, liveMode]);
 
-  const submitPreLiveSignalAnswer = () => {
-    const answer = input.trim();
+  const normalPreparationCheckpoint = normalPreparationSession?.workflow.current;
+  const normalPreparationObjective = normalizeExplicitNormalPreparationObjective(
+    normalPreparationSession?.knowledge.objective,
+  );
+  const normalPreparationQuestion =
+    normalPreparationSession?.briefing.currentQuestion || null;
+  const normalBriefingCheckpoint =
+    normalPreparationCheckpoint?.surface === "briefing"
+      ? normalPreparationCheckpoint
+      : null;
+  const isNormalPreparationBriefingActive = Boolean(
+    showPreLiveSignalSurface &&
+      normalPreparationSession?.provenance.entrySource === "normal" &&
+      normalBriefingCheckpoint,
+  );
+  const normalBriefingActionState =
+    isNormalPreparationBriefingActive
+      ? normalBriefingCheckpoint?.phase === "questions" &&
+        normalPreparationQuestion
+        ? "question"
+        : normalBriefingCheckpoint?.phase === "decision"
+          ? "decision"
+          : null
+      : null;
+  const normalPreparationQuestionIsOptional = Boolean(
+    normalPreparationQuestion &&
+      !/^(desiredoutcome|intent|conversationintent|objective)$/i.test(
+        normalPreparationQuestion.key,
+      ),
+  );
+  const hasClosedNormalBriefing = Boolean(
+    !showPreLiveSignalSurface &&
+      normalPreparationSession?.provenance.entrySource === "normal" &&
+      normalBriefingCheckpoint,
+  );
+
+  const submitPreLiveSignalAnswer = (
+    answerOverride?: string,
+    interactionStatusOverride?: "answered" | "skipped" | "unknown",
+  ) => {
+    const answer = String(answerOverride ?? input).trim();
 
     if (!showPreLiveSignalSurface || !answer || !currentPreLiveQuestion) {
       return false;
@@ -6082,7 +6352,8 @@ I’ll stay with you.`,
 
     const normalizedAnswer = answer.toLowerCase().replace(/[.!?]+$/g, "");
     const interactionStatus =
-      normalizedAnswer === "skip" ||
+      interactionStatusOverride ||
+      (normalizedAnswer === "skip" ||
       normalizedAnswer === "skipped" ||
       normalizedAnswer === "pass"
         ? ("skipped" as const)
@@ -6090,7 +6361,7 @@ I’ll stay with you.`,
             normalizedAnswer === "i dont know" ||
             normalizedAnswer === "unknown"
           ? ("unknown" as const)
-          : ("answered" as const);
+          : ("answered" as const));
     const nextSignals = {
       ...preparationSession.knowledge.additionalSignals,
       ...(interactionStatus === "answered"
@@ -6116,6 +6387,7 @@ I’ll stay with you.`,
       role: "user",
       content: answer,
       source: "user_input",
+      presentationMode: "live_preparation",
     };
 
     setMessages((prev) => {
@@ -6144,22 +6416,36 @@ I’ll stay with you.`,
     } catch {}
 
     setInput("");
-    const decisionSession = beginNormalLivePreparation({
+    const shouldRequestNextQuestion = interactionStatus === "skipped";
+    const nextPreparationSession = beginNormalLivePreparation({
       signals: nextSignals,
       explicitObjective: nextObjective,
       briefing: {
         priorInteractions,
         currentQuestion: undefined,
       },
-      checkpoint: { surface: "briefing", phase: "decision" },
+      checkpoint: {
+        surface: "briefing",
+        phase: shouldRequestNextQuestion ? "questions" : "decision",
+      },
     });
     const objective = normalizeExplicitNormalPreparationObjective(
-      decisionSession?.knowledge.objective,
+      nextPreparationSession?.knowledge.objective,
     );
 
     setCurrentPreLiveQuestion(null);
-    setPreLiveSignalComplete(Boolean(objective));
+    setPreLiveSignalComplete(
+      shouldRequestNextQuestion ? false : Boolean(objective),
+    );
     setShowPreLiveSignalSurface(true);
+
+    if (shouldRequestNextQuestion && nextPreparationSession) {
+      setActivePromptContext("pre_live_signal_acquisition");
+      setActivePromptLabel("LIVE");
+      void requestNormalAdaptiveQuestion(nextPreparationSession);
+      return true;
+    }
+
     setActivePromptContext(
       objective ? "pre_live_signal_ready" : "pre_live_signal_acquisition",
     );
@@ -6167,6 +6453,50 @@ I’ll stay with you.`,
 
     return true;
   };
+
+  const normalPreparationActions: Array<{
+    label: string;
+    action: () => void;
+    emphasis?: "primary" | "secondary";
+  }> = [];
+
+  if (normalBriefingActionState === "question") {
+    if (normalPreparationQuestionIsOptional) {
+      normalPreparationActions.push({
+        label: "SKIP",
+        action: () => {
+          submitPreLiveSignalAnswer("Skip to next question", "skipped");
+        },
+      });
+    }
+
+    if (normalPreparationQuestionIsOptional && normalPreparationObjective) {
+      normalPreparationActions.push({
+        label: "START LIVE",
+        action: openLiveEntry,
+        emphasis: "primary",
+      });
+    }
+  }
+
+  if (normalBriefingActionState === "decision" && normalPreparationObjective) {
+    normalPreparationActions.push(
+      {
+        label: "NEXT QUESTION",
+        action: continueNormalAdaptiveBriefing,
+        emphasis: "secondary",
+      },
+      {
+        label: "START LIVE",
+        action: openLiveEntry,
+        emphasis: "primary",
+      },
+      {
+        label: "CLOSE",
+        action: closeNormalPreparationBriefing,
+      },
+    );
+  }
 
   const enterLiveConversation = () => {
     if (liveMode) return;
@@ -6438,6 +6768,7 @@ I’ll stay with you.`,
               } catch {}
 
               setShowPreLiveSignalSurface(false);
+              setNormalPreparationSession(null);
               setCurrentPreLiveQuestion(null);
               setPreLiveSignals({});
               setPreLiveSignalComplete(false);
@@ -7212,6 +7543,8 @@ I’ll stay with you.`,
                     );
                     const isLatestAssistant =
                       m.role === "assistant" && i === latestAssistantIndex;
+                    const isLatestVisibleMessage =
+                      i === visibleMessages.length - 1;
                     const isWelcomeAssistant =
                       m.role === "assistant" && i === firstAssistantIndex;
 
@@ -7503,32 +7836,40 @@ I’ll stay with you.`,
                               <div className="relative flex max-w-full items-center gap-2 overflow-x-auto whitespace-nowrap text-[11px] text-[#D7DBE4]/50 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 {
                                   <>
-                                    {isLatestAssistant && (
+                                    {isLatestAssistant &&
+                                      !isNormalPreparationBriefingActive && (
                                       <>
-                                        <LiveCapabilitySurface
-                                          phase={
-                                            preLiveSignalComplete
-                                              ? "ready"
-                                              : showPreLiveSignalSurface
-                                                ? "preparing"
-                                                : "available"
-                                          }
-                                          onPrepare={() => {
-                                            try {
-                                              window.localStorage.setItem(
-                                                "GEORGE_PRE_LIVE_FROM_MESSAGE",
-                                                "1",
-                                              );
-                                              window.localStorage.setItem(
-                                                "GEORGE_LIVE_INTENT_STAGE",
-                                                "signal_acquisition",
-                                              );
-                                            } catch {}
-
-                                            startLiveSignalAcquisition();
-                                          }}
-                                          onStart={openLiveEntry}
-                                        />
+                                        {hasClosedNormalBriefing ? (
+                                          <button
+                                            type="button"
+                                            onClick={
+                                              resumeNormalPreparationBriefing
+                                            }
+                                            className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.55rem] border border-[#5678C8]/28 bg-[#172347]/54 px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.17em] text-[#B9C9F3]/74 transition hover:border-[#6F91DE]/44 hover:text-[#E4EBFF]/90 active:scale-[0.97]"
+                                          >
+                                            PREPARING LIVE
+                                          </button>
+                                        ) : (
+                                          <LiveCapabilitySurface
+                                            phase={
+                                              preLiveSignalComplete
+                                                ? "ready"
+                                                : normalLiveOrientationActive
+                                                  ? "orientation"
+                                                : showPreLiveSignalSurface
+                                                  ? "preparing"
+                                                  : "available"
+                                            }
+                                            onPrepare={() => {
+                                              handleNormalLiveControl();
+                                            }}
+                                            onStart={
+                                              normalLiveOrientationActive
+                                                ? handleNormalLiveControl
+                                                : openLiveEntry
+                                            }
+                                          />
+                                        )}
 
                                         {[
                                           {
@@ -7883,6 +8224,29 @@ I’ll stay with you.`,
                             )}
                           </div>
                         )}
+
+                        {isLatestVisibleMessage &&
+                          normalBriefingActionState &&
+                          normalPreparationActions.length > 0 && (
+                            <div className="mt-1.5 flex w-fit max-w-[min(92%,42rem)] flex-wrap items-center gap-1.5 self-start rounded-[0.75rem] border border-[#5678C8]/18 bg-[#0B1225]/54 p-1.5">
+                              {normalPreparationActions.map((action) => (
+                                <button
+                                  key={action.label}
+                                  type="button"
+                                  onClick={action.action}
+                                  className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-[0.5rem] px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.15em] transition active:scale-[0.97] ${
+                                    action.emphasis === "primary"
+                                      ? "border border-[#7EA1FF]/48 bg-[#172347] text-white hover:border-[#AEB6FF]/75 hover:bg-[#203268]"
+                                      : action.emphasis === "secondary"
+                                        ? "border border-white/[0.14] bg-white/[0.025] text-white/78 hover:border-white/30 hover:text-white"
+                                        : "border border-white/[0.08] bg-transparent text-[#D7DBE4]/52 hover:border-white/[0.2] hover:text-[#D7DBE4]/88"
+                                  }`}
+                                >
+                                  {action.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     );
                   })}
@@ -8024,6 +8388,8 @@ I’ll stay with you.`,
                   className={`${
                     (forceLive || liveMode) && !showLiveEntrySequence
                       ? "h-[300px] md:h-[320px]"
+                      : isNormalPreparationBriefingActive
+                        ? "h-[294px] md:h-[320px]"
                       : "h-[270px] md:h-[290px]"
                   }`}
                 />
@@ -9444,8 +9810,20 @@ Continue from here, tell me what changed, or start fresh.`,
 
                 {!(forceLive || liveMode) && (
                   <>
-                    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-[176px] bg-[#000000] md:h-[248px]" />
-                    <div className="pointer-events-none fixed inset-x-0 bottom-[160px] z-[40] h-[72px] bg-gradient-to-t from-[#000000] via-[#000000]/88 to-transparent md:bottom-[232px] md:h-[120px]" />
+                    <div
+                      className={`pointer-events-none fixed inset-x-0 bottom-0 z-[40] bg-[#000000] ${
+                        isNormalPreparationBriefingActive
+                          ? "h-[112px] md:h-[184px]"
+                          : "h-[176px] md:h-[248px]"
+                      }`}
+                    />
+                    <div
+                      className={`pointer-events-none fixed inset-x-0 z-[40] bg-gradient-to-t from-[#000000] via-[#000000]/88 to-transparent ${
+                        isNormalPreparationBriefingActive
+                          ? "bottom-[104px] h-[40px] md:bottom-[176px] md:h-[56px]"
+                          : "bottom-[160px] h-[72px] md:bottom-[232px] md:h-[120px]"
+                      }`}
+                    />
                   </>
                 )}
 
