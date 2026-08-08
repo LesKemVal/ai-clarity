@@ -16,8 +16,8 @@ export default function Brand({
         alt="BRANESx"
         className={
           compact
-            ? "h-16 w-16 shrink-0 rounded-[1.15rem] object-contain opacity-95"
-            : "h-[72px] w-[72px] shrink-0 rounded-[1.35rem] object-contain opacity-95"
+            ? "h-[68px] w-[68px] shrink-0 rounded-[1.2rem] object-contain opacity-95"
+            : "h-[76px] w-[76px] shrink-0 rounded-[1.4rem] object-contain opacity-95"
         }
       />
 

@@ -127,14 +127,24 @@ export function HomeHeroSequence() {
           <div className="mt-8 min-h-[12rem] max-w-4xl sm:mt-10 sm:min-h-[14rem]">
             <div
               aria-live="polite"
-              className={`george-motion-fade-soft min-h-[12rem] rounded-[16px] border border-white/[0.12] bg-white/[0.025] px-5 py-6 text-white/80 transition-opacity duration-700 motion-reduce:transition-none sm:min-h-[14rem] sm:px-8 sm:py-8 ${
+              className={`relative overflow-hidden george-motion-fade-soft min-h-[12rem] rounded-[16px] border border-[#4E7CFF]/45 bg-[#0A1022] px-5 py-6 text-white/80 shadow-[0_18px_55px_rgba(20,52,130,0.2)] transition-opacity duration-700 before:pointer-events-none before:absolute before:-inset-px before:rounded-[inherit] before:border before:border-transparent before:border-r-[#7EA1FF]/35 before:border-t-[#AEB6FF]/75 before:animate-[spin_7s_linear_infinite] motion-reduce:before:animate-none motion-reduce:transition-none sm:min-h-[14rem] sm:px-8 sm:py-8 ${
                 messageVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/72">
+              <div className="relative z-10 flex items-center justify-between gap-4">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/78">
                 {OPERATIONAL_SECTIONS[sectionIndex].heading}
-              </p>
-              <p className="mt-4 max-w-3xl text-[20px] font-medium leading-[1.55] sm:text-[28px] sm:leading-[1.45]">
+                </p>
+                <div className="flex shrink-0 items-center gap-1.5" aria-label={`Rendering ${sectionIndex + 1} of ${OPERATIONAL_SECTIONS.length}`}>
+                  {OPERATIONAL_SECTIONS.map((_, index) => (
+                    <span
+                      key={index}
+                      className={`h-[3px] rounded-full transition-colors duration-500 motion-reduce:transition-none ${index === sectionIndex ? "w-6 bg-[#AEB6FF]" : "w-2 bg-[#4E7CFF]/35"}`}
+                    />
+                  ))}
+                </div>
+              </div>
+              <p className="relative z-10 mt-4 max-w-3xl text-[20px] font-medium leading-[1.55] sm:text-[28px] sm:leading-[1.45]">
                 {typedParagraph}
               </p>
             </div>

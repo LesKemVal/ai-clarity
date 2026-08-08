@@ -121,8 +121,8 @@ export default function PageShell({
         )}
 
         <div className="flex min-w-0 w-full flex-1 flex-col overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-4 md:px-6 md:pt-6 xl:px-8">
-            <div className="mb-5 border-b border-white/[0.04] pb-3 md:mb-6">
+          <div className="mx-auto w-full max-w-[1320px] px-4 pb-12 pt-5 md:px-6 md:pt-7 xl:px-8">
+            <div className="mb-6 border-b border-white/[0.05] pb-4 md:mb-7">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
                   {withSidebar && (
