@@ -43,7 +43,9 @@ import {
 } from "@/lib/george/live-runtime/support-style";
 import {
   getActiveSessionForMode,
+  getActiveSessionIdForMode,
   getSessionsForMode,
+  updateSessionLinkage,
   setActiveMode,
   setActiveSessionIdForMode,
   type GeorgeStoredSession,
@@ -770,6 +772,24 @@ export default function LiveEntryClient() {
     return true;
   };
 
+  const linkNormalPreparationSurface = (
+    surface: "preparation" | "live" | "post_live",
+  ) => {
+    const preparationSession = normalPreparationSeedRef.current;
+    const normalSessionId = String(
+      preparationSession?.relations.normalSessionId || "",
+    ).trim();
+
+    if (!normalSessionId || !preparationSession?.preparationSessionId) {
+      return;
+    }
+
+    updateSessionLinkage(normalSessionId, {
+      preparationSessionId: preparationSession.preparationSessionId,
+      surface,
+    });
+  };
+
   const goToPreviousLivePreparationState = () => {
     const previous = livePreparationHistoryRef.current.pop();
 
@@ -974,6 +994,8 @@ export default function LiveEntryClient() {
           skippedOptionalSignalKeys?: string[];
           livePreparationHistory?: LivePreparationWorkflowState[];
           preparationSession?: unknown;
+          georgeSessionId?: string;
+          preparationSessionId?: string;
         };
 
         const restoredPreparationSession = normalizePreparationSession(
@@ -1006,6 +1028,7 @@ export default function LiveEntryClient() {
           ) {
             normalPreparationSeedRef.current = restoredPreparationSession;
             savePreparationSession(restoredPreparationSession);
+            linkNormalPreparationSurface("preparation");
           }
         }
 
@@ -2696,6 +2719,7 @@ export default function LiveEntryClient() {
       if (normalPreparationSeed) {
         normalPreparationSeedRef.current = normalPreparationSeed;
         savePreparationSession(normalPreparationSeed);
+        linkNormalPreparationSurface("preparation");
 
         const normalDocument = normalPreparationSeed.knowledge.documents[0];
         if (normalDocument) {
@@ -3732,9 +3756,9 @@ export default function LiveEntryClient() {
         "GEORGE_LIVE_PREP_SCROLL_Y",
         String(window.scrollY),
       );
-      window.sessionStorage.setItem(
-        "GEORGE_LIVE_PREP_RETURN_STATE",
-        JSON.stringify({
+        window.sessionStorage.setItem(
+          "GEORGE_LIVE_PREP_RETURN_STATE",
+          JSON.stringify({
           livePrepOpenSection,
           liveBriefingSupportAccepted,
           liveBriefingActiveSupportStyle,
@@ -3755,6 +3779,14 @@ export default function LiveEntryClient() {
           optionalSignalQuestionHistory,
           skippedOptionalSignalKeys,
           livePreparationHistory: livePreparationHistoryRef.current,
+          georgeSessionId:
+            normalPreparationSession?.relations.normalSessionId ||
+            homepagePreparationSession?.relations.normalSessionId ||
+            getActiveSessionIdForMode("normal") ||
+            undefined,
+          preparationSessionId:
+            (homepagePreparationSession || normalPreparationSession)
+              ?.preparationSessionId,
           preparationSession:
             homepagePreparationSession || normalPreparationSession,
         }),

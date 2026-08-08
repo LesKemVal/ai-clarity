@@ -11,6 +11,31 @@ export type OperationalMemoryRetrievalPolicy = {
   generalReserve: number
 }
 
+export type OperationalMemoryExecutionMode =
+  | 'normal'
+  | 'preparation'
+  | 'live'
+  | 'post_live'
+
+export function isExplicitOperationalMemoryRequest(text: unknown) {
+  const normalized = String(text || '').trim().toLowerCase()
+  if (!normalized) return false
+
+  return /\b(what did i tell you|last month|previous notes?|prior (conversation|call)|previous (investor|contact|decision|strategy)|who was that investor|show (?:me )?(?:my )?(?:previous|prior)|use the last conversation|compare (?:this|it) to the previous)\b/.test(normalized)
+}
+
+export function shouldRetrieveOperationalMemory(input: {
+  mode: OperationalMemoryExecutionMode
+  explicitUserRequest?: boolean
+  currentContextSufficient?: boolean
+}) {
+  if (input.mode === 'live') {
+    return Boolean(input.explicitUserRequest) || !input.currentContextSufficient
+  }
+
+  return true
+}
+
 const DEFAULT_POLICY: OperationalMemoryRetrievalPolicy = {
   maximumResults: 5,
   minimumScore: 0.5,

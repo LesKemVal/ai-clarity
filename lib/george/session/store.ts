@@ -1,5 +1,13 @@
 export type GeorgeSessionMode = 'normal' | 'live' | 'campaign'
 
+export type GeorgeSessionSurface =
+  | 'normal'
+  | 'library'
+  | 'marketplace'
+  | 'preparation'
+  | 'live'
+  | 'post_live'
+
 export type GeorgeStoredMessage = {
   role: 'assistant' | 'user' | 'system'
   content: string
@@ -16,6 +24,8 @@ export type GeorgeStoredSessionMetadata = {
   campaignName?: string
   dataToCapture?: string[]
   reportingDestination?: string
+  preparationSessionId?: string
+  surface?: GeorgeSessionSurface
   [key: string]: unknown
 }
 
@@ -496,6 +506,52 @@ export function updateActiveSessionMessages(
   )
 
   safeWriteSessions(updated)
+}
+
+export function updateSessionLinkage(
+  sessionId: string,
+  linkage: {
+    preparationSessionId?: string | null
+    surface?: GeorgeSessionSurface
+  },
+) {
+  if (typeof window === 'undefined') return null
+
+  const id = String(sessionId || '').trim()
+  if (!id) return null
+
+  const sessions = safeReadSessions()
+  let updatedSession: GeorgeStoredSession | null = null
+  const updated = sessions.map((session) => {
+    if (session.id !== id) return session
+
+    const metadata = {
+      ...(session.metadata || {}),
+      ...(linkage.surface ? { surface: linkage.surface } : {}),
+    }
+
+    if (Object.prototype.hasOwnProperty.call(linkage, 'preparationSessionId')) {
+      if (linkage.preparationSessionId) {
+        metadata.preparationSessionId = linkage.preparationSessionId
+      } else {
+        delete metadata.preparationSessionId
+      }
+    }
+
+    updatedSession = {
+      ...session,
+      updatedAt: Date.now(),
+      metadata,
+    }
+
+    return updatedSession
+  })
+
+  if (!updatedSession) return null
+
+  safeWriteSessions(updated)
+  syncSessionToServer(updatedSession)
+  return updatedSession
 }
 
 export function getActiveSession() {

@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-import { loadLivePreparationSignals } from "@/lib/george/live-browser/live-preparation-browser-storage";
+import {
+  loadLivePreparationSignals,
+  loadPreparationSession,
+} from "@/lib/george/live-browser/live-preparation-browser-storage";
+import {
+  getActiveSessionId,
+  getActiveSessionIdForMode,
+  updateSessionLinkage,
+} from "@/lib/george/session/store";
 import {
   GEORGE_PREPARATION_RESUME_EVENT_KEY,
   createGeorgePreparationResumeEvent,
@@ -22,6 +30,46 @@ type FormulaResponse = {
   formulas?: OperationalFormula[];
   formula?: OperationalFormula;
   ownedFormulaIds?: string[];
+  error?: string;
+};
+
+type MarketplaceCatalogEntry = {
+  formula: OperationalFormula;
+  publisher?: string;
+  author?: string;
+  listedAt?: number;
+};
+
+type MarketplaceCatalogResponse = {
+  ok: boolean;
+  entries?: MarketplaceCatalogEntry[];
+  error?: string;
+};
+
+type RecommendationResponse = {
+  ok: boolean;
+  recommendation?: {
+    recommendedFormula: OperationalFormula | null;
+    recommendedScript: OperationalScript | null;
+    alternativeFormulas: OperationalFormula[];
+    strategyStatus: string;
+    recommendationSummary: string;
+    reviewRequired: boolean;
+  };
+  error?: string;
+};
+
+type EntitlementResponse = {
+  ok: boolean;
+  formulaId?: string;
+  decision?: {
+    allowed: boolean;
+    source: string;
+    reason: string;
+    requiredTier?: string;
+    currentTier: string;
+    purchasable: boolean;
+  };
   error?: string;
 };
 
@@ -195,77 +243,6 @@ function formatDate(value: number) {
   }).format(new Date(value));
 }
 
-function normalizeRecommendationText(value: unknown): string {
-  if (Array.isArray(value)) {
-    return value.map(normalizeRecommendationText).join(" ");
-  }
-
-  if (typeof value === "string") {
-    return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-  }
-
-  return "";
-}
-
-function recommendationTermScore(
-  searchText: string,
-  signal: string | undefined,
-  weight: number,
-): number {
-  const normalizedSignal = normalizeRecommendationText(signal);
-  if (!normalizedSignal) return 0;
-
-  const terms = normalizedSignal
-    .split(" ")
-    .filter((term) => term.length > 2);
-
-  if (!terms.length) return 0;
-
-  const matchedTerms = terms.filter((term) => searchText.includes(term));
-  return (matchedTerms.length / terms.length) * weight;
-}
-
-function marketplaceRecommendationScore(
-  formula: OperationalFormula,
-  role: string | undefined,
-  goal: string | undefined,
-): number {
-  const searchText = normalizeRecommendationText([
-    formula.name,
-    formula.roomTypes,
-    formula.bestUsedFor,
-    formula.objectiveTypes,
-    formula.prerequisites,
-  ]);
-
-  const publicationPriority: Record<
-    OperationalFormulaPublicationState,
-    number
-  > = {
-    marketplace_listed: 12,
-    published: 10,
-    verified: 8,
-    verification_requested: 5,
-    draft: 3,
-    retired: -100,
-    withdrawn: -100,
-  };
-
-  const roleScore = recommendationTermScore(searchText, role, 45);
-  const goalScore = recommendationTermScore(searchText, goal, 55);
-  const evidenceScore = Math.min(Number(formula.successCount ?? 0), 10) * 2;
-  const maturityScore = publicationPriority[publicationState(formula)];
-  const confidenceScore = Math.max(0, Math.min(formula.confidence, 1)) * 10;
-
-  return (
-    roleScore +
-    goalScore +
-    evidenceScore +
-    maturityScore +
-    confidenceScore
-  );
-}
-
 function displayName(name: string | undefined, fallback: string) {
   const normalized = String(name ?? "").trim();
   return normalized || fallback;
@@ -340,6 +317,18 @@ const inputClassName =
 
 export default function OperationalLibraryClient() {
   const [formulas, setFormulas] = useState<OperationalFormula[]>([]);
+  const [marketplaceEntries, setMarketplaceEntries] = useState<
+    MarketplaceCatalogEntry[]
+  >([]);
+  const [recommendation, setRecommendation] = useState<
+    RecommendationResponse["recommendation"]
+  >(undefined);
+  const [entitlements, setEntitlements] = useState<
+    Record<string, EntitlementResponse["decision"]>
+  >({});
+  const [entitlementLoadingId, setEntitlementLoadingId] = useState<string | null>(
+    null,
+  );
   const [ownedFormulaIds, setOwnedFormulaIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -380,6 +369,22 @@ export default function OperationalLibraryClient() {
     loadLivePreparationSignals(),
   );
 
+  function markCurrentSessionSurface(
+    surface: "library" | "marketplace" | "preparation",
+  ) {
+    const sessionId =
+      getActiveSessionIdForMode("normal") || getActiveSessionId();
+    if (!sessionId) return;
+
+    const preparation = loadPreparationSession();
+    const preparationSessionId =
+      preparation?.relations.normalSessionId === sessionId
+        ? preparation.preparationSessionId
+        : undefined;
+
+    updateSessionLinkage(sessionId, { preparationSessionId, surface });
+  }
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -391,9 +396,55 @@ export default function OperationalLibraryClient() {
     setLivePrepReturnAvailable(
       params.get("source") === "live-prep" && Boolean(returnUrl),
     );
+    markCurrentSessionSurface(
+      params.get("source") === "marketplace" ? "marketplace" : "library",
+    );
   }, []);
 
+  useEffect(() => {
+    const formulaIds = Array.from(
+      new Set([
+        ...marketplaceEntries.map((entry) => entry.formula.id),
+        recommendation?.recommendedFormula?.id,
+      ].filter((id): id is string => Boolean(id))),
+    );
+
+    if (formulaIds.length === 0) return;
+
+    let cancelled = false;
+    setEntitlementLoadingId("bulk");
+
+    Promise.all(
+      formulaIds.map(async (formulaId) => {
+        const response = await fetch(
+          `/api/george/marketplace/entitlements/${encodeURIComponent(formulaId)}`,
+          { cache: "no-store" },
+        );
+        const payload = (await response.json()) as EntitlementResponse;
+        if (!response.ok || !payload.ok || !payload.decision) {
+          throw new Error(payload.error || "Unable to determine formula access");
+        }
+        return [formulaId, payload.decision] as const;
+      }),
+    )
+      .then((entries) => {
+        if (cancelled) return;
+        setEntitlements(Object.fromEntries(entries));
+      })
+      .catch(() => {
+        if (!cancelled) setEntitlements({});
+      })
+      .finally(() => {
+        if (!cancelled) setEntitlementLoadingId(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [marketplaceEntries, recommendation?.recommendedFormula?.id]);
+
   function returnToLivePrep() {
+    markCurrentSessionSurface("preparation");
     try {
       const returnUrl = window.sessionStorage.getItem(
         "GEORGE_LIVE_PREP_RETURN_URL",
@@ -414,18 +465,43 @@ export default function OperationalLibraryClient() {
 
     async function loadLibrary() {
       try {
-        const [formulaResponse, scriptResponse] = await Promise.all([
+        const recommendationInput = {
+          roomType:
+            homepagePreparationSignals.conversationTypeId ||
+            homepagePreparationSignals.conversationType ||
+            undefined,
+          objectiveType:
+            homepagePreparationSignals.desiredOutcome ||
+            homepagePreparationSignals.broadGoal ||
+            undefined,
+          briefingComplete: true,
+        };
+
+        const [formulaResponse, scriptResponse, catalogResponse, recommendationResponse] = await Promise.all([
           fetch("/api/george/operational-memory/formulas", {
             cache: "no-store",
           }),
           fetch("/api/george/operational-memory/scripts", {
             cache: "no-store",
           }),
+          fetch("/api/george/marketplace/catalog?limit=100", {
+            cache: "no-store",
+          }),
+          fetch("/api/george/operational-memory/recommend", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            cache: "no-store",
+            body: JSON.stringify(recommendationInput),
+          }),
         ]);
 
         const formulaPayload =
           (await formulaResponse.json()) as FormulaResponse;
         const scriptPayload = (await scriptResponse.json()) as ScriptResponse;
+        const catalogPayload =
+          (await catalogResponse.json()) as MarketplaceCatalogResponse;
+        const recommendationPayload =
+          (await recommendationResponse.json()) as RecommendationResponse;
 
         if (!formulaResponse.ok || !formulaPayload.ok) {
           throw new Error(
@@ -439,11 +515,26 @@ export default function OperationalLibraryClient() {
           );
         }
 
+        if (!catalogResponse.ok || !catalogPayload.ok) {
+          throw new Error(
+            catalogPayload.error || "Unable to load the marketplace catalog",
+          );
+        }
+
+        if (!recommendationResponse.ok || !recommendationPayload.ok) {
+          throw new Error(
+            recommendationPayload.error ||
+              "Unable to load the operational recommendation",
+          );
+        }
+
         if (cancelled) return;
 
         setFormulas(formulaPayload.formulas ?? []);
         setOwnedFormulaIds(new Set(formulaPayload.ownedFormulaIds ?? []));
         setScripts(scriptPayload.scripts ?? []);
+        setMarketplaceEntries(catalogPayload.entries ?? []);
+        setRecommendation(recommendationPayload.recommendation);
       } catch (loadError) {
         if (cancelled) return;
 
@@ -845,6 +936,11 @@ export default function OperationalLibraryClient() {
         payload.formula as OperationalFormula,
         ...current.filter((formula) => formula.id !== payload.formula?.id),
       ]);
+      setOwnedFormulaIds((current) => {
+        const next = new Set(current);
+        if (payload.formula?.id) next.add(payload.formula.id);
+        return next;
+      });
       setEditingFormulaId(null);
       setDraft(null);
     } catch (deriveError) {
@@ -858,7 +954,12 @@ export default function OperationalLibraryClient() {
     }
   }
 
-  function useMarketplaceFormula(formula: OperationalFormula) {
+  async function useMarketplaceFormula(formula: OperationalFormula) {
+    const decision = entitlements[formula.id];
+    if (!decision || !decision.allowed) return;
+
+    markCurrentSessionSurface("marketplace");
+
     const selection = {
       formulaId: formula.id,
       formulaVersion: formula.version,
@@ -887,6 +988,9 @@ export default function OperationalLibraryClient() {
         "GEORGE_LIVE_PREP_RETURN_STATE",
         JSON.stringify({
           ...snapshot,
+          georgeSessionId:
+            getActiveSessionIdForMode("normal") || getActiveSessionId(),
+          preparationSessionId: loadPreparationSession()?.preparationSessionId,
           selectedFormula: formula,
           selectedFormulaSource: "user",
           livePrepOpenSection: "formula",
@@ -950,24 +1054,25 @@ export default function OperationalLibraryClient() {
     );
   }
 
-  const activeMarketplaceFormulas = formulas.filter(
-    (formula) =>
-      formula.status !== "retired" &&
-      publicationState(formula) !== "retired" &&
-      publicationState(formula) !== "withdrawn",
+  const marketplaceFormulas = marketplaceEntries.map((entry) => entry.formula);
+  const ownedFormulas = formulas
+    .filter((formula) => ownedFormulaIds.has(formula.id))
+    .sort((left, right) => right.updatedAt - left.updatedAt);
+  const workspaceScripts = [...scripts].sort(
+    (left, right) => right.updatedAt - left.updatedAt,
   );
 
-  const sandboxFormulas = activeMarketplaceFormulas.filter(
+  const sandboxFormulas = marketplaceFormulas.filter(
     (formula) => formula.status !== "validated",
   );
 
-  const emergingFormulas = activeMarketplaceFormulas.filter(
+  const emergingFormulas = marketplaceFormulas.filter(
     (formula) =>
       formula.status !== "validated" &&
       Number(formula.successCount ?? 0) > 0,
   );
 
-  const provenFormulas = activeMarketplaceFormulas.filter(
+  const provenFormulas = marketplaceFormulas.filter(
     (formula) => formula.status === "validated",
   );
 
@@ -978,34 +1083,18 @@ export default function OperationalLibraryClient() {
     String(homepagePreparationSignals.desiredOutcome || "").trim() ||
     "Improve execution in the next important conversation.";
 
-  const recommendedFormula = [...activeMarketplaceFormulas].sort(
-    (left, right) => {
-      const scoreDifference =
-        marketplaceRecommendationScore(
-          right,
-          recommendationRole,
-          recommendationGoal,
-        ) -
-        marketplaceRecommendationScore(
-          left,
-          recommendationRole,
-          recommendationGoal,
-        );
-
-      if (scoreDifference !== 0) return scoreDifference;
-
-      const successDifference =
-        Number(right.successCount ?? 0) - Number(left.successCount ?? 0);
-
-      if (successDifference !== 0) return successDifference;
-
-      return right.confidence - left.confidence;
-    },
-  )[0];
-  const recommendationReason = recommendedFormula
-    ? recommendedFormula.bestUsedFor?.join(" · ") ||
-      "Selected from available operational evidence and readiness."
-    : "Operational strategies will appear here when available.";
+  const recommendedFormula = recommendation?.recommendedFormula ?? null;
+  const recommendationReason =
+    recommendedFormula
+      ? `I recommended this because your current objective is ${
+          recommendationGoal.charAt(0).toLowerCase() +
+          recommendationGoal.slice(1)
+        }${
+          recommendationRole !== "Professional"
+            ? `, and you're approaching it as a ${recommendationRole.toLowerCase()}`
+            : ""
+        }.`
+      : "Recommendations appear here when a strategy fits your current work.";
   const recommendationPublisher = recommendedFormula
     ? recommendedFormula.publication?.publisher ||
       recommendedFormula.publication?.author ||
@@ -1013,35 +1102,20 @@ export default function OperationalLibraryClient() {
     : "BRANESX";
 
   return (
-    <div className="mt-10 space-y-8">
-      {livePrepReturnAvailable ? (
-        <div className="flex justify-start">
-          <button
-            type="button"
-            onClick={returnToLivePrep}
-            className="rounded-[10px] border border-[#7EA1FF]/35 bg-[#11182A] px-4 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-white transition hover:border-[#AEB6FF]/65 hover:bg-[#18213A]"
-          >
-            Back to Ready Room
-          </button>
-        </div>
-      ) : null}
-
+    <div className="george-motion-fade-soft mt-10 space-y-8">
       <section
         data-marketplace-hero="operational-strategy"
         className="overflow-hidden rounded-[24px] border border-white/14 bg-[#090909] shadow-[0_24px_80px_rgba(0,0,0,0.42)]"
       >
         <div className="border-b border-white/10 px-6 py-5 sm:px-9">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/45">
-            Recommended for you
+            Recommended for this conversation
           </p>
         </div>
 
         {recommendedFormula ? (
           <div className="px-6 py-8 sm:px-9 sm:py-10">
             <div className="max-w-3xl">
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/38">
-                Operational Strategy
-              </p>
               <h2 className="mt-4 text-3xl font-medium tracking-[-0.035em] text-white sm:text-5xl">
                 {displayName(
                   recommendedFormula.name,
@@ -1061,40 +1135,32 @@ export default function OperationalLibraryClient() {
               </div>
             </div>
 
-            <div className="mt-9 border-t border-white/10 pt-7">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/42">
-                Why this strategy
-              </p>
-              <p className="mt-3 max-w-3xl text-base leading-7 text-white/72">
+            <div className="mt-8 border-t border-white/10 pt-7">
+              <p className="max-w-3xl line-clamp-2 text-base leading-7 text-white/72">
                 {recommendationReason}
               </p>
             </div>
 
-            <div className="mt-8 grid gap-6 border-y border-white/10 py-7 sm:grid-cols-2">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-                  Your role
-                </p>
-                <p className="mt-2 text-sm text-white/82">{recommendationRole}</p>
-              </div>
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-                  Your goal
-                </p>
-                <p className="mt-2 text-sm leading-6 text-white/82">
-                  {recommendationGoal}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                onClick={() => useMarketplaceFormula(recommendedFormula)}
-                className="min-h-12 rounded-[12px] bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/88 active:translate-y-px"
-              >
-                Use Strategy
-              </button>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              {entitlementLoadingId === "bulk" ? (
+                <span className="min-h-12 rounded-[12px] border border-white/14 px-6 py-3 text-sm text-white/48">
+                  Checking access…
+                </span>
+              ) : entitlements[recommendedFormula.id]?.allowed ? (
+                <button
+                  type="button"
+                  onClick={() => void useMarketplaceFormula(recommendedFormula)}
+                  className="min-h-12 rounded-[12px] bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/88 active:translate-y-px"
+                >
+                  Use Strategy
+                </button>
+              ) : (
+                <span className="min-h-12 rounded-[12px] border border-white/14 px-6 py-3 text-sm text-white/48">
+                  {entitlements[recommendedFormula.id]?.purchasable
+                    ? "Locked"
+                    : "Unavailable"}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => viewMarketplaceFormula(recommendedFormula.id)}
@@ -1107,10 +1173,10 @@ export default function OperationalLibraryClient() {
         ) : (
           <div className="px-6 py-10 sm:px-9">
             <h2 className="text-2xl font-medium tracking-tight">
-              Operational strategies are being prepared.
+              No strategy is available for this preparation yet.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
-              Your recommendation will appear here when an operational formula is available.
+              Recommendations appear here when a strategy fits your current work.
             </p>
           </div>
         )}
@@ -1122,17 +1188,16 @@ export default function OperationalLibraryClient() {
       >
         <div className="max-w-3xl">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
-            Operational Marketplace
+            Discover
           </p>
           <h2
             id="marketplace-sandbox-heading"
             className="mt-3 text-2xl font-medium tracking-[-0.025em] text-white sm:text-3xl"
           >
-            Sandbox
+            Discover strategies
           </h2>
           <p className="mt-3 text-sm leading-6 text-white/55">
-            Baseline operational hypotheses available for execution before they
-            have accumulated enough evidence to be considered proven.
+            Browse strategies for specific conversations and outcomes.
           </p>
         </div>
 
@@ -1162,14 +1227,32 @@ export default function OperationalLibraryClient() {
                     "Available as an operational hypothesis for real execution."}
                 </p>
 
+                {formula.objectiveTypes?.length ? (
+                  <p className="mt-2 text-xs text-white/38">
+                    For {formula.objectiveTypes.slice(0, 2).join(" · ")}
+                  </p>
+                ) : null}
+
                 <div className="mt-5 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => useMarketplaceFormula(formula)}
-                    className="rounded-[9px] bg-white px-4 py-2 text-xs font-semibold text-black transition hover:bg-white/88"
-                  >
-                    Try Strategy
-                  </button>
+                  {entitlementLoadingId === "bulk" ? (
+                    <span className="rounded-[9px] border border-white/14 px-4 py-2 text-xs text-white/48">
+                      Checking access…
+                    </span>
+                  ) : entitlements[formula.id]?.allowed ? (
+                    <button
+                      type="button"
+                      onClick={() => void useMarketplaceFormula(formula)}
+                      className="rounded-[9px] bg-white px-4 py-2 text-xs font-semibold text-black transition hover:bg-white/88"
+                    >
+                      Try Strategy
+                    </button>
+                  ) : (
+                    <span className="rounded-[9px] border border-white/14 px-4 py-2 text-xs text-white/48">
+                      {entitlements[formula.id]?.purchasable
+                        ? "Locked"
+                        : "Unavailable"}
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => viewMarketplaceFormula(formula.id)}
@@ -1270,11 +1353,48 @@ export default function OperationalLibraryClient() {
         </section>
       </div>
 
+      {livePrepReturnAvailable ? (
+      <section className="george-motion-collapse-down rounded-xl border border-white/10 bg-[#070707] p-6">
+        <div className="flex items-baseline justify-between gap-4">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#AEB6FF]/58">
+              Continue your work
+            </p>
+            <h2 className="mt-2 text-xl font-medium text-white">
+              Resume an active preparation
+            </h2>
+          </div>
+          <span className="text-xs uppercase tracking-[0.16em] text-white/35">
+            In progress
+          </span>
+        </div>
+
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-white/55">
+              Your Ready Room is waiting for you.
+        </p>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={returnToLivePrep}
+            className="rounded-[10px] bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-white/88"
+          >
+            Continue to Ready Room
+          </button>
+        </div>
+      </section>
+      ) : null}
+
       <section className="rounded-xl border border-white/10 p-6">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-lg font-medium">Operational Formulas</h2>
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+              My Workspace
+            </p>
+            <h2 className="mt-2 text-lg font-medium">Owned strategies</h2>
+          </div>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
-            {formulas.length} available
+            {ownedFormulas.length} owned
           </span>
         </div>
 
@@ -1284,13 +1404,13 @@ export default function OperationalLibraryClient() {
           </p>
         ) : null}
 
-        {formulas.length === 0 ? (
+        {ownedFormulas.length === 0 ? (
           <p className="mt-5 text-sm text-white/55">
-            No operational formulas are available yet.
+            No owned formulas are available yet.
           </p>
         ) : (
           <div className="mt-5 space-y-4">
-            {formulas.map((formula) => {
+            {ownedFormulas.map((formula) => {
               const isEditing = editingFormulaId === formula.id;
               const isDeriving = derivingFormulaId === formula.id;
               const isOwned = ownedFormulaIds.has(formula.id);
@@ -1934,7 +2054,12 @@ export default function OperationalLibraryClient() {
 
       <section className="rounded-xl border border-white/10 p-6">
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-lg font-medium">Operational Scripts</h2>
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+              My Workspace
+            </p>
+            <h2 className="mt-2 text-lg font-medium">Scripts</h2>
+          </div>
           <span className="text-xs uppercase tracking-[0.18em] text-white/40">
             {scripts.length} saved
           </span>
@@ -1946,7 +2071,7 @@ export default function OperationalLibraryClient() {
           </p>
         ) : (
           <div className="mt-5 space-y-4">
-            {scripts.map((script) => (
+            {workspaceScripts.map((script) => (
               <article
                 key={script.id}
                 className="rounded-lg border border-white/8 bg-white/[0.025] p-5"

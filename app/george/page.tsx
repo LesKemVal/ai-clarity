@@ -132,6 +132,7 @@ import {
   setActiveSessionIdForMode,
   setActiveMode,
   updateActiveSessionMessages,
+  updateSessionLinkage,
   updateCampaignSessionMetadata,
   getCampaignSessions,
   getSessionsForMode,
@@ -2306,6 +2307,16 @@ export default function Page({
       }
 
       setActiveMode("live");
+      const activePreparation = loadPreparationSession();
+      const parentSessionId = String(
+        activePreparation?.relations.normalSessionId || "",
+      ).trim();
+      if (parentSessionId && activePreparation?.preparationSessionId) {
+        updateSessionLinkage(parentSessionId, {
+          preparationSessionId: activePreparation.preparationSessionId,
+          surface: "live",
+        });
+      }
       setMessages([]);
       messagesRef.current = [];
 
@@ -2463,6 +2474,17 @@ export default function Page({
           subscriberEmail,
         });
     const storedPreparationSession = loadPreparationSession();
+
+    if (activeSession?.id) {
+      updateSessionLinkage(activeSession.id, {
+        preparationSessionId:
+          storedPreparationSession?.relations.normalSessionId ===
+          activeSession.id
+            ? storedPreparationSession.preparationSessionId
+            : undefined,
+        surface: "normal",
+      });
+    }
 
     setNormalPreparationSession(
       storedPreparationSession?.provenance.entrySource === "normal" &&
@@ -3468,6 +3490,10 @@ export default function Page({
     });
 
     savePreparationSession(session);
+    updateSessionLinkage(normalSessionId, {
+      preparationSessionId: session.preparationSessionId,
+      surface: "preparation",
+    });
     setNormalPreparationSession(session);
     return session;
   };
@@ -4026,6 +4052,16 @@ export default function Page({
     setLiveOutcomeReview(null);
     setPendingLiveExitAction(null);
 
+    const parentSessionId =
+      preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
+    const preparationSession = loadPreparationSession();
+    if (parentSessionId) {
+      updateSessionLinkage(parentSessionId, {
+        preparationSessionId: preparationSession?.preparationSessionId,
+        surface: "live",
+      });
+    }
+
     beginNextLiveConversation({
       enterLiveMode,
       startListening,
@@ -4057,6 +4093,16 @@ export default function Page({
     setStableLiveGuidance(null);
     setInterimTranscript("");
     setVoiceError("");
+
+    const parentSessionId =
+      preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
+    const preparationSession = loadPreparationSession();
+    if (parentSessionId) {
+      updateSessionLinkage(parentSessionId, {
+        preparationSessionId: preparationSession?.preparationSessionId,
+        surface: "post_live",
+      });
+    }
 
     if (typeof window !== "undefined") {
       window.localStorage.removeItem("george_active_context");
@@ -4098,6 +4144,9 @@ export default function Page({
           lastKnownState: "User exited LIVE mode.",
           suggestedRestart: "Resume this LIVE Conversation naturally.",
           metadata: {
+            normalSessionId: parentSessionId,
+            preparationSessionId: preparationSession?.preparationSessionId,
+            surface: "post_live",
             liveOutcomeObservation:
               typeof window !== "undefined"
                 ? JSON.parse(
@@ -4113,12 +4162,21 @@ export default function Page({
 
     setPreLiveMessages(null);
 
-    if (
-      typeof window !== "undefined" &&
-      window.location.pathname === "/george/live"
-    ) {
-      router.replace("/george");
+  };
+
+  const finishActiveBriefing = () => {
+    setShowConversationRecord(false);
+    const parentSessionId =
+      preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
+    if (parentSessionId) {
+      updateSessionLinkage(parentSessionId, { surface: "normal" });
     }
+    router.replace("/george");
+  };
+
+  const askWithinActiveBriefing = () => {
+    setShowConversationRecord(false);
+    window.setTimeout(() => textareaRef.current?.focus(), 0);
   };
   const startNewGeorgeSession = (
     openingMessage: Message,
@@ -4150,6 +4208,9 @@ export default function Page({
     }
     if (typeof window !== "undefined" && messagesRef.current.length > 1) {
       try {
+        const parentSessionId =
+          preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
+        const preparationSession = loadPreparationSession();
         saveSessionToV2({
           mode: liveMode ? "live" : "normal",
           title: liveMode
@@ -4167,6 +4228,13 @@ export default function Page({
           suggestedRestart: liveMode
             ? "Resume this LIVE Conversation naturally."
             : "Resume this GEORGE session from the clearest next step.",
+          metadata: liveMode
+            ? {
+                normalSessionId: parentSessionId,
+                preparationSessionId: preparationSession?.preparationSessionId,
+                surface: "live",
+              }
+            : undefined,
         });
       } catch {}
     }
@@ -6508,6 +6576,9 @@ I’ll stay with you.`,
   const startNewLiveConversation = () => {
     try {
       if (messagesRef.current.length > 2) {
+        const parentSessionId =
+          preLiveSessionIdRef.current || getActiveSessionIdForMode("normal");
+        const preparationSession = loadPreparationSession();
         saveSessionToV2({
           mode: "live",
           title: getActiveLiveDesiredOutcomeTitle("LIVE Conversation"),
@@ -6516,7 +6587,11 @@ I’ll stay with you.`,
           userGoal: "In progress",
           lastKnownState: "User started a new LIVE conversation.",
           suggestedRestart: "Resume this LIVE Conversation naturally.",
-          metadata: {},
+          metadata: {
+            normalSessionId: parentSessionId,
+            preparationSessionId: preparationSession?.preparationSessionId,
+            surface: "live",
+          },
         });
       }
 
@@ -9100,7 +9175,8 @@ I’ll stay with you.`,
                           <div className="fixed inset-0 z-[230] flex items-center justify-center bg-black george-motion-fade-soft/58 px-4 backdrop-blur-[14px]">
                             <PostLiveConversationRecordPanel
                               record={lastConversationRecord}
-                              onClose={() => setShowConversationRecord(false)}
+                              onClose={finishActiveBriefing}
+                              onAskGeorge={askWithinActiveBriefing}
                               onNextCall={beginNextRepeatedConversation}
                             />
                           </div>,

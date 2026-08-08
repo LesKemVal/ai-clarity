@@ -81,7 +81,9 @@ import { createRedisOperationalFormulaLibrary } from '@/lib/george/operational-m
 import {
   applyOperationalMemoryRetrievalPolicy,
   buildFormulaRetrievalContext,
+  isExplicitOperationalMemoryRequest,
   normalizeFormulaRetrievalType,
+  shouldRetrieveOperationalMemory,
 } from '@/lib/george/operational-memory/retrieval-policy'
 import { createOperationalMemoryRuntimeEvidence } from '@/lib/george/operational-memory/runtime-evidence'
 import { readGeorgeSession } from '@/lib/security/george-session'
@@ -950,16 +952,25 @@ LANGUAGE MODE: SPANISH
 
     let operationalMemoryEvidence = null
 
-    if (operationalMemoryUserId) {
+    const operationalMemoryContext =
+      body?.operationalMemoryContext &&
+      typeof body.operationalMemoryContext === 'object'
+        ? body.operationalMemoryContext
+        : {}
+    const currentOperationalContextSufficient = Boolean(
+      operationalMemoryContext.roomType &&
+      operationalMemoryContext.objectiveType
+    )
+    const shouldRetrieveCurrentOperationalMemory = shouldRetrieveOperationalMemory({
+      mode: currentRuntime === 'live_george' ? 'live' : 'normal',
+      explicitUserRequest: isExplicitOperationalMemoryRequest(latestUserRaw),
+      currentContextSufficient: currentOperationalContextSufficient,
+    })
+
+    if (operationalMemoryUserId && shouldRetrieveCurrentOperationalMemory) {
       const operationalMemoryRetrievalStartedAt = Date.now()
 
       try {
-        const operationalMemoryContext =
-          body?.operationalMemoryContext &&
-          typeof body.operationalMemoryContext === 'object'
-            ? body.operationalMemoryContext
-            : {}
-
         const operationalMemoryStartedAt = performance.now()
 
         const formulaContext = buildFormulaRetrievalContext({
@@ -997,6 +1008,8 @@ LANGUAGE MODE: SPANISH
           selectedCount: selected.length,
           evidenceInjected:
             operationalMemoryEvidence.formulas.length > 0,
+          runtime: currentRuntime,
+          explicitUserRequest: isExplicitOperationalMemoryRequest(latestUserRaw),
         })
       } catch (error) {
         console.error(
