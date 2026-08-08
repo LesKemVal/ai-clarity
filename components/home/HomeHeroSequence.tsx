@@ -127,22 +127,14 @@ export function HomeHeroSequence() {
           <div className="mt-8 min-h-[12rem] max-w-4xl sm:mt-10 sm:min-h-[14rem]">
             <div
               aria-live="polite"
-              className={`relative overflow-hidden george-motion-fade-soft min-h-[12rem] rounded-[16px] border border-[#4E7CFF]/45 bg-[#0A1022] px-5 py-6 text-white/80 shadow-[0_18px_55px_rgba(20,52,130,0.2)] transition-opacity duration-700 before:pointer-events-none before:absolute before:-inset-px before:rounded-[inherit] before:border before:border-transparent before:border-r-[#7EA1FF]/35 before:border-t-[#AEB6FF]/75 before:animate-[spin_7s_linear_infinite] motion-reduce:before:animate-none motion-reduce:transition-none sm:min-h-[14rem] sm:px-8 sm:py-8 ${
+              className={`george-motion-fade-soft min-h-[12rem] px-1 py-2 text-white/80 transition-opacity duration-700 motion-reduce:transition-none sm:min-h-[14rem] sm:px-2 sm:py-4 ${
                 messageVisible ? "opacity-100" : "opacity-0"
               }`}
             >
               <div className="relative z-10 flex items-center justify-between gap-4">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#AEB6FF]/78">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/68">
                 {OPERATIONAL_SECTIONS[sectionIndex].heading}
                 </p>
-                <div className="flex shrink-0 items-center gap-1.5" aria-label={`Rendering ${sectionIndex + 1} of ${OPERATIONAL_SECTIONS.length}`}>
-                  {OPERATIONAL_SECTIONS.map((_, index) => (
-                    <span
-                      key={index}
-                      className={`h-[3px] rounded-full transition-colors duration-500 motion-reduce:transition-none ${index === sectionIndex ? "w-6 bg-[#AEB6FF]" : "w-2 bg-[#4E7CFF]/35"}`}
-                    />
-                  ))}
-                </div>
               </div>
               <p className="relative z-10 mt-4 max-w-3xl text-[20px] font-medium leading-[1.55] sm:text-[28px] sm:leading-[1.45]">
                 {typedParagraph}
@@ -152,6 +144,11 @@ export function HomeHeroSequence() {
         </div>
 
         <div className="mt-auto w-full pt-8">
+          <div className="mb-4 flex items-center gap-1.5 px-1" aria-label={`Rendering ${sectionIndex + 1} of ${OPERATIONAL_SECTIONS.length}`}>
+            {OPERATIONAL_SECTIONS.map((_, index) => (
+              <span key={index} className={`h-[2px] rounded-full transition-colors duration-500 motion-reduce:transition-none ${index === sectionIndex ? "w-8 bg-[#4E7CFF]" : "w-3 bg-white/20"}`} />
+            ))}
+          </div>
           <div className="mx-auto grid max-w-[1040px] grid-cols-1 gap-2.5 md:grid-cols-3 md:gap-3">
             <button
               type="button"
@@ -188,6 +185,7 @@ export function HomeHeroSequence() {
           </div>
         </div>
       </div>
+
     </section>
   );
 }
